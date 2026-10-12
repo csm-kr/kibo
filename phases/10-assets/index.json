@@ -1,0 +1,9 @@
+{
+  "project": "KIBO",
+  "phase": "10-assets",
+  "steps": [
+    { "step": 0, "name": "footage-capture", "status": "pending" },
+    { "step": 1, "name": "deck-assets", "status": "pending" },
+    { "step": 2, "name": "qa", "status": "pending" }
+  ]
+}

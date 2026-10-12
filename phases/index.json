@@ -37,6 +37,10 @@
     {
       "dir": "9-polish",
       "status": "pending"
+    },
+    {
+      "dir": "10-assets",
+      "status": "pending"
     }
   ]
 }
