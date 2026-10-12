@@ -323,12 +323,12 @@ Pages: `/kiosk?k=<kioskId>` (`&demo=1` shows the tap counter and timer), `/assis
 |---|---|---|---|
 | `startTouch` | | ✓ | `idle → ordering` |
 | `setDineOption` | ✓ | ✓ | `connected → ordering`, or update in `ordering` |
-| `addToCart`, `updateCart`, `removeFromCart` | ✓ | ✓ | `ordering`; in `confirming` the change sends the session back to `ordering` |
+| `addToCart`, `updateCart`, `removeFromCart` | ✓ | ✓ | `ordering`; from `connected` the first cart change moves to `ordering` (the dine option can come later; `requestCheckout` asks for it); in `confirming` the change sends the session back to `ordering` |
 | `clearCart` | | ✓ | `ordering` or `confirming` → `ordering` with an empty cart (kiosk "clear all") |
 | `undoLastChange` | ✓ | ✓ | not in `paying` or `paid` |
 | `offerChoices` | ✓ | | any state before `paying` |
 | `callStaff` | ✓ | ✓ | any state |
-| `requestCheckout` | ✓ | ✓ | `ordering → confirming`; refused when the cart is empty; records `checkoutUtteranceSeq` and `checkoutAt` |
+| `requestCheckout` | ✓ | ✓ | `ordering → confirming`; refused when the cart is empty (`CONFLICT`); without a dine option it returns `NEEDS_CHOICE` with the two dine choices; records `checkoutUtteranceSeq` and `checkoutAt` |
 | `cancelCheckout` | ✓ | ✓ | `confirming → ordering`, cart unchanged ([Pick more], kiosk back button) |
 | `confirmCheckout` | ✓ | ✓ | `confirming → paying`; needs matching `cartVersion`. From the phone: either `source: "button"` (a tap on the confirm card) or an AI call with `utteranceSeq > checkoutUtteranceSeq` and at least 1.5 s after `checkoutAt` |
 | `editOrder` | | ✓ | `paying → confirming` (back to the review) |
@@ -382,7 +382,7 @@ LearnedAdapter normalizes the catalog into the items shape: ids generated from l
 | `cartVersion` | int | +1 on every cart change |
 | `phoneConnectedAt`, `phoneSeenAt` | epoch ms \| null | set by claim and phone pings; the kiosk shows "phone connected" and, after 60 s without a ping, "connection paused" |
 | `screen` | `{ category?, itemId? }` | what the kiosk should show |
-| `lastChange` | `{ lineId, source: voice\|text\|button\|touch, at }` | drives the 2 s highlight; "Added by AI" only for `voice` and `text` |
+| `lastChange` | `{ lineId, kind: add\|update\|remove\|undo\|clear, source: voice\|text\|button\|touch, at }` | drives the 2 s highlight and the status line ("Added by AI", "Changed by AI"); AI wording only for `voice` and `text` |
 | `pendingChoice` | `{ templateId, choices[{ kind: item\|variant\|option\|dine\|yesno, id }] } \| null` | question text and labels come from templates and menu data, never free text |
 | `staffCalled` | `{ reasonCode: unknown_info\|user_request\|stuck\|learned_mismatch, at } \| null` | fixed banner text on the kiosk; no free text in a public document |
 | `undoStack` | last 5 carts | |
