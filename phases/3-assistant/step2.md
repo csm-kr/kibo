@@ -33,7 +33,7 @@ Props: `{ kiosk; session; deviceToken; locale; onLocaleChange; mode: "phone" | "
 - **P6 done (status `paid`):** order number 100–140px in KIBO blue Space Grotesk 700, "We'll call your number at the counter.", kept until the user taps [Done], which clears messages and the cart view.
 - **P7 ended / taken** with one plain sentence and what to do next.
 - **PX overlays:** idle warning one minute before `expiresAt` with [Continue] (`ping` active), "Reconnecting…" while the stream is not open, staff-called confirmation.
-- Errors from commands or chat appear as plain sentences in the conversation (heuristic 9), never codes or red alerts; `RATE_LIMITED` suggests the buttons.
+- Errors from commands or chat appear as plain sentences in the conversation (heuristic 9) using `errorCopy(code, locale, detail)` from `src/lib/i18n/errors.ts`, never codes or red alerts; `RATE_LIMITED` suggests the buttons.
 - Accessibility: real buttons and inputs with labels; `aria-live="polite"` announces cart changes; focus moves to the confirm card when it opens; respects system font size (rem units).
 
 ### Page: `src/app/assistant/page.tsx`

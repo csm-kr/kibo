@@ -1,42 +1,56 @@
-# Step 3: kiosk-e2e
+# Step 3: kiosk-checkout
 
 ## Read first
-- `CLAUDE.md` and `docs/*.md` are in your prompt. Sections: TESTING ("End to end", "Measurements", "Evidence ledger"), PRD "Demo scenario" step 2 (touch order), UX "Flow A", "Flow B"; RULE R-001.
-- All kiosk code from steps 0–2: `src/app/kiosk/page.tsx`, `src/components/kiosk/*`, `src/lib/kiosk/*`, `src/lib/client/api.ts`, `src/hooks/*`.
+- `CLAUDE.md` and `docs/*.md` are in your prompt. Sections: UX "Flow A" A8–A11, "Exception flows" (phone disconnected, idle, change of mind at payment, staff), "Screen map" K6, K7, K8, KX; UI_QA "Visual standard" (time limits, motion); ARCHITECTURE "Session state machine", `confirmCheckout`, `editOrder`, `cardAction`, `staffCalled`, `phoneSeenAt`.
+- Files from steps 1–2: `src/components/kiosk/*`, `src/lib/kiosk/*`, `src/lib/i18n/kiosk.ts`, `src/lib/client/api.ts`, `src/hooks/*`, `src/app/kiosk/page.tsx`.
 
 Shell: only `npm`, `npx`, `node`, `python3`, `ls`, `mkdir`, `git status|diff|add|commit|log`.
 
 ## Task
-Browser end-to-end tests for the kiosk with Playwright Test, against the dev server with the in-memory store.
+Order review, virtual payment, order number, the kiosk banners, and demo counters. Pure helpers get tests first.
 
-### Setup
-- `npm install -D @playwright/test` and `npx playwright install chromium` (a cached Chromium may already exist).
-- `playwright.config.ts`: `testDir: "e2e"`, Chromium only, `webServer: { command: "npm run dev -- --port 3100", url: "http://localhost:3100/api/health", env: { STORE: "memory" }, reuseExistingServer: false }`, `use.baseURL = "http://localhost:3100"`, traces on first retry.
-- `package.json`: `"test:e2e": "playwright test"`. Make sure Vitest ignores `e2e/` (its include is `src/**`) and ESLint still passes.
+### Pure helpers (tests first): `src/lib/kiosk/timers.ts`
+- `idleWarning(session, now, clockOffset) → { show: boolean; secondsLeft: number }`: show during the last 60 s before `expiresAt`.
+- `phonePaused(session, now, clockOffset) → boolean`: a phone is connected and the last `phoneSeenAt` is more than 60 s ago.
+- `staffBannerVisible(session, now, clockOffset) → boolean`: `staffCalled` set within the last 60 s.
+- `doneCountdown(paidAt, now, clockOffset) → secondsLeft` (10 s).
 
-### Tests
-1. `e2e/kiosk-touch.spec.ts` (viewport 1080×1920): the **hero order by touch** on `/kiosk?k=malo&demo=1`: touch start → dine in → burger category → cheeseburger → set → side (keep fries M) → drink zero cola → ingredients no pickles → add → upsell "괜찮아요" → cheeseburger → set → drink cider → add → change both fries to large (open each line from the review or re-add as your UI allows; follow the simplest real kiosk path your UI offers) → order → review shows 2 lines and the server total → pay → card → card insert → approving → receipt "출력 안 함" → order number visible → countdown visible. Assert the total equals the server's total for that cart (14,800원 with both fries large) and read `data-taps` / `data-seconds`.
-2. `e2e/kiosk-mirror.spec.ts`: open `/kiosk?k=malo`, read the claim URL from the QR's `data-claim-url`, claim it with `fetch` (as the phone), send `addToCart` with the device token and `source: "voice"`; the kiosk shows the menu, the highlighted tile and the status line "AI가 담았어요"; then `requestCheckout` from the phone → the kiosk shows the review; a phone `confirmCheckout` with `source: "button"` → the kiosk shows payment. Also: a second claim of the same QR gets 409 with "Someone else is using this kiosk."
-3. `e2e/kiosk-states.spec.ts`: sold-out tile is not tappable and says 품절; a morning item outside its hours is marked unavailable (skip this assertion if the test runs between 05:00 and 10:30 KST); after `paid` the kiosk returns to the attract screen after the countdown with a new QR.
+### K6 order review (`ReviewScreen.tsx`, status `confirming`)
+"주문 내역을 확인해 주세요": every line with photo, `lineLabel` title and detail, quantity − / + (`updateCart` qty; at 1 the − asks to remove, `removeFromCart`), line price; dine option; total in Space Grotesk 700 ≥ 64px. Buttons: "메뉴 더 담기" (`cancelCheckout`) and "결제하기" (`confirmCheckout`, `source: "touch"`, with the session's `cartVersion`). A cart change sends the session back to `ordering` (server rule); the screen follows the stream.
 
-### Evidence
-Write the measured touch run to `evidence/touch-hero.json`: `{ date, taps, seconds, total, note: "automated Playwright run on /kiosk, not a human timing" }`. Add a row to the `docs/TESTING.md` evidence ledger: "Touch hero order on /kiosk (automated tap count)" with the value and the file. Seconds from an automated run are not a human measurement: say so in the row (R-001).
+### K7 payment (`PaymentScreen.tsx`, status `paying`)
+Local sub-steps: (1) payment method: "카드" enabled; "간편결제", "쿠폰" shown disabled with "지원하지 않아요" (coupons and wallets are out of scope, PRD); (2) "카드를 아래 투입구에 넣어 주세요" with an arrow and a slot drawing, a 0.5 s card-insert slide that runs only while waiting (static under `prefers-reduced-motion`), and a big "카드 넣기" button that simulates the insert (virtual payment, no real card); (3) "승인 중…" for 1.5 s, then `cardAction`. "주문 수정" (`editOrder`) is available in (1) and (2). Always show the total.
+
+### K8 done (`DoneScreen.tsx`, status `paid`)
+"영수증을 출력할까요?" ("출력" / "출력 안 함", both lead on; nothing prints), then the order number in Space Grotesk 700 at 200–280px, "번호를 부르면 카운터에서 받아 가세요", and a **visible 10 s countdown** "10초 후 처음 화면으로 돌아가요" (WCAG 2.2.1; UX A11). At 0 call `onNewSession()` (standalone `/kiosk` creates a fresh session and QR).
+
+### KX banners (`KioskBanners.tsx`, on every screen)
+- Staff called: fixed text by `reasonCode` ("직원을 불렀어요. 잠시만 기다려 주세요."), warning colors `#7A2E0E` on `#FFF1CC` with an icon, `role="status"`; never model text.
+- Connection paused: "휴대폰 연결이 잠시 끊겼어요. 화면을 눌러 계속할 수 있어요."
+- Idle warning: "계속 주문하시겠어요?" with seconds left and "계속하기" (sends `ping` with `active: true`). On expiry the stream reports `expired`; standalone `/kiosk` starts a new session.
+- AI status line from step 2 stays where it is.
+
+### Demo counters (`&demo=1` only)
+A small overlay in a corner of the canvas: tap count (every `pointerdown` on a button inside the canvas after K1) and elapsed time from the first tap after K1 until `paid`, frozen at `paid`. Text ≥ 40px. Hidden without `demo=1` (UX heuristic 8). Expose the final values as `data-taps` and `data-seconds` attributes for the E2E test.
+
+### Wire into `KioskScreen`
+Replace step 1's placeholders. Every screen keeps the small QR or "휴대폰 연결됨" (Flow B) and the banners.
 
 ## Acceptance criteria
 ```bash
 npm run lint
 npm run build
 npm run test
-npm run test:e2e
 ```
+Then a smoke test with `npm run dev` (memory store): drive one full order through the API with the kiosk token (`startTouch`, `setDineOption`, `addToCart`, `requestCheckout`, `confirmCheckout` touch, `cardAction`) and fetch `/kiosk`; stop the server.
 
 ## Verify
-1. Run the AC commands.
-2. If a test exposes a kiosk bug, fix the kiosk code (that is in scope) and say so in the summary; log anything you could not fix in `docs/ISSUE.md`.
+1. Run the AC commands and the smoke test.
+2. Check: total and order number sizes, countdown visible, no animation longer than 0.5 s except the 2 s highlight fade, reduced-motion rule present, banners use fixed copy from `src/lib/i18n/kiosk.ts`.
 3. Update this step in `phases/2-kiosk/index.json` (completed + summary / error / blocked).
 
 ## Do not
-- Do not point tests at Firestore or any external URL; `STORE=memory` only (I-006: tests never reach the network).
-- Do not weaken assertions to make a flaky UI pass; fix the cause (waits on stream updates, not fixed sleeps, except the 10 s countdown).
-- Do not publish a number without its evidence file (R-001).
+- Do not let anything but the kiosk's card action reach `paid`, and do not add a client shortcut that skips `confirming` (CLAUDE.md safety promise).
+- Do not show real payment brands, card networks or bank names.
+- Do not return to K1 without the visible countdown.
 - Break existing tests.
