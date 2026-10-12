@@ -56,6 +56,8 @@ export function MenuScreen(props: {
   kiosk: KioskData;
   session: Session;
   claimUrl: string | null;
+  /** Server time minus local time; lastChange.at is server time. */
+  clockOffset: number;
   send(type: CommandType, args: object): Promise<CommandReply | null>;
   onClaimUrl(claimUrl: string): void;
 }) {
@@ -72,10 +74,13 @@ export function MenuScreen(props: {
   const touchTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const pendingSeq = useRef(0);
 
-  // A new lastChange starts the 2 s ring; the change present when the menu opened is not replayed.
+  // A new lastChange starts the 2 s ring. The change present when the menu opened is replayed only if it is
+  // under 2 s old: a phone's first add is what moves the kiosk from K2 to K3 (Flow A6), an old one is not news.
   const lc = session.lastChange;
   const changeKey = lc ? `${lc.at}:${lc.kind}:${lc.lineId}:${lc.source}` : null;
-  const [seenKey, setSeenKey] = useState(changeKey);
+  const [seenKey, setSeenKey] = useState(() =>
+    lc && Date.now() + props.clockOffset - lc.at < RING_MS ? null : changeKey,
+  );
   const [flash, setFlash] = useState<Flash | null>(null);
   if (changeKey !== seenKey) {
     setSeenKey(changeKey);

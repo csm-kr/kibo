@@ -42,3 +42,7 @@ docs/ko/
 # local harness run logs
 .harness-logs/
 qa-output/
+
+# Playwright outputs
+test-results/
+playwright-report/

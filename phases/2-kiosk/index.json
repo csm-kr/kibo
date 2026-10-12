@@ -37,7 +37,10 @@
     {
       "step": 4,
       "name": "kiosk-e2e",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-12T23:43:10+0900",
+      "completed_at": "2026-10-12T23:55:00+0900",
+      "summary": "Playwright Test E2E for /kiosk (4 tests, Chromium, 1080x1920). playwright.config.ts: testDir e2e, workers 1 (shared per-IP limit), webServer 'npm run dev -- --port 3100' with STORE=memory, traces on first retry; package.json test:e2e; @playwright/test dev dep; test-results/ and playwright-report/ git-ignored; Vitest include stays src/**. e2e/helpers.ts: kioskRoot ([data-screen]), buttonWithText (button containing an exact text, inner locator rooted at the page), readClaim (img[data-claim-url] -> sessionId, claimToken), claim, command (uuid commandId, Bearer, asserts ok), storedKioskSession (localStorage kibo.kiosk.malo). kiosk-touch.spec: hero order on /kiosk?k=malo&demo=1; 'both fries to large' = [전체 삭제] + re-add both sets with fries L (no option edit on cart lines, I-039); asserts requestCheckout reply total 14800, 2 review lines, '14,800원', payment -> card -> 승인 중… -> 출력 안 함 -> 주문 번호 + timer; writes evidence/touch-hero.json on every run (41 taps; seconds are Playwright speed). kiosk-mirror.spec: claim via HTTP, voice addToCart -> K3 with k-ring tile and 'AI가 담았어요', setDineOption + requestCheckout -> review, button confirmCheckout -> payment, second claim 409 'Someone else is using this kiosk.'. kiosk-states.spec: 새우버거 disabled with 품절; 에그 머핀 '지금은 판매하지 않아요' (skipped 05:00-10:30 KST); paid via kiosk-token API -> countdown -> attract with a new QR. Kiosk fixes: I-037 MenuScreen replays a lastChange under 2 s old at mount (new clockOffset prop), so the phone's first add that opens K3 rings; I-038 DemoCounter key 'counter:<id>' (duplicate key with DoneScreen). I-039 logged (touch tap count inflated by clear-and-re-add; decide before 10/16). TESTING ledger row added. E2E passed twice in a row."
     },
     {
       "step": 5,

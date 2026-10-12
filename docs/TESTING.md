@@ -58,6 +58,7 @@ python3 design/prototype/e2e_check.py   # prototype state logic (42 checks)
 | Blind cafe with coverage audit (gpt-6.1-sol, dev only) | items 40/40, audit passed, example orders 2/5 | `spikes/blind-kiosk/results/blind-sol2/` | measured, dev only |
 | Coverage audit regression | 4/4 | `spikes/kibo-learn/test_audit.mjs` | measured |
 | Prototype hero order (reference only) | touch 19 taps vs 5 utterances + 4 phone taps + 3 kiosk taps | `design/prototype/e2e_check.py` | measured, not for the deck |
+| Touch hero order on `/kiosk` (automated tap count) | 41 taps, total 14,800원. Path: both sets added with fries M, then [전체 삭제] and both re-added with fries L, because the kiosk cannot change options on a cart line. The run's 3 s is Playwright speed, not a human timing | `evidence/touch-hero.json` (`e2e/kiosk-touch.spec.ts`, 10-12) | measured, taps only |
 | Touch vs voice on the real `/kiosk` | — | 10/16 measurement log | planned |
 | Latency (a)(b) | — | 10/14–16 measurements | planned |
 | Agent evaluation pass rate | — | 10/13 eval results | planned |

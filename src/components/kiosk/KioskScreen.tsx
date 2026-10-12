@@ -108,7 +108,14 @@ export function KioskScreen({ kiosk, session, kioskToken, claimUrl, demo, clockO
           onLarge={() => setLarge((v) => !v)}
         />
       ) : screen === "menu" && session ? (
-        <MenuScreen kiosk={kiosk} session={session} claimUrl={claimUrl} send={send} onClaimUrl={onClaimUrl} />
+        <MenuScreen
+          kiosk={kiosk}
+          session={session}
+          claimUrl={claimUrl}
+          clockOffset={clockOffset}
+          send={send}
+          onClaimUrl={onClaimUrl}
+        />
       ) : screen === "review" && session ? (
         <ReviewScreen kiosk={kiosk} session={session} claimUrl={claimUrl} send={send} onClaimUrl={onClaimUrl} />
       ) : screen === "payment" && session ? (
@@ -128,7 +135,8 @@ export function KioskScreen({ kiosk, session, kioskToken, claimUrl, demo, clockO
       {session && <KioskBanners kiosk={kiosk} session={session} kioskToken={kioskToken} clockOffset={clockOffset} />}
       {demo && (
         <DemoCounter
-          key={sessionId}
+          // DoneScreen, a sibling, is keyed by the bare session id.
+          key={`counter:${sessionId}`}
           locale={locale}
           taps={counted.count}
           startAt={counted.startAt}

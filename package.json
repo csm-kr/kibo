@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run --passWithNoTests",
+    "test:e2e": "playwright test",
     "test:firestore": "FIRESTORE_IT=1 STORE=firestore vitest run src/lib/store/firestore.it.test.ts"
   },
   "dependencies": {
@@ -20,6 +21,7 @@
     "zod": "^4.6.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.0",
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^24.19.2",
     "@types/qrcode": "^1.5.6",
