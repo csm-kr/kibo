@@ -39,6 +39,25 @@
   line-height: 1.2;
 }
 
+/* AI change on the kiosk (docs/UI_GUIDE.md "Components"): an 8px ring that holds, then fades within 2 s.
+   The component removes the class after 2 s, so with reduced motion the ring is static and simply goes. */
+@keyframes k-ring {
+  0%,
+  70% {
+    box-shadow: 0 0 0 8px var(--k-primary);
+  }
+  100% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+}
+@utility k-ring {
+  box-shadow: 0 0 0 8px var(--k-primary);
+  animation: k-ring 2s ease-out forwards;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

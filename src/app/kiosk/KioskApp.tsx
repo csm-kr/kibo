@@ -17,6 +17,7 @@ export function KioskApp({ kiosk, demo }: { kiosk: KioskData; demo: boolean }) {
         claimUrl={ks.claimUrl}
         demo={demo}
         onNewSession={() => void ks.newSession()}
+        onClaimUrl={ks.setClaimUrl}
       />
     </KioskCanvas>
   );

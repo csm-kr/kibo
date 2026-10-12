@@ -1,0 +1,13 @@
+{
+  "project": "KIBO",
+  "phase": "9-polish",
+  "steps": [
+    { "step": 0, "name": "design-review", "status": "pending" },
+    { "step": 1, "name": "polish-kiosk", "status": "pending" },
+    { "step": 2, "name": "polish-phone", "status": "pending" },
+    { "step": 3, "name": "compare-card", "status": "pending" },
+    { "step": 4, "name": "cost-measure", "status": "pending" },
+    { "step": 5, "name": "mic-test", "status": "pending" },
+    { "step": 6, "name": "qa", "status": "pending" }
+  ]
+}

@@ -2,11 +2,40 @@
   "project": "KIBO",
   "phase": "3-assistant",
   "steps": [
-    { "step": 0, "name": "agent-core", "status": "pending" },
-    { "step": 1, "name": "chat-api", "status": "pending" },
-    { "step": 2, "name": "assistant-ui", "status": "pending" },
-    { "step": 3, "name": "demo-mode", "status": "pending" },
-    { "step": 4, "name": "agent-eval", "status": "pending" },
-    { "step": 5, "name": "qa", "status": "pending" }
+    {
+      "step": 0,
+      "name": "core-hardening",
+      "status": "pending"
+    },
+    {
+      "step": 1,
+      "name": "agent-core",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "name": "chat-api",
+      "status": "pending"
+    },
+    {
+      "step": 3,
+      "name": "assistant-ui",
+      "status": "pending"
+    },
+    {
+      "step": 4,
+      "name": "demo-mode",
+      "status": "pending"
+    },
+    {
+      "step": 5,
+      "name": "agent-eval",
+      "status": "pending"
+    },
+    {
+      "step": 6,
+      "name": "qa",
+      "status": "pending"
+    }
   ]
 }

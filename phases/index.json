@@ -32,6 +32,10 @@
     {
       "dir": "8-scenarios",
       "status": "pending"
+    },
+    {
+      "dir": "9-polish",
+      "status": "pending"
     }
   ]
 }

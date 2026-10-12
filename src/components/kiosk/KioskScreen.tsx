@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import QRCode from "qrcode";
-import { useEffect, useState, type CSSProperties } from "react";
-import { ApiError, sendCommand } from "@/lib/client/api";
+import { useState, type CSSProperties, type ReactNode } from "react";
+import { useQrSrc } from "@/hooks/useQrSrc";
+import { ApiError, sendCommand, type CommandReply } from "@/lib/client/api";
 import type { ErrorDetail } from "@/lib/commands/errors";
 import type { CommandType } from "@/lib/commands/schemas";
 import { errorCopy, type ScreenErrorCode } from "@/lib/i18n/errors";
@@ -11,10 +11,10 @@ import { kt } from "@/lib/i18n/kiosk";
 import { kioskScreen } from "@/lib/kiosk/screen";
 import type { KioskData, Locale } from "@/types/menu";
 import type { DineOption, Session } from "@/types/session";
+import { MenuScreen } from "./MenuScreen";
+import { FOCUS } from "./styles";
 
 // All sizes are 1080x1920 canvas px (docs/UI_GUIDE.md). Text uses the k-text-* utilities (>= 40px).
-
-const FOCUS = "focus-visible:outline-[6px] focus-visible:outline-offset-4 focus-visible:outline-[#1E1B18]";
 
 interface Props {
   kiosk: KioskData;
@@ -24,9 +24,11 @@ interface Props {
   demo: boolean;
   /** Called when the session has ended or vanished; the owner decides how to get a new one. */
   onNewSession(): void;
+  /** [Connect another phone] issued a new QR; the owner stores it. */
+  onClaimUrl(claimUrl: string): void;
 }
 
-export function KioskScreen({ kiosk, session, kioskToken, claimUrl, demo, onNewSession }: Props) {
+export function KioskScreen({ kiosk, session, kioskToken, claimUrl, demo, onNewSession, onClaimUrl }: Props) {
   const locale = kiosk.locale;
   const sessionId = session?.sessionId ?? null;
   // Keyed by session, so a new session starts without the previous one's touch start.
@@ -37,17 +39,18 @@ export function KioskScreen({ kiosk, session, kioskToken, claimUrl, demo, onNewS
   const touchStarted = touch.forId === sessionId && touch.started;
   const screen = kioskScreen(session, { touchStarted });
 
-  async function send(type: CommandType, args: object): Promise<boolean> {
-    if (!session || !kioskToken) return false;
+  /** Sends a touch command; on failure shows the error copy and returns null. */
+  async function send(type: CommandType, args: object): Promise<CommandReply | null> {
+    if (!session || !kioskToken) return null;
     try {
-      await sendCommand({ sessionId: session.sessionId, token: kioskToken, type, args, source: "touch" });
+      const reply = await sendCommand({ sessionId: session.sessionId, token: kioskToken, type, args, source: "touch" });
       setError(null);
-      return true;
+      return reply;
     } catch (e) {
       const err = e instanceof ApiError ? e : new ApiError("INTERNAL", "");
       if (err.code === "GONE" || err.code === "NOT_FOUND") onNewSession();
       setError({ code: err.code, detail: err.detail });
-      return false;
+      return null;
     }
   }
 
@@ -69,6 +72,8 @@ export function KioskScreen({ kiosk, session, kioskToken, claimUrl, demo, onNewS
           onTouch={startTouch}
           onLarge={() => setLarge((v) => !v)}
         />
+      ) : screen === "menu" && session ? (
+        <MenuScreen kiosk={kiosk} session={session} claimUrl={claimUrl} send={send} onClaimUrl={onClaimUrl} />
       ) : (
         <>
           <Header kiosk={kiosk} />
@@ -88,7 +93,7 @@ export function KioskScreen({ kiosk, session, kioskToken, claimUrl, demo, onNewS
       {error && (
         <div
           role="alert"
-          className="absolute inset-x-12 bottom-12 flex items-center gap-8 rounded-[32px] border-4 border-[#7A2E0E] bg-[#FFF1CC] p-10 text-[#7A2E0E]"
+          className="absolute inset-x-12 bottom-12 z-40 flex items-center gap-8 rounded-[32px] border-4 border-[#7A2E0E] bg-[#FFF1CC] p-10 text-[#7A2E0E]"
         >
           <p className="k-text-40 flex-1 font-bold">{errorCopy(error.code, locale, error.detail)}</p>
           <button
@@ -104,7 +109,7 @@ export function KioskScreen({ kiosk, session, kioskToken, claimUrl, demo, onNewS
   );
 }
 
-function Header({ kiosk }: { kiosk: KioskData }) {
+export function Header({ kiosk, children }: { kiosk: KioskData; children?: ReactNode }) {
   // The wordmark is the store's logo, so it keeps one spelling in every language.
   const wordmark = kiosk.brand.name.en;
   return (
@@ -116,25 +121,9 @@ function Header({ kiosk }: { kiosk: KioskData }) {
         {wordmark[0]}
       </span>
       <span className="k-text-56 font-display font-bold tracking-wide text-(--k-bg)">{wordmark}</span>
+      {children}
     </header>
   );
-}
-
-function useQrSrc(url: string | null): string | null {
-  const [qr, setQr] = useState<{ url: string; src: string } | null>(null);
-  useEffect(() => {
-    if (!url) return;
-    let live = true;
-    QRCode.toString(url, { type: "svg", margin: 1, errorCorrectionLevel: "M", color: { dark: "#1E1B18", light: "#FFFFFF" } })
-      .then((svg) => {
-        if (live) setQr({ url, src: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}` });
-      })
-      .catch(() => {});
-    return () => {
-      live = false;
-    };
-  }, [url]);
-  return qr && qr.url === url ? qr.src : null;
 }
 
 function Attract(props: {
