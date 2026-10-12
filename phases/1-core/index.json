@@ -7,7 +7,8 @@
       "name": "menu-data",
       "status": "completed",
       "started_at": "2026-10-12T22:37:10+0900",
-      "summary": "data/kiosks/malo.json (MALO BURGER, 7 categories, 35 items; burgers single/set(+2000)/largeSet(+2700) with side default fries_m, drink no default, ingredients max 3; chicken_nuggets sauce required no default; cola/zero_cola/cider size default m; shrimp_burger sold out; morning 05:00-10:30 KST), src/types/menu.ts, src/lib/adapters/catalog.ts (kioskSchema zod strict, cached getKiosk throws CatalogError, findItem, groupsFor, findOption, isAvailableNow KST end-exclusive, localName), catalog.test.ts (20 tests), vitest.config.ts; deps zod 4, firebase-admin 14, @google/genai 2.28, qrcode"
+      "summary": "data/kiosks/malo.json (MALO BURGER, 7 categories, 35 items; burgers single/set(+2000)/largeSet(+2700) with side default fries_m, drink no default, ingredients max 3; chicken_nuggets sauce required no default; cola/zero_cola/cider size default m; shrimp_burger sold out; morning 05:00-10:30 KST), src/types/menu.ts, src/lib/adapters/catalog.ts (kioskSchema zod strict, cached getKiosk throws CatalogError, findItem, groupsFor, findOption, isAvailableNow KST end-exclusive, localName), catalog.test.ts (20 tests), vitest.config.ts; deps zod 4, firebase-admin 14, @google/genai 2.28, qrcode",
+      "completed_at": "2026-10-12T22:40:27+0900"
     },
     {
       "step": 1,
