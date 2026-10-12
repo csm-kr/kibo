@@ -159,6 +159,19 @@ describe("toolResult", () => {
 
   it("leaves upsell out when there is none", () => {
     expect(toolResult(k, "en", { ok: true, response: { ...response, result: {} } })).not.toHaveProperty("upsell");
+    expect(toolResult(k, "en", { ok: true, response: { ...response, result: {} } })).not.toHaveProperty("pending");
+  });
+
+  it("tells the model to wait while a learned kiosk replays the change", () => {
+    const pending: CommandResponse = { ok: true, pending: true, status: "ordering", cart: [], total: 0, cartVersion: 0, result: { pending: true } };
+    expect(toolResult(k, "en", { ok: true, response: pending })).toEqual({
+      ok: true,
+      pending: true,
+      message: "The kiosk is doing it now; say you are adding it and wait.",
+      status: "ordering",
+      total: 0,
+      cart: [],
+    });
   });
 
   it("lists the drink choices with names for NEEDS_CHOICE", () => {

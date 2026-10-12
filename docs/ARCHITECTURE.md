@@ -245,8 +245,8 @@ sequenceDiagram
     FS-->>P: onSnapshot, cart card
   else mismatch or step failed
     B->>KU: close dialogs, read the cart
-    B->>API: report failure with the kiosk's actual cart
-    API->>FS: cart overwritten from the kiosk, staff offered
+    B->>API: report failure (kiosk total and lines)
+    API->>FS: change not applied, staff called (learned_mismatch); kiosk text never stored
     FS-->>P: "Please check the kiosk screen"
   end
 ```
@@ -337,11 +337,11 @@ Pages: `/kiosk?k=<kioskId>` (`&demo=1` shows the tap counter and timer), `/assis
 | `editOrder` | | ✓ | `paying → confirming` (back to the review); sets `checkoutUtteranceSeq` to null and `checkoutAt` to now |
 | `cardAction` | | ✓ | `paying → paid`; issues the order number. Refused for learned kiosks (the user pays on the real kiosk). `/demo` sends it from the kiosk half of the page with the demo's `kioskToken` |
 | `reissueClaim` | | ✓ | any state before `paying`: new claim token and QR, the old `deviceToken` stops working ([Connect another phone]) |
-| `bridgeReport` | | ✓ | learned kiosks only: mirrors the kiosk's real cart (sequence 3) |
+| `bridgeReport` | | ✓ | learned kiosks only (`CONFLICT` on a direct kiosk). Args `{ commandId, ok, kioskTotal (int ≥ 0 \| null), kioskLines (≤ 20 × ≤ 120 chars) }`; `commandId` must be the pending one (`CONFLICT`). The server applies the pending change to its own cart with menu data; if `ok` and `kioskTotal` equals that cart's total, the change is applied (`lastChange.source` = the original command's source) and `bridgeStatus.lastOk` is true. Otherwise nothing is applied, `staffCalled` is `learned_mismatch` and `bridgeStatus.lastOk` is false. `kioskLines` are third-party page text: bounded, never stored (the bridge compares lines itself). The report keeps `pendingChoice` |
 
 - `utteranceSeq` is the phone's counter of finished user turns. With the 1.5 s wait it stops the model from chaining `requestCheckout` and `confirmCheckout` in one turn; the confirm card is still the real safeguard. In `/api/chat` one request counts as one utterance. The server only knows a seq the phone's AI sent with `requestCheckout`; when the kiosk opened the review or `editOrder` reopened it, no later utterance can be proven, so only a tap on the card confirms.
-- A tap on a choice button is sent to the agent as the user's answer (the button's label, counted as a new utterance), because the agent holds the half-finished order the question belongs to; the agent then calls the tool. Dine choices send `setDineOption` directly, and the confirm card's [Yes, pay now] sends `confirmCheckout` with `source: "button"`. Any accepted command clears `pendingChoice`.
-- **Learned kiosks:** a cart command is stored in `pendingBridgeCommand` and answered `{ ok: true, pending: true }`; the phone waits for the bridge's `bridgeReport` through `onSnapshot`. After 15 s without a report the phone shows "Please check the kiosk screen" and offers staff. A second command while one is pending gets `CONFLICT`. Learned sessions end at `confirming`: the user pays on the kiosk itself.
+- A tap on a choice button is sent to the agent as the user's answer (the button's label, counted as a new utterance), because the agent holds the half-finished order the question belongs to; the agent then calls the tool. Dine choices send `setDineOption` directly, and the confirm card's [Yes, pay now] sends `confirmCheckout` with `source: "button"`. Any accepted command except `bridgeReport` clears `pendingChoice`.
+- **Learned kiosks:** `setDineOption`, `addToCart` and `removeFromCart` are validated as on a direct kiosk, then stored in `pendingBridgeCommand` without changing the session and answered `{ ok: true, pending: true, status, cart, total, cartVersion }` (`result.pending`); the phone waits for the bridge's `bridgeReport` through `onSnapshot`. After 15 s without a report the phone shows "Please check the kiosk screen" and offers staff. While one is pending, those three, `undoLastChange` and `requestCheckout` get `CONFLICT` "The kiosk is still working on your last request."; a pending command older than 20 s counts as failed (cleared, `learned_mismatch`, `bridgeStatus.lastOk` false), also when its late report arrives. `updateCart` gets `CONFLICT` "On this kiosk, please remove the item and add it again."; `undoLastChange` works only when the last change was an add that made a new line, and becomes a pending `removeFromCart` of it. Learned sessions end at `confirming`: `confirmCheckout`, `editOrder`, `cardAction` and `clearCart` get `CONFLICT` "Please finish and pay on the kiosk screen.", and the user pays on the kiosk itself. Nothing is retried automatically.
 
 ### `/api/command` processing order
 1. Parse with zod (`BAD_REQUEST`); `sessionId` must match `^[A-Za-z0-9_-]{16,64}$` (the same check on every route that takes one).
@@ -350,7 +350,7 @@ Pages: `/kiosk?k=<kioskId>` (`&demo=1` shows the tap counter and timer), `/assis
 4. If `commandId` is in `recentCommandIds`, return the current state with the stored `result` from `sessionSecrets.recentResults`, write nothing (except a repeated `reissueClaim`, which rotates the claim again).
 5. Check the state machine (`CONFLICT`, `GONE`).
 6. Validate against the adapter's catalog: item exists, options belong to the item, required groups, min/max, hours, sold out (`NEEDS_CHOICE`, `SOLD_OUT`, `UNAVAILABLE`).
-7. For commands that change the cart: build the new cart (prices and total come from menu data, never from arguments), `cartVersion + 1`, push the old cart on `undoStack`, set `lastChange`. For every accepted command: set `status` and `screen`, clear `pendingChoice`, append `commandId`, extend `expiresAt`.
+7. For commands that change the cart: build the new cart (prices and total come from menu data, never from arguments), `cartVersion + 1`, push the old cart on `undoStack`, set `lastChange`. On a learned kiosk a cart change waits in `pendingBridgeCommand` and is built this way only when the matching `bridgeReport` arrives. For every accepted command: set `status` and `screen`, clear `pendingChoice` (not on `bridgeReport`), append `commandId`, extend `expiresAt`.
 8. Commit. Firestore retries the transaction on contention, so touch and AI changes at the same moment serialize instead of overwriting each other.
 
 ## Database (Firestore)
@@ -401,7 +401,8 @@ recipes{startOrder, addToCart, removeLine, ...}, cartTotalPattern, cartLinePatte
 | `checkoutUtteranceSeq`, `checkoutAt` | int \| null, timestamp | set by `requestCheckout` (seq null when the kiosk opened the review); `editOrder` sets the seq to null and `checkoutAt` to now |
 | `upsellOffered` | bool | the dessert offer is made once per order: the first accepted `addToCart` that matches an upsell rule sets it and returns `result.upsell { offerItemIds }`, which the kiosk (touch) and the AI both use |
 | `orderNumber`, `paidAt` | int, timestamp | set by `cardAction` |
-| `pendingBridgeCommand` | `{ commandId, type, args, at } \| null` | learned kiosks, one at a time |
+| `pendingBridgeCommand` | `{ commandId, type: setDineOption\|addToCart\|removeFromCart, args, lineIndex? (remove: the line's position), source, at } \| null` | learned kiosks, one at a time; ids and catalog values only |
+| `bridgeStatus` | `{ lastOk, at } \| null` | learned kiosks: the bridge's last result, for the phone's "Please check the kiosk screen" |
 | `createdAt`, `lastSeenAt`, `expiresAt` | timestamp | TTL deletes on `expiresAt` |
 
 Worst case (20 lines × 6 carts) stays far below the 1 MiB document limit. Sessions hold no personal data: the session id is printed in a public QR, so anyone holding it can read the cart.

@@ -21,6 +21,8 @@ export interface CreateResult {
 
 export interface CommandResponse {
   ok: true;
+  /** Learned kiosks: accepted, and the cart changes once the bridge reports the kiosk's own screen. */
+  pending?: true;
   status: SessionStatus;
   cart: CartLine[];
   total: number;
@@ -144,6 +146,7 @@ export async function runCommand(
     const { session, result, duplicate } = applied;
     const response: CommandResponse = {
       ok: true,
+      ...(result.pending ? { pending: true as const } : {}),
       status: session.status,
       cart: session.cart,
       total: session.total,
@@ -162,6 +165,7 @@ export async function runCommand(
     if (duplicate) {
       const stored = sec.recentResults?.find((r) => r.commandId === cmd.commandId);
       response.result = stored?.result ?? result;
+      if (response.result.pending) response.pending = true;
       response.duplicate = true;
       // The first answer's claim token was never stored. Its QR is already void, so rotating again is safe,
       // but only in the states where reissueClaim itself is accepted.

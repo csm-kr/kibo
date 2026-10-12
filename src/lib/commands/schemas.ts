@@ -65,6 +65,17 @@ const commandSchema = z.discriminatedUnion("type", [
     }),
   ),
   command("callStaff", z.strictObject({ reasonCode: z.enum(["unknown_info", "user_request", "stuck", "learned_mismatch"]) })),
+  // Learned kiosks: what the bridge saw after replaying the pending command. The lines are third-party page text,
+  // bounded here and never stored.
+  command(
+    "bridgeReport",
+    z.strictObject({
+      commandId: z.string().min(1).max(128),
+      ok: z.boolean(),
+      kioskTotal: z.number().int().min(0).nullable(),
+      kioskLines: z.array(z.string().max(120)).max(20),
+    }),
+  ),
 ]);
 
 export type Command = z.infer<typeof commandSchema>;

@@ -1,10 +1,20 @@
 import { findItem, isAvailableNow } from "@/lib/adapters/catalog";
 import type { KioskData } from "@/types/menu";
-import type { Actor, CartLine, ChangeKind, Session, SessionStatus } from "@/types/session";
+import type {
+  Actor,
+  BridgeChange,
+  CartLine,
+  ChangeKind,
+  DineOption,
+  PendingBridgeCommand,
+  Session,
+  SessionStatus,
+  Source,
+} from "@/types/session";
 import { ACTOR_COMMANDS, ACTOR_SOURCES } from "./actors";
 import { addLine, cartTotal, removeLine, updateLine } from "./cart";
 import { type ChoiceRef, CommandError } from "./errors";
-import type { Command } from "./schemas";
+import type { Command, CommandType } from "./schemas";
 import { SESSION_TTL_MS } from "./session";
 
 // Pure session state machine: no clock, env or storage; everything comes through ctx.
@@ -26,6 +36,8 @@ export interface CommandContext {
 export interface CommandResult {
   upsell?: { offerItemIds: string[] };
   lineId?: string;
+  /** Learned kiosks: accepted and waiting for the bridge to replay it. */
+  pending?: true;
 }
 
 export const BEFORE_PAYING: SessionStatus[] = ["idle", "connected", "ordering", "confirming"];
@@ -37,7 +49,7 @@ function requireStatus(s: Session, allowed: SessionStatus[], message: string): v
 
 function withCart(
   s: Session,
-  cmd: Command,
+  source: Source,
   ctx: CommandContext,
   change: { cart: CartLine[]; undoStack: CartLine[][]; lineId: string | null; kind: ChangeKind; itemId: string | null },
 ): Session {
@@ -49,9 +61,17 @@ function withCart(
     total: cartTotal(change.cart),
     cartVersion: s.cartVersion + 1,
     undoStack: change.undoStack,
-    lastChange: { lineId: change.lineId, kind: change.kind, source: cmd.source, at: ctx.now },
+    lastChange: { lineId: change.lineId, kind: change.kind, source, at: ctx.now },
     screen: item ? { category: item.category, itemId: item.itemId } : s.screen,
   };
+}
+
+function withDineOption(s: Session, option: DineOption): Session {
+  const status = s.status === "confirming" ? "confirming" : "ordering";
+  // The confirm card shows the dine option, so a change during the review must make an open card stale.
+  const changed = s.status === "confirming" && s.dineOption !== option;
+  const cartVersion = changed ? s.cartVersion + 1 : s.cartVersion;
+  return { ...s, status, dineOption: option, cartVersion };
 }
 
 function pushUndo(s: Session): CartLine[][] {
@@ -114,17 +134,13 @@ function transition(s: Session, cmd: Command, ctx: CommandContext): { next: Sess
     case "setDineOption": {
       const allowed: SessionStatus[] = ctx.actor === "kiosk" ? ["idle", ...CART_EDITABLE] : CART_EDITABLE;
       requireStatus(s, allowed, "The order can no longer be changed.");
-      const status = s.status === "confirming" ? "confirming" : "ordering";
-      // The confirm card shows the dine option, so a change during the review must make an open card stale.
-      const changed = s.status === "confirming" && s.dineOption !== cmd.args.option;
-      const cartVersion = changed ? s.cartVersion + 1 : s.cartVersion;
-      return { next: { ...s, status, dineOption: cmd.args.option, cartVersion }, result: {} };
+      return { next: withDineOption(s, cmd.args.option), result: {} };
     }
 
     case "addToCart": {
       requireStatus(s, CART_EDITABLE, "Please start an order first.");
       const { cart, lineId } = addLine(k, s.cart, cmd.args, ctx.now, ctx.newLineId);
-      let next = withCart(s, cmd, ctx, { cart, undoStack: pushUndo(s), lineId, kind: "add", itemId: cmd.args.itemId });
+      let next = withCart(s, cmd.source, ctx, { cart, undoStack: pushUndo(s), lineId, kind: "add", itemId: cmd.args.itemId });
       const result: CommandResult = { lineId };
       if (!s.upsellOffered) {
         const offer = upsellOffer(k, cmd.args.itemId, ctx.now);
@@ -141,7 +157,7 @@ function transition(s: Session, cmd: Command, ctx: CommandContext): { next: Sess
       const { lineId, changes } = cmd.args;
       const cart = updateLine(k, s.cart, lineId, changes, ctx.now);
       const itemId = lineItemId(s, lineId);
-      return { next: withCart(s, cmd, ctx, { cart, undoStack: pushUndo(s), lineId, kind: "update", itemId }), result: {} };
+      return { next: withCart(s, cmd.source, ctx, { cart, undoStack: pushUndo(s), lineId, kind: "update", itemId }), result: {} };
     }
 
     case "removeFromCart": {
@@ -149,19 +165,19 @@ function transition(s: Session, cmd: Command, ctx: CommandContext): { next: Sess
       const { lineId } = cmd.args;
       const cart = removeLine(s.cart, lineId);
       const itemId = lineItemId(s, lineId);
-      return { next: withCart(s, cmd, ctx, { cart, undoStack: pushUndo(s), lineId, kind: "remove", itemId }), result: {} };
+      return { next: withCart(s, cmd.source, ctx, { cart, undoStack: pushUndo(s), lineId, kind: "remove", itemId }), result: {} };
     }
 
     case "clearCart":
       requireStatus(s, ["ordering", "confirming"], "The order can no longer be changed.");
-      return { next: withCart(s, cmd, ctx, { cart: [], undoStack: pushUndo(s), lineId: null, kind: "clear", itemId: null }), result: {} };
+      return { next: withCart(s, cmd.source, ctx, { cart: [], undoStack: pushUndo(s), lineId: null, kind: "clear", itemId: null }), result: {} };
 
     case "undoLastChange": {
       requireStatus(s, BEFORE_PAYING, "The order can no longer be changed.");
       if (s.undoStack.length === 0) throw new CommandError("CONFLICT", "Nothing to undo.");
       const cart = s.undoStack[s.undoStack.length - 1];
       const undoStack = s.undoStack.slice(0, -1);
-      return { next: withCart(s, cmd, ctx, { cart, undoStack, lineId: null, kind: "undo", itemId: null }), result: {} };
+      return { next: withCart(s, cmd.source, ctx, { cart, undoStack, lineId: null, kind: "undo", itemId: null }), result: {} };
     }
 
     case "offerChoices": {
@@ -223,6 +239,125 @@ function transition(s: Session, cmd: Command, ctx: CommandContext): { next: Sess
       // The session service rotates the claim and device secrets; the machine only checks the state.
       requireStatus(s, BEFORE_PAYING, "A new phone cannot connect during payment.");
       return { next: s, result: {} };
+
+    case "bridgeReport":
+      throw new CommandError("CONFLICT", NO_BRIDGE_CHANGE);
+  }
+}
+
+// Learned kiosks (KIBO Learn): the kiosk page is the source of truth. A cart change is validated here, then waits in
+// pendingBridgeCommand until the bridge replays it and reports the kiosk's total. Nothing is retried automatically
+// (double-add risk), and the order ends at `confirming`: the user pays on the kiosk itself.
+
+/** A pending replay older than this counts as failed (the phone gives up waiting after 15 s). */
+export const BRIDGE_TIMEOUT_MS = 20_000;
+
+const KIOSK_BUSY = "The kiosk is still working on your last request.";
+const PAY_ON_KIOSK = "Please finish and pay on the kiosk screen.";
+const NO_BRIDGE_CHANGE = "There is no kiosk change waiting for this report.";
+/** Commands that would act on a cart the kiosk has not finished changing. */
+const WAITS_FOR_BRIDGE: CommandType[] = ["setDineOption", "addToCart", "removeFromCart", "undoLastChange", "requestCheckout"];
+
+function bridgeFailed(s: Session, now: number): Session {
+  return {
+    ...s,
+    pendingBridgeCommand: null,
+    staffCalled: { reasonCode: "learned_mismatch", at: now },
+    bridgeStatus: { lastOk: false, at: now },
+  };
+}
+
+function isStale(p: PendingBridgeCommand, now: number): boolean {
+  return now - p.at > BRIDGE_TIMEOUT_MS;
+}
+
+/** The session after the pending change, built from menu data exactly as on a direct kiosk. */
+function applyBridgeChange(s: Session, p: PendingBridgeCommand, ctx: CommandContext): Session {
+  switch (p.type) {
+    case "setDineOption":
+      return withDineOption(s, p.args.option);
+    case "addToCart": {
+      const { cart, lineId } = addLine(ctx.kiosk, s.cart, p.args, ctx.now, ctx.newLineId);
+      return withCart(s, p.source, ctx, { cart, undoStack: pushUndo(s), lineId, kind: "add", itemId: p.args.itemId });
+    }
+    case "removeFromCart": {
+      const { lineId } = p.args;
+      const cart = removeLine(s.cart, lineId);
+      return withCart(s, p.source, ctx, { cart, undoStack: pushUndo(s), lineId, kind: "remove", itemId: lineItemId(s, lineId) });
+    }
+  }
+}
+
+function learnedTransition(s: Session, cmd: Command, ctx: CommandContext): { next: Session; result: CommandResult } {
+  const p = s.pendingBridgeCommand;
+  // A replay that never reported is a failure; the next command clears it and goes on.
+  const base = p && isStale(p, ctx.now) ? bridgeFailed(s, ctx.now) : s;
+  if (base.pendingBridgeCommand && WAITS_FOR_BRIDGE.includes(cmd.type)) throw new CommandError("CONFLICT", KIOSK_BUSY);
+
+  const wait = (change: BridgeChange) => ({
+    next: { ...base, pendingBridgeCommand: { ...change, commandId: cmd.commandId, source: cmd.source, at: ctx.now } },
+    result: { pending: true as const },
+  });
+
+  switch (cmd.type) {
+    case "setDineOption": {
+      const allowed: SessionStatus[] = ctx.actor === "kiosk" ? ["idle", ...CART_EDITABLE] : CART_EDITABLE;
+      requireStatus(base, allowed, "The order can no longer be changed.");
+      return wait({ type: "setDineOption", args: { option: cmd.args.option } });
+    }
+
+    case "addToCart":
+      requireStatus(base, CART_EDITABLE, "Please start an order first.");
+      // Validation only: the line is added when the bridge reports the kiosk's total.
+      addLine(ctx.kiosk, base.cart, cmd.args, ctx.now, ctx.newLineId);
+      return wait({ type: "addToCart", args: cmd.args });
+
+    case "removeFromCart": {
+      requireStatus(base, CART_EDITABLE, "The order can no longer be changed.");
+      const lineIndex = base.cart.findIndex((l) => l.lineId === cmd.args.lineId);
+      if (lineIndex < 0) throw new CommandError("BAD_REQUEST", "That item is no longer in the cart.");
+      return wait({ type: "removeFromCart", args: { lineId: cmd.args.lineId }, lineIndex });
+    }
+
+    case "undoLastChange": {
+      requireStatus(base, BEFORE_PAYING, "The order can no longer be changed.");
+      const lineId = base.lastChange?.kind === "add" ? base.lastChange.lineId : null;
+      const lineIndex = base.cart.findIndex((l) => l.lineId === lineId);
+      const before = base.undoStack.at(-1);
+      // Removing the line undoes only an add that made a new line; an add that raised a quantity would lose more.
+      if (lineId === null || lineIndex < 0 || !before || before.some((l) => l.lineId === lineId)) {
+        throw new CommandError("CONFLICT", "On this kiosk, only the last added item can be undone.");
+      }
+      return wait({ type: "removeFromCart", args: { lineId }, lineIndex });
+    }
+
+    case "updateCart":
+      throw new CommandError("CONFLICT", "On this kiosk, please remove the item and add it again.");
+
+    case "confirmCheckout":
+    case "editOrder":
+    case "cardAction":
+    case "clearCart":
+      throw new CommandError("CONFLICT", PAY_ON_KIOSK);
+
+    case "bridgeReport": {
+      if (!p || p.commandId !== cmd.args.commandId) throw new CommandError("CONFLICT", NO_BRIDGE_CHANGE);
+      if (isStale(p, ctx.now)) return { next: bridgeFailed(s, ctx.now), result: {} };
+      let expected: Session | null = null;
+      try {
+        expected = applyBridgeChange(s, p, ctx);
+      } catch (e) {
+        if (!(e instanceof CommandError)) throw e;
+      }
+      // Only the total is compared here; kioskLines are third-party page text and never enter the session.
+      if (!cmd.args.ok || expected === null || cmd.args.kioskTotal !== expected.total) {
+        return { next: bridgeFailed(s, ctx.now), result: {} };
+      }
+      return { next: { ...expected, pendingBridgeCommand: null, bridgeStatus: { lastOk: true, at: ctx.now } }, result: {} };
+    }
+
+    default:
+      return transition(base, cmd, ctx);
   }
 }
 
@@ -245,11 +380,13 @@ export function applyCommand(
     throw new CommandError("CONFLICT", "This order is already paid.");
   }
 
-  const { next, result } = transition(s, cmd, ctx);
+  const { next, result } = ctx.kiosk.kind === "learned" ? learnedTransition(s, cmd, ctx) : transition(s, cmd, ctx);
+  // The bridge's report is not a user answer, so an open question stays open.
+  const keepsChoice = cmd.type === "offerChoices" || cmd.type === "bridgeReport";
   return {
     session: {
       ...next,
-      pendingChoice: cmd.type === "offerChoices" ? next.pendingChoice : null,
+      pendingChoice: keepsChoice ? next.pendingChoice : null,
       recentCommandIds: [...s.recentCommandIds, cmd.commandId].slice(-RECENT_COMMANDS),
       lastSeenAt: ctx.now,
       expiresAt: ctx.now + SESSION_TTL_MS,

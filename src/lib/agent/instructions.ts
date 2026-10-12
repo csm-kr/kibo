@@ -62,6 +62,15 @@ export function buildInstructions(
     "Payment happens on the kiosk with a card. You never pay and cannot complete a payment.",
     "Status confirming means the confirm card is showing; paying means the user is paying at the kiosk; do not change the cart then.",
     "",
+    ...(kiosk.kind === "learned"
+      ? [
+          "## This kiosk",
+          "This kiosk is operated by replaying its own screens. Changes take a few seconds.",
+          "To change an item, remove it and add it again.",
+          "The user pays on the kiosk itself after the confirm card.",
+          "",
+        ]
+      : []),
     "## Current order",
     `Status: ${opts.status ?? "connected"}`,
     `Dine option: ${opts.dineOption ?? "not chosen"}`,

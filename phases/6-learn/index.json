@@ -13,7 +13,10 @@
     {
       "step": 1,
       "name": "bridge-server",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-13T03:46:06+0900",
+      "summary": "Session gains pendingBridgeCommand ({commandId, type setDineOption|addToCart|removeFromCart, args, lineIndex (remove only), source, at}; types BridgeChange/PendingBridgeCommand in src/types/session.ts) and bridgeStatus {lastOk, at}; newSession null, both in toPublicSession (the bridge reads pending via SSE). machine.ts: applyCommand routes kiosk.kind 'learned' to learnedTransition: setDineOption/addToCart/removeFromCart validated as direct then stored pending, result {pending:true}; undo only after an add that made a new line -> pending removeFromCart; updateCart CONFLICT 'On this kiosk, please remove the item and add it again.'; confirmCheckout/editOrder/cardAction/clearCart CONFLICT 'Please finish and pay on the kiosk screen.'; while pending, the three + undo + requestCheckout get CONFLICT 'The kiosk is still working on your last request.' (callStaff/offerChoices/cancelCheckout still work); pending older than BRIDGE_TIMEOUT_MS 20 s -> cleared, staffCalled learned_mismatch, bridgeStatus false (also on its late report). New kiosk-only command bridgeReport {commandId, ok, kioskTotal int>=0|null, kioskLines <=20x<=120} (schemas, ACTOR_COMMANDS.kiosk); server rebuilds the change with cart.ts and applies only if ok && kioskTotal === expected total (lastChange.source = original source), else mismatch; kioskLines never stored or compared server-side (bridge compares lines in step 2); bridgeReport keeps pendingChoice; CONFLICT on direct kiosks. withCart now takes source; withDineOption extracted. service: CommandResponse.pending (also on duplicates). Agent: toolResult adds pending + 'The kiosk is doing it now; say you are adding it and wait.'; toolDeclarations omits updateCart/confirmCheckout for learned (7); buildInstructions adds a '## This kiosk' section for learned. Tests in machine/service/tools/mapping/instructions tests. ARCHITECTURE, UX synced; I-094 logged.",
+      "completed_at": "2026-10-13T04:20:00+0900"
     },
     {
       "step": 2,

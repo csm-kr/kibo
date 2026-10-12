@@ -89,4 +89,18 @@ describe("buildInstructions", () => {
   it("never uses technical words in what it asks the model to say", () => {
     expect(text).toMatch(/never say technical words/i);
   });
+
+  it("explains replay, remove-and-add and paying on the kiosk only for a learned kiosk", () => {
+    const LEARNED = [
+      "This kiosk is operated by replaying its own screens.",
+      "Changes take a few seconds.",
+      "To change an item, remove it and add it again.",
+      "The user pays on the kiosk itself after the confirm card.",
+    ];
+    const learned = buildInstructions(getKiosk("doughhouse"), { locale: "en" });
+    for (const line of LEARNED) {
+      expect(learned).toContain(line);
+      expect(text).not.toContain(line);
+    }
+  });
 });

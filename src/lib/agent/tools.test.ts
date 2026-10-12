@@ -72,4 +72,20 @@ describe("toolDeclarations", () => {
       expect(params(name).properties).toEqual({});
     }
   });
+
+  it("leaves updateCart and confirmCheckout out for a learned kiosk (7 tools)", () => {
+    const dh = getKiosk("doughhouse");
+    const learned = toolDeclarations(dh);
+    expect(learned.map((d) => d.name)).toEqual([
+      "setDineOption",
+      "addToCart",
+      "removeFromCart",
+      "undoLastChange",
+      "offerChoices",
+      "callStaff",
+      "requestCheckout",
+    ]);
+    const itemIds = (learned[1].parametersJsonSchema as Schema).properties!.itemId.enum;
+    expect(itemIds).toEqual(dh.items.map((i) => i.itemId));
+  });
 });

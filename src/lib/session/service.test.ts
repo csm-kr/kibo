@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CommandError } from "@/lib/commands/errors";
+import { CommandError, HTTP_STATUS } from "@/lib/commands/errors";
 import { SESSION_TTL_MS } from "@/lib/commands/session";
 import { MemoryStore } from "@/lib/store/memory";
 import { hashToken } from "@/lib/tokens";
@@ -320,5 +320,52 @@ describe("bumpSessionCounter", () => {
     expect(await code(bumpSessionCounter(store, input(deviceToken, "nope"), T0))).toBe("NOT_FOUND");
     expect(await code(bumpSessionCounter(store, input(deviceToken), T0 + SESSION_TTL_MS + 1))).toBe("GONE");
     expect((await store.get(sessionId))?.status).toBe("expired");
+  });
+});
+
+describe("learned kiosk commands", () => {
+  const PIZZA = { itemId: "margherita", selections: { size: ["large"], dough: ["thin"] } };
+
+  async function learned() {
+    const store = new MemoryStore();
+    const created = await createSession(store, { kioskId: "doughhouse" }, T0);
+    const { deviceToken } = await claimSession(store, { sessionId: created.sessionId, claimToken: created.claimToken }, T0);
+    return { store, deviceToken, ...created };
+  }
+
+  it("a phone add answers pending; the bridge's matching report applies it", async () => {
+    const { store, sessionId, kioskToken, deviceToken } = await learned();
+    const add = body(sessionId, "addToCart", PIZZA, { source: "voice", utteranceSeq: 1 });
+    const res = await runCommand(store, { body: add, bearer: deviceToken }, T0 + 1);
+    expect(res).toEqual({ ok: true, pending: true, status: "connected", cart: [], total: 0, cartVersion: 0, result: { pending: true } });
+
+    // A retry of the same command is answered pending again and applies nothing.
+    const again = await runCommand(store, { body: add, bearer: deviceToken }, T0 + 2);
+    expect(again).toMatchObject({ pending: true, duplicate: true });
+
+    const reportBody = body(sessionId, "bridgeReport", { commandId: add.commandId, ok: true, kioskTotal: 19900, kioskLines: [] });
+    const done = await runCommand(store, { body: reportBody, bearer: kioskToken }, T0 + 3);
+    expect(done.pending).toBeUndefined();
+    expect(done.cart).toHaveLength(1);
+    expect(done.total).toBe(19900);
+    expect((await store.get(sessionId))?.lastChange?.source).toBe("voice");
+  });
+
+  it("bridgeReport with the phone token → FORBIDDEN (403)", async () => {
+    const { store, sessionId, deviceToken } = await learned();
+    const add = body(sessionId, "addToCart", PIZZA, { source: "voice" });
+    await runCommand(store, { body: add, bearer: deviceToken }, T0 + 1);
+    const reportBody = body(sessionId, "bridgeReport", { commandId: add.commandId, ok: true, kioskTotal: 19900, kioskLines: [] }, {
+      source: "button",
+    });
+    const err = await runCommand(store, { body: reportBody, bearer: deviceToken }, T0 + 2).catch((e) => e);
+    expect(err).toBeInstanceOf(CommandError);
+    expect(err.code).toBe("FORBIDDEN");
+    expect(HTTP_STATUS[(err as CommandError).code]).toBe(403);
+  });
+
+  it("cardAction on a learned kiosk → CONFLICT", async () => {
+    const { store, sessionId, kioskToken } = await learned();
+    expect(await code(runCommand(store, { body: body(sessionId, "cardAction"), bearer: kioskToken }, T0 + 1))).toBe("CONFLICT");
   });
 });

@@ -71,5 +71,9 @@ export function toolDeclarations(k: KioskData): FunctionDeclaration[] {
     ["confirmCheckout", "Move to payment, only after the user clearly says yes in a new turn after the confirm card appeared.", object({})],
   ];
 
-  return tools.map(([name, description, parametersJsonSchema]) => ({ name, description, parametersJsonSchema }));
+  // A learned kiosk changes a line by remove + add, and the user pays on the kiosk itself (ARCHITECTURE "Agent tools").
+  const learnedOmits = k.kind === "learned" ? ["updateCart", "confirmCheckout"] : [];
+  return tools
+    .filter(([name]) => !learnedOmits.includes(name))
+    .map(([name, description, parametersJsonSchema]) => ({ name, description, parametersJsonSchema }));
 }

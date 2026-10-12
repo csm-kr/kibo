@@ -80,7 +80,7 @@ Pressing "Order by touch" runs the familiar kiosk flow (dine option → category
 | **Idle** | One minute before expiry: "Still ordering?" **[Continue]** | Same warning | 5 |
 | **Someone else scans the same QR** | "Someone else is using this kiosk" | Unchanged | 5 |
 | **Noise** | After two failures: "Try typing or choosing a button" | — | 9, 7 |
-| **Learned kiosk replay fails** | "Please check the kiosk screen" + [Call staff] | Shows its own real cart; the session mirrors it | 9 |
+| **Learned kiosk replay fails** | "Please check the kiosk screen" + [Call staff] | Shows its own real cart; the session keeps its last verified cart and calls staff | 9 |
 | **Change of mind at payment** | — | **[Edit order]** returns to review | 3 |
 
 ## Screen map

@@ -27,6 +27,8 @@ function session(status: SessionStatus, over: Partial<Session> = {}): Session {
     paidAt: null,
     phoneConnectedAt: null,
     phoneSeenAt: null,
+    pendingBridgeCommand: null,
+    bridgeStatus: null,
     createdAt: T - 60_000,
     lastSeenAt: T,
     expiresAt: T + 600_000,

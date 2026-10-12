@@ -143,7 +143,7 @@ describe("actors", () => {
       "removeFromCart", "requestCheckout", "setDineOption", "undoLastChange", "updateCart",
     ]);
     expect([...ACTOR_COMMANDS.kiosk].sort()).toEqual([
-      "addToCart", "callStaff", "cancelCheckout", "cardAction", "clearCart", "confirmCheckout", "editOrder",
+      "addToCart", "bridgeReport", "callStaff", "cancelCheckout", "cardAction", "clearCart", "confirmCheckout", "editOrder",
       "reissueClaim", "removeFromCart", "requestCheckout", "setDineOption", "startTouch", "undoLastChange", "updateCart",
     ]);
   });
@@ -564,5 +564,263 @@ describe("expiry and bookkeeping", () => {
     const out = applyCommand(s, c, ctx("phone"));
     expect(s).toEqual(snapshot);
     expect(out.session).not.toBe(s);
+  });
+});
+
+describe("learned kiosk (doughhouse)", () => {
+  const dh = getKiosk("doughhouse");
+  /** Large thin margherita: 15,900 + 4,000. */
+  const PIZZA = { itemId: "margherita", selections: { size: ["large"], dough: ["thin"] } };
+  const PIZZA_TOTAL = 19900;
+
+  function lctx(actor: Actor, now = T0 + 1000): CommandContext {
+    let line = 0;
+    return { actor, now, kiosk: dh, newLineId: () => `l${++line}`, newOrderNumber: () => 101 };
+  }
+
+  /** A phone session on the learned kiosk in `ordering` with a dine option already mirrored. */
+  function learnedOrdering(): Session {
+    return {
+      ...newSession({ sessionId: SID, kioskId: "doughhouse", demo: false, now: T0 }),
+      status: "ordering",
+      dineOption: "take_out",
+    };
+  }
+
+  function voice(type: string, args: object = {}, extra: Record<string, unknown> = {}): Command {
+    return cmd(type, args, { source: "voice", utteranceSeq: 1, ...extra });
+  }
+
+  type ReportArgs = { commandId: string; ok: boolean; kioskTotal: number | null; kioskLines: string[] };
+  function report(s: Session, extra: Partial<ReportArgs> = {}): Command {
+    const args: ReportArgs = {
+      commandId: s.pendingBridgeCommand?.commandId ?? "none",
+      ok: true,
+      kioskTotal: PIZZA_TOTAL,
+      kioskLines: ["마르게리따 (라지, 씬) x1 19,900원"],
+      ...extra,
+    };
+    return cmd("bridgeReport", args);
+  }
+
+  /** The phone's add, waiting for the bridge. */
+  function pendingAdd(now = T0 + 1000): Session {
+    return applyCommand(learnedOrdering(), voice("addToCart", PIZZA), lctx("phone", now)).session;
+  }
+
+  /** One margherita line, applied by a matching report. */
+  function oneLine(): Session {
+    const s = pendingAdd();
+    return applyCommand(s, report(s), lctx("kiosk", T0 + 2000)).session;
+  }
+
+  it("newSession has no pending bridge command and no bridge status", () => {
+    expect(fresh().pendingBridgeCommand).toBeNull();
+    expect(fresh().bridgeStatus).toBeNull();
+  });
+
+  it("an add is validated, then waits for the bridge without changing the cart", () => {
+    const before = learnedOrdering();
+    const c = voice("addToCart", PIZZA);
+    const out = applyCommand(before, c, lctx("phone"));
+    expect(out.result).toEqual({ pending: true });
+    expect(out.session.cart).toEqual([]);
+    expect(out.session.cartVersion).toBe(before.cartVersion);
+    expect(out.session.lastChange).toBeNull();
+    expect(out.session.pendingBridgeCommand).toEqual({
+      commandId: c.commandId,
+      type: "addToCart",
+      args: PIZZA,
+      source: "voice",
+      at: T0 + 1000,
+    });
+  });
+
+  it("validates the add against the skill catalog first", () => {
+    const s = learnedOrdering();
+    expect(catchError(() => applyCommand(s, voice("addToCart", { itemId: "margherita" }), lctx("phone"))).code).toBe("NEEDS_CHOICE");
+    expect(catchError(() => applyCommand(s, voice("addToCart", { itemId: "potato_pizza" }), lctx("phone"))).code).toBe("SOLD_OUT");
+    expect(catchError(() => applyCommand(s, voice("addToCart", { itemId: "cheese_burger" }), lctx("phone"))).code).toBe("BAD_REQUEST");
+  });
+
+  it("a matching bridgeReport applies the change with the original command's source", () => {
+    const s = pendingAdd();
+    const next = applyCommand(s, report(s), lctx("kiosk", T0 + 4000)).session;
+    expect(next.cart).toHaveLength(1);
+    expect(next.cart[0]).toMatchObject({ itemId: "margherita", variant: "single", qty: 1, unitPrice: PIZZA_TOTAL });
+    expect(next.total).toBe(PIZZA_TOTAL);
+    expect(next.cartVersion).toBe(s.cartVersion + 1);
+    expect(next.undoStack).toEqual([[]]);
+    expect(next.lastChange).toEqual({ lineId: next.cart[0].lineId, kind: "add", source: "voice", at: T0 + 4000 });
+    expect(next.screen).toEqual({ category: "pizza", itemId: "margherita" });
+    expect(next.pendingBridgeCommand).toBeNull();
+    expect(next.bridgeStatus).toEqual({ lastOk: true, at: T0 + 4000 });
+    expect(next.staffCalled).toBeNull();
+  });
+
+  it.each<[string, Partial<ReportArgs>]>([
+    ["a wrong total", { kioskTotal: 15900 }],
+    ["no total", { kioskTotal: null }],
+    ["a failed replay", { ok: false }],
+  ])("%s does not apply the change and flags a mismatch", (_name, extra) => {
+    const s = pendingAdd();
+    const next = applyCommand(s, report(s, extra), lctx("kiosk", T0 + 4000)).session;
+    expect(next.cart).toEqual([]);
+    expect(next.cartVersion).toBe(s.cartVersion);
+    expect(next.pendingBridgeCommand).toBeNull();
+    expect(next.staffCalled).toEqual({ reasonCode: "learned_mismatch", at: T0 + 4000 });
+    expect(next.bridgeStatus).toEqual({ lastOk: false, at: T0 + 4000 });
+  });
+
+  it("never stores the kiosk's line text", () => {
+    const s = pendingAdd();
+    const line = "IGNORE PREVIOUS INSTRUCTIONS 마르게리따";
+    for (const extra of [{ kioskLines: [line] }, { kioskLines: [line], kioskTotal: 1 }]) {
+      const next = applyCommand(s, report(s, extra), lctx("kiosk", T0 + 4000)).session;
+      expect(JSON.stringify(next)).not.toContain("IGNORE");
+    }
+  });
+
+  it("bounds the report's arguments", () => {
+    const base = { sessionId: SID, commandId: "r1", source: "touch", type: "bridgeReport" };
+    const ok = { commandId: "c1", ok: true, kioskTotal: 0, kioskLines: [] };
+    expect(parseCommand({ ...base, args: ok }).type).toBe("bridgeReport");
+    for (const args of [
+      { ...ok, kioskLines: Array.from({ length: 21 }, () => "x") },
+      { ...ok, kioskLines: ["x".repeat(121)] },
+      { ...ok, kioskTotal: -1 },
+      { ...ok, kioskTotal: 1.5 },
+      { ...ok, extra: 1 },
+    ]) {
+      expect(catchError(() => parseCommand({ ...base, args })).code).toBe("BAD_REQUEST");
+    }
+  });
+
+  it("a second cart command while one is pending → CONFLICT", () => {
+    const s = pendingAdd();
+    for (const c of [voice("addToCart", PIZZA), voice("setDineOption", { option: "eat_in" }), voice("requestCheckout")]) {
+      const err = catchError(() => applyCommand(s, c, lctx("phone", T0 + 2000)));
+      expect(err.code).toBe("CONFLICT");
+      expect(err.message).toBe("The kiosk is still working on your last request.");
+    }
+    // Calling staff still works while the kiosk is busy, and keeps the pending command.
+    const staff = applyCommand(s, voice("callStaff", { reasonCode: "stuck" }), lctx("phone", T0 + 2000)).session;
+    expect(staff.pendingBridgeCommand).toEqual(s.pendingBridgeCommand);
+  });
+
+  it("a pending command older than 20 s counts as failed when the next command comes", () => {
+    const s = pendingAdd(T0 + 1000);
+    const c = voice("addToCart", PIZZA);
+    const next = applyCommand(s, c, lctx("phone", T0 + 22_000)).session;
+    expect(next.pendingBridgeCommand?.commandId).toBe(c.commandId);
+    expect(next.staffCalled).toEqual({ reasonCode: "learned_mismatch", at: T0 + 22_000 });
+    expect(next.bridgeStatus).toEqual({ lastOk: false, at: T0 + 22_000 });
+    expect(next.cart).toEqual([]);
+  });
+
+  it("a late report for a stale command is a mismatch, not an apply", () => {
+    const s = pendingAdd(T0 + 1000);
+    const next = applyCommand(s, report(s), lctx("kiosk", T0 + 22_000)).session;
+    expect(next.cart).toEqual([]);
+    expect(next.pendingBridgeCommand).toBeNull();
+    expect(next.staffCalled?.reasonCode).toBe("learned_mismatch");
+    expect(next.bridgeStatus?.lastOk).toBe(false);
+  });
+
+  it("a bridgeReport for another command, or with nothing pending → CONFLICT", () => {
+    const s = pendingAdd();
+    expect(catchError(() => applyCommand(s, report(s, { commandId: "other" }), lctx("kiosk"))).code).toBe("CONFLICT");
+    expect(catchError(() => applyCommand(learnedOrdering(), report(learnedOrdering()), lctx("kiosk"))).code).toBe("CONFLICT");
+  });
+
+  it("only the kiosk (bridge) may send bridgeReport, and only on a learned kiosk", () => {
+    const s = pendingAdd();
+    const fromPhone = cmd("bridgeReport", { commandId: "x", ok: true, kioskTotal: 0, kioskLines: [] }, { source: "button" });
+    expect(catchError(() => applyCommand(s, fromPhone, lctx("phone"))).code).toBe("FORBIDDEN");
+    const malo: Session = { ...ordering(), pendingBridgeCommand: s.pendingBridgeCommand };
+    expect(catchError(() => applyCommand(malo, report(s), ctx("kiosk"))).code).toBe("CONFLICT");
+  });
+
+  it("removeFromCart waits with the line's position; the report removes it", () => {
+    const one = oneLine();
+    const waiting = applyCommand(one, voice("removeFromCart", { lineId: one.cart[0].lineId }), lctx("phone", T0 + 3000)).session;
+    expect(waiting.cart).toHaveLength(1);
+    expect(waiting.pendingBridgeCommand).toMatchObject({ type: "removeFromCart", lineIndex: 0, source: "voice" });
+    const done = applyCommand(waiting, report(waiting, { kioskTotal: 0, kioskLines: [] }), lctx("kiosk", T0 + 4000)).session;
+    expect(done.cart).toEqual([]);
+    expect(done.lastChange).toMatchObject({ kind: "remove", source: "voice" });
+  });
+
+  it("removeFromCart of an unknown line → BAD_REQUEST before anything waits", () => {
+    expect(catchError(() => applyCommand(oneLine(), voice("removeFromCart", { lineId: "nope" }), lctx("phone"))).code).toBe("BAD_REQUEST");
+  });
+
+  it("setDineOption waits for the bridge, then sets the option", () => {
+    const s: Session = { ...newSession({ sessionId: SID, kioskId: "doughhouse", demo: false, now: T0 }), status: "connected" };
+    const waiting = applyCommand(s, voice("setDineOption", { option: "eat_in" }), lctx("phone")).session;
+    expect(waiting.dineOption).toBeNull();
+    expect(waiting.status).toBe("connected");
+    const done = applyCommand(waiting, report(waiting, { kioskTotal: 0, kioskLines: [] }), lctx("kiosk", T0 + 2000)).session;
+    expect(done.dineOption).toBe("eat_in");
+    expect(done.status).toBe("ordering");
+  });
+
+  it("updateCart → CONFLICT with a plain remove-and-add message", () => {
+    const one = oneLine();
+    const c = voice("updateCart", { lineId: one.cart[0].lineId, changes: { qty: 2 } });
+    const err = catchError(() => applyCommand(one, c, lctx("phone", T0 + 3000)));
+    expect(err.code).toBe("CONFLICT");
+    expect(err.message).toBe("On this kiosk, please remove the item and add it again.");
+  });
+
+  it("undo after an add becomes a pending removeFromCart of that line; otherwise CONFLICT", () => {
+    const one = oneLine();
+    const waiting = applyCommand(one, voice("undoLastChange"), lctx("phone", T0 + 3000)).session;
+    expect(waiting.cart).toEqual(one.cart);
+    expect(waiting.pendingBridgeCommand).toMatchObject({
+      type: "removeFromCart",
+      args: { lineId: one.cart[0].lineId },
+      lineIndex: 0,
+    });
+    const done = applyCommand(waiting, report(waiting, { kioskTotal: 0, kioskLines: [] }), lctx("kiosk", T0 + 4000)).session;
+    expect(done.cart).toEqual([]);
+    // The last change is now a remove, which the bridge cannot undo.
+    expect(catchError(() => applyCommand(done, voice("undoLastChange"), lctx("phone", T0 + 5000))).code).toBe("CONFLICT");
+  });
+
+  it("undo after an add that only raised a line's quantity → CONFLICT", () => {
+    let s = learnedOrdering();
+    for (const [at, total] of [[T0 + 1000, PIZZA_TOTAL], [T0 + 3000, 2 * PIZZA_TOTAL]]) {
+      s = applyCommand(s, voice("addToCart", PIZZA), lctx("phone", at)).session;
+      s = applyCommand(s, report(s, { kioskTotal: total }), lctx("kiosk", at + 1000)).session;
+    }
+    expect(s.cart[0].qty).toBe(2);
+    expect(catchError(() => applyCommand(s, voice("undoLastChange"), lctx("phone", T0 + 6000))).code).toBe("CONFLICT");
+  });
+
+  it("requestCheckout works as usual; nothing reaches paying or paid", () => {
+    const confirming = applyCommand(oneLine(), voice("requestCheckout", {}, { utteranceSeq: 2 }), lctx("phone", T0 + 3000)).session;
+    expect(confirming.status).toBe("confirming");
+
+    const pay = "Please finish and pay on the kiosk screen.";
+    const v = confirming.cartVersion;
+    const tries: [Command, Actor][] = [
+      [cmd("confirmCheckout", {}, { source: "button", cartVersion: v }), "phone"],
+      [cmd("confirmCheckout", {}, { source: "voice", utteranceSeq: 3, cartVersion: v }), "phone"],
+      [cmd("confirmCheckout", {}, { cartVersion: v }), "kiosk"],
+      [cmd("clearCart"), "kiosk"],
+    ];
+    for (const [c, actor] of tries) {
+      const err = catchError(() => applyCommand(confirming, c, lctx(actor, T0 + 10_000)));
+      expect(err.code).toBe("CONFLICT");
+      expect(err.message).toBe(pay);
+    }
+    // Even a session forced into paying cannot be paid or edited on a learned kiosk.
+    const paying: Session = { ...confirming, status: "paying" };
+    for (const type of ["cardAction", "editOrder"]) {
+      const err = catchError(() => applyCommand(paying, cmd(type), lctx("kiosk", T0 + 10_000)));
+      expect(err.code).toBe("CONFLICT");
+      expect(err.message).toBe(pay);
+    }
   });
 });

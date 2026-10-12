@@ -34,6 +34,10 @@ export interface Session {
   paidAt: number | null;
   phoneConnectedAt: number | null;
   phoneSeenAt: number | null;
+  /** Learned kiosks: the one cart change waiting for the bridge to replay it; always null on a direct kiosk. */
+  pendingBridgeCommand: PendingBridgeCommand | null;
+  /** Learned kiosks: the bridge's last result, for the phone's "Please check the kiosk screen". */
+  bridgeStatus: { lastOk: boolean; at: number } | null;
   /** Epoch ms. */
   createdAt: number;
   lastSeenAt: number;
@@ -56,6 +60,14 @@ export interface LineInput {
   qty?: number;
   selections?: Record<string, string[]>;
 }
+
+/** Ids and catalog values only; `lineIndex` (remove) is the line's position, which the bridge clicks by. */
+export type BridgeChange =
+  | { type: "setDineOption"; args: { option: DineOption } }
+  | { type: "addToCart"; args: LineInput }
+  | { type: "removeFromCart"; args: { lineId: string }; lineIndex: number };
+
+export type PendingBridgeCommand = BridgeChange & { commandId: string; source: Source; at: number };
 
 export interface LineChanges {
   qty?: number;

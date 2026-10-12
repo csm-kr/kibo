@@ -39,5 +39,6 @@ export const ACTOR_COMMANDS: Record<Actor, ReadonlySet<CommandType>> = {
     "editOrder",
     "cardAction",
     "reissueClaim",
+    "bridgeReport",
   ]),
 };
