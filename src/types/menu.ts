@@ -56,9 +56,41 @@ export interface KioskTheme {
   background: string;
 }
 
+/** One recipe step for the learned-kiosk bridge. String fields may hold `{placeholders}`. */
+export interface RecipeStep {
+  op: "click" | "check" | "clickIfVisible" | "clickNth" | "forEach" | "repeat";
+  label?: string;
+  role?: string;
+  name?: string;
+  text?: string;
+  exact?: boolean;
+  index?: number | string;
+  over?: string;
+  as?: string;
+  times?: number | string;
+  steps?: RecipeStep[];
+}
+
+/** What the bridge needs to drive a learned kiosk page (skills/*.json). */
+export interface LearnedKiosk {
+  page: string;
+  recipes: Record<string, RecipeStep[]>;
+  dineLabels: { eat_in: string; take_out: string };
+  uiLabels: string[];
+  /** A label containing any of these is never clicked (payment, card, checkout). */
+  forbiddenLabels: string[];
+  cartTotalPattern: string;
+  cartLinePattern: string;
+  labels: {
+    items: Record<string, string>;
+    categories: Record<string, string>;
+    options: Record<string, string>;
+  };
+}
+
 export interface KioskData {
   kioskId: string;
-  kind: "direct";
+  kind: "direct" | "learned";
   brand: { name: LocalizedName; tagline: LocalizedName };
   theme: KioskTheme;
   locale: Locale;
@@ -70,4 +102,5 @@ export interface KioskData {
   categories: Category[];
   items: MenuItem[];
   upsellRules: UpsellRule[];
+  learned?: LearnedKiosk;
 }

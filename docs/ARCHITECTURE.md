@@ -370,9 +370,15 @@ A required group with `defaultOptionIds` (the set side: medium fries) takes the 
 
 ### `skills/{kioskId}.json` (learned, reviewed, committed)
 ```
-catalog, categories, uiLabels, dineOptions, recipes{startOrder, addToCart, ...}, cartTotalPattern, cartLinePattern
-LearnedAdapter normalizes the catalog into the items shape: ids generated from labels, name.en added during human review.
+kioskId, kind: "learned", brand{ko,en}, locale, currency, page (/learned-kiosks/<kiosk>/index.html, the kiosk page copied unchanged),
+provenance{learnedBy, evidence, reviewed}, dineOptions{eat_in, take_out: exact kiosk labels},
+categories[{categoryId, name{ko,en}, label}],
+catalog[{itemId, name{ko,en}, label, category, price, soldOut,
+         optionGroups[{groupId, name{ko,en}, label, required, min, max, defaultOptionIds[], options[{optionId, name{ko,en}, label, priceDelta}]}]}],
+uiLabels[], forbiddenLabels[] (a label containing any entry is never clicked: payment, card, checkout),
+recipes{startOrder, addToCart, removeLine, ...}, cartTotalPattern, cartLinePattern
 ```
+`label` is the exact text the kiosk shows; ids (ASCII snake_case) and `name.en` are added during human review. `skillSchema` (`src/lib/adapters/learned.ts`) checks it (names ≤ 40 chars, single line, integer prices); `learnedToKiosk` normalizes it into the items shape (one `single` variant per item, a neutral placeholder image, no upsell rules) plus `learned` (page, recipes, labels by id) for the bridge.
 
 ### `sessions/{sessionId}` — server only; clients read it through the SSE route (ADR-010)
 | Field | Type | Notes |

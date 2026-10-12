@@ -1,0 +1,881 @@
+{
+  "kioskId": "doughhouse",
+  "kind": "learned",
+  "brand": {
+    "ko": "도우하우스",
+    "en": "Doughhouse"
+  },
+  "locale": "ko",
+  "currency": "KRW",
+  "page": "/learned-kiosks/doughhouse/index.html",
+  "provenance": {
+    "learnedBy": "gemini-3.8-flash",
+    "evidence": "spikes/kibo-learn/results/skill.run2.json",
+    "reviewed": "2026-10-13"
+  },
+  "dineOptions": {
+    "eat_in": "🍽 먹고 갈게요",
+    "take_out": "🛍 가져갈게요"
+  },
+  "categories": [
+    {
+      "categoryId": "pizza",
+      "name": {
+        "ko": "피자",
+        "en": "Pizza"
+      },
+      "label": "피자"
+    },
+    {
+      "categoryId": "side",
+      "name": {
+        "ko": "사이드",
+        "en": "Sides"
+      },
+      "label": "사이드"
+    },
+    {
+      "categoryId": "drink",
+      "name": {
+        "ko": "음료",
+        "en": "Drinks"
+      },
+      "label": "음료"
+    }
+  ],
+  "catalog": [
+    {
+      "itemId": "margherita",
+      "name": {
+        "ko": "마르게리따",
+        "en": "Margherita"
+      },
+      "label": "마르게리따",
+      "category": "pizza",
+      "price": 15900,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "size",
+          "name": {
+            "ko": "사이즈",
+            "en": "Size"
+          },
+          "label": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "regular",
+              "name": {
+                "ko": "레귤러",
+                "en": "Regular"
+              },
+              "label": "레귤러",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "large",
+              "name": {
+                "ko": "라지",
+                "en": "Large"
+              },
+              "label": "라지",
+              "priceDelta": 4000
+            }
+          ]
+        },
+        {
+          "groupId": "dough",
+          "name": {
+            "ko": "도우",
+            "en": "Dough"
+          },
+          "label": "도우",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "original",
+              "name": {
+                "ko": "오리지널",
+                "en": "Original"
+              },
+              "label": "오리지널",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "thin",
+              "name": {
+                "ko": "씬",
+                "en": "Thin"
+              },
+              "label": "씬",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "cheese_crust",
+              "name": {
+                "ko": "치즈크러스트",
+                "en": "Cheese crust"
+              },
+              "label": "치즈크러스트",
+              "priceDelta": 3000
+            }
+          ]
+        },
+        {
+          "groupId": "toppings",
+          "name": {
+            "ko": "토핑 추가",
+            "en": "Extra toppings"
+          },
+          "label": "토핑 추가",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "bacon",
+              "name": {
+                "ko": "베이컨",
+                "en": "Bacon"
+              },
+              "label": "베이컨",
+              "priceDelta": 1500
+            },
+            {
+              "optionId": "olive",
+              "name": {
+                "ko": "올리브",
+                "en": "Olive"
+              },
+              "label": "올리브",
+              "priceDelta": 800
+            },
+            {
+              "optionId": "corn",
+              "name": {
+                "ko": "옥수수",
+                "en": "Corn"
+              },
+              "label": "옥수수",
+              "priceDelta": 800
+            },
+            {
+              "optionId": "double_cheese",
+              "name": {
+                "ko": "더블치즈",
+                "en": "Double cheese"
+              },
+              "label": "더블치즈",
+              "priceDelta": 2000
+            },
+            {
+              "optionId": "jalapeno",
+              "name": {
+                "ko": "할라피뇨",
+                "en": "Jalapeno"
+              },
+              "label": "할라피뇨",
+              "priceDelta": 800
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "pepperoni",
+      "name": {
+        "ko": "페퍼로니",
+        "en": "Pepperoni"
+      },
+      "label": "페퍼로니",
+      "category": "pizza",
+      "price": 17900,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "size",
+          "name": {
+            "ko": "사이즈",
+            "en": "Size"
+          },
+          "label": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "regular",
+              "name": {
+                "ko": "레귤러",
+                "en": "Regular"
+              },
+              "label": "레귤러",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "large",
+              "name": {
+                "ko": "라지",
+                "en": "Large"
+              },
+              "label": "라지",
+              "priceDelta": 4000
+            }
+          ]
+        },
+        {
+          "groupId": "dough",
+          "name": {
+            "ko": "도우",
+            "en": "Dough"
+          },
+          "label": "도우",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "original",
+              "name": {
+                "ko": "오리지널",
+                "en": "Original"
+              },
+              "label": "오리지널",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "thin",
+              "name": {
+                "ko": "씬",
+                "en": "Thin"
+              },
+              "label": "씬",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "cheese_crust",
+              "name": {
+                "ko": "치즈크러스트",
+                "en": "Cheese crust"
+              },
+              "label": "치즈크러스트",
+              "priceDelta": 3000
+            }
+          ]
+        },
+        {
+          "groupId": "toppings",
+          "name": {
+            "ko": "토핑 추가",
+            "en": "Extra toppings"
+          },
+          "label": "토핑 추가",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "bacon",
+              "name": {
+                "ko": "베이컨",
+                "en": "Bacon"
+              },
+              "label": "베이컨",
+              "priceDelta": 1500
+            },
+            {
+              "optionId": "olive",
+              "name": {
+                "ko": "올리브",
+                "en": "Olive"
+              },
+              "label": "올리브",
+              "priceDelta": 800
+            },
+            {
+              "optionId": "corn",
+              "name": {
+                "ko": "옥수수",
+                "en": "Corn"
+              },
+              "label": "옥수수",
+              "priceDelta": 800
+            },
+            {
+              "optionId": "double_cheese",
+              "name": {
+                "ko": "더블치즈",
+                "en": "Double cheese"
+              },
+              "label": "더블치즈",
+              "priceDelta": 2000
+            },
+            {
+              "optionId": "jalapeno",
+              "name": {
+                "ko": "할라피뇨",
+                "en": "Jalapeno"
+              },
+              "label": "할라피뇨",
+              "priceDelta": 800
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "bulgogi_pizza",
+      "name": {
+        "ko": "불고기 피자",
+        "en": "Bulgogi pizza"
+      },
+      "label": "불고기 피자",
+      "category": "pizza",
+      "price": 19900,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "size",
+          "name": {
+            "ko": "사이즈",
+            "en": "Size"
+          },
+          "label": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "regular",
+              "name": {
+                "ko": "레귤러",
+                "en": "Regular"
+              },
+              "label": "레귤러",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "large",
+              "name": {
+                "ko": "라지",
+                "en": "Large"
+              },
+              "label": "라지",
+              "priceDelta": 4000
+            }
+          ]
+        },
+        {
+          "groupId": "dough",
+          "name": {
+            "ko": "도우",
+            "en": "Dough"
+          },
+          "label": "도우",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "original",
+              "name": {
+                "ko": "오리지널",
+                "en": "Original"
+              },
+              "label": "오리지널",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "thin",
+              "name": {
+                "ko": "씬",
+                "en": "Thin"
+              },
+              "label": "씬",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "cheese_crust",
+              "name": {
+                "ko": "치즈크러스트",
+                "en": "Cheese crust"
+              },
+              "label": "치즈크러스트",
+              "priceDelta": 3000
+            }
+          ]
+        },
+        {
+          "groupId": "toppings",
+          "name": {
+            "ko": "토핑 추가",
+            "en": "Extra toppings"
+          },
+          "label": "토핑 추가",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "bacon",
+              "name": {
+                "ko": "베이컨",
+                "en": "Bacon"
+              },
+              "label": "베이컨",
+              "priceDelta": 1500
+            },
+            {
+              "optionId": "olive",
+              "name": {
+                "ko": "올리브",
+                "en": "Olive"
+              },
+              "label": "올리브",
+              "priceDelta": 800
+            },
+            {
+              "optionId": "corn",
+              "name": {
+                "ko": "옥수수",
+                "en": "Corn"
+              },
+              "label": "옥수수",
+              "priceDelta": 800
+            },
+            {
+              "optionId": "double_cheese",
+              "name": {
+                "ko": "더블치즈",
+                "en": "Double cheese"
+              },
+              "label": "더블치즈",
+              "priceDelta": 2000
+            },
+            {
+              "optionId": "jalapeno",
+              "name": {
+                "ko": "할라피뇨",
+                "en": "Jalapeno"
+              },
+              "label": "할라피뇨",
+              "priceDelta": 800
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "potato_pizza",
+      "name": {
+        "ko": "포테이토 피자",
+        "en": "Potato pizza"
+      },
+      "label": "포테이토 피자",
+      "category": "pizza",
+      "price": 19900,
+      "soldOut": true,
+      "optionGroups": [
+        {
+          "groupId": "size",
+          "name": {
+            "ko": "사이즈",
+            "en": "Size"
+          },
+          "label": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "regular",
+              "name": {
+                "ko": "레귤러",
+                "en": "Regular"
+              },
+              "label": "레귤러",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "large",
+              "name": {
+                "ko": "라지",
+                "en": "Large"
+              },
+              "label": "라지",
+              "priceDelta": 4000
+            }
+          ]
+        },
+        {
+          "groupId": "dough",
+          "name": {
+            "ko": "도우",
+            "en": "Dough"
+          },
+          "label": "도우",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "original",
+              "name": {
+                "ko": "오리지널",
+                "en": "Original"
+              },
+              "label": "오리지널",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "thin",
+              "name": {
+                "ko": "씬",
+                "en": "Thin"
+              },
+              "label": "씬",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "cheese_crust",
+              "name": {
+                "ko": "치즈크러스트",
+                "en": "Cheese crust"
+              },
+              "label": "치즈크러스트",
+              "priceDelta": 3000
+            }
+          ]
+        },
+        {
+          "groupId": "toppings",
+          "name": {
+            "ko": "토핑 추가",
+            "en": "Extra toppings"
+          },
+          "label": "토핑 추가",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "bacon",
+              "name": {
+                "ko": "베이컨",
+                "en": "Bacon"
+              },
+              "label": "베이컨",
+              "priceDelta": 1500
+            },
+            {
+              "optionId": "olive",
+              "name": {
+                "ko": "올리브",
+                "en": "Olive"
+              },
+              "label": "올리브",
+              "priceDelta": 800
+            },
+            {
+              "optionId": "corn",
+              "name": {
+                "ko": "옥수수",
+                "en": "Corn"
+              },
+              "label": "옥수수",
+              "priceDelta": 800
+            },
+            {
+              "optionId": "double_cheese",
+              "name": {
+                "ko": "더블치즈",
+                "en": "Double cheese"
+              },
+              "label": "더블치즈",
+              "priceDelta": 2000
+            },
+            {
+              "optionId": "jalapeno",
+              "name": {
+                "ko": "할라피뇨",
+                "en": "Jalapeno"
+              },
+              "label": "할라피뇨",
+              "priceDelta": 800
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "cheese_oven_spaghetti",
+      "name": {
+        "ko": "치즈 오븐 스파게티",
+        "en": "Cheese oven spaghetti"
+      },
+      "label": "치즈 오븐 스파게티",
+      "category": "side",
+      "price": 6900,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "itemId": "garlic_dip",
+      "name": {
+        "ko": "갈릭디핑소스",
+        "en": "Garlic dipping sauce"
+      },
+      "label": "갈릭디핑소스",
+      "category": "side",
+      "price": 500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "itemId": "buffalo_wings_6",
+      "name": {
+        "ko": "버팔로 윙 6조각",
+        "en": "Buffalo wings (6 pieces)"
+      },
+      "label": "버팔로 윙 6조각",
+      "category": "side",
+      "price": 7900,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "itemId": "cola",
+      "name": {
+        "ko": "콜라",
+        "en": "Cola"
+      },
+      "label": "콜라",
+      "category": "drink",
+      "price": 2000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "volume",
+          "name": {
+            "ko": "용량",
+            "en": "Size"
+          },
+          "label": "용량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "ml_500",
+              "name": {
+                "ko": "500ml",
+                "en": "500 ml"
+              },
+              "label": "500ml",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "l_1_25",
+              "name": {
+                "ko": "1.25L",
+                "en": "1.25 L"
+              },
+              "label": "1.25L",
+              "priceDelta": 1300
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "zero_cola",
+      "name": {
+        "ko": "제로콜라",
+        "en": "Zero cola"
+      },
+      "label": "제로콜라",
+      "category": "drink",
+      "price": 2000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "volume",
+          "name": {
+            "ko": "용량",
+            "en": "Size"
+          },
+          "label": "용량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "ml_500",
+              "name": {
+                "ko": "500ml",
+                "en": "500 ml"
+              },
+              "label": "500ml",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "l_1_25",
+              "name": {
+                "ko": "1.25L",
+                "en": "1.25 L"
+              },
+              "label": "1.25L",
+              "priceDelta": 1300
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "cider",
+      "name": {
+        "ko": "사이다",
+        "en": "Cider"
+      },
+      "label": "사이다",
+      "category": "drink",
+      "price": 2000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "volume",
+          "name": {
+            "ko": "용량",
+            "en": "Size"
+          },
+          "label": "용량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "ml_500",
+              "name": {
+                "ko": "500ml",
+                "en": "500 ml"
+              },
+              "label": "500ml",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "l_1_25",
+              "name": {
+                "ko": "1.25L",
+                "en": "1.25 L"
+              },
+              "label": "1.25L",
+              "priceDelta": 1300
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "uiLabels": [
+    "화면을 터치하여 주문을 시작하세요",
+    "+",
+    "−",
+    "장바구니 담기",
+    "닫기",
+    "아니요, 괜찮아요",
+    "사이드 보러가기",
+    "삭제"
+  ],
+  "forbiddenLabels": [
+    "주문하기",
+    "💳 신용/체크카드",
+    "결제",
+    "카드"
+  ],
+  "recipes": {
+    "startOrder": [
+      {
+        "op": "click",
+        "label": "화면을 터치하여 주문을 시작하세요"
+      },
+      {
+        "op": "click",
+        "label": "{dineOption}"
+      }
+    ],
+    "addToCart": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "forEach",
+        "over": "options",
+        "as": "option",
+        "steps": [
+          {
+            "op": "clickIfVisible",
+            "role": "radio",
+            "name": "{option}"
+          },
+          {
+            "op": "clickIfVisible",
+            "role": "checkbox",
+            "name": "{option}"
+          }
+        ]
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "label": "+"
+          }
+        ]
+      },
+      {
+        "op": "click",
+        "label": "장바구니 담기"
+      },
+      {
+        "op": "clickIfVisible",
+        "label": "아니요, 괜찮아요"
+      }
+    ],
+    "removeLine": [
+      {
+        "op": "clickNth",
+        "label": "삭제",
+        "index": "{lineIndex}"
+      }
+    ]
+  },
+  "cartTotalPattern": "합계\\s*([0-9,]+)원",
+  "cartLinePattern": "^(.+?)(?: \\((.+)\\))? x(\\d+) ([0-9,]+)원"
+}

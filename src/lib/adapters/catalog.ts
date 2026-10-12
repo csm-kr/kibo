@@ -1,5 +1,6 @@
 import { z } from "zod";
 import malo from "../../../data/kiosks/malo.json";
+import doughhouse from "../../../skills/doughhouse.json";
 import type {
   KioskData,
   Locale,
@@ -9,8 +10,9 @@ import type {
   OptionGroup,
   Variant,
 } from "@/types/menu";
+import { learnedToKiosk, skillSchema } from "./learned";
 
-export type KioskId = "malo";
+export type KioskId = "malo" | "doughhouse";
 
 export class CatalogError extends Error {
   constructor(message: string) {
@@ -84,7 +86,10 @@ export const kioskSchema: z.ZodType<KioskData> = z.strictObject({
   ),
 });
 
-const sources: Record<KioskId, unknown> = { malo };
+const sources: Record<KioskId, () => KioskData> = {
+  malo: () => kioskSchema.parse(malo),
+  doughhouse: () => learnedToKiosk(skillSchema.parse(doughhouse)),
+};
 const cache = new Map<KioskId, KioskData>();
 
 export function isKioskId(v: string): v is KioskId {
@@ -95,7 +100,7 @@ export function getKiosk(kioskId: string): KioskData {
   if (!isKioskId(kioskId)) throw new CatalogError(`Unknown kiosk: ${kioskId}`);
   let kiosk = cache.get(kioskId);
   if (!kiosk) {
-    kiosk = kioskSchema.parse(sources[kioskId]);
+    kiosk = sources[kioskId]();
     cache.set(kioskId, kiosk);
   }
   return kiosk;

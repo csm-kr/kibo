@@ -2,11 +2,38 @@
   "project": "KIBO",
   "phase": "6-learn",
   "steps": [
-    { "step": 0, "name": "learned-adapter", "status": "pending" },
-    { "step": 1, "name": "bridge-server", "status": "pending" },
-    { "step": 2, "name": "bridge-client", "status": "pending" },
-    { "step": 3, "name": "learned-assistant", "status": "pending" },
-    { "step": 4, "name": "learn-rerun", "status": "pending" },
-    { "step": 5, "name": "qa", "status": "pending" }
-  ]
+    {
+      "step": 0,
+      "name": "learned-adapter",
+      "status": "completed",
+      "started_at": "2026-10-13T03:41:50+0900",
+      "summary": "Reviewed skill skills/doughhouse.json (ids snake_case incl. options ml_500/l_1_25, groups size/dough/toppings/volume, no defaults; forbiddenLabels 주문하기, 💳 신용/체크카드, 결제, 카드 matched as substrings via isForbiddenLabel; recipes startOrder/addToCart as learned + removeLine clickNth 삭제 {lineIndex}; cartLinePattern groups name/opts/qty/price). Kiosk page copied byte-identical to public/learned-kiosks/doughhouse/index.html; placeholder public/learned-kiosks/item.svg. src/lib/adapters/learned.ts: skillSchema (strict, recursive RecipeStep), learnedToKiosk -> KioskData kind 'learned' with learned{page, recipes, dineLabels, uiLabels, forbiddenLabels, patterns, labels{items,categories,options} by id}. types/menu.ts: RecipeStep, LearnedKiosk, KioskData.kind/learned. getKiosk('doughhouse') works (KioskId union); kioskSchema (direct) unchanged. Tests in learned.test.ts (20). ARCHITECTURE skill format updated. Note: until step 1, doughhouse sessions have no learned-kiosk guards (cardAction etc.)."
+    },
+    {
+      "step": 1,
+      "name": "bridge-server",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "name": "bridge-client",
+      "status": "pending"
+    },
+    {
+      "step": 3,
+      "name": "learned-assistant",
+      "status": "pending"
+    },
+    {
+      "step": 4,
+      "name": "learn-rerun",
+      "status": "pending"
+    },
+    {
+      "step": 5,
+      "name": "qa",
+      "status": "pending"
+    }
+  ],
+  "created_at": "2026-10-13T03:41:50+0900"
 }
