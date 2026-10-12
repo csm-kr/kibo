@@ -7,7 +7,8 @@
       "name": "core-fixes",
       "status": "completed",
       "started_at": "2026-10-12T23:16:15+0900",
-      "summary": "I-029 Option A in src/lib/commands/machine.ts: AI confirmCheckout refused when checkoutUtteranceSeq is null; kiosk requestCheckout records null; editOrder sets it null and checkoutAt=now (phone must tap [Yes, pay now], AI gets CONFLICT 'Please confirm on the card.'), 3 new tests. I-031: src/lib/i18n/errors.ts errorCopy(code, locale, detail?) with ko/en for every ErrorCode plus client NETWORK (pick_dine gets the dine question); screens use it, server keeps English message. I-030: metrics row removed. Docs synced (ARCHITECTURE, SECURITY, ADR-005, docs/ko, phase 3 step 0 agent rule); I-032 logged for stale docs/ko."
+      "summary": "I-029 Option A in src/lib/commands/machine.ts: AI confirmCheckout refused when checkoutUtteranceSeq is null; kiosk requestCheckout records null; editOrder sets it null and checkoutAt=now (phone must tap [Yes, pay now], AI gets CONFLICT 'Please confirm on the card.'), 3 new tests. I-031: src/lib/i18n/errors.ts errorCopy(code, locale, detail?) with ko/en for every ErrorCode plus client NETWORK (pick_dine gets the dine question); screens use it, server keeps English message. I-030: metrics row removed. Docs synced (ARCHITECTURE, SECURITY, ADR-005, docs/ko, phase 3 step 0 agent rule); I-032 logged for stale docs/ko.",
+      "completed_at": "2026-10-12T23:20:06+0900"
     },
     {
       "step": 1,
