@@ -2,10 +2,33 @@
   "project": "KIBO",
   "phase": "4-voice",
   "steps": [
-    { "step": 0, "name": "live-token", "status": "pending" },
-    { "step": 1, "name": "live-client", "status": "pending" },
-    { "step": 2, "name": "voice-ui", "status": "pending" },
-    { "step": 3, "name": "voice-e2e", "status": "pending" },
-    { "step": 4, "name": "qa", "status": "pending" }
-  ]
+    {
+      "step": 0,
+      "name": "live-token",
+      "status": "completed",
+      "started_at": "2026-10-13T02:01:56+0900",
+      "summary": "POST /api/live-token (src/app/api/live-token/route.ts) + src/lib/agent/live.ts: liveTokenRequest {sessionId, locale}, geminiTokenIssuer (v1alpha authTokens.create, uses 1, liveConnectConstraints pin model, instructions with current cart, 9 tools, AUDIO, input/output transcription; no lockAdditionalFields so every field is locked; default voice), liveConfig, issueLiveToken (device token only; bumpSessionCounter liveTokenCount 2 demo / 6 phone, then CONFLICT unless before paying, then daily voiceSessions 200; RATE_LIMITED 'Voice is busy right now. Please type instead.'; Gemini 429 -> RATE_LIMITED, other -> UPSTREAM, logs status only). Returns {token, model, expiresAt, voiceSeconds 180|600}; newSessionExpireTime now+60s, expireTime now+voiceSeconds. Tests: live.test.ts, live-token/route.test.ts (fake issuer, no network). Manual check 10-13 on next dev with real gemini-3.8-live: token issued, live.connect with it, text turn -> toolCall addToCart {cheese_burger, set, drink zero_cola} after 2.6 s; a 2nd connect with the same token closed 1011 'Token has been used too many times' (no saved log). ARCHITECTURE Endpoints/Limits synced (I-078)."
+    },
+    {
+      "step": 1,
+      "name": "live-client",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "name": "voice-ui",
+      "status": "pending"
+    },
+    {
+      "step": 3,
+      "name": "voice-e2e",
+      "status": "pending"
+    },
+    {
+      "step": 4,
+      "name": "qa",
+      "status": "pending"
+    }
+  ],
+  "created_at": "2026-10-13T02:01:56+0900"
 }
