@@ -21,9 +21,9 @@ Measure in CSS px at these sizes. Phone numbers apply as written; kiosk numbers 
    ```bash
    npm run lint && npm run build && npm run test
    python3 design/prototype/e2e_check.py      # while the prototype is the reference
-   npm run qa:ui                              # Aside H checks, once it exists (see "Automating")
+   npm run qa:ui                              # Playwright H checks, once it exists (see "Automating")
    ```
-3. **Screenshots.** Capture each scoped screen and state at each viewport with Aside (`npm run qa:ui`, or `aside repl` by hand) into `phases/<phase>/qa/` (harness) or the session scratchpad (interactive). Look at the images, not only the code.
+3. **Screenshots.** Capture each scoped screen and state at each viewport (`npm run qa:ui`; Aside by hand for interactive passes) into `phases/<phase>/qa/` (harness) or the session scratchpad (interactive). Look at the images, not only the code.
 4. **Angles.** Go through each angle below on the screenshots and the code. Each finding names the screen id, the angle, the severity (P0/P1/P2, see "Visual heuristics") and the evidence (file:line, measured value, screenshot).
 5. **Fix or log.** Fix what is in scope; log everything else in `docs/ISSUE.md` (a repeated class adds to `Seen`; the 3rd time adds a rule in `docs/RULE.md`). Re-run step 2 after fixes.
 6. **Fresh eyes.** Where possible, a reviewer that did not write the change (a harness `qa` session or a separate agent) does steps 3–4 again from the screenshots and this file.
@@ -115,25 +115,21 @@ Ten-second checks on each screenshot, like Nielsen's ten but for the look. Sourc
 
 Rate each finding: **P0** broken or unsafe, **P1** rule violation, **P2** polish. There is no standard pixel tolerance for build vs design; KIBO treats a difference of ≤ 2px as P2 and > 2px on a size, gap or alignment as P1.
 
-## Automating (Aside)
-UI QA drives the user's Aside browser (`aside repl`, Playwright-style JavaScript), not Playwright. Checked on Aside CLI 1.26 (2026-10-12):
-- `page.setViewportSize` and `page.addScriptTag` do not exist. **Viewport:** on a page of the app's own origin, replace the document with a same-origin `<iframe>` of the exact size (390×844, 1080×1920, …) and measure inside `iframe.contentWindow`; `innerWidth`/`innerHeight` match. **axe-core:** fetch a pinned `axe.min.js` with the REPL's `fetch`, then `contentWindow.eval(src)` and `axe.run(contentDocument)`.
-- One call has a 120 s limit and the REPL has no `import`/`require`; run one route per call.
-- `fs` writes only to the session's `./artifacts/`, whose absolute path changes every call: print `path.resolve('./artifacts')` and copy the files out right away.
-- `page.screenshot({ path, clip })` works for the iframe area; for the 1080×1920 kiosk, scale the iframe with CSS `transform` for the picture and measure in native px inside it.
-- `prefers-reduced-motion` cannot be emulated; check the CSS for a reduced-motion rule instead.
+## Automating (Playwright)
+Automated UI checks run in headless Chromium with Playwright, the same tool as the E2E tests. Decided 10-12 (Claude, with decisions delegated by the user): harness `qa` steps run unattended for hours, and Playwright sets exact viewports, emulates `prefers-reduced-motion`, injects axe with `addScriptTag` and never touches a browser that holds personal logins. Aside (`aside repl`) stays available for interactive passes and for capturing video footage (`.claude/skills/motion-demo-video/references/aside-capture.md`); its 1.26 gaps are in `docs/ISSUE.md` I-016.
 
 **Setup (once).** The first phase that builds a real screen gets a step before its `qa` step that adds:
-- `e2e/aside-ui-qa.js`: self-contained REPL script. For one route and its viewports it builds the iframe, injects axe, runs the checks below, takes screenshots and prints one JSON line `{ route, viewport, h: [failures], t: [misses], artifacts }`.
-- `scripts/ui_qa.sh` behind `"qa:ui": "sh scripts/ui_qa.sh"`: starts `npm run start` on a free port if nothing is listening (stops it at the end), runs `aside repl "$(cat e2e/aside-ui-qa.js)"` once per route with the route and port substituted, copies each artifacts folder to `phases/$PHASE/qa/` (or the scratchpad outside the harness), and exits 1 if any `h` list is not empty. `QA_ALL=1` also fails on `t`.
-- It opens only `http://localhost` URLs. Aside carries the user's logins, so the script never visits other sites, and the harness allowlist does not include `aside` itself: sessions reach Aside only through `npm run qa:ui`. If Aside is not running, the script exits 1 with "Aside not running", and the `qa` step sets `blocked`.
+- `e2e/ui-qa.spec.ts` (run by its own config `playwright.qa.config.ts`, so `npm run test:e2e` stays fast): for each route and state in a list, at each viewport, run the checks below, save screenshots, and write one JSON line per route and viewport `{ route, state, viewport, h: [failures], t: [misses], shots }` to the output folder.
+- `"qa:ui": "playwright test -c playwright.qa.config.ts"`: the config starts the app with `STORE=memory` on its own port, writes screenshots and the JSON report to `phases/$PHASE/qa/` (or `qa-output/` outside the harness, git-ignored), and the run fails if any `h` list is not empty. `QA_ALL=1` also fails on `t`.
+- States are reached through the real UI and the API (claim with the QR's `data-claim-url`, send commands with the tokens), never by mocking components.
+- It opens only `http://localhost` URLs. axe-core comes from the `axe-core` npm package, not a CDN.
 
 Until then the `qa` step checks the angles from code and the prototype and says so in its report.
 
 **What the script checks:**
 - **axe-core** (H) with the WCAG 2.0/2.1/2.2 A and AA tags, with `target-size` turned on explicitly (off by default). Contrast results marked "incomplete" (text over images) go to human review.
 - **Computed styles:** minimum font size per route and every interactive element's box ≥ the route's target size and ≥ 8px from its neighbor (H); body line-height ≥ 1.5, margins, paddings and gaps on the 4/8 scale, radius, font family and weight from the tokens, ≤ 4 font sizes per screen, transitions ≤ 500ms unless allowlisted (T).
-- **Robustness** (H): no horizontal overflow in a 320px-wide iframe; no clipped text after injecting the WCAG 1.4.12 spacing CSS or at 200% root font size.
+- **Robustness** (H): no horizontal overflow at 320px wide; no clipped text after injecting the WCAG 1.4.12 spacing CSS or at 200% root font size.
 - **Focus** (H): `focus()` each control in order; the outline is ≥ 2px and `elementFromPoint` at its center returns it.
 - **Screenshots:** every scoped screen and state per viewport. There is no pixel-diff baseline; steps 3–4 compare them by eye with the prototype and the previous pass.
 

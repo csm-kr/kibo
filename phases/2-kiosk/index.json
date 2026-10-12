@@ -1,0 +1,12 @@
+{
+  "project": "KIBO",
+  "phase": "2-kiosk",
+  "steps": [
+    { "step": 0, "name": "kiosk-shell", "status": "pending" },
+    { "step": 1, "name": "kiosk-menu", "status": "pending" },
+    { "step": 2, "name": "kiosk-checkout", "status": "pending" },
+    { "step": 3, "name": "kiosk-e2e", "status": "pending" },
+    { "step": 4, "name": "ui-qa-setup", "status": "pending" },
+    { "step": 5, "name": "qa", "status": "pending" }
+  ]
+}
