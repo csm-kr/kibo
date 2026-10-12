@@ -1,6 +1,6 @@
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
 import { command, kioskRoot } from "../helpers";
-import { DEMO, qaState, type Findings } from "./checks";
+import { DEMO, HOME, qaState, type Findings } from "./checks";
 
 // UI QA of /demo (docs/UX.md screen map D1–D3) at the judge viewports in docs/UI_QA.md. The checks measure the
 // intro and the phone column; the kiosk half is the scaled canvas, whose sizes kiosk.qa.spec.ts checks at full size,
@@ -79,4 +79,15 @@ test("D1 to D3", async ({ page, request }, info) => {
   await page.getByRole("button", { name: "출력 안 함" }).click();
   await expect(page.locator("[data-demo-end]")).toBeVisible();
   await check(page, info, "D3-done");
+});
+
+test("root landing page", async ({ page }, info) => {
+  await page.goto("/");
+  await expect(page.getByRole("link", { name: "Try the demo" })).toBeVisible({ timeout: 60_000 });
+  for (const vp of [...VIEWPORTS, { width: 390, height: 844 }, { width: 320, height: 700 }]) {
+    await page.setViewportSize(vp);
+    const f: Findings = await qaState(page, info, HOME, "landing", { reflow: true });
+    expect.soft(f.h, `/ ${vp.width}x${vp.height}: H failures`).toEqual([]);
+    if (STRICT) expect.soft(f.t, `/ ${vp.width}x${vp.height}: T misses`).toEqual([]);
+  }
 });

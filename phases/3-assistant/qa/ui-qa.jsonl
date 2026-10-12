@@ -57,6 +57,11 @@
 {"route":"/demo","state":"D3-done","viewport":"1440x900","h":[],"t":[],"shots":["phases/3-assistant/qa/demo-D3-done-1440x900.png"]}
 {"route":"/demo","state":"D3-done","viewport":"1280x720","h":[],"t":[],"shots":["phases/3-assistant/qa/demo-D3-done-1280x720.png"]}
 {"route":"/demo","state":"D3-done","viewport":"1920x1080","h":[],"t":[],"shots":["phases/3-assistant/qa/demo-D3-done-1920x1080.png"]}
+{"route":"/","state":"landing","viewport":"1440x900","h":[],"t":["spacing off the 4/8 scale: 384px (main.mx-auto.flex.w-full)"],"shots":["phases/3-assistant/qa/home-landing-1440x900.png"]}
+{"route":"/","state":"landing","viewport":"1280x720","h":[],"t":["spacing off the 4/8 scale: 304px (main.mx-auto.flex.w-full)"],"shots":["phases/3-assistant/qa/home-landing-1280x720.png"]}
+{"route":"/","state":"landing","viewport":"1920x1080","h":[],"t":["spacing off the 4/8 scale: 624px (main.mx-auto.flex.w-full)"],"shots":["phases/3-assistant/qa/home-landing-1920x1080.png"]}
+{"route":"/","state":"landing","viewport":"390x844","h":[],"t":[],"shots":["phases/3-assistant/qa/home-landing-390x844.png"]}
+{"route":"/","state":"landing","viewport":"320x700","h":[],"t":[],"shots":["phases/3-assistant/qa/home-landing-320x700.png"]}
 {"route":"/kiosk","state":"K1-attract","viewport":"1080x1920","h":[],"t":["body line-height 1.35 < 1.5 on 1 elements, e.g. p \"휴대폰 카메라로 찍으세요\"","spacing off the 4/8 scale: 40px (h1.k-text-72.flex-none.px-16)"],"shots":["phases/3-assistant/qa/kiosk-K1-attract-1080x1920.png"]}
 {"route":"/kiosk","state":"K1-attract-scaled","viewport":"600x1067","h":[],"t":[],"shots":["phases/3-assistant/qa/kiosk-K1-attract-scaled-600x1067.png"],"note":"screenshot only"}
 {"route":"/kiosk","state":"K2-dine","viewport":"1080x1920","h":[],"t":["spacing off the 4/8 scale: 40px (div.grid.grid-cols-2.gap-10), 96px (div.flex.flex-1.flex-col)"],"shots":["phases/3-assistant/qa/kiosk-K2-dine-1080x1920.png"]}

@@ -21,8 +21,8 @@ export function DemoIntro(props: { starting: boolean; error: ScreenErrorCode | n
           <span className="block">Don&apos;t learn the kiosk.</span> <span className="block">Just talk.</span>
         </h1>
         <p className="text-xl text-[#33302B]">
-          Your phone becomes the voice of any self-order kiosk: say your order, the kiosk fills itself, you confirm and
-          pay.
+          Your phone becomes the voice of an existing self-order kiosk: say your order, the kiosk fills itself, you
+          confirm and pay.
         </p>
         <ol className="flex flex-col gap-4 rounded-[26px] border border-[#E2DACB] bg-white p-6">
           {STEPS.map((step, i) => (

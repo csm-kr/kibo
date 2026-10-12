@@ -22,6 +22,8 @@ export const KIOSK: Profile = { route: "/kiosk", root: "[data-kiosk-canvas]", ca
 export const PHONE: Profile = { route: "/assistant", root: "body", minFont: 16, minTarget: 56 };
 /** /demo: the intro, or the phone column of the split. The kiosk half is the scaled canvas, measured at full size by KIOSK. */
 export const DEMO: Profile = { route: "/demo", root: "[data-demo-check]", minFont: 16, minTarget: 56 };
+/** The root landing page `/`, judged by the phone numbers (a judge may open it on either device). */
+export const HOME: Profile = { route: "/", root: "body", minFont: 16, minTarget: 56 };
 
 export interface Findings {
   h: string[];
@@ -336,7 +338,7 @@ async function screenshot(page: Page, info: TestInfo, p: Profile, state: string)
   const vp = page.viewportSize();
   const viewport = vp ? `${vp.width}x${vp.height}` : "unknown";
   await page.evaluate(() => document.fonts.ready);
-  const shot = `${out}/${p.route.replace(/\W/g, "")}-${state}-${viewport}.png`;
+  const shot = `${out}/${p.route.replace(/\W/g, "") || "home"}-${state}-${viewport}.png`;
   await page.screenshot({ path: shot });
   return { out, viewport, shot };
 }

@@ -11,7 +11,7 @@ export default function Home() {
         <span className="block">Don&apos;t learn the kiosk.</span> <span className="block">Just talk.</span>
       </h1>
       <p className="text-xl text-[#33302B]">
-        Your phone becomes the voice of any self-order kiosk: say your order, the kiosk fills itself, you confirm and pay.
+        Your phone becomes the voice of an existing self-order kiosk: say your order, the kiosk fills itself, you confirm and pay.
       </p>
       <div className="flex flex-col gap-4">
         <Link href="/demo" className={`${PRIMARY} max-w-sm`}>
