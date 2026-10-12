@@ -66,6 +66,12 @@ const PHONE_TEXT = {
   },
   twoDeviceOpen: { ko: "키오스크와 휴대폰으로 해 보기", en: "Open two-device mode" },
   backToIntro: { ko: "처음 안내로 돌아가기", en: "Back to the intro" },
+  // Voice, when it gives way to text
+  voiceBusy: { ko: "지금은 음성 주문이 붐벼요. 글자로 입력해 주세요.", en: "Voice is busy right now. Please type instead." },
+  voiceFailed: { ko: "음성 연결이 안 돼요. 글자로 입력해 주세요.", en: "Voice isn't working right now. Please type instead." },
+  voiceNoMic: { ko: "마이크를 쓸 수 없어요. 글자로 입력해 주세요.", en: "The microphone isn't available. Please type instead." },
+  voiceOtherTab: { ko: "다른 탭에서 음성이 켜져 있어요.", en: "Voice is open in another tab." },
+  voiceTimeUp: { ko: "이번 주문의 음성 시간이 끝났어요. 글자로 입력해 주세요.", en: "Voice time for this order is up. Please type." },
   // Idle
   idleQuestion: { ko: "계속 주문하시겠어요?", en: "Still ordering?" },
   idleContinue: { ko: "계속하기", en: "Continue" },

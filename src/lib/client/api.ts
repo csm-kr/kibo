@@ -79,9 +79,11 @@ export function sendCommand(input: {
   source: Source;
   cartVersion?: number;
   utteranceSeq?: number;
+  /** Voice passes `<liveSessionId>:<functionCallId>`; everything else gets a fresh uuid. */
+  commandId?: string;
 }): Promise<CommandReply> {
-  const { token, ...rest } = input;
-  return post("/api/command", { ...rest, commandId: crypto.randomUUID() }, token);
+  const { token, commandId, ...rest } = input;
+  return post("/api/command", { ...rest, commandId: commandId ?? crypto.randomUUID() }, token);
 }
 
 export function ping(input: { sessionId: string; token: string; active: boolean }): Promise<PingReply> {
@@ -90,6 +92,18 @@ export function ping(input: { sessionId: string; token: string; active: boolean 
 
 export function claim(input: { sessionId: string; claimToken: string }): Promise<{ deviceToken: string; status: SessionStatus }> {
   return post("/api/session/claim", input);
+}
+
+export interface LiveTokenReply {
+  token: string;
+  model: string;
+  expiresAt: number;
+  voiceSeconds: number;
+}
+
+/** One-use Gemini Live token; model, instructions and tools are pinned in it (ADR-003). */
+export function liveToken(input: { sessionId: string; token: string; locale: Locale }): Promise<LiveTokenReply> {
+  return post("/api/live-token", { sessionId: input.sessionId, locale: input.locale }, input.token);
 }
 
 export interface ChatReply {

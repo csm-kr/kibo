@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { ApiError, chat, claim, createSession, ping, sendCommand } from "./api";
+import { ApiError, chat, claim, createSession, liveToken, ping, sendCommand } from "./api";
 
 const fetchMock = vi.fn();
 
@@ -161,5 +161,21 @@ describe("claim and chat", () => {
     expect(body).not.toHaveProperty("token");
     expect(body).not.toHaveProperty("cartVersion");
     expect(r.reply).toBe("Done");
+  });
+
+  it("sendCommand keeps a given commandId (voice: <liveSessionId>:<functionCallId>)", async () => {
+    fetchMock.mockResolvedValue(reply(200, { ok: true, status: "ordering", cart: [], total: 0, cartVersion: 1 }));
+    await sendCommand({ sessionId: "s", token: "d", type: "undoLastChange", args: {}, source: "voice", utteranceSeq: 4, commandId: "live:fc_1" });
+    expect(lastCall().body).toMatchObject({ commandId: "live:fc_1", source: "voice", utteranceSeq: 4 });
+  });
+
+  it("liveToken posts the session and locale with the device token", async () => {
+    fetchMock.mockResolvedValue(reply(200, { ok: true, token: "auth_tokens/x", model: "m", expiresAt: 1, voiceSeconds: 600 }));
+    const r = await liveToken({ sessionId: "s", token: "d", locale: "ko" });
+    const { url, init, body } = lastCall();
+    expect(url).toBe("/api/live-token");
+    expect(new Headers(init.headers).get("Authorization")).toBe("Bearer d");
+    expect(body).toEqual({ sessionId: "s", locale: "ko" });
+    expect(r).toMatchObject({ token: "auth_tokens/x", model: "m", voiceSeconds: 600 });
   });
 });

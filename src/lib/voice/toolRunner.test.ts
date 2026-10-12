@@ -1,0 +1,157 @@
+import { describe, expect, it, vi } from "vitest";
+import { getKiosk } from "@/lib/adapters/catalog";
+import { ApiError, type CommandReply } from "@/lib/client/api";
+import { runToolCalls, type ToolContext, type VoiceCommand } from "./toolRunner";
+
+const kiosk = getKiosk("malo");
+const LINE = { lineId: "a1b2c3d4e5f60718", itemId: "cheese_burger", variant: "set" as const, qty: 1, selections: {}, unitPrice: 7200 };
+const REPLY: CommandReply = { status: "ordering", cart: [LINE], total: 7200, cartVersion: 4 };
+
+function ctx(over: Partial<ToolContext> = {}): ToolContext & { sent: VoiceCommand[] } {
+  const sent: VoiceCommand[] = [];
+  return {
+    liveSessionId: "live-uuid",
+    utteranceSeq: 3,
+    cartVersion: () => 9,
+    kiosk,
+    locale: "en",
+    send: vi.fn(async (cmd: VoiceCommand) => {
+      sent.push(cmd);
+      return REPLY;
+    }),
+    sent,
+    ...over,
+  };
+}
+
+describe("runToolCalls", () => {
+  it("sends each call as a voice command with <liveSessionId>:<callId> and the current utteranceSeq", async () => {
+    const c = ctx();
+    const out = await runToolCalls([{ id: "fc_1", name: "addToCart", args: { itemId: "cheese_burger", variant: "set" } }], c);
+    expect(c.sent).toEqual([
+      {
+        commandId: "live-uuid:fc_1",
+        type: "addToCart",
+        args: { itemId: "cheese_burger", variant: "set" },
+        source: "voice",
+        utteranceSeq: 3,
+      },
+    ]);
+    expect(out).toEqual([
+      {
+        id: "fc_1",
+        name: "addToCart",
+        response: {
+          ok: true,
+          status: "ordering",
+          total: 7200,
+          cart: [{ lineId: LINE.lineId, name: "Cheeseburger", variant: "set", options: [], qty: 1, unitPrice: 7200 }],
+        },
+      },
+    ]);
+  });
+
+  it("sends the cartVersion shown on the phone with confirmCheckout only", async () => {
+    const c = ctx();
+    await runToolCalls(
+      [
+        { id: "a", name: "requestCheckout", args: {} },
+        { id: "b", name: "confirmCheckout", args: {} },
+      ],
+      c,
+    );
+    expect(c.sent[0]).not.toHaveProperty("cartVersion");
+    expect(c.sent[1]).toMatchObject({ commandId: "live-uuid:b", type: "confirmCheckout", cartVersion: 9, utteranceSeq: 3 });
+  });
+
+  it("runs calls one after another, in order", async () => {
+    const order: string[] = [];
+    let release!: () => void;
+    const first = new Promise<void>((r) => (release = r));
+    const c = ctx({
+      send: async (cmd) => {
+        order.push(`start ${cmd.commandId}`);
+        if (cmd.commandId.endsWith(":1")) await first;
+        order.push(`end ${cmd.commandId}`);
+        return REPLY;
+      },
+    });
+    const run = runToolCalls(
+      [
+        { id: "1", name: "undoLastChange", args: {} },
+        { id: "2", name: "undoLastChange", args: {} },
+      ],
+      c,
+    );
+    await Promise.resolve();
+    release();
+    await run;
+    expect(order).toEqual(["start live-uuid:1", "end live-uuid:1", "start live-uuid:2", "end live-uuid:2"]);
+  });
+
+  it("returns a server refusal as the tool result, with choices named from menu data", async () => {
+    const c = ctx({
+      send: async () => {
+        throw new ApiError("NEEDS_CHOICE", "Please choose a drink.", {
+          templateId: "pick_option",
+          groupId: "drink",
+          choices: [{ kind: "option", id: "cola" }],
+        });
+      },
+    });
+    const [res] = await runToolCalls([{ id: "x", name: "addToCart", args: { itemId: "cheese_burger", variant: "set" } }], c);
+    expect(res).toEqual({
+      id: "x",
+      name: "addToCart",
+      response: {
+        ok: false,
+        code: "NEEDS_CHOICE",
+        message: "Please choose a drink.",
+        templateId: "pick_option",
+        choices: [{ kind: "option", id: "cola", name: expect.any(String) }],
+      },
+    });
+  });
+
+  it("answers an unknown tool or bad arguments without calling the server", async () => {
+    const c = ctx();
+    const out = await runToolCalls(
+      [
+        { id: "u", name: "payNow", args: {} },
+        { id: "b", name: "addToCart", args: { itemId: 5 } },
+      ],
+      c,
+    );
+    expect(c.send).not.toHaveBeenCalled();
+    expect(out.map((r) => (r.response as { code: string }).code)).toEqual(["BAD_REQUEST", "BAD_REQUEST"]);
+  });
+
+  it("turns a network failure into a result the model can read, and keeps going", async () => {
+    let n = 0;
+    const c = ctx({
+      send: async () => {
+        if (n++ === 0) throw new ApiError("NETWORK", "Connection problem. Please try again.");
+        return REPLY;
+      },
+    });
+    const out = await runToolCalls(
+      [
+        { id: "1", name: "undoLastChange", args: {} },
+        { id: "2", name: "undoLastChange", args: {} },
+      ],
+      c,
+    );
+    expect(out[0].response).toMatchObject({ ok: false, code: "NETWORK" });
+    expect(out[1].response).toMatchObject({ ok: true });
+  });
+
+  it("answers an unexpected exception as INTERNAL without its message", async () => {
+    const c = ctx({
+      send: async () => {
+        throw new TypeError("secret detail");
+      },
+    });
+    const [res] = await runToolCalls([{ id: "1", name: "undoLastChange", args: {} }], c);
+    expect(res.response).toEqual({ ok: false, code: "INTERNAL", message: "Something went wrong. Please try again." });
+  });
+});
