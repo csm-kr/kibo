@@ -11,6 +11,9 @@ design
 videos
 scripts
 .claude
+.harness-logs
+.pytest_cache
+.DS_Store
 docs
 phases
 evals

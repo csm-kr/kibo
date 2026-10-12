@@ -187,7 +187,7 @@ export default function Home() {
             <Fact
               value="40 of 40 items found on a café kiosk it had never seen"
               detail="example orders: 2 of 5 and 3 of 5 passed; the rest were refused before running"
-              path="spikes/blind-kiosk/results/v3run1/grade.txt, holdout.log"
+              path="spikes/blind-kiosk/results/v3run1/grade.txt, spikes/blind-kiosk/results/holdout.log"
             />
           </article>
         </div>
@@ -321,7 +321,8 @@ function Architecture() {
       role="img"
       aria-labelledby="arch-title"
       viewBox="0 0 1000 424"
-      className="h-auto w-full min-w-[760px]"
+      // Never narrower than the viewBox: shrunk, the 16-unit labels render under the 16px minimum (docs/UI_QA.md).
+      className="h-auto w-full min-w-[1000px]"
     >
       <title id="arch-title">
         Architecture: the phone talks to Gemini Live directly and sends commands to Cloud Run; the kiosk sends cart

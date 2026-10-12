@@ -32,3 +32,8 @@ When an issue class in `docs/ISSUE.md` is seen for the **3rd time**, it becomes 
 - From: `qa-coverage-gap` — I-049 (seen 10-13/2-kiosk:6), I-065 (10-13/3-assistant:3), I-071 (10-13/3-assistant:6)
 - Why: states and pages left out of `e2e/qa/*.qa.spec.ts` (kiosk banners, Korean phone copy, the root page) get no screenshots or checks, so the phase-end QA passes without ever measuring them.
 - Check: for each route or screen-map id (`docs/UX.md`) the step adds or changes, `grep -rn "<id or route>" e2e/qa/` finds a `qaState` call, and `phases/<phase>/qa/` holds its screenshot after `npm run qa:ui`.
+
+### R-004 (proposed): Every QA report names which T misses are checker false positives, and each one has an issue row
+- From: `checker-false-positive` — I-061 (seen 10-13/3-assistant:3), I-075 (10-13/3-assistant:6, 10-13/5-ship:3)
+- Why: false positives from `e2e/qa/checks.ts` (screen-reader-only text, `auto` margins) come back on every run, and unexplained T noise hides the real misses.
+- Check: in `phases/<phase>/qa/REPORT.md`, every kind of T miss in `ui-qa.jsonl` on a changed screen is either a real miss with an issue id or a false positive with an issue id (`grep checker-false-positive docs/ISSUE.md`).
