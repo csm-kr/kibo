@@ -13,7 +13,10 @@
     {
       "step": 1,
       "name": "scenario-data",
-      "status": "pending"
+      "status": "completed",
+      "summary": "src/lib/demo/scenarios.ts: 9 scenarios as data (malo: sunja-lunch, not-sure, sold-out, halal, ai-cannot-pay, undo; airport_rail: mei-tickets, which-platform; doughhouse: learned-pizza), ko/en text, sentences reused from evals/examples, every one ends at confirming (stopBeforePay, no paying/paid check). stepDone: cartHas matches item, optional variant, listed groups as option sets, qty = total over matching lines. scenarioProgress(session, scenario, from = 0) checks steps in order from `from`, so the panel must keep doneSteps and pass it back (undo ends on an empty cart, choice taps clear pendingChoice; I-126). Scenarios assume the dine option is set on P2 before talking (MALO, Doughhouse). scenarios.test.ts checks every id against the kiosk data.",
+      "started_at": "2026-10-13T07:52:27+0900",
+      "completed_at": "2026-10-13T07:59:00+0900"
     },
     {
       "step": 2,
