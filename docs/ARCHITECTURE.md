@@ -312,7 +312,7 @@ Pages: `/kiosk?k=<kioskId>` (`&demo=1` shows the tap counter and timer), `/assis
 | `POST /api/session/claim` | `{ sessionId, claimToken }` | `{ deviceToken }`. A second claim gets `CONFLICT`; the same phone reconnects with its stored `deviceToken` instead of claiming again |
 | `POST /api/command` | `{ sessionId, commandId (string, 1–128), type, args, cartVersion?, utteranceSeq?, source: "voice"\|"text"\|"button"\|"touch" }`. `commandId`: `<liveSessionId>:<functionCallId>` for voice, `<chatRequestId>:<n>` for text, a uuid for buttons and touch | `{ ok, status, cart, total, cartVersion, result? }`; a repeated `commandId` returns the current state with `duplicate: true` and applies nothing |
 | `POST /api/live-token` | `{ sessionId }` | `{ token, expiresAt }` (model, instructions and tools pinned in the token) |
-| `POST /api/chat` | `{ sessionId, message (≤ 500 chars), history (last 10 turns of user and model text, kept on the phone; tool turns are rejected) }` | `{ reply, status, cart, total, choices? }` after ≤ 5 tool rounds. One request is one user utterance: `confirmCheckout` is refused in the request that ran `requestCheckout` |
+| `POST /api/chat` | `{ sessionId, chatRequestId (uuid), message (≤ 500 chars), history (last 10 turns of user and model text, kept on the phone; tool turns are rejected), utteranceSeq, cartVersion? (the version shown on the confirm card), locale }` + device token | `{ reply, status, cart, total, cartVersion }` after ≤ 5 tool rounds; choice buttons come from `pendingChoice` in the stream. One request is one user utterance: every command in it carries the request's `utteranceSeq`, so `confirmCheckout` is refused in the request that ran `requestCheckout` |
 | `POST /api/ping` | `{ sessionId, active }` | `{ status, expiresAt }`; `active: true` extends the session |
 | `GET /api/health` | — | `{ ok, version }` |
 
@@ -337,7 +337,7 @@ Pages: `/kiosk?k=<kioskId>` (`&demo=1` shows the tap counter and timer), `/assis
 | `bridgeReport` | | ✓ | learned kiosks only: mirrors the kiosk's real cart (sequence 3) |
 
 - `utteranceSeq` is the phone's counter of finished user turns. With the 1.5 s wait it stops the model from chaining `requestCheckout` and `confirmCheckout` in one turn; the confirm card is still the real safeguard. In `/api/chat` one request counts as one utterance.
-- A tap on a choice button sends the command the choice stands for (for example `addToCart` with the chosen id) with `source: "button"`. Any accepted command clears `pendingChoice`.
+- A tap on a choice button is sent to the agent as the user's answer (the button's label, counted as a new utterance), because the agent holds the half-finished order the question belongs to; the agent then calls the tool. Dine choices send `setDineOption` directly, and the confirm card's [Yes, pay now] sends `confirmCheckout` with `source: "button"`. Any accepted command clears `pendingChoice`.
 - **Learned kiosks:** a cart command is stored in `pendingBridgeCommand` and answered `{ ok: true, pending: true }`; the phone waits for the bridge's `bridgeReport` through `onSnapshot`. After 15 s without a report the phone shows "Please check the kiosk screen" and offers staff. A second command while one is pending gets `CONFLICT`. Learned sessions end at `confirming`: the user pays on the kiosk itself.
 
 ### `/api/command` processing order
@@ -397,7 +397,7 @@ LearnedAdapter normalizes the catalog into the items shape: ids generated from l
 Worst case (20 lines × 6 carts) stays far below the 1 MiB document limit. Sessions hold no personal data: the session id is printed in a public QR, so anyone holding it can read the cart.
 
 ### `sessionSecrets/{sessionId}` — server only
-`claimTokenHash`, `claimed`, `deviceTokenHash`, `kioskTokenHash`, `createdAt`, `expiresAt` (TTL).
+`claimTokenHash`, `claimed`, `deviceTokenHash`, `kioskTokenHash`, `chatCount`, `liveTokenCount`, `createdAt`, `expiresAt` (TTL). The per-session limits count here, where no client can see or change them.
 
 ### `usage/{yyyy-mm-dd}` (KST) — server only
 `voiceSessions`, `chatMessages`, incremented with `FieldValue.increment` inside the limit check. Per-IP limits are kept in memory per Cloud Run instance; with `max-instances=3` the effective limit is at most 3× the configured value.
