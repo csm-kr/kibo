@@ -155,19 +155,6 @@ export function voiceSecondsLeft(seconds: number, locale: Locale): string {
   return locale === "ko" ? `음성 ${seconds}초 남았어요` : `Voice: ${seconds} s left`;
 }
 
-/** Example sentences on /demo (docs/UX.md Flow C2): a short first order before the hero order. */
-export function demoExamples(locale: Locale): string[] {
-  return locale === "ko"
-    ? ["치즈버거 세트 하나, 음료는 제로콜라.", ...phoneExamples(locale)]
-    : [
-        "One cheeseburger set with zero cola",
-        "Two cheeseburger sets, one without pickles. Drinks zero cola and cider.",
-        "Make both fries large",
-        "Is this halal?",
-        "I'll pay",
-      ];
-}
-
 /** P4 on a learned kiosk: the kiosk's own checkout label, quoted as the kiosk shows it, with its meaning in English. */
 export function learnedPayHint(
   checkout: { label: string; name: LocalizedName },
@@ -176,23 +163,4 @@ export function learnedPayHint(
   return locale === "ko"
     ? { pre: "주문이 키오스크에 담겼어요. 키오스크에서 '", label: checkout.label, gloss: "", post: "' 버튼을 누르고 결제해 주세요." }
     : { pre: "Your order is on the kiosk. Tap ", label: checkout.label, gloss: ` (${checkout.name.en})`, post: " on the kiosk and pay there." };
-}
-
-/** Example sentences for the learned pizza kiosk, on /demo and /assistant (items and options from skills/doughhouse.json). */
-export function learnedExamples(locale: Locale): string[] {
-  return locale === "ko"
-    ? ["페퍼로니 라지, 씬 도우에 베이컨 추가해 줘.", "콜라 1.25L 하나 추가해 줘.", "콜라는 빼 줘.", "다 골랐어요."]
-    : ["A large pepperoni with thin dough and extra bacon", "Add a cola, 1.25 liters", "Remove the cola", "I'm done"];
-}
-
-/** Example sentences on /assistant. */
-export function phoneExamples(locale: Locale): string[] {
-  return locale === "ko"
-    ? ["치즈버거 세트 두 개, 하나는 피클 빼고. 음료는 제로콜라랑 사이다.", "감자튀김 둘 다 라지로 바꿔 줘.", "이거 할랄이에요?", "결제할게요."]
-    : [
-        "Two cheeseburger sets, one without pickles. Drinks zero cola and cider.",
-        "Make both fries large.",
-        "Is this halal?",
-        "I'll pay.",
-      ];
 }

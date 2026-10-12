@@ -3,7 +3,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { AssistantPanel } from "@/components/assistant/AssistantPanel";
 import { usePhoneSession } from "@/hooks/usePhoneSession";
-import { learnedExamples, phoneExamples } from "@/lib/i18n/phone";
+import { examplesFor } from "@/lib/agent/examples";
 import { isInAppBrowser } from "@/lib/phone/inApp";
 import { phoneLocale } from "@/lib/phone/locale";
 import type { KioskData, Locale } from "@/types/menu";
@@ -53,7 +53,7 @@ export function AssistantApp({ sessionId, kiosks }: { sessionId: string | null; 
       locale={locale}
       onLocaleChange={setStoredLocale}
       mode="phone"
-      examples={kiosk.kind === "learned" ? learnedExamples(locale) : phoneExamples(locale)}
+      examples={examplesFor(kiosk.kioskId, locale)}
       claimError={ps.claimError}
       streamState={ps.streamState}
       clockOffset={ps.clockOffset}

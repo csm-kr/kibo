@@ -42,7 +42,7 @@ export function ChoiceButtons(props: {
   return (
     <section aria-labelledby={titleId} className="flex flex-col gap-3">
       <h2 id={titleId} className="text-xl font-bold">
-        {choiceQuestion(pending.templateId, locale)}
+        {choiceQuestion(kiosk, pending, locale)}
       </h2>
       {/* One column: menu names like "Double cheeseburger" do not fit half a phone at 20px. */}
       <div className="flex flex-col gap-2">

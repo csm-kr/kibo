@@ -447,6 +447,8 @@ Mutating tools return the updated cart, so no separate summary tool is needed. T
 
 Learned kiosks support `setDineOption`, `addToCart`, `removeFromCart`, `requestCheckout`/`confirmCheckout`, `offerChoices`, `callStaff`; `updateCart` becomes remove + add, `undoLastChange` only undoes the last add.
 
+A kiosk without `dineOptions` (the airport rail ticket machine) gets no `setDineOption`, and `offerChoices` there has no `pick_dine` template or `dine` choice kind; `addToCart`'s `variant` lists only the variants the catalog sells. The instructions follow the kiosk's `domain` (`src/lib/agent/instructions.ts`): a `ticket` kiosk talks about tickets, destinations and passengers, adds one line per passenger type, asks for an unclear destination (`pick_item`) and a transit card's top-up, and calls staff (`unknown_info`) for platforms, timetables, delays, luggage and connections. Dine and upsell lines appear only on kiosks whose data has them. Example sentences per kiosk: `examplesFor(kioskId, locale)` in `src/lib/agent/examples.ts`.
+
 Anti-hallucination: names, prices and options exist only in menu data; the server validates every argument; the cart card and confirm screen are rendered from session state, never from model text.
 
 ## Voice

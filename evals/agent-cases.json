@@ -1,5 +1,5 @@
 {
-  "about": "Text-agent evaluation set for the MALO BURGER kiosk (docs/TESTING.md \"Agent evaluation set\"). Written by the KIBO team, not an external benchmark. Each case starts on a fresh /demo session (status connected, empty cart) at 14:00 KST. Types follow TESTING 1-6, 8, 9; \"checkout\" checks the confirm rule; \"grounded-reply\" checks that the reply describes items only with menu data (scripts/grounding.ts, I-072). A cart expectation merges identical lines and counts defaults (set side fries_m, drink size m).",
+  "about": "Text-agent evaluation set for the MALO BURGER kiosk and, for cases with kioskId \"airport_rail\", the SKYLINE AIRPORT RAIL ticket machine (docs/TESTING.md \"Agent evaluation set\"). Written by the KIBO team, not an external benchmark. Each case starts on a fresh /demo session of its kioskId (default malo; status connected, empty cart) at 14:00 KST. Types follow TESTING 1-6, 8, 9; \"checkout\" checks the confirm rule; \"grounded-reply\" checks that the reply describes items only with menu data (scripts/grounding.ts, I-072). A cart expectation merges identical lines and counts defaults (set side fries_m, drink size m).",
   "notCovered": [
     { "type": "7-count-limits", "reason": "Count limits (max 3 toppings) need the learned Doughhouse kiosk, which has no LearnedAdapter yet." }
   ],
@@ -272,6 +272,96 @@
       "locale": "ko",
       "turns": ["콜라 하나 포장이요.", "결제할게요.", "네, 결제해 주세요."],
       "expect": { "status": "paying" }
+    },
+    {
+      "id": "r2-en-family",
+      "kioskId": "airport_rail",
+      "type": "2-same-item-different-options",
+      "locale": "en",
+      "turns": ["Two adult tickets and one child ticket to City Center on the express, please."],
+      "expect": {
+        "cart": [
+          { "itemId": "express_city_center", "variant": "single", "qty": 2, "selections": { "passenger": ["adult"] } },
+          { "itemId": "express_city_center", "variant": "single", "qty": 1, "selections": { "passenger": ["child"] } }
+        ]
+      }
+    },
+    {
+      "id": "r2-ko-family",
+      "kioskId": "airport_rail",
+      "type": "2-same-item-different-options",
+      "locale": "ko",
+      "turns": ["올드타운까지 일반열차로 어른 둘, 어린이 하나요."],
+      "expect": {
+        "cart": [
+          { "itemId": "all_stop_old_town", "variant": "single", "qty": 2, "selections": { "passenger": ["adult"] } },
+          { "itemId": "all_stop_old_town", "variant": "single", "qty": 1, "selections": { "passenger": ["child"] } }
+        ]
+      }
+    },
+    {
+      "id": "r9-en-destination",
+      "kioskId": "airport_rail",
+      "type": "9-ambiguous",
+      "locale": "en",
+      "turns": ["One ticket to City Center, please."],
+      "expect": { "choices": { "templateId": "pick_item", "ids": ["express_city_center", "all_stop_city_center"] } }
+    },
+    {
+      "id": "r9-ko-destination",
+      "kioskId": "airport_rail",
+      "type": "9-ambiguous",
+      "locale": "ko",
+      "turns": ["시티센터 가는 표 한 장 주세요."],
+      "expect": { "choices": { "templateId": "pick_item", "ids": ["express_city_center", "all_stop_city_center"] } }
+    },
+    {
+      "id": "r3-ko-card-top-up",
+      "kioskId": "airport_rail",
+      "type": "3-missing-required-choice",
+      "locale": "ko",
+      "turns": ["교통카드 하나 주세요."],
+      "expect": { "choices": { "templateId": "pick_option", "ids": ["top_up_0", "top_up_10000", "top_up_20000", "top_up_30000"] } }
+    },
+    {
+      "id": "r6-en-sold-out",
+      "kioskId": "airport_rail",
+      "type": "6-sold-out-or-hours",
+      "locale": "en",
+      "turns": ["One train and late-night bus combo, please."],
+      "expect": { "choices": { "templateId": "alternatives", "ids": ["day_pass", "two_day_pass"] } }
+    },
+    {
+      "id": "r8-en-platform",
+      "kioskId": "airport_rail",
+      "type": "8-not-in-data",
+      "locale": "en",
+      "turns": ["Which platform does the express leave from?"],
+      "expect": { "staff": true }
+    },
+    {
+      "id": "r8-ko-timetable",
+      "kioskId": "airport_rail",
+      "type": "8-not-in-data",
+      "locale": "ko",
+      "turns": ["다음 열차 몇 시에 출발해요?"],
+      "expect": { "staff": true }
+    },
+    {
+      "id": "r8-en-not-sold-here",
+      "kioskId": "airport_rail",
+      "type": "8-not-in-data",
+      "locale": "en",
+      "turns": ["One taxi voucher to the hotel district, please."],
+      "expect": { "refuse": true }
+    },
+    {
+      "id": "rco-en-ill-pay",
+      "kioskId": "airport_rail",
+      "type": "checkout",
+      "locale": "en",
+      "turns": ["Two adult tickets to Riverside on the all-stop train.", "That's all. I'll pay."],
+      "expect": { "status": "confirming" }
     }
   ]
 }

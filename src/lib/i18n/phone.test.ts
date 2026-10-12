@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getKiosk } from "@/lib/adapters/catalog";
-import { learnedExamples, learnedPayHint, pt } from "./phone";
+import { learnedPayHint, pt } from "./phone";
 
 const checkout = getKiosk("doughhouse").learned!.checkout;
 
@@ -17,15 +17,5 @@ describe("learned kiosk copy", () => {
     expect(pt("bridgeSlow", "en")).toBe("Please check the kiosk screen.");
     expect(pt("bridgeMismatch", "en")).toBe("The kiosk did not take that change. Please check the kiosk screen. Staff is on the way.");
     for (const key of ["bridgePending", "bridgeSlow", "bridgeMismatch"] as const) expect(pt(key, "ko")).not.toBe("");
-  });
-
-  it("pizza examples", () => {
-    expect(learnedExamples("en")).toEqual([
-      "A large pepperoni with thin dough and extra bacon",
-      "Add a cola, 1.25 liters",
-      "Remove the cola",
-      "I'm done",
-    ]);
-    expect(learnedExamples("ko")).toHaveLength(4);
   });
 });

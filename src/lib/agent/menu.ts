@@ -1,6 +1,6 @@
 import type { KioskData } from "@/types/menu";
 
-// The menu as the model sees it: everything it may quote (names, prices, options, allergens, kcal, badge),
+// The menu as the model sees it: everything it may quote (names, subtitles, prices, options, allergens, kcal, badge),
 // nothing it does not need (images, theme). Compact, because it goes into every voice and text session.
 
 export function menuForModel(k: KioskData) {
@@ -10,6 +10,8 @@ export function menuForModel(k: KioskData) {
     items: k.items.map((i) => ({
       itemId: i.itemId,
       name: i.name,
+      // Ticket subtitles hold travel time and stops ("Non-stop · 43 min"), which the model may quote.
+      ...(i.subtitle ? { subtitle: i.subtitle } : {}),
       category: i.category,
       variants: i.variants,
       groups: i.optionGroups.map((g) => ({

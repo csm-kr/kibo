@@ -6,7 +6,7 @@ import { KioskCanvas } from "@/components/kiosk/KioskCanvas";
 import { KioskScreen } from "@/components/kiosk/KioskScreen";
 import { LearnedKioskHost } from "@/components/learned/LearnedKioskHost";
 import { useDemoSession } from "@/hooks/useDemoSession";
-import { demoExamples, learnedExamples } from "@/lib/i18n/phone";
+import { examplesFor } from "@/lib/agent/examples";
 import type { KioskData, Locale } from "@/types/menu";
 import { DemoEndCard } from "./DemoEndCard";
 import { DemoIntro } from "./DemoIntro";
@@ -83,7 +83,7 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
             locale={locale}
             onLocaleChange={setLocale}
             mode="demo"
-            examples={learned ? learnedExamples(locale) : demoExamples(locale)}
+            examples={examplesFor(kiosk.kioskId, locale, "demo")}
             onCardStandIn={() => cardTap.dispatchEvent(new Event("tap"))}
             streamState={demo.streamState}
             clockOffset={demo.clockOffset}

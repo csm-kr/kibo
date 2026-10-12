@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { getKiosk } from "@/lib/adapters/catalog";
-import type { TemplateId } from "@/lib/commands/errors";
+import type { ChoiceRef, TemplateId } from "@/lib/commands/errors";
 import { choiceLabel, choiceQuestion } from "./choices";
 
 const k = getKiosk("malo");
+const rail = getKiosk("airport_rail");
 
 describe("choiceLabel", () => {
   it("names items and options from menu data", () => {
@@ -33,13 +34,46 @@ describe("choiceLabel", () => {
 
 describe("choiceQuestion", () => {
   const templates: TemplateId[] = ["pick_item", "pick_variant", "pick_option", "pick_dine", "yes_no", "alternatives", "upsell"];
+  const ask = (kiosk = k, templateId: TemplateId, choices: ChoiceRef[] = []) => ({
+    ko: choiceQuestion(kiosk, { templateId, choices }, "ko"),
+    en: choiceQuestion(kiosk, { templateId, choices }, "en"),
+  });
 
   it("has a fixed question for every template in both languages", () => {
     for (const t of templates) {
-      expect(choiceQuestion(t, "ko"), t).toMatch(/\?$/);
-      expect(choiceQuestion(t, "en"), t).toMatch(/\?$/);
+      for (const kiosk of [k, rail]) {
+        const q = ask(kiosk, t);
+        expect(q.ko, t).toMatch(/\?$/);
+        expect(q.en, t).toMatch(/\?$/);
+      }
     }
-    expect(choiceQuestion("pick_dine", "en")).toBe("Eat here or take out?");
-    expect(choiceQuestion("upsell", "ko")).toBe("디저트도 함께 드릴까요?");
+    expect(ask(k, "pick_dine").en).toBe("Eat here or take out?");
+    expect(ask(k, "upsell").ko).toBe("디저트도 함께 드릴까요?");
+  });
+
+  it("keeps MALO's questions, including for its own option groups", () => {
+    expect(ask(k, "pick_item").ko).toBe("어떤 메뉴로 드릴까요?");
+    expect(ask(k, "pick_option", [{ kind: "option", id: "cola" }]).en).toBe("Which one would you like?");
+  });
+
+  it("asks about tickets on a ticket machine, never about the menu", () => {
+    expect(ask(rail, "pick_item")).toEqual({ ko: "어떤 승차권으로 드릴까요?", en: "Which ticket would you like?" });
+    expect(ask(rail, "alternatives")).toEqual({ ko: "이 승차권은 어떠세요?", en: "How about one of these?" });
+    for (const t of templates) expect(ask(rail, t).ko, t).not.toContain("메뉴");
+  });
+
+  it("names the passenger, seat and top-up groups", () => {
+    expect(ask(rail, "pick_option", [{ kind: "option", id: "adult" }, { kind: "option", id: "child" }])).toEqual({
+      ko: "어느 승객으로 드릴까요?",
+      en: "Who is the ticket for?",
+    });
+    expect(ask(rail, "pick_option", [{ kind: "option", id: "window" }])).toEqual({
+      ko: "어느 좌석으로 드릴까요?",
+      en: "Window or aisle seat?",
+    });
+    expect(ask(rail, "pick_option", [{ kind: "option", id: "top_up_10000" }])).toEqual({
+      ko: "얼마를 충전할까요?",
+      en: "How much would you like to top up?",
+    });
   });
 });

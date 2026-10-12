@@ -19,7 +19,9 @@ function object(properties: Record<string, object>, required: string[] = []) {
 export function toolDeclarations(k: KioskData): FunctionDeclaration[] {
   const groups = k.items.flatMap((i) => i.optionGroups);
   const qty = { type: "integer", minimum: 1, maximum: 10 };
-  const variant = { type: "string", enum: VARIANTS };
+  const variant = { type: "string", enum: VARIANTS.filter((v) => k.items.some((i) => i.variants.some((x) => x.variant === v))) };
+  // A kiosk without dine options (a ticket machine) never asks eat-in or take-out; the server refuses it there too.
+  const dine = k.dineOptions !== undefined;
   const options = {
     type: "array",
     description: "Choices per option group; leave a group out to keep its default or current choice.",
@@ -53,12 +55,15 @@ export function toolDeclarations(k: KioskData): FunctionDeclaration[] {
     ["undoLastChange", "Undo the last cart change when the user says no, cancel that, or undo.", object({})],
     ["offerChoices", "Show the user choice buttons (menu ids only) when a choice is needed or the request is ambiguous.", object(
       {
-        templateId: { type: "string", enum: TEMPLATES },
+        templateId: { type: "string", enum: dine ? TEMPLATES : TEMPLATES.filter((t) => t !== "pick_dine") },
         choices: {
           type: "array",
           minItems: 1,
           maxItems: 6,
-          items: object({ kind: { type: "string", enum: CHOICE_KINDS }, id: { type: "string" } }, ["kind", "id"]),
+          items: object(
+            { kind: { type: "string", enum: dine ? CHOICE_KINDS : CHOICE_KINDS.filter((c) => c !== "dine") }, id: { type: "string" } },
+            ["kind", "id"],
+          ),
         },
       },
       ["templateId", "choices"],
@@ -72,8 +77,8 @@ export function toolDeclarations(k: KioskData): FunctionDeclaration[] {
   ];
 
   // A learned kiosk changes a line by remove + add, and the user pays on the kiosk itself (ARCHITECTURE "Agent tools").
-  const learnedOmits = k.kind === "learned" ? ["updateCart", "confirmCheckout"] : [];
+  const omit = [...(k.kind === "learned" ? ["updateCart", "confirmCheckout"] : []), ...(dine ? [] : ["setDineOption"])];
   return tools
-    .filter(([name]) => !learnedOmits.includes(name))
+    .filter(([name]) => !omit.includes(name))
     .map(([name, description, parametersJsonSchema]) => ({ name, description, parametersJsonSchema }));
 }

@@ -38,6 +38,8 @@ type Expect =
 
 interface Case {
   id: string;
+  /** Kiosk the case runs on; default "malo". */
+  kioskId?: string;
   type: string;
   locale: Locale;
   turns: string[];
@@ -134,7 +136,8 @@ async function runCase(c: Case, model: ModelClient) {
   const usage = new MemoryUsageStore();
   const started = Date.now();
   const now = () => EVAL_CLOCK + (Date.now() - started);
-  const { sessionId, deviceToken } = await createSession(store, { kioskId: "malo", demo: true }, now());
+  const kioskId = c.kioskId ?? "malo";
+  const { sessionId, deviceToken } = await createSession(store, { kioskId, demo: true }, now());
 
   let chat = initialChat;
   let before: CartLine[] = [];
@@ -195,12 +198,13 @@ async function runCase(c: Case, model: ModelClient) {
   }
 
   const final = (await store.get(sessionId))!;
-  const grounding = "reply" in c.expect && lastReply !== null ? checkGrounding(lastReply, getKiosk("malo")) : null;
+  const grounding = "reply" in c.expect && lastReply !== null ? checkGrounding(lastReply, getKiosk(kioskId)) : null;
   const failure = requests.find((r) => r.error)
     ? `request error ${requests.find((r) => r.error)!.error}`
     : judge(c, final, before, allCalls, grounding);
   return {
     id: c.id,
+    kioskId,
     type: c.type,
     locale: c.locale,
     pass: failure === null,
@@ -256,6 +260,13 @@ async function main() {
     if (r.pass) t.pass++;
     byType.set(r.type, t);
   }
+  const byKiosk = new Map<string, { pass: number; total: number }>();
+  for (const r of results) {
+    const t = byKiosk.get(r.kioskId) ?? { pass: 0, total: 0 };
+    t.total++;
+    if (r.pass) t.pass++;
+    byKiosk.set(r.kioskId, t);
+  }
   const reqs = results.flatMap((r) => r.requests).filter((q) => !q.error);
   const totals = reqs.map((q) => q.ms);
   const firsts = reqs.flatMap((q) => (q.firstToolMs === null ? [] : [q.firstToolMs]));
@@ -285,6 +296,7 @@ async function main() {
     cases: results.length,
     passed,
     passRate: results.length ? passed / results.length : 0,
+    byKiosk: Object.fromEntries(byKiosk),
     byType: Object.fromEntries(byType),
     latency,
     notCovered: file.notCovered,
@@ -300,6 +312,10 @@ async function main() {
     `- Overall: **${passed}/${results.length} (${pct(passed, results.length || 1)})**`,
     `- Latency per request (${latency.requests} requests): median ${latency.totalMedianMs} ms, p90 ${latency.totalP90Ms} ms`,
     `- Until the first command is applied (${latency.firstToolRequests} requests): median ${latency.firstToolMedianMs} ms, p90 ${latency.firstToolP90Ms} ms`,
+    "",
+    "| Kiosk | Pass |",
+    "|---|---|",
+    ...[...byKiosk].map(([k, v]) => `| ${k} | ${v.pass}/${v.total} |`),
     "",
     "| Type | Pass |",
     "|---|---|",

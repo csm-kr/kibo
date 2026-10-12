@@ -37,7 +37,10 @@
     {
       "step": 4,
       "name": "agent-domains",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-13T05:42:02+0900",
+      "summary": "Agent per domain. buildInstructions (src/lib/agent/instructions.ts) reads domain and vocabulary: ticket machines get 'ticket machine'/'station staff', a ## Tickets section (tickets, destinations, passengers; never food or eat-in/take-out; one addToCart per passenger type with qty, 'two adults and a child' = adult qty 2 + child qty 1; unclear destination or train type -> offerChoices pick_item; transit card without amount -> pick_option top_up; sold-out ticket -> alternatives from the same category; may quote subtitles; never name stations/operators not in data), staff (unknown_info) for platforms, timetables, delays, luggage, connections; best-seller example from the kiosk's own data; dine and upsell lines and the 'Dine option' status only when the data has them. menuForModel adds subtitle. toolDeclarations omits setDineOption, pick_dine and the dine choice kind without dineOptions; variant enum lists only variants the catalog sells. choiceQuestion(kiosk, pending, locale) asks per group (passenger, seat, top_up) and in ticket words (pick_item, alternatives), ko and en; ChoiceButtons updated. src/lib/agent/examples.ts examplesFor(kioskId, locale, surface='phone'|'demo') for malo (demo has a short first order), doughhouse, airport_rail; phone.ts example functions removed; AssistantApp and DemoApp use it; /assistant lists every kiosk from allKioskIds() (I-097 again, fixed). Evals: 10 airport_rail cases (ko/en: family x2, destination x2, card top-up, sold out, platform, timetable, item not sold, checkout); eval-agent.ts takes kioskId per case (default malo) and reports byKiosk. Full run on Vertex 41/42: malo 32/32, airport_rail 9/10 (evals/results/2026-10-13T06-38); one ticket-only tuning line, airport re-run 10/10 (2026-10-13T06-50, partial). TESTING ledger, ARCHITECTURE agent tools paragraph updated; ISSUE I-098 (rail phone placeholder still says cheeseburger, for step 5), I-111 (Vertex 429 in an earlier full run, check quota), I-112 (eval longer than a 10 min tool limit). lint, build, 644 unit tests pass.",
+      "completed_at": "2026-10-13T06:55:00+0900"
     },
     {
       "step": 5,

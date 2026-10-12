@@ -73,6 +73,27 @@ describe("toolDeclarations", () => {
     }
   });
 
+  it("leaves setDineOption and dine choices out on a kiosk without dine options (8 tools)", () => {
+    const rail = getKiosk("airport_rail");
+    const ticket = toolDeclarations(rail);
+    expect(ticket.map((d) => d.name)).toEqual([
+      "addToCart",
+      "updateCart",
+      "removeFromCart",
+      "undoLastChange",
+      "offerChoices",
+      "callStaff",
+      "requestCheckout",
+      "confirmCheckout",
+    ]);
+    const offer = (ticket.find((d) => d.name === "offerChoices")!.parametersJsonSchema as Schema).properties!;
+    expect(offer.templateId.enum).not.toContain("pick_dine");
+    expect(offer.choices.items!.properties!.kind.enum).not.toContain("dine");
+    // Only the variants the catalog sells: every ticket is "single".
+    const add = (ticket.find((d) => d.name === "addToCart")!.parametersJsonSchema as Schema).properties!;
+    expect(add.variant.enum).toEqual(["single"]);
+  });
+
   it("leaves updateCart and confirmCheckout out for a learned kiosk (7 tools)", () => {
     const dh = getKiosk("doughhouse");
     const learned = toolDeclarations(dh);

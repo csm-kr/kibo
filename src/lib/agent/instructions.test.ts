@@ -90,6 +90,70 @@ describe("buildInstructions", () => {
     expect(text).toMatch(/never say technical words/i);
   });
 
+  it("keeps the food-only lines for MALO", () => {
+    expect(text).toContain("Speak like counter staff");
+    expect(text).toContain("If the order needs a dine option, ask \"Eat here or take out?\" and call setDineOption.");
+    expect(text).toContain("Would you like a dessert too?");
+    expect(text).not.toContain("## Tickets");
+  });
+
+  describe("on a ticket machine (airport_rail)", () => {
+    const rail = getKiosk("airport_rail");
+    const t = buildInstructions(rail, { locale: "en" });
+
+    it("talks about tickets, destinations and passengers, never food or dine options", () => {
+      expect(t).toContain("SKYLINE AIRPORT RAIL ticket machine");
+      expect(t).toContain("Speak like station staff");
+      expect(t).toMatch(/talk about tickets, destinations and passengers/i);
+      expect(t).toMatch(/never ask eat here or take out/i);
+      expect(t).not.toContain("Eat here or take out?");
+      expect(t).not.toMatch(/dessert|fries|soft cone|halal/i);
+      expect(t).not.toContain("setDineOption");
+    });
+
+    it("uses the machine's own words for items and the cart", () => {
+      expect(t).toContain('"ticket" (승차권)');
+      expect(t).toContain('"Selected tickets" (선택한 승차권)');
+    });
+
+    it("splits passengers into one addToCart per passenger type", () => {
+      expect(t).toMatch(/two adults and a child/i);
+      expect(t).toMatch(/passenger adult and qty 2/);
+      expect(t).toMatch(/passenger child and qty 1/);
+    });
+
+    it("asks for the destination, the top-up and calls staff for travel information", () => {
+      expect(t).toMatch(/offerChoices with pick_item/);
+      expect(t).toMatch(/top-up amount/);
+      expect(t).toMatch(/platform/);
+      expect(t).toMatch(/departure times/);
+      expect(t).toMatch(/delays/);
+      expect(t).toMatch(/luggage/);
+      expect(t).toMatch(/machine does not have that information, call callStaff with unknown_info/);
+    });
+
+    it("offers sold-out alternatives from the same category", () => {
+      expect(t).toMatch(/sold-out ticket: offer the other tickets of the same category/);
+      expect(buildInstructions(getKiosk("malo"), { locale: "en" })).not.toMatch(/sold-out ticket/);
+    });
+
+    it("takes its best-seller example from its own data", () => {
+      expect(t).toContain("The Express to City Center is marked as a best seller.");
+    });
+
+    it("never names a real station, operator or timetable", () => {
+      for (const word of ["Incheon", "Gimpo", "Seoul Station", "AREX", "Korail", "T-money", "인천", "김포", "서울역", "공항철도", "코레일", "티머니"]) {
+        expect(t).not.toContain(word);
+      }
+      expect(t).not.toMatch(/\b\d{1,2}:\d{2}\b/);
+    });
+
+    it("gives the model each ticket's subtitle (travel time, stops) from the data", () => {
+      expect(menuBlock(t)).toEqual(menuForModel(rail));
+      expect(t).toContain("Non-stop · 43 min");
+    });
+  });
+
   it("explains replay, remove-and-add and paying on the kiosk only for a learned kiosk", () => {
     const LEARNED = [
       "This kiosk is operated by replaying its own screens.",
