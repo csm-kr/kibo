@@ -304,17 +304,19 @@ Pages: `/kiosk?k=<kioskId>` (`&demo=1` shows the tap counter and timer), `/assis
 | `NEEDS_CHOICE`, `SOLD_OUT`, `UNAVAILABLE` | 422 | catalog rule failed; `error.detail` lists the missing group or alternatives so the AI can call `offerChoices` |
 | `RATE_LIMITED` | 429 | per-session, daily or per-IP limit (see Limits) |
 | `UPSTREAM` | 502 | Gemini error; the phone falls back to text |
+| `INTERNAL` | 500 | any other server error; the log records only the error name |
 
 ### Endpoints
 | Route | Request | Response |
 |---|---|---|
 | `POST /api/session` | `{ kioskId, demo? }` | `{ sessionId, claimUrl, kioskToken, expiresAt }`; with `demo: true` also `deviceToken` |
-| `POST /api/session/claim` | `{ sessionId, claimToken }` | `{ deviceToken }`. A second claim gets `CONFLICT`; the same phone reconnects with its stored `deviceToken` instead of claiming again |
-| `POST /api/command` | `{ sessionId, commandId (string, 1–128), type, args, cartVersion?, utteranceSeq?, source: "voice"\|"text"\|"button"\|"touch" }`. `commandId`: `<liveSessionId>:<functionCallId>` for voice, `<chatRequestId>:<n>` for text, a uuid for buttons and touch | `{ ok, status, cart, total, cartVersion, result? }`; a repeated `commandId` returns the current state with `duplicate: true` and applies nothing |
+| `POST /api/session/claim` | `{ sessionId, claimToken }` | `{ deviceToken, status }`. A second claim gets `CONFLICT`; the same phone reconnects with its stored `deviceToken` instead of claiming again |
+| `POST /api/command` | `{ sessionId, commandId (string, 1–128), type, args, cartVersion?, utteranceSeq?, source: "voice"\|"text"\|"button"\|"touch" }`. `commandId`: `<liveSessionId>:<functionCallId>` for voice, `<chatRequestId>:<n>` for text, a uuid for buttons and touch | `{ ok, status, cart, total, cartVersion, result? }`; a repeated `commandId` returns the current state with `duplicate: true` and applies nothing; `reissueClaim` also returns `claimUrl` |
 | `POST /api/live-token` | `{ sessionId }` | `{ token, expiresAt }` (model, instructions and tools pinned in the token) |
 | `POST /api/chat` | `{ sessionId, chatRequestId (uuid), message (≤ 500 chars), history (last 10 turns of user and model text, kept on the phone; tool turns are rejected), utteranceSeq, cartVersion? (the version shown on the confirm card), locale }` + device token | `{ reply, status, cart, total, cartVersion }` after ≤ 5 tool rounds; choice buttons come from `pendingChoice` in the stream. One request is one user utterance: every command in it carries the request's `utteranceSeq`, so `confirmCheckout` is refused in the request that ran `requestCheckout` |
-| `POST /api/ping` | `{ sessionId, active }` | `{ status, expiresAt }`; `active: true` extends the session |
-| `GET /api/health` | — | `{ ok, version }` |
+| `POST /api/ping` | `{ sessionId, active }` | `{ status, expiresAt, serverTime }`; `active: true` extends the session; `serverTime` lets screens correct for clock offset |
+| `GET /api/session/{id}/events` | — | SSE; each change is `data: <public session JSON>`; an unknown or deleted session gets one `event: gone` (`data: {}`) and the stream closes, so the client should close its `EventSource` |
+| `GET /api/health` | — | `{ ok, service, version, store, revision, time }` |
 
 ### Commands and actors
 `type` in `/api/command`. The AI tools ("Agent tools" below) are the phone's commands; the kiosk adds touch and payment commands. On a learned kiosk the bridge in the kiosk page acts as the kiosk, with the `kioskToken`.

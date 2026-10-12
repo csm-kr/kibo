@@ -9,7 +9,8 @@ export type ErrorCode =
   | "SOLD_OUT"
   | "UNAVAILABLE"
   | "RATE_LIMITED"
-  | "UPSTREAM";
+  | "UPSTREAM"
+  | "INTERNAL";
 
 export type TemplateId =
   | "pick_item"
@@ -56,4 +57,5 @@ export const HTTP_STATUS: Record<ErrorCode, number> = {
   UNAVAILABLE: 422,
   RATE_LIMITED: 429,
   UPSTREAM: 502,
+  INTERNAL: 500,
 };
