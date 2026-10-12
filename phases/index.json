@@ -7,7 +7,8 @@
     },
     {
       "dir": "2-kiosk",
-      "status": "pending"
+      "status": "completed",
+      "completed_at": "2026-10-13T00:15:37+0900"
     },
     {
       "dir": "3-assistant",
