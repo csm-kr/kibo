@@ -1,0 +1,10 @@
+{
+  "project": "KIBO",
+  "phase": "5-ship",
+  "steps": [
+    { "step": 0, "name": "deploy-ready", "status": "pending" },
+    { "step": 1, "name": "landing", "status": "pending" },
+    { "step": 2, "name": "readme", "status": "pending" },
+    { "step": 3, "name": "qa", "status": "pending" }
+  ]
+}

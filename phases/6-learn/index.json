@@ -1,0 +1,12 @@
+{
+  "project": "KIBO",
+  "phase": "6-learn",
+  "steps": [
+    { "step": 0, "name": "learned-adapter", "status": "pending" },
+    { "step": 1, "name": "bridge-server", "status": "pending" },
+    { "step": 2, "name": "bridge-client", "status": "pending" },
+    { "step": 3, "name": "learned-assistant", "status": "pending" },
+    { "step": 4, "name": "learn-rerun", "status": "pending" },
+    { "step": 5, "name": "qa", "status": "pending" }
+  ]
+}

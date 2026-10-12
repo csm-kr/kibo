@@ -1,0 +1,7 @@
+rules_version = '2';
+// Clients never touch Firestore: screens read sessions through the server's SSE route (docs/ADR.md ADR-010).
+service cloud.firestore {
+  match /databases/{db}/documents {
+    match /{document=**} { allow read, write: if false; }
+  }
+}
