@@ -1,0 +1,323 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!--
+  Moments (photo-moments.app) 36s demo, v2.
+  Hero object: the product's own orange period (logo "Moments.", moment titles, home greeting).
+  All footage is real logged-in app screens captured with Aside (2880x1800 @2x).
+  Screens live in #cam in screen-pixel coordinates; one virtual camera {cx, cy, z} moves over them.
+-->
+<script src="./node_modules/gsap/dist/gsap.min.js"></script>
+<style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+  html, body { margin: 0; background: #000; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #241C18;
+           color: #EDE9DD; font-family: Pretendard, system-ui, sans-serif; }
+  .abs { position: absolute; left: 0; top: 0; }
+  #cam { width: 2880px; height: 1800px; transform-origin: 0 0; }
+  .scr { position: absolute; left: 0; top: 0; width: 2880px; height: 1800px; opacity: 0; }
+  .scr > img.full { position: absolute; left: 0; top: 0; width: 2880px; height: 1800px; border-radius: 36px;
+           box-shadow: 0 0 0 2px rgba(237,233,221,.08), 0 60px 160px rgba(0,0,0,.45); }
+  .seq img { position: absolute; left: 0; top: 0; opacity: 0; }
+  .tile { position: absolute; border-radius: 14px; box-shadow: 0 24px 60px rgba(0,0,0,.45); opacity: 0; }
+  .line { position: absolute; left: 0; width: 1920px; text-align: center; white-space: nowrap; }
+  .swap span { position: absolute; left: 0; right: 0; opacity: 0; }
+  .slot { display: inline-block; vertical-align: baseline; }
+  .w { display: inline-block; }
+  #dot { position: absolute; left: 0; top: 0; border-radius: 50%; background: #E08566; opacity: 0; }
+  #ring { position: absolute; box-sizing: border-box; border: 11px solid #E08566; border-radius: 999px; opacity: 0; }
+  #fly { position: absolute; background: url(assets/whale.jpg) center / cover no-repeat; opacity: 0; }
+  #pill { position: absolute; left: 960px; top: 978px; height: 76px; opacity: 0;
+          border-radius: 999px; background: rgba(26,20,17,.86); box-shadow: 0 0 0 1.5px rgba(237,233,221,.14), 0 18px 50px rgba(0,0,0,.4);
+          overflow: hidden; }
+  #pill i { position: absolute; left: 32px; top: 31px; width: 14px; height: 14px; border-radius: 50%; background: #E08566; }
+  #pill span { position: absolute; left: 64px; top: 0; line-height: 76px; font-size: 34px; font-weight: 600;
+               letter-spacing: -0.02em; white-space: nowrap; opacity: 0; }
+  #flood { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; color: #241C18;
+           font-size: 104px; font-weight: 800; letter-spacing: -0.04em; line-height: 1.18; opacity: 0; }
+  #sum { position: absolute; left: 300px; top: 250px; font-size: 150px; font-weight: 800; letter-spacing: -0.05em; line-height: 1.12; }
+  #sum div { opacity: 0; }
+  #logo { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+  #logoRow { position: absolute; left: 0; width: 1920px; top: 380px; text-align: center; font-size: 168px; font-weight: 800; letter-spacing: -0.05em; white-space: nowrap; }
+  #logoRow img { width: 176px; height: 176px; vertical-align: -26px; margin-right: 34px; border-radius: 40px; }
+  #logoRow .ch { display: inline-block; opacity: 0; }
+  #tag { top: 640px; font-size: 54px; font-weight: 600; color: #EDE9DD; opacity: 0; letter-spacing: -0.02em; }
+  #cta { top: 746px; font-size: 36px; font-weight: 500; color: #A99C90; opacity: 0; letter-spacing: 0; }
+  #cta b { color: #E08566; font-weight: 600; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="cam" class="abs">
+    <div class="scr" id="sSearch">
+      <img class="full" src="assets/search_focus.jpg">
+      <div class="seq" id="typ" style="position:absolute;left:560px;top:240px"></div>
+    </div>
+    <div class="scr seq" id="sLoad"></div>
+    <div class="scr" id="sViewer">
+      <img class="full" src="assets/viewer.jpg">
+      <div class="seq" id="cmt" style="position:absolute;left:2140px;top:1580px"></div>
+    </div>
+    <div class="scr" id="sMoment"><img class="full" src="assets/moment.jpg"></div>
+    <div class="scr" id="sHome"><img class="full" src="assets/home.jpg"></div>
+  </div>
+
+  <div id="tiles" class="abs" style="width:1920px;height:1080px"></div>
+  <div id="titles" class="line swap" style="top:470px;font-size:76px;font-weight:600;color:#9B8E83;letter-spacing:-0.03em;height:100px"></div>
+  <div id="count" class="line" style="top:432px;font-size:150px;font-weight:800;letter-spacing:-0.05em;opacity:0">사진 <span id="num">0</span>장</div>
+  <div id="ask" class="line" style="top:446px;font-size:132px;font-weight:800;letter-spacing:-0.05em">
+    <span class="w">그</span> <span class="w">사진,</span> <span class="w">어디서</span> <span class="w">찾죠</span><span class="slot" id="slotAsk" style="width:34px;height:20px"></span>
+  </div>
+
+  <div id="sum"><div>올리고,</div><div>찾고,</div><div>남기고<span class="slot" id="slotSum" style="width:40px;height:20px"></span></div></div>
+  <div id="logo">
+    <div id="logoRow"><img id="logoIcon" src="assets/icon.png" style="opacity:0"><span class="ch">M</span><span class="ch">o</span><span class="ch">m</span><span class="ch">e</span><span class="ch">n</span><span class="ch">t</span><span class="ch">s</span><span class="slot" id="slotLogo" style="width:48px;height:20px"></span></div>
+    <div id="tag" class="line">흩어진 순간을, 하나의 Moment로.</div>
+    <div id="cta" class="line">첫 모먼트 만들기 · 5GB 무료 · <b>photo-moments.app</b></div>
+  </div>
+
+  <div id="ring"></div>
+  <div id="fly"></div>
+  <div id="dot"></div>
+  <div id="flood"><div>사진 4,922장이<br>Moment 117개로.</div></div>
+  <div id="pill"><i></i></div>
+</div>
+<script>
+// ---- timeline sheet (seconds). Beat grid 100 BPM = 0.6s; scene boundaries sit on beats.
+const T = {
+  titles: 0.3, count: 2.7, ask: 4.2, sweep: 5.6, ring: 6.0, searchIn: 6.4,
+  type: 6.9, enter: 9.3, zoomOut: 9.6, results: 10.2, push: 11.7, fly1: 12.6,
+  viewerPan: 14.4, cmtType: 15.4, viewerBack: 17.6, fly2: 18.6,
+  titlePush: 20.4, dotZoom: 21.6, flood: 22.8, floodOut: 25.2, homeOut: 26.0,
+  sum: 27.6, toLogo: 30.6, logo: 31.0, tag: 32.2, cta: 32.8, end: 36,
+};
+const PILL = [
+  [6.9, '말하듯이 검색하면'], [11.1, '그 순간이 바로 나와요'], [14.4, '사진마다, 조용한 댓글'],
+  [19.2, '각자 올린 사진이, 하나의 Moment로'],
+];
+const PILL_OFF = 22.2;
+
+// ---- screen-pixel targets measured from the captures (2880x1800, @2x)
+const RING = [594, 254, 979, 86];            // search input focus ring
+const TILE_SEARCH = [600, 368, 546, 546];     // first search result
+const PHOTO_VIEWER = [452, 90, 1215, 1620];   // whale photo in lightbox
+const TILE_MOMENT = [688, 556, 502, 502];     // first tile on the moment page
+const DOT_MOMENT = [1325, 312, 9];            // orange period after the moment title (cx, cy, d)
+const DOT_HOME = [1619, 311, 11];             // orange period after the greeting
+const CAM = {
+  type: { cx: 1083, cy: 297, z: 1300 }, full: { cx: 1440, cy: 900, z: 3240 },
+  tile: { cx: 873, cy: 641, z: 1500 }, cmt: { cx: 2250, cy: 1560, z: 1300 },
+  title: { cx: 1010, cy: 330, z: 1500 }, mdot: { cx: DOT_MOMENT[0], cy: DOT_MOMENT[1], z: 520 },
+  hdot: { cx: DOT_HOME[0], cy: DOT_HOME[1], z: 900 },
+};
+const S = (z) => 1920 / z;
+const toStage = ([x, y, w, h], c) => { const s = S(c.z); return { left: (x - c.cx) * s + 960, top: (y - c.cy) * s + 540, width: w * s, height: h * s }; };
+
+const $ = (q) => document.querySelector(q);
+const stage = $('#stage');
+const addImgs = (host, srcs, style = '') => srcs.map((src) => { const im = new Image(); im.src = src; im.style.cssText = style; host.appendChild(im); return im; });
+const pad = (n) => String(n).padStart(2, '0');
+const typImgs = addImgs($('#typ'), Array.from({ length: 16 }, (_, i) => `assets/type/k${pad(i)}.jpg`));
+const cmtImgs = addImgs($('#cmt'), Array.from({ length: 14 }, (_, i) => `assets/cmt/c${pad(i)}.jpg`));
+const loadImgs = addImgs($('#sLoad'), ['036', '039', '040', '041', '084'].map((n) => `assets/s_${n}.jpg`), 'width:2880px;height:1800px;border-radius:36px');
+loadImgs.forEach((im) => im.classList.add('full'));
+
+const TITLE_WORDS = ['가족모임이 끝나고 용산어린이공원', '과천 미술관 나들이', '삼시세끼 집밥 주말', '생일 전전전야제', '공포의 방탈출', '불꽃축제는 유튜브로 보는게 제맛'];
+TITLE_WORDS.forEach((t) => { const s = document.createElement('span'); s.textContent = t; $('#titles').appendChild(s); });
+
+// scattered real photo tiles around the centre text band (deterministic layout)
+let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const tiles = Array.from({ length: 18 }, (_, i) => {
+  const im = new Image(); im.src = `assets/tiles/p${pad(i)}.jpg`; im.className = 'tile';
+  const w = 230 + rnd() * 110; let x, y;
+  do { x = rnd() * (1920 - w) ; y = rnd() * (1080 - w * 0.84); } while (x + w > 380 && x < 1540 && y + w * 0.84 > 380 && y < 720);
+  Object.assign(im.style, { width: `${w}px`, left: `${x}px`, top: `${y}px` });
+  im.dataset.r = (rnd() - 0.5) * 22; $('#tiles').appendChild(im); return im;
+});
+
+const pillSpans = PILL.map(([, text]) => { const s = document.createElement('span'); s.textContent = text; $('#pill').appendChild(s); return s; });
+
+// ---- camera
+const tl = gsap.timeline({ paused: true });
+// Camera = list of moves evaluated from time alone, so any seek order gives the same frame.
+// Each move starts from where the previous one ended; z interpolates in log space so zooms feel even.
+const camMoves = [];
+const camTo = (c, at, dur, ease = 'power2.inOut') => camMoves.push({ at, dur, to: c, ease: gsap.parseEase(ease) });
+const camAt = (t) => {
+  let cur = camMoves[0].to;
+  for (const m of camMoves) {
+    if (t < m.at) break;
+    if (m.dur > 0 && t < m.at + m.dur) {
+      const k = m.ease((t - m.at) / m.dur);
+      return { cx: cur.cx + (m.to.cx - cur.cx) * k, cy: cur.cy + (m.to.cy - cur.cy) * k, z: Math.exp(Math.log(cur.z) + (Math.log(m.to.z) - Math.log(cur.z)) * k) };
+    }
+    cur = m.to;
+  }
+  return cur;
+};
+const applyCam = () => { const c = camAt(tl.time()), s = S(c.z); $('#cam').style.transform = `translate(${960 - c.cx * s}px, ${540 - c.cy * s}px) scale(${s})`; };
+// show images[i] at times t0 + i*dt, hiding the previous one (stepwise footage playback)
+// Sound cues: every audible event is registered here from the same constants that drive the picture,
+// then exported as window.__cues so the score (score.py) is synthesized against exact frame times.
+const cues = [];
+const cue = (t, type, o = {}) => cues.push({ t: Math.round(t * 1000) / 1000, type, ...o });
+const seq = (imgs, t0, dt, sound) => imgs.forEach((im, i) => { if (sound) cue(t0 + i * dt, sound, { i }); tl.set(im, { opacity: 1 }, t0 + i * dt); if (i) tl.set(imgs[i - 1], { opacity: 0 }, t0 + i * dt); });
+const slotPos = (el, d) => { const r = el.getBoundingClientRect(), st = stage.getBoundingClientRect(); return { left: r.left - st.left + 4, top: r.bottom - st.top - d - 4, width: d, height: d }; };
+
+function build() {
+  // measure before any transforms are applied
+  const dAsk = 26, dSum = 30, dLogo = 34;
+  const pAsk = slotPos($('#slotAsk'), dAsk), pSum = slotPos($('#slotSum'), dSum), pLogo = slotPos($('#slotLogo'), dLogo);
+  gsap.set('#pill', { xPercent: -50 });
+  const pillW = pillSpans.map((s) => s.getBoundingClientRect().width + 64 + 36);
+  gsap.set(['#ask .w', '#sum div', '#logoRow .ch'], { opacity: 0 });
+
+  // S1 problem: real moment titles swap in place, faster each time, while real photos pile up
+  const gaps = [0.6, 0.48, 0.38, 0.32, 0.26, 0.4];
+  const titleSpans = [...document.querySelectorAll('#titles span')];
+  let t = T.titles;
+  titleSpans.forEach((s, i) => {
+    tl.fromTo(s, { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.14, ease: 'power2.out' }, t);
+    tl.set(s, { opacity: 0 }, t + gaps[i]);
+    cue(t, 'swap', { i }); cue(t, 'pop', { i: i * 2 }); cue(t + 0.08, 'pop', { i: i * 2 + 1 });
+    [tiles[i * 2], tiles[i * 2 + 1]].forEach((tile, k) => tl.fromTo(tile, { opacity: 0, scale: 0.55, rotation: 0, y: 40 },
+      { opacity: 1, scale: 1, rotation: +tile.dataset.r, y: 0, duration: 0.42, ease: 'back.out(1.6)' }, t + k * 0.08));
+    t += gaps[i];
+  });
+  tiles.slice(12).forEach((_, k) => cue(T.count + 0.1 + k * 0.12, 'pop', { i: 12 + k }));
+  tiles.slice(12).forEach((tile, k) => tl.fromTo(tile, { opacity: 0, scale: 0.55, y: 40 }, { opacity: 1, scale: 1, rotation: +tile.dataset.r, y: 0, duration: 0.4, ease: 'back.out(1.6)' }, T.count + 0.1 + k * 0.12));
+  tl.fromTo('#tiles', { scale: 1 }, { scale: 1.07, duration: T.sweep - T.titles, ease: 'none' }, T.titles);
+  cue(T.count, 'count', { dur: 1.2 });
+  [0, 1, 2, 3].forEach((i) => cue(T.ask + i * 0.16, 'word', { i }));
+  cue(T.ask + 0.62, 'ding'); cue(T.sweep, 'whoosh', { dur: 0.45 }); cue(T.ring, 'morph', { dur: 0.5 });
+  const num = { v: 0 };
+  tl.fromTo('#count', { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.3, ease: 'power3.out' }, T.count)
+    .to(num, { v: 4922, duration: 1.2, ease: 'power2.out', onUpdate: () => { $('#num').textContent = Math.round(num.v).toLocaleString('en-US'); } }, T.count)
+    .to('#count', { opacity: 0, y: -50, filter: 'blur(10px)', duration: 0.25, ease: 'power2.in' }, T.ask - 0.2);
+  tl.to(tiles, { opacity: 0.32, filter: 'blur(7px)', duration: 0.5, ease: 'power2.out' }, T.ask - 0.1);
+  tl.fromTo('#ask .w', { opacity: 0, y: 40, filter: 'blur(8px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.32, ease: 'power3.out', stagger: 0.16 }, T.ask);
+  tl.fromTo('#dot', { ...pAsk, opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.3, ease: 'back.out(3)' }, T.ask + 0.62);
+
+  // hero dot leaves the sentence; everything else is swept away
+  tiles.forEach((tile) => { const r = tile.getBoundingClientRect(), cx = r.left + r.width / 2 - 960, cy = r.top + r.height / 2 - 540;
+    tl.to(tile, { x: `+=${cx * 0.9}`, y: `+=${cy * 0.9}`, opacity: 0, duration: 0.45, ease: 'power2.in' }, T.sweep); });
+  tl.to('#ask .w', { opacity: 0, y: -30, filter: 'blur(10px)', duration: 0.3, ease: 'power2.in', stagger: 0.04 }, T.sweep);
+  tl.to('#dot', { left: 960 - 15, top: 540 - 15, width: 30, height: 30, duration: 0.45, ease: 'power3.inOut' }, T.sweep);
+
+  // dot stretches into the real search box's focus ring (hero object becomes product UI)
+  const ring = toStage(RING, CAM.type);
+  tl.set('#ring', { left: 945, top: 525, width: 30, height: 30, borderWidth: 15, opacity: 1 }, T.ring)
+    .set('#dot', { opacity: 0 }, T.ring)
+    .to('#ring', { ...ring, borderWidth: 4 * S(CAM.type.z), duration: 0.5, ease: 'expo.inOut' }, T.ring)
+    .to('#sSearch', { opacity: 1, duration: 0.35, ease: 'none' }, T.searchIn)
+    .to('#ring', { opacity: 0, duration: 0.2 }, T.searchIn + 0.3);
+
+  // S2 search: real keystroke frames under a macro camera, then zoom out as results blur up
+  camTo(CAM.type, 0, 0);
+  camTo({ cx: 1150, cy: 297, z: 1240 }, T.type, T.enter - T.type, 'none'); // slow drift along the text
+  seq(typImgs, T.type, 0.15, 'key');
+  cue(T.enter, 'enter'); cue(T.results, 'shimmer', { dur: 0.7 });
+  tl.set(typImgs.at(-1), { opacity: 0 }, T.enter + 0.1).set('#sSearch', { opacity: 0 }, T.enter + 0.1).set('#sLoad', { opacity: 1 }, T.enter + 0.1);
+  tl.set(loadImgs[0], { opacity: 1 }, T.enter + 0.1);
+  [T.results, T.results + 0.22, T.results + 0.44, T.results + 0.7].forEach((tt, i) => { tl.set(loadImgs[i], { opacity: 0 }, tt); tl.set(loadImgs[i + 1], { opacity: 1 }, tt); });
+  camTo(CAM.full, T.zoomOut, 1.4, 'power3.inOut');
+
+  // push into the first result, then the same photo flies into the lightbox
+  camTo(CAM.tile, T.push, 0.9, 'power2.inOut');
+  const tS = toStage(TILE_SEARCH, CAM.tile), pV = toStage(PHOTO_VIEWER, CAM.full);
+  tl.set('#fly', { ...tS, borderRadius: 26, opacity: 1 }, T.fly1)
+    .to('#sLoad', { opacity: 0, duration: 0.3 }, T.fly1)
+    .to('#fly', { ...pV, borderRadius: 0, duration: 0.85, ease: 'power3.inOut' }, T.fly1);
+  camTo(CAM.full, T.fly1 + 0.35, 0);
+  tl.to('#sViewer', { opacity: 1, duration: 0.35, ease: 'none' }, T.fly1 + 0.5)
+    .set('#fly', { opacity: 0 }, T.fly1 + 0.9);
+
+  // S3 quiet comment on the same photo
+  camTo(CAM.cmt, T.viewerPan, 1.0, 'power3.inOut');
+  seq(cmtImgs, T.cmtType, 0.15, 'keySoft');
+  cue(T.fly1, 'fly', { dur: 0.85 }); cue(T.fly2, 'fly', { dur: 0.85 });
+  camTo(CAM.full, T.viewerBack, 0.9, 'power3.inOut');
+
+  // the photo goes home: back into its tile on the moment page
+  const tM = toStage(TILE_MOMENT, CAM.full);
+  tl.set('#fly', { ...pV, borderRadius: 0, opacity: 1 }, T.fly2)
+    .to('#sViewer', { opacity: 0, duration: 0.3 }, T.fly2)
+    .to('#sMoment', { opacity: 1, duration: 0.4 }, T.fly2 + 0.2)
+    .to('#fly', { ...tM, borderRadius: 12, duration: 0.85, ease: 'power3.inOut' }, T.fly2)
+    .set('#fly', { opacity: 0 }, T.fly2 + 0.95);
+
+  // S4 push to the title's orange period, swap it for the vector dot, flood the screen
+  camTo(CAM.title, T.titlePush, 1.1, 'power2.inOut');
+  camTo(CAM.mdot, T.dotZoom, 1.0, 'power3.in');
+  const dM = DOT_MOMENT[2] * S(CAM.mdot.z);
+  tl.set('#dot', { left: 960 - dM / 2, top: 540 - dM / 2, width: dM, height: dM, scale: 1, opacity: 1 }, T.flood)
+    .to('#dot', { left: 960 - 1250, top: 540 - 1250, width: 2500, height: 2500, duration: 0.7, ease: 'expo.in' }, T.flood)
+    .set('#sMoment', { opacity: 0 }, T.flood + 0.7)
+    .fromTo('#flood', { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 0.4, ease: 'power3.out' }, T.flood + 0.6)
+    .to('#flood', { opacity: 0, scale: 0.94, duration: 0.25, ease: 'power2.in' }, T.floodOut - 0.3);
+  cue(T.dotZoom, 'riser', { to: T.flood + 0.6 }); cue(T.flood, 'grow', { dur: 0.7 }); cue(T.flood + 0.6, 'impact');
+  cue(T.floodOut, 'suck', { dur: 0.6 });
+  // the flood collapses into the greeting's period on the real home screen
+  camTo(CAM.hdot, T.floodOut - 0.05, 0);
+  const dH = DOT_HOME[2] * S(CAM.hdot.z);
+  tl.set('#sHome', { opacity: 1 }, T.floodOut - 0.05)
+    .to('#dot', { left: 960 - dH / 2, top: 540 - dH / 2, width: dH, height: dH, duration: 0.6, ease: 'expo.out' }, T.floodOut)
+    .set('#dot', { opacity: 0 }, T.homeOut);
+  camTo(CAM.full, T.homeOut, 1.2, 'power3.inOut');
+
+  // S5 summary builds on top of the dimmed home; hero dot lifts off the greeting
+  const hd = toStage([DOT_HOME[0] - DOT_HOME[2] / 2, DOT_HOME[1] - DOT_HOME[2] / 2, DOT_HOME[2], DOT_HOME[2]], CAM.full);
+  tl.to('#sHome', { opacity: 0.12, filter: 'blur(6px)', duration: 0.6, ease: 'power2.out' }, T.sum - 0.4);
+  tl.fromTo('#sum div', { opacity: 0, x: -60, filter: 'blur(12px)' }, { opacity: 1, x: 0, filter: 'blur(0px)', duration: 0.4, ease: 'power3.out', stagger: 0.6 }, T.sum);
+  tl.set('#dot', { ...hd, opacity: 1 }, T.sum - 0.4)
+    .to('#dot', { ...pSum, duration: 1.6, ease: 'power3.inOut' }, T.sum - 0.2);
+
+  [0, 1, 2].forEach((i) => cue(T.sum + i * 0.6, 'stab', { i }));
+  // S6 logo: words leave, dot lands as the logo's period
+  tl.to('#sum div', { opacity: 0, x: 80, filter: 'blur(12px)', duration: 0.3, ease: 'power2.in', stagger: 0.06 }, T.toLogo)
+    .to('#sHome', { opacity: 0, duration: 0.4 }, T.toLogo);
+  tl.fromTo('#logoIcon', { opacity: 0, scale: 0.6, rotation: -12 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.5, ease: 'back.out(2)' }, T.logo)
+    .fromTo('#logoRow .ch', { opacity: 0, x: -90, filter: 'blur(14px)' }, { opacity: 1, x: 0, filter: 'blur(0px)', duration: 0.38, ease: 'power3.out', stagger: 0.05 }, T.logo + 0.1)
+    .to('#dot', { keyframes: [{ left: pLogo.left, top: pLogo.top - 150, width: pLogo.width, height: pLogo.height, duration: 0.45, ease: 'power2.out' },
+                              { top: pLogo.top, duration: 0.3, ease: 'bounce.out' }] }, T.logo + 0.35);
+  cue(T.toLogo, 'whoosh', { dur: 0.4 }); cue(T.logo, 'chime');
+  [...document.querySelectorAll('#logoRow .ch')].forEach((_, i) => cue(T.logo + 0.1 + i * 0.05, 'letter', { i }));
+  // bounce.out touches down at 1/2.75, 2/2.75 and 2.5/2.75 of the 0.3s drop
+  [1 / 2.75, 2 / 2.75, 2.5 / 2.75].forEach((p, i) => cue(T.logo + 0.8 + 0.3 * p, 'land', { i }));
+  cue(T.tag, 'tag'); cue(T.cta, 'cta');
+  tl
+    .fromTo('#tag', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' }, T.tag)
+    .fromTo('#cta', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' }, T.cta);
+
+  // persistent caption pill: same place, only the words change
+  tl.fromTo('#pill', { opacity: 0, y: 30, width: pillW[0] }, { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out' }, PILL[0][0] - 0.1);
+  PILL.forEach(([at], i) => {
+    cue(at, 'pill', { i });
+    if (i) { tl.to(pillSpans[i - 1], { opacity: 0, y: -24, duration: 0.18, ease: 'power2.in' }, at - 0.18)
+             .to('#pill', { width: pillW[i], duration: 0.35, ease: 'power3.inOut' }, at - 0.18); }
+    tl.fromTo(pillSpans[i], { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.25, ease: 'power3.out' }, at);
+  });
+  tl.to('#pill', { opacity: 0, y: 30, duration: 0.3, ease: 'power2.in' }, PILL_OFF);
+
+  camMoves.sort((a, b) => a.at - b.at);
+  camMoves.forEach((m, i) => { if (m.dur > 0 && i) cue(m.at, 'cam', { dur: m.dur, zr: m.to.z / camMoves[i - 1].to.z }); });
+  cues.sort((a, b) => a.t - b.t);
+  window.__cues = cues; window.__T = T;
+  tl.set({}, {}, T.end);
+}
+
+Promise.all([
+  document.fonts.ready,
+  ...[...document.images].map((im) => im.complete ? null : new Promise((r) => { im.onload = im.onerror = r; })),
+]).then(() => {
+  build();
+  tl.seek(0);
+  applyCam();
+  window.__duration = tl.duration();
+  window.__seek = async (t) => { tl.seek(t, false); applyCam(); };
+  window.__ready = true;
+});
+</script>
+</body>
+</html>

@@ -1,6 +1,9 @@
-import subprocess
-SP='/private/tmp/claude-501/-Users-sungmincho-mac-Desktop-sm-apps-kibo/666d8d65-fa84-4561-b38d-5aa95cc9bd9e/scratchpad'
-s=open(SP+'/kibo-design/project/Main.dc.html').read()
+import subprocess, sys, tempfile
+from pathlib import Path
+# Checks the prototype in the repo (not a scratch copy); the generated JS harness goes to a temp dir.
+HERE=Path(__file__).resolve().parent
+SP=tempfile.mkdtemp()
+s=(HERE/'Main.dc.html').read_text()
 js=s.split('data-dc-script')[1].split('\n',1)[1].rsplit('</script>',1)[0]
 harness = r'''
 const Q=[]; global.setTimeout=(f)=>{Q.push(f);return Q.length}; global.clearTimeout=()=>{};
@@ -68,3 +71,4 @@ console.log(`TOTAL ${pass} pass, ${fail} fail`);
 '''
 open(SP+'/e2e_check2.mjs','w').write(harness)
 r=subprocess.run(['node',SP+'/e2e_check2.mjs'],capture_output=True,text=True); print(r.stdout, r.stderr[-1500:])
+sys.exit(1 if r.returncode or 'FAIL ' in r.stdout or 'TOTAL' not in r.stdout else 0)

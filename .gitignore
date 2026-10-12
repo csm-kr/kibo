@@ -5,6 +5,8 @@
 # not for the public hackathon repo
 photo-moments*.mp4
 videos/moments/
+# ad and video projects: renders and node_modules, about 1 GB
+videos/
 plan.md
 
 node_modules/
@@ -19,6 +21,7 @@ scripts/test_execute.py
 .claude/commands/review.md
 
 # harness run outputs
+phases/**/qa/*.png
 phases/**/phase*-output.json
 phases/**/step*-output.json
 
@@ -32,3 +35,6 @@ next-env.d.ts
 
 .pytest_cache/
 __pycache__/
+
+# Korean translations for the team (repo materials must be English)
+docs/ko/

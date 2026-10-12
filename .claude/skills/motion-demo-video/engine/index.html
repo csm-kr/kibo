@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!--
+  Composition contract (render.mjs depends on it):
+  - Fixed 1920x1080 stage. Everything animates from ONE paused GSAP timeline `tl`.
+  - window.__duration  total seconds
+  - window.__seek(t)   moves every layer to time t (timeline + <video data-start>), returns a Promise
+  - window.__ready     true once fonts and media are loaded
+  Never use CSS animations, setTimeout, or requestAnimationFrame for motion: they run on wall-clock
+  time and will not match the seeked frames.
+-->
+<script src="./node_modules/gsap/dist/gsap.min.js"></script>
+<style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+  html, body { margin: 0; background: #000; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden;
+           background: #0b0b0f; color: #f5f3ee; font-family: Pretendard, system-ui, sans-serif; }
+  .layer { position: absolute; inset: 0; display: grid; place-items: center; }
+  .headline { font-size: 120px; font-weight: 800; letter-spacing: -0.03em; }
+  .accent { color: #ff6b5b; }
+  video.footage { width: 1400px; border-radius: 28px; box-shadow: 0 40px 120px rgba(0,0,0,.5); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="layer" id="s1"><div class="headline">Just <span class="accent">talk.</span></div></div>
+  <div class="layer" id="s2" style="opacity:0">
+    <!-- data-start = composition time (s) at which this clip's frame 0 plays -->
+    <!-- <video class="footage" src="assets/flow.webm" data-start="2" muted preload="auto"></video> -->
+  </div>
+</div>
+<script>
+  const tl = gsap.timeline({ paused: true });
+  tl.from('#s1 .headline', { y: 80, opacity: 0, duration: 0.8, ease: 'power3.out' }, 0)
+    .to('#s1', { scale: 0.2, opacity: 0, duration: 0.6, ease: 'power2.in' }, 1.6)
+    .to('#s2', { opacity: 1, duration: 0.4 }, 2);
+  tl.set({}, {}, 4); // pins total length
+
+  const videos = [...document.querySelectorAll('video[data-start]')];
+  window.__duration = tl.duration();
+  window.__seek = async (t) => {
+    tl.seek(t, false);
+    await Promise.all(videos.map((v) => {
+      const local = Math.max(0, Math.min(t - Number(v.dataset.start), v.duration - 0.001));
+      if (Math.abs(v.currentTime - local) < 1e-4) return null;
+      return new Promise((r) => { v.addEventListener('seeked', r, { once: true }); v.currentTime = local; });
+    }));
+  };
+  Promise.all([
+    document.fonts.ready,
+    ...videos.map((v) => v.readyState >= 1 ? null : new Promise((r) => v.addEventListener('loadedmetadata', r, { once: true }))),
+  ]).then(() => { window.__ready = true; });
+</script>
+</body>
+</html>

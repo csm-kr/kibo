@@ -1,0 +1,185 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!--
+  Moments — "따로, 그리고 하나" 40s solo-violin ad.
+  Reference: Sony "Music Bridges Us" (Ray Chen): two worlds cross-cut (cool A / warm B), cuts INTO the warm
+  world on note onsets and OUT on breaths, the worlds meet in one frame on the violin's highest note,
+  thin wide-tracked cards that persist across cuts, music ends → 0.5 s silence → logo sound.
+  Here: two people's Jeju photos (cool vs warm grade) → the real Moment page puts them side by side →
+  the whole Moment on the peak → the posted comment → the title's orange period becomes the logo's.
+-->
+<script src="./node_modules/gsap/dist/gsap.min.js"></script>
+<style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+  html, body { margin: 0; background: #000; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #241C18;
+           color: #F4F1E8; font-family: Pretendard, system-ui, sans-serif; }
+  .abs { position: absolute; left: 0; top: 0; }
+  .shot { position: absolute; inset: 0; opacity: 0; overflow: hidden; }
+  .shot .img { position: absolute; inset: -2%; background: center / cover no-repeat; }
+  .shot .tint { position: absolute; inset: 0; }
+  .A .img { filter: saturate(.5) brightness(.9) contrast(1.06); }
+  .A .tint { background: #4f6d8a; mix-blend-mode: soft-light; opacity: .75; }
+  .B .img { filter: saturate(1.12) sepia(.18) brightness(.97); }
+  .B .tint { background: #e09a6a; mix-blend-mode: soft-light; opacity: .45; }
+  #cam { width: 2880px; height: 1800px; transform-origin: 0 0; }
+  .scr { position: absolute; left: 0; top: 0; width: 2880px; height: 1800px; opacity: 0; }
+  .scr img { position: absolute; left: 0; top: 0; width: 2880px; height: 1800px; border-radius: 36px;
+             box-shadow: 0 0 0 2px rgba(237,233,221,.08), 0 60px 160px rgba(0,0,0,.45); }
+  .card { position: absolute; left: 0; width: 1920px; top: 500px; text-align: center; font-size: 64px; font-weight: 300;
+          letter-spacing: .32em; text-indent: .32em; white-space: nowrap; opacity: 0; text-shadow: 0 2px 24px rgba(0,0,0,.35); }
+  #dot { position: absolute; left: 0; top: 0; border-radius: 50%; background: #E08566; opacity: 0; }
+  #logoRow { position: absolute; left: 0; width: 1920px; top: 400px; text-align: center; font-size: 140px; font-weight: 800; letter-spacing: -0.05em; white-space: nowrap; color: #EDE9DD; }
+  #logoRow img { width: 148px; height: 148px; vertical-align: -22px; margin-right: 28px; border-radius: 34px; opacity: 0; }
+  #logoRow .ch { display: inline-block; opacity: 0; }
+  .slot { display: inline-block; }
+  .line { position: absolute; left: 0; width: 1920px; text-align: center; white-space: nowrap; opacity: 0; }
+  #tag { top: 620px; font-size: 40px; font-weight: 400; letter-spacing: .12em; text-indent: .12em; color: #EDE9DD; }
+  #url { top: 700px; font-size: 30px; font-weight: 500; color: #E08566; letter-spacing: .04em; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="shots" class="abs" style="width:1920px;height:1080px"></div>
+  <div id="cam" class="abs">
+    <div class="scr" id="sJeju"><img src="assets/m_jeju.jpg"></div>
+    <div class="scr" id="sThread"><img src="assets/viewer_thread.jpg"></div>
+  </div>
+  <div class="shot M" id="heroShot"><div class="img" style="background-image:url(assets/ph/jeju_01.jpg)"></div></div>
+  <div class="card" id="card1">따로 찍은 사진이,</div>
+  <div class="card" id="card2" style="top:860px;text-shadow:0 2px 30px rgba(0,0,0,.6)">하나의 순간으로.</div>
+  <div id="logo" class="abs" style="width:1920px;height:1080px">
+    <div id="logoRow"><img id="logoIcon" src="assets/icon.png"><span class="ch">M</span><span class="ch">o</span><span class="ch">m</span><span class="ch">e</span><span class="ch">n</span><span class="ch">t</span><span class="ch">s</span><span class="slot" id="slotLogo" style="width:40px;height:20px"></span></div>
+    <div id="tag" class="line">흩어진 순간을, 하나의 Moment로</div>
+    <div id="url" class="line">photo-moments.app</div>
+  </div>
+  <div id="dot"></div>
+</div>
+<script>
+// ---- timeline sheet (free tempo, like the reference's rubato: times are phrase onsets and breaths)
+const SHOTS = [  // [start, world, photo]  A = one person's photos (cool), B = the other's (warm)
+  [0.5, 'A', 'jeju_00'], [2.5, 'B', 'jeju_09'], [4.5, 'A', 'jeju_03'], [6.75, 'B', 'jeju_06'],
+  [9.0, 'A', 'jeju_05'], [11.0, 'B', 'jeju_08'], [13.0, 'A', 'jeju_02'], [15.25, 'B', 'jeju_04'],
+];
+const T = {
+  mix: 17.5,        // real Moment page: the two worlds side by side (quietest)
+  open1: 21.5,      // phrase onset: pull back, more of the Moment
+  open2: 26.0,      // pull back to the title
+  peak: 30.0,       // highest note held: the whole Moment in one frame, one shot
+  comment: 33.5,    // descent: the comment left on the sunset photo
+  hero: 35.0,       // onset: that photo full frame, natural colour, card 2
+  title: 36.8,      // breath: back to the title's orange period
+  fade: 37.3,       // everything but the period fades
+  silence: 37.8,    // music has ended; the dot holds alone
+  logo: 38.3,       // the logo forms around it: one note
+  tag: 38.9, url: 39.3, end: 40.0,
+};
+const DOT = [1113.5, 312, 7];
+const S = (z) => 1920 / z;
+const toStage = ([x, y, w, h], c) => { const s = S(c.z); return { left: (x - c.cx) * s + 960, top: (y - c.cy) * s + 540, width: w * s, height: h * s }; };
+const camFor = ([x, y, w, h], sw, sx = 960, sy = 540) => { const s = sw / w; return { cx: x + w / 2 - (sx - 960) / s, cy: y + h / 2 - (sy - 540) / s, z: 1920 / s }; };
+const CAM = {
+  pair: camFor([688, 556, 1018, 502], 1560),
+  rows: { cx: 1250, cy: 900, z: 2000 }, page: { cx: 1300, cy: 760, z: 2650 },
+  full: { cx: 1440, cy: 900, z: 3240 }, fullIn: { cx: 1420, cy: 860, z: 3000 },
+  comment: { cx: 2250, cy: 600, z: 1250 }, commentIn: { cx: 2250, cy: 600, z: 1150 },
+  title: { cx: 920, cy: 312, z: 1150 }, titleIn: { cx: 960, cy: 312, z: 1050 },
+};
+
+const $ = (q) => document.querySelector(q);
+const stage = $('#stage');
+const shotEls = SHOTS.map(([, w, n]) => {
+  const d = document.createElement('div'); d.className = `shot ${w}`;
+  d.innerHTML = `<div class="img" style="background-image:url(assets/ph/${n}.jpg)"></div><div class="tint"></div>`;
+  $('#shots').appendChild(d); return d;
+});
+const preload = [...SHOTS.map(([, , n]) => n), 'jeju_01'].map((n) => { const im = new Image(); im.src = `assets/ph/${n}.jpg`; return im; });
+
+const tl = gsap.timeline({ paused: true });
+const camMoves = [];
+const camTo = (c, at, dur, ease = 'power2.inOut') => camMoves.push({ at, dur, to: c, ease: gsap.parseEase(ease) });
+const camAt = (t) => {
+  let cur = camMoves[0].to;
+  for (const m of camMoves) {
+    if (t < m.at) break;
+    if (m.dur > 0 && t < m.at + m.dur) {
+      const k = m.ease((t - m.at) / m.dur);
+      return { cx: cur.cx + (m.to.cx - cur.cx) * k, cy: cur.cy + (m.to.cy - cur.cy) * k, z: Math.exp(Math.log(cur.z) + (Math.log(m.to.z) - Math.log(cur.z)) * k) };
+    }
+    cur = m.to;
+  }
+  return cur;
+};
+const applyCam = () => { const c = camAt(tl.time()), s = S(c.z); $('#cam').style.transform = `translate(${960 - c.cx * s}px, ${540 - c.cy * s}px) scale(${s})`; };
+const cues = [];
+const cue = (t, type, o = {}) => cues.push({ t: Math.round(t * 1000) / 1000, type, ...o });
+const slotPos = (el, d) => { const r = el.getBoundingClientRect(), st = stage.getBoundingClientRect(); return { left: r.left - st.left + 4, top: r.bottom - st.top - d - 24, width: d, height: d }; };
+
+function build() {
+  const pLogo = slotPos($('#slotLogo'), 30);
+  gsap.set('#logoRow .ch', { opacity: 0 });
+
+  // cross-cut: hard cuts; each shot drifts slowly (cinematic, never static)
+  SHOTS.forEach(([at, w], i) => {
+    const el = shotEls[i], end = i + 1 < SHOTS.length ? SHOTS[i + 1][0] : T.mix;
+    tl.set(el, { opacity: 1 }, at).set(el, { opacity: 0 }, end);
+    tl.fromTo(el.querySelector('.img'), { scale: 1.03, x: i % 2 ? 18 : -18 }, { scale: 1.09, x: i % 2 ? -18 : 18, duration: end - at + 0.1, ease: 'none' }, at);
+    cue(at, 'cut', { world: w, i });
+  });
+  tl.fromTo(shotEls[0], { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power1.out' }, SHOTS[0][0] - 0.2);
+  // card 1 holds across a cut (text bridge)
+  tl.fromTo('#card1', { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.9).to('#card1', { opacity: 0, duration: 0.5 }, 3.9);
+
+  // the worlds meet: the real Moment page puts two people's photos side by side (their grades fall away)
+  camTo(CAM.pair, 0, 0);
+  tl.set('#sJeju', { opacity: 1 }, T.mix);
+  cue(T.mix, 'mix');
+  camTo({ ...CAM.pair, z: CAM.pair.z * 0.96 }, T.mix, T.open1 - T.mix, 'none');
+  camTo(CAM.rows, T.open1, 3.2, 'power2.inOut');
+  camTo(CAM.page, T.open2, 3.4, 'power2.inOut');
+  camTo(CAM.full, T.peak - 0.4, 0.4, 'power1.out');
+  camTo(CAM.fullIn, T.peak, T.comment - T.peak, 'none');
+  cue(T.open1, 'open'); cue(T.open2, 'open'); cue(T.peak, 'peak');
+
+  // descent: the comment on the sunset photo, then that photo full frame with card 2
+  camTo(CAM.comment, T.comment, 0);
+  camTo(CAM.commentIn, T.comment, T.hero - T.comment, 'none');
+  tl.set('#sThread', { opacity: 1 }, T.comment).set('#sJeju', { opacity: 0 }, T.comment);
+  tl.set('#heroShot', { opacity: 1 }, T.hero).set('#sThread', { opacity: 0 }, T.hero).set('#heroShot', { opacity: 0 }, T.title);
+  tl.fromTo('#heroShot .img', { scale: 1.02 }, { scale: 1.07, duration: T.title - T.hero, ease: 'none' }, T.hero);
+  tl.fromTo('#card2', { opacity: 0 }, { opacity: 1, duration: 0.45 }, T.hero + 0.15).to('#card2', { opacity: 0, duration: 0.35 }, T.title - 0.4);
+  cue(T.comment, 'cut', { world: 'M' }); cue(T.hero, 'cut', { world: 'B' });
+
+  // breath: the title. Everything but its orange period fades; the period holds in silence
+  camTo(CAM.title, T.title, 0);
+  camTo(CAM.titleIn, T.title, T.fade - T.title, 'power1.out');
+  tl.set('#sJeju', { opacity: 1 }, T.title);
+  const d0 = toStage([DOT[0] - DOT[2] / 2, DOT[1] - DOT[2] / 2, DOT[2], DOT[2]], CAM.titleIn);
+  tl.set('#dot', { ...d0, opacity: 1 }, T.fade)
+    .to('#sJeju', { opacity: 0, duration: 0.5, ease: 'power1.in' }, T.fade);
+  cue(T.title, 'cut', { world: 'M' }); cue(T.fade, 'fade');
+  tl.to('#dot', { ...pLogo, duration: T.logo - T.silence, ease: 'power2.inOut' }, T.silence)
+    .fromTo('#logoIcon', { opacity: 0 }, { opacity: 1, duration: 0.5 }, T.logo)
+    .fromTo('#logoRow .ch', { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out', stagger: 0.03 }, T.logo)
+    .fromTo('#tag', { opacity: 0 }, { opacity: 1, duration: 0.5 }, T.tag)
+    .fromTo('#url', { opacity: 0 }, { opacity: 1, duration: 0.5 }, T.url);
+  cue(T.logo, 'logo');
+
+  camMoves.sort((a, b) => a.at - b.at);
+  cues.sort((a, b) => a.t - b.t);
+  window.__cues = cues; window.__T = T;
+  tl.set({}, {}, T.end);
+}
+
+Promise.all([document.fonts.ready, ...[...document.images, ...preload].map((im) => im.complete ? null : new Promise((r) => { im.onload = im.onerror = r; }))]).then(() => {
+  build();
+  tl.seek(0); applyCam();
+  window.__duration = tl.duration();
+  window.__seek = async (t) => { tl.seek(t, false); applyCam(); };
+  window.__ready = true;
+});
+</script>
+</body>
+</html>

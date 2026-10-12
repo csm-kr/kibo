@@ -1,0 +1,413 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!--
+  Moments 50s, drum-driven, Apple-style (reference: Apple "The new MacBook Air with M5").
+  100 BPM grid: beat 0.6s = 18 frames, bar 2.4s. Cuts land on downbeats, type pops on offbeats.
+  All UI is real footage of the logged-in app (demo team "우리의 기록"), 2880x1800 @2x captures.
+  Motion vocabulary is only: cut-in, peel (3-4 frames), punch-in (1-3 frames), cursor/typing.
+-->
+<script src="./node_modules/gsap/dist/gsap.min.js"></script>
+<style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+  html, body { margin: 0; background: #000; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #241C18;
+           color: #EDE9DD; font-family: Pretendard, system-ui, sans-serif; }
+  .abs { position: absolute; left: 0; top: 0; }
+  .hid { display: none; }   /* containers use display so children with their own visibility are hidden too, and hidden layers cost nothing to paint */
+  #cam { width: 2880px; height: 1800px; transform-origin: 0 0; will-change: transform; }
+  .scr { position: absolute; left: 0; top: 0; width: 2880px; height: 1800px; }
+  .scr > img, img.scr { position: absolute; left: 0; top: 0; width: 2880px; height: 1800px; }
+  .seq img { position: absolute; left: 0; top: 0; visibility: hidden; }
+  .full { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+  .ecu { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; }
+  .ecu img { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; transform-origin: 50% 50%; will-change: transform; }
+  .card { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; }
+  .big { position: absolute; font-weight: 900; letter-spacing: -0.055em; line-height: 0.98; white-space: nowrap; }
+  .w { display: inline-block; visibility: hidden; transform-origin: 0% 80%; }
+  .sticker { position: absolute; padding: 18px 34px 22px; border-radius: 22px; font-weight: 850; font-size: 76px; letter-spacing: -0.04em;
+             white-space: nowrap; box-shadow: 0 18px 50px rgba(0,0,0,.45); visibility: hidden; transform-origin: 50% 50%; will-change: transform; }
+  .note { position: absolute; width: 360px; height: 330px; padding: 34px 32px; box-sizing: border-box; background: #EDE9DD; color: #241C18;
+          font-weight: 850; font-size: 64px; line-height: 1.08; letter-spacing: -0.045em; box-shadow: 0 22px 60px rgba(0,0,0,.5);
+          visibility: hidden; transform-origin: 50% 0%; }
+  .note i { display: block; width: 18px; height: 18px; border-radius: 50%; background: #E08566; margin-top: 26px; }
+  #curl { position: absolute; visibility: hidden; pointer-events: none; }
+  .ring { position: absolute; box-sizing: border-box; border: 10px solid #E08566; border-radius: 26px; visibility: hidden; }
+  .hl { position: absolute; background: rgba(224,133,102,.55); visibility: hidden; mix-blend-mode: screen; }
+  #collage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 960px 540px; will-change: transform; }
+  #collage img { position: absolute; width: 560px; height: 350px; border-radius: 14px; box-shadow: 0 30px 80px rgba(0,0,0,.55); }
+  #dot { position: absolute; border-radius: 50%; background: #E08566; visibility: hidden; }
+  #logo { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+  #logoRow { position: absolute; left: 0; width: 1920px; top: 410px; text-align: center; font-size: 150px; font-weight: 800; letter-spacing: -0.05em; white-space: nowrap; }
+  #logoRow img { width: 150px; height: 150px; vertical-align: -22px; margin-right: 30px; border-radius: 34px; }
+  #url { position: absolute; left: 0; width: 1920px; top: 640px; text-align: center; font-size: 44px; font-weight: 600; color: #A99C90; letter-spacing: 0; }
+  #url b { color: #E08566; font-weight: 700; }
+  #endIcon { position: absolute; left: 900px; top: 480px; width: 120px; height: 120px; border-radius: 28px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="cam" class="abs">
+    <img class="scr hid" id="sEmpty" src="assets/empty.jpg">
+    <div class="scr seq hid" id="sUp"></div>
+    <img class="scr hid" id="mGrad" src="assets/m_graduation.jpg">
+    <img class="scr hid" id="mBlos" src="assets/m_blossom.jpg">
+    <img class="scr hid" id="mJeju" src="assets/m_jeju.jpg">
+    <img class="scr hid" id="mBday" src="assets/m_birthday.jpg">
+    <img class="scr hid" id="mWork" src="assets/m_workshop.jpg">
+    <img class="scr hid" id="mDog" src="assets/m_dog.jpg">
+    <img class="scr hid" id="mCamp" src="assets/m_camping.jpg">
+    <img class="scr hid" id="sPhotos" src="assets/photos.jpg">
+    <div class="scr hid" id="sSearch">
+      <img src="assets/search_focus.jpg">
+      <div class="seq" id="typ" style="position:absolute;left:560px;top:240px"></div>
+    </div>
+    <div class="scr seq hid" id="sLoad"></div>
+    <div class="ring" id="ringRes" style="left:588px;top:356px;width:570px;height:570px"></div>
+    <div class="scr hid" id="sViewer">
+      <img src="assets/viewer.jpg">
+      <div class="seq" id="cmt" style="position:absolute;left:2140px;top:1580px"></div>
+    </div>
+    <img class="scr hid" id="sThread" src="assets/viewer_thread.jpg">
+    <img class="scr hid" id="sHome" src="assets/home.jpg">
+    <div class="scr hid" id="sRen">
+      <img src="assets/rename.jpg">
+      <div class="seq" id="ren" style="position:absolute;left:1040px;top:860px"></div>
+      <div class="hl" id="renHl" style="left:1102px;top:908px;width:196px;height:54px"></div>
+    </div>
+  </div>
+
+  <!-- stage-level layers -->
+  <div class="ecu hid" id="e1"><img src="assets/sm/birthday_06.jpg"></div>
+  <div class="ecu hid" id="e2"><img src="assets/sm/camping_06.jpg"></div>
+  <div class="ecu hid" id="e3"><img src="assets/sm/dog_00.jpg"></div>
+  <div class="ecu hid" id="e4"><img src="assets/sm/birthday_03.jpg"></div>
+  <div class="ecu hid" id="e5"><img src="assets/sm/dog_07.jpg"></div>
+  <div class="ecu hid" id="e6"><img src="assets/sm/birthday_02.jpg"></div>
+  <div class="ecu hid" id="e7"><img src="assets/sm/graduation_04.jpg"></div>
+  <div class="ecu hid" id="e8"><img src="assets/sm/workshop_01.jpg"></div>
+  <div class="ecu hid" id="e9"><img src="assets/sm/jeju_07.jpg"></div>
+  <div class="ecu hid" id="e10"><img src="assets/sm/camping_07.jpg"></div>
+
+  <div class="sticker" id="st1" style="left:1060px;top:600px;background:#EDE9DD;color:#241C18;transform:rotate(-4deg)"><span class="w">각자</span> <span class="w">올린</span> <span class="w">사진이,</span></div>
+  <div class="sticker" id="st2" style="left:1130px;top:740px;background:#E08566;color:#241C18;transform:rotate(3deg)"><span class="w">하나의</span> <span class="w">Moment로.</span></div>
+  <div class="sticker" id="st3" style="left:250px;top:250px;background:#EDE9DD;color:#241C18;transform:rotate(-3deg);font-size:70px"><span class="w">조용히,</span> <span class="w">우리끼리.</span></div>
+
+  <div class="card hid" id="cTalk" style="background:#241C18">
+    <div class="big" style="left:150px;top:300px;font-size:250px;color:#EDE9DD"><span class="w">말하듯</span><br><span class="w" style="color:#E08566">찾으면</span></div>
+  </div>
+  <div class="card hid" id="cStat" style="background:#E08566">
+    <div class="big" style="left:140px;top:230px;font-size:230px;color:#241C18"><span class="w">사진 56장이</span><br><span class="w">Moment 7개로.</span></div>
+  </div>
+  <div class="card hid" id="cFree" style="background:#EDE9DD">
+    <div class="big" id="freeTxt" style="left:150px;top:250px;font-size:250px;color:#241C18;transform-origin:20% 50%"><span class="w">5GB</span><br><span class="w" style="color:#C9603F">무료로 시작.</span></div>
+  </div>
+
+  <div class="note" id="n1" style="left:1150px;top:180px;transform:rotate(-5deg)">광고<br>없이.<i></i></div>
+  <div class="note" id="n2" style="left:1420px;top:330px;transform:rotate(4deg)">트래킹<br>없이.<i></i></div>
+  <div class="note" id="n3" style="left:1180px;top:560px;transform:rotate(-2deg)">초대한<br>사람만.<i></i></div>
+
+  <div id="collage" class="hid"></div>
+
+  <div id="logo" class="hid">
+    <div id="logoRow"><img src="assets/icon.png">Moments<span style="display:inline-block;width:46px"></span></div>
+    <div id="url" class="hid"><b>photo-moments.app</b> · 5GB 무료로 시작</div>
+  </div>
+  <img id="endIcon" class="hid" src="assets/icon.png">
+
+  <div id="curl"></div>
+  <div id="dot"></div>
+</div>
+<script>
+// ---- timeline sheet (seconds). 100 BPM: beat 0.6, bar 2.4. Bars: 0 2.4 4.8 7.2 9.6 12 14.4 16.8 19.2 21.6 24 26.4 28.8 31.2 33.6 36 38.4 40.8 43.2 45.6 48
+const B = 0.6, Q = 0.15;
+const T = {
+  e1: 0.0, e2: 1.2, e3: 2.4, e4: 3.3, breath: 4.2, dotIn: 4.5, drop: 4.8,
+  up: 5.4, peel0: 6.6, st1: 8.85, st2: 9.6, ecuA: 10.8, ecuB: 11.1, ecuC: 11.4, burst: 12.0,
+  talk: 12.6, talkPeel: 13.5, type: 13.8, lastKey: 15.6, results: 16.2, ring: 16.8, tilePunch: 17.4, stat: 17.7, stat2: 18.3,
+  statPeel: 19.2, cmtPanel: 19.8, cmtType: 20.4, send: 22.65, thread: 22.8, st3: 23.1,
+  whip1: 24.0, n1: 24.15, n2: 24.75, n3: 25.35, free: 26.4, punch: 27.0, ecuD: 27.6, ecuE: 28.2,
+  whip2: 28.8, side1: 29.4, side2: 30.0, side3: 30.6, ren: 31.2, renType: 31.5, ecuF: 33.6, ecuG: 34.2, ecuH: 34.8, hl: 35.4,
+  collage: 36.0, float: 38.4, stop: 40.8, fill: 41.7, reentry: 43.2, end: 45.0, endIcon: 45.6, total: 50.0,
+};
+
+// ---- screen-pixel targets measured from the captures
+const CAM = {
+  full: { cx: 1440, cy: 900, z: 2880 },
+  type: { cx: 1083, cy: 297, z: 1300 },
+  tile: { cx: 873, cy: 641, z: 1150 },
+  cmtPanel: { cx: 2420, cy: 900, z: 1500 },
+  cmtBox: { cx: 2500, cy: 1600, z: 900 },
+  thread: { cx: 2330, cy: 565, z: 760 },
+  side: { cx: 300, cy: 650, z: 1150 },
+  ren: { cx: 1440, cy: 937, z: 1250 },
+  renHl: { cx: 1260, cy: 935, z: 820 },
+  photos: { cx: 1440, cy: 900, z: 2880 },
+};
+
+const $ = (q) => document.querySelector(q);
+const $$ = (q) => [...document.querySelectorAll(q)];
+const stage = $('#stage');
+const pad = (n) => String(n).padStart(2, '0');
+const addImgs = (host, srcs, style = '') => srcs.map((src) => { const im = new Image(); im.src = src; if (style) im.style.cssText = style; host.appendChild(im); return im; });
+const typImgs = addImgs($('#typ'), Array.from({ length: 13 }, (_, i) => `assets/type/k${pad(i)}.jpg`));
+const cmtImgs = addImgs($('#cmt'), Array.from({ length: 15 }, (_, i) => `assets/cmt/c${pad(i)}.jpg`));
+const renImgs = addImgs($('#ren'), Array.from({ length: 10 }, (_, i) => `assets/ren/r${pad(i)}.jpg`));
+const upImgs = addImgs($('#sUp'), [0, 1, 2, 3].map((i) => `assets/up/u${i}.jpg`), 'width:2880px;height:1800px');
+const loadImgs = addImgs($('#sLoad'), [0, 1, 2, 3, 4, 5].map((i) => `assets/s_${i}.jpg`), 'width:2880px;height:1800px');
+const collageImgs = addImgs($('#collage'), ['m_jeju', 'm_camping', 'm_birthday', 'm_dog', 'm_blossom', 'm_workshop', 'm_graduation', 'photos'].map((k) => `assets/sm/c_${k}.jpg`));
+
+const tl = gsap.timeline({ paused: true });
+const cues = [];
+const cue = (t, type, o = {}) => cues.push({ t: Math.round(t * 1000) / 1000, type, ...o });
+
+// visibility windows (cut-ins are 0-frame sets, reversible on seek)
+const show = (sel, t0, t1) => {
+  const el = typeof sel === 'string' ? $(sel) : sel;
+  tl.set(el, { display: 'block' }, t0);
+  if (t1 != null) tl.set(el, { display: 'none' }, t1);
+};
+const seq = (imgs, t0, dt, t1, sound) => imgs.forEach((im, i) => {
+  if (sound) cue(t0 + i * dt, sound, { i });
+  tl.set(im, { visibility: 'visible' }, t0 + i * dt);
+  tl.set(im, { visibility: 'hidden' }, i + 1 < imgs.length ? t0 + (i + 1) * dt : t1);
+});
+// pop: 2-frame overshoot, used for words/stickers on offbeats
+const pop = (el, t, from = 1.18) => { tl.set(el, { visibility: 'visible' }, t); tl.fromTo(el, { scale: from }, { scale: 1, duration: 0.067, ease: 'power2.out', immediateRender: false }, t); };
+
+// ---- camera: list of moves evaluated from time alone (seek-safe)
+const camMoves = [];
+const camTo = (c, at, dur = 0, ease = 'power3.out') => camMoves.push({ at, dur, to: c, ease: gsap.parseEase(ease) });
+const camAt = (t) => {
+  let cur = camMoves[0].to;
+  for (const m of camMoves) {
+    if (t < m.at) break;
+    if (m.dur > 0 && t < m.at + m.dur) {
+      const k = m.ease((t - m.at) / m.dur);
+      return { cx: cur.cx + (m.to.cx - cur.cx) * k, cy: cur.cy + (m.to.cy - cur.cy) * k, z: Math.exp(Math.log(cur.z) + (Math.log(m.to.z) - Math.log(cur.z)) * k) };
+    }
+    cur = m.to;
+  }
+  return cur;
+};
+const S = (z) => 1920 / z;
+
+// ---- peel: the outgoing layer is clipped by a fold line sweeping corner to corner; the flap is a cream band
+const peels = [];
+const peel = (sel, at, dur = 0.12, inCam = false) => { const el = typeof sel === 'string' ? $(sel) : sel; peels.push({ el, at, dur, inCam }); cue(at, 'peel', { dur }); tl.set(el, { display: 'none' }, at + dur); };
+function clipBand(a, b) {
+  // polygon of {a <= u+v <= b} inside the unit square (Sutherland-Hodgman against two half-planes)
+  let poly = [[0, 0], [1, 0], [1, 1], [0, 1]];
+  const cut = (pts, keep) => {
+    const out = [];
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i], q = pts[(i + 1) % pts.length], fp = keep(p), fq = keep(q);
+      if (fp >= 0) out.push(p);
+      if ((fp >= 0) !== (fq >= 0)) { const k = fp / (fp - fq); out.push([p[0] + (q[0] - p[0]) * k, p[1] + (q[1] - p[1]) * k]); }
+    }
+    return out;
+  };
+  poly = cut(poly, (p) => p[0] + p[1] - a);
+  poly = cut(poly, (p) => b - p[0] - p[1]);
+  return poly;
+}
+const polyCss = (pts) => pts.length < 3 ? 'polygon(0 0,0 0,0 0)' : `polygon(${pts.map(([u, v]) => `${(u * 100).toFixed(2)}% ${(v * 100).toFixed(2)}%`).join(',')})`;
+function applyPeels(t) {
+  const curl = $('#curl');
+  curl.style.visibility = 'hidden';
+  for (const p of peels) {
+    if (t < p.at) { p.el.style.clipPath = ''; continue; }
+    if (t >= p.at + p.dur) { p.el.style.clipPath = ''; continue; }
+    const k = (t - p.at) / p.dur;
+    const s = 2 * (1 - k);                 // fold line u+v = s sweeps from bottom-right to top-left
+    p.el.style.clipPath = polyCss(clipBand(-1, s));
+    const cw = Math.min(0.45, 2 - s) * 0.7;
+    const box = p.inCam ? (() => { const c = camAt(t), sc = S(c.z); return { l: (0 - c.cx) * sc + 960, t: (0 - c.cy) * sc + 540, w: 2880 * sc, h: 1800 * sc }; })() : { l: 0, t: 0, w: 1920, h: 1080 };
+    Object.assign(curl.style, { left: `${box.l}px`, top: `${box.t}px`, width: `${box.w}px`, height: `${box.h}px`, visibility: 'visible',
+      clipPath: polyCss(clipBand(s - cw, s)),
+      background: `linear-gradient(to bottom right, #8f8579 ${((s - cw) / 2 * 100).toFixed(2)}%, #f7f2ea ${(s / 2 * 100).toFixed(2)}%)` });
+  }
+}
+
+const applyAll = () => {
+  const t = tl.time(), c = camAt(t), s = S(c.z);
+  $('#cam').style.transform = `translate(${960 - c.cx * s}px, ${540 - c.cy * s}px) scale(${s})`;
+  applyPeels(t);
+};
+
+function build() {
+  gsap.set(['.sticker', '.note'], { visibility: 'hidden' });
+  // hero dot = the logo's period (measured before any transform)
+  $('#logo').style.display = 'block';
+  const span = $('#logoRow span'), lr = span.getBoundingClientRect(), sr = stage.getBoundingClientRect();
+  $('#logo').style.display = '';
+  const pLogo = { left: lr.left - sr.left + 8, top: lr.bottom - sr.top - 52, width: 30, height: 30 };
+  // outgoing layers of the peel volley must sit above the incoming ones
+  ['#sEmpty', '#sUp', '#mGrad', '#mBlos', '#mJeju', '#mBday', '#mWork', '#mDog', '#mCamp'].forEach((id, i) => { $(id).style.zIndex = 50 - i; });
+
+  // ---------- 0-4.8 cold open: macro ECUs of real moments, no rhythm section; then a breath and the hero dot
+  const ecu = (id, t0, t1, o) => { show(id, t0, t1); tl.fromTo(`${id} img`, { scale: o.s0, xPercent: o.x || 0, yPercent: o.y || 0 }, { scale: o.s1, duration: t1 - t0, ease: 'none', immediateRender: false }, t0); cue(t0, 'ecu', { id }); };
+  ecu('#e1', T.e1, T.e2, { s0: 1.55, s1: 1.7, y: 6 });
+  ecu('#e2', T.e2, T.e3, { s0: 1.6, s1: 1.75, x: -4 });
+  ecu('#e3', T.e3, T.e4, { s0: 1.45, s1: 1.6, x: 8 });
+  ecu('#e4', T.e4, T.breath, { s0: 1.5, s1: 1.62 });
+  tl.set('#dot', { left: 949, top: 529, width: 22, height: 22, visibility: 'visible', scale: 0 }, T.dotIn)
+    .to('#dot', { scale: 1, duration: 0.1, ease: 'back.out(3)' }, T.dotIn)
+    .set('#dot', { visibility: 'hidden' }, T.drop);
+  cue(T.dotIn, 'dot');
+
+  // ---------- 4.8 DROP: first Moments UI (empty team) as a hard cut on the biggest hit
+  camTo(CAM.full, 0);
+  camTo({ cx: 1760, cy: 520, z: 1650 }, T.drop - 0.001, 0);
+  camTo(CAM.full, T.up - 0.12, 0);
+  show('#sEmpty', T.drop, T.up);
+  cue(T.drop, 'drop');
+  // real upload: started toast, progress, sidebar gains a NEW moment
+  show('#sUp', T.up - 0.12, T.peel0);
+  seq(upImgs, T.up, 0.3, T.peel0);
+  tl.set(upImgs[0], { visibility: 'visible' }, T.up - 0.12);
+  peel('#sEmpty', T.up - 0.12, 0.12, true);
+  // peel volley on 8ths through the seven auto-made Moments
+  const vol = ['#mGrad', '#mBlos', '#mJeju', '#mBday', '#mWork', '#mDog', '#mCamp'];
+  vol.forEach((id, i) => {
+    const t0 = T.peel0 + i * 0.3;
+    show(id, t0 - 0.12, i + 1 < vol.length ? t0 + 0.3 : T.ecuA);
+  });
+  peel('#sUp', T.peel0 - 0.12, 0.12, true);
+  vol.slice(0, -1).forEach((id, i) => peel(id, T.peel0 + (i + 1) * 0.3 - 0.12, 0.12, true));
+  // copy inside the UI: stickers, words pop on offbeats
+  const st1w = $$('#st1 .w'), st2w = $$('#st2 .w');
+  tl.set('#st1', { visibility: 'visible' }, T.st1); st1w.forEach((w, i) => pop(w, T.st1 + i * 0.3));
+  st1w.forEach((_, i) => cue(T.st1 + i * 0.3, 'pop', { i }));
+  tl.set('#st2', { visibility: 'visible' }, T.st2 + 0.15); st2w.forEach((w, i) => pop(w, T.st2 + 0.15 + i * 0.3));
+  st2w.forEach((_, i) => cue(T.st2 + 0.15 + i * 0.3, 'pop', { i: 3 + i }));
+  camTo({ cx: 1440, cy: 900, z: 2700 }, T.st2, 0.07);
+  tl.set(['#st1', '#st2'], { visibility: 'hidden' }, T.ecuA);
+  st1w.concat(st2w).forEach((w) => tl.set(w, { visibility: 'hidden' }, T.ecuA));
+
+  // ---------- 10.8-12 three hard cuts on 8ths, then the whole library bursts open on the downbeat
+  ecu('#e5', T.ecuA, T.ecuB, { s0: 1.3, s1: 1.34 });
+  ecu('#e6', T.ecuB, T.ecuC, { s0: 1.35, s1: 1.38 });
+  ecu('#e7', T.ecuC, T.burst, { s0: 1.2, s1: 1.25 });
+  show('#sPhotos', T.burst, T.talk);
+  camTo({ cx: 1700, cy: 700, z: 900 }, T.burst - 0.001, 0);
+  camTo(CAM.full, T.burst, 0.35, 'expo.out');
+  cue(T.burst, 'burst');
+
+  // ---------- 12.6 card "말하듯 찾으면", peel to the real search box, typed char by char
+  show('#cTalk', T.talk, T.talkPeel + 0.12);
+  $$('#cTalk .w').forEach((w, i) => { pop(w, T.talk + 0.15 + i * 0.3, 1.12); cue(T.talk + 0.15 + i * 0.3, 'pop', { i: 6 + i }); });
+  peel('#cTalk', T.talkPeel, 0.12);
+  show('#sSearch', T.talkPeel, T.results);
+  camTo(CAM.type, T.talkPeel, 0);
+  camTo({ cx: 1160, cy: 297, z: 1220 }, T.type, T.lastKey - T.type, 'none');
+  seq(typImgs, T.type, Q, T.results, 'key');               // 13 keys, the last one lands on 15.6 (beat 26)
+  cue(T.lastKey, 'lastKey');
+  // results on the next hit, selection ring on the one after
+  show('#sLoad', T.results, T.statPeel);
+  [0, 1, 2, 3, 4, 5].forEach((i) => { const tt = T.results + [0, 0.05, 0.1, 0.17, 0.25, 0.4][i]; tl.set(loadImgs[i], { visibility: 'visible' }, tt); if (i) tl.set(loadImgs[i - 1], { visibility: 'hidden' }, tt); });
+  camTo(CAM.full, T.results, 0.1, 'power3.out');
+  cue(T.results, 'results');
+  tl.set('#ringRes', { visibility: 'visible' }, T.ring).fromTo('#ringRes', { scale: 1.06 }, { scale: 1, duration: 0.067, immediateRender: false }, T.ring)
+    .set('#ringRes', { visibility: 'hidden' }, T.stat);
+  cue(T.ring, 'ring');
+  camTo(CAM.tile, T.tilePunch, 0.07);
+  cue(T.tilePunch, 'punch');
+
+  // ---------- 17.7 stat card (real demo numbers), peel to the same photo opened
+  show('#cStat', T.stat, T.statPeel + 0.12);
+  const sw = $$('#cStat .w');
+  pop(sw[0], T.stat + 0.15, 1.1); pop(sw[1], T.stat2 + 0.15, 1.1);
+  cue(T.stat, 'stat'); cue(T.stat + 0.15, 'pop', { i: 8 }); cue(T.stat2 + 0.15, 'pop', { i: 9 });
+  peel('#cStat', T.statPeel, 0.12);
+  show('#sViewer', T.statPeel, T.thread);
+  camTo(CAM.full, T.statPeel, 0);
+  // quiet comment: 3-step punch-in
+  camTo(CAM.cmtPanel, T.cmtPanel, 0.07); cue(T.cmtPanel, 'punch');
+  camTo(CAM.cmtBox, T.cmtType, 0.07); cue(T.cmtType, 'punch');
+  seq(cmtImgs, T.cmtType + 0.05, Q, T.thread, 'keySoft');
+  cue(T.send, 'send');
+  show('#sThread', T.thread, T.whip1);
+  camTo(CAM.thread, T.thread, 0.07);
+  tl.set('#st3', { visibility: 'visible' }, T.st3);
+  $$('#st3 .w').forEach((w, i) => { pop(w, T.st3 + i * 0.3); cue(T.st3 + i * 0.3, 'pop', { i: 10 + i }); });
+  tl.set(['#st3', ...$$('#st3 .w')], { visibility: 'hidden' }, T.whip1);
+
+  // ---------- 24.0 whip to a Moment page; sticky notes pop on offbeats
+  show('#mBday', T.whip1, T.free);
+  camTo({ cx: 1700, cy: 900, z: 2880 }, T.whip1 - 0.001, 0);
+  camTo({ cx: 1300, cy: 950, z: 2600 }, T.whip1, 0.12, 'power4.out');
+  cue(T.whip1, 'whip');
+  ['#n1', '#n2', '#n3'].forEach((id, i) => { const tt = [T.n1, T.n2, T.n3][i]; pop(id, tt, 1.25); cue(tt, 'note', { i }); tl.set(id, { visibility: 'hidden' }, T.free); });
+
+  // ---------- 26.4 cream card, punch-in on the top accent
+  show('#cFree', T.free, T.ecuD);
+  $$('#cFree .w').forEach((w, i) => { pop(w, T.free + 0.15 + i * 0.3, 1.1); cue(T.free + 0.15 + i * 0.3, 'pop', { i: 12 + i }); });
+  tl.fromTo('#freeTxt', { scale: 1 }, { scale: 1.32, duration: 0.067, ease: 'power3.out', immediateRender: false }, T.punch);
+  cue(T.punch, 'bigPunch');
+  ecu('#e9', T.ecuD, T.ecuE, { s0: 1.25, s1: 1.3 });
+  ecu('#e10', T.ecuE, T.whip2, { s0: 1.3, s1: 1.35 });
+
+  // ---------- 28.8 whip to the sidebar: the auto-made Moments, punch down the list on beats
+  show('#sHome', T.whip2, T.ren);
+  camTo({ cx: 300, cy: 300, z: 1150 }, T.whip2 - 0.001, 0);
+  camTo({ cx: 300, cy: 450, z: 1150 }, T.whip2, 0.12, 'power4.out');
+  cue(T.whip2, 'whip');
+  [[T.side1, 600], [T.side2, 800], [T.side3, 1000]].forEach(([tt, cy]) => { camTo({ cx: 300, cy, z: 1000 }, tt, 0.07); cue(tt, 'punch'); });
+
+  // ---------- 31.2 the line typed inside the product: renaming a Moment (then cancelled in the capture)
+  show('#sRen', T.ren, T.ecuF);
+  camTo(CAM.ren, T.ren, 0);
+  seq(renImgs.slice(0, 9), T.renType, Q, T.ecuF, 'key');
+  tl.set(renImgs[9], { visibility: 'visible' }, T.renType + 9 * Q);
+  cue(T.ren, 'renCut');
+  ecu('#e8', T.ecuF, T.ecuG, { s0: 1.2, s1: 1.24 });
+  ecu('#e9', T.ecuG, T.ecuH, { s0: 1.35, s1: 1.4 });
+  ecu('#e10', T.ecuH, T.hl, { s0: 1.5, s1: 1.55 });
+  show('#sRen', T.hl, T.collage);
+  camTo(CAM.renHl, T.hl, 0);
+  tl.set('#renHl', { visibility: 'visible' }, T.hl + 0.3);
+  cue(T.hl + 0.3, 'select');
+
+  // ---------- 36.0 every Moment at once, then everything floats out of frame
+  show('#collage', T.collage, T.stop);
+  const pos = [[110, 90], [690, 90], [1270, 90], [110, 450], [690, 450], [1270, 450], [400, 810], [980, 810]];
+  collageImgs.forEach((im, i) => { im.style.left = `${pos[i][0]}px`; im.style.top = `${pos[i][1]}px`; });
+  tl.fromTo('#collage', { scale: 3.2, rotation: -4 }, { scale: 0.92, rotation: -4, duration: 0.5, ease: 'expo.out', immediateRender: false }, T.collage);
+  cue(T.collage, 'collage');
+  collageImgs.forEach((im, i) => tl.to(im, { y: -1500, rotation: (i % 2 ? 6 : -6), duration: 1.6, ease: 'power2.in' }, T.float + 0.12 * i * 0.6));
+  cue(T.float, 'float', { dur: 2.2 });
+
+  // ---------- 40.8 STOP: wordmark held, no cuts through the fill; 43.2 re-entry adds the URL
+  show('#logo', T.stop, T.end);
+  tl.set('#dot', { ...pLogo, visibility: 'visible', scale: 1 }, T.stop);
+  cue(T.stop, 'stop'); cue(T.fill, 'fill', { to: T.reentry });
+  show('#url', T.reentry, T.end);
+  cue(T.reentry, 'reentry');
+  tl.set('#dot', { visibility: 'hidden' }, T.end);
+  // ---------- 45.0 silent end card
+  show('#endIcon', T.endIcon);
+  tl.fromTo('#endIcon', { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'none', immediateRender: false }, T.endIcon);
+  cue(T.end, 'end');
+
+  camMoves.sort((a, b) => a.at - b.at);
+  cues.sort((a, b) => a.t - b.t);
+  tl.set({}, {}, T.total);
+  window.__cues = cues; window.__T = T;
+}
+
+Promise.all([
+  document.fonts.ready,
+  ...[...document.images].map((im) => im.complete ? null : new Promise((r) => { im.onload = im.onerror = r; })),
+]).then(() => {
+  build();
+  tl.seek(0);
+  applyAll();
+  window.__duration = tl.duration();
+  window.__seek = async (t) => { tl.seek(t, false); applyAll(); };
+  window.__ready = true;
+});
+</script>
+</body>
+</html>

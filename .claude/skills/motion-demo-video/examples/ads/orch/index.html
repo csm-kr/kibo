@@ -1,0 +1,325 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!--
+  Moments — "우리의 명장면" 60s orchestral ad.
+  Reference: Google Photos "Best Picture" (2017): quiet intro of moments → entry hit → steady build →
+  photo montage on beats → hero photo zooms out into the product → IV→I on the logo.
+  Hero object: the sunset-family photo (found by AI search at the entry hit, commented on, and finally
+  revealed as one tile of its Moment) and the orange period that lands on the logo.
+  All UI is the real logged-in app (demo team "우리의 기록"), 2880x1800 captures.
+-->
+<script src="./node_modules/gsap/dist/gsap.min.js"></script>
+<style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+  html, body { margin: 0; background: #000; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #241C18;
+           color: #EDE9DD; font-family: Pretendard, system-ui, sans-serif; }
+  .abs { position: absolute; left: 0; top: 0; }
+  #cam { width: 2880px; height: 1800px; transform-origin: 0 0; }
+  .scr { position: absolute; left: 0; top: 0; width: 2880px; height: 1800px; opacity: 0; }
+  .scr img.full, img.full { position: absolute; left: 0; top: 0; width: 2880px; height: 1800px; border-radius: 36px;
+           box-shadow: 0 0 0 2px rgba(237,233,221,.08), 0 60px 160px rgba(0,0,0,.45); }
+  .seq img { position: absolute; left: 0; top: 0; opacity: 0; }
+  .photo { position: absolute; background: center / cover no-repeat; opacity: 0; border-radius: 6px; }
+  #ring { position: absolute; box-sizing: border-box; border: 0 solid #E08566; border-radius: 6px; opacity: 0; background: center / cover no-repeat; }
+  #fly, #hero { position: absolute; background: center / cover no-repeat; opacity: 0; }
+  #mark { position: absolute; box-sizing: border-box; border: 6px solid #E08566; border-radius: 22px; opacity: 0; }
+  #dot { position: absolute; left: 0; top: 0; border-radius: 50%; background: #E08566; opacity: 0; }
+  #pill { position: absolute; left: 960px; top: 966px; height: 76px; opacity: 0; border-radius: 999px;
+          background: rgba(26,20,17,.86); box-shadow: 0 0 0 1.5px rgba(237,233,221,.14), 0 18px 50px rgba(0,0,0,.4); overflow: hidden; }
+  #pill i { position: absolute; left: 32px; top: 31px; width: 14px; height: 14px; border-radius: 50%; background: #E08566; }
+  #pill span { position: absolute; left: 64px; top: 0; line-height: 76px; font-size: 34px; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; opacity: 0; }
+  #logoRow { position: absolute; left: 0; width: 1920px; top: 380px; text-align: center; font-size: 160px; font-weight: 800; letter-spacing: -0.05em; white-space: nowrap; }
+  #logoRow img { width: 168px; height: 168px; vertical-align: -24px; margin-right: 32px; border-radius: 38px; opacity: 0; }
+  #logoRow .ch { display: inline-block; opacity: 0; }
+  .slot { display: inline-block; }
+  .line { position: absolute; left: 0; width: 1920px; text-align: center; white-space: nowrap; }
+  #tag1, #tag2 { font-size: 52px; font-weight: 600; letter-spacing: -0.02em; opacity: 0; }
+  #tag1 { top: 618px; } #tag2 { top: 690px; }
+  #cta { top: 800px; font-size: 34px; font-weight: 500; color: #A99C90; opacity: 0; }
+  #cta b { color: #E08566; font-weight: 600; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="photos" class="abs" style="width:1920px;height:1080px"></div>
+  <div id="cam" class="abs">
+    <div class="scr" id="sSearch"><img class="full" src="assets/search_focus.jpg"><div class="seq" id="typ" style="position:absolute;left:560px;top:240px"></div></div>
+    <div class="scr seq" id="sLoad"></div>
+    <div class="scr" id="sViewer"><img class="full" src="assets/viewer.jpg"><div class="seq" id="cmt" style="position:absolute;left:2140px;top:1580px"></div></div>
+    <div class="scr" id="sThread"><img class="full" src="assets/viewer_thread.jpg"></div>
+    <div class="scr seq" id="sUp"></div>
+    <div class="scr" id="sHome"><img class="full" src="assets/home.jpg"></div>
+    <div class="scr seq" id="sTitles"></div>
+    <div class="scr" id="sInvA"><img class="full" src="assets/inv_a.jpg"></div>
+    <div class="scr" id="sInvB"><img class="full" src="assets/inv_b.jpg"></div>
+    <div class="scr" id="sPhotos"><img class="full" src="assets/photos.jpg"></div>
+    <div class="scr" id="sJeju"><img class="full" src="assets/m_jeju.jpg"></div>
+  </div>
+  <div id="ring"></div>
+  <div id="fly"></div>
+  <div id="hero"></div>
+  <div id="mark"></div>
+  <div id="logo" class="abs" style="width:1920px;height:1080px">
+    <div id="logoRow"><img id="logoIcon" src="assets/icon.png"><span class="ch">M</span><span class="ch">o</span><span class="ch">m</span><span class="ch">e</span><span class="ch">n</span><span class="ch">t</span><span class="ch">s</span><span class="slot" id="slotLogo" style="width:46px;height:20px"></span></div>
+    <div id="tag1" class="line">흩어진 순간을,</div>
+    <div id="tag2" class="line">하나의 Moment로.</div>
+    <div id="cta" class="line">초대한 사람끼리만 · 5GB 무료로 시작 · <b>photo-moments.app</b></div>
+  </div>
+  <div id="dot"></div>
+  <div id="pill"><i></i></div>
+</div>
+<script>
+// ---- timeline sheet. 90 BPM: beat = 2/3 s = 20 frames, bar = 8/3 s.
+const B = 2 / 3, BAR = 4 * B;
+const T = {
+  intro: 0, ask: 5 * BAR,              // 13.333 photo morphs into the search box
+  type: 5 * BAR + 0.5,                 // keystrokes on 16ths
+  hit: 6 * BAR,                        // 16.0 ENTRY HIT: results land
+  push: 6.5 * BAR,                     // 17.333 dive into the first result
+  fly: 6.75 * BAR,                     // 18.0 same photo opens in the viewer
+  cmtPan: 7.25 * BAR,                  // 19.333
+  cmtType: 7.75 * BAR,                 // 20.667
+  send: 8.75 * BAR,                    // 23.333 comment posted
+  whip: 9.25 * BAR,                    // 24.667 viewer whips out, upload whips in
+  sidebar: 10.75 * BAR,                // 28.667 new Moment appears in the sidebar
+  home: 11 * BAR,                      // 29.333
+  titles: 12 * BAR,                    // 32.0 titles swap in place, one per 2 beats
+  invite: 14 * BAR,                    // 37.333
+  photos: 16 * BAR,                    // 42.667
+  montage: 17 * BAR,                   // 45.333 photos on every beat
+  hero: 19 * BAR,                      // 50.667 hero photo holds
+  heroTile: 19 * BAR + 0.333,          // 51.0 siblings appear
+  zoom: 19.25 * BAR,                   // 51.333 zoom out into the Moment
+  dotFly: 19.75 * BAR,                 // 52.667 title period lifts off
+  land: 20 * BAR,                      // 53.333 lands on the logo = IV→I
+  tag1: 20.5 * BAR, tag2: 20.875 * BAR, cta: 21.375 * BAR, end: 60,
+};
+const PILL = [
+  [0.4, '벚꽃이 피던 날도,'], [1 * BAR, '할머니의 여든 번째 생신도,'], [2 * BAR, '보리가 처음 물에 뛰어든 날도,'],
+  [3 * BAR, '졸업 모자를 던진 날도,'], [4 * BAR, '다 어딘가에 있는데.'], [T.ask, '그 사진, 어디 있더라?'],
+  [T.hit, '말하듯 찾고,'], [T.cmtPan, '조용히 남기고,'], [T.whip, '각자 올리면,'], [T.sidebar, '알아서 하나의 Moment로.'],
+  [T.titles, '날마다, 하나의 Moment.'], [T.invite, '초대한 사람끼리만.'], [T.photos, '우리의 명장면은,'],
+];
+const PILL_OFF = T.montage - 0.2;
+const INTRO = ['blossom_01', 'birthday_03', 'dog_00', 'graduation_02', 'camping_06'];
+const MONTAGE = ['jeju_07', 'camping_07', 'birthday_07', 'dog_07', 'blossom_04', 'workshop_01', 'graduation_04', 'jeju_04'];
+const HERO = 'jeju_01';
+
+// ---- measured screen targets (2880x1800 captures)
+const RING = [594, 254, 979, 86];
+const TILE_SEARCH = [600, 368, 546, 546];
+const PHOTO_VIEWER = [42, 221, 2036, 1357];
+const TILE_JEJU = [1204, 556, 502, 502];
+const DOT_JEJU = [1113.5, 312, 7];
+const CAM = {
+  type: { cx: 1083, cy: 297, z: 1300 }, typeEnd: { cx: 1170, cy: 297, z: 1220 }, full: { cx: 1440, cy: 900, z: 3240 },
+  tile: { cx: 873, cy: 641, z: 1500 }, cmt: { cx: 2250, cy: 1560, z: 1300 }, thread: { cx: 2250, cy: 620, z: 1300 },
+  upProg: { cx: 1400, cy: 420, z: 2100 }, upSide: { cx: 420, cy: 680, z: 1250 }, side: { cx: 420, cy: 700, z: 1350 },
+  sideEnd: { cx: 420, cy: 1050, z: 1350 }, titles: { cx: 1330, cy: 640, z: 2500 }, inv: { cx: 1440, cy: 900, z: 1650 },
+  photosIn: { cx: 1700, cy: 900, z: 1500 },
+};
+const S = (z) => 1920 / z;
+const toStage = ([x, y, w, h], c) => { const s = S(c.z); return { left: (x - c.cx) * s + 960, top: (y - c.cy) * s + 540, width: w * s, height: h * s }; };
+// zoom anchored so `rect` fills `w` stage px centred at (sx, sy)
+const camFor = ([x, y, w, h], sw, sx = 960, sy = 540) => { const s = sw / w; return { cx: x + w / 2 - (sx - 960) / s, cy: y + h / 2 - (sy - 540) / s, z: 1920 / s }; };
+CAM.heroTile = camFor(TILE_JEJU, 756, 960, 500);
+
+const $ = (q) => document.querySelector(q);
+const stage = $('#stage');
+const pad = (n) => String(n).padStart(2, '0');
+const addImgs = (host, srcs, cls = '') => srcs.map((src) => { const im = new Image(); im.src = src; if (cls) im.className = cls; host.appendChild(im); return im; });
+const typImgs = addImgs($('#typ'), Array.from({ length: 13 }, (_, i) => `assets/type/k${pad(i)}.jpg`));
+const cmtImgs = addImgs($('#cmt'), Array.from({ length: 15 }, (_, i) => `assets/cmt/c${pad(i)}.jpg`));
+const loadImgs = addImgs($('#sLoad'), [0, 1, 2, 3, 4, 5].map((i) => `assets/s_${i}.jpg`), 'full');
+const upImgs = addImgs($('#sUp'), Array.from({ length: 31 }, (_, i) => `assets/up/u${pad(i)}.jpg`), 'full');
+const titleImgs = addImgs($('#sTitles'), ['m_camping', 'm_birthday', 'm_dog', 'm_blossom'].map((k) => `assets/${k}.jpg`), 'full');
+// photos are shown at a fixed height (70%), centred, whatever their aspect: like the reference's gallery
+const PH_H = 756, PH_CY = 500;
+const photoEl = (name) => { const d = document.createElement('div'); d.className = 'photo'; d.style.backgroundImage = `url(assets/ph/${name}.jpg)`; $('#photos').appendChild(d); return d; };
+const introEls = INTRO.map(photoEl), montageEls = MONTAGE.map(photoEl);
+const preload = [...INTRO, ...MONTAGE, HERO].map((n) => { const im = new Image(); im.src = `assets/ph/${n}.jpg`; return im; });
+$('#fly').style.backgroundImage = $('#hero').style.backgroundImage = `url(assets/ph/${HERO}.jpg)`;
+const pillSpans = PILL.map(([, text]) => { const s = document.createElement('span'); s.textContent = text; $('#pill').appendChild(s); return s; });
+
+// ---- camera (time-evaluated moves) + sound cues
+const tl = gsap.timeline({ paused: true });
+const camMoves = [];
+const camTo = (c, at, dur, ease = 'power2.inOut') => camMoves.push({ at, dur, to: c, ease: gsap.parseEase(ease) });
+const camAt = (t) => {
+  let cur = camMoves[0].to;
+  for (const m of camMoves) {
+    if (t < m.at) break;
+    if (m.dur > 0 && t < m.at + m.dur) {
+      const k = m.ease((t - m.at) / m.dur);
+      return { cx: cur.cx + (m.to.cx - cur.cx) * k, cy: cur.cy + (m.to.cy - cur.cy) * k, z: Math.exp(Math.log(cur.z) + (Math.log(m.to.z) - Math.log(cur.z)) * k) };
+    }
+    cur = m.to;
+  }
+  return cur;
+};
+const trackers = [];   // stage elements glued to a screen rect while the camera moves
+const applyCam = () => {
+  const t = tl.time(), c = camAt(t), s = S(c.z);
+  $('#cam').style.transform = `translate(${960 - c.cx * s}px, ${540 - c.cy * s}px) scale(${s})`;
+  for (const k of trackers) if (t >= k.a && t <= k.b) Object.assign(k.el.style, Object.fromEntries(Object.entries(toStage(k.rect, c)).map(([p, v]) => [p, `${v}px`])));
+};
+const cues = [];
+const cue = (t, type, o = {}) => cues.push({ t: Math.round(t * 1000) / 1000, type, ...o });
+const seq = (imgs, t0, dt, sound) => imgs.forEach((im, i) => { if (sound) cue(t0 + i * dt, sound, { i }); tl.set(im, { opacity: 1 }, t0 + i * dt); if (i) tl.set(imgs[i - 1], { opacity: 0 }, t0 + i * dt); });
+const show = (el, at, until) => { tl.set(el, { opacity: 1 }, at); if (until != null) tl.set(el, { opacity: 0 }, until); };
+const slotPos = (el, d) => { const r = el.getBoundingClientRect(), st = stage.getBoundingClientRect(); return { left: r.left - st.left + 6, top: r.bottom - st.top - d - 28, width: d, height: d }; };
+const photoBox = (img, h = PH_H, cy = PH_CY) => { const w = h * img.naturalWidth / img.naturalHeight; return { left: 960 - w / 2, top: cy - h / 2, width: w, height: h }; };
+
+function build() {
+  const pLogo = slotPos($('#slotLogo'), 34);
+  gsap.set('#pill', { xPercent: -50 });
+  const pillW = pillSpans.map((s) => s.getBoundingClientRect().width + 64 + 36);
+  const nat = Object.fromEntries(preload.map((im) => [im.src.split('/').pop().replace('.jpg', ''), im]));
+
+  // S1 intro: one moment per bar, hard cuts on the downbeat, slow push on each
+  INTRO.forEach((n, i) => {
+    const el = introEls[i], box = photoBox(nat[n]), at = i * BAR;
+    gsap.set(el, box);
+    show(el, at, i < INTRO.length - 1 ? at + BAR : null);
+    tl.fromTo(el, { scale: 1.0 }, { scale: 1.045, duration: BAR, ease: 'none' }, at);
+    if (i) cue(at, 'cut', { i });
+  });
+
+  // S2 the last photo folds into the real search box's focus ring (object becomes UI)
+  camTo(CAM.type, 0, 0);
+  const ring = toStage(RING, CAM.type), last = introEls.at(-1);
+  tl.to(last, { ...ring, scale: 1, borderRadius: ring.height / 2, duration: 0.55, ease: 'expo.inOut' }, T.ask)
+    .set('#ring', { ...ring, borderRadius: ring.height / 2, borderWidth: 4 * S(CAM.type.z), opacity: 0 }, T.ask)
+    .to('#ring', { opacity: 1, duration: 0.2 }, T.ask + 0.3)
+    .to(last, { opacity: 0, duration: 0.25 }, T.ask + 0.35)
+    .to('#sSearch', { opacity: 1, duration: 0.3 }, T.ask + 0.35)
+    .to('#ring', { opacity: 0, duration: 0.2 }, T.ask + 0.7);
+  cue(T.ask, 'fold', { dur: 0.55 });
+  camTo(CAM.typeEnd, T.type, T.hit - T.type, 'none');
+  seq(typImgs, T.type, B / 4, 'key');
+  // results land on the entry hit, blur up, while the camera pulls back
+  tl.set(typImgs.at(-1), { opacity: 0 }, T.hit - 0.15).set('#sSearch', { opacity: 0 }, T.hit - 0.15).set('#sLoad', { opacity: 1 }, T.hit - 0.15);
+  tl.set(loadImgs[0], { opacity: 1 }, T.hit - 0.15);
+  [T.hit, T.hit + 0.12, T.hit + 0.25, T.hit + 0.4, T.hit + 0.6].forEach((tt, i) => { tl.set(loadImgs[i], { opacity: 0 }, tt); tl.set(loadImgs[i + 1], { opacity: 1 }, tt); });
+  cue(T.hit, 'hit'); cue(T.hit - 0.15, 'enter');
+  camTo(CAM.full, T.hit - 0.25, 1.2, 'power3.out');
+
+  // S3 dive into the first result; the same photo opens in the lightbox
+  camTo(CAM.tile, T.push, 0.6, 'power2.in');
+  const tS = toStage(TILE_SEARCH, CAM.tile), pV = toStage(PHOTO_VIEWER, CAM.full);
+  tl.set('#fly', { ...tS, borderRadius: 26, opacity: 1 }, T.fly)
+    .to('#sLoad', { opacity: 0, duration: 0.25 }, T.fly)
+    .to('#fly', { ...pV, borderRadius: 0, duration: 0.8, ease: 'power3.inOut' }, T.fly);
+  camTo(CAM.full, T.fly + 0.3, 0);
+  tl.to('#sViewer', { opacity: 1, duration: 0.3 }, T.fly + 0.45).set('#fly', { opacity: 0 }, T.fly + 0.85);
+  cue(T.fly, 'fly', { dur: 0.8 });
+  camTo(CAM.cmt, T.cmtPan, 1.0, 'power3.inOut');
+  seq(cmtImgs, T.cmtType, B / 4, 'keySoft');
+  // posted: the real thread frame replaces the editor, camera rises to the comment
+  tl.set('#sThread', { opacity: 1 }, T.send).set('#sViewer', { opacity: 0 }, T.send + 0.05);
+  cue(T.send, 'send');
+  camTo(CAM.thread, T.send + 0.1, 0.9, 'power3.inOut');
+
+  // S4 whip: viewer out left, the real upload in from the right (same frame, new content)
+  tl.to('#sThread', { x: -3200, filter: 'blur(24px)', duration: 0.35, ease: 'power3.in' }, T.whip - 0.15)
+    .fromTo('#sUp', { opacity: 1, x: 3200, filter: 'blur(24px)' }, { x: 0, filter: 'blur(0px)', duration: 0.4, ease: 'power3.out' }, T.whip);
+  camTo(CAM.full, T.whip - 0.75, 0.6, 'power2.inOut');
+  cue(T.whip - 0.15, 'whip', { dur: 0.55 });
+  seq(upImgs, T.whip, 0.115);
+  camTo(CAM.upProg, T.whip + 0.5, 1.4, 'power2.inOut');
+  camTo(CAM.upSide, T.sidebar - 0.9, 0.9, 'power3.inOut');
+  // the new Moment row gets the accent ring on the beat
+  const NEWROW = [16, 625, 690, 110];
+  tl.set('#mark', { ...toStage(NEWROW, CAM.upSide), opacity: 0, scale: 1.25 }, T.sidebar)
+    .to('#mark', { opacity: 1, scale: 1, duration: 0.3, ease: 'back.out(2)' }, T.sidebar)
+    .to('#mark', { opacity: 0, duration: 0.25 }, T.home - 0.1);
+  cue(T.sidebar, 'ding');
+
+  // S5 same sidebar, a few weeks later: every Moment titled, all NEW
+  tl.set('#sHome', { opacity: 1 }, T.home).set('#sUp', { opacity: 0 }, T.home + 0.2);
+  camTo(CAM.side, T.home, 0.5, 'power2.out');
+  camTo(CAM.sideEnd, T.home + 0.6, T.titles - T.home - 0.6, 'sine.inOut');
+
+  // S6 titles swap in a fixed frame, on every second beat (their orange periods keep the hero dot alive)
+  camTo(CAM.titles, T.titles, 0);
+  tl.set('#sTitles', { opacity: 1 }, T.titles).set('#sHome', { opacity: 0 }, T.titles);
+  seq(titleImgs, T.titles, 2 * B, 'swap');
+  camTo({ ...CAM.titles, z: 2300 }, T.titles, T.invite - T.titles, 'none');
+
+  // S7 invite: the dialog promises "only people with the link", then the link is made (cut on the beat)
+  camTo(CAM.inv, T.invite, 0);
+  tl.set('#sInvA', { opacity: 1 }, T.invite).set('#sTitles', { opacity: 0 }, T.invite);
+  tl.set('#sInvB', { opacity: 1 }, T.invite + 4 * B).set('#sInvA', { opacity: 0 }, T.invite + 4 * B);
+  cue(T.invite, 'cut', { i: 9 }); cue(T.invite + 4 * B, 'click');
+  camTo({ ...CAM.inv, z: 1500 }, T.invite, 8 * B, 'none');
+
+  // S8 everything we kept: the whole library, pulling back on the build
+  camTo(CAM.photosIn, T.photos, 0);
+  tl.set('#sPhotos', { opacity: 1 }, T.photos).set('#sInvB', { opacity: 0 }, T.photos);
+  camTo(CAM.full, T.photos + 0.1, BAR - 0.3, 'power2.inOut');
+  cue(T.photos, 'cut', { i: 10 });
+
+  // S9 montage: a photo on every beat, hard cuts
+  tl.set('#sPhotos', { opacity: 0 }, T.montage);
+  MONTAGE.forEach((n, i) => {
+    const el = montageEls[i], at = T.montage + i * B;
+    gsap.set(el, photoBox(nat[n]));
+    show(el, at, at + B);
+    tl.fromTo(el, { scale: 1.0 }, { scale: 1.03, duration: B, ease: 'none' }, at);
+    cue(at, 'mcut', { i });
+  });
+
+  // S10 hero holds, becomes its own tile, siblings appear, zoom out into the real Moment page
+  const hb = photoBox(nat[HERO]);
+  tl.set('#hero', { ...hb, opacity: 1 }, T.hero);
+  const sq = { left: 960 - PH_H / 2, top: PH_CY - PH_H / 2, width: PH_H, height: PH_H };
+  tl.to('#hero', { ...sq, borderRadius: 20 * S(CAM.heroTile.z), duration: 0.33, ease: 'power2.inOut' }, T.heroTile);
+  camTo(CAM.heroTile, T.heroTile, 0);
+  tl.fromTo('#sJeju', { opacity: 0 }, { opacity: 0.22, duration: 0.33 }, T.heroTile)
+    .to('#sJeju', { opacity: 1, duration: 0.9, ease: 'power1.in' }, T.zoom + 0.1);
+  camTo(CAM.full, T.zoom, T.dotFly - T.zoom, 'power2.inOut');
+  trackers.push({ el: $('#hero'), rect: TILE_JEJU, a: T.zoom, b: T.dotFly + 0.01 });
+  tl.to('#hero', { opacity: 0, duration: 0.25 }, T.dotFly - 0.3);
+  cue(T.zoom, 'swell', { to: T.land });
+
+  // S11 the title's orange period lifts off and lands as the logo's period on the resolution
+  const d0 = toStage([DOT_JEJU[0] - DOT_JEJU[2] / 2, DOT_JEJU[1] - DOT_JEJU[2] / 2, DOT_JEJU[2], DOT_JEJU[2]], CAM.full);
+  tl.set('#dot', { ...d0, opacity: 1 }, T.dotFly)
+    .to('#sJeju', { opacity: 0, duration: 0.3, ease: 'power2.in' }, T.dotFly + 0.08)
+    .to('#dot', { ...pLogo, duration: T.land - T.dotFly, ease: 'power3.in' }, T.dotFly)
+    .fromTo('#logoIcon', { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.4, ease: 'back.out(1.8)' }, T.dotFly + 0.38)
+    .fromTo('#logoRow .ch', { opacity: 0, x: -60, filter: 'blur(10px)' }, { opacity: 1, x: 0, filter: 'blur(0px)', duration: 0.35, ease: 'power3.out', stagger: 0.04 }, T.dotFly + 0.36)
+    .fromTo('#tag1', { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, T.tag1)
+    .fromTo('#tag2', { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, T.tag2)
+    .fromTo('#cta', { opacity: 0 }, { opacity: 1, duration: 0.8 }, T.cta);
+  cue(T.land, 'land'); cue(T.tag1, 'tag', { i: 0 }); cue(T.tag2, 'tag', { i: 1 }); cue(T.cta, 'cta');
+
+  // persistent caption pill
+  tl.fromTo('#pill', { opacity: 0, y: 24, width: pillW[0] }, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, PILL[0][0] - 0.1);
+  PILL.forEach(([at], i) => {
+    if (i) { tl.to(pillSpans[i - 1], { opacity: 0, y: -22, duration: 0.18, ease: 'power2.in' }, at - 0.18)
+             .to('#pill', { width: pillW[i], duration: 0.35, ease: 'power3.inOut' }, at - 0.18); }
+    tl.fromTo(pillSpans[i], { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.3, ease: 'power3.out' }, at);
+  });
+  tl.to('#pill', { opacity: 0, y: 24, duration: 0.3, ease: 'power2.in' }, PILL_OFF);
+
+  camMoves.sort((a, b) => a.at - b.at);
+  camMoves.forEach((m, i) => { if (m.dur > 0 && i) cue(m.at, 'cam', { dur: m.dur, zr: m.to.z / camMoves[i - 1].to.z }); });
+  cues.sort((a, b) => a.t - b.t);
+  window.__cues = cues; window.__T = T;
+  tl.set({}, {}, T.end);
+}
+
+Promise.all([document.fonts.ready, ...[...document.images, ...preload].map((im) => im.complete ? null : new Promise((r) => { im.onload = im.onerror = r; }))]).then(() => {
+  build();
+  tl.seek(0); applyCam();
+  window.__duration = tl.duration();
+  window.__seek = async (t) => { tl.seek(t, false); applyCam(); };
+  window.__ready = true;
+});
+</script>
+</body>
+</html>

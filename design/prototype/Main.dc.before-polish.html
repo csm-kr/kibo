@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>KIBO E2E prototype</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#E7E2D8}
+a{color:#0E5E5A}a:hover{color:#083E3B}
+button{font-family:inherit;cursor:pointer;color:inherit}
+button:disabled{cursor:not-allowed}
+button:focus-visible{outline:3px solid #0E5E5A;outline-offset:2px}
+img{display:block}
+</style>
+</helmet>
+<div style="width: 1640px; height: 1160px; box-sizing: border-box; padding: 40px; display: flex; gap: 36px; align-items: flex-start; font-family: 'IBM Plex Sans KR', sans-serif; color: #1E1B18; background: #E7E2D8">
+
+<!-- ======================= KIOSK (9:16) ======================= -->
+<section aria-label="키오스크 화면" style="width: 620px; height: 1080px; flex: none; position: relative; display: flex; flex-direction: column; background: #FBF7EF; border: 12px solid #1E1B18; border-radius: 30px; overflow: hidden; box-sizing: border-box">
+
+  <!-- top bar (all screens except attract) -->
+  <sc-if value="{{ k.bar }}" hint-placeholder-val="{{ false }}">
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: #0E5E5A; color: #FBF7EF">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <div style="width: 34px; height: 34px; border-radius: 10px; background: #F2B13D; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #1E1B18; font-size: 20px">M</div>
+        <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: 0.04em">MALO BURGER</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px">
+        <span style="{{ kStatusStyle }}">{{ kStatus }}</span>
+        <span style="padding: 6px 12px; border-radius: 999px; background: #FBF7EF; color: #0E5E5A; font-size: 16px; font-weight: 700">{{ dineText }}</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ staff }}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="padding: 12px 20px; background: #FFF1CC; color: #6B4A00; font-size: 20px; font-weight: 700; border-bottom: 2px solid #F2B13D">직원을 불렀어요. 곧 도와드릴게요.</div>
+  </sc-if>
+
+  <!-- ===== attract ===== -->
+  <sc-if value="{{ k.attract }}" hint-placeholder-val="{{ true }}">
+    <div style="flex: 1; display: flex; flex-direction: column; min-height: 0">
+      <div style="position: relative; flex: 1; min-height: 0; overflow: hidden; background: #2A211A">
+        <img src="{{ img.hero }}" alt="더블치즈버거" style="width: 100%; height: 100%; object-fit: cover">
+        <div style="position: absolute; left: 0; right: 0; top: 0; padding: 28px 30px; display: flex; flex-direction: column; gap: 8px; background: linear-gradient(rgba(20,16,12,0.78), rgba(20,16,12,0))">
+          <div style="display: flex; align-items: center; gap: 10px">
+            <div style="width: 40px; height: 40px; border-radius: 12px; background: #F2B13D; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #1E1B18; font-size: 24px">M</div>
+            <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 26px; letter-spacing: 0.05em; color: #FBF7EF">MALO BURGER</div>
+          </div>
+          <div style="font-size: 44px; font-weight: 700; line-height: 1.2; color: #FFFFFF; margin-top: 12px">두 배로 진하게,<br>더블치즈버거</div>
+          <div style="font-size: 22px; color: #F7E7C4">세트 8,400원</div>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 16px; background: #FBF7EF">
+        <button type="button" onClick="{{ act.scan }}" aria-label="휴대폰으로 말해서 주문하기. QR 코드" style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 16px; border: 3px solid #0E5E5A; border-radius: 20px; background: #FFFFFF">
+          <span style="font-size: 24px; font-weight: 700; color: #0E5E5A">휴대폰으로 말해서</span>
+          <span style="width: 132px; height: 132px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; padding: 6px; box-sizing: border-box; background: #FFFFFF; border: 2px solid #1E1B18; border-radius: 10px">
+            <sc-for list="{{ qr }}" as="cell" hint-placeholder-count="49"><span style="{{ cell.style }}"></span></sc-for>
+          </span>
+          <span style="font-size: 18px; color: #4B463F">카메라로 찍으세요</span>
+        </button>
+        <button type="button" onClick="{{ act.touchStart }}" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 16px; border: 0; border-radius: 20px; background: #0E5E5A; color: #FFFFFF">
+          <svg width="56" height="56" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#FFFFFF" stroke-width="1.8"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V10"></path><path d="M12 10V4.5a1.5 1.5 0 0 1 3 0V11"></path><path d="M15 10.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1a6 6 0 0 1-5-2.7L3.5 14a1.5 1.5 0 0 1 2.4-1.8L9 15"></path></svg>
+          <span style="font-size: 24px; font-weight: 700">화면을 눌러서 주문</span>
+          <span style="font-size: 18px; color: #CFE6E3">기존 방식 그대로</span>
+        </button>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 0 16px 16px; flex-wrap: wrap">
+        <div style="display: flex; gap: 6px">
+          <span style="padding: 8px 12px; border-radius: 10px; background: #1E1B18; color: #FFFFFF; font-size: 16px; font-weight: 700">한국어</span>
+          <span style="padding: 8px 12px; border-radius: 10px; background: #ECE5D6; font-size: 16px">English</span>
+          <span style="padding: 8px 12px; border-radius: 10px; background: #ECE5D6; font-size: 16px">中文</span>
+          <span style="padding: 8px 12px; border-radius: 10px; background: #ECE5D6; font-size: 16px">日本語</span>
+        </div>
+        <span style="padding: 8px 12px; border-radius: 10px; border: 2px solid #1E1B18; font-size: 16px; font-weight: 700">큰 글씨 · 낮은 화면</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== dine ===== -->
+  <sc-if value="{{ k.dine }}" hint-placeholder-val="{{ false }}">
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 20px; padding: 32px 24px">
+      <div style="font-size: 34px; font-weight: 700; text-align: center; margin-top: 20px">어디에서 드시나요?</div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+        <button type="button" onClick="{{ act.kDineIn }}" style="padding: 0; border: 3px solid #1E1B18; border-radius: 22px; background: #FFFFFF; overflow: hidden; text-align: center">
+          <img src="{{ img.dine_in }}" alt="" style="width: 100%; height: 240px; object-fit: cover">
+          <span style="display: block; padding: 18px; font-size: 28px; font-weight: 700">매장에서 먹어요</span>
+        </button>
+        <button type="button" onClick="{{ act.kTakeOut }}" style="padding: 0; border: 3px solid #1E1B18; border-radius: 22px; background: #FFFFFF; overflow: hidden; text-align: center">
+          <img src="{{ img.take_out }}" alt="" style="width: 100%; height: 240px; object-fit: cover">
+          <span style="display: block; padding: 18px; font-size: 28px; font-weight: 700">포장해 갈게요</span>
+        </button>
+      </div>
+      <div style="text-align: center; font-size: 20px; color: #4B463F">{{ dineHint }}</div>
+    </div>
+  </sc-if>
+
+  <!-- ===== menu ===== -->
+  <sc-if value="{{ k.menu }}" hint-placeholder-val="{{ false }}">
+    <div style="flex: 1; display: flex; min-height: 0">
+      <nav aria-label="메뉴 분류" style="width: 118px; flex: none; display: flex; flex-direction: column; gap: 6px; padding: 12px 8px; background: #F1EADC">
+        <sc-for list="{{ cats }}" as="c" hint-placeholder-count="5">
+          <button type="button" onClick="{{ c.go }}" style="{{ c.style }}">
+            <img src="{{ c.icon }}" alt="" style="width: 56px; height: 56px; object-fit: cover; border-radius: 12px; margin: 0 auto 4px">
+            {{ c.label }}
+          </button>
+        </sc-for>
+      </nav>
+      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; min-height: 0">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 6px; gap: 8px">
+          <div style="font-size: 26px; font-weight: 700">{{ catTitle }}</div>
+          <sc-if value="{{ p.off }}" hint-placeholder-val="{{ true }}">
+            <button type="button" onClick="{{ act.scan }}" style="min-height: 44px; padding: 0 12px; border: 2px solid #0E5E5A; border-radius: 999px; background: #FFFFFF; color: #0E5E5A; font-size: 16px; font-weight: 700">말로 주문하기 QR</button>
+          </sc-if>
+        </div>
+        <sc-if value="{{ aiToast }}" hint-placeholder-val="{{ false }}">
+          <div role="status" style="margin: 0 16px 6px; padding: 10px 14px; border-radius: 12px; background: #DDF0EE; color: #083E3B; font-size: 18px; font-weight: 700; box-shadow: inset 0 0 0 2px #0E5E5A">{{ aiToast }}</div>
+        </sc-if>
+        <div style="flex: 1; min-height: 0; overflow: auto; padding: 6px 16px 12px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-content: start">
+          <sc-for list="{{ products }}" as="m" hint-placeholder-count="6">
+            <button type="button" onClick="{{ m.open }}" disabled="{{ m.soldOut }}" style="{{ m.style }}">
+              <span style="position: relative; display: block; background: #FBF7EF">
+                <img src="{{ m.img }}" alt="" style="width: 100%; height: 150px; object-fit: cover">
+                <sc-if value="{{ m.badge }}" hint-placeholder-val="{{ false }}"><span style="{{ m.badgeStyle }}">{{ m.badge }}</span></sc-if>
+                <sc-if value="{{ m.soldOut }}" hint-placeholder-val="{{ false }}"><span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(251,247,239,0.72); font-size: 26px; font-weight: 700; color: #7A2E0E">품절</span></sc-if>
+              </span>
+              <span style="display: block; padding: 10px 12px 12px; text-align: left">
+                <span style="display: block; font-size: 21px; font-weight: 700">{{ m.name }}</span>
+                <span style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 4px"><span style="font-size: 20px; font-weight: 700; color: #0E5E5A">{{ m.priceText }}</span><span style="font-size: 15px; color: #6A645A">{{ m.kcal }}</span></span>
+              </span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== review (주문 내역 = 확인 화면) ===== -->
+  <sc-if value="{{ k.review }}" hint-placeholder-val="{{ false }}">
+    <div style="flex: 1; display: flex; flex-direction: column; min-height: 0; padding: 18px 20px; gap: 12px">
+      <div style="font-size: 30px; font-weight: 700">주문 내역을 확인해 주세요</div>
+      <div style="flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 10px">
+        <sc-for list="{{ cartView }}" as="line" hint-placeholder-count="2">
+          <div style="display: flex; gap: 12px; align-items: center; padding: 10px; border-radius: 16px; background: #FFFFFF; box-shadow: 0 0 0 1px #E2DACB">
+            <img src="{{ line.img }}" alt="" style="width: 88px; height: 88px; object-fit: cover; border-radius: 12px; flex: none">
+            <div style="flex: 1; min-width: 0">
+              <div style="font-size: 22px; font-weight: 700">{{ line.name }}</div>
+              <div style="font-size: 17px; color: #4B463F; line-height: 1.4">{{ line.optText }}</div>
+              <div style="font-size: 20px; font-weight: 700; color: #0E5E5A; margin-top: 2px">{{ line.priceText }}</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px">
+              <button type="button" onClick="{{ line.dec }}" aria-label="수량 줄이기" style="width: 44px; height: 44px; border-radius: 999px; border: 2px solid #1E1B18; background: #FFFFFF; font-size: 22px; font-weight: 700">−</button>
+              <span style="min-width: 24px; text-align: center; font-size: 22px; font-weight: 700">{{ line.qty }}</span>
+              <button type="button" onClick="{{ line.inc }}" aria-label="수량 늘리기" style="width: 44px; height: 44px; border-radius: 999px; border: 2px solid #1E1B18; background: #FFFFFF; font-size: 22px; font-weight: 700">+</button>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: baseline; padding-top: 8px; border-top: 2px solid #1E1B18">
+        <span style="font-size: 24px">총 결제금액</span>
+        <span style="font-size: 40px; font-weight: 700; font-family: 'Space Grotesk', sans-serif">{{ totalText }}</span>
+      </div>
+      <sc-if value="{{ phoneOn }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 12px 14px; border-radius: 12px; background: #DDF0EE; font-size: 19px; color: #083E3B; font-weight: 700">휴대폰에서 [네, 결제할게요]를 눌러도 돼요</div>
+      </sc-if>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+        <button type="button" onClick="{{ act.moreOrder }}" style="min-height: 68px; border: 2px solid #1E1B18; border-radius: 16px; background: #FFFFFF; font-size: 22px; font-weight: 700">추가 주문</button>
+        <button type="button" onClick="{{ act.goPay }}" style="min-height: 68px; border: 0; border-radius: 16px; background: #F2B13D; color: #1E1B18; font-size: 22px; font-weight: 700">결제하기</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== pay method ===== -->
+  <sc-if value="{{ k.method }}" hint-placeholder-val="{{ false }}">
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 16px; padding: 28px 22px">
+      <div style="font-size: 30px; font-weight: 700">결제 방법을 선택해 주세요</div>
+      <div style="font-size: 22px">결제금액 <b style="font-family: 'Space Grotesk', sans-serif; font-size: 30px">{{ totalText }}</b></div>
+      <button type="button" onClick="{{ act.pickCard }}" style="display: flex; align-items: center; gap: 18px; min-height: 120px; padding: 0 22px; border: 3px solid #1E1B18; border-radius: 20px; background: #FFFFFF; text-align: left">
+        <svg width="64" height="46" viewBox="0 0 56 40" aria-hidden="true" fill="none" stroke="#1E1B18" stroke-width="2.6"><rect x="2" y="2" width="52" height="36" rx="5"></rect><line x1="2" y1="12" x2="54" y2="12"></line><line x1="10" y1="28" x2="26" y2="28"></line></svg>
+        <span><span style="display: block; font-size: 26px; font-weight: 700">신용 · 체크카드</span><span style="display: block; font-size: 18px; color: #4B463F">카드를 꽂거나 대주세요</span></span>
+      </button>
+      <button type="button" disabled="{{ true }}" style="display: flex; align-items: center; gap: 18px; min-height: 100px; padding: 0 22px; border: 2px solid #D8CFBE; border-radius: 20px; background: #F3EEE4; text-align: left; color: #6A645A">
+        <svg width="56" height="56" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#6A645A" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><path d="M14 14h3v3h-3zM20 14v7M14 20h3"></path></svg>
+        <span style="font-size: 22px; font-weight: 700">간편결제 · 쿠폰 (시연에서는 카드만)</span>
+      </button>
+    </div>
+  </sc-if>
+
+  <!-- ===== card insert ===== -->
+  <sc-if value="{{ k.card }}" hint-placeholder-val="{{ false }}">
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding: 28px">
+      <div style="font-size: 30px; font-weight: 700; text-align: center">{{ cardTitle }}</div>
+      <div style="font-size: 42px; font-weight: 700; font-family: 'Space Grotesk', sans-serif">{{ totalText }}</div>
+      <button type="button" onClick="{{ act.insertCard }}" disabled="{{ payBusy }}" style="width: 360px; padding: 26px 0 20px; border: 0; border-radius: 22px; background: #1E1B18; color: #FBF7EF; display: flex; flex-direction: column; align-items: center; gap: 14px">
+        <span style="{{ cardStyle }}">
+          <span style="display: block; width: 46px; height: 34px; border-radius: 6px; background: #E9C46A; margin: 30px 0 0 22px"></span>
+        </span>
+        <span style="width: 240px; height: 14px; border-radius: 999px; background: #4B463F"></span>
+        <span style="font-size: 20px; font-weight: 700">{{ cardHint }}</span>
+      </button>
+      <button type="button" onClick="{{ act.editOrder }}" disabled="{{ payBusy }}" style="min-height: 56px; padding: 0 22px; border: 2px solid #1E1B18; border-radius: 14px; background: transparent; font-size: 20px; font-weight: 700">주문 수정</button>
+    </div>
+  </sc-if>
+
+  <!-- ===== receipt ===== -->
+  <sc-if value="{{ k.receipt }}" hint-placeholder-val="{{ false }}">
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 28px">
+      <div style="font-size: 30px; font-weight: 700">결제가 완료됐어요</div>
+      <div style="font-size: 24px">영수증을 출력할까요?</div>
+      <div style="display: flex; gap: 14px">
+        <button type="button" onClick="{{ act.receiptYes }}" style="width: 220px; min-height: 96px; border: 3px solid #1E1B18; border-radius: 18px; background: #FFFFFF; font-size: 24px; font-weight: 700">출력</button>
+        <button type="button" onClick="{{ act.receiptNo }}" style="width: 220px; min-height: 96px; border: 0; border-radius: 18px; background: #F2B13D; font-size: 24px; font-weight: 700">출력 안 함</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== done ===== -->
+  <sc-if value="{{ k.done }}" hint-placeholder-val="{{ false }}">
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 28px; text-align: center">
+      <div style="font-size: 26px; font-weight: 700">주문해 주셔서 고마워요</div>
+      <div style="font-size: 22px; color: #4B463F; margin-top: 10px">주문번호</div>
+      <div style="font-size: 140px; line-height: 1; font-weight: 700; font-family: 'Space Grotesk', sans-serif; color: #0E5E5A">{{ orderNo }}</div>
+      <div style="font-size: 22px; color: #4B463F">{{ dineText }} · 준비되면 번호를 불러드려요</div>
+      <button type="button" onClick="{{ act.reset }}" style="margin-top: 24px; min-height: 56px; padding: 0 24px; border: 0; border-radius: 14px; background: #1E1B18; color: #FBF7EF; font-size: 20px; font-weight: 700">처음으로 (실제로는 10초 뒤 자동)</button>
+    </div>
+  </sc-if>
+
+  <!-- bottom cart bar on menu -->
+  <sc-if value="{{ k.menu }}" hint-placeholder-val="{{ false }}">
+    <div style="background: #FFFFFF; border-top: 2px solid #E2DACB">
+      <sc-if value="{{ hasCart }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; gap: 10px; padding: 10px 16px 0; overflow-x: auto">
+          <sc-for list="{{ cartView }}" as="line" hint-placeholder-count="2">
+            <div style="{{ line.chipStyle }}">
+              <img src="{{ line.img }}" alt="" style="width: 44px; height: 44px; object-fit: cover; border-radius: 8px; flex: none">
+              <span style="font-size: 15px; line-height: 1.25"><b>{{ line.name }}</b> ×{{ line.qty }}<br>{{ line.shortOpt }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="display: flex; align-items: center; gap: 10px; padding: 12px 16px 14px">
+        <button type="button" onClick="{{ act.clearAll }}" style="min-height: 60px; padding: 0 14px; border: 2px solid #1E1B18; border-radius: 14px; background: #FFFFFF; font-size: 18px; font-weight: 700">전체 취소</button>
+        <div style="flex: 1; text-align: right">
+          <div style="font-size: 16px; color: #4B463F">주문 {{ cartCount }}개</div>
+          <div style="font-size: 30px; font-weight: 700; font-family: 'Space Grotesk', sans-serif">{{ totalText }}</div>
+        </div>
+        <button type="button" onClick="{{ act.kioskCheckout }}" style="min-height: 60px; padding: 0 22px; border: 0; border-radius: 14px; background: #F2B13D; color: #1E1B18; font-size: 22px; font-weight: 700">주문하기</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== touch: product sheet (set / side / drink / custom) ===== -->
+  <sc-if value="{{ sheet.open }}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; inset: 0; background: rgba(30,27,24,0.55); display: flex; align-items: flex-end">
+      <div role="dialog" aria-label="{{ sheet.title }}" style="width: 100%; max-height: 86%; display: flex; flex-direction: column; background: #FBF7EF; border-radius: 26px 26px 0 0; overflow: hidden">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 8px">
+          <div>
+            <div style="font-size: 16px; color: #0E5E5A; font-weight: 700">{{ sheet.stepText }}</div>
+            <div style="font-size: 26px; font-weight: 700">{{ sheet.title }}</div>
+          </div>
+          <button type="button" onClick="{{ act.closeSheet }}" aria-label="닫기" style="width: 48px; height: 48px; border-radius: 999px; border: 2px solid #1E1B18; background: #FFFFFF; font-size: 22px; font-weight: 700">✕</button>
+        </div>
+        <div style="padding: 6px 20px 14px; overflow: auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+          <sc-for list="{{ sheet.options }}" as="o" hint-placeholder-count="3">
+            <button type="button" onClick="{{ o.pick }}" disabled="{{ o.disabled }}" style="{{ o.style }}">
+              <img src="{{ o.img }}" alt="" style="width: 100%; height: 110px; object-fit: cover; border-radius: 12px">
+              <span style="display: block; font-size: 19px; font-weight: 700; margin-top: 8px">{{ o.label }}</span>
+              <span style="display: block; font-size: 17px; color: #0E5E5A; font-weight: 700">{{ o.priceText }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <sc-if value="{{ sheet.isCustom }}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 20px 10px">
+            <span style="font-size: 20px; font-weight: 700">수량</span>
+            <span style="display: flex; align-items: center; gap: 10px">
+              <button type="button" onClick="{{ act.qtyDec }}" aria-label="수량 줄이기" style="width: 48px; height: 48px; border-radius: 999px; border: 2px solid #1E1B18; background: #FFFFFF; font-size: 24px; font-weight: 700">−</button>
+              <span style="font-size: 26px; font-weight: 700; min-width: 28px; text-align: center">{{ sheet.qty }}</span>
+              <button type="button" onClick="{{ act.qtyInc }}" aria-label="수량 늘리기" style="width: 48px; height: 48px; border-radius: 999px; border: 2px solid #1E1B18; background: #FFFFFF; font-size: 24px; font-weight: 700">+</button>
+            </span>
+          </div>
+          <div style="padding: 0 20px 18px">
+            <button type="button" onClick="{{ act.addFromSheet }}" style="width: 100%; min-height: 68px; border: 0; border-radius: 16px; background: #F2B13D; font-size: 24px; font-weight: 700">{{ sheet.addText }}</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== upsell popup ===== -->
+  <sc-if value="{{ upsell.open }}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; inset: 0; background: rgba(30,27,24,0.55); display: flex; align-items: center; justify-content: center; padding: 24px">
+      <div role="dialog" aria-label="함께하면 좋은 메뉴" style="width: 100%; padding: 22px; border-radius: 24px; background: #FBF7EF; display: flex; flex-direction: column; gap: 14px">
+        <div style="font-size: 26px; font-weight: 700">디저트도 함께 드릴까요?</div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+          <sc-for list="{{ upsell.items }}" as="u" hint-placeholder-count="2">
+            <button type="button" onClick="{{ u.add }}" style="padding: 10px; border: 2px solid #1E1B18; border-radius: 16px; background: #FFFFFF; text-align: left">
+              <img src="{{ u.img }}" alt="" style="width: 100%; height: 130px; object-fit: cover; border-radius: 10px">
+              <span style="display: block; font-size: 20px; font-weight: 700; margin-top: 8px">{{ u.name }}</span>
+              <span style="display: block; font-size: 18px; color: #0E5E5A; font-weight: 700">+{{ u.priceText }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <button type="button" onClick="{{ act.upsellNo }}" style="min-height: 60px; border: 0; border-radius: 14px; background: #1E1B18; color: #FBF7EF; font-size: 22px; font-weight: 700">추가 안 할게요</button>
+      </div>
+    </div>
+  </sc-if>
+</section>
+
+<!-- ======================= PHONE ======================= -->
+<section aria-label="휴대폰 화면" style="width: 390px; height: 844px; flex: none; margin-top: 70px; display: flex; flex-direction: column; background: #FFFFFF; border: 10px solid #121212; border-radius: 50px; overflow: hidden; box-sizing: border-box">
+  <div style="display: flex; justify-content: space-between; align-items: center; padding: 18px 16px 8px; gap: 8px">
+    <div>
+      <div style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 20px">KIBO</div>
+      <sc-if value="{{ phoneOn }}" hint-placeholder-val="{{ false }}"><div style="font-size: 14px; color: #0E5E5A; font-weight: 700">MALO BURGER 키오스크와 연결됨</div></sc-if>
+    </div>
+    <sc-if value="{{ p.showStaff }}" hint-placeholder-val="{{ false }}">
+      <button type="button" onClick="{{ act.callStaff }}" style="min-height: 48px; padding: 0 14px; border: 2px solid #7A2E0E; border-radius: 999px; background: #FFFFFF; color: #7A2E0E; font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 6px">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#7A2E0E" stroke-width="2.4"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"></path></svg>
+        직원 부르기
+      </button>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ p.off }}" hint-placeholder-val="{{ true }}">
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 32px; text-align: center">
+      <svg width="72" height="72" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#6A645A" stroke-width="1.6"><path d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2"></path><rect x="8" y="8" width="8" height="8" rx="1"></rect></svg>
+      <div style="font-size: 20px; color: #4B463F; line-height: 1.5">키오스크의 QR을 찍으면<br>여기에 KIBO가 열려요<br><span style="font-size: 16px">앱 설치는 필요 없어요</span></div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ p.mic }}" hint-placeholder-val="{{ false }}">
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 16px; padding: 12px 22px 22px">
+      <div style="font-size: 26px; font-weight: 700; line-height: 1.35">말로 주문할 수 있어요</div>
+      <div style="font-size: 21px; line-height: 1.5">다음에 뜨는 창에서 <b>'허용'</b>을 눌러 주세요.</div>
+      <div style="padding: 18px; border-radius: 18px; background: #F3EEE4; display: flex; flex-direction: column; gap: 12px">
+        <div style="font-size: 18px; line-height: 1.45">"kibo.app에서 마이크를 사용하려고 합니다"</div>
+        <div style="display: flex; gap: 8px"><span style="flex: 1; text-align: center; padding: 10px; border-radius: 10px; background: #FFFFFF; font-size: 18px">차단</span><span style="flex: 1; text-align: center; padding: 10px; border-radius: 10px; background: #0E5E5A; color: #FFFFFF; font-size: 18px; font-weight: 700; box-shadow: 0 0 0 4px #F2B13D">허용</span></div>
+      </div>
+      <button type="button" onClick="{{ act.allowMic }}" style="margin-top: auto; min-height: 68px; border: 0; border-radius: 18px; background: #0E5E5A; color: #FFFFFF; font-size: 22px; font-weight: 700">허용했어요</button>
+      <button type="button" onClick="{{ act.denyMic }}" style="min-height: 56px; border: 2px solid #1E1B18; border-radius: 18px; background: #FFFFFF; font-size: 19px; font-weight: 700">말 대신 글자·버튼으로 할게요</button>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ p.dine }}" hint-placeholder-val="{{ false }}">
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 14px; padding: 12px 22px 22px">
+      <div style="font-size: 26px; font-weight: 700">매장에서 드세요, 포장하세요?</div>
+      <button type="button" onClick="{{ act.dineIn }}" style="display: flex; align-items: center; gap: 14px; padding: 10px; border: 2px solid #1E1B18; border-radius: 20px; background: #FFFFFF; text-align: left">
+        <img src="{{ img.dine_in }}" alt="" style="width: 96px; height: 96px; object-fit: cover; border-radius: 14px"><span style="font-size: 24px; font-weight: 700">매장에서 먹어요</span>
+      </button>
+      <button type="button" onClick="{{ act.takeOut }}" style="display: flex; align-items: center; gap: 14px; padding: 10px; border: 2px solid #1E1B18; border-radius: 20px; background: #FFFFFF; text-align: left">
+        <img src="{{ img.take_out }}" alt="" style="width: 96px; height: 96px; object-fit: cover; border-radius: 14px"><span style="font-size: 24px; font-weight: 700">포장할게요</span>
+      </button>
+      <div style="font-size: 18px; color: #4B463F">"포장이요"라고 말해도 돼요</div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ p.talk }}" hint-placeholder-val="{{ false }}">
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 4px 16px 14px; min-height: 0">
+      <div aria-live="polite" style="display: flex; flex-direction: column; gap: 8px; min-height: 96px">
+        <sc-for list="{{ msgs }}" as="m" hint-placeholder-count="2">
+          <div style="{{ m.style }}">{{ m.text }}</div>
+        </sc-for>
+      </div>
+      <sc-if value="{{ hasChoices }}" hint-placeholder-val="{{ false }}">
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+          <sc-for list="{{ choices }}" as="c" hint-placeholder-count="2">
+            <button type="button" onClick="{{ c.pick }}" disabled="{{ c.disabled }}" style="{{ c.style }}">
+              <sc-if value="{{ c.img }}" hint-placeholder-val="{{ false }}"><img src="{{ c.img }}" alt="" style="width: 100%; height: 70px; object-fit: cover; border-radius: 10px; margin-bottom: 6px"></sc-if>
+              {{ c.label }}
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="padding: 10px 12px; border-radius: 18px; background: #F3EEE4; display: flex; flex-direction: column; gap: 6px; min-height: 0">
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <span style="font-size: 18px; font-weight: 700">내 주문 {{ cartCount }}개</span>
+          <button type="button" onClick="{{ act.undo }}" disabled="{{ undoDisabled }}" style="min-height: 44px; padding: 0 12px; border: 2px solid #1E1B18; border-radius: 999px; background: #FFFFFF; font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 6px">
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#1E1B18" stroke-width="2.6"><path d="M9 14 4 9l5-5"></path><path d="M4 9h11a5 5 0 0 1 0 10h-3"></path></svg>
+            되돌리기
+          </button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px; max-height: 178px; overflow: auto">
+          <sc-for list="{{ cartView }}" as="line" hint-placeholder-count="2">
+            <div style="{{ line.pStyle }}">
+              <img src="{{ line.img }}" alt="" style="width: 52px; height: 52px; object-fit: cover; border-radius: 10px; flex: none">
+              <span style="flex: 1; min-width: 0; font-size: 16px; line-height: 1.35"><b style="font-size: 17px">{{ line.name }} ×{{ line.qty }}</b><br>{{ line.optText }}</span>
+              <span style="font-size: 16px; font-weight: 700">{{ line.priceText }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ true }}"><div style="font-size: 17px; color: #6A645A">아직 담은 메뉴가 없어요</div></sc-if>
+        <div style="text-align: right; font-size: 18px">합계 <span style="font-size: 30px; font-weight: 700; font-family: 'Space Grotesk', sans-serif">{{ totalText }}</span></div>
+      </div>
+      <div style="margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 6px">
+        <div style="font-size: 15px; color: #4B463F">{{ micHint }}</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px; justify-content: center">
+          <sc-for list="{{ say }}" as="u" hint-placeholder-count="5">
+            <button type="button" onClick="{{ u.go }}" disabled="{{ listening }}" style="min-height: 44px; padding: 6px 10px; border: 1px solid #0E5E5A; border-radius: 12px; background: #E6F3F1; color: #083E3B; font-size: 15px; text-align: left">{{ u.text }}</button>
+          </sc-for>
+        </div>
+        <div style="{{ micStyle }}" aria-hidden="true">
+          <sc-if value="{{ listening }}" hint-placeholder-val="{{ false }}">
+            <span style="display: flex; gap: 4px; align-items: center; height: 36px"><span style="width: 5px; height: 14px; border-radius: 3px; background: #FFFFFF"></span><span style="width: 5px; height: 30px; border-radius: 3px; background: #FFFFFF"></span><span style="width: 5px; height: 22px; border-radius: 3px; background: #FFFFFF"></span><span style="width: 5px; height: 34px; border-radius: 3px; background: #FFFFFF"></span><span style="width: 5px; height: 16px; border-radius: 3px; background: #FFFFFF"></span></span>
+          </sc-if>
+          <sc-if value="{{ notListening }}" hint-placeholder-val="{{ true }}">
+            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0"></path><line x1="12" y1="18" x2="12" y2="21"></line></svg>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ p.confirm }}" hint-placeholder-val="{{ false }}">
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 8px 20px 20px; min-height: 0">
+      <div style="font-size: 26px; font-weight: 700">이대로 주문할까요?</div>
+      <div style="flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 8px">
+        <sc-for list="{{ cartView }}" as="line" hint-placeholder-count="2">
+          <div style="display: flex; gap: 10px; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #E2DACB">
+            <img src="{{ line.img }}" alt="" style="width: 60px; height: 60px; object-fit: cover; border-radius: 12px; flex: none">
+            <span style="flex: 1; font-size: 17px; line-height: 1.4"><b style="font-size: 19px">{{ line.name }} ×{{ line.qty }}</b><br>{{ line.optText }}</span>
+            <span style="font-size: 18px; font-weight: 700">{{ line.priceText }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-size: 20px">합계 <span style="font-size: 36px; font-weight: 700; font-family: 'Space Grotesk', sans-serif">{{ totalText }}</span></div>
+      <button type="button" onClick="{{ act.sayYes }}" disabled="{{ listening }}" style="min-height: 44px; border: 1px solid #0E5E5A; border-radius: 12px; background: #E6F3F1; color: #083E3B; font-size: 16px">말하기: "네, 결제할게요"</button>
+      <button type="button" onClick="{{ act.confirmYes }}" style="min-height: 72px; border: 0; border-radius: 18px; background: #0E5E5A; color: #FFFFFF; font-size: 24px; font-weight: 700">네, 결제할게요</button>
+      <button type="button" onClick="{{ act.confirmNo }}" style="min-height: 58px; border: 2px solid #1E1B18; border-radius: 18px; background: #FFFFFF; font-size: 21px; font-weight: 700">더 고를게요</button>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ p.card }}" hint-placeholder-val="{{ false }}">
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; text-align: center">
+      <div style="width: 150px; height: 104px; border-radius: 14px; background: #1E1B18; position: relative"><span style="position: absolute; left: 18px; top: 34px; width: 40px; height: 30px; border-radius: 6px; background: #E9C46A"></span></div>
+      <div style="font-size: 28px; font-weight: 700; line-height: 1.35">키오스크에<br>카드를 꽂아 주세요</div>
+      <div style="font-size: 19px; color: #4B463F">결제는 키오스크에서만 해요</div>
+      <div style="font-size: 36px; font-weight: 700; font-family: 'Space Grotesk', sans-serif">{{ totalText }}</div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ p.done }}" hint-placeholder-val="{{ false }}">
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center">
+      <div style="font-size: 24px; font-weight: 700">주문이 끝났어요</div>
+      <div style="font-size: 20px; color: #4B463F">주문번호</div>
+      <div style="font-size: 100px; line-height: 1; font-weight: 700; font-family: 'Space Grotesk', sans-serif; color: #0E5E5A">{{ orderNo }}</div>
+      <div style="font-size: 19px; line-height: 1.5">준비되면 번호를 불러드려요.<br>이 화면은 그대로 남아 있어요.</div>
+    </div>
+  </sc-if>
+</section>
+
+<!-- ======================= SCENARIO PANEL ======================= -->
+<aside aria-label="시나리오 점검" style="flex: 1; min-width: 0; height: 1080px; display: flex; flex-direction: column; gap: 14px">
+  <div>
+    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700">KIBO E2E</div>
+    <div style="font-size: 17px; color: #4B463F; line-height: 1.5">왼쪽은 실제 패스트푸드 키오스크 흐름(광고 화면 → 매장/포장 → 메뉴판 → 세트 → 사이드·음료 → 재료 → 추천 → 주문 내역 → 결제 → 영수증 → 번호)을 그대로 따랐어요. 터치로 하거나, QR을 눌러 폰으로 말해 보세요.</div>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+    <div style="padding: 12px; border-radius: 14px; background: #FFFFFF"><div style="font-size: 14px; color: #4B463F">키오스크 탭</div><div style="font-size: 34px; font-weight: 700; font-family: 'Space Grotesk', sans-serif">{{ kTaps }}</div></div>
+    <div style="padding: 12px; border-radius: 14px; background: #FFFFFF"><div style="font-size: 14px; color: #4B463F">발화 / 폰 탭</div><div style="font-size: 34px; font-weight: 700; font-family: 'Space Grotesk', sans-serif">{{ utter }} / {{ pTaps }}</div></div>
+  </div>
+  <div style="padding: 10px 12px; border-radius: 12px; background: #FFFFFF; font-size: 15px">세션 상태 <b style="font-family: 'Space Grotesk', sans-serif; font-size: 18px">{{ status }}</b></div>
+  <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px">
+    <sc-for list="{{ steps }}" as="s" hint-placeholder-count="10">
+      <li style="{{ s.style }}"><span style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; width: 34px; flex: none">{{ s.id }}</span><span style="flex: 1">{{ s.text }}</span><span style="font-size: 13px; flex: none">H{{ s.h }}</span></li>
+    </sc-for>
+  </ol>
+  <div style="margin-top: auto; padding: 12px 14px; border-radius: 14px; background: #FFFFFF; font-size: 15px; line-height: 1.55">
+    <b>예외도 눌러 보세요:</b> "버거 하나 주세요"(모호함 → 사진 선택 → 세트 여부), "이거 할랄이에요?"(직원 호출), [되돌리기], 결제 화면 [주문 수정], 마이크 거부. 품절 메뉴(새우버거)는 눌리지 않아요.
+  </div>
+  <button type="button" onClick="{{ act.reset }}" style="min-height: 52px; border: 2px solid #1E1B18; border-radius: 12px; background: transparent; font-size: 18px; font-weight: 700">처음부터 다시</button>
+</aside>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1640,"height":1160}}'>
+var IMG = {"apple_pie": "/_blob/9da32b8bb19f15009b960a02562bbca7", "burger_bulgogi": "/_blob/e662ac5165eae5aff0daeee6ac82302f", "burger_cheese": "/_blob/5259d08d597237d9d1522d257b20ea44", "burger_chicken": "/_blob/a09cd6e3041b76e7a1e3d5b9c410ac7d", "burger_double": "/_blob/af736e4cf01d456627bbd80db993cddd", "burger_shrimp": "/_blob/2c3f70aff73c5b7ce37d61c329a41b70", "cheese_sticks": "/_blob/fd4c1ebe73e9b825314220d429f749d3", "cider": "/_blob/de5bc08ed9a23852ed027e3b91ff3a39", "cola": "/_blob/4ec6227f4543c06d2298d934e00e214d", "coleslaw": "/_blob/4140620b3ec339b88d5ea0d0d3bd8615", "dine_in": "/_blob/5fe1ea68af8b38ed08ab1776bb2f8f62", "fries": "/_blob/a815f3ffe50ccd6c68f3a55fb666c486", "hero": "/_blob/77d7b752733ae2b0119918f897f36e07", "iced_coffee": "/_blob/a3f96b4ec214039bbdab4b243613ed1a", "set_cheese": "/_blob/de2ee601a52be8e527aed61b07348231", "soft_cone": "/_blob/271c8ec1e3eb2d654be549ddf33f8359", "take_out": "/_blob/6e5661219b0a92fc53fcd8d9f8f02aff", "zero_cola": "/_blob/e5d7b30478334cb45c76b40a9049aa7d"};
+var won = function (n) { return n.toLocaleString('ko-KR') + '원'; };
+var QR = [1,1,1,0,1,1,1, 1,0,1,1,1,0,1, 1,1,1,0,1,1,1, 0,1,0,1,0,1,0, 1,1,1,0,1,0,1, 1,0,1,1,0,1,1, 1,1,1,0,1,1,0];
+var CATS = [
+  { id: 'burger', label: '버거', icon: 'burger_cheese' },
+  { id: 'side', label: '사이드', icon: 'fries' },
+  { id: 'drink', label: '음료', icon: 'cola' },
+  { id: 'dessert', label: '디저트', icon: 'soft_cone' }
+];
+var MENU = {
+  cheese: { cat: 'burger', name: '치즈버거', price: 4900, kcal: '520kcal', img: 'burger_cheese', setImg: 'set_cheese', badge: 'BEST' },
+  bulgogi: { cat: 'burger', name: '불고기버거', price: 5200, kcal: '560kcal', img: 'burger_bulgogi', badge: '' },
+  double: { cat: 'burger', name: '더블치즈버거', price: 6400, kcal: '760kcal', img: 'burger_double', badge: '' },
+  chicken: { cat: 'burger', name: '매콤 치킨버거', price: 5600, kcal: '610kcal', img: 'burger_chicken', badge: 'NEW' },
+  shrimp: { cat: 'burger', name: '새우버거', price: 5500, kcal: '540kcal', img: 'burger_shrimp', badge: '', soldOut: true },
+  fries: { cat: 'side', name: '감자튀김 M', price: 2000, kcal: '330kcal', img: 'fries' },
+  sticks: { cat: 'side', name: '치즈스틱', price: 2500, kcal: '290kcal', img: 'cheese_sticks' },
+  slaw: { cat: 'side', name: '코울슬로', price: 1800, kcal: '180kcal', img: 'coleslaw' },
+  cola: { cat: 'drink', name: '콜라 M', price: 1800, kcal: '150kcal', img: 'cola' },
+  zero: { cat: 'drink', name: '제로콜라 M', price: 1800, kcal: '0kcal', img: 'zero_cola' },
+  cider: { cat: 'drink', name: '사이다 M', price: 1800, kcal: '140kcal', img: 'cider' },
+  coffee: { cat: 'drink', name: '아이스커피', price: 2300, kcal: '10kcal', img: 'iced_coffee' },
+  cone: { cat: 'dessert', name: '소프트콘', price: 1000, kcal: '160kcal', img: 'soft_cone', badge: 'BEST' },
+  pie: { cat: 'dessert', name: '애플파이', price: 1600, kcal: '250kcal', img: 'apple_pie' }
+};
+var SET_SIDES = [{ id: 'friesM', label: '감자튀김 M', img: 'fries', d: 0 }, { id: 'friesL', label: '감자튀김 L', img: 'fries', d: 500 }, { id: 'sticks', label: '치즈스틱', img: 'cheese_sticks', d: 1000 }, { id: 'slaw', label: '코울슬로', img: 'coleslaw', d: 0 }];
+var SET_DRINKS = [{ id: 'cola', label: '콜라', img: 'cola', d: 0 }, { id: 'zero', label: '제로콜라', img: 'zero_cola', d: 0 }, { id: 'cider', label: '사이다', img: 'cider', d: 0 }, { id: 'coffee', label: '아이스커피', img: 'iced_coffee', d: 500 }];
+var INGR = [{ id: 'nopickle', label: '피클 빼기', img: 'burger_cheese', d: 0 }, { id: 'noonion', label: '양파 빼기', img: 'burger_double', d: 0 }, { id: 'cheese', label: '치즈 추가', img: 'burger_double', d: 500 }];
+var STEPS = [
+  { id: 'A1', text: '광고 대기 화면: 말해서(QR) / 눌러서', h: '2,6' },
+  { id: 'A2', text: 'QR 찍기, 앱 설치 없이 열림', h: '1' },
+  { id: 'A3', text: '연결 표시 + 마이크 허용 안내', h: '1,10' },
+  { id: 'A4', text: '매장/포장 사진 버튼', h: '6' },
+  { id: 'A5', text: '말하기: 듣고 있어요 + 들은 말', h: '1,3' },
+  { id: 'A6', text: '키오스크가 메뉴판으로 이동, 담은 줄 하이라이트', h: '1,3' },
+  { id: 'A7', text: '기존 줄 수정 + 추천 1회', h: '1,6' },
+  { id: 'A8', text: '주문 내역 확인 = 확인 카드', h: '5' },
+  { id: 'A9', text: '키오스크에 카드 꽂기', h: '2' },
+  { id: 'A10', text: '영수증 → 주문번호 양쪽에', h: '1,6' }
+];
+var SAY = [
+  { key: 'order', text: '치즈버거 세트 두 개요. 하나는 피클 빼고, 음료는 제로콜라랑 사이다로요.' },
+  { key: 'fries', text: '감자튀김 둘 다 라지로 바꿔줘' },
+  { key: 'vague', text: '버거 하나 주세요' },
+  { key: 'halal', text: '이거 할랄이에요?' },
+  { key: 'pay', text: '결제할게요' }
+];
+function fresh() {
+  return { k: 'attract', p: 'off', cat: 'burger', cart: [], undo: [], msgs: [], choices: null, staff: false,
+    upsellDone: false, utter: 0, kTaps: 0, pTaps: 0, reached: 1, listening: false, payPhase: 'insert',
+    orderNo: null, dine: null, seq: 1, textMode: false, sheet: null, upsell: false, aiToast: '' };
+}
+function optLabel(list, id) { for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i]; return null; }
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = fresh(); this.timers = []; this._bump = 0; }
+  componentWillUnmount() { this.timers.forEach(function (t) { clearTimeout(t); }); }
+  later(fn, ms) { this.timers.push(setTimeout(fn, ms)); }
+  reach(n) { if (n > this.state.reached) this.setState({ reached: n }); }
+  kt(extra) { return Object.assign({ kTaps: this.state.kTaps + 1 }, extra || {}); }
+  pt(extra) { return Object.assign({ pTaps: this.state.pTaps + 1 }, extra || {}); }
+  say(role, text, base) { var m = (base || this.state.msgs).concat([{ role: role, text: text }]); return m.slice(-2); }
+  // A cart line. variant: single | set | large. side/drink only for sets.
+  makeLine(itemId, o, byAi) {
+    var it = MENU[itemId], price = it.price, opts = [], img = it.img;
+    o = o || {};
+    if (o.variant === 'set' || o.variant === 'large') {
+      price += o.variant === 'large' ? 2700 : 2000;
+      var side = optLabel(SET_SIDES, o.side || 'friesM'), drink = optLabel(SET_DRINKS, o.drink || 'cola');
+      price += side.d + drink.d;
+      opts.push(side.label, drink.label);
+      img = it.setImg || it.img;
+    }
+    (o.ingr || []).forEach(function (g) { var x = optLabel(INGR, g); opts.unshift(x.label); price += x.d; });
+    var id = this.state.seq + this._bump; this._bump += 1;
+    var name = it.name + (o.variant === 'set' ? ' 세트' : o.variant === 'large' ? ' 라지 세트' : '');
+    return { id: id, itemId: itemId, name: name, opts: opts, unit: price, qty: o.qty || 1, img: img, hl: true, byAi: !!byAi, o: o };
+  }
+  commit(cart, extra) {
+    var self = this;
+    var undo = this.state.undo.concat([this.state.cart]).slice(-5);
+    this.setState(Object.assign({ cart: cart, undo: undo, seq: this.state.seq + this._bump }, extra));
+    this._bump = 0;
+    this.later(function () { self.setState({ aiToast: '', cart: self.state.cart.map(function (l) { return Object.assign({}, l, { hl: false, byAi: false }); }) }); }, 2200);
+  }
+  // ---- kiosk touch ----
+  touchStart() { this.setState(this.kt({ k: 'dine' })); }
+  scan() {
+    var fromKiosk = this.state.k !== 'attract';
+    this.setState(this.kt({ p: 'mic', k: fromKiosk ? this.state.k : 'dine' }));
+    this.reach(3);
+  }
+  setDine(d, fromPhone) {
+    var next = { dine: d, k: 'menu', cat: 'burger' };
+    next = fromPhone ? this.pt(next) : this.kt(next);
+    if (this.state.p === 'dine') { next.p = 'talk'; next.msgs = this.say('ai', (d === 'eat_in' ? '매장에서 드시는군요.' : '포장이군요.') + ' 무엇을 드릴까요?'); }
+    this.setState(next); this.reach(5);
+  }
+  openItem(itemId) {
+    var it = MENU[itemId];
+    if (it.cat === 'burger') this.setState(this.kt({ sheet: { step: 'variant', itemId: itemId, o: { qty: 1, ingr: [] } } }));
+    else this.setState(this.kt({ sheet: { step: 'custom', itemId: itemId, o: { qty: 1, ingr: [], variant: 'single' } } }));
+  }
+  pickSheet(value) {
+    var sh = this.state.sheet, o = Object.assign({}, sh.o), step = sh.step;
+    if (step === 'variant') { o.variant = value; step = value === 'single' ? 'ingr' : 'side'; }
+    else if (step === 'side') { o.side = value; step = 'drink'; }
+    else if (step === 'drink') { o.drink = value; step = 'ingr'; }
+    else if (step === 'ingr') {
+      var g = (o.ingr || []).slice(), i = g.indexOf(value);
+      if (i === -1) g.push(value); else g.splice(i, 1);
+      o.ingr = g; this.setState(this.kt({ sheet: { step: 'ingr', itemId: sh.itemId, o: o } })); return;
+    }
+    this.setState(this.kt({ sheet: { step: step, itemId: sh.itemId, o: o } }));
+  }
+  addFromSheet() {
+    this._bump = 0;
+    var sh = this.state.sheet, line = this.makeLine(sh.itemId, sh.o, false);
+    var showUpsell = !this.state.upsellDone && MENU[sh.itemId].cat === 'burger';
+    this.commit(this.state.cart.concat([line]), this.kt({ sheet: null, upsell: showUpsell, upsellDone: this.state.upsellDone || showUpsell }));
+  }
+  // ---- phone voice ----
+  allowMic() { var d = !!this.state.dine; this.setState(this.pt({ p: d ? 'talk' : 'dine', msgs: d ? this.say('ai', '장바구니는 그대로예요. 이어서 말씀하세요.') : this.state.msgs })); this.reach(d ? 5 : 4); }
+  denyMic() { var d = !!this.state.dine; this.setState(this.pt({ p: d ? 'talk' : 'dine', textMode: true, msgs: [{ role: 'ai', text: '괜찮아요. 아래 문장이나 버튼을 눌러 주문해도 돼요.' }] })); this.reach(d ? 5 : 4); }
+  utter(key, text) {
+    var self = this;
+    if (this.state.listening) return;
+    this.setState({ listening: true, utter: this.state.utter + 1, msgs: this.say('me', text), choices: null });
+    this.later(function () { self.setState({ listening: false }); self.handle(key); }, 900);
+  }
+  aiShow(cat, toast) { return { k: 'menu', cat: cat, aiToast: toast, sheet: null, upsell: false }; }
+  handle(key) {
+    this._bump = 0;
+    var cart = this.state.cart;
+    if (key === 'order') {
+      var a = this.makeLine('cheese', { variant: 'set', side: 'friesM', drink: 'zero', ingr: ['nopickle'] }, true);
+      var b = this.makeLine('cheese', { variant: 'set', side: 'friesM', drink: 'cider' }, true);
+      this.commit(cart.concat([a, b]), Object.assign(this.aiShow('burger', 'AI가 담았어요: 치즈버거 세트 2개'), { msgs: this.say('ai', '치즈버거 세트 두 개 담았어요. 하나는 피클 빼고 제로콜라, 하나는 사이다예요.') }));
+      this.reach(6);
+    } else if (key === 'fries') {
+      var self = this, hit = 0;
+      var next = cart.map(function (l) {
+        if (!l.o || l.o.side !== 'friesM') return l;
+        hit += 1;
+        var o = Object.assign({}, l.o, { side: 'friesL' });
+        var n = self.makeLine(l.itemId, Object.assign({}, o, { qty: l.qty }), true); n.id = l.id; self._bump -= 1;
+        return n;
+      });
+      if (!hit) {
+        var already = cart.some(function (l) { return l.o && l.o.side === 'friesL'; });
+        this.setState({ msgs: this.say('ai', already ? '감자튀김은 이미 라지예요.' : '바꿀 감자튀김이 아직 없어요. 먼저 세트를 담아 주세요.') });
+        return;
+      }
+      var extra = Object.assign(this.aiShow('burger', 'AI가 바꿨어요: 감자튀김 L'), { msgs: this.say('ai', '감자튀김 ' + (hit === 2 ? '둘 다 ' : '') + '라지로 바꿨어요. +' + won(500 * hit)) });
+      if (!this.state.upsellDone) {
+        extra.upsellDone = true;
+        extra.choices = { kind: 'upsell', items: [{ id: 'no', label: '괜찮아요' }, { id: 'cone', label: '소프트콘 +1,000원', img: 'soft_cone' }] };
+        extra.msgs = [extra.msgs[extra.msgs.length - 1], { role: 'ai', text: '디저트도 함께 드릴까요?' }];
+      }
+      this.commit(next, extra); this.reach(7);
+    } else if (key === 'vague') {
+      this.setState(Object.assign(this.aiShow('burger', ''), { msgs: this.say('ai', '어떤 버거로 드릴까요?'), choices: { kind: 'burger', items: [
+        { id: 'cheese', label: '치즈버거 4,900원', img: 'burger_cheese' }, { id: 'bulgogi', label: '불고기버거 5,200원', img: 'burger_bulgogi' },
+        { id: 'double', label: '더블치즈 6,400원', img: 'burger_double' }, { id: 'shrimp', label: '새우버거 · 품절', img: 'burger_shrimp', disabled: true } ] } }));
+    } else if (key === 'halal') {
+      this.setState({ staff: true, msgs: this.say('ai', '그 정보는 이 키오스크에 없어요. 직원을 불렀어요.') });
+    } else if (key === 'pay') {
+      this.requestCheckout(false);
+    } else if (key === 'yes') {
+      this.confirmYes(true);
+    }
+  }
+  pick(kind, id) {
+    this._bump = 0;
+    if (kind === 'upsell') {
+      if (id === 'cone') this.commit(this.state.cart.concat([this.makeLine('cone', { variant: 'single' }, true)]), this.pt(Object.assign(this.aiShow('dessert', 'AI가 담았어요: 소프트콘'), { choices: null, msgs: this.say('ai', '소프트콘 하나 담았어요.') })));
+      else this.setState(this.pt({ choices: null, msgs: this.say('ai', '알겠어요. 더 필요하시면 말씀해 주세요.') }));
+    } else if (kind === 'burger') {
+      this.setState(this.pt({ msgs: this.say('ai', MENU[id].name + ', 세트로 드릴까요?'), choices: { kind: 'variant', itemId: id, items: [
+        { id: 'single', label: '단품 ' + won(MENU[id].price), img: MENU[id].img }, { id: 'set', label: '세트 ' + won(MENU[id].price + 2000), img: 'set_cheese' } ] } }));
+    } else if (kind === 'variant') {
+      var itemId = this.state.choices.itemId;
+      var line = this.makeLine(itemId, { variant: id }, true);
+      this.commit(this.state.cart.concat([line]), this.pt(Object.assign(this.aiShow('burger', 'AI가 담았어요: ' + line.name), { choices: null, msgs: this.say('ai', line.name + ' 담았어요.' + (id === 'set' ? ' 감자튀김 M, 콜라예요.' : '')) })));
+    }
+  }
+  requestCheckout(fromKiosk) {
+    if (!this.state.cart.length) { this.setState(fromKiosk ? this.kt({}) : { msgs: this.say('ai', '아직 담은 메뉴가 없어요.') }); return; }
+    var next = { k: 'review', sheet: null, upsell: false, choices: null };
+    if (this.state.p !== 'off') { next.p = 'confirm'; next.msgs = this.say('ai', '주문 내용을 확인해 주세요.'); }
+    this.setState(fromKiosk ? this.kt(next) : next);
+    this.reach(8);
+  }
+  confirmYes(byVoice) {
+    var next = { k: 'card', payPhase: 'insert' };
+    if (this.state.p !== 'off') next.p = 'card';
+    this.setState(byVoice ? next : this.pt(next)); this.reach(9);
+  }
+  goPayFromKiosk() { this.setState(this.kt({ k: 'method' })); }
+  pickCard() { var next = { k: 'card', payPhase: 'insert' }; if (this.state.p !== 'off') next.p = 'card'; this.setState(this.kt(next)); this.reach(9); }
+  moreOrder() { this.setState(this.kt({ k: 'menu', p: this.state.p === 'off' ? 'off' : 'talk' })); }
+  insertCard() {
+    var self = this;
+    this.setState(this.kt({ payPhase: 'approving' }));
+    this.later(function () { self.setState({ k: 'receipt', payPhase: 'ok' }); }, 1300);
+  }
+  finish() { this.setState(this.kt({ k: 'done', p: this.state.p === 'off' ? 'off' : 'done', orderNo: 127 })); this.reach(10); }
+  editOrder() { this.setState(this.kt({ k: 'review', p: this.state.p === 'off' ? 'off' : 'confirm' })); }
+  changeQty(id, delta) {
+    var cart = this.state.cart.map(function (l) { return l.id === id ? Object.assign({}, l, { qty: l.qty + delta }) : l; }).filter(function (l) { return l.qty > 0; });
+    this.setState(this.kt({ cart: cart, undo: this.state.undo.concat([this.state.cart]).slice(-5) }));
+  }
+  undo() {
+    if (!this.state.undo.length) return;
+    var prev = this.state.undo[this.state.undo.length - 1];
+    this.setState(this.pt({ cart: prev, undo: this.state.undo.slice(0, -1), choices: null, msgs: this.say('ai', '방금 바꾼 것을 되돌렸어요.') }));
+  }
+  renderVals() {
+    var s = this.state, self = this;
+    var total = s.cart.reduce(function (a, l) { return a + l.unit * l.qty; }, 0);
+    var count = s.cart.reduce(function (a, l) { return a + l.qty; }, 0);
+    var phoneOn = s.p !== 'off';
+    var img = function (k) { return IMG[k] || ''; };
+    var stat = { attract: 'idle', dine: phoneOn ? 'connected' : 'ordering', menu: 'ordering', review: 'confirming', method: 'paying', card: 'paying', receipt: 'paid', done: 'paid' }[s.k];
+    var sh = s.sheet, sheetVals = { open: !!sh, title: '', stepText: '', options: [], isCustom: false, qty: 1, addText: '' };
+    if (sh) {
+      var it = MENU[sh.itemId], o = sh.o;
+      var mk = function (list, sel, base) {
+        return list.map(function (x) {
+          var on = Array.isArray(sel) ? sel.indexOf(x.id) !== -1 : sel === x.id;
+          return { label: x.label, img: img(x.img), priceText: x.d ? '+' + won(x.d) : (base || '추가 금액 없음'), disabled: false, pick: function () { self.pickSheet(x.id); },
+            style: 'padding: 8px; border-radius: 16px; background: #FFFFFF; text-align: left; border: 3px solid ' + (on ? '#0E5E5A; box-shadow: 0 0 0 3px #BFE3DF' : '#E2DACB') };
+        });
+      };
+      if (sh.step === 'variant') {
+        sheetVals.title = it.name + ', 세트로 드릴까요?'; sheetVals.stepText = '1단계';
+        sheetVals.options = [
+          { id: 'single', label: '단품', img: img(it.img), price: it.price },
+          { id: 'set', label: '세트', img: img(it.setImg || 'set_cheese'), price: it.price + 2000 },
+          { id: 'large', label: '라지 세트', img: img(it.setImg || 'set_cheese'), price: it.price + 2700 }
+        ].map(function (x) { return { label: x.label, img: x.img, priceText: won(x.price), disabled: false, pick: function () { self.pickSheet(x.id); }, style: 'padding: 8px; border-radius: 16px; background: #FFFFFF; text-align: left; border: 3px solid #E2DACB' }; });
+      } else if (sh.step === 'side') { sheetVals.title = '사이드를 골라 주세요'; sheetVals.stepText = '2단계 · 세트 구성'; sheetVals.options = mk(SET_SIDES, o.side, '기본'); }
+      else if (sh.step === 'drink') { sheetVals.title = '음료를 골라 주세요'; sheetVals.stepText = '3단계 · 세트 구성'; sheetVals.options = mk(SET_DRINKS, o.drink, '기본'); }
+      else if (sh.step === 'ingr') { sheetVals.title = '재료를 바꿀까요? (선택)'; sheetVals.stepText = '마지막 단계'; sheetVals.options = mk(INGR, o.ingr); sheetVals.isCustom = true; }
+      else if (sh.step === 'custom') { sheetVals.title = it.name; sheetVals.stepText = '수량을 골라 주세요'; sheetVals.options = [{ label: it.name, img: img(it.img), priceText: won(it.price), disabled: true, pick: function () {}, style: 'padding: 8px; border-radius: 16px; background: #FFFFFF; text-align: left; border: 3px solid #0E5E5A' }]; sheetVals.isCustom = true; }
+      sheetVals.qty = o.qty;
+      if (sheetVals.isCustom) { var preview = this.makeLineDry(sh.itemId, o); sheetVals.addText = '장바구니 담기 · ' + won(preview); }
+    }
+    var cats = CATS.map(function (c) {
+      return { label: c.label, icon: img(c.icon), go: function () { self.setState(self.kt({ cat: c.id })); },
+        style: 'display: flex; flex-direction: column; align-items: center; padding: 8px 4px; border-radius: 14px; font-size: 17px; font-weight: 700; border: 0; ' + (s.cat === c.id ? 'background: #0E5E5A; color: #FFFFFF' : 'background: transparent; color: #1E1B18') };
+    });
+    var hlIds = s.cart.filter(function (l) { return l.hl; }).map(function (l) { return l.itemId; });
+    var products = Object.keys(MENU).filter(function (id) { return MENU[id].cat === s.cat; }).map(function (id) {
+      var m = MENU[id], lit = hlIds.indexOf(id) !== -1;
+      return { name: m.name, priceText: won(m.price), kcal: m.kcal, img: img(m.img), badge: m.badge || '', soldOut: !!m.soldOut,
+        badgeStyle: 'position: absolute; left: 8px; top: 8px; padding: 4px 10px; border-radius: 999px; font-size: 14px; font-weight: 700; ' + (m.badge === 'NEW' ? 'background: #0E5E5A; color: #FFFFFF' : 'background: #F2B13D; color: #1E1B18'),
+        open: function () { self.openItem(id); },
+        style: 'padding: 0; border-radius: 18px; overflow: hidden; background: #FFFFFF; text-align: left; ' + (lit ? 'border: 4px solid #0E5E5A; box-shadow: 0 0 0 4px #BFE3DF' : 'border: 2px solid #E2DACB') };
+    });
+    return {
+      act: {
+        scan: function () { self.scan(); }, touchStart: function () { self.touchStart(); },
+        allowMic: function () { self.allowMic(); }, denyMic: function () { self.denyMic(); },
+        dineIn: function () { self.setDine('eat_in', true); }, takeOut: function () { self.setDine('take_out', true); },
+        kDineIn: function () { self.setDine('eat_in', false); }, kTakeOut: function () { self.setDine('take_out', false); },
+        undo: function () { self.undo(); },
+        callStaff: function () { self.setState(self.pt({ staff: true, msgs: self.say('ai', '직원을 불렀어요. 곧 도와드릴 거예요.') })); },
+        kioskCheckout: function () { self.requestCheckout(true); },
+        goPay: function () { self.goPayFromKiosk(); }, moreOrder: function () { self.moreOrder(); },
+        pickCard: function () { self.pickCard(); },
+        confirmYes: function () { self.confirmYes(false); }, confirmNo: function () { self.setState(self.pt({ k: 'menu', p: 'talk', msgs: self.say('ai', '네, 더 고르세요.') })); },
+        sayYes: function () { self.utter('yes', '네, 결제할게요'); },
+        insertCard: function () { self.insertCard(); }, editOrder: function () { self.editOrder(); },
+        receiptYes: function () { self.finish(); }, receiptNo: function () { self.finish(); },
+        closeSheet: function () { self.setState(self.kt({ sheet: null })); },
+        qtyInc: function () { var sh2 = s.sheet; self.setState(self.kt({ sheet: { step: sh2.step, itemId: sh2.itemId, o: Object.assign({}, sh2.o, { qty: sh2.o.qty + 1 }) } })); },
+        qtyDec: function () { var sh2 = s.sheet; self.setState(self.kt({ sheet: { step: sh2.step, itemId: sh2.itemId, o: Object.assign({}, sh2.o, { qty: Math.max(1, sh2.o.qty - 1) }) } })); },
+        addFromSheet: function () { self.addFromSheet(); },
+        upsellNo: function () { self.setState(self.kt({ upsell: false })); },
+        clearAll: function () { self.setState(self.kt({ cart: [], undo: s.undo.concat([s.cart]).slice(-5) })); },
+        reset: function () { self.timers.forEach(function (t) { clearTimeout(t); }); self.timers = []; self.setState(fresh()); }
+      },
+      k: { bar: s.k !== 'attract', attract: s.k === 'attract', dine: s.k === 'dine', menu: s.k === 'menu', review: s.k === 'review', method: s.k === 'method', card: s.k === 'card', receipt: s.k === 'receipt', done: s.k === 'done' },
+      p: { off: s.p === 'off', mic: s.p === 'mic', dine: s.p === 'dine', talk: s.p === 'talk', confirm: s.p === 'confirm', card: s.p === 'card', done: s.p === 'done', showStaff: phoneOn && s.p !== 'done' },
+      img: { hero: img('hero'), dine_in: img('dine_in'), take_out: img('take_out') },
+      phoneOn: phoneOn,
+      kStatus: phoneOn ? (s.listening ? 'AI가 듣고 있어요' : '휴대폰 연결됨') : '터치 주문',
+      kStatusStyle: 'padding: 6px 12px; border-radius: 999px; font-size: 15px; font-weight: 700; ' + (phoneOn ? 'background: #F2B13D; color: #1E1B18' : 'background: #083E3B; color: #FBF7EF'),
+      dineText: s.dine === 'take_out' ? '포장' : s.dine === 'eat_in' ? '매장' : '주문 중',
+      dineHint: phoneOn ? '휴대폰에서 말로 골라도 돼요' : '사진을 눌러 골라 주세요',
+      staff: s.staff,
+      qr: QR.map(function (v) { return { style: 'display: block; background: ' + (v ? '#1E1B18' : '#FFFFFF') + '; border-radius: 2px' }; }),
+      cats: cats, catTitle: { burger: '버거', side: '사이드', drink: '음료', dessert: '디저트' }[s.cat], products: products,
+      aiToast: s.aiToast,
+      sheet: sheetVals,
+      upsell: { open: s.upsell, items: ['cone', 'pie'].map(function (id) { return { name: MENU[id].name, img: img(MENU[id].img), priceText: won(MENU[id].price),
+        add: function () { self._bump = 0; self.commit(s.cart.concat([self.makeLine(id, { variant: 'single' }, false)]), self.kt({ upsell: false })); } }; }) },
+      cartView: s.cart.map(function (l) {
+        return { name: l.name, qty: l.qty, priceText: won(l.unit * l.qty), optText: l.opts.length ? l.opts.join(' · ') : '기본', shortOpt: l.opts.slice(0, 2).join(' · ') || '기본', img: img(l.img),
+          inc: function () { self.changeQty(l.id, 1); }, dec: function () { self.changeQty(l.id, -1); },
+          chipStyle: 'flex: none; display: flex; gap: 8px; align-items: center; padding: 6px 10px 6px 6px; border-radius: 12px; ' + (l.hl ? 'background: #DDF0EE; box-shadow: 0 0 0 3px #0E5E5A' : 'background: #F3EEE4'),
+          pStyle: 'display: flex; gap: 8px; align-items: center; padding: 4px; border-radius: 12px; ' + (l.hl ? 'background: #DDF0EE' : 'background: transparent') };
+      }),
+      hasCart: s.cart.length > 0, cartEmpty: s.cart.length === 0, cartCount: count, totalText: won(total),
+      msgs: s.msgs.map(function (m) { return { text: m.text, style: 'font-size: 18px; line-height: 1.45; padding: 10px 14px; border-radius: 16px; max-width: 92%; ' + (m.role === 'me' ? 'align-self: flex-end; background: #1E1B18; color: #FFFFFF' : 'align-self: flex-start; background: #E6F3F1; color: #083E3B') }; }),
+      hasChoices: !!s.choices,
+      choices: (s.choices ? s.choices.items : []).map(function (c) {
+        return { label: c.label, img: c.img ? img(c.img) : '', disabled: !!c.disabled, pick: function () { self.pick(s.choices.kind, c.id); },
+          style: 'min-height: 52px; padding: 8px; border-radius: 14px; font-size: 16px; font-weight: 700; text-align: left; border: 2px solid ' + (c.disabled ? '#D8CFBE; background: #F3EEE4; color: #6A645A' : '#0E5E5A; background: #FFFFFF; color: #083E3B') };
+      }),
+      undoDisabled: s.undo.length === 0,
+      say: SAY.map(function (u) { return { text: u.text, go: function () { self.utter(u.key, u.text); } }; }),
+      listening: s.listening, notListening: !s.listening,
+      micHint: s.listening ? '듣고 있어요…' : s.textMode ? '마이크 없이: 문장이나 버튼을 눌러 주세요' : '이렇게 말해 보세요',
+      micStyle: 'width: 84px; height: 84px; border-radius: 999px; display: flex; align-items: center; justify-content: center; ' + (s.textMode ? 'background: #A8A196' : s.listening ? 'background: #0E5E5A; box-shadow: 0 0 0 10px #BFE3DF' : 'background: #1E1B18'),
+      cardTitle: s.payPhase === 'approving' ? '승인 중이에요. 카드를 빼지 마세요' : '카드를 아래 투입구에 꽂아 주세요',
+      cardHint: s.payPhase === 'approving' ? '승인 중…' : '눌러서 카드 꽂기',
+      cardStyle: 'display: block; width: 200px; height: 126px; border-radius: 14px; background: #2E6F6B; ' + (s.payPhase === 'approving' ? 'transform: translateY(40px); opacity: 0.6' : 'transform: translateY(0)') + '; transition: transform 0.5s, opacity 0.5s',
+      payBusy: s.payPhase === 'approving',
+      orderNo: s.orderNo,
+      kTaps: s.kTaps, pTaps: s.pTaps, utter: s.utter, status: stat,
+      steps: STEPS.map(function (st, i) {
+        var n = i + 1, done = n < s.reached, cur = n === s.reached;
+        return { id: st.id, text: st.text, h: st.h,
+          style: 'display: flex; gap: 8px; align-items: baseline; padding: 8px 12px; border-radius: 10px; font-size: 16px; ' + (cur ? 'background: #0E5E5A; color: #FFFFFF' : done ? 'background: #FFFFFF; color: #1E1B18; text-decoration: line-through; text-decoration-color: #8A8478' : 'background: transparent; color: #33302B; box-shadow: inset 0 0 0 1px #CFC7B8') };
+      })
+    };
+  }
+  makeLineDry(itemId, o) { var b = this._bump; var l = this.makeLine(itemId, o, false); this._bump = b; return l.unit * l.qty; }
+}
+</script>
+</body>
+</html>

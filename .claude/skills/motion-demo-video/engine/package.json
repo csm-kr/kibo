@@ -1,0 +1,13 @@
+{
+  "name": "motion-video",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "render": "node render.mjs index.html out/demo.mp4",
+    "preview": "open index.html"
+  },
+  "dependencies": {
+    "gsap": "^3.13.0",
+    "playwright-core": "^1.64.0"
+  }
+}
