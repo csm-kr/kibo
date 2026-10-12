@@ -1,6 +1,5 @@
 # secrets
-.env
-.env.*
+.env*
 
 # not for the public hackathon repo
 photo-moments*.mp4
@@ -22,8 +21,7 @@ scripts/test_execute.py
 
 # harness run outputs
 phases/**/qa/*.png
-phases/**/phase*-output.json
-phases/**/step*-output.json
+phases/**/*-output.json
 
 # from create-next-app
 /coverage

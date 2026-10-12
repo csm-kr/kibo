@@ -21,7 +21,10 @@
     {
       "step": 2,
       "name": "readme",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-13T03:28:53+0900",
+      "summary": "README.md (English): pitch, public/landing/demo.webp, live /demo link (video and deck placeholders), try-in-one-minute + two-device mode, features and personas, the ARCHITECTURE deployment, voice-order sequence and state-machine mermaid diagrams, 'why the AI cannot pay' (ADR-005/006), Google Cloud and Gemini section, evidence table of only the ledger's measured rows each with its file (coverage audit row left out: no saved result, I-022; the dev-only OpenAI row left out), known limits (in-app learned kiosk replay not built yet, ko/en only, virtual payment, synthetic-voice latency), run locally / tests / deploy, repo map, credits (ideas reimplemented, OFL fonts, offline image generation, fictional brands, harness tooling local), license 'All rights reserved, for now' (I-089, user decides). spikes/README.md marks OpenAI runs (openai/, blind-sol, blind-sol2) as development aids and lists the Gemini evidence. .gitignore: .env* and phases/**/*-output.json. I-023 fixed",
+      "completed_at": "2026-10-13T03:32:00+0900"
     },
     {
       "step": 3,
