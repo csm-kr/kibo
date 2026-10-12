@@ -1,0 +1,11 @@
+{
+  "project": "KIBO",
+  "phase": "4-voice",
+  "steps": [
+    { "step": 0, "name": "live-token", "status": "pending" },
+    { "step": 1, "name": "live-client", "status": "pending" },
+    { "step": 2, "name": "voice-ui", "status": "pending" },
+    { "step": 3, "name": "voice-e2e", "status": "pending" },
+    { "step": 4, "name": "qa", "status": "pending" }
+  ]
+}
