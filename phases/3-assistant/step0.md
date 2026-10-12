@@ -17,6 +17,7 @@ An independent review of phase 1 (10-12, read-only agent) found no path to `payi
 5. **`source` is not bound to the actor.** Phone commands may use `voice`, `text` or `button`; kiosk commands may use only `touch` (the learned-kiosk bridge is a kiosk actor and uses `touch` too). Anything else → `BAD_REQUEST`. Note in SECURITY "Command handling" that the phone's `button` source is trusted as a tap, so the phone code must set it only from real taps. Tests.
 6. **`sessionId` characters are not validated** in the command envelope, `/api/ping`, `/api/session/claim` (and any other body that carries it). Use one shared `SESSION_ID` regex (`^[A-Za-z0-9_-]{16,64}$`, the SSE route's) everywhere; `a/b` → `BAD_REQUEST`, never a 500. Tests.
 7. **Per-IP limits can be bypassed by rotating IPv6 addresses.** Key IPv6 addresses by their /64 prefix (IPv4 unchanged). Test with two addresses in the same /64.
+8. **Two small UI fixes seen in the phase 2 screenshots** (no test-first needed): Korean text breaks inside words ("포장하시나 / 요?" on K2, "찍으세 / 요" on K1): set `word-break: keep-all` and `overflow-wrap: anywhere` for Korean text globally (`:lang(ko)` in `globals.css`); and the Next.js dev indicator (the "N" badge) shows in QA screenshots: set `devIndicators: false` in `next.config.ts`. Re-run `npm run qa:ui` and look at K1 and K2.
 
 ## Acceptance criteria
 ```bash
@@ -24,6 +25,7 @@ npm run lint
 npm run build
 npm run test
 npm run test:e2e
+npm run qa:ui
 ```
 
 ## Verify
