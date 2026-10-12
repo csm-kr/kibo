@@ -20,6 +20,25 @@
   --font-display: var(--font-grotesk), var(--font-plex-kr), sans-serif;
 }
 
+/* Kiosk text in 1080x1920 canvas px (docs/UI_GUIDE.md "Canvas"); nothing below 40px.
+   --k-fs is 1.15 in large-text mode. */
+@utility k-text-40 {
+  font-size: calc(40px * var(--k-fs, 1));
+  line-height: 1.35;
+}
+@utility k-text-48 {
+  font-size: calc(48px * var(--k-fs, 1));
+  line-height: 1.3;
+}
+@utility k-text-56 {
+  font-size: calc(56px * var(--k-fs, 1));
+  line-height: 1.25;
+}
+@utility k-text-72 {
+  font-size: calc(72px * var(--k-fs, 1));
+  line-height: 1.2;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
