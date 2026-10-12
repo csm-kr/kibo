@@ -56,4 +56,5 @@ The phone is KIBO's product: KIBO blue for primary buttons, the mic, selection b
 ## Accessibility
 - Every control is a real `<button>`/`<a>`/`<input>` with a label; icon-only buttons get `aria-label`.
 - Cart changes announced with `aria-live` when AI voice is off; suppressed while AI is speaking.
+- While a sheet or dialog is open, the rest of the screen is `inert`, so focus never lands under the scrim (kiosk: `ModalLayer`).
 - Respect system font size; no text in images.

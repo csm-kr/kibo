@@ -6,6 +6,7 @@ import { kt, secondsLeftText, type KioskTextKey } from "@/lib/i18n/kiosk";
 import { idleWarning, phonePaused, staffBannerVisible } from "@/lib/kiosk/timers";
 import type { KioskData } from "@/types/menu";
 import type { Session, StaffReason } from "@/types/session";
+import { ModalLayer } from "./ModalLayer";
 import { FOCUS } from "./styles";
 
 // KX banners on every screen (docs/UX.md "Exception flows"). Fixed copy only: the session holds a reason code,
@@ -50,7 +51,7 @@ export function KioskBanners(props: { kiosk: KioskData; session: Session; kioskT
       </div>
       {idle.show && (
         // Above sheets (SCRIM is z-20): the warning must win over whatever is open.
-        <div className="absolute inset-0 z-30 flex items-center justify-center bg-[#1E1B18]/60 p-12">
+        <ModalLayer className="absolute inset-0 z-30 flex items-center justify-center bg-[#1E1B18]/60 p-12">
           <section role="alertdialog" aria-modal aria-labelledby="idle-title" className="flex w-full flex-col items-center gap-10 rounded-[48px] bg-(--k-bg) p-12 text-center">
             <h2 id="idle-title" className="k-text-72 font-bold">
               {kt("idleQuestion", locale)}
@@ -66,7 +67,7 @@ export function KioskBanners(props: { kiosk: KioskData; session: Session; kioskT
               {kt("idleContinue", locale)}
             </button>
           </section>
-        </div>
+        </ModalLayer>
       )}
     </>
   );

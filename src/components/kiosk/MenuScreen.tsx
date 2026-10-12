@@ -12,6 +12,7 @@ import type { CartLine, ChangeKind, LineInput, Session } from "@/types/session";
 import { CartBar } from "./CartBar";
 import { Header } from "./KioskScreen";
 import { KioskToolbar } from "./KioskToolbar";
+import { ModalLayer } from "./ModalLayer";
 import { ProductSheet } from "./ProductSheet";
 import { UpsellPopup } from "./UpsellPopup";
 import { FOCUS, SCRIM } from "./styles";
@@ -281,7 +282,7 @@ function ProductTile(props: { kiosk: KioskData; item: MenuItem; available: boole
 function ConfirmClear(props: { kiosk: KioskData; onCancel(): void; onConfirm(): void }) {
   const locale = props.kiosk.locale;
   return (
-    <div className={`${SCRIM} flex items-center justify-center p-12`}>
+    <ModalLayer className={`${SCRIM} flex items-center justify-center p-12`}>
       <section role="alertdialog" aria-modal aria-labelledby="clear-title" className="flex w-full flex-col gap-10 rounded-[48px] bg-(--k-bg) p-12">
         <h2 id="clear-title" className="k-text-56 text-center font-bold">
           {kt("clearConfirm", locale)}
@@ -303,6 +304,6 @@ function ConfirmClear(props: { kiosk: KioskData; onCancel(): void; onConfirm(): 
           </button>
         </div>
       </section>
-    </div>
+    </ModalLayer>
   );
 }

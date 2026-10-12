@@ -3,6 +3,8 @@ import { defineConfig, devices } from "@playwright/test";
 // Browser E2E against the dev server with the in-memory store: no Firestore, no network (docs/TESTING.md).
 export default defineConfig({
   testDir: "e2e",
+  // The UI QA specs have their own config (npm run qa:ui).
+  testIgnore: "qa/**",
   // One worker: every test shares the dev server's per-IP limit (60 API requests a minute).
   workers: 1,
   retries: process.env.CI ? 1 : 0,

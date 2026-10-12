@@ -7,6 +7,7 @@ import { kt, stepLabel, variantWord } from "@/lib/i18n/kiosk";
 import { draftSelections, formatWon, sheetPrice, sheetSteps, type SheetDraft } from "@/lib/kiosk/menu";
 import type { KioskData, MenuItem, MenuOption, Variant } from "@/types/menu";
 import type { LineInput } from "@/types/session";
+import { ModalLayer } from "./ModalLayer";
 import { FOCUS, SCRIM } from "./styles";
 
 // K4: set → side → drink → ingredients and quantity (docs/UX.md screen map). Canvas px.
@@ -70,7 +71,7 @@ export function ProductSheet(props: {
 
   const titleId = `sheet-${item.itemId}`;
   return (
-    <div className={SCRIM} onClick={props.onClose}>
+    <ModalLayer className={SCRIM} onClick={props.onClose}>
       <section
         role="dialog"
         aria-modal
@@ -199,7 +200,7 @@ export function ProductSheet(props: {
           </button>
         </div>
       </section>
-    </div>
+    </ModalLayer>
   );
 }
 

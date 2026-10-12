@@ -5,6 +5,7 @@ import { findItem } from "@/lib/adapters/catalog";
 import { kt } from "@/lib/i18n/kiosk";
 import { formatWon } from "@/lib/kiosk/menu";
 import type { KioskData } from "@/types/menu";
+import { ModalLayer } from "./ModalLayer";
 import { FOCUS, SCRIM } from "./styles";
 
 // K5: the dessert offer, once per order. The server picks the items (result.upsell) and marks the offer made.
@@ -14,7 +15,7 @@ export function UpsellPopup(props: { kiosk: KioskData; offerItemIds: string[]; o
   const locale = kiosk.locale;
   const items = props.offerItemIds.flatMap((id) => findItem(kiosk, id) ?? []);
   return (
-    <div className={`${SCRIM} flex items-center justify-center p-12`}>
+    <ModalLayer className={`${SCRIM} flex items-center justify-center p-12`}>
       <section
         role="dialog"
         aria-modal
@@ -53,6 +54,6 @@ export function UpsellPopup(props: { kiosk: KioskData; offerItemIds: string[]; o
           {kt("upsellNo", locale)}
         </button>
       </section>
-    </div>
+    </ModalLayer>
   );
 }

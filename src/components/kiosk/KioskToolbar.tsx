@@ -7,6 +7,7 @@ import type { CommandType } from "@/lib/commands/schemas";
 import { kt } from "@/lib/i18n/kiosk";
 import type { KioskData } from "@/types/menu";
 import type { Session } from "@/types/session";
+import { ModalLayer } from "./ModalLayer";
 import { FOCUS, SCRIM } from "./styles";
 
 // The row under the header on K3, K6, K7 and K8: dine chip, and the small QR or "phone connected" (Flow B).
@@ -100,7 +101,7 @@ function QrSheet(props: { kiosk: KioskData; claimUrl: string | null; onClose(): 
   const locale = props.kiosk.locale;
   const src = useQrSrc(props.claimUrl);
   return (
-    <div className={`${SCRIM} flex items-center justify-center p-12`} onClick={props.onClose}>
+    <ModalLayer className={`${SCRIM} flex items-center justify-center p-12`} onClick={props.onClose}>
       <section
         role="dialog"
         aria-modal
@@ -129,6 +130,6 @@ function QrSheet(props: { kiosk: KioskData; claimUrl: string | null; onClose(): 
           {kt("close", locale)}
         </button>
       </section>
-    </div>
+    </ModalLayer>
   );
 }
