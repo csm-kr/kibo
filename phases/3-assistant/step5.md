@@ -24,6 +24,13 @@ Include the PRD hero sentence, "make both fries large" as a second turn (`update
 - Writes `evals/results/<YYYY-MM-DDTHH-mm>.json` (per case: pass/fail, final cart ids, pendingChoice, staffCalled, tool call names and result codes, latency ms; **no reply text and no key**) and `evals/results/<same>.md` with the pass rate per type and overall, the model id, and the date.
 - Exits 0 even when cases fail (it is a measurement); exits 1 only on a crash or a missing key.
 
+### Latency first (I-059)
+The chat-api step measured 17–21 s per request with real Gemini. A manual check on 10-13 (orchestrating session, same 9k-token menu prompt and the hero sentence) gave one `generateContent` round of about 7.1 s with the default thinking level and 3.5–5.1 s with `thinkingConfig: { thinkingLevel: "low" }`, with identical tool calls (`"minimal"` is rejected by `gemini-3.8-flash`). So:
+- `geminiClient()` sets `thinkingConfig.thinkingLevel` from `GEMINI_TEXT_THINKING` (default `"low"`; allowed `low | medium | high`), documented in ARCHITECTURE "Environment variables" (R-002) and `scripts/deploy.sh` later.
+- The eval records per-request latency (total ms and ms until the first tool call is applied) and the result `.md` reports the median and p90.
+- Use the model's default temperature (remove the 0.2 override; I-059 notes Google's Gemini 3 guidance recommends the default) unless the eval shows it hurts.
+- Run the eval once with the default level for comparison only if the pass rate with `low` is below 90%; keep `low` unless the pass rate drops by more than 5 points. Mark I-059 with the measured medians and the result files.
+
 ### Tune (at most 3 rounds)
 Run the eval. If a type fails, improve `buildInstructions` or tool descriptions (not the cases, not the server rules), re-run, and keep every result file. Stop after 3 rounds or at ≥ 90% overall. Unit tests must still pass after each change.
 

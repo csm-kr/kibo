@@ -21,3 +21,10 @@ Not injected into harness steps (lives under `docs/plan/`).
 - Live demo: the touch vs voice comparison on stage, with an offline backup video and a hotspot; do not rely on venue Wi-Fi.
 - Consider extending KIBO Learn to native kiosk apps via OS accessibility APIs.
 - Check entry requirements for Singapore after the result.
+
+## Gemini quotas (read 10-13 from the Service Usage API for project `kibo-2026`, "paid tier" buckets)
+| Model | Requests | Input tokens |
+|---|---|---|
+| `gemini-3.8-flash` (text agent) | 1,000 per minute; 10,000 per day | 2,000,000 per minute |
+| `gemini-3.8-live` (voice) | no per-minute request cap listed (-1) | 150,000 per minute |
+One text order is about 2–3 `generateContent` rounds of about 9k input tokens each (manual check 10-13, no saved log), so the app's own caps (3,000 chat messages per day, 200 voice sessions per day) stay under these limits. Re-read the limits before judging starts; the higher tier buckets apply only if the project is upgraded.
