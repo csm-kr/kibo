@@ -3,6 +3,7 @@ import malo from "../../../data/kiosks/malo.json";
 import doughhouse from "../../../skills/doughhouse.json";
 import type {
   KioskData,
+  KioskVocabulary,
   Locale,
   LocalizedName,
   MenuItem,
@@ -50,7 +51,8 @@ const menuItem = z.strictObject({
   name: localizedName,
   category: z.string(),
   image: imagePath,
-  kcal: z.number().int().min(0),
+  subtitle: localizedName.optional(),
+  kcal: z.number().int().min(0).nullable(),
   badge: z.enum(["best", "new"]).nullable(),
   allergens: z.array(z.string()),
   soldOut: z.boolean(),
@@ -64,6 +66,7 @@ const dineOption = z.strictObject({ name: localizedName, image: imagePath });
 export const kioskSchema: z.ZodType<KioskData> = z.strictObject({
   kioskId: z.string(),
   kind: z.literal("direct"),
+  domain: z.enum(["food", "ticket"]),
   brand: z.strictObject({ name: localizedName, tagline: localizedName }),
   theme: z.strictObject({
     primary: z.string(),
@@ -73,8 +76,10 @@ export const kioskSchema: z.ZodType<KioskData> = z.strictObject({
     background: z.string(),
   }),
   locale: z.enum(["ko", "en"]),
+  locales: z.array(z.enum(["ko", "en"])).min(1).default(["ko"]),
   currency: z.literal("KRW"),
-  dineOptions: z.strictObject({ eat_in: dineOption, take_out: dineOption }),
+  dineOptions: z.strictObject({ eat_in: dineOption, take_out: dineOption }).optional(),
+  vocabulary: z.strictObject({ item: localizedName, add: localizedName, cart: localizedName }).optional(),
   categories: z.array(z.strictObject({ categoryId: z.string(), name: localizedName, icon: imagePath })),
   items: z.array(menuItem),
   upsellRules: z.array(
@@ -94,6 +99,20 @@ const cache = new Map<KioskId, KioskData>();
 
 export function isKioskId(v: string): v is KioskId {
   return Object.hasOwn(sources, v);
+}
+
+export function allKioskIds(): KioskId[] {
+  return Object.keys(sources) as KioskId[];
+}
+
+const FOOD_VOCABULARY: KioskVocabulary = {
+  item: { ko: "메뉴", en: "menu" },
+  add: { ko: "담기", en: "Add" },
+  cart: { ko: "장바구니", en: "Cart" },
+};
+
+export function vocabularyOf(k: KioskData): KioskVocabulary {
+  return k.vocabulary ?? FOOD_VOCABULARY;
 }
 
 export function getKiosk(kioskId: string): KioskData {

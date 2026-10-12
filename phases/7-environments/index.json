@@ -13,7 +13,10 @@
     {
       "step": 1,
       "name": "domain-model",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-13T05:08:15+0900",
+      "summary": "Types (src/types/menu.ts): KioskDomain food|ticket, KioskData.domain, locales: Locale[] (schema default [\"ko\"]), optional dineOptions, optional vocabulary {item, add, cart} (KioskVocabulary); MenuItem.kcal number|null, optional subtitle; priceDelta may be negative. kioskSchema in catalog.ts matches; new allKioskIds() and vocabularyOf(k) (food default 메뉴/menu, 담기/Add, 장바구니/Cart). malo.json has domain food (locales default [\"ko\"], step 2 sets [\"ko\",\"en\"]); learnedToKiosk sets domain food, locales [skill.locale] (kcal still 0, logged I-106). machine.ts: setDineOption → BAD_REQUEST without dineOptions (direct and learned), requestCheckout asks for a dine option only when the kiosk has dineOptions, offerChoices refuses dine choices there. UI call sites type-check with optional dineOptions (K2 Dine returns null, others optional chaining); no MALO change. Tests first: catalog.test.ts runs generic checks (unique ids, names, images, groups, brand words incl. rail/pizza brands, prices multiple of 10, lowest resolvable fare >= 0, domain/locales) for every allKioskIds() kiosk plus schema tests for a ticket-shaped kiosk; machine.test no-dine kiosk; cart.test negative delta. ARCHITECTURE menu schema and setDineOption/requestCheckout rows updated (R-002). lint, build, 594 unit, e2e 7 passed/5 skipped; evidence/*.json restored after e2e (I-099).",
+      "completed_at": "2026-10-13T05:20:00+0900"
     },
     {
       "step": 2,

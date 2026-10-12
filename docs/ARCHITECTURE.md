@@ -326,13 +326,13 @@ Pages: `/kiosk?k=<kioskId>` (`&demo=1` shows the tap counter and timer), `/assis
 | Command | Phone | Kiosk | State rule |
 |---|---|---|---|
 | `startTouch` | | ✓ | `idle → ordering`; in `connected` or `ordering` accepted without a change |
-| `setDineOption` | ✓ | ✓ | `connected → ordering` (kiosk also from `idle`), or update in `ordering` or `confirming`; a change in `confirming` adds 1 to `cartVersion`, because the confirm card shows the dine option |
+| `setDineOption` | ✓ | ✓ | `connected → ordering` (kiosk also from `idle`), or update in `ordering` or `confirming`; a change in `confirming` adds 1 to `cartVersion`, because the confirm card shows the dine option. `BAD_REQUEST` on a kiosk without `dineOptions` (tickets); `offerChoices` with a dine choice is refused there too |
 | `addToCart`, `updateCart`, `removeFromCart` | ✓ | ✓ | `ordering`; from `connected` the first cart change moves to `ordering` (the dine option can come later; `requestCheckout` asks for it); in `confirming` the change sends the session back to `ordering` |
 | `clearCart` | | ✓ | `ordering` or `confirming` → `ordering` with an empty cart (kiosk "clear all") |
 | `undoLastChange` | ✓ | ✓ | not in `paying` or `paid` |
 | `offerChoices` | ✓ | | any state before `paying` |
 | `callStaff` | ✓ | ✓ | any state except `expired`; the only command accepted in `paid` |
-| `requestCheckout` | ✓ | ✓ | `ordering → confirming`; refused when the cart is empty (`CONFLICT`); without a dine option it returns `NEEDS_CHOICE` with the two dine choices; records `checkoutAt` and `checkoutUtteranceSeq` (the phone command's `utteranceSeq`; null from the kiosk or without one) |
+| `requestCheckout` | ✓ | ✓ | `ordering → confirming`; refused when the cart is empty (`CONFLICT`); on a kiosk with `dineOptions` and no dine option chosen it returns `NEEDS_CHOICE` with the two dine choices (a kiosk without `dineOptions` never asks); records `checkoutAt` and `checkoutUtteranceSeq` (the phone command's `utteranceSeq`; null from the kiosk or without one) |
 | `cancelCheckout` | ✓ | ✓ | `confirming → ordering`, cart unchanged ([Pick more], kiosk back button) |
 | `confirmCheckout` | ✓ | ✓ | `confirming → paying`; needs matching `cartVersion`. From the phone: either `source: "button"` (a tap on the confirm card) or an AI call when the phone's AI opened the review: `checkoutUtteranceSeq` is not null, `utteranceSeq > checkoutUtteranceSeq`, and at least 1.5 s after `checkoutAt`. A review the kiosk opened or `editOrder` reopened has a null `checkoutUtteranceSeq`, so the phone must tap the card (an AI confirm gets `CONFLICT` "Please confirm on the card."). From the kiosk: `source: "touch"` |
 | `editOrder` | | ✓ | `paying → confirming` (back to the review); sets `checkoutUtteranceSeq` to null and `checkoutAt` to now |
@@ -359,15 +359,17 @@ Firestore Native mode in `asia-northeast3` (the location cannot be changed later
 
 ### `data/kiosks/{kioskId}.json` (repo, read-only)
 ```
-brand, theme{colors, logo}, locale, categories[],
-items[{itemId, name{ko,en}, category, image, kcal, badge (best|new|null), allergens[], soldOut,
+kind: "direct", domain (food|ticket), brand, theme{colors, logo}, locale (default), locales[] (ko|en the kiosk screen offers; default ["ko"]),
+dineOptions?{eat_in, take_out: {name{ko,en}, image}} (absent: the kiosk never asks eat-in or take-out),
+vocabulary?{item, add, cart: name{ko,en}} (domain words; default 메뉴/menu, 담기/Add, 장바구니/Cart), categories[],
+items[{itemId, name{ko,en}, subtitle?{ko,en}, category, image, kcal (int | null: hidden), badge (best|new|null), allergens[] (may be empty), soldOut,
        availableHours ("HH:MM-HH:MM" KST | null),
        variants[{variant: single|set|largeSet, price}],
        optionGroups[{groupId, name{ko,en}, appliesTo[variant], required, min, max, defaultOptionIds[],
-         options[{optionId, name{ko,en}, image?, priceDelta, soldOut}]}]}],
-upsellRules[{whenCategory | whenItemId, offerItemIds}]   (upsell once per order)
+         options[{optionId, name{ko,en}, image?, priceDelta (may be negative: a child fare), soldOut}]}]}],
+upsellRules[{whenCategory | whenItemId, offerItemIds}]   (upsell once per order; may be empty)
 ```
-A required group with `defaultOptionIds` (the set side: medium fries) takes the default when the order does not say; a required group without defaults (the set drink) is rejected with `NEEDS_CHOICE` so the AI asks. The kiosk sheet preselects defaults.
+A required group with `defaultOptionIds` (the set side: medium fries) takes the default when the order does not say; a required group without defaults (the set drink) is rejected with `NEEDS_CHOICE` so the AI asks. The kiosk sheet preselects defaults. Prices are multiples of 10, and no valid selection may bring a unit price below 0; the catalog tests check both for every kiosk (`allKioskIds()`). Learned kiosks normalize to `domain: "food"`, `locales: [locale]`.
 
 ### `skills/{kioskId}.json` (learned, reviewed, committed)
 ```

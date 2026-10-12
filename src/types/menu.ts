@@ -2,10 +2,14 @@ export type Locale = "ko" | "en";
 export type LocalizedName = { ko: string; en: string };
 export type Variant = "single" | "set" | "largeSet";
 
+/** What a kiosk sells: food has dine options and kcal; tickets have neither. */
+export type KioskDomain = "food" | "ticket";
+
 export interface MenuOption {
   optionId: string;
   name: LocalizedName;
   image?: string;
+  /** May be negative (a child or senior fare); no selection may bring a unit price below 0 (catalog tests). */
   priceDelta: number;
   soldOut: boolean;
 }
@@ -24,9 +28,12 @@ export interface OptionGroup {
 export interface MenuItem {
   itemId: string;
   name: LocalizedName;
+  /** One short line under the name, e.g. "Non-stop · 43 min". */
+  subtitle?: LocalizedName;
   category: string;
   image: string;
-  kcal: number;
+  /** null hides it (tickets). */
+  kcal: number | null;
   badge: "best" | "new" | null;
   allergens: string[];
   soldOut: boolean;
@@ -90,17 +97,30 @@ export interface LearnedKiosk {
   };
 }
 
+export interface KioskVocabulary {
+  item: LocalizedName;
+  add: LocalizedName;
+  cart: LocalizedName;
+}
+
 export interface KioskData {
   kioskId: string;
   kind: "direct" | "learned";
+  domain: KioskDomain;
   brand: { name: LocalizedName; tagline: LocalizedName };
   theme: KioskTheme;
+  /** The kiosk screen's default language. */
   locale: Locale;
+  /** The languages the kiosk's own screen offers; includes `locale`. */
+  locales: Locale[];
   currency: "KRW";
-  dineOptions: {
+  /** Absent on kiosks that do not ask eat-in or take-out (tickets). */
+  dineOptions?: {
     eat_in: { name: LocalizedName; image: string };
     take_out: { name: LocalizedName; image: string };
   };
+  /** Domain words for screens and instructions; `vocabularyOf` falls back to food words. */
+  vocabulary?: KioskVocabulary;
   categories: Category[];
   items: MenuItem[];
   upsellRules: UpsellRule[];

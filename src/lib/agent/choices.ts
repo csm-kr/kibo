@@ -43,7 +43,7 @@ export function choiceLabel(k: KioskData, choice: ChoiceRef, locale: Locale): st
     case "variant":
       return Object.hasOwn(VARIANT_LABEL, choice.id) ? VARIANT_LABEL[choice.id as Variant][locale] : "";
     case "dine":
-      return choice.id === "eat_in" || choice.id === "take_out" ? k.dineOptions[choice.id].name[locale] : "";
+      return choice.id === "eat_in" || choice.id === "take_out" ? (k.dineOptions?.[choice.id].name[locale] ?? "") : "";
     case "yesno":
       return Object.hasOwn(YES_NO, choice.id) ? YES_NO[choice.id][locale] : "";
   }

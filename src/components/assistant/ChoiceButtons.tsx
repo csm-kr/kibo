@@ -14,7 +14,7 @@ import { CHIP } from "./styles";
 
 function choicePhoto(k: KioskData, c: ChoiceRef): string | undefined {
   if (c.kind === "item") return findItem(k, c.id)?.image;
-  if (c.kind === "dine" && (c.id === "eat_in" || c.id === "take_out")) return k.dineOptions[c.id].image;
+  if (c.kind === "dine" && (c.id === "eat_in" || c.id === "take_out")) return k.dineOptions?.[c.id].image;
   if (c.kind === "option") {
     for (const item of k.items) {
       for (const group of item.optionGroups) {

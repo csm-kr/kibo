@@ -235,6 +235,7 @@ export function AssistantPanel(props: Props) {
     />
   );
 
+  const dineOptions = kiosk.dineOptions;
   let body: ReactNode;
   switch (screen) {
     case "connecting":
@@ -301,7 +302,7 @@ export function AssistantPanel(props: Props) {
           <Scroll>
             <h1 className="text-2xl font-bold">{pt("dineQuestion", locale)}</h1>
             <div className="grid grid-cols-2 gap-3">
-              {(["eat_in", "take_out"] as DineOption[]).map((option) => (
+              {dineOptions && (["eat_in", "take_out"] as DineOption[]).map((option) => (
                 <button
                   key={option}
                   type="button"
@@ -310,9 +311,9 @@ export function AssistantPanel(props: Props) {
                   className={`overflow-hidden rounded-[18px] border-2 border-[#15171C] bg-white text-left active:border-[#3446D4] disabled:opacity-60 ${FOCUS}`}
                 >
                   <span className="relative block aspect-[4/3]">
-                    <Image src={kiosk.dineOptions[option].image} alt="" fill sizes="50vw" loading="eager" className="object-cover" />
+                    <Image src={dineOptions[option].image} alt="" fill sizes="50vw" loading="eager" className="object-cover" />
                   </span>
-                  <span className="block px-3 py-3 text-xl font-bold">{kiosk.dineOptions[option].name[locale]}</span>
+                  <span className="block px-3 py-3 text-xl font-bold">{dineOptions[option].name[locale]}</span>
                 </button>
               ))}
             </div>
@@ -630,7 +631,7 @@ function ConfirmCard({ kiosk, session, locale }: { kiosk: KioskData; session: Se
       <h1 id="phone-confirm-title" ref={titleRef} tabIndex={-1} className="text-2xl font-bold outline-none">
         {pt("confirmTitle", locale)}
       </h1>
-      {session.dineOption && <p className="text-xl text-[#4B463F]">{kiosk.dineOptions[session.dineOption].name[locale]}</p>}
+      {session.dineOption && <p className="text-xl text-[#4B463F]">{kiosk.dineOptions?.[session.dineOption].name[locale]}</p>}
       <CartLines kiosk={kiosk} cart={session.cart} locale={locale} />
       <TotalRow total={session.total} locale={locale} />
     </section>

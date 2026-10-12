@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { findItem, getKiosk } from "@/lib/adapters/catalog";
+import type { KioskData } from "@/types/menu";
 import type { CartLine, LineInput } from "@/types/session";
 import {
   addLine,
@@ -346,5 +347,16 @@ describe("errors", () => {
     expect(HTTP_STATUS.NEEDS_CHOICE).toBe(422);
     expect(HTTP_STATUS.CONFLICT).toBe(409);
     expect(HTTP_STATUS.UPSTREAM).toBe(502);
+  });
+});
+
+describe("negative price deltas", () => {
+  it("lower the unit price the same way (a child fare)", () => {
+    const fares: KioskData = structuredClone(k);
+    const ingredients = findItem(fares, "cheese_burger")!.optionGroups.find((g) => g.groupId === "ingredients")!;
+    ingredients.options.push({ optionId: "child", name: { ko: "어린이", en: "Child" }, priceDelta: -2000, soldOut: false });
+    const line = resolveLine(fares, { itemId: "cheese_burger", variant: "single", selections: { ingredients: ["child"] } }, AFTERNOON);
+    expect(line.unitPrice).toBe(4900 - 2000);
+    expect(unitPriceOf(fares, "cheese_burger", "single", { ingredients: ["child", "extra_cheese"] })).toBe(4900 - 2000 + 500);
   });
 });

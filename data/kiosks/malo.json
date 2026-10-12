@@ -1,6 +1,7 @@
 {
   "kioskId": "malo",
   "kind": "direct",
+  "domain": "food",
   "brand": {
     "name": {
       "ko": "말로 버거",

@@ -65,7 +65,7 @@ export function ReviewScreen(props: {
           <span className="k-text-40 text-[#4B463F]">{kt("dineLabel", locale)}</span>
           <span className="k-text-48 font-bold">
             {session.dineOption
-              ? kiosk.dineOptions[session.dineOption].name[locale]
+              ? kiosk.dineOptions?.[session.dineOption].name[locale]
               : kt("dineNotSet", locale)}
           </span>
         </div>

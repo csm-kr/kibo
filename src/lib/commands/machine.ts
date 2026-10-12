@@ -67,6 +67,10 @@ function withCart(
   };
 }
 
+function requireDineOptions(k: KioskData): void {
+  if (!k.dineOptions) throw new CommandError("BAD_REQUEST", "This kiosk does not ask eat-in or take-out.");
+}
+
 function withDineOption(s: Session, option: DineOption): Session {
   const status = s.status === "confirming" ? "confirming" : "ordering";
   // The confirm card shows the dine option, so a change during the review must make an open card stale.
@@ -106,7 +110,7 @@ function isValidChoice(k: KioskData, c: ChoiceRef): boolean {
     case "option":
       return k.items.some((i) => i.optionGroups.some((g) => g.options.some((o) => o.optionId === c.id)));
     case "dine":
-      return c.id === "eat_in" || c.id === "take_out";
+      return k.dineOptions !== undefined && (c.id === "eat_in" || c.id === "take_out");
     case "yesno":
       return c.id === "yes" || c.id === "no";
   }
@@ -133,6 +137,7 @@ function transition(s: Session, cmd: Command, ctx: CommandContext): { next: Sess
       return { next: s.status === "idle" ? { ...s, status: "ordering" } : s, result: {} };
 
     case "setDineOption": {
+      requireDineOptions(k);
       const allowed: SessionStatus[] = ctx.actor === "kiosk" ? ["idle", ...CART_EDITABLE] : CART_EDITABLE;
       requireStatus(s, allowed, "The order can no longer be changed.");
       return { next: withDineOption(s, cmd.args.option), result: {} };
@@ -196,7 +201,7 @@ function transition(s: Session, cmd: Command, ctx: CommandContext): { next: Sess
     case "requestCheckout":
       requireStatus(s, ["ordering"], "Please add something to your order first.");
       if (s.cart.length === 0) throw new CommandError("CONFLICT", "Your cart is empty.");
-      if (s.dineOption === null) {
+      if (k.dineOptions && s.dineOption === null) {
         throw new CommandError("NEEDS_CHOICE", "Eat here or take out?", {
           templateId: "pick_dine",
           choices: [
@@ -302,6 +307,7 @@ function learnedTransition(s: Session, cmd: Command, ctx: CommandContext): { nex
 
   switch (cmd.type) {
     case "setDineOption": {
+      requireDineOptions(ctx.kiosk);
       const allowed: SessionStatus[] = ctx.actor === "kiosk" ? ["idle", ...CART_EDITABLE] : CART_EDITABLE;
       requireStatus(base, allowed, "The order can no longer be changed.");
       return wait({ type: "setDineOption", args: { option: cmd.args.option } });

@@ -179,7 +179,7 @@ export function KioskScreen(props: Props) {
                 }}
                 className={`k-text-40 min-h-22 rounded-full bg-(--k-primary) px-10 font-bold text-white ${FOCUS}`}
               >
-                {kiosk.dineOptions[option].name[locale]}
+                {kiosk.dineOptions?.[option].name[locale]}
               </button>
             ))}
           <button
@@ -295,6 +295,8 @@ function Attract(props: {
 function Dine({ kiosk, phoneConnected, onPick }: { kiosk: KioskData; phoneConnected: boolean; onPick(o: DineOption): void }) {
   const locale = kiosk.locale;
   const options: DineOption[] = ["eat_in", "take_out"];
+  const dine = kiosk.dineOptions;
+  if (!dine) return null;
   return (
     <div className="flex flex-1 flex-col gap-16 px-12 pt-24">
       <h1 className="k-text-72 text-center font-bold">{kt("dineQuestion", locale)}</h1>
@@ -307,9 +309,9 @@ function Dine({ kiosk, phoneConnected, onPick }: { kiosk: KioskData; phoneConnec
             className={`overflow-hidden rounded-[32px] border-[6px] border-[#1E1B18] bg-white active:bg-(--k-primary-tint) ${FOCUS}`}
           >
             <span className="relative block h-140">
-              <Image src={kiosk.dineOptions[o].image} alt="" fill sizes="480px" className="object-cover" />
+              <Image src={dine[o].image} alt="" fill sizes="480px" className="object-cover" />
             </span>
-            <span className="k-text-56 block px-6 py-10 font-bold">{kiosk.dineOptions[o].name[locale]}</span>
+            <span className="k-text-56 block px-6 py-10 font-bold">{dine[o].name[locale]}</span>
           </button>
         ))}
       </div>

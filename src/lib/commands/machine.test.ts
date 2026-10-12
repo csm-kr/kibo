@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getKiosk } from "@/lib/adapters/catalog";
+import type { KioskData } from "@/types/menu";
 import type { Actor, Session, Source } from "@/types/session";
 import { ACTOR_COMMANDS } from "./actors";
 import { CommandError } from "./errors";
@@ -412,6 +413,22 @@ describe("cart changes and undo", () => {
         { kind: "dine", id: "take_out" },
       ],
     });
+  });
+
+  it("a kiosk without dine options refuses setDineOption and checks out without asking", () => {
+    const ticket: KioskData = { ...k, domain: "ticket", dineOptions: undefined };
+    const tctx = (actor: Actor): CommandContext => ({ ...ctx(actor), kiosk: ticket });
+    expect(catchError(() => applyCommand(fresh(), cmd("setDineOption", { option: "eat_in" }), tctx("kiosk"))).code)
+      .toBe("BAD_REQUEST");
+    let s: Session = { ...fresh(), status: "connected" };
+    const phoneDine = cmd("setDineOption", { option: "take_out" }, { source: "voice", utteranceSeq: 1 });
+    expect(catchError(() => applyCommand(s, phoneDine, tctx("phone"))).code).toBe("BAD_REQUEST");
+    const dineChoice = cmd("offerChoices", { templateId: "pick_dine", choices: [{ kind: "dine", id: "eat_in" }] }, { source: "voice" });
+    expect(catchError(() => applyCommand(s, dineChoice, tctx("phone"))).code).toBe("BAD_REQUEST");
+    s = applyCommand(s, cmd("addToCart", SET_ORDER, { source: "voice", utteranceSeq: 1 }), tctx("phone")).session;
+    s = applyCommand(s, cmd("requestCheckout", {}, { source: "voice", utteranceSeq: 2 }), tctx("phone")).session;
+    expect(s.status).toBe("confirming");
+    expect(s.dineOption).toBeNull();
   });
 
   it("updateCart and removeFromCart change the line and bump cartVersion", () => {

@@ -126,6 +126,7 @@ export function learnedToKiosk(skill: Skill): KioskData {
   return {
     kioskId: skill.kioskId,
     kind: "learned",
+    domain: "food",
     brand: { name: skill.brand, tagline: { ko: "학습된 키오스크", en: "Learned kiosk" } },
     theme: {
       primary: "#4B463F",
@@ -135,6 +136,7 @@ export function learnedToKiosk(skill: Skill): KioskData {
       background: "#FBF7EF",
     },
     locale: skill.locale,
+    locales: [skill.locale],
     currency: skill.currency,
     dineOptions: {
       eat_in: { name: both("dineChip"), image: LEARNED_PLACEHOLDER },

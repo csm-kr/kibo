@@ -2,8 +2,9 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import raw from "../../../data/kiosks/malo.json";
-import type { LocalizedName } from "@/types/menu";
+import type { KioskData, LocalizedName } from "@/types/menu";
 import {
+  allKioskIds,
   findItem,
   findOption,
   getKiosk,
@@ -12,21 +13,19 @@ import {
   isKioskId,
   kioskSchema,
   localName,
+  vocabularyOf,
 } from "./catalog";
 
 const kiosk = getKiosk("malo");
 const publicDir = join(process.cwd(), "public");
 
-function allNames(): LocalizedName[] {
-  const names: LocalizedName[] = [
-    kiosk.brand.name,
-    kiosk.brand.tagline,
-    kiosk.dineOptions.eat_in.name,
-    kiosk.dineOptions.take_out.name,
-    ...kiosk.categories.map((c) => c.name),
-  ];
-  for (const item of kiosk.items) {
+function allNames(k: KioskData): LocalizedName[] {
+  const names: LocalizedName[] = [k.brand.name, k.brand.tagline, ...k.categories.map((c) => c.name)];
+  if (k.dineOptions) names.push(k.dineOptions.eat_in.name, k.dineOptions.take_out.name);
+  if (k.vocabulary) names.push(k.vocabulary.item, k.vocabulary.add, k.vocabulary.cart);
+  for (const item of k.items) {
     names.push(item.name);
+    if (item.subtitle) names.push(item.subtitle);
     for (const g of item.optionGroups) {
       names.push(g.name, ...g.options.map((o) => o.name));
     }
@@ -34,24 +33,40 @@ function allNames(): LocalizedName[] {
   return names;
 }
 
-describe("malo.json", () => {
-  it("parses with kioskSchema", () => {
-    expect(kioskSchema.safeParse(raw).success).toBe(true);
-  });
+/** The lowest unit price any valid selection can reach: each group takes up to `max` of its most negative deltas. */
+function lowestFare(k: KioskData, itemId: string): number {
+  const item = findItem(k, itemId)!;
+  let lowest = Infinity;
+  for (const v of item.variants) {
+    let price = v.price;
+    for (const g of groupsFor(item, v.variant)) {
+      const negatives = g.options.map((o) => o.priceDelta).filter((d) => d < 0).sort((a, b) => a - b);
+      price += negatives.slice(0, g.max).reduce((sum, d) => sum + d, 0);
+    }
+    lowest = Math.min(lowest, price);
+  }
+  return lowest;
+}
 
-  it("has 7 categories and 34-37 items in known categories", () => {
-    expect(kiosk.categories).toHaveLength(7);
-    expect(kiosk.items.length).toBeGreaterThanOrEqual(34);
-    expect(kiosk.items.length).toBeLessThanOrEqual(37);
-    const cats = new Set(kiosk.categories.map((c) => c.categoryId));
-    for (const item of kiosk.items) expect(cats, item.itemId).toContain(item.category);
-  });
+const BRANDS = [
+  "coca", "pepsi", "sprite", "fanta", "chilsung", "mcdonald", "burger king",
+  "lotteria", "kfc", "mom's touch", "starbucks", "ediya", "twosome", "dunkin",
+  "baskin", "subway", "domino", "pizza hut", "korail", "arex",
+  "코카", "펩시", "스프라이트", "환타", "칠성", "맥도날드", "버거킹", "롯데리아",
+  "맘스터치", "스타벅스", "이디야", "투썸", "던킨", "배스킨", "써브웨이", "도미노", "피자헛",
+  "코레일", "공항철도",
+];
 
-  it("has unique ids for categories, items, groups and options", () => {
+describe.each(allKioskIds())("kiosk %s (generic checks)", (id) => {
+  const k = getKiosk(id);
+
+  it("has unique ids for categories, items, groups and options, and items in known categories", () => {
     const unique = (ids: string[]) => new Set(ids).size === ids.length;
-    expect(unique(kiosk.categories.map((c) => c.categoryId))).toBe(true);
-    expect(unique(kiosk.items.map((i) => i.itemId))).toBe(true);
-    for (const item of kiosk.items) {
+    expect(unique(k.categories.map((c) => c.categoryId))).toBe(true);
+    expect(unique(k.items.map((i) => i.itemId))).toBe(true);
+    const cats = new Set(k.categories.map((c) => c.categoryId));
+    for (const item of k.items) {
+      expect(cats, item.itemId).toContain(item.category);
       expect(unique(item.optionGroups.map((g) => g.groupId)), item.itemId).toBe(true);
       for (const g of item.optionGroups) {
         expect(unique(g.options.map((o) => o.optionId)), `${item.itemId}.${g.groupId}`).toBe(true);
@@ -59,26 +74,8 @@ describe("malo.json", () => {
     }
   });
 
-  it("points every image at a file under public/", () => {
-    const paths = [
-      kiosk.dineOptions.eat_in.image,
-      kiosk.dineOptions.take_out.image,
-      ...kiosk.categories.map((c) => c.icon),
-    ];
-    for (const item of kiosk.items) {
-      paths.push(item.image);
-      for (const g of item.optionGroups) {
-        for (const o of g.options) if (o.image) paths.push(o.image);
-      }
-    }
-    for (const p of paths) {
-      expect(p.startsWith("/menu/"), p).toBe(true);
-      expect(existsSync(join(publicDir, p)), p).toBe(true);
-    }
-  });
-
   it("has short single-line names in Korean and English", () => {
-    for (const n of allNames()) {
+    for (const n of allNames(k)) {
       for (const s of [n.ko, n.en]) {
         expect(s.trim().length, JSON.stringify(n)).toBeGreaterThan(0);
         expect(s.length, s).toBeLessThanOrEqual(40);
@@ -87,16 +84,120 @@ describe("malo.json", () => {
     }
   });
 
+  it("points every image at a file under public/", () => {
+    const paths = [...k.categories.map((c) => c.icon)];
+    if (k.dineOptions) paths.push(k.dineOptions.eat_in.image, k.dineOptions.take_out.image);
+    for (const item of k.items) {
+      paths.push(item.image);
+      for (const g of item.optionGroups) {
+        for (const o of g.options) if (o.image) paths.push(o.image);
+      }
+    }
+    for (const p of paths) expect(existsSync(join(publicDir, p)), p).toBe(true);
+  });
+
+  it("keeps groups consistent: defaults exist, min <= max, required means min >= 1", () => {
+    for (const item of k.items) {
+      for (const g of item.optionGroups) {
+        const where = `${item.itemId}.${g.groupId}`;
+        for (const d of g.defaultOptionIds) expect(findOption(g, d), where).toBeDefined();
+        expect(g.min, where).toBeLessThanOrEqual(g.max);
+        if (g.required) expect(g.min, where).toBeGreaterThanOrEqual(1);
+        expect(g.appliesTo.length, where).toBeGreaterThan(0);
+        for (const v of g.appliesTo) {
+          expect(item.variants.map((x) => x.variant), where).toContain(v);
+        }
+      }
+    }
+  });
+
   it("contains no real brand names", () => {
-    const text = JSON.stringify(raw).toLowerCase();
-    const brands = [
-      "coca", "pepsi", "sprite", "fanta", "chilsung", "mcdonald", "burger king",
-      "lotteria", "kfc", "mom's touch", "starbucks", "ediya", "twosome", "dunkin",
-      "baskin", "subway",
-      "코카", "펩시", "스프라이트", "환타", "칠성", "맥도날드", "버거킹", "롯데리아",
-      "맘스터치", "스타벅스", "이디야", "투썸", "던킨", "배스킨", "써브웨이",
-    ];
-    for (const b of brands) expect(text, b).not.toContain(b);
+    const text = JSON.stringify(k).toLowerCase();
+    for (const b of BRANDS) expect(text, b).not.toContain(b);
+  });
+
+  it("uses KRW prices in multiples of 10, and no selection makes a fare negative", () => {
+    for (const item of k.items) {
+      for (const v of item.variants) expect(v.price % 10, item.itemId).toBe(0);
+      for (const g of item.optionGroups) {
+        for (const o of g.options) expect(o.priceDelta % 10, `${item.itemId}.${o.optionId}`).toBe(0);
+      }
+      expect(lowestFare(k, item.itemId), item.itemId).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it("has a domain, and a default locale that its own screen offers", () => {
+    expect(["food", "ticket"]).toContain(k.domain);
+    expect(k.locales).toContain(k.locale);
+  });
+});
+
+describe("kioskSchema (domain model)", () => {
+  /** MALO without dine options, as a ticket kiosk with one child fare. */
+  function ticketRaw() {
+    const t = structuredClone(raw) as Record<string, unknown> & { items: Record<string, unknown>[] };
+    delete t.dineOptions;
+    t.domain = "ticket";
+    t.locales = ["ko", "en"];
+    t.vocabulary = {
+      item: { ko: "승차권", en: "ticket" },
+      add: { ko: "선택", en: "Select" },
+      cart: { ko: "선택한 승차권", en: "Selected tickets" },
+    };
+    t.items[0].kcal = null;
+    t.items[0].allergens = [];
+    t.items[0].subtitle = { ko: "직통 · 43분", en: "Non-stop · 43 min" };
+    const groups = t.items[0].optionGroups as { options: { priceDelta: number }[] }[];
+    groups[0].options[0].priceDelta = -1000;
+    return t;
+  }
+
+  it("accepts a ticket kiosk: no dine options, null kcal, subtitle, negative delta, vocabulary, locales", () => {
+    const parsed = kioskSchema.safeParse(ticketRaw());
+    expect(parsed.success, JSON.stringify(parsed.error?.issues)).toBe(true);
+    expect(parsed.data?.dineOptions).toBeUndefined();
+    expect(parsed.data?.items[0].kcal).toBeNull();
+  });
+
+  it("defaults locales to Korean only and rejects other languages", () => {
+    expect(kioskSchema.parse(raw).locales).toEqual(["ko"]);
+    expect(kioskSchema.safeParse({ ...ticketRaw(), locales: ["ko", "ja"] }).success).toBe(false);
+  });
+
+  it("requires a known domain", () => {
+    const noDomain = ticketRaw();
+    delete noDomain.domain;
+    expect(kioskSchema.safeParse(noDomain).success).toBe(false);
+    expect(kioskSchema.safeParse({ ...ticketRaw(), domain: "hospital" }).success).toBe(false);
+  });
+
+  it("vocabularyOf falls back to food words", () => {
+    expect(vocabularyOf(kiosk)).toEqual({
+      item: { ko: "메뉴", en: "menu" },
+      add: { ko: "담기", en: "Add" },
+      cart: { ko: "장바구니", en: "Cart" },
+    });
+    const t = kioskSchema.parse(ticketRaw());
+    expect(vocabularyOf(t).cart).toEqual({ ko: "선택한 승차권", en: "Selected tickets" });
+  });
+});
+
+describe("malo.json", () => {
+  it("parses with kioskSchema as a food kiosk with dine options", () => {
+    expect(kioskSchema.safeParse(raw).success).toBe(true);
+    expect(kiosk.domain).toBe("food");
+    expect(kiosk.dineOptions).toBeDefined();
+  });
+
+  it("has 7 categories and 34-37 items", () => {
+    expect(kiosk.categories).toHaveLength(7);
+    expect(kiosk.items.length).toBeGreaterThanOrEqual(34);
+    expect(kiosk.items.length).toBeLessThanOrEqual(37);
+  });
+
+  it("keeps its images under /menu/", () => {
+    expect(kiosk.dineOptions?.eat_in.image).toBe("/menu/dine_in.jpg");
+    for (const item of kiosk.items) expect(item.image.startsWith("/menu/"), item.itemId).toBe(true);
   });
 
   it("makes no health or religious claims", () => {
@@ -180,21 +281,6 @@ describe("malo.json", () => {
     }
   });
 
-  it("keeps groups consistent: defaults exist, min <= max, required means min >= 1", () => {
-    for (const item of kiosk.items) {
-      for (const g of item.optionGroups) {
-        const where = `${item.itemId}.${g.groupId}`;
-        for (const d of g.defaultOptionIds) expect(findOption(g, d), where).toBeDefined();
-        expect(g.min, where).toBeLessThanOrEqual(g.max);
-        if (g.required) expect(g.min, where).toBeGreaterThanOrEqual(1);
-        expect(g.appliesTo.length, where).toBeGreaterThan(0);
-        for (const v of g.appliesTo) {
-          expect(item.variants.map((x) => x.variant), where).toContain(v);
-        }
-      }
-    }
-  });
-
   it("uses integer KRW prices in multiples of 100", () => {
     for (const item of kiosk.items) {
       for (const v of item.variants) expect(v.price % 100, item.itemId).toBe(0);
@@ -227,6 +313,11 @@ describe("catalog helpers", () => {
     expect(() => getKiosk("nope")).toThrow();
     expect(isKioskId("malo")).toBe(true);
     expect(isKioskId("nope")).toBe(false);
+  });
+
+  it("allKioskIds lists every kiosk", () => {
+    expect(allKioskIds()).toEqual(["malo", "doughhouse"]);
+    for (const id of allKioskIds()) expect(isKioskId(id)).toBe(true);
   });
 
   it("caches the parsed kiosk", () => {

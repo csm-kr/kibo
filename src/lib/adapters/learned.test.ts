@@ -117,8 +117,8 @@ describe("learnedToKiosk", () => {
     const names: LocalizedName[] = [
       kiosk.brand.name,
       kiosk.brand.tagline,
-      kiosk.dineOptions.eat_in.name,
-      kiosk.dineOptions.take_out.name,
+      kiosk.dineOptions!.eat_in.name,
+      kiosk.dineOptions!.take_out.name,
       ...kiosk.categories.map((c) => c.name),
     ];
     for (const item of kiosk.items) {
@@ -136,8 +136,8 @@ describe("learnedToKiosk", () => {
 
   it("points every image at a file under public/", () => {
     const paths = [
-      kiosk.dineOptions.eat_in.image,
-      kiosk.dineOptions.take_out.image,
+      kiosk.dineOptions!.eat_in.image,
+      kiosk.dineOptions!.take_out.image,
       ...kiosk.categories.map((c) => c.icon),
       ...kiosk.items.map((i) => i.image),
     ];
