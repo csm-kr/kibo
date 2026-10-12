@@ -1,0 +1,1597 @@
+{
+  "date": "2026-10-12T19:56:26.631Z",
+  "model": "gemini-3.8-flash",
+  "backend": "vertex",
+  "thinkingLevel": "low",
+  "evalClock": "14:00 KST",
+  "subset": null,
+  "cases": 32,
+  "passed": 32,
+  "passRate": 1,
+  "byType": {
+    "1-several-items": {
+      "pass": 2,
+      "total": 2
+    },
+    "2-same-item-different-options": {
+      "pass": 2,
+      "total": 2
+    },
+    "3-missing-required-choice": {
+      "pass": 4,
+      "total": 4
+    },
+    "4-remove-add-ingredients": {
+      "pass": 2,
+      "total": 2
+    },
+    "5-edit-existing-line": {
+      "pass": 5,
+      "total": 5
+    },
+    "6-sold-out-or-hours": {
+      "pass": 4,
+      "total": 4
+    },
+    "8-not-in-data": {
+      "pass": 4,
+      "total": 4
+    },
+    "grounded-reply": {
+      "pass": 4,
+      "total": 4
+    },
+    "9-ambiguous": {
+      "pass": 2,
+      "total": 2
+    },
+    "checkout": {
+      "pass": 3,
+      "total": 3
+    }
+  },
+  "latency": {
+    "requests": 42,
+    "totalMedianMs": 5959,
+    "totalP90Ms": 21155,
+    "firstToolRequests": 39,
+    "firstToolMedianMs": 3302,
+    "firstToolP90Ms": 6389
+  },
+  "notCovered": [
+    {
+      "type": "7-count-limits",
+      "reason": "Count limits (max 3 toppings) need the learned Doughhouse kiosk, which has no LearnedAdapter yet."
+    }
+  ],
+  "results": [
+    {
+      "id": "t1-en-several",
+      "type": "1-several-items",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        },
+        {
+          "itemId": "chicken_nuggets",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "sauce": [
+              "honey_mustard"
+            ]
+          }
+        },
+        {
+          "itemId": "cola",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "size": [
+              "l"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 10945,
+          "firstToolMs": 4498,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t1-ko-several",
+      "type": "1-several-items",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_sticks",
+          "variant": "single",
+          "qty": 2,
+          "selections": {}
+        },
+        {
+          "itemId": "iced_tea",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        },
+        {
+          "itemId": "soft_cone",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 7388,
+          "firstToolMs": 4007,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t2-en-hero",
+      "type": "2-same-item-different-options",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 1,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "zero_cola"
+            ],
+            "ingredients": [
+              "no_pickles"
+            ]
+          }
+        },
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 1,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "cider"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 12000,
+          "firstToolMs": 5768,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t2-ko-hero",
+      "type": "2-same-item-different-options",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 1,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "zero_cola"
+            ],
+            "ingredients": [
+              "no_pickles"
+            ]
+          }
+        },
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 1,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "cider"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 13056,
+          "firstToolMs": 6389,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t3-en-set-no-drink",
+      "type": "3-missing-required-choice",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_option",
+        "choices": [
+          {
+            "kind": "option",
+            "id": "cola"
+          },
+          {
+            "kind": "option",
+            "id": "zero_cola"
+          },
+          {
+            "kind": "option",
+            "id": "cider"
+          },
+          {
+            "kind": "option",
+            "id": "iced_coffee"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 6786,
+          "firstToolMs": 5138,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "NEEDS_CHOICE"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t3-ko-set-no-drink",
+      "type": "3-missing-required-choice",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_option",
+        "choices": [
+          {
+            "kind": "option",
+            "id": "cola"
+          },
+          {
+            "kind": "option",
+            "id": "zero_cola"
+          },
+          {
+            "kind": "option",
+            "id": "cider"
+          },
+          {
+            "kind": "option",
+            "id": "iced_coffee"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 16619,
+          "firstToolMs": 4465,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "NEEDS_CHOICE"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t3-en-variant",
+      "type": "3-missing-required-choice",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_variant",
+        "choices": [
+          {
+            "kind": "variant",
+            "id": "single"
+          },
+          {
+            "kind": "variant",
+            "id": "set"
+          },
+          {
+            "kind": "variant",
+            "id": "largeSet"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 5959,
+          "firstToolMs": 4439,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "NEEDS_CHOICE"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t3-ko-sauce",
+      "type": "3-missing-required-choice",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_option",
+        "choices": [
+          {
+            "kind": "option",
+            "id": "sweet_chili"
+          },
+          {
+            "kind": "option",
+            "id": "honey_mustard"
+          },
+          {
+            "kind": "option",
+            "id": "bbq"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 21155,
+          "firstToolMs": 12647,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "NEEDS_CHOICE"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t4-en-ingredients",
+      "type": "4-remove-add-ingredients",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "double_cheese_burger",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "ingredients": [
+              "extra_cheese",
+              "no_onion"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "upsell",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "soft_cone"
+          },
+          {
+            "kind": "item",
+            "id": "apple_pie"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 5652,
+          "firstToolMs": 1679,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t4-ko-ingredients",
+      "type": "4-remove-add-ingredients",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "bacon_cheese_burger",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "ingredients": [
+              "no_pickles",
+              "extra_patty"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "upsell",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "soft_cone"
+          },
+          {
+            "kind": "item",
+            "id": "apple_pie"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 22413,
+          "firstToolMs": 3181,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t5-en-both-fries-large",
+      "type": "5-edit-existing-line",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 1,
+          "selections": {
+            "side": [
+              "fries_l"
+            ],
+            "drink": [
+              "zero_cola"
+            ],
+            "ingredients": [
+              "no_pickles"
+            ]
+          }
+        },
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 1,
+          "selections": {
+            "side": [
+              "fries_l"
+            ],
+            "drink": [
+              "cider"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 14155,
+          "firstToolMs": 6739,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 5320,
+          "firstToolMs": 2207,
+          "tools": [
+            {
+              "name": "updateCart",
+              "code": "ok"
+            },
+            {
+              "name": "updateCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t5-ko-fries-large",
+      "type": "5-edit-existing-line",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 1,
+          "selections": {
+            "side": [
+              "fries_l"
+            ],
+            "drink": [
+              "cola"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 8424,
+          "firstToolMs": 2317,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 4729,
+          "firstToolMs": 2594,
+          "tools": [
+            {
+              "name": "updateCart",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t5-en-undo",
+      "type": "5-edit-existing-line",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cola",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "size": [
+              "m"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 4858,
+          "firstToolMs": 1581,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 6596,
+          "firstToolMs": 2493,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 3304,
+          "firstToolMs": 1710,
+          "tools": [
+            {
+              "name": "undoLastChange",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t5-ko-undo",
+      "type": "5-edit-existing-line",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cider",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "size": [
+              "m"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 7257,
+          "firstToolMs": 2084,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 5101,
+          "firstToolMs": 2460,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 3151,
+          "firstToolMs": 1561,
+          "tools": [
+            {
+              "name": "undoLastChange",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t5-ko-qty",
+      "type": "5-edit-existing-line",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cola",
+          "variant": "single",
+          "qty": 2,
+          "selections": {
+            "size": [
+              "m"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 28203,
+          "firstToolMs": 3782,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 3487,
+          "firstToolMs": 1516,
+          "tools": [
+            {
+              "name": "updateCart",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t6-en-sold-out",
+      "type": "6-sold-out-or-hours",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "alternatives",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bulgogi_burger"
+          },
+          {
+            "kind": "item",
+            "id": "spicy_chicken_burger"
+          },
+          {
+            "kind": "item",
+            "id": "crispy_chicken_burger"
+          },
+          {
+            "kind": "item",
+            "id": "classic_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bacon_cheese_burger"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 5354,
+          "firstToolMs": 3665,
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t6-ko-sold-out",
+      "type": "6-sold-out-or-hours",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "alternatives",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bulgogi_burger"
+          },
+          {
+            "kind": "item",
+            "id": "crispy_chicken_burger"
+          },
+          {
+            "kind": "item",
+            "id": "classic_burger"
+          },
+          {
+            "kind": "item",
+            "id": "spicy_chicken_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bacon_cheese_burger"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 7600,
+          "firstToolMs": 3697,
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t6-en-out-of-hours",
+      "type": "6-sold-out-or-hours",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 11695,
+          "firstToolMs": null,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "UNAVAILABLE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t6-ko-out-of-hours",
+      "type": "6-sold-out-or-hours",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "alternatives",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "fries_m"
+          },
+          {
+            "kind": "item",
+            "id": "cheese_sticks"
+          },
+          {
+            "kind": "item",
+            "id": "onion_rings"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 24812,
+          "firstToolMs": 17257,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "UNAVAILABLE"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t8-en-unknown-item",
+      "type": "8-not-in-data",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "alternatives",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "classic_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bacon_cheese_burger"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 8637,
+          "firstToolMs": 6289,
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t8-ko-unknown-item",
+      "type": "8-not-in-data",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 3685,
+          "firstToolMs": null,
+          "tools": []
+        }
+      ]
+    },
+    {
+      "id": "t8-en-halal",
+      "type": "8-not-in-data",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": "unknown_info",
+      "requests": [
+        {
+          "ms": 3536,
+          "firstToolMs": 1956,
+          "tools": [
+            {
+              "name": "callStaff",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t8-ko-origin",
+      "type": "8-not-in-data",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": "unknown_info",
+      "requests": [
+        {
+          "ms": 4864,
+          "firstToolMs": 3048,
+          "tools": [
+            {
+              "name": "callStaff",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "g-en-recommend-dessert",
+      "type": "grounded-reply",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": [
+          "soft_cone"
+        ]
+      },
+      "requests": [
+        {
+          "ms": 8462,
+          "firstToolMs": null,
+          "tools": []
+        }
+      ]
+    },
+    {
+      "id": "g-ko-recommend-dessert",
+      "type": "grounded-reply",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "soft_cone"
+          },
+          {
+            "kind": "item",
+            "id": "apple_pie"
+          },
+          {
+            "kind": "item",
+            "id": "choco_sundae"
+          },
+          {
+            "kind": "item",
+            "id": "choco_cookie"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": [
+          "soft_cone"
+        ]
+      },
+      "requests": [
+        {
+          "ms": 61547,
+          "firstToolMs": 3498,
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "g-en-popular",
+      "type": "grounded-reply",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "soft_cone"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": [
+          "cheese_burger",
+          "soft_cone"
+        ]
+      },
+      "requests": [
+        {
+          "ms": 5595,
+          "firstToolMs": 3357,
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "g-ko-popular",
+      "type": "grounded-reply",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "soft_cone"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": [
+          "cheese_burger",
+          "soft_cone"
+        ]
+      },
+      "requests": [
+        {
+          "ms": 5908,
+          "firstToolMs": 3420,
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t9-en-one-burger",
+      "type": "9-ambiguous",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bulgogi_burger"
+          },
+          {
+            "kind": "item",
+            "id": "double_cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "spicy_chicken_burger"
+          },
+          {
+            "kind": "item",
+            "id": "classic_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bacon_cheese_burger"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 7400,
+          "firstToolMs": 3302,
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t9-ko-one-drink",
+      "type": "9-ambiguous",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cola"
+          },
+          {
+            "kind": "item",
+            "id": "zero_cola"
+          },
+          {
+            "kind": "item",
+            "id": "cider"
+          },
+          {
+            "kind": "item",
+            "id": "lemonade"
+          },
+          {
+            "kind": "item",
+            "id": "orange_juice"
+          },
+          {
+            "kind": "item",
+            "id": "iced_tea"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 6508,
+          "firstToolMs": 3710,
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "co-en-ill-pay",
+      "type": "checkout",
+      "locale": "en",
+      "pass": true,
+      "status": "confirming",
+      "cart": [
+        {
+          "itemId": "cola",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "size": [
+              "m"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 4109,
+          "firstToolMs": 1630,
+          "tools": [
+            {
+              "name": "setDineOption",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 3134,
+          "firstToolMs": 1578,
+          "tools": [
+            {
+              "name": "requestCheckout",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "co-en-pay-in-one-message",
+      "type": "checkout",
+      "locale": "en",
+      "pass": true,
+      "status": "confirming",
+      "cart": [
+        {
+          "itemId": "zero_cola",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "size": [
+              "m"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 5411,
+          "firstToolMs": 3367,
+          "tools": [
+            {
+              "name": "setDineOption",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "requestCheckout",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "co-ko-yes-after-card",
+      "type": "checkout",
+      "locale": "ko",
+      "pass": true,
+      "status": "paying",
+      "cart": [
+        {
+          "itemId": "cola",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "size": [
+              "m"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 3414,
+          "firstToolMs": 1633,
+          "tools": [
+            {
+              "name": "setDineOption",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 3619,
+          "firstToolMs": 1547,
+          "tools": [
+            {
+              "name": "requestCheckout",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 3739,
+          "firstToolMs": 1612,
+          "tools": [
+            {
+              "name": "confirmCheckout",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

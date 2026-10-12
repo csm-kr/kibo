@@ -40,8 +40,9 @@ const BUSY = "Voice is busy right now. Please type instead.";
 
 function tokenError(e: unknown): CommandError {
   if (e instanceof ApiError && e.status === 429) return new CommandError("RATE_LIMITED", BUSY);
-  // Status or name only: the upstream message can echo the request.
-  console.error("live token error:", e instanceof ApiError ? `ApiError ${e.status}` : e instanceof Error ? e.name : typeof e);
+  // Status or name only: the upstream message can echo the request. HTTP 402: the key's prepaid credits are used up.
+  if (e instanceof ApiError && e.status === 402) console.error("gemini billing error (402)");
+  else console.error("live token error:", e instanceof ApiError ? `ApiError ${e.status}` : e instanceof Error ? e.name : typeof e);
   return new CommandError("UPSTREAM", "Voice is not available right now. Please type instead.");
 }
 

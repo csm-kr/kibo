@@ -224,6 +224,15 @@ describe("geminiTokenIssuer", () => {
     expect(JSON.stringify(log.mock.calls)).not.toContain("AIza");
   });
 
+  it("a 402 (prepaid credits used up) is UPSTREAM with the plain message, logged as a billing error", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    const create = vi.fn().mockRejectedValue(new ApiError({ message: "credits for AIza-secret", status: 402 }));
+    const e = await errorOf(geminiTokenIssuer(fakeAi(create)).create(INPUT));
+    expect(e).toMatchObject({ code: "UPSTREAM", message: "Voice is not available right now. Please type instead." });
+    expect(log).toHaveBeenCalledWith("gemini billing error (402)");
+    expect(JSON.stringify(log.mock.calls)).not.toContain("AIza");
+  });
+
   it("without GEMINI_API_KEY the real client is UPSTREAM with the plain message", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     vi.stubEnv("GEMINI_API_KEY", "");

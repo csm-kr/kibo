@@ -2,7 +2,8 @@
 // through runChat, exactly as POST /api/chat does, and saves the result as evidence in evals/results/.
 // Results hold ids, codes and timings only: no reply text, no utterances, no key. Reply cases keep only the
 // grounding verdict and the deny-list words it matched.
-// Run with `npm run eval:agent` (reads GEMINI_API_KEY from .env).
+// Run with `npm run eval:agent`: the text agent's backend, Vertex AI through gcloud application default credentials
+// by default; `GEMINI_TEXT_BACKEND=api npm run eval:agent` runs it on the Gemini API key in .env for comparison.
 
 import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -224,8 +225,9 @@ function kstStamp(ms: number): string {
 }
 
 async function main() {
-  if (!process.env.GEMINI_API_KEY) {
-    console.error("GEMINI_API_KEY is not set (.env).");
+  const backend = process.env.GEMINI_TEXT_BACKEND === "api" ? "api" : "vertex";
+  if (backend === "api" && !process.env.GEMINI_API_KEY) {
+    console.error("GEMINI_TEXT_BACKEND=api needs GEMINI_API_KEY (.env).");
     process.exit(1);
   }
   const file = JSON.parse(readFileSync(join(ROOT, "evals/agent-cases.json"), "utf8")) as {
@@ -275,6 +277,7 @@ async function main() {
   const summary = {
     date: new Date(startedAt).toISOString(),
     model: modelId,
+    backend,
     thinkingLevel: thinking,
     evalClock: "14:00 KST",
     // Case ids given on the command line: a partial run, not a pass rate for the whole set.
@@ -292,7 +295,7 @@ async function main() {
     `# Agent evaluation ${stamp} (KST)`,
     "",
     ...(only.length > 0 ? [`**Partial run** of ${only.length} case(s), not the whole set.`, ""] : []),
-    `- Model: \`${modelId}\`, thinking level \`${thinking}\`, default temperature`,
+    `- Model: \`${modelId}\` on ${backend === "vertex" ? "Vertex AI" : "the Gemini API"}, thinking level \`${thinking}\`, default temperature`,
     `- Date: ${summary.date}; eval clock 14:00 KST; cases from \`evals/agent-cases.json\` (written by the KIBO team, not an external benchmark)`,
     `- Overall: **${passed}/${results.length} (${pct(passed, results.length || 1)})**`,
     `- Latency per request (${latency.requests} requests): median ${latency.totalMedianMs} ms, p90 ${latency.totalP90Ms} ms`,

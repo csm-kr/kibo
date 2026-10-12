@@ -45,6 +45,7 @@ KIBO is a public demo that must stay up for three weeks of judging, handles a (s
 
 ## Secrets and repo hygiene
 - Keys only in `.env` (git-ignored) or Secret Manager; never printed or logged.
+- The Cloud Run runtime service account `kibo-runtime` has only `datastore.user`, `secretmanager.secretAccessor` (the `gemini-api-key` secret) and, since 10-13, `aiplatform.user` (the text agent on Vertex AI, which needs no key).
 - Logs record tool names and results only; no utterances, no free-text reasons (they may contain health information).
 - Before the repo goes public: scan the full history with gitleaks.
 - A project hook (`scripts/hooks/guard_bash.py`) blocks destructive shell commands and reading `.env` during agent sessions.
@@ -54,4 +55,4 @@ KIBO is a public demo that must stay up for three weeks of judging, handles a (s
 - Phone heartbeat every 30 s; the kiosk shows "connection paused" after 60 s. Expiry is extended only when the user was active in the last 30 s; the kiosk corrects for server clock offset.
 - Live reconnect with a fresh token; GoAway handled; `/demo` falls back to text automatically.
 - Only one tab per phone holds a Live session (`navigator.locks`); [Try again] and `paid` close the Live session.
-- `/api/health` + Cloud Monitoring uptime check on `/api/health?deep=1` (store and both model ids) with email alerts to both team members. Model ids in environment variables.
+- `/api/health` + Cloud Monitoring uptime check on `/api/health?deep=1` (store, both model ids, a 1-token generation through the text backend and on the API key, and an ephemeral token) with email alerts to both team members. Model ids in environment variables.

@@ -1,7 +1,17 @@
-import { ApiError, GoogleGenAI, ThinkingLevel, type Content, type Part, type ToolListUnion } from "@google/genai";
+import {
+  ApiError,
+  GoogleGenAI,
+  ThinkingLevel,
+  type Content,
+  type GoogleGenAIOptions,
+  type Part,
+  type ToolListUnion,
+} from "@google/genai";
 import { CommandError } from "@/lib/commands/errors";
 
 // The text agent's model (ADR-011). Server only: GEMINI_API_KEY never leaves this module.
+// Since 10-13 the text agent runs on Vertex AI (billed to the GCP account, credentials from the runtime
+// service account or gcloud ADC); GEMINI_TEXT_BACKEND=api switches back to the Gemini API key for comparison.
 
 export interface ModelTurn {
   role: "user" | "model";
@@ -31,21 +41,46 @@ function thinkingLevel(): ThinkingLevel {
   return v !== undefined && Object.hasOwn(THINKING, v) ? THINKING[v] : ThinkingLevel.LOW;
 }
 
+export function textClientOptions(): GoogleGenAIOptions {
+  if (process.env.GEMINI_TEXT_BACKEND === "api") {
+    if (!process.env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not set");
+    return { apiKey: process.env.GEMINI_API_KEY };
+  }
+  // An explicit project and location make the SDK ignore any API key in the environment.
+  return {
+    vertexai: true,
+    project: process.env.GOOGLE_CLOUD_PROJECT || "kibo-2026",
+    location: process.env.GEMINI_VERTEX_LOCATION || "global",
+  };
+}
+
+let shared: { options: string; ai: GoogleGenAI } | null = null;
+
+/** One client per configuration, so Vertex reuses its access token instead of fetching one per request. */
+export function textGenAI(): GoogleGenAI {
+  const options = textClientOptions();
+  const key = JSON.stringify(options);
+  if (shared?.options !== key) shared = { options: key, ai: new GoogleGenAI(options) };
+  return shared.ai;
+}
+
 /** Upstream messages can hold request data, so callers only ever see these fixed ones. */
 function modelError(e: unknown): CommandError {
   if (e instanceof ApiError && e.status === 429) return new CommandError("RATE_LIMITED", "Please try again in a moment.");
-  console.error("model error:", e instanceof ApiError ? `ApiError ${e.status}` : e instanceof Error ? e.name : typeof e);
+  // HTTP 402: the Gemini API's prepaid credits are used up (seen 10-13, I-104).
+  if (e instanceof ApiError && e.status === 402) console.error("gemini billing error (402)");
+  else console.error("model error:", e instanceof ApiError ? `ApiError ${e.status}` : e instanceof Error ? e.name : typeof e);
   return new CommandError("UPSTREAM", "The assistant is not available right now. Please use the buttons or try again.");
 }
 
-/** `ai` is injectable for tests; production builds the client on first use, so a missing key is an UPSTREAM error. */
+/** `ai` is injectable for tests; production gets the shared client on first use, so a missing key is an UPSTREAM error. */
 export function geminiClient(ai?: Pick<GoogleGenAI, "models">): ModelClient {
   const model = process.env.GEMINI_TEXT_MODEL ?? "gemini-3.8-flash";
   return {
     async generate({ system, contents, tools }) {
       let res;
       try {
-        ai ??= new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+        ai ??= textGenAI();
         res = await ai.models.generateContent({
           model,
           // Gemini 3 returns thought signatures with function calls; the caller sends `content` back unchanged.

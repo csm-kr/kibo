@@ -285,7 +285,7 @@ stateDiagram-v2
 | `POST /api/chat` | Phone, `/demo` | Text agent (Gemini Flash function-calling loop) |
 | `GET /api/session/{id}/events` | Phone, kiosk, bridge, `/demo` | SSE stream: the public session JSON on connect and after every change; a comment line every 25 s keeps the connection open; `EventSource` reconnects when Cloud Run ends the request |
 | `POST /api/ping` | Phone, kiosk | 30 s heartbeat with an "active in the last 30 s" flag; the kiosk pings in touch-only sessions |
-| `GET /api/health` | Monitoring | Liveness; `?deep=1` also checks the store and that both Gemini model ids are served (uptime check, `docs/plan/OPERATIONS.md` "Deploy") |
+| `GET /api/health` | Monitoring | Liveness; `?deep=1` also checks the store, that both Gemini model ids are served, and that the text backend and the API key can still spend (uptime check, `docs/plan/OPERATIONS.md` "Deploy") |
 
 Pages: `/kiosk?k=<kioskId>` (`&demo=1` shows the tap counter and timer), `/assistant?s=<sessionId>#t=<claim>` (token in the fragment, removed from the URL right after claiming), `/demo` (creates a session with `demo: true` and claims it in the same page, so it holds both tokens), `/learned/<kiosk>/`, `/mic-test` (development only, not linked: microphone permission check on real phones).
 
@@ -318,7 +318,7 @@ Pages: `/kiosk?k=<kioskId>` (`&demo=1` shows the tap counter and timer), `/assis
 | `POST /api/chat` | `{ sessionId, chatRequestId (uuid), message (≤ 500 chars), history (last 10 turns of user and model text, kept on the phone; tool turns are rejected), utteranceSeq, cartVersion? (the version shown on the confirm card), locale }` + device token | `{ reply, status, cart, total, cartVersion }` after ≤ 5 tool rounds; choice buttons come from `pendingChoice` in the stream. One request is one user utterance: every command in it carries the request's `utteranceSeq`, so `confirmCheckout` is refused in the request that ran `requestCheckout` |
 | `POST /api/ping` | `{ sessionId, active }` | `{ status, expiresAt, serverTime }`; `active: true` extends the session; `serverTime` lets screens correct for clock offset |
 | `GET /api/session/{id}/events` | — | SSE; each change is `data: <public session JSON>`; an unknown or deleted session gets one `event: gone` (`data: {}`) and the stream closes, so the client should close its `EventSource`. If the server's Firestore listener fails, the stream ends without `gone` and `EventSource` reconnects |
-| `GET /api/health` | — | `{ ok, service, version, store, revision, time }`. With `?deep=1`: `{ ok, checks: { store, textModel, liveModel } }` (each `ok` or `fail`; a store `get` of an id that never exists must return null, `models.get` for each model id; 5 s timeout each, result cached 60 s per instance), 200 when all pass, else 503 |
+| `GET /api/health` | — | `{ ok, service, version, store, revision, time }`. With `?deep=1`: `{ ok, checks: { store, textModel, liveModel, textGenerate, keyGenerate, liveToken } }` (each `ok` or `fail`; a store `get` of an id that never exists must return null; `models.get` for each model id on the Gemini API (Vertex AI refuses it with 403); `textGenerate` and `keyGenerate`: a 1-output-token `generateContent` through the text backend and on the API key, which fail when billing does; `liveToken`: a one-use ephemeral token with a 60 s expiry, discarded. Lookups and tokens are free and kept passing with the key's credits used up, 10-13, I-104. 5 s timeout each, result cached 60 s per instance), 200 when all pass, else 503 |
 
 ### Commands and actors
 `type` in `/api/command`. The AI tools ("Agent tools" below) are the phone's commands; the kiosk adds touch and payment commands. On a learned kiosk the bridge in the kiosk page acts as the kiosk, with the `kioskToken`.
@@ -467,17 +467,19 @@ Anti-hallucination: names, prices and options exist only in menu data; the serve
 
 ## Region and secrets
 - Cloud Run and Firestore in `asia-northeast3`; always pass `--region` (local gcloud defaults elsewhere).
-- The app uses one Gemini API key from Secret Manager (ephemeral tokens are a Gemini API feature). The offline learner uses Vertex AI locally.
-- Dedicated runtime service account with only `datastore.user` and `secretmanager.secretAccessor`.
+- The text agent (`/api/chat`) runs on Vertex AI since 10-13 (`GEMINI_TEXT_BACKEND=vertex`, location `global`), billed to the GCP billing account, with the runtime service account's credentials; no key (I-104). Voice keeps one Gemini API key from Secret Manager, because ephemeral tokens are a Gemini API feature, so voice depends on that key's prepaid credits. The offline learner uses Vertex AI locally.
+- Dedicated runtime service account with only `datastore.user`, `secretmanager.secretAccessor` and `aiplatform.user`.
 
 ## Environment variables
 | Name | Where | Value |
 |---|---|---|
-| `GEMINI_API_KEY` | `.env` locally; Secret Manager `gemini-api-key` on Cloud Run | server only, never sent to a browser |
+| `GEMINI_API_KEY` | `.env` locally; Secret Manager `gemini-api-key` on Cloud Run | server only, never sent to a browser. Voice (ephemeral tokens), the deep health's key checks, and the text agent only with `GEMINI_TEXT_BACKEND=api` |
+| `GEMINI_TEXT_BACKEND` | env | `vertex` (default; Vertex AI with application default credentials: the runtime service account on Cloud Run, `gcloud auth application-default login` locally) or `api` (the Gemini API key, for comparison) |
+| `GEMINI_VERTEX_LOCATION` | env | Vertex AI location for the text agent, default `global` |
 | `GEMINI_TEXT_MODEL`, `GEMINI_LIVE_MODEL` | env | ADR-011 |
 | `GEMINI_TEXT_THINKING` | env | text agent thinking level: `low` (default), `medium` or `high`; `gemini-3.8-flash` rejects `minimal`. `low` was chosen for latency (I-059, `evals/results/2026-10-13T01-38.md`); temperature stays the model default |
 | `STORE` | env | `firestore` (default when `NODE_ENV=production`) or `memory` (default otherwise; tests, local E2E, `npm run qa:ui`). In production `memory` is refused unless `ALLOW_MEMORY_STORE=1` (single instance only) |
-| `GOOGLE_CLOUD_PROJECT` | env | `kibo-2026`; locally the Admin SDK uses gcloud application default credentials |
+| `GOOGLE_CLOUD_PROJECT` | env | `kibo-2026` (also the Vertex AI project); locally the Admin SDK uses gcloud application default credentials |
 
 ## State management
 - Shared order state: Firestore session document (server-written).

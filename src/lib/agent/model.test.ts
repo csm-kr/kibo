@@ -1,7 +1,44 @@
 import { ApiError, type GoogleGenAI } from "@google/genai";
 import { describe, expect, it, vi } from "vitest";
 import { CommandError } from "@/lib/commands/errors";
-import { geminiClient } from "./model";
+import { geminiClient, textClientOptions } from "./model";
+
+describe("textClientOptions", () => {
+  it("defaults to Vertex AI with application default credentials: project kibo-2026, location global, no key", () => {
+    vi.stubEnv("GEMINI_TEXT_BACKEND", "");
+    vi.stubEnv("GOOGLE_CLOUD_PROJECT", "");
+    vi.stubEnv("GEMINI_VERTEX_LOCATION", "");
+    vi.stubEnv("GEMINI_API_KEY", "key-that-must-not-be-used");
+    try {
+      expect(textClientOptions()).toEqual({ vertexai: true, project: "kibo-2026", location: "global" });
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it("Vertex project and location come from GOOGLE_CLOUD_PROJECT and GEMINI_VERTEX_LOCATION", () => {
+    vi.stubEnv("GEMINI_TEXT_BACKEND", "vertex");
+    vi.stubEnv("GOOGLE_CLOUD_PROJECT", "other-project");
+    vi.stubEnv("GEMINI_VERTEX_LOCATION", "asia-northeast3");
+    try {
+      expect(textClientOptions()).toEqual({ vertexai: true, project: "other-project", location: "asia-northeast3" });
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it("GEMINI_TEXT_BACKEND=api uses the Gemini API key; without a key it throws", () => {
+    vi.stubEnv("GEMINI_TEXT_BACKEND", "api");
+    vi.stubEnv("GEMINI_API_KEY", "k");
+    try {
+      expect(textClientOptions()).toEqual({ apiKey: "k" });
+      vi.stubEnv("GEMINI_API_KEY", "");
+      expect(() => textClientOptions()).toThrow("GEMINI_API_KEY is not set");
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+});
 
 const REQ = { system: "sys", contents: [{ role: "user" as const, parts: [{ text: "hi" }] }], tools: [] };
 
@@ -72,8 +109,21 @@ describe("geminiClient", () => {
     expect(err2.message).not.toContain("secret");
   });
 
-  it("without GEMINI_API_KEY the real client is UPSTREAM with the plain message", async () => {
+  it("HTTP 402 (prepaid credits used up) → UPSTREAM, logged as a billing error without the body", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    const billing = geminiClient(fakeAi(async () => Promise.reject(new ApiError({ message: "credits for AIza-secret", status: 402 }))));
+    const err = await billing.generate(REQ).catch((e) => e);
+    expect(err).toMatchObject({
+      code: "UPSTREAM",
+      message: "The assistant is not available right now. Please use the buttons or try again.",
+    });
+    expect(log).toHaveBeenCalledWith("gemini billing error (402)");
+    expect(JSON.stringify(log.mock.calls)).not.toContain("AIza");
+  });
+
+  it("with GEMINI_TEXT_BACKEND=api and no GEMINI_API_KEY the real client is UPSTREAM with the plain message", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.stubEnv("GEMINI_TEXT_BACKEND", "api");
     vi.stubEnv("GEMINI_API_KEY", "");
     try {
       const err = await geminiClient().generate(REQ).catch((e) => e);

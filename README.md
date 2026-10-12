@@ -181,10 +181,11 @@ The KIBO Learn runs above predate the learner's finish gate (≥ 3 passing self-
 Needs Node 24.
 ```bash
 npm ci
-echo "GEMINI_API_KEY=<your key>" > .env   # git-ignored; never commit it
+echo "GEMINI_API_KEY=<your key>" > .env   # git-ignored; never commit it; used for voice
+gcloud auth application-default login      # the text agent runs on Vertex AI (project kibo-2026)
 npm run dev                                # http://localhost:3000, in-memory store by default
 ```
-Without a key the screens run, but the AI answers with an error.
+Without a key voice answers with an error; without Vertex AI credentials the text agent does. `GEMINI_TEXT_BACKEND=api` in `.env` runs the text agent on the key instead.
 
 Tests:
 ```bash
@@ -192,7 +193,7 @@ npm test                # unit tests (Vitest)
 npm run test:e2e        # Playwright E2E, in-memory store, no model calls
 npm run test:e2e:live   # @live tests against real Gemini (needs GEMINI_API_KEY)
 npm run qa:ui           # UI checks: axe, sizes, reflow, screenshots
-npm run eval:agent      # agent evaluation against real Gemini (needs GEMINI_API_KEY)
+npm run eval:agent      # agent evaluation against real Gemini on Vertex AI (gcloud ADC)
 ```
 
 Deploy (needs gcloud and access to the project; the API key comes from Secret Manager):
