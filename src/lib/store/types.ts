@@ -12,6 +12,9 @@ export interface SessionSecrets {
    * `reissueClaim` is stored with an empty result: the claim token itself is never kept. Absent until the first one.
    */
   recentResults?: { commandId: string; result: CommandResult }[];
+  /** Per-session limits (ARCHITECTURE "Limits and cost"); absent until the first bump. */
+  chatCount?: number;
+  liveTokenCount?: number;
   /** Epoch ms. */
   createdAt: number;
   expiresAt: number;

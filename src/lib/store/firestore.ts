@@ -9,7 +9,7 @@ type FirestoreModule = typeof import("firebase-admin/firestore");
 
 export type Loaded = { db: Firestore; fs: FirestoreModule };
 
-async function connect(): Promise<Loaded> {
+export async function connect(): Promise<Loaded> {
   const app = await import("firebase-admin/app");
   const fs = await import("firebase-admin/firestore");
   // Application default credentials; project from GOOGLE_CLOUD_PROJECT or the credentials' default.

@@ -204,3 +204,23 @@ export async function ping(
   });
   return { ...unwrap(out), serverTime: now };
 }
+
+/**
+ * Counts one use of a per-session limit in sessionSecrets, where no client can see or change it.
+ * Only the phone may use it. At the limit nothing is written and `allowed` is false.
+ */
+export async function bumpSessionCounter(
+  store: SessionStore,
+  input: { sessionId: string; bearer: string | null; field: "chatCount" | "liveTokenCount"; limit: number },
+  now: number,
+): Promise<{ allowed: boolean; session: Session }> {
+  const out = await store.transact<Outcome<{ allowed: boolean; session: Session }>>(input.sessionId, (s, sec) => {
+    if (!s || !sec) throw new CommandError("NOT_FOUND", NOT_FOUND);
+    if (actorFor(input.bearer, sec) !== "phone") throw new CommandError("FORBIDDEN", "Please use the phone for this.");
+    if (isExpired(s, now)) return expire(s);
+    const count = sec[input.field] ?? 0;
+    if (count >= input.limit) return { value: { ok: { allowed: false, session: s } } };
+    return { secrets: { ...sec, [input.field]: count + 1 }, value: { ok: { allowed: true, session: s } } };
+  });
+  return unwrap(out);
+}

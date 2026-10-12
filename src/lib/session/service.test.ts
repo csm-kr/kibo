@@ -4,7 +4,7 @@ import { SESSION_TTL_MS } from "@/lib/commands/session";
 import { MemoryStore } from "@/lib/store/memory";
 import { hashToken } from "@/lib/tokens";
 import type { Session } from "@/types/session";
-import { claimSession, createSession, ping, runCommand } from "./service";
+import { bumpSessionCounter, claimSession, createSession, ping, runCommand } from "./service";
 
 /** 2026-10-12 14:00 KST */
 const T0 = Date.UTC(2026, 9, 12, 5, 0);
@@ -294,5 +294,31 @@ describe("ping", () => {
     const { store, sessionId } = await setup();
     expect(await code(ping(store, { sessionId, bearer: null, active: true }, T0))).toBe("UNAUTHORIZED");
     expect(await code(ping(store, { sessionId: "nope", bearer: "x", active: true }, T0))).toBe("NOT_FOUND");
+  });
+});
+
+describe("bumpSessionCounter", () => {
+  it("counts per session in sessionSecrets and refuses at the limit without writing", async () => {
+    const { store, sessionId, claimToken } = await setup();
+    const { deviceToken } = await claimSession(store, { sessionId, claimToken }, T0);
+    const bump = () => bumpSessionCounter(store, { sessionId, bearer: deviceToken, field: "chatCount", limit: 2 }, T0 + 1);
+    expect((await bump()).allowed).toBe(true);
+    const second = await bump();
+    expect(second.allowed).toBe(true);
+    expect(second.session.sessionId).toBe(sessionId);
+    expect((await bump()).allowed).toBe(false);
+    const sec = await store.transact(sessionId, (_s, sec) => ({ value: sec }));
+    expect(sec?.chatCount).toBe(2);
+  });
+
+  it("only the phone may use it; unknown NOT_FOUND, expired GONE", async () => {
+    const { store, sessionId, claimToken, kioskToken } = await setup();
+    const { deviceToken } = await claimSession(store, { sessionId, claimToken }, T0);
+    const input = (bearer: string | null, id = sessionId) => ({ sessionId: id, bearer, field: "chatCount" as const, limit: 60 });
+    expect(await code(bumpSessionCounter(store, input(kioskToken), T0))).toBe("FORBIDDEN");
+    expect(await code(bumpSessionCounter(store, input(null), T0))).toBe("UNAUTHORIZED");
+    expect(await code(bumpSessionCounter(store, input(deviceToken, "nope"), T0))).toBe("NOT_FOUND");
+    expect(await code(bumpSessionCounter(store, input(deviceToken), T0 + SESSION_TTL_MS + 1))).toBe("GONE");
+    expect((await store.get(sessionId))?.status).toBe("expired");
   });
 });
