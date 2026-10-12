@@ -16,6 +16,7 @@ export function KioskApp({ kiosk, demo }: { kiosk: KioskData; demo: boolean }) {
         kioskToken={ks.kioskToken}
         claimUrl={ks.claimUrl}
         demo={demo}
+        clockOffset={ks.clockOffset}
         onNewSession={() => void ks.newSession()}
         onClaimUrl={ks.setClaimUrl}
       />

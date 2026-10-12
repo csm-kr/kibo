@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, type CSSProperties, type ReactNode } from "react";
+import { useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { useQrSrc } from "@/hooks/useQrSrc";
 import { ApiError, sendCommand, type CommandReply } from "@/lib/client/api";
 import type { ErrorDetail } from "@/lib/commands/errors";
@@ -11,7 +11,12 @@ import { kt } from "@/lib/i18n/kiosk";
 import { kioskScreen } from "@/lib/kiosk/screen";
 import type { KioskData, Locale } from "@/types/menu";
 import type { DineOption, Session } from "@/types/session";
+import { DemoCounter } from "./DemoCounter";
+import { DoneScreen } from "./DoneScreen";
+import { KioskBanners } from "./KioskBanners";
 import { MenuScreen } from "./MenuScreen";
+import { PaymentScreen } from "./PaymentScreen";
+import { ReviewScreen } from "./ReviewScreen";
 import { FOCUS } from "./styles";
 
 // All sizes are 1080x1920 canvas px (docs/UI_GUIDE.md). Text uses the k-text-* utilities (>= 40px).
@@ -22,28 +27,43 @@ interface Props {
   kioskToken: string | null;
   claimUrl: string | null;
   demo: boolean;
+  /** Server time minus local time, from ping; session times are server time. */
+  clockOffset: number;
   /** Called when the session has ended or vanished; the owner decides how to get a new one. */
   onNewSession(): void;
   /** [Connect another phone] issued a new QR; the owner stores it. */
   onClaimUrl(claimUrl: string): void;
 }
 
-export function KioskScreen({ kiosk, session, kioskToken, claimUrl, demo, onNewSession, onClaimUrl }: Props) {
+export function KioskScreen({ kiosk, session, kioskToken, claimUrl, demo, clockOffset, onNewSession, onClaimUrl }: Props) {
   const locale = kiosk.locale;
   const sessionId = session?.sessionId ?? null;
   // Keyed by session, so a new session starts without the previous one's touch start.
   const [touch, setTouch] = useState<{ forId: string | null; started: boolean }>({ forId: null, started: false });
   const [large, setLarge] = useState(false);
   const [error, setError] = useState<{ code: ScreenErrorCode; detail?: ErrorDetail } | null>(null);
+  // Demo counters: taps on buttons after K1 and the time from the first of them, keyed by session.
+  const [taps, setTaps] = useState<{ forId: string | null; count: number; startAt: number | null }>({
+    forId: null,
+    count: 0,
+    startAt: null,
+  });
 
   const touchStarted = touch.forId === sessionId && touch.started;
   const screen = kioskScreen(session, { touchStarted });
 
   /** Sends a touch command; on failure shows the error copy and returns null. */
-  async function send(type: CommandType, args: object): Promise<CommandReply | null> {
+  async function send(type: CommandType, args: object, opts?: { cartVersion?: number }): Promise<CommandReply | null> {
     if (!session || !kioskToken) return null;
     try {
-      const reply = await sendCommand({ sessionId: session.sessionId, token: kioskToken, type, args, source: "touch" });
+      const reply = await sendCommand({
+        sessionId: session.sessionId,
+        token: kioskToken,
+        type,
+        args,
+        source: "touch",
+        cartVersion: opts?.cartVersion,
+      });
       setError(null);
       return reply;
     } catch (e) {
@@ -59,10 +79,25 @@ export function KioskScreen({ kiosk, session, kioskToken, claimUrl, demo, onNewS
     if (!(await send("startTouch", {}))) setTouch({ forId: sessionId, started: false });
   }
 
+  const counted = taps.forId === sessionId ? taps : { count: 0, startAt: null };
+
+  function countTap(e: PointerEvent) {
+    // Counting stops at `paid`, so the receipt and countdown screens do not add to the comparison.
+    if (!demo || screen === "attract" || screen === "done") return;
+    if (!(e.target instanceof Element) || !e.target.closest("button:not(:disabled)")) return;
+    setTaps({ forId: sessionId, count: counted.count + 1, startAt: counted.startAt ?? Date.now() });
+  }
+
   const style = { "--k-fs": large ? 1.15 : 1 } as CSSProperties;
 
   return (
-    <div className="relative flex h-full flex-col" style={style} data-screen={screen} data-demo={demo || undefined}>
+    <div
+      className="relative flex h-full flex-col"
+      style={style}
+      data-screen={screen}
+      data-demo={demo || undefined}
+      onPointerDownCapture={countTap}
+    >
       {screen === "attract" ? (
         <Attract
           kiosk={kiosk}
@@ -74,21 +109,31 @@ export function KioskScreen({ kiosk, session, kioskToken, claimUrl, demo, onNewS
         />
       ) : screen === "menu" && session ? (
         <MenuScreen kiosk={kiosk} session={session} claimUrl={claimUrl} send={send} onClaimUrl={onClaimUrl} />
+      ) : screen === "review" && session ? (
+        <ReviewScreen kiosk={kiosk} session={session} claimUrl={claimUrl} send={send} onClaimUrl={onClaimUrl} />
+      ) : screen === "payment" && session ? (
+        <PaymentScreen kiosk={kiosk} session={session} claimUrl={claimUrl} send={send} onClaimUrl={onClaimUrl} />
+      ) : screen === "done" && session ? (
+        <DoneScreen key={session.sessionId} kiosk={kiosk} session={session} clockOffset={clockOffset} onNewSession={onNewSession} />
       ) : (
         <>
           <Header kiosk={kiosk} />
-          {screen === "dine" ? (
-            <Dine
-              kiosk={kiosk}
-              phoneConnected={session?.phoneConnectedAt != null}
-              onPick={(option: DineOption) => void send("setDineOption", { option })}
-            />
-          ) : (
-            <p className="k-text-48 flex flex-1 items-center justify-center px-16 text-center text-[#4B463F]">
-              {kt("screenSoon", locale)}
-            </p>
-          )}
+          <Dine
+            kiosk={kiosk}
+            phoneConnected={session?.phoneConnectedAt != null}
+            onPick={(option: DineOption) => void send("setDineOption", { option })}
+          />
         </>
+      )}
+      {session && <KioskBanners kiosk={kiosk} session={session} kioskToken={kioskToken} clockOffset={clockOffset} />}
+      {demo && (
+        <DemoCounter
+          key={sessionId}
+          locale={locale}
+          taps={counted.count}
+          startAt={counted.startAt}
+          paid={screen === "done"}
+        />
       )}
       {error && (
         <div
@@ -96,6 +141,20 @@ export function KioskScreen({ kiosk, session, kioskToken, claimUrl, demo, onNewS
           className="absolute inset-x-12 bottom-12 z-40 flex items-center gap-8 rounded-[32px] border-4 border-[#7A2E0E] bg-[#FFF1CC] p-10 text-[#7A2E0E]"
         >
           <p className="k-text-40 flex-1 font-bold">{errorCopy(error.code, locale, error.detail)}</p>
+          {error.detail?.templateId === "pick_dine" &&
+            // [주문하기] without a dine option (a phone added items first): answer here, then order again (I-034).
+            (["eat_in", "take_out"] as const).map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={async () => {
+                  if (await send("setDineOption", { option })) void send("requestCheckout", {});
+                }}
+                className={`k-text-40 min-h-22 rounded-full bg-(--k-primary) px-10 font-bold text-white ${FOCUS}`}
+              >
+                {kiosk.dineOptions[option].name[locale]}
+              </button>
+            ))}
           <button
             type="button"
             onClick={() => setError(null)}

@@ -29,7 +29,10 @@
     {
       "step": 3,
       "name": "kiosk-checkout",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-12T23:35:40+0900",
+      "completed_at": "2026-10-12T23:42:42+0900",
+      "summary": "K6/K7/K8/KX + demo counters. src/lib/kiosk/timers.ts (18 tests): idleWarning (last 60 s, only connected/ordering/confirming/paying), phonePaused (phoneSeenAt, else phoneConnectedAt, > 60 s; not in paid/expired), staffBannerVisible (60 s), doneCountdown (10 s); all take server time = now + clockOffset. hooks/useNow.ts (1 s clock). components/kiosk: KioskToolbar (dine chip + small QR/QrSheet or 'phone connected' + [다른 휴대폰 연결], hidden in paying/paid; moved out of MenuScreen) on K3/K6/K7; ReviewScreen (lines with photo, -/+ updateCart, - at 1 opens remove dialog -> removeFromCart, dine option, total k-text-72 Space Grotesk, [메뉴 더 담기]=cancelCheckout, [결제하기]=confirmCheckout touch with session cartVersion, one command at a time); PaymentScreen (method: 카드 enabled, 간편결제/쿠폰 disabled '지원하지 않아요'; insert: slot drawing + arrow + k-card-insert 0.5 s alternate slide (globals.css, none under reduced motion) + [카드 넣기]; approving 1.5 s then cardAction, back to insert on error; [주문 수정]=editOrder in method/insert; total always shown); DoneScreen (receipt question with its own visible 10 s countdown that moves on to the number, never to K1; order number 240px; role=timer '10초 후 처음 화면으로 돌아가요' counted from when the number appears; calls onNewSession once at 0); KioskBanners (staff by reasonCode, phone paused, idle alertdialog with [계속하기] = ping active:true; fixed copy in i18n/kiosk.ts); DemoCounter (demo=1 only, taps = pointerdown on enabled buttons outside K1 and K8, time from first such tap, frozen at paid, data-taps/data-seconds, data-demo-counter). KioskScreen: new prop clockOffset (KioskApp passes ks.clockOffset), send(type,args,{cartVersion}), screenSoon placeholder removed, I-034 fixed (pick_dine error bar shows dine buttons -> setDineOption then requestCheckout). I-036 logged (K6 qty change returns to K3, server rule). API smoke test passed (touch order through editOrder to paid, /kiosk 200). Not viewed in a browser yet (Playwright in step 5)."
     },
     {
       "step": 4,

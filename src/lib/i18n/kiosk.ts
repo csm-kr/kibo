@@ -20,7 +20,6 @@ const KIOSK_TEXT = {
     ko: "휴대폰이 연결됐어요. 휴대폰에서 주문하거나 여기서 눌러도 돼요.",
     en: "Your phone is connected. Order on your phone, or tap here.",
   },
-  screenSoon: { ko: "이 화면은 준비 중이에요", en: "This screen is coming soon" },
   close: { ko: "닫기", en: "Close" },
   // K3 menu
   dineChip: { ko: "매장", en: "Eat here" },
@@ -67,6 +66,44 @@ const KIOSK_TEXT = {
   upsellTitle: { ko: "디저트도 함께 드릴까요?", en: "Would you like a dessert too?" },
   upsellAdd: { ko: "추가", en: "Add" },
   upsellNo: { ko: "괜찮아요", en: "No, thanks" },
+  // K6 review
+  reviewTitle: { ko: "주문 내역을 확인해 주세요", en: "Please check your order" },
+  dineLabel: { ko: "식사 장소", en: "Where" },
+  dineNotSet: { ko: "아직 고르지 않았어요", en: "Not chosen yet" },
+  total: { ko: "총 결제 금액", en: "Total" },
+  pickMore: { ko: "메뉴 더 담기", en: "Pick more" },
+  pay: { ko: "결제하기", en: "Pay" },
+  removeAsk: { ko: "이 메뉴를 뺄까요?", en: "Remove this item?" },
+  removeYes: { ko: "빼기", en: "Remove" },
+  // K7 payment
+  payMethodTitle: { ko: "결제 방법을 골라 주세요", en: "Choose how to pay" },
+  payCard: { ko: "카드", en: "Card" },
+  payEasy: { ko: "간편결제", en: "Mobile pay" },
+  payCoupon: { ko: "쿠폰", en: "Coupon" },
+  notSupported: { ko: "지원하지 않아요", en: "Not supported" },
+  insertCard: { ko: "카드를 아래 투입구에 넣어 주세요", en: "Insert your card below" },
+  insertCardButton: { ko: "카드 넣기", en: "Insert card" },
+  virtualPayment: { ko: "체험용 결제예요. 실제로 결제되지 않아요.", en: "Practice payment. Nothing is charged." },
+  approving: { ko: "승인 중…", en: "Approving…" },
+  editOrder: { ko: "주문 수정", en: "Edit order" },
+  // K8 done
+  receiptQuestion: { ko: "영수증을 출력할까요?", en: "Print a receipt?" },
+  receiptYes: { ko: "출력", en: "Print" },
+  receiptNo: { ko: "출력 안 함", en: "No receipt" },
+  orderNumber: { ko: "주문 번호", en: "Order number" },
+  pickupHint: { ko: "번호를 부르면 카운터에서 받아 가세요", en: "We'll call your number at the counter" },
+  // KX banners
+  staffCalled: { ko: "직원을 불렀어요. 잠시만 기다려 주세요.", en: "Staff is on the way. Please wait a moment." },
+  staffMismatch: {
+    ko: "키오스크 화면을 확인해 주세요. 직원을 불렀어요.",
+    en: "Please check the kiosk screen. Staff is on the way.",
+  },
+  phonePaused: {
+    ko: "휴대폰 연결이 잠시 끊겼어요. 화면을 눌러 계속할 수 있어요.",
+    en: "The phone connection paused. You can keep going by touch.",
+  },
+  idleQuestion: { ko: "계속 주문하시겠어요?", en: "Still ordering?" },
+  idleContinue: { ko: "계속하기", en: "Continue" },
 } satisfies Record<string, Record<Locale, string>>;
 
 export type KioskTextKey = keyof typeof KIOSK_TEXT;
@@ -86,6 +123,26 @@ export function stepLabel(step: { index: number; count: number; label: string },
   return locale === "ko"
     ? `${step.index}/${step.count} 단계 · ${step.label}`
     : `Step ${step.index} of ${step.count} · ${step.label}`;
+}
+
+/** "10초 후 처음 화면으로 돌아가요" */
+export function backInSeconds(seconds: number, locale: Locale): string {
+  return locale === "ko" ? `${seconds}초 후 처음 화면으로 돌아가요` : `Back to the start in ${seconds} s`;
+}
+
+/** "10초 후 주문 번호로 넘어가요": nobody answered the receipt question. */
+export function receiptInSeconds(seconds: number, locale: Locale): string {
+  return locale === "ko" ? `${seconds}초 후 주문 번호로 넘어가요` : `Showing your number in ${seconds} s`;
+}
+
+/** Demo-only counter (`&demo=1`): "터치 12번 · 34초". */
+export function demoCounterText(taps: number, seconds: number, locale: Locale): string {
+  return locale === "ko" ? `터치 ${taps}번 · ${seconds}초` : `${taps} taps · ${seconds} s`;
+}
+
+/** "45초 남았어요" */
+export function secondsLeftText(seconds: number, locale: Locale): string {
+  return locale === "ko" ? `${seconds}초 남았어요` : `${seconds} s left`;
 }
 
 export function variantWord(variant: Variant, locale: Locale): string {

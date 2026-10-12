@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { useQrSrc } from "@/hooks/useQrSrc";
 import type { CommandReply } from "@/lib/client/api";
 import { findItem, isAvailableNow } from "@/lib/adapters/catalog";
 import type { CommandType } from "@/lib/commands/schemas";
@@ -12,6 +11,7 @@ import type { KioskData, MenuItem } from "@/types/menu";
 import type { CartLine, ChangeKind, LineInput, Session } from "@/types/session";
 import { CartBar } from "./CartBar";
 import { Header } from "./KioskScreen";
+import { KioskToolbar } from "./KioskToolbar";
 import { ProductSheet } from "./ProductSheet";
 import { UpsellPopup } from "./UpsellPopup";
 import { FOCUS, SCRIM } from "./styles";
@@ -66,7 +66,6 @@ export function MenuScreen(props: {
   const [category, setCategory] = useState(session.screen.category ?? kiosk.categories[0].categoryId);
   const [sheetItem, setSheetItem] = useState<MenuItem | null>(null);
   const [upsell, setUpsell] = useState<string[] | null>(null);
-  const [qrOpen, setQrOpen] = useState(false);
   const [clearOpen, setClearOpen] = useState(false);
   const [pending, setPending] = useState<Pending[]>([]);
   const [recentTouch, setRecentTouch] = useState(false);
@@ -121,14 +120,6 @@ export function MenuScreen(props: {
     if (offerUpsell && reply.result?.upsell) setUpsell(reply.result.upsell.offerItemIds);
   }
 
-  async function connectOtherPhone() {
-    const reply = await send("reissueClaim", {});
-    if (reply?.claimUrl) {
-      props.onClaimUrl(reply.claimUrl);
-      setQrOpen(true);
-    }
-  }
-
   const shownPending = pending.filter((p) => p.version === null || session.cartVersion < p.version);
   const lines = [
     ...session.cart.map((line) => ({ line, pending: false })),
@@ -137,37 +128,11 @@ export function MenuScreen(props: {
   // Preview only; the server's total is the truth once the stream catches up.
   const total = session.total + shownPending.reduce((sum, p) => sum + p.line.unitPrice * p.line.qty, 0);
   const items = kiosk.items.filter((i) => i.category === category);
-  const phoneConnected = session.phoneConnectedAt !== null;
 
   return (
     <div className="relative flex h-full flex-col" onPointerDownCapture={onTouch}>
       <Header kiosk={kiosk} />
-      <div className="flex h-28 flex-none items-center justify-between gap-6 bg-[#F3EEE4] px-12">
-        {session.dineOption ? (
-          <span className="k-text-40 rounded-full bg-(--k-primary) px-8 py-2 font-bold text-white">
-            {kt(session.dineOption === "eat_in" ? "dineChip" : "takeOutChip", locale)}
-          </span>
-        ) : (
-          <span />
-        )}
-        {phoneConnected ? (
-          <div className="flex items-center gap-6">
-            <span className="k-text-40 flex items-center gap-3 font-bold text-(--k-primary-dark)">
-              <PhoneIcon />
-              {kt("phoneConnectedShort", locale)}
-            </span>
-            <button
-              type="button"
-              onClick={() => void connectOtherPhone()}
-              className={`k-text-40 min-h-22 rounded-full border-4 border-[#1E1B18] bg-white px-8 font-bold ${FOCUS}`}
-            >
-              {kt("connectOtherPhone", locale)}
-            </button>
-          </div>
-        ) : (
-          <SmallQrButton claimUrl={props.claimUrl} label={kt("openQr", locale)} onOpen={() => setQrOpen(true)} />
-        )}
-      </div>
+      <KioskToolbar kiosk={kiosk} session={session} claimUrl={props.claimUrl} send={send} onClaimUrl={props.onClaimUrl} />
 
       <div className="relative flex min-h-0 flex-1">
         <nav aria-label={kt("categories", locale)} className="flex w-65 flex-none flex-col gap-2 overflow-y-auto bg-[#F3EEE4] py-4">
@@ -253,7 +218,6 @@ export function MenuScreen(props: {
           }}
         />
       )}
-      {qrOpen && <QrSheet kiosk={kiosk} claimUrl={props.claimUrl} onClose={() => setQrOpen(false)} />}
       {clearOpen && (
         <ConfirmClear
           kiosk={kiosk}
@@ -306,73 +270,6 @@ function ProductTile(props: { kiosk: KioskData; item: MenuItem; available: boole
         </span>
       </span>
     </button>
-  );
-}
-
-function PhoneIcon() {
-  return (
-    <svg width="48" height="48" viewBox="0 0 24 24" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-      <rect x="6" y="2.5" width="12" height="19" rx="2.5" />
-      <path d="M10.5 18h3" />
-    </svg>
-  );
-}
-
-/** Flow B: the small QR on the menu; tapping it shows the QR large. The cart is kept when a phone joins. */
-function SmallQrButton(props: { claimUrl: string | null; label: string; onOpen(): void }) {
-  const src = useQrSrc(props.claimUrl);
-  return (
-    <button
-      type="button"
-      onClick={props.onOpen}
-      disabled={!props.claimUrl}
-      className={`k-text-40 flex min-h-22 items-center gap-4 rounded-full border-4 border-(--k-primary) bg-white py-1 pr-8 pl-2 font-bold text-(--k-primary-dark) ${FOCUS}`}
-    >
-      {src ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={src} alt="" width={72} height={72} className="size-18 rounded-full" />
-      ) : (
-        <span className="size-18" />
-      )}
-      {props.label}
-    </button>
-  );
-}
-
-function QrSheet(props: { kiosk: KioskData; claimUrl: string | null; onClose(): void }) {
-  const locale = props.kiosk.locale;
-  const src = useQrSrc(props.claimUrl);
-  return (
-    <div className={`${SCRIM} flex items-center justify-center p-12`} onClick={props.onClose}>
-      <section
-        role="dialog"
-        aria-modal
-        aria-labelledby="qr-title"
-        onClick={(e) => e.stopPropagation()}
-        className="flex w-full flex-col items-center gap-10 rounded-[48px] bg-(--k-bg) p-12 text-center"
-      >
-        <h2 id="qr-title" className="k-text-56 font-bold">
-          {kt("qrSheetTitle", locale)}
-        </h2>
-        {src && props.claimUrl ? (
-          // A data URL, so next/image would add nothing.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={src} alt={kt("qrAlt", locale)} data-claim-url={props.claimUrl} width={600} height={600} className="size-150" />
-        ) : (
-          <p className="k-text-40 flex size-150 items-center justify-center rounded-[32px] bg-[#F3EEE4] p-8 text-[#4B463F]">
-            {kt("qrLoading", locale)}
-          </p>
-        )}
-        <p className="k-text-40 text-[#4B463F]">{kt("qrSheetHint", locale)}</p>
-        <button
-          type="button"
-          onClick={props.onClose}
-          className={`k-text-48 min-h-32 w-full rounded-full border-4 border-[#1E1B18] bg-white font-bold ${FOCUS}`}
-        >
-          {kt("close", locale)}
-        </button>
-      </section>
-    </div>
   );
 }
 
