@@ -1,0 +1,182 @@
+{
+ "gemini-flash-batch": {
+  "clips": [
+   "ko01_kore_clean",
+   "ko04_kore_clean",
+   "ko07_kore_clean",
+   "ko10_kore_clean",
+   "ko13_kore_clean",
+   "ko16_kore_clean",
+   "ko19_kore_clean",
+   "en02_kore_clean",
+   "en05_kore_clean",
+   "en08_kore_clean"
+  ],
+  "latencyMs": [
+   3258,
+   2815,
+   2081,
+   2836,
+   2441,
+   3006,
+   2503,
+   1921,
+   2543,
+   2221
+  ],
+  "medianMs": 2523,
+  "minMs": 1921,
+  "maxMs": 3258,
+  "at": "2026-10-12T20:52:11.644Z"
+ },
+ "chirp3": {
+  "clips": [
+   "ko01_kore_clean",
+   "ko04_kore_clean",
+   "ko07_kore_clean",
+   "ko10_kore_clean",
+   "ko13_kore_clean",
+   "ko16_kore_clean",
+   "ko19_kore_clean",
+   "en02_kore_clean",
+   "en05_kore_clean",
+   "en08_kore_clean"
+  ],
+  "latencyMs": [
+   3377,
+   1623,
+   1894,
+   1616,
+   2135,
+   2432,
+   1520,
+   2265,
+   1993,
+   1398
+  ],
+  "medianMs": 1944,
+  "minMs": 1398,
+  "maxMs": 3377,
+  "at": "2026-10-12T20:52:32.603Z"
+ },
+ "chirp3-hints": {
+  "clips": [
+   "ko01_kore_clean",
+   "ko04_kore_clean",
+   "ko07_kore_clean",
+   "ko10_kore_clean",
+   "ko13_kore_clean",
+   "ko16_kore_clean",
+   "ko19_kore_clean",
+   "en02_kore_clean",
+   "en05_kore_clean",
+   "en08_kore_clean"
+  ],
+  "latencyMs": [
+   2325,
+   2498,
+   1832,
+   1688,
+   1203,
+   1650,
+   2355,
+   1217,
+   1255,
+   1373
+  ],
+  "medianMs": 1669,
+  "minMs": 1203,
+  "maxMs": 2498,
+  "at": "2026-10-12T20:52:50.026Z"
+ },
+ "openai-batch": {
+  "clips": [
+   "ko01_kore_clean",
+   "ko04_kore_clean",
+   "ko07_kore_clean",
+   "ko10_kore_clean",
+   "ko13_kore_clean",
+   "ko16_kore_clean",
+   "ko19_kore_clean",
+   "en02_kore_clean",
+   "en05_kore_clean",
+   "en08_kore_clean"
+  ],
+  "latencyMs": [
+   1556,
+   629,
+   902,
+   855,
+   713,
+   816,
+   761,
+   668,
+   638,
+   754
+  ],
+  "medianMs": 758,
+  "minMs": 629,
+  "maxMs": 1556,
+  "at": "2026-10-12T20:52:58.333Z"
+ },
+ "mai-transcribe-2-hints": {
+  "clips": [
+   "ko01_kore_clean",
+   "ko04_kore_clean",
+   "ko07_kore_clean",
+   "ko10_kore_clean",
+   "ko13_kore_clean",
+   "ko16_kore_clean",
+   "ko19_kore_clean",
+   "en02_kore_clean",
+   "en05_kore_clean",
+   "en08_kore_clean"
+  ],
+  "latencyMs": [
+   4259,
+   2280,
+   472,
+   6159,
+   535,
+   2832,
+   30226,
+   1191,
+   26612,
+   5460
+  ],
+  "medianMs": 3546,
+  "minMs": 472,
+  "maxMs": 30226,
+  "at": "2026-10-12T21:39:34.007Z"
+ },
+ "mai-transcribe-2": {
+  "clips": [
+   "ko01_kore_clean",
+   "ko04_kore_clean",
+   "ko07_kore_clean",
+   "ko10_kore_clean",
+   "ko13_kore_clean",
+   "ko16_kore_clean",
+   "ko19_kore_clean",
+   "en02_kore_clean",
+   "en05_kore_clean",
+   "en08_kore_clean"
+  ],
+  "latencyMs": [
+   4261,
+   2307,
+   35979,
+   68223,
+   800,
+   33516,
+   25456,
+   2189,
+   5601,
+   7063
+  ],
+  "medianMs": 6332,
+  "minMs": 800,
+  "maxMs": 68223,
+  "at": "2026-10-12T21:41:19.362Z"
+ }
+}

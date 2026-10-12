@@ -1,0 +1,6 @@
+# Generated locally, not committed: TTS audio (regenerate with synth.mjs), raw run logs
+node_modules/
+audio/
+logs/
+dev/
+results/raw/

@@ -1,0 +1,10 @@
+{
+  "name": "kibo-voice-compare",
+  "private": true,
+  "type": "module",
+  "description": "Offline speech-recognition comparison for KIBO (not product code)",
+  "dependencies": {
+    "@google/genai": "2.28.0",
+    "ws": "^8.18.0"
+  }
+}

@@ -2,9 +2,30 @@
   "project": "KIBO",
   "phase": "8-scenarios",
   "steps": [
-    { "step": 0, "name": "scenario-data", "status": "pending" },
-    { "step": 1, "name": "scenario-panel", "status": "pending" },
-    { "step": 2, "name": "ai-actions", "status": "pending" },
-    { "step": 3, "name": "qa", "status": "pending" }
+    {
+      "step": 0,
+      "name": "text-fallback",
+      "status": "pending"
+    },
+    {
+      "step": 1,
+      "name": "scenario-data",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "name": "scenario-panel",
+      "status": "pending"
+    },
+    {
+      "step": 3,
+      "name": "ai-actions",
+      "status": "pending"
+    },
+    {
+      "step": 4,
+      "name": "qa",
+      "status": "pending"
+    }
   ]
 }
