@@ -40,7 +40,7 @@
       "status": "completed",
       "started_at": "2026-10-12T22:53:11+0900",
       "summary": "src/lib/http.ts (readJson streams ≤64 KB else BAD_REQUEST, parseBody(zod)→BAD_REQUEST, bearer, ok/fail with Cache-Control no-store, unknown errors → 500 INTERNAL logging only the error name (INTERNAL added to ErrorCode), clientIp = last X-Forwarded-For hop, publicOrigin, claimUrl with the token only in #t=), src/lib/limits/ip.ts (checkIpLimit(ip, 'api'|'session'): fixed 1-min windows, 60 API / 10 new sessions per IP, resetLimits), src/lib/session/public.ts (toPublicSession copies Session fields one by one), store/index.ts storeKind(); routes POST /api/session, /api/session/claim ({deviceToken,status}), /api/command (reissueClaim adds claimUrl), /api/ping ({status,expiresAt,serverTime}), GET /api/session/[id]/events (SSE: data per snapshot, unknown id → `event: gone` + data {} then close, `: keepalive` every 25 s, unsubscribe on abort/cancel, id ^[A-Za-z0-9_-]{16,64}$), /api/health (+version, store); all routes ƒ; no `runtime` export because Next 16 + cacheComponents rejects it (I-027); GET handlers read the request before the try so the prerender bailout is not caught (I-028); next.config headers Referrer-Policy no-referrer, nosniff, Permissions-Policy microphone=(self) camera=(); route tests call handlers with new Request (src/app/api/testing.ts helpers); ARCHITECTURE API tables updated; smoke test on next dev (memory): create → claim → addToCart cheeseburger set + zero cola (total 6900, cartVersion 1) → SSE event 1 then event 2 with cartVersion 1 arriving immediately, security headers present",
-      "completed_at": "2026-10-12T23:02:00+0900"
+      "completed_at": "2026-10-12T23:00:25+0900"
     },
     {
       "step": 5,
