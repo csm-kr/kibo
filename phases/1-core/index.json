@@ -32,7 +32,7 @@
       "status": "completed",
       "started_at": "2026-10-12T22:48:01+0900",
       "summary": "src/lib/tokens.ts (newToken 32B / newSessionId 16B base64url, hashToken SHA-256 hex, tokenMatches timingSafeEqual), src/lib/store/{types,memory,firestore,index}.ts (SessionStore + SessionSecrets; MemoryStore: structuredClone, per-id promise chain, async notify; FirestoreStore: firebase-admin loaded lazily on first use, sessions + sessionSecrets in one runTransaction, createdAt/expiresAt as Timestamp, undoStack stored as [{lines}] because Firestore has no nested arrays; getStore singleton, STORE default firestore in production else memory, unknown STORE throws), src/lib/session/service.ts (createSession/claimSession/runCommand/ping; randomness outside transact fn; lineIds are 8 random bytes hex to match the schema id pattern (I-026); order number 101-999; expired sessions written as `expired` before GONE in claim/command/ping; secrets.expiresAt follows every session extension so TTL never deletes live secrets; reissueClaim rotates claim hash, clears device hash and phoneConnectedAt, returns result.claimToken; actor = kiosk if kiosk hash matches, else phone, else UNAUTHORIZED); tests: tokens 4, memory 8, service 17, firestore.it (skipped unless FIRESTORE_IT=1; `npm run test:firestore` passed against kibo-2026)",
-      "completed_at": "2026-10-12T22:53:00+0900"
+      "completed_at": "2026-10-12T22:53:11+0900"
     },
     {
       "step": 4,
