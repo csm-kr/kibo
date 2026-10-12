@@ -17,6 +17,8 @@ Every phase checked its own screens. Nobody has yet looked at the product as a w
 4. Write `phases/9-polish/REVIEW.md`: a punch list ranked P0 → P2, each item with screen id, what is wrong, the evidence (screenshot file, measured value, file:line), and the concrete fix; group by **kiosk** (for step 1) and **phone, `/demo`, landing** (for step 2); at most 25 items in total, the ones that change a judge's impression first. Also log each item in `docs/ISSUE.md` (reuse classes; a 3rd occurrence adds a rule).
 5. Do not change product code in this step.
 
+Observations from the orchestrating session's own look at earlier screenshots (verify them; include them in the punch list only if they still hold): `/demo` D1 at 1440×900 leaves the right half empty (a real screenshot of D2 or the environment cards could sit there); D2 at 1440×900 leaves wide empty margins on both sides while the kiosk is drawn small (kiosk text about 11 px on screen), so a judge may not read the kiosk change; the kiosk's "AI가 담았어요" toast covers the top row of tiles; K2 has no way back and no small QR (I-048).
+
 ## Acceptance criteria
 ```bash
 npm run lint
