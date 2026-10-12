@@ -83,6 +83,38 @@ const PHONE_TEXT = {
     en: "In a real store, you would now pay on the kiosk itself. KIBO never pays for you.",
   },
   tryAnotherPlace: { ko: "다른 곳에서 해 보기", en: "Try another place" },
+  // /demo scenario guide (src/components/demo/ScenarioGuide.tsx)
+  scenarios: { ko: "시나리오", en: "Scenarios" },
+  scenariosLead: {
+    ko: "고르면 새 주문으로 시작해요. 결제는 대신하지 않아요.",
+    en: "Each one starts a fresh order. Nothing is paid for you.",
+  },
+  allScenarios: { ko: "시나리오 목록", en: "All scenarios" },
+  scenarioStarting: { ko: "새 주문을 시작하고 있어요…", en: "Starting a fresh order…" },
+  scenarioStartFailed: { ko: "새 주문을 시작하지 못했어요. 다시 골라 주세요.", en: "Couldn't start a fresh order. Please choose again." },
+  scenarioSayHint: { ko: "문장을 누르면 보내져요. 직접 말하거나 입력해도 돼요.", en: "Tap a sentence to send it, or say or type it yourself." },
+  scenarioDineFirst: { ko: "먼저 휴대폰에서 먹고 갈지, 포장할지 골라 주세요.", en: "First choose eat here or take out on the phone." },
+  playForMe: { ko: "대신 해 보기", en: "Play it for me" },
+  stopPlaying: { ko: "멈추기", en: "Stop" },
+  playPaused: { ko: "다음 단계로 넘어가요…", en: "Next step in a moment…" },
+  playStopped: { ko: "멈췄어요. 직접 이어서 해도 돼요.", en: "Stopped. You can carry on yourself." },
+  playFailed: {
+    ko: "이 단계가 예상대로 되지 않았어요. 직접 입력하거나 다시 해 보세요.",
+    en: "This step didn't go as expected. You can type it yourself or try again.",
+  },
+  playLimit: {
+    ko: "이번 주문의 데모 메시지를 다 썼어요. 휴대폰에서 [다시 해 보기]를 누르세요.",
+    en: "Demo limit reached for this order. Tap Try again on the phone.",
+  },
+  stepDoneLabel: { ko: "완료", en: "Done" },
+  yourTurnPre: { ko: "이제 직접 해 보세요: 휴대폰에서 ", en: "Your turn: tap " },
+  yourTurnPost: { ko: "를 누르고, 키오스크에서 카드를 대세요.", en: " on the phone, then the card on the kiosk." },
+  yourTurnLearned: { ko: "이제 키오스크에서 직접 주문을 마치고 결제해요.", en: "Your turn: finish and pay on the kiosk itself." },
+  tagOrdering: { ko: "주문", en: "Ordering" },
+  tagSafety: { ko: "안전", en: "Safety" },
+  tagGrounding: { ko: "데이터로만 답해요", en: "Answers from data" },
+  tagAccessibility: { ko: "접근성", en: "Accessibility" },
+  tagLearned: { ko: "KIBO Learn", en: "KIBO Learn" },
   // P1 microphone hint, before the browser asks
   micHintTitle: { ko: "말로 주문하려면 마이크를 켜 주세요", en: "Turn on the microphone to talk" },
   micHintPre: { ko: "다음 화면에서 ", en: "Tap " },
@@ -129,6 +161,13 @@ export type PhoneTextKey = keyof typeof PHONE_TEXT;
 
 export function pt(key: PhoneTextKey, locale: Locale): string {
   return PHONE_TEXT[key][locale];
+}
+
+/** The scenario guide while it plays: "Step 2 of 3: watch the kiosk…" (step counts from 1). */
+export function playStep(waiting: boolean, step: number, total: number, locale: Locale): string {
+  return locale === "ko"
+    ? `${total}단계 중 ${step}단계: ${waiting ? "키오스크를 지켜보세요…" : "AI에게 보내고 있어요…"}`
+    : `Step ${step} of ${total}: ${waiting ? "watch the kiosk…" : "sending it to the AI…"}`;
 }
 
 /** "13,800원" or "13,800 won": KRW in both, words the reader knows. */

@@ -1,6 +1,6 @@
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
 import { command, kioskRoot } from "../helpers";
-import { DEMO, qaState, type Findings } from "./checks";
+import { DEMO, DEMO_GUIDE, qaState, type Findings } from "./checks";
 
 // UI QA of /demo (docs/UX.md screen map D1–D3) at the judge viewports in docs/UI_QA.md. The checks measure the
 // intro and the phone column; the kiosk half is the scaled canvas, whose sizes kiosk.qa.spec.ts checks at full size,
@@ -21,11 +21,11 @@ test.use({
   extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.11" },
 });
 
-async function check(page: Page, info: TestInfo, state: string, before?: () => Promise<void>, viewports = VIEWPORTS) {
+async function check(page: Page, info: TestInfo, state: string, before?: () => Promise<void>, viewports = VIEWPORTS, profile = DEMO) {
   for (const vp of viewports) {
     await page.setViewportSize(vp);
     await before?.();
-    const f: Findings = await qaState(page, info, DEMO, state);
+    const f: Findings = await qaState(page, info, profile, state);
     expect.soft(f.h, `${state} ${vp.width}x${vp.height}: H failures`).toEqual([]);
     if (STRICT) expect.soft(f.t, `${state} ${vp.width}x${vp.height}: T misses`).toEqual([]);
     // No page scroll at any judge viewport (the step's layout rule).
@@ -147,6 +147,36 @@ test.describe(() => {
     await page.getByRole("button", { name: "출력 안 함" }).click();
     await expect(page.locator("[data-demo-end]")).toBeVisible();
     await check(page, info, "D3-rail-done");
+  });
+});
+
+test.describe(() => {
+  // Its own address: choosing a scenario creates a second session (R-005).
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.29" } });
+
+  test("D2 with the scenario guide open and a scenario half done", async ({ page, request }, info) => {
+    await page.goto("/demo");
+    await expect(page.getByRole("heading", { name: "Don't learn the kiosk. Just talk." })).toBeVisible({ timeout: 60_000 });
+    await page.getByRole("button", { name: "Start", exact: true }).click();
+    await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "dine");
+    const guide = page.locator("[data-scenario-guide]");
+    await guide.getByRole("button", { name: "Scenarios", exact: true }).click();
+    await check(page, info, "D2-scenarios-list");
+    await check(page, info, "D2-scenarios-list-guide", undefined, VIEWPORTS, DEMO_GUIDE);
+
+    const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
+    await page.locator('[data-scenario="sunja-lunch"]').click();
+    const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
+    let seq = 0;
+    const ai = (type: string, args: object) =>
+      command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "text", utteranceSeq: ++seq });
+    await ai("setDineOption", { option: "eat_in" });
+    for (const drink of ["zero_cola", "cider"]) {
+      await ai("addToCart", { itemId: "cheese_burger", variant: "set", qty: 1, selections: { drink: [drink] } });
+    }
+    await expect(guide.locator('[data-scenario-step][data-done="true"]')).toHaveCount(1);
+    await check(page, info, "D2-scenario-half");
+    await check(page, info, "D2-scenario-half-guide", undefined, VIEWPORTS, DEMO_GUIDE);
   });
 });
 

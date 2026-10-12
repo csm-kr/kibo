@@ -10,6 +10,7 @@ import type { StreamState } from "@/hooks/useSessionStream";
 import { ping, sendCommand } from "@/lib/client/api";
 import type { ChoiceRef } from "@/lib/commands/errors";
 import type { CommandType } from "@/lib/commands/schemas";
+import type { SendResult } from "@/lib/demo/player";
 import { learnedUndoLine } from "@/lib/commands/undo";
 import { cartAnnouncement, learnedPayHint, phoneSecondsLeft, pt } from "@/lib/i18n/phone";
 import { idleWarning, staffBannerVisible } from "@/lib/kiosk/timers";
@@ -54,7 +55,11 @@ interface Props {
   endCard?: ReactNode;
   /** /assistant in an in-app browser: `held` while the claim waits for the user's choice on P1. */
   inApp?: { held: boolean; onStay(): void };
+  /** /demo only: receives the panel's own send, for the scenario guide (src/components/demo/ScenarioGuide.tsx). */
+  onSay?: (say: SayFn | null) => void;
 }
+
+export type SayFn = (text: string) => Promise<SendResult>;
 
 /** The parent keys this by session id, so local flags never carry over to a new session. */
 export function AssistantPanel(props: Props) {
@@ -163,14 +168,24 @@ export function AssistantPanel(props: Props) {
    * the voice model never misses a change. Otherwise it goes to /api/chat. The confirm card shows `cartVersion`; a
    * typed "yes" carries it so the server can match it (voice reads it from the session itself).
    */
-  function say(text: string) {
+  async function speak(text: string): Promise<SendResult> {
     if (voiceOpen && voice.sendText(text)) {
       chat.voice("user", text);
-      return;
+      return "ok";
     }
-    if (limited) return;
-    void chat.send(text, session?.status === "confirming" ? session.cartVersion : undefined);
+    if (limited) return "limit";
+    return (await chat.send(text, session?.status === "confirming" ? session.cartVersion : undefined)) ? "ok" : "error";
   }
+  function say(text: string) {
+    void speak(text);
+  }
+  // /demo's scenario guide sends its sentences through this same path, so they show and count exactly as typed.
+  const onSay = props.onSay;
+  useEffect(() => {
+    if (!onSay) return;
+    onSay(speak);
+    return () => onSay(null);
+  });
 
   function pickChoice(choice: ChoiceRef, label: string) {
     // Dine choices go straight to the session; any other tap is the user's answer to the agent's question.

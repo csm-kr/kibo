@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { AssistantPanel } from "@/components/assistant/AssistantPanel";
+import { useCallback, useRef, useState } from "react";
+import { AssistantPanel, type SayFn } from "@/components/assistant/AssistantPanel";
 import { KioskCanvas } from "@/components/kiosk/KioskCanvas";
 import { KioskScreen } from "@/components/kiosk/KioskScreen";
 import { LearnedKioskHost } from "@/components/learned/LearnedKioskHost";
@@ -11,6 +11,7 @@ import type { KioskData, Locale } from "@/types/menu";
 import { DemoEndCard } from "./DemoEndCard";
 import { DemoIntro } from "./DemoIntro";
 import { environmentOf } from "./environments";
+import { ScenarioGuide } from "./ScenarioGuide";
 
 // /demo (docs/UX.md Flow C, screen map D1–D3): the real KioskScreen (or a learned kiosk page with the bridge) and
 // AssistantPanel on one real session. Nothing is recorded or simulated beyond the card reader, and the stand-in goes
@@ -24,6 +25,12 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
   const [locale, setLocale] = useState<Locale>("en");
   // The card stand-in on the phone half sends "tap" here; the kiosk's K7 inserts the card when it hears it.
   const [cardTap] = useState(() => new EventTarget());
+  // The phone half's own send, for the scenario guide's sentences.
+  const sayRef = useRef<SayFn | null>(null);
+  const onSay = useCallback((say: SayFn | null) => {
+    sayRef.current = say;
+  }, []);
+  const send = useCallback<SayFn>((text) => sayRef.current?.(text) ?? Promise.resolve("error"), []);
   const learned = kiosk.kind === "learned";
 
   if (!demo.tokens) {
@@ -90,9 +97,20 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
             endCard={
               <DemoEndCard kioskId={kiosk.kioskId} locale={locale} learned={learned} onTryAgain={tryAgain} onIntro={demo.stop} />
             }
+            onSay={onSay}
           />
         </div>
       </section>
+      <ScenarioGuide
+        kiosk={kiosk}
+        session={session}
+        sessionId={tokens.sessionId}
+        locale={locale}
+        send={send}
+        starting={demo.starting}
+        startFailed={demo.error !== null}
+        onFresh={tryAgain}
+      />
     </main>
   );
 }

@@ -21,7 +21,10 @@
     {
       "step": 2,
       "name": "scenario-panel",
-      "status": "pending"
+      "status": "completed",
+      "summary": "D2 scenario guide: src/components/demo/ScenarioGuide.tsx, a third /demo column (w-80, closed by default, [Scenarios] toggle with aria-expanded) listing scenariosFor(kioskId) as cards (title, persona, goal, tags as text pills). Choosing one calls [Try again] (fresh session) and shows a checklist keyed by session id: sentence chips send through AssistantPanel's own path (new onSay prop registers `speak`, which returns ok/error/limit; useChat.send now returns boolean), ticks come from scenarioProgress with a kept doneSteps, and the end says 'Your turn: tap Yes, pay now…' (learned: pay on the kiosk). src/lib/demo/player.ts playScenario: sending → waiting (20 s counted from the agent's answer, 250 ms polling) → paused 1.5 s → done/stopped/failed; one message per step, no retry, never sends unless status is idle/connected/ordering (canSend); Play needs the dine option first on dine kiosks. Tests: player.test.ts (10), e2e/demo-scenarios.spec.ts (halal ticks from an API callStaff; @live Sunja's lunch reaches confirm with 2 lines Fries (L), passed 21 s), demo.qa.spec.ts D2-scenarios-list and D2-scenario-half at 3 sizes plus DEMO_GUIDE profile ([data-scenario-guide]): 0 H, 0 T. AC: lint, build, test 687, test:e2e 11 passed, qa:ui 20 passed, test:e2e:live 6/6. Evidence JSONs rewritten by the runs were not committed (I-099). New issues I-127 (flaky first dev load, font), I-128 (live.test.ts reaches network). Docs: UX C2a and D2, UI_QA demo coverage.",
+      "started_at": "2026-10-13T07:59:06+0900",
+      "completed_at": "2026-10-13T08:35:00+0900"
     },
     {
       "step": 3,

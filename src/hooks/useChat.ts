@@ -26,9 +26,10 @@ export function useChat(opts: {
   // When the current request started, for the "Working…" line after 1 s.
   const [sentAt, setSentAt] = useState(0);
 
-  async function send(text: string, cartVersion?: number) {
+  /** True when the agent answered; false when nothing was sent or the request failed (the notice says why). */
+  async function send(text: string, cartVersion?: number): Promise<boolean> {
     const message = text.trim().slice(0, 500);
-    if (!message || !opts.sessionId || !opts.token || state.busy) return;
+    if (!message || !opts.sessionId || !opts.token || state.busy) return false;
     const history = historyFor(state.messages);
     const utteranceSeq = opts.nextSeq ? opts.nextSeq() : state.utteranceSeq + 1;
     dispatch({ type: "send", text: message });
@@ -44,8 +45,10 @@ export function useChat(opts: {
         locale: opts.locale,
       });
       dispatch({ type: "reply", text: r.reply });
+      return true;
     } catch (e) {
       dispatch({ type: "notice", text: errorText(e, opts.locale) });
+      return false;
     }
   }
 
