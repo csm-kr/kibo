@@ -8,7 +8,9 @@
 Shell: only `npm`, `npx`, `node`, `python3`, `ls`, `mkdir`, `git status|diff|add|commit|log`.
 
 ## Task
-Fix the kiosk group of the punch list, P0 first, then P1, then P2 as far as they are cheap. For each fixed item, mark the ISSUE row fixed with how. Items you cannot fix without a product decision: leave them open with a note.
+First, a decision made on 10-13 by the orchestrating session (the user delegated decisions) for ISSUE I-122: the airport_rail express data ("43 min", adult 11,000) may echo a real airport express service. Change the fictional numbers so they resemble no real operator: express "39 min" / adult 10,500 (child and teen deltas adjusted so every fare stays a multiple of 10 and ≥ 0), and check the all-stop times and fares likewise (avoid the exact pairs of any real airport line you know of). Update tests, scenarios (`src/lib/demo/scenarios.ts`), evals cases and any docs or landing text that quote the old numbers (R-002), and mark I-122 decided and fixed. Also fix I-119 (tiles show the adult fare, the default passenger option, not the cheapest fare with "from").
+
+Then fix the kiosk group of the punch list, P0 first, then P1, then P2 as far as they are cheap. For each fixed item, mark the ISSUE row fixed with how. Items you cannot fix without a product decision: leave them open with a note.
 Keep every written rule (text ≥ 40px on the canvas, targets, contrast, motion) and the existing flows; after the fixes, the E2E tests and `qa:ui` must still pass. Look at the new screenshots of every screen you changed before finishing.
 
 ## Acceptance criteria
