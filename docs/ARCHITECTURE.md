@@ -292,6 +292,7 @@ Pages: `/kiosk?k=<kioskId>` (`&demo=1` shows the tap counter and timer), `/assis
 - JSON over HTTPS, body ≤ 64 KB (a chat history of Korean text needs more than 16 KB), every body parsed with a zod schema before anything else.
 - Actor token in `Authorization: Bearer <deviceToken|kioskToken>`. The server stores only SHA-256 hashes and compares in constant time. Tokens are 32 random bytes, base64url.
 - Success: `{ "ok": true, ... }`. Failure: `{ "ok": false, "error": { "code", "message", "detail"? } }`. `message` is plain words a user can read (heuristic 9); no stack traces, ids or model text.
+- `message` stays plain English, for the AI, logs and as a fallback; the server never translates it. Screens show their own ko/en copy chosen by `error.code` (and `detail.templateId`) with `errorCopy` in `src/lib/i18n/errors.ts`, which also covers the client-side `NETWORK` (no answer).
 
 | Code | HTTP | When |
 |---|---|---|
@@ -330,15 +331,15 @@ Pages: `/kiosk?k=<kioskId>` (`&demo=1` shows the tap counter and timer), `/assis
 | `undoLastChange` | ✓ | ✓ | not in `paying` or `paid` |
 | `offerChoices` | ✓ | | any state before `paying` |
 | `callStaff` | ✓ | ✓ | any state except `expired`; the only command accepted in `paid` |
-| `requestCheckout` | ✓ | ✓ | `ordering → confirming`; refused when the cart is empty (`CONFLICT`); without a dine option it returns `NEEDS_CHOICE` with the two dine choices; records `checkoutUtteranceSeq` and `checkoutAt` |
+| `requestCheckout` | ✓ | ✓ | `ordering → confirming`; refused when the cart is empty (`CONFLICT`); without a dine option it returns `NEEDS_CHOICE` with the two dine choices; records `checkoutAt` and `checkoutUtteranceSeq` (the phone command's `utteranceSeq`; null from the kiosk or without one) |
 | `cancelCheckout` | ✓ | ✓ | `confirming → ordering`, cart unchanged ([Pick more], kiosk back button) |
-| `confirmCheckout` | ✓ | ✓ | `confirming → paying`; needs matching `cartVersion`. From the phone: either `source: "button"` (a tap on the confirm card) or an AI call with `utteranceSeq > checkoutUtteranceSeq` (a null `checkoutUtteranceSeq` counts as -1) and at least 1.5 s after `checkoutAt`. From the kiosk: `source: "touch"` |
-| `editOrder` | | ✓ | `paying → confirming` (back to the review) |
+| `confirmCheckout` | ✓ | ✓ | `confirming → paying`; needs matching `cartVersion`. From the phone: either `source: "button"` (a tap on the confirm card) or an AI call when the phone's AI opened the review: `checkoutUtteranceSeq` is not null, `utteranceSeq > checkoutUtteranceSeq`, and at least 1.5 s after `checkoutAt`. A review the kiosk opened or `editOrder` reopened has a null `checkoutUtteranceSeq`, so the phone must tap the card (an AI confirm gets `CONFLICT` "Please confirm on the card."). From the kiosk: `source: "touch"` |
+| `editOrder` | | ✓ | `paying → confirming` (back to the review); sets `checkoutUtteranceSeq` to null and `checkoutAt` to now |
 | `cardAction` | | ✓ | `paying → paid`; issues the order number. Refused for learned kiosks (the user pays on the real kiosk). `/demo` sends it from the kiosk half of the page with the demo's `kioskToken` |
 | `reissueClaim` | | ✓ | any state before `paying`: new claim token and QR, the old `deviceToken` stops working ([Connect another phone]) |
 | `bridgeReport` | | ✓ | learned kiosks only: mirrors the kiosk's real cart (sequence 3) |
 
-- `utteranceSeq` is the phone's counter of finished user turns. With the 1.5 s wait it stops the model from chaining `requestCheckout` and `confirmCheckout` in one turn; the confirm card is still the real safeguard. In `/api/chat` one request counts as one utterance.
+- `utteranceSeq` is the phone's counter of finished user turns. With the 1.5 s wait it stops the model from chaining `requestCheckout` and `confirmCheckout` in one turn; the confirm card is still the real safeguard. In `/api/chat` one request counts as one utterance. The server only knows a seq the phone's AI sent with `requestCheckout`; when the kiosk opened the review or `editOrder` reopened it, no later utterance can be proven, so only a tap on the card confirms.
 - A tap on a choice button is sent to the agent as the user's answer (the button's label, counted as a new utterance), because the agent holds the half-finished order the question belongs to; the agent then calls the tool. Dine choices send `setDineOption` directly, and the confirm card's [Yes, pay now] sends `confirmCheckout` with `source: "button"`. Any accepted command clears `pendingChoice`.
 - **Learned kiosks:** a cart command is stored in `pendingBridgeCommand` and answered `{ ok: true, pending: true }`; the phone waits for the bridge's `bridgeReport` through `onSnapshot`. After 15 s without a report the phone shows "Please check the kiosk screen" and offers staff. A second command while one is pending gets `CONFLICT`. Learned sessions end at `confirming`: the user pays on the kiosk itself.
 
@@ -391,11 +392,10 @@ LearnedAdapter normalizes the catalog into the items shape: ids generated from l
 | `staffCalled` | `{ reasonCode: unknown_info\|user_request\|stuck\|learned_mismatch, at } \| null` | fixed banner text on the kiosk; no free text in a public document |
 | `undoStack` | last 5 carts | |
 | `recentCommandIds` | last 30 strings | idempotency |
-| `checkoutUtteranceSeq`, `checkoutAt` | int, timestamp | set by `requestCheckout` |
+| `checkoutUtteranceSeq`, `checkoutAt` | int \| null, timestamp | set by `requestCheckout` (seq null when the kiosk opened the review); `editOrder` sets the seq to null and `checkoutAt` to now |
 | `upsellOffered` | bool | the dessert offer is made once per order: the first accepted `addToCart` that matches an upsell rule sets it and returns `result.upsell { offerItemIds }`, which the kiosk (touch) and the AI both use |
 | `orderNumber`, `paidAt` | int, timestamp | set by `cardAction` |
 | `pendingBridgeCommand` | `{ commandId, type, args, at } \| null` | learned kiosks, one at a time |
-| `metrics` | `{ touchCount, startedAt, finishedAt, mode: touch\|voice }` | measurements in `docs/TESTING.md` |
 | `createdAt`, `lastSeenAt`, `expiresAt` | timestamp | TTL deletes on `expiresAt` |
 
 Worst case (20 lines × 6 carts) stays far below the 1 MiB document limit. Sessions hold no personal data: the session id is printed in a public QR, so anyone holding it can read the cart.
@@ -431,7 +431,7 @@ Mutating tools return the updated cart, so no separate summary tool is needed. T
 | `offerChoices(templateId, choices[{kind, id}])` | Show choice buttons (catalog ids only; the server builds the question and labels) | Heuristic 6 |
 | `callStaff(reasonCode)` | Unanswerable question or stuck user; fixed banner text on the kiosk | Data principle |
 | `requestCheckout()` | Open the confirm card (`confirming`) | A8 |
-| `confirmCheckout()` | Accepted only in `confirming`, after a new user utterance, with matching `cartVersion` | Heuristic 5 |
+| `confirmCheckout()` | Accepted only in `confirming`, with matching `cartVersion`, after a new user utterance on a review the AI opened; a review the kiosk opened or reopened needs a tap on the card | Heuristic 5 |
 
 Learned kiosks support `setDineOption`, `addToCart`, `removeFromCart`, `requestCheckout`/`confirmCheckout`, `offerChoices`, `callStaff`; `updateCart` becomes remove + add, `undoLastChange` only undoes the last add.
 

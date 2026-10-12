@@ -26,7 +26,7 @@ Ship one vertical demo that works end to end and survives three weeks of judging
 **Trade-off**: Very large menus need a `searchMenu` tool; the adapter decides.
 
 ### ADR-005: Server-enforced session state machine
-**Decision**: `idle → (connected →) ordering ⇄ confirming → paying → paid`, plus `paying → confirming` (edit) and `expired`. `confirmCheckout` is accepted only in `confirming` with a matching `cartVersion`, and either a tap on the confirm card or, from the AI, a new user utterance at least 1.5 s after the card appeared. `paid` comes only from the kiosk card action with a `kioskToken`.
+**Decision**: `idle → (connected →) ordering ⇄ confirming → paying → paid`, plus `paying → confirming` (edit) and `expired`. `confirmCheckout` is accepted only in `confirming` with a matching `cartVersion`, and either a tap on the confirm card or, from the AI, a new user utterance at least 1.5 s after the card appeared. An AI confirm needs a review the phone's AI opened; after a kiosk-opened review or `editOrder` only a tap confirms (10-12, I-029). `paid` comes only from the kiosk card action with a `kioskToken`.
 **Why**: The AI can never skip the confirm card or complete a payment.
 **Trade-off**: More server logic and tests.
 

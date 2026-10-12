@@ -71,6 +71,7 @@ Order (ARCHITECTURE processing order 3–7):
    - `cancelCheckout`: `confirming → ordering`, cart unchanged.
    - `confirmCheckout`: only in `confirming`; `cmd.cartVersion !== s.cartVersion` → `CONFLICT`. Phone: `source === "button"` is enough; otherwise (voice/text) needs `cmd.utteranceSeq > s.checkoutUtteranceSeq` (a null checkout seq counts as -1) **and** `now - s.checkoutAt ≥ 1500`, else `CONFLICT` "Please confirm on the card." Kiosk: `source === "touch"`. → `paying`.
    - `editOrder`: `paying → confirming`.
+   - (Superseded 10-12 by `phases/2-kiosk/step0.md`, I-029: a null `checkoutUtteranceSeq` no longer counts as -1; it refuses AI confirms. A kiosk `requestCheckout` records null, and `editOrder` sets it to null and `checkoutAt = now`, so the phone must tap the card.)
    - `cardAction`: `paying → paid`; `orderNumber = ctx.newOrderNumber()`, `paidAt = now`.
    - `reissueClaim`: allowed before `paying`; the machine only validates state and records the command; the session service (next step) rotates the secrets.
 5. Cart-changing commands (`addToCart`, `updateCart`, `removeFromCart`, `clearCart`, `undoLastChange`): push the old cart onto `undoStack` (keep last 5; not for undo itself), `cartVersion + 1`, recompute `total`, set `lastChange { lineId, kind, source: cmd.source, at: now }`, set `screen` to the changed item's `{ category, itemId }`.

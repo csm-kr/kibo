@@ -24,6 +24,14 @@
     {
       "dir": "6-learn",
       "status": "pending"
+    },
+    {
+      "dir": "7-environments",
+      "status": "pending"
+    },
+    {
+      "dir": "8-scenarios",
+      "status": "pending"
     }
   ]
 }

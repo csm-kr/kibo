@@ -38,7 +38,7 @@ Safety gap found: an AI confirm after a kiosk-opened review or after `editOrder`
 
 ## Contract drift
 Fixed in docs (code follows an explicit step 2 rule, R-002):
-- ARCHITECTURE command table: `startTouch` no-op in `connected`/`ordering`; `setDineOption` from `idle` (kiosk) and in `confirming`; `callStaff` refused only when `expired`, the only command in `paid`; null `checkoutUtteranceSeq` counts as -1; kiosk confirm needs `source: "touch"` (I-024).
+- ARCHITECTURE command table: `startTouch` no-op in `connected`/`ordering`; `setDineOption` from `idle` (kiosk) and in `confirming`; `callStaff` refused only when `expired`, the only command in `paid`; null `checkoutUtteranceSeq` counts as -1 (superseded 10-12 by 2-kiosk step 0, I-029: null now refuses AI confirms); kiosk confirm needs `source: "touch"` (I-024).
 - Sessions table heading: server only, clients read through SSE (I-025); added `sessionId`, `demo`; `lastChange.lineId` null for undo and clear.
 
 Matches the docs: routes and response shapes (`/api/session`, `claim` `{deviceToken,status}`, `command` incl. `duplicate` and `claimUrl`, `ping` `{status,expiresAt,serverTime}`, SSE `data:`/`event: gone`, `health` `{ok,service,version,store,revision,time}`); error codes and HTTP statuses (incl. `INTERNAL` 500); actor table; `/api/command` processing order (zod → token → actor → duplicate → state → catalog → commit).

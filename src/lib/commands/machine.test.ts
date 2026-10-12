@@ -288,13 +288,36 @@ describe("payment safety", () => {
     expect(catchError(() => applyCommand(s, cmd("requestCheckout"), ctx("kiosk"))).code).toBe("CONFLICT");
   });
 
-  it("editOrder goes paying → confirming and restarts the 1.5 s wait", () => {
+  it("editOrder goes paying → confirming; then only a card tap confirms from the phone", () => {
     let s = phoneConfirming();
     s = confirm(s, "phone", "button", T0 + 2000).session;
     s = applyCommand(s, cmd("editOrder"), ctx("kiosk", T0 + 20000)).session;
     expect(s.status).toBe("confirming");
-    expect(catchError(() => confirm(s, "phone", "voice", T0 + 20500, { utteranceSeq: 5 })).code).toBe("CONFLICT");
-    expect(confirm(s, "phone", "voice", T0 + 21600, { utteranceSeq: 5 }).session.status).toBe("paying");
+    expect(s.checkoutUtteranceSeq).toBeNull();
+    expect(s.checkoutAt).toBe(T0 + 20000);
+    const e = catchError(() => confirm(s, "phone", "voice", T0 + 30000, { utteranceSeq: 99 }));
+    expect(e.code).toBe("CONFLICT");
+    expect(e.message).toBe("Please confirm on the card.");
+    expect(confirm(s, "phone", "button", T0 + 20100).session.status).toBe("paying");
+  });
+
+  it("a review the kiosk opened: AI confirm → CONFLICT, card tap → paying", () => {
+    let s = applyCommand({ ...ordering(), phoneConnectedAt: T0 }, cmd("requestCheckout"), ctx("kiosk", T0 + 2000)).session;
+    expect(s.status).toBe("confirming");
+    expect(s.checkoutUtteranceSeq).toBeNull();
+    const e = catchError(() => confirm(s, "phone", "voice", T0 + 30000, { utteranceSeq: 99 }));
+    expect(e.code).toBe("CONFLICT");
+    expect(e.message).toBe("Please confirm on the card.");
+    s = confirm(s, "phone", "button", T0 + 2100).session;
+    expect(s.status).toBe("paying");
+  });
+
+  it("a kiosk requestCheckout clears an utteranceSeq left from an earlier phone review", () => {
+    let s = phoneConfirming();
+    s = applyCommand(s, cmd("cancelCheckout", {}, { source: "button" }), ctx("phone", T0 + 3000)).session;
+    s = applyCommand(s, cmd("requestCheckout", {}, { utteranceSeq: 3 }), ctx("kiosk", T0 + 4000)).session;
+    expect(s.checkoutUtteranceSeq).toBeNull();
+    expect(catchError(() => confirm(s, "phone", "voice", T0 + 10000, { utteranceSeq: 4 })).code).toBe("CONFLICT");
   });
 
   it("cancelCheckout returns to ordering with the cart unchanged", () => {

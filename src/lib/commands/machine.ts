@@ -94,9 +94,11 @@ function isValidChoice(k: KioskData, c: ChoiceRef): boolean {
 function isConfirmed(s: Session, cmd: Command, ctx: CommandContext): boolean {
   if (ctx.actor === "kiosk") return cmd.source === "touch";
   if (cmd.source === "button") return true;
+  // A null seq means the kiosk opened the review or an edit reopened it: the phone's AI never saw a "yes" after it, so only a tap counts.
   return (
     cmd.utteranceSeq !== undefined &&
-    cmd.utteranceSeq > (s.checkoutUtteranceSeq ?? -1) &&
+    s.checkoutUtteranceSeq !== null &&
+    cmd.utteranceSeq > s.checkoutUtteranceSeq &&
     s.checkoutAt !== null &&
     ctx.now - s.checkoutAt >= CONFIRM_WAIT_MS
   );
@@ -184,7 +186,12 @@ function transition(s: Session, cmd: Command, ctx: CommandContext): { next: Sess
         });
       }
       return {
-        next: { ...s, status: "confirming", checkoutUtteranceSeq: cmd.utteranceSeq ?? null, checkoutAt: ctx.now },
+        next: {
+          ...s,
+          status: "confirming",
+          checkoutUtteranceSeq: ctx.actor === "phone" ? (cmd.utteranceSeq ?? null) : null,
+          checkoutAt: ctx.now,
+        },
         result: {},
       };
 
@@ -202,8 +209,8 @@ function transition(s: Session, cmd: Command, ctx: CommandContext): { next: Sess
 
     case "editOrder":
       requireStatus(s, ["paying"], "There is no payment to go back from.");
-      // The review card appears again, so an AI confirm must wait for a new utterance after it.
-      return { next: { ...s, status: "confirming", checkoutAt: ctx.now }, result: {} };
+      // The review card appears again and no utterance after it is known, so the phone must tap the card.
+      return { next: { ...s, status: "confirming", checkoutUtteranceSeq: null, checkoutAt: ctx.now }, result: {} };
 
     case "cardAction":
       requireStatus(s, ["paying"], "Please confirm the order before paying.");
