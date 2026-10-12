@@ -110,3 +110,65 @@ describe("POST /api/command", () => {
     expect(old.status).toBe(401);
   });
 });
+
+// Phase 1 QA spot checks (phases/1-core/qa/REPORT.md): each forged request is refused with the documented code.
+describe("POST /api/command security spot checks", () => {
+  async function send(s: { sessionId: string }, token: string, type: string, args: object = {}, extra: Record<string, unknown> = {}) {
+    return read(await POST(jsonRequest("/api/command", commandBody(s.sessionId, type, args, extra), auth(token))));
+  }
+
+  it("FORBIDDEN: a device token cannot send cardAction even while the session is paying", async () => {
+    const s = await claimed();
+    await send(s, s.kioskToken, "setDineOption", { option: "eat_in" });
+    const added = await send(s, s.kioskToken, "addToCart", HERO_LINE);
+    await send(s, s.kioskToken, "requestCheckout");
+    const paying = await send(s, s.kioskToken, "confirmCheckout", {}, { cartVersion: added.body.cartVersion });
+    expect(paying.body.status).toBe("paying");
+    const { status, body } = await send(s, s.deviceToken, "cardAction");
+    expect(status).toBe(403);
+    expect(body.error.code).toBe("FORBIDDEN");
+  });
+
+  it("CONFLICT: confirmCheckout outside confirming, from the phone button and the kiosk", async () => {
+    const s = await claimed();
+    const added = await send(s, s.deviceToken, "addToCart", HERO_LINE, { source: "voice" });
+    expect(added.body.status).toBe("ordering");
+    const tries = [
+      await send(s, s.deviceToken, "confirmCheckout", {}, { source: "button", cartVersion: added.body.cartVersion }),
+      await send(s, s.kioskToken, "confirmCheckout", {}, { cartVersion: added.body.cartVersion }),
+    ];
+    for (const { status, body } of tries) {
+      expect(status).toBe(409);
+      expect(body.error.code).toBe("CONFLICT");
+    }
+  });
+
+  it("BAD_REQUEST: an option id or group from another item", async () => {
+    const s = await claimed();
+    const lines = [
+      { ...HERO_LINE, selections: { drink: ["sweet_chili"] } },
+      { ...HERO_LINE, selections: { drink: ["zero_cola"], sauce: ["bbq"] } },
+    ];
+    for (const line of lines) {
+      const { status, body } = await send(s, s.deviceToken, "addToCart", line, { source: "voice" });
+      expect(status).toBe(400);
+      expect(body.error.code).toBe("BAD_REQUEST");
+    }
+  });
+
+  it("BAD_REQUEST: a 1,000-character id in any id field", async () => {
+    const s = await claimed();
+    const long = "a".repeat(1000);
+    const bodies = [
+      commandBody(long, "startTouch"),
+      { ...commandBody(s.sessionId, "startTouch"), commandId: long },
+      commandBody(s.sessionId, "addToCart", { ...HERO_LINE, itemId: long }),
+      commandBody(s.sessionId, "removeFromCart", { lineId: long }),
+    ];
+    for (const b of bodies) {
+      const { status, body } = await read(await POST(jsonRequest("/api/command", b, auth(s.kioskToken))));
+      expect(status).toBe(400);
+      expect(body.error.code).toBe("BAD_REQUEST");
+    }
+  });
+});

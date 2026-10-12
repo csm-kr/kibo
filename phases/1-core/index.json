@@ -45,7 +45,10 @@
     {
       "step": 5,
       "name": "qa",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-12T23:00:25+0900",
+      "summary": "phases/1-core/qa/REPORT.md (A,B,D,F,H n/a; C,E,G,I pass; flows supported except learned-kiosk replay, phase 6); security spot checks as route tests in src/app/api/command/route.test.ts and the SSE test (forged cardAction 403, confirm outside confirming 409, option/group from another item 400, 1,000-char ids 400, 70 KB body 400), 203 tests pass; ARCHITECTURE command table and sessions table aligned with step 2 code (I-024, I-025 fixed); logged I-029 P1 (AI confirm after a kiosk-opened review or editOrder does not prove a fresh utterance; decide option A or B before phase 4), I-030 (`metrics` field unbuilt), I-031 (English-only error messages, decide in phase 2); R-002 links updated",
+      "completed_at": "2026-10-12T23:06:00+0900"
     }
   ],
   "created_at": "2026-10-12T22:37:10+0900"

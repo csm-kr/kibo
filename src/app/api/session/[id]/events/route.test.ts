@@ -74,10 +74,12 @@ describe("GET /api/session/[id]/events", () => {
     expect(await stream.next()).toBeNull();
   });
 
-  it("refuses a malformed id", async () => {
-    const res = await open("../../secrets");
-    expect(res.status).toBe(400);
-    expect((await res.json()).error.code).toBe("BAD_REQUEST");
+  it("refuses a malformed or 1,000-character id", async () => {
+    for (const id of ["../../secrets", "a".repeat(1000)]) {
+      const res = await open(id);
+      expect(res.status).toBe(400);
+      expect((await res.json()).error.code).toBe("BAD_REQUEST");
+    }
   });
 
   it("unsubscribes when the request is aborted", async () => {
