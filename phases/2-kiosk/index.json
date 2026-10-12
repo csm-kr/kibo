@@ -55,7 +55,7 @@
       "name": "qa",
       "status": "completed",
       "started_at": "2026-10-13T00:08:42+0900",
-      "completed_at": "2026-10-13T00:15:00+0900",
+      "completed_at": "2026-10-13T00:15:37+0900",
       "summary": "QA pass on K1-K8, KX at 1080x1920: qa:ui 15 states 0 H, all 15 screenshots viewed, Flow B / Flow A kiosk side / kiosk exception rows / J1-J2 kiosk stages walked via E2E + screenshots; phases/2-kiosk/qa/REPORT.md (A-I). Fixed: I-047 doneCountdown capped at 10 (K8 receipt showed '11초' from clock-offset lag; test in timers.test.ts); I-044 break-keep on the KioskCanvas root (K1 hint and K2 heading stranded '요'). Logged: I-045 +KX staff banner covers top tiles (layout decision), I-048 K2 has no small QR or way back to K1, I-049 QA spec lacks connection-paused / error bar / many lines / K7 method+approving / large-text states, I-035 +step 5 commit 00b3233 included the stray undefined/ folder (needs `git rm -r undefined/` by hand). AC: lint, build, test (282), test:e2e (4), e2e_check (42), qa:ui (0 H)."
     }
   ],
