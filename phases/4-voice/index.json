@@ -40,7 +40,7 @@
       "status": "completed",
       "started_at": "2026-10-13T03:00:06+0900",
       "summary": "QA pass on P1, P3 mic states, PX, D2: 0 H on every scoped state; no product code changed. assistant.qa.spec.ts adds 'P3: noise hint, voice reconnecting, then text after the retries fail' (fake Live socket the test drops and talks through; P3-voice-noise/-reconnecting/-failed at 4 phone sizes) and 'PX: the session stream drops, and the same phone continues after a reload' (events route answers one snapshot then ends with retry 1 h; PX-reconnecting). Security spot checks on a dev server (script in /tmp, prints only statuses/booleans): live-token kiosk token 403, no token 401, demo 3rd token 429, paying 409, no API key in token responses or .next/static (307 files). Flow A by voice from evidence/voice-e2e.json (6/6, no src change since); not re-run live. ISSUE: I-083 (voice states missing from QA spec, fixed), I-084 (320x700 voice footer takes half the screen), I-085 (voice E2E covers only the first sentence; real phones unchecked), I-065 and I-077 notes updated. UI_QA coverage line updated. phases/4-voice/qa/REPORT.md: A-I all pass, real-phone walk pending.",
-      "completed_at": "2026-10-13T03:40:00+0900"
+      "completed_at": "2026-10-13T03:08:51+0900"
     }
   ],
   "created_at": "2026-10-13T02:01:56+0900"
