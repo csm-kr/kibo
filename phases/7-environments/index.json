@@ -56,7 +56,7 @@
       "status": "completed",
       "started_at": "2026-10-13T07:19:09+0900",
       "summary": "QA pass on rail K1/K3/K4/K6/K7/K8, MALO English K1-K8, D1 picker, rail D2/D3, landing places; report phases/7-environments/qa/REPORT.md (A-I pass, open items logged). QA specs extended (R-003): kiosk.qa walks rail to K8 receipt + reference number and MALO English K1-K8; demo.qa rail D2 confirm/payment + D3. Fixed: I-117 H (WCAG 1.4.12) English cart chips clipped, CartBar chip max-w-full; I-116 (R-007) ticket machine said 주문 on K8 receipt countdown, idle warning, QR alt: receiptInSeconds(seconds, locale, domain), TICKET_TEXT qrAlt/phoneConnected/idleQuestion, test in kiosk.test.ts (phone 'Your order' on tickets left open). Fresh-eyes agent review verified; logged I-118 (J2 Pay: Korean payment method screen), I-119 (rail tile shows child fare as 'from'), I-120 (lowercase English variant buttons), I-121 (QA screenshots keep a focus ring from the previous viewport), I-122 (user decides: express 43 min / 11,000 may echo a real operator, unverified), I-123 (D1 card alignment); Seen tokens on I-042, I-073 (rail confirm at 1440x900), I-109. RULE: R-007 extended to kiosk copy, R-008 (proposed) for flow-gap x3. MALO Korean hero unchanged (41 taps, 14,800). lint, build, 646 unit (+1 skipped), e2e 10 passed/6 skipped, prototype 42, qa:ui 19 passed 0 H; evidence/*.json rewritten by e2e not committed (I-099).",
-      "completed_at": "2026-10-13T07:50:00+0900"
+      "completed_at": "2026-10-13T07:38:52+0900"
     }
   ],
   "created_at": "2026-10-13T04:53:03+0900"
