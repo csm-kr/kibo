@@ -1,0 +1,12 @@
+{
+  "project": "KIBO",
+  "phase": "1-core",
+  "steps": [
+    { "step": 0, "name": "menu-data", "status": "pending" },
+    { "step": 1, "name": "cart-engine", "status": "pending" },
+    { "step": 2, "name": "state-machine", "status": "pending" },
+    { "step": 3, "name": "session-store", "status": "pending" },
+    { "step": 4, "name": "api-routes", "status": "pending" },
+    { "step": 5, "name": "qa", "status": "pending" }
+  ]
+}
