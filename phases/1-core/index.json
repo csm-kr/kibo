@@ -13,7 +13,10 @@
     {
       "step": 1,
       "name": "cart-engine",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-12T22:40:27+0900",
+      "summary": "src/types/session.ts (Source, CartLine, LineInput, LineChanges), src/lib/commands/errors.ts (ErrorCode, TemplateId, ChoiceRef, ErrorDetail, CommandError(code, message, detail), HTTP_STATUS), src/lib/commands/cart.ts (pure: MAX_LINES 20, MAX_QTY 10, resolveLine/unitPriceOf/cartTotal/addLine/updateLine/removeLine/sameLine; prices only from KioskData; selections normalized with empty groups omitted; sold out/off-hours give up to 2 same-category alternatives; missing required group without default gives NEEDS_CHOICE pick_option; duplicate option ids rejected; identical add merges qty and returns its lineId; updateLine merges named groups, drops groups not in the new variant, no merge with other lines; removeLine on unknown lineId is BAD_REQUEST; messages use English menu names), cart.test.ts (35 tests)",
+      "completed_at": "2026-10-12T22:43:00+0900"
     },
     {
       "step": 2,
