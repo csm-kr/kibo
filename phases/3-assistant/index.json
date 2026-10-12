@@ -16,7 +16,7 @@
       "status": "completed",
       "started_at": "2026-10-13T00:25:53+0900",
       "summary": "src/lib/agent/: menu.ts menuForModel (compact menu, no images/theme; groups with id/name/appliesTo/required/min/max/default/options{id,name,priceDelta,soldOut}); tools.ts toolDeclarations(kiosk) = 9 FunctionDeclarations with parametersJsonSchema (itemId/groupId/optionId enums from the catalog; updateCart takes flat lineId/qty/variant/options; callStaff without learned_mismatch); mapping.ts toolCallToCommand (zod shape check, options[] merged into a selections record, updateCart fields under changes, unknown tool or bad shape -> CommandError BAD_REQUEST) and toolResult ({ok,status,total,cart[{lineId,name,variant,options,qty,unitPrice}],upsell?} or {ok:false,code,message,templateId?,choices?[{kind,id,name}]}; templateId added so the model can call offerChoices; never tokens, claimToken or cartVersion), plus cartForModel; choices.ts choiceLabel/choiceQuestion (menu data + fixed ko/en words, empty label for unknown ids); instructions.ts buildInstructions(kiosk,{cart,status,dineOption,locale}) with grounding/staff, choices, upsell once, confirm rule (never requestCheckout+confirmCheckout in one turn, tap on 'Please confirm on the card.'), current order block 'already applied', and a <menu_data> JSON block marked as data. 32 tests in src/lib/agent/*.test.ts.",
-      "completed_at": "2026-10-13T00:31:00+0900"
+      "completed_at": "2026-10-13T00:30:05+0900"
     },
     {
       "step": 2,
