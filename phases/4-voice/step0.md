@@ -8,6 +8,13 @@
 Shell: only `npm`, `npx`, `node`, `python3`, `ls`, `mkdir`, `git status|diff|add|commit|log`.
 
 ## Task
+### First: fix I-072 (P1, grounding) before the voice path reuses the instructions
+The phase 3 QA probe got "Our warm Apple pie is very popular." from the text agent: "warm" is not in the data and Apple pie is not marked popular (`docs/ISSUE.md` I-072). Fix, test-first where it is code:
+- `menuForModel` includes `badge` (best/new) so "popular" questions have a data answer (items with `badge: "best"`).
+- `buildInstructions` adds explicit lines: describe items only with words from the menu data (name, options, price, kcal, allergens, badge); never add taste, temperature, origin, freshness or popularity words that the data does not state; "popular" or "recommended" means items with the `best` badge, and say so plainly ("The soft cone is marked as a best seller."); if asked for anything else about an item, say the kiosk does not have that information (and call staff only when the user needs it to decide).
+- Add 4 eval cases to `evals/agent-cases.json` (ko and en: "What dessert do you recommend?", "What's popular?") with a new expectation kind `reply` checked by a **grounding checker** in `scripts/eval-agent.ts`: the reply may mention only item names that exist in the menu data and must not contain words from a small deny list (warm, hot and fresh, homemade, famous, delicious, signature, organic, 따뜻한, 인기 많은 unless the item has `best`…). Store only pass/fail and the matched words, never the reply text. Run `npm run eval:agent` and keep the overall pass rate; update the ledger row and mark I-072 fixed with the result file.
+
+### Then: the live token
 `POST /api/live-token`: a one-use ephemeral Gemini Live token with the model, instructions and tools pinned. **Tests first** with a fake token issuer; no network in tests.
 
 ### `src/lib/agent/live.ts`
@@ -41,6 +48,7 @@ With `next dev` and `.env` loaded, a `node` script creates a demo session, gets 
 npm run lint
 npm run build
 npm run test
+npm run eval:agent
 ```
 
 ## Verify
