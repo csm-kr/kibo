@@ -7,7 +7,14 @@
 Shell: only `npm`, `npx`, `node`, `python3`, `ls`, `mkdir`, `git status|diff|add|commit|log`.
 
 ## Task
-Prove voice ordering end to end in a real browser with a synthetic voice, and measure latency.
+### First: fix I-072 (P1, grounding); step 0 of this phase did not get to it
+The phase 3 QA probe got "Our warm Apple pie is very popular." from the text agent: "warm" is not in the data and Apple pie is not marked popular (`docs/ISSUE.md` I-072). Fix, test-first where it is code:
+- `menuForModel` includes `badge` (best/new) so "popular" questions have a data answer (items with `badge: "best"`).
+- `buildInstructions` adds explicit lines: describe items only with words from the menu data (name, options, price, kcal, allergens, badge); never add taste, temperature, origin, freshness or popularity words that the data does not state; "popular" or "recommended" means items with the `best` badge, and say so plainly ("The soft cone is marked as a best seller."); if asked for anything else about an item, say the kiosk does not have that information (and call staff only when the user needs it to decide).
+- Add 4 eval cases to `evals/agent-cases.json` (ko and en: "What dessert do you recommend?", "What's popular?") with a new expectation kind `reply` checked by a **grounding checker** in `scripts/eval-agent.ts`: the reply may mention only item names that exist in the menu data and must not contain words from a small deny list (warm, hot and fresh, homemade, famous, delicious, signature, organic, 따뜻한, 인기 많은 unless the item has `best`…). Store only pass/fail and the matched words, never the reply text. Run `npm run eval:agent` and keep the overall pass rate; update the ledger row and mark I-072 fixed with the result file.
+
+
+### Then: prove voice ordering end to end in a real browser with a synthetic voice, and measure latency.
 
 ### Voice fixtures: `scripts/make-voice-fixtures.ts` (`npm run fixtures:voice`, uses `tsx --env-file=.env`)
 Generate WAV files (16-bit PCM mono, 16 kHz or 48 kHz, with 1 s of silence before and 2 s after the speech) with **Gemini TTS** (`gemini-3.8-flash-tts` via `@google/genai`, response modality AUDIO; it returns raw 24 kHz PCM: wrap it in a WAV header yourself). Sentences:
@@ -29,6 +36,7 @@ npm run lint
 npm run build
 npm run test
 npm run test:e2e
+npm run eval:agent
 npm run test:e2e:live
 ```
 
