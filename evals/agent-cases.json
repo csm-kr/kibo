@@ -1,5 +1,5 @@
 {
-  "about": "Text-agent evaluation set for the MALO BURGER kiosk (docs/TESTING.md \"Agent evaluation set\"). Written by the KIBO team, not an external benchmark. Each case starts on a fresh /demo session (status connected, empty cart) at 14:00 KST. Types follow TESTING 1-6, 8, 9; \"checkout\" checks the confirm rule. A cart expectation merges identical lines and counts defaults (set side fries_m, drink size m).",
+  "about": "Text-agent evaluation set for the MALO BURGER kiosk (docs/TESTING.md \"Agent evaluation set\"). Written by the KIBO team, not an external benchmark. Each case starts on a fresh /demo session (status connected, empty cart) at 14:00 KST. Types follow TESTING 1-6, 8, 9; \"checkout\" checks the confirm rule; \"grounded-reply\" checks that the reply describes items only with menu data (scripts/grounding.ts, I-072). A cart expectation merges identical lines and counts defaults (set side fries_m, drink size m).",
   "notCovered": [
     { "type": "7-count-limits", "reason": "Count limits (max 3 toppings) need the learned Doughhouse kiosk, which has no LearnedAdapter yet." }
   ],
@@ -209,6 +209,34 @@
       "locale": "ko",
       "turns": ["불고기버거 소고기 원산지가 어디예요?"],
       "expect": { "staff": true }
+    },
+    {
+      "id": "g-en-recommend-dessert",
+      "type": "grounded-reply",
+      "locale": "en",
+      "turns": ["What dessert do you recommend?"],
+      "expect": { "reply": { "mentionsAny": ["soft_cone"] } }
+    },
+    {
+      "id": "g-ko-recommend-dessert",
+      "type": "grounded-reply",
+      "locale": "ko",
+      "turns": ["디저트 뭐 추천해요?"],
+      "expect": { "reply": { "mentionsAny": ["soft_cone"] } }
+    },
+    {
+      "id": "g-en-popular",
+      "type": "grounded-reply",
+      "locale": "en",
+      "turns": ["What's popular?"],
+      "expect": { "reply": { "mentionsAny": ["cheese_burger", "soft_cone"] } }
+    },
+    {
+      "id": "g-ko-popular",
+      "type": "grounded-reply",
+      "locale": "ko",
+      "turns": ["제일 인기 있는 메뉴가 뭐예요?"],
+      "expect": { "reply": { "mentionsAny": ["cheese_burger", "soft_cone"] } }
     },
     {
       "id": "t9-en-one-burger",

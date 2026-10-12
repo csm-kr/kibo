@@ -29,7 +29,10 @@
     {
       "step": 3,
       "name": "voice-e2e",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-13T02:33:30+0900",
+      "summary": "I-072 fixed test-first: menuForModel keeps badge; buildInstructions limits item descriptions to menu-data words, 'popular/recommended' = best badge, other item questions -> 'kiosk does not have that information' (staff only when needed; halal/origin rule unchanged). scripts/grounding.ts (tested, vitest now includes scripts/**/*.test.ts): reply names, deny-list words, popularity only for best items, off-menu food; eval-agent.ts gets expectation kind reply {mentionsAny} and stores only pass/fail, matched words, item ids. 4 grounded-reply cases. Voice: scripts/make-voice-fixtures.ts (npm run fixtures:voice, gemini-3.8-flash-tts, 48 kHz WAV, 1 s lead / 2 s tail; a style prefix gets spoken, so the sentence alone) -> e2e/fixtures/hero-en, fries-en, hero-ko.wav (fries-en not used by a test yet). src/lib/voice/e2eMarks.ts (tested, only with ?e2e=1, window.__kiboVoiceTimings): gate opens after 1 s of silence and sends one utterance (the fake mic loops the file; earlier it opened at an inner pause and Live heard half a sentence), speechEnd = last voiced frame before the model's first output, firstAudio, firstTool; wired into useLiveVoice. e2e/voice.live.spec.ts: own Chromium per fixture (launch flags cannot change per describe), /demo?e2e=1 -> Start -> mic, asserts the hero cart from /api/command responses and the same lines on phone and kiosk, MutationObserver for the first k-ring; every run appended to evidence/voice-e2e.json (fixture, pass, a/b/tool ms, command types, model; no text, no token). Found I-081 (Live added one set and promised the other): two instruction lines, call addToCart for every line before speaking. Official: 3 runs of test:e2e:live, 6/6 voice (hero-en 3/3, hero-ko 3/3) + demo text @live 3/3; gemini-3.8-live; median (a) 2,070 ms (over 2 s, I-082 open), (b) 1,084 ms. Eval after all changes 32/32 (evals/results/2026-10-13T02-54). TESTING ledger and ISSUE (I-072 fixed, I-081, I-082) updated.",
+      "completed_at": "2026-10-13T03:00:00+0900"
     },
     {
       "step": 4,

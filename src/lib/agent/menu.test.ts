@@ -29,6 +29,13 @@ describe("menuForModel", () => {
     expect(cheese.groups.find((g) => g.groupId === "side")!.default).toEqual(["fries_m"]);
   });
 
+  it("keeps the best/new badge so popularity questions have a data answer", () => {
+    expect(cheese.badge).toBe("best");
+    expect(menu.items.find((i) => i.itemId === "soft_cone")!.badge).toBe("best");
+    expect(menu.items.find((i) => i.itemId === "spicy_chicken_burger")!.badge).toBe("new");
+    expect(menu.items.find((i) => i.itemId === "apple_pie")!.badge).toBeNull();
+  });
+
   it("keeps sold-out and hours", () => {
     expect(menu.items.find((i) => i.itemId === "shrimp_burger")!.soldOut).toBe(true);
     expect(menu.items.find((i) => i.itemId === "egg_muffin")!.hours).toBe("05:00-10:30");

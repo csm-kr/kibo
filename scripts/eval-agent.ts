@@ -1,6 +1,7 @@
 // Agent evaluation (docs/TESTING.md "Agent evaluation set"): runs evals/agent-cases.json against real Gemini
 // through runChat, exactly as POST /api/chat does, and saves the result as evidence in evals/results/.
-// Results hold ids, codes and timings only: no reply text, no utterances, no key.
+// Results hold ids, codes and timings only: no reply text, no utterances, no key. Reply cases keep only the
+// grounding verdict and the deny-list words it matched.
 // Run with `npm run eval:agent` (reads GEMINI_API_KEY from .env).
 
 import { randomUUID } from "node:crypto";
@@ -12,9 +13,11 @@ import { CommandError } from "@/lib/commands/errors";
 import { MemoryUsageStore } from "@/lib/limits/usage";
 import { chatReducer, historyFor, initialChat } from "@/lib/phone/chat";
 import { createSession } from "@/lib/session/service";
+import { getKiosk } from "@/lib/adapters/catalog";
 import { MemoryStore } from "@/lib/store/memory";
 import type { Locale } from "@/types/menu";
 import type { CartLine, Session, SessionStatus } from "@/types/session";
+import { checkGrounding, type GroundingResult } from "./grounding";
 
 interface ExpectedLine {
   itemId: string;
@@ -28,7 +31,9 @@ type Expect =
   | { choices: { templateId: string; ids: string[] } }
   | { staff: true }
   | { refuse: true }
-  | { status: SessionStatus };
+  | { status: SessionStatus }
+  // The last reply passes the grounding check (I-072) and names at least one of these items.
+  | { reply: { mentionsAny: string[] } };
 
 interface Case {
   id: string;
@@ -100,9 +105,15 @@ function cartIds(cart: CartLine[]) {
   return cart.map(({ itemId, variant, qty, selections }) => ({ itemId, variant, qty, selections }));
 }
 
-function judge(c: Case, final: Session, before: CartLine[], calls: ToolCall[]): string | null {
+function judge(c: Case, final: Session, before: CartLine[], calls: ToolCall[], grounding: GroundingResult | null): string | null {
   const unchanged = normalize(final.cart) === normalize(before);
   const e = c.expect;
+  if ("reply" in e) {
+    if (!unchanged) return "cart changed";
+    if (!grounding) return "no reply";
+    if (!grounding.pass) return `ungrounded: ${grounding.matched.join(",")}`;
+    return e.reply.mentionsAny.some((id) => grounding.mentioned.includes(id)) ? null : "names none of the expected items";
+  }
   if ("cart" in e) return normalize(final.cart) === normalize(e.cart) ? null : "final cart differs";
   if ("status" in e) return final.status === e.status ? null : `status ${final.status}`;
   if (!unchanged) return "cart changed";
@@ -126,6 +137,7 @@ async function runCase(c: Case, model: ModelClient) {
 
   let chat = initialChat;
   let before: CartLine[] = [];
+  let lastReply: string | null = null;
   const allCalls: ToolCall[] = [];
   const requests: RequestLog[] = [];
 
@@ -166,6 +178,7 @@ async function runCase(c: Case, model: ModelClient) {
         reply = (await runChat(deps, input)).reply;
       }
       chat = chatReducer(chat, { type: "reply", text: reply });
+      lastReply = reply;
     } catch (e) {
       if (!(e instanceof CommandError)) throw e;
       log.error = e.code;
@@ -181,7 +194,10 @@ async function runCase(c: Case, model: ModelClient) {
   }
 
   const final = (await store.get(sessionId))!;
-  const failure = requests.find((r) => r.error) ? `request error ${requests.find((r) => r.error)!.error}` : judge(c, final, before, allCalls);
+  const grounding = "reply" in c.expect && lastReply !== null ? checkGrounding(lastReply, getKiosk("malo")) : null;
+  const failure = requests.find((r) => r.error)
+    ? `request error ${requests.find((r) => r.error)!.error}`
+    : judge(c, final, before, allCalls, grounding);
   return {
     id: c.id,
     type: c.type,
@@ -192,6 +208,7 @@ async function runCase(c: Case, model: ModelClient) {
     cart: cartIds(final.cart),
     pendingChoice: final.pendingChoice,
     staffCalled: final.staffCalled ? final.staffCalled.reasonCode : null,
+    ...(grounding ? { grounding } : {}),
     requests,
   };
 }

@@ -12,7 +12,8 @@
     "test:e2e:live": "E2E_LIVE=1 playwright test --grep @live",
     "test:firestore": "FIRESTORE_IT=1 STORE=firestore vitest run src/lib/store/firestore.it.test.ts",
     "qa:ui": "playwright test -c playwright.qa.config.ts",
-    "eval:agent": "tsx --env-file=.env scripts/eval-agent.ts"
+    "eval:agent": "tsx --env-file=.env scripts/eval-agent.ts",
+    "fixtures:voice": "tsx --env-file=.env scripts/make-voice-fixtures.ts"
   },
   "dependencies": {
     "@google/genai": "^2.28.0",

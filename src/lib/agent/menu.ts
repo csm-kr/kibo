@@ -1,6 +1,6 @@
 import type { KioskData } from "@/types/menu";
 
-// The menu as the model sees it: everything it may quote (names, prices, options, allergens, kcal),
+// The menu as the model sees it: everything it may quote (names, prices, options, allergens, kcal, badge),
 // nothing it does not need (images, theme). Compact, because it goes into every voice and text session.
 
 export function menuForModel(k: KioskData) {
@@ -26,6 +26,7 @@ export function menuForModel(k: KioskData) {
       hours: i.availableHours,
       allergens: i.allergens,
       kcal: i.kcal,
+      badge: i.badge,
     })),
   };
 }

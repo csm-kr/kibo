@@ -1,0 +1,107 @@
+{
+  "about": "Voice order E2E on /demo with real Gemini Live (e2e/voice.live.spec.ts, `npm run test:e2e:live`). Synthetic TTS voice (Gemini TTS, e2e/fixtures) through Chromium's fake microphone on a laptop, not a real phone. End of speech = the last voiced 40 ms mic frame sent to Live before the model's first output; the page sends the looping fixture once. (a) end of speech → first AI audio chunk; (b) end of speech → first 2 s highlight ring on the kiosk half. Medians over passing runs.",
+  "model": "gemini-3.8-live",
+  "firstRun": "2026-10-12T17:51:42.293Z",
+  "lastRun": "2026-10-12T17:53:52.099Z",
+  "summary": {
+    "runs": 6,
+    "passed": 6,
+    "aMedianMs": 2070,
+    "bMedianMs": 1084,
+    "byFixture": {
+      "hero-en": {
+        "runs": 3,
+        "passed": 3,
+        "aMedianMs": 2164,
+        "bMedianMs": 1142
+      },
+      "hero-ko": {
+        "runs": 3,
+        "passed": 3,
+        "aMedianMs": 1772,
+        "bMedianMs": 896
+      }
+    }
+  },
+  "runs": [
+    {
+      "at": "2026-10-12T17:51:42.293Z",
+      "fixture": "hero-en",
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 2227,
+      "bMs": 1257,
+      "toolMs": 1095,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ]
+    },
+    {
+      "at": "2026-10-12T17:52:01.880Z",
+      "fixture": "hero-ko",
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 3079,
+      "bMs": 1125,
+      "toolMs": 1073,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok",
+        "offerChoices:ok"
+      ]
+    },
+    {
+      "at": "2026-10-12T17:52:38.096Z",
+      "fixture": "hero-en",
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 1975,
+      "bMs": 1043,
+      "toolMs": 887,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ]
+    },
+    {
+      "at": "2026-10-12T17:52:57.338Z",
+      "fixture": "hero-ko",
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 1772,
+      "bMs": 696,
+      "toolMs": 645,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ]
+    },
+    {
+      "at": "2026-10-12T17:53:32.632Z",
+      "fixture": "hero-en",
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 2164,
+      "bMs": 1142,
+      "toolMs": 982,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ]
+    },
+    {
+      "at": "2026-10-12T17:53:52.099Z",
+      "fixture": "hero-ko",
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 1530,
+      "bMs": 896,
+      "toolMs": 844,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ]
+    }
+  ]
+}

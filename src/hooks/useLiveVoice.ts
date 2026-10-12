@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { ApiError, liveToken, sendCommand } from "@/lib/client/api";
 import { errorCopy } from "@/lib/i18n/errors";
 import { pt } from "@/lib/i18n/phone";
+import { e2eFrame, e2eMarks, e2eOutput, frameRms } from "@/lib/voice/e2eMarks";
 import { base64ToFloat32, downsampleTo16k, int16ToBase64 } from "@/lib/voice/pcm";
 import { runToolCalls } from "@/lib/voice/toolRunner";
 import { initialTurns, noiseStep, raiseSeq, turnEvents, turnsReducer, type TurnEvent } from "@/lib/voice/turns";
@@ -93,6 +94,8 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
   let run: Run | null = null;
   // Survives reconnects and restarts, so utteranceSeq never goes back during this order.
   let turns = initialTurns();
+  // Latency marks for the voice E2E (`?e2e=1` only); null otherwise.
+  const marks = e2eMarks();
 
   function flushUser(r: Run) {
     const text = r.userText.trim();
@@ -167,6 +170,7 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
   function sendFrame(r: Run, frame: Float32Array) {
     // Half-duplex: nothing goes up while the AI voice plays or just after.
     if (!r.live || r.sources.size > 0 || performance.now() < r.mutedUntil) return;
+    if (marks && !e2eFrame(marks, frameRms(frame), performance.now())) return;
     const pcm = downsampleTo16k(frame, r.ctx.sampleRate);
     try {
       r.live.sendRealtimeInput({ audio: { data: int16ToBase64(pcm), mimeType: "audio/pcm;rate=16000" } });
@@ -233,6 +237,12 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     const events = turnEvents(m);
     countTurns(events);
     const sc = m.serverContent;
+    if (marks) {
+      const now = performance.now();
+      if (m.toolCall?.functionCalls?.length) e2eOutput(marks, "tool", now);
+      if (events.some((e) => e.type === "modelOutput")) e2eOutput(marks, "text", now);
+      if (sc?.modelTurn?.parts?.some((p) => p.inlineData?.mimeType?.startsWith("audio/"))) e2eOutput(marks, "audio", now);
+    }
 
     if (m.setupComplete) {
       r.retries = 0;

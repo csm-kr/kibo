@@ -27,7 +27,7 @@ About 20 utterances in Korean and English (the supported languages), each with t
 Report pass rate per type. Cases are in `evals/agent-cases.json`; `npm run eval:agent` runs them against real Gemini (needs `GEMINI_API_KEY` in `.env`) and writes `evals/results/<KST time>.json` and `.md`.
 
 ## End to end
-- `npm run test:e2e`: Playwright against the dev server with the in-memory store, no model calls. `npm run test:e2e:live` runs only the `@live` tests (`/demo` typed order to real Gemini; needs `GEMINI_API_KEY` in `.env`).
+- `npm run test:e2e`: Playwright against the dev server with the in-memory store, no model calls. `npm run test:e2e:live` runs only the `@live` tests (`/demo` typed order to real Gemini, and `e2e/voice.live.spec.ts`: the hero order spoken to Gemini Live by a synthetic TTS voice through Chromium's fake microphone; needs `GEMINI_API_KEY` in `.env`). The voice fixtures in `e2e/fixtures/` come from `npm run fixtures:voice` (Gemini TTS); no real person's voice.
 - Real phones (iOS Safari, Android Chrome) from QR scan to order number; three consecutive passes the day before recording.
 - iOS checks: mic permission persistence across visits, silent switch, volume, AI voice feeding back into the mic, KakaoTalk/Naver in-app browsers.
 - Live reconnect (network switch, screen lock).
@@ -61,8 +61,9 @@ python3 design/prototype/e2e_check.py   # prototype state logic (42 checks)
 | Prototype hero order (reference only) | touch 19 taps vs 5 utterances + 4 phone taps + 3 kiosk taps | `design/prototype/e2e_check.py` | measured, not for the deck |
 | Touch hero order on `/kiosk` (automated tap count) | 41 taps, total 14,800원. Path: both sets added with fries M, then [전체 삭제] and both re-added with fries L, because the kiosk cannot change options on a cart line. The run's 3 s is Playwright speed, not a human timing | `evidence/touch-hero.json` (`e2e/kiosk-touch.spec.ts`, 10-12) | measured, taps only |
 | Touch vs voice on the real `/kiosk` | — | 10/16 measurement log | planned |
-| Latency (a)(b) | — | 10/14–16 measurements | planned |
-| Agent evaluation pass rate (text agent, `/api/chat` path) | 28/28 (100%) in each of two runs, `gemini-3.8-flash` thinking `low`; types 1–6, 8, 9 and checkout, Korean and English; type 7 not covered yet. Cases written by the KIBO team, not an external benchmark. Per request median 5.9 s / 6.0 s, p90 12.1 s / 9.9 s; until the first command is applied median 2.5 s / 3.3 s, p90 6.7 s / 6.8 s (in-process, no network to the route) | `evals/results/2026-10-13T01-38.{json,md}`, `evals/results/2026-10-13T01-45.{json,md}` (`npm run eval:agent`, cases `evals/agent-cases.json`) | measured |
+| Latency (a)(b), voice hero order on `/demo` | 6/6 runs passed (hero-en 3/3, hero-ko 3/3), `gemini-3.8-live`, 10-13. (a) end of speech → first AI audio: median 2,070 ms (target ≤ 2 s, missed, I-082). (b) end of speech → kiosk highlight: median 1,084 ms (target ≤ 3 s). Synthetic TTS voice on a laptop (Chromium fake microphone), not a real phone; end of speech is the last voiced mic frame sent to Live | `evidence/voice-e2e.json` (`e2e/voice.live.spec.ts`, three runs of `npm run test:e2e:live`) | measured, synthetic voice |
+| Latency on a real phone | — | 10/14–16 measurements | planned |
+| Agent evaluation pass rate (text agent, `/api/chat` path) | 32/32 (100%), `gemini-3.8-flash` thinking `low`, 10-13 after the grounding and batching instruction changes (I-072, I-081); types 1–6, 8, 9, checkout and grounded-reply (reply checked by `scripts/grounding.ts`), Korean and English; type 7 not covered yet. Cases written by the KIBO team, not an external benchmark. Per request median 5.1 s, p90 8.0 s; until the first command is applied median 2.3 s, p90 4.6 s (in-process, no network to the route). Earlier: 28/28 in each of two runs before the changes | `evals/results/2026-10-13T02-54.{json,md}`; earlier `2026-10-13T01-38`, `2026-10-13T01-45` (`npm run eval:agent`, cases `evals/agent-cases.json`) | measured |
 | Cost per session | — | 10/14 token log | planned |
 | Real kiosk tap counts | — | field notes (10/13) | planned |
 

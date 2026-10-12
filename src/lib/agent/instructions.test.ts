@@ -50,6 +50,20 @@ describe("buildInstructions", () => {
     expect(text).toMatch(/halal/);
   });
 
+  it("limits item descriptions to menu data words (I-072)", () => {
+    expect(text).toMatch(/describe items only with words from the menu data/i);
+    expect(text).toMatch(/never add taste, temperature, origin, freshness or popularity words/i);
+    expect(text).toMatch(/"popular" or "recommended" means items with the best badge/i);
+    expect(text).toContain("The soft cone is marked as a best seller.");
+    expect(text).toMatch(/kiosk does not have that information/);
+    expect(text).toMatch(/call staff only when the user needs it to decide/i);
+  });
+
+  it("asks for every line of one sentence in the same response, before speaking", () => {
+    expect(text).toMatch(/call addToCart for every line in the same response, before you say anything/);
+    expect(text).toMatch(/Never say you will add something later/);
+  });
+
   it("states choices, edits, upsell and undo", () => {
     expect(text).toContain("offerChoices");
     expect(text).toContain("updateCart");
