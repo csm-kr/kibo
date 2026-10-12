@@ -24,7 +24,7 @@ About 20 utterances in Korean and English (the supported languages), each with t
 8. unknown item → refuses
 9. ambiguous ("one burger") → choice buttons
 
-Report pass rate per type.
+Report pass rate per type. Cases are in `evals/agent-cases.json`; `npm run eval:agent` runs them against real Gemini (needs `GEMINI_API_KEY` in `.env`) and writes `evals/results/<KST time>.json` and `.md`.
 
 ## End to end
 - `npm run test:e2e`: Playwright against the dev server with the in-memory store, no model calls. `npm run test:e2e:live` runs only the `@live` tests (`/demo` typed order to real Gemini; needs `GEMINI_API_KEY` in `.env`).
@@ -62,7 +62,7 @@ python3 design/prototype/e2e_check.py   # prototype state logic (42 checks)
 | Touch hero order on `/kiosk` (automated tap count) | 41 taps, total 14,800원. Path: both sets added with fries M, then [전체 삭제] and both re-added with fries L, because the kiosk cannot change options on a cart line. The run's 3 s is Playwright speed, not a human timing | `evidence/touch-hero.json` (`e2e/kiosk-touch.spec.ts`, 10-12) | measured, taps only |
 | Touch vs voice on the real `/kiosk` | — | 10/16 measurement log | planned |
 | Latency (a)(b) | — | 10/14–16 measurements | planned |
-| Agent evaluation pass rate | — | 10/13 eval results | planned |
+| Agent evaluation pass rate (text agent, `/api/chat` path) | 28/28 (100%) in each of two runs, `gemini-3.8-flash` thinking `low`; types 1–6, 8, 9 and checkout, Korean and English; type 7 not covered yet. Cases written by the KIBO team, not an external benchmark. Per request median 5.9 s / 6.0 s, p90 12.1 s / 9.9 s; until the first command is applied median 2.5 s / 3.3 s, p90 6.7 s / 6.8 s (in-process, no network to the route) | `evals/results/2026-10-13T01-38.{json,md}`, `evals/results/2026-10-13T01-45.{json,md}` (`npm run eval:agent`, cases `evals/agent-cases.json`) | measured |
 | Cost per session | — | 10/14 token log | planned |
 | Real kiosk tap counts | — | field notes (10/13) | planned |
 

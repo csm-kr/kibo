@@ -31,6 +31,25 @@ describe("geminiClient", () => {
     expect(sent.config.maxOutputTokens).toBeLessThanOrEqual(2048);
   });
 
+  it("thinking level comes from GEMINI_TEXT_THINKING (default low); temperature stays the model default", async () => {
+    const generate = vi.fn().mockResolvedValue({ candidates: [] });
+    const saved = process.env.GEMINI_TEXT_THINKING;
+    try {
+      delete process.env.GEMINI_TEXT_THINKING;
+      await geminiClient(fakeAi(generate)).generate(REQ);
+      process.env.GEMINI_TEXT_THINKING = "high";
+      await geminiClient(fakeAi(generate)).generate(REQ);
+      process.env.GEMINI_TEXT_THINKING = "minimal";
+      await geminiClient(fakeAi(generate)).generate(REQ);
+    } finally {
+      if (saved === undefined) delete process.env.GEMINI_TEXT_THINKING;
+      else process.env.GEMINI_TEXT_THINKING = saved;
+    }
+    const configs = generate.mock.calls.map((c) => c[0].config);
+    expect(configs.map((c) => c.thinkingConfig)).toEqual([{ thinkingLevel: "LOW" }, { thinkingLevel: "HIGH" }, { thinkingLevel: "LOW" }]);
+    expect(configs[0]).not.toHaveProperty("temperature");
+  });
+
   it("an empty answer is an empty model turn", async () => {
     const out = await geminiClient(fakeAi(async () => ({ candidates: [] }))).generate(REQ);
     expect(out).toEqual({ content: { role: "model", parts: [] }, functionCalls: [], text: "" });

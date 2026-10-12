@@ -1,0 +1,249 @@
+{
+  "about": "Text-agent evaluation set for the MALO BURGER kiosk (docs/TESTING.md \"Agent evaluation set\"). Written by the KIBO team, not an external benchmark. Each case starts on a fresh /demo session (status connected, empty cart) at 14:00 KST. Types follow TESTING 1-6, 8, 9; \"checkout\" checks the confirm rule. A cart expectation merges identical lines and counts defaults (set side fries_m, drink size m).",
+  "notCovered": [
+    { "type": "7-count-limits", "reason": "Count limits (max 3 toppings) need the learned Doughhouse kiosk, which has no LearnedAdapter yet." }
+  ],
+  "cases": [
+    {
+      "id": "t1-en-several",
+      "type": "1-several-items",
+      "locale": "en",
+      "turns": ["One cheeseburger, just the burger. Chicken nuggets with honey mustard sauce, and a large cola."],
+      "expect": {
+        "cart": [
+          { "itemId": "cheese_burger", "variant": "single", "qty": 1, "selections": {} },
+          { "itemId": "chicken_nuggets", "variant": "single", "qty": 1, "selections": { "sauce": ["honey_mustard"] } },
+          { "itemId": "cola", "variant": "single", "qty": 1, "selections": { "size": ["l"] } }
+        ]
+      }
+    },
+    {
+      "id": "t1-ko-several",
+      "type": "1-several-items",
+      "locale": "ko",
+      "turns": ["치즈스틱 두 개랑 아이스티 하나, 소프트콘 하나 주세요."],
+      "expect": {
+        "cart": [
+          { "itemId": "cheese_sticks", "variant": "single", "qty": 2, "selections": {} },
+          { "itemId": "iced_tea", "variant": "single", "qty": 1, "selections": {} },
+          { "itemId": "soft_cone", "variant": "single", "qty": 1, "selections": {} }
+        ]
+      }
+    },
+    {
+      "id": "t2-en-hero",
+      "type": "2-same-item-different-options",
+      "locale": "en",
+      "turns": ["Two cheeseburger sets. One without pickles; drinks zero cola and cider."],
+      "expect": {
+        "cart": [
+          { "itemId": "cheese_burger", "variant": "set", "qty": 1, "selections": { "side": ["fries_m"], "drink": ["zero_cola"], "ingredients": ["no_pickles"] } },
+          { "itemId": "cheese_burger", "variant": "set", "qty": 1, "selections": { "side": ["fries_m"], "drink": ["cider"] } }
+        ]
+      }
+    },
+    {
+      "id": "t2-ko-hero",
+      "type": "2-same-item-different-options",
+      "locale": "ko",
+      "turns": ["치즈버거 세트 두 개요. 하나는 피클 빼고 제로콜라, 하나는 사이다로 주세요."],
+      "expect": {
+        "cart": [
+          { "itemId": "cheese_burger", "variant": "set", "qty": 1, "selections": { "side": ["fries_m"], "drink": ["zero_cola"], "ingredients": ["no_pickles"] } },
+          { "itemId": "cheese_burger", "variant": "set", "qty": 1, "selections": { "side": ["fries_m"], "drink": ["cider"] } }
+        ]
+      }
+    },
+    {
+      "id": "t3-en-set-no-drink",
+      "type": "3-missing-required-choice",
+      "locale": "en",
+      "turns": ["One bulgogi burger set, please."],
+      "expect": { "choices": { "templateId": "pick_option", "ids": ["cola", "zero_cola", "cider", "iced_coffee"] } }
+    },
+    {
+      "id": "t3-ko-set-no-drink",
+      "type": "3-missing-required-choice",
+      "locale": "ko",
+      "turns": ["치즈버거 세트 하나 주세요."],
+      "expect": { "choices": { "templateId": "pick_option", "ids": ["cola", "zero_cola", "cider", "iced_coffee"] } }
+    },
+    {
+      "id": "t3-en-variant",
+      "type": "3-missing-required-choice",
+      "locale": "en",
+      "turns": ["I'd like a classic burger."],
+      "expect": { "choices": { "templateId": "pick_variant", "ids": ["single", "set"] } }
+    },
+    {
+      "id": "t3-ko-sauce",
+      "type": "3-missing-required-choice",
+      "locale": "ko",
+      "turns": ["치킨너겟 하나 주세요."],
+      "expect": { "choices": { "templateId": "pick_option", "ids": ["sweet_chili", "honey_mustard", "bbq"] } }
+    },
+    {
+      "id": "t4-en-ingredients",
+      "type": "4-remove-add-ingredients",
+      "locale": "en",
+      "turns": ["A double cheeseburger, burger only, with extra cheese and no onion."],
+      "expect": {
+        "cart": [
+          { "itemId": "double_cheese_burger", "variant": "single", "qty": 1, "selections": { "ingredients": ["extra_cheese", "no_onion"] } }
+        ]
+      }
+    },
+    {
+      "id": "t4-ko-ingredients",
+      "type": "4-remove-add-ingredients",
+      "locale": "ko",
+      "turns": ["베이컨치즈버거 단품 하나, 피클 빼고 패티 추가해 주세요."],
+      "expect": {
+        "cart": [
+          { "itemId": "bacon_cheese_burger", "variant": "single", "qty": 1, "selections": { "ingredients": ["no_pickles", "extra_patty"] } }
+        ]
+      }
+    },
+    {
+      "id": "t5-en-both-fries-large",
+      "type": "5-edit-existing-line",
+      "locale": "en",
+      "turns": ["Two cheeseburger sets. One without pickles; drinks zero cola and cider.", "Make both fries large."],
+      "expect": {
+        "cart": [
+          { "itemId": "cheese_burger", "variant": "set", "qty": 1, "selections": { "side": ["fries_l"], "drink": ["zero_cola"], "ingredients": ["no_pickles"] } },
+          { "itemId": "cheese_burger", "variant": "set", "qty": 1, "selections": { "side": ["fries_l"], "drink": ["cider"] } }
+        ]
+      }
+    },
+    {
+      "id": "t5-ko-fries-large",
+      "type": "5-edit-existing-line",
+      "locale": "ko",
+      "turns": ["치즈버거 세트 하나, 음료는 콜라로 주세요.", "감자튀김은 큰 걸로 바꿔 주세요."],
+      "expect": {
+        "cart": [
+          { "itemId": "cheese_burger", "variant": "set", "qty": 1, "selections": { "side": ["fries_l"], "drink": ["cola"] } }
+        ]
+      }
+    },
+    {
+      "id": "t5-en-undo",
+      "type": "5-edit-existing-line",
+      "locale": "en",
+      "turns": ["One cola, please.", "And one apple pie.", "No, cancel that."],
+      "expect": {
+        "cart": [{ "itemId": "cola", "variant": "single", "qty": 1, "selections": { "size": ["m"] } }]
+      }
+    },
+    {
+      "id": "t5-ko-undo",
+      "type": "5-edit-existing-line",
+      "locale": "ko",
+      "turns": ["사이다 하나 주세요.", "코울슬로도 하나 추가해 주세요.", "아니요, 방금 거 취소해 주세요."],
+      "expect": {
+        "cart": [{ "itemId": "cider", "variant": "single", "qty": 1, "selections": { "size": ["m"] } }]
+      }
+    },
+    {
+      "id": "t5-ko-qty",
+      "type": "5-edit-existing-line",
+      "locale": "ko",
+      "turns": ["콜라 하나 주세요.", "콜라 두 개로 해 주세요."],
+      "expect": {
+        "cart": [{ "itemId": "cola", "variant": "single", "qty": 2, "selections": { "size": ["m"] } }]
+      }
+    },
+    {
+      "id": "t6-en-sold-out",
+      "type": "6-sold-out-or-hours",
+      "locale": "en",
+      "turns": ["One shrimp burger set with cola, please."],
+      "expect": { "choices": { "templateId": "alternatives", "ids": ["cheese_burger", "bulgogi_burger"] } }
+    },
+    {
+      "id": "t6-ko-sold-out",
+      "type": "6-sold-out-or-hours",
+      "locale": "ko",
+      "turns": ["새우버거 하나 주세요."],
+      "expect": { "choices": { "templateId": "alternatives", "ids": ["cheese_burger", "bulgogi_burger"] } }
+    },
+    {
+      "id": "t6-en-out-of-hours",
+      "type": "6-sold-out-or-hours",
+      "locale": "en",
+      "turns": ["An egg muffin, please."],
+      "expect": { "refuse": true }
+    },
+    {
+      "id": "t6-ko-out-of-hours",
+      "type": "6-sold-out-or-hours",
+      "locale": "ko",
+      "turns": ["해시브라운 하나 주세요."],
+      "expect": { "refuse": true }
+    },
+    {
+      "id": "t8-en-unknown-item",
+      "type": "8-not-in-data",
+      "locale": "en",
+      "turns": ["A pepperoni pizza, please."],
+      "expect": { "refuse": true }
+    },
+    {
+      "id": "t8-ko-unknown-item",
+      "type": "8-not-in-data",
+      "locale": "ko",
+      "turns": ["떡볶이 1인분 주세요."],
+      "expect": { "refuse": true }
+    },
+    {
+      "id": "t8-en-halal",
+      "type": "8-not-in-data",
+      "locale": "en",
+      "turns": ["Is this halal?"],
+      "expect": { "staff": true }
+    },
+    {
+      "id": "t8-ko-origin",
+      "type": "8-not-in-data",
+      "locale": "ko",
+      "turns": ["불고기버거 소고기 원산지가 어디예요?"],
+      "expect": { "staff": true }
+    },
+    {
+      "id": "t9-en-one-burger",
+      "type": "9-ambiguous",
+      "locale": "en",
+      "turns": ["One burger, please."],
+      "expect": { "choices": { "templateId": "pick_item", "ids": ["cheese_burger"] } }
+    },
+    {
+      "id": "t9-ko-one-drink",
+      "type": "9-ambiguous",
+      "locale": "ko",
+      "turns": ["음료 하나 주세요."],
+      "expect": { "choices": { "templateId": "pick_item", "ids": ["cola"] } }
+    },
+    {
+      "id": "co-en-ill-pay",
+      "type": "checkout",
+      "locale": "en",
+      "turns": ["One cola to take out, please.", "That's all. I'll pay."],
+      "expect": { "status": "confirming" }
+    },
+    {
+      "id": "co-en-pay-in-one-message",
+      "type": "checkout",
+      "locale": "en",
+      "turns": ["One zero cola to take out, then go straight to payment. Yes, I confirm, pay now."],
+      "expect": { "status": "confirming" }
+    },
+    {
+      "id": "co-ko-yes-after-card",
+      "type": "checkout",
+      "locale": "ko",
+      "turns": ["콜라 하나 포장이요.", "결제할게요.", "네, 결제해 주세요."],
+      "expect": { "status": "paying" }
+    }
+  ]
+}

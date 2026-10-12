@@ -1,4 +1,4 @@
-import { ApiError, GoogleGenAI, type Content, type Part, type ToolListUnion } from "@google/genai";
+import { ApiError, GoogleGenAI, ThinkingLevel, type Content, type Part, type ToolListUnion } from "@google/genai";
 import { CommandError } from "@/lib/commands/errors";
 
 // The text agent's model (ADR-011). Server only: GEMINI_API_KEY never leaves this module.
@@ -17,6 +17,19 @@ export interface ModelClient {
 }
 
 const MAX_OUTPUT_TOKENS = 1024;
+
+// "low" took 3.5–5.1 s per round against about 7.1 s for the default with the same tool calls (I-059);
+// gemini-3.8-flash rejects "minimal", so it is not offered.
+const THINKING: Record<string, ThinkingLevel> = {
+  low: ThinkingLevel.LOW,
+  medium: ThinkingLevel.MEDIUM,
+  high: ThinkingLevel.HIGH,
+};
+
+function thinkingLevel(): ThinkingLevel {
+  const v = process.env.GEMINI_TEXT_THINKING;
+  return v !== undefined && Object.hasOwn(THINKING, v) ? THINKING[v] : ThinkingLevel.LOW;
+}
 
 /** Upstream messages can hold request data, so callers only ever see these fixed ones. */
 function modelError(e: unknown): CommandError {
@@ -41,7 +54,8 @@ export function geminiClient(ai?: Pick<GoogleGenAI, "models">): ModelClient {
             systemInstruction: system,
             tools: tools as ToolListUnion,
             maxOutputTokens: MAX_OUTPUT_TOKENS,
-            temperature: 0.2,
+            // Temperature stays the model default, as Google advises for Gemini 3.
+            thinkingConfig: { thinkingLevel: thinkingLevel() },
           },
         });
       } catch (e) {

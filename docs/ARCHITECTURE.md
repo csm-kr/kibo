@@ -465,6 +465,7 @@ Anti-hallucination: names, prices and options exist only in menu data; the serve
 |---|---|---|
 | `GEMINI_API_KEY` | `.env` locally; Secret Manager `gemini-api-key` on Cloud Run | server only, never sent to a browser |
 | `GEMINI_TEXT_MODEL`, `GEMINI_LIVE_MODEL` | env | ADR-011 |
+| `GEMINI_TEXT_THINKING` | env | text agent thinking level: `low` (default), `medium` or `high`; `gemini-3.8-flash` rejects `minimal`. `low` was chosen for latency (I-059, `evals/results/2026-10-13T01-38.md`); temperature stays the model default |
 | `STORE` | env | `firestore` (default when `NODE_ENV=production`) or `memory` (default otherwise; tests, local E2E, `npm run qa:ui`) |
 | `GOOGLE_CLOUD_PROJECT` | env | `kibo-2026`; locally the Admin SDK uses gcloud application default credentials |
 

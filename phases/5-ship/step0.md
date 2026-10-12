@@ -12,7 +12,7 @@ Make the app ready to deploy and to stay up for three weeks of judging.
 
 ### `scripts/deploy.sh`
 A POSIX `sh` script (set -eu) that deploys from source with Cloud Build:
-`gcloud run deploy kibo --source . --project kibo-2026 --region asia-northeast3 --service-account kibo-runtime@kibo-2026.iam.gserviceaccount.com --allow-unauthenticated --min-instances 1 --max-instances 3 --concurrency 80 --timeout 3600 --cpu 1 --memory 1Gi --set-secrets GEMINI_API_KEY=gemini-api-key:latest --set-env-vars STORE=firestore,GOOGLE_CLOUD_PROJECT=kibo-2026,GEMINI_TEXT_MODEL=gemini-3.8-flash,GEMINI_LIVE_MODEL=gemini-3.8-live`, then prints the service URL and curls `/api/health`. The region flag is mandatory (CLAUDE.md: the local gcloud default points elsewhere). `--timeout 3600` keeps SSE streams open up to an hour; `EventSource` reconnects after.
+`gcloud run deploy kibo --source . --project kibo-2026 --region asia-northeast3 --service-account kibo-runtime@kibo-2026.iam.gserviceaccount.com --allow-unauthenticated --min-instances 1 --max-instances 3 --concurrency 80 --timeout 3600 --cpu 1 --memory 1Gi --set-secrets GEMINI_API_KEY=gemini-api-key:latest --set-env-vars STORE=firestore,GOOGLE_CLOUD_PROJECT=kibo-2026,GEMINI_TEXT_MODEL=gemini-3.8-flash,GEMINI_TEXT_THINKING=low,GEMINI_LIVE_MODEL=gemini-3.8-live`, then prints the service URL and curls `/api/health`. The region flag is mandatory (CLAUDE.md: the local gcloud default points elsewhere). `--timeout 3600` keeps SSE streams open up to an hour; `EventSource` reconnects after.
 Note: this script is run by a person or the orchestrator, never by the app.
 
 ### Build context
