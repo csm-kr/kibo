@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="240" height="240" fill="none" stroke="#163A70" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Transit card">
+  <!-- contactless card: card outline, chip, tap waves -->
+  <rect x="2" y="5" width="20" height="14" rx="2.5"/>
+  <rect x="5" y="9" width="4" height="3" rx="0.75"/>
+  <path d="M5 15.5h6"/>
+  <path d="M15 9.5a3 3 0 0 1 0 5M17.5 8a5.5 5.5 0 0 1 0 8"/>
+</svg>

@@ -360,3 +360,32 @@ describe("negative price deltas", () => {
     expect(unitPriceOf(fares, "cheese_burger", "single", { ingredients: ["child", "extra_cheese"] })).toBe(4900 - 2000 + 500);
   });
 });
+
+describe("airport rail tickets", () => {
+  const rail = getKiosk("airport_rail");
+
+  it("needs a top-up choice for the transit card", () => {
+    const e = catchError(() => resolveLine(rail, { itemId: "transit_card" }, AFTERNOON));
+    expect(e.code).toBe("NEEDS_CHOICE");
+    expect(e.detail).toMatchObject({ templateId: "pick_option", itemId: "transit_card", groupId: "top_up" });
+  });
+
+  it("2 adults and 1 child on the express are two lines with the right total", () => {
+    const next = ids();
+    let cart: CartLine[] = [];
+    cart = addLine(rail, cart, { itemId: "express_city_center", qty: 2 }, AFTERNOON, next).cart;
+    cart = addLine(rail, cart, {
+      itemId: "express_city_center",
+      selections: { passenger: ["child"] },
+    }, AFTERNOON, next).cart;
+    expect(cart).toHaveLength(2);
+    expect(cart[0]).toMatchObject({ variant: "single", qty: 2, selections: { passenger: ["adult"] }, unitPrice: 11000 });
+    expect(cart[1]).toMatchObject({ qty: 1, selections: { passenger: ["child"] }, unitPrice: 5500 });
+    expect(cartTotal(cart)).toBe(27500);
+  });
+
+  it("sells a transit card with a 10,000 won top-up for 14,000 won", () => {
+    const line = resolveLine(rail, { itemId: "transit_card", selections: { top_up: ["top_up_10000"] } }, AFTERNOON);
+    expect(line.unitPrice).toBe(14000);
+  });
+});

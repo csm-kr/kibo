@@ -1,4 +1,5 @@
 import { z } from "zod";
+import airportRail from "../../../data/kiosks/airport_rail.json";
 import malo from "../../../data/kiosks/malo.json";
 import doughhouse from "../../../skills/doughhouse.json";
 import type {
@@ -13,7 +14,7 @@ import type {
 } from "@/types/menu";
 import { learnedToKiosk, skillSchema } from "./learned";
 
-export type KioskId = "malo" | "doughhouse";
+export type KioskId = "malo" | "doughhouse" | "airport_rail";
 
 export class CatalogError extends Error {
   constructor(message: string) {
@@ -24,7 +25,8 @@ export class CatalogError extends Error {
 
 const localizedName = z.strictObject({ ko: z.string(), en: z.string() });
 const variant = z.enum(["single", "set", "largeSet"]);
-const imagePath = z.string().startsWith("/menu/");
+/** Food photos live in /menu/, other kiosks' pictograms in /kiosks/<kioskId>/. */
+const imagePath = z.string().regex(/^\/(menu|kiosks)\//);
 const won = z.number().int();
 
 const menuOption = z.strictObject({
@@ -94,6 +96,7 @@ export const kioskSchema: z.ZodType<KioskData> = z.strictObject({
 const sources: Record<KioskId, () => KioskData> = {
   malo: () => kioskSchema.parse(malo),
   doughhouse: () => learnedToKiosk(skillSchema.parse(doughhouse)),
+  airport_rail: () => kioskSchema.parse(airportRail),
 };
 const cache = new Map<KioskId, KioskData>();
 

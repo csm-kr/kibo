@@ -21,7 +21,10 @@
     {
       "step": 2,
       "name": "airport-rail-data",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-13T05:15:12+0900",
+      "summary": "data/kiosks/airport_rail.json: kioskId airport_rail, direct, domain ticket, brand 스카이라인 공항열차 / SKYLINE AIRPORT RAIL (not 공항철도: real operator name, on the step-1 brand list, I-107), tagline 도심까지 가장 빠른 길; navy theme primary #163A70, dark #0C2449, tint #DCEBF9, accent #F6C445 (ink text), bg #F6F8FB, all pairs >= 9:1; locales [ko,en], no dineOptions, vocabulary 승차권/ticket, 선택/Select, 선택한 승차권/Selected tickets; upsellRules [] (transit card needs a top-up choice, so a one-tap upsell would hit NEEDS_CHOICE). Categories express, all_stop, pass; 11 items, variant single only: express_city_center 11,000 (best, seat group window/aisle optional), express_city_center_return 21,000, all_stop_{harbor_gate 1450, expo_park 2050, riverside 3150, old_town 4150, city_center 4750} with subtitles, day_pass 15,000, two_day_pass 25,000, transit_card 4,000 + required top_up (top_up_0/10000/20000/30000, no default), rail_night_bus_combo 18,000 soldOut. Every train: required passenger group adult(0)/teen(-20%)/child(-50%)/senior(-30%), default adult; kcal null, allergens [], availableHours null. Stroke SVG pictograms (24 grid, 1.75 stroke, navy) in public/kiosks/airport_rail/{train,express,ticket,card,pass}.svg; kioskSchema imagePath now /menu/ or /kiosks/ (ARCHITECTURE updated). Registered in catalog.ts sources (KioskId, allKioskIds = malo, doughhouse, airport_rail), so /kiosk?k=airport_rail already loads before step 3 generalizes the UI; kiosk tiles may need unoptimized/plain img for SVG. Tests: airport_rail block in catalog.test.ts (categories, passenger default, fares >= 0, card top-up, theme contrast, no real names, no emoji) and cart.test.ts (transit_card NEEDS_CHOICE top_up, 2 adult + 1 child express = 27,500, card + 10,000 = 14,000); fixed step-1 -0 bug in the generic delta check (I-108). lint, build, 614 unit tests pass.",
+      "completed_at": "2026-10-13T05:22:00+0900"
     },
     {
       "step": 3,

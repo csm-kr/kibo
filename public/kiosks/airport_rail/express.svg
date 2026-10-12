@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="240" height="240" fill="none" stroke="#163A70" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Express train">
+  <!-- express train from the side: pointed nose, windows, speed lines, rail -->
+  <path d="M3 16V9a2 2 0 0 1 2-2h9c3.5 0 6.5 3 7 7v2z"/>
+  <path d="M6 10h3M11 10h3"/>
+  <path d="M16 10l3 3"/>
+  <circle cx="7" cy="18.5" r="1.25"/>
+  <circle cx="16" cy="18.5" r="1.25"/>
+  <path d="M2 21h20"/>
+  <path d="M1 4h5M3 1.5h4"/>
+</svg>

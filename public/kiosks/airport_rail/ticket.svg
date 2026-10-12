@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="240" height="240" fill="none" stroke="#163A70" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Ticket">
+  <!-- paper ticket with notched sides and a tear line -->
+  <path d="M3 6h18v4a2 2 0 0 0 0 4v4H3v-4a2 2 0 0 0 0-4z"/>
+  <path d="M15 6v2M15 11v2M15 16v2"/>
+  <path d="M6 10h6M6 14h4"/>
+</svg>

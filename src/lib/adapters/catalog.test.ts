@@ -120,7 +120,8 @@ describe.each(allKioskIds())("kiosk %s (generic checks)", (id) => {
     for (const item of k.items) {
       for (const v of item.variants) expect(v.price % 10, item.itemId).toBe(0);
       for (const g of item.optionGroups) {
-        for (const o of g.options) expect(o.priceDelta % 10, `${item.itemId}.${o.optionId}`).toBe(0);
+        // Math.abs: a negative delta gives -0, which toBe(0) rejects.
+        for (const o of g.options) expect(Math.abs(o.priceDelta % 10), `${item.itemId}.${o.optionId}`).toBe(0);
       }
       expect(lowestFare(k, item.itemId), item.itemId).toBeGreaterThanOrEqual(0);
     }
@@ -308,6 +309,118 @@ describe("malo.json", () => {
   });
 });
 
+/** WCAG relative luminance of a "#RRGGBB" color. */
+function luminance(hex: string): number {
+  const [r, g, b] = [1, 3, 5].map((i) => {
+    const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+function contrast(a: string, b: string): number {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (hi + 0.05) / (lo + 0.05);
+}
+
+describe("airport_rail.json", () => {
+  const rail = getKiosk("airport_rail");
+  const trains = rail.items.filter((i) => i.category === "express" || i.category === "all_stop");
+
+  it("is a direct ticket kiosk in Korean and English without dine options or hours", () => {
+    expect(rail.kind).toBe("direct");
+    expect(rail.domain).toBe("ticket");
+    expect(rail.locale).toBe("ko");
+    expect(rail.locales).toEqual(["ko", "en"]);
+    expect(rail.dineOptions).toBeUndefined();
+    expect(vocabularyOf(rail).item).toEqual({ ko: "승차권", en: "ticket" });
+    for (const item of rail.items) {
+      expect(item.availableHours, item.itemId).toBeNull();
+      expect(item.kcal, item.itemId).toBeNull();
+      expect(item.allergens, item.itemId).toEqual([]);
+    }
+  });
+
+  it("has 3 categories and 10-14 items, with one sold out", () => {
+    expect(rail.categories.map((c) => c.categoryId)).toEqual(["express", "all_stop", "pass"]);
+    expect(rail.items.length).toBeGreaterThanOrEqual(10);
+    expect(rail.items.length).toBeLessThanOrEqual(14);
+    expect(rail.items.filter((i) => i.soldOut)).toHaveLength(1);
+  });
+
+  it("gives every train a subtitle and a required passenger group defaulting to adult", () => {
+    expect(trains.length).toBeGreaterThanOrEqual(6);
+    for (const t of trains) {
+      expect(t.subtitle, t.itemId).toBeDefined();
+      const passenger = t.optionGroups.find((g) => g.groupId === "passenger");
+      expect(passenger, t.itemId).toMatchObject({ required: true, min: 1, max: 1, defaultOptionIds: ["adult"] });
+      expect(passenger?.options.map((o) => o.optionId), t.itemId).toEqual(["adult", "teen", "child", "senior"]);
+      expect(findOption(passenger!, "adult")?.priceDelta, t.itemId).toBe(0);
+    }
+  });
+
+  it("resolves every train fare to 0 or more for every passenger", () => {
+    for (const t of trains) {
+      const price = t.variants[0].price;
+      for (const o of t.optionGroups.find((g) => g.groupId === "passenger")!.options) {
+        expect(price + o.priceDelta, `${t.itemId}.${o.optionId}`).toBeGreaterThanOrEqual(0);
+      }
+    }
+  });
+
+  it("has the express at 11,000 with an optional seat group, and all-stop fares from 1,450 to 4,750", () => {
+    const express = findItem(rail, "express_city_center")!;
+    expect(express.variants).toEqual([{ variant: "single", price: 11000 }]);
+    expect(express.badge).toBe("best");
+    expect(express.optionGroups.find((g) => g.groupId === "seat")).toMatchObject({ required: false, min: 0, max: 1 });
+    for (const t of rail.items.filter((i) => i.category === "all_stop")) {
+      const price = t.variants[0].price;
+      expect(price, t.itemId).toBeGreaterThanOrEqual(1450);
+      expect(price, t.itemId).toBeLessThanOrEqual(4750);
+    }
+  });
+
+  it("sells the transit card with a required top-up group and no default", () => {
+    const card = findItem(rail, "transit_card")!;
+    expect(card.variants).toEqual([{ variant: "single", price: 4000 }]);
+    const topUp = card.optionGroups.find((g) => g.groupId === "top_up");
+    expect(topUp).toMatchObject({ required: true, min: 1, max: 1, defaultOptionIds: [] });
+    expect(topUp?.options.map((o) => o.priceDelta)).toEqual([0, 10000, 20000, 30000]);
+    expect(findItem(rail, "day_pass")?.variants).toEqual([{ variant: "single", price: 15000 }]);
+  });
+
+  it("keeps its pictograms under /kiosks/airport_rail/ as SVG", () => {
+    const paths = [...rail.categories.map((c) => c.icon), ...rail.items.map((i) => i.image)];
+    for (const p of paths) expect(p, p).toMatch(/^\/kiosks\/airport_rail\/[a-z_]+\.svg$/);
+  });
+
+  it("keeps every theme text pair at 4.5:1 or more on a light background", () => {
+    const { primary, primaryDark, primaryTint, accent, background } = rail.theme;
+    const white = "#FFFFFF";
+    const ink = "#1E1B18";
+    const pairs: [string, string][] = [
+      [white, primary], [primaryTint, primary], [background, primary], [primary, white],
+      [primary, background], [primary, primaryTint], [primaryDark, primaryTint], [white, primaryDark],
+      [primaryDark, background], [ink, accent], [ink, background], [ink, primaryTint],
+    ];
+    for (const [fg, bg] of pairs) expect(contrast(fg, bg), `${fg} on ${bg}`).toBeGreaterThanOrEqual(4.5);
+    expect(luminance(background)).toBeGreaterThan(0.8);
+  });
+
+  it("names no real airport, line, station, operator or transit card", () => {
+    const text = JSON.stringify(rail).toLowerCase();
+    const real = [
+      "incheon", "gimpo", "seoul", "hongik", "digital media", "cheongna", "yeongjong", "t-money", "tmoney",
+      "cashbee", "rail+", "인천", "김포", "서울", "홍대", "디지털미디어", "청라", "영종", "티머니", "캐시비",
+    ];
+    for (const w of real) expect(text, w).not.toContain(w);
+  });
+
+  it("uses no emoji", () => {
+    expect(JSON.stringify(rail)).not.toMatch(/\p{Extended_Pictographic}/u);
+  });
+});
+
 describe("catalog helpers", () => {
   it("getKiosk throws for unknown ids; isKioskId narrows", () => {
     expect(() => getKiosk("nope")).toThrow();
@@ -316,7 +429,7 @@ describe("catalog helpers", () => {
   });
 
   it("allKioskIds lists every kiosk", () => {
-    expect(allKioskIds()).toEqual(["malo", "doughhouse"]);
+    expect(allKioskIds()).toEqual(["malo", "doughhouse", "airport_rail"]);
     for (const id of allKioskIds()) expect(isKioskId(id)).toBe(true);
   });
 

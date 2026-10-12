@@ -26,6 +26,7 @@ src/
 │   └── limits/           # per-session, per-day and per-IP limits
 └── types/
 data/kiosks/malo.json     # direct-adapter menu with option groups and upsell rules
+data/kiosks/airport_rail.json  # direct-adapter ticket machine (fictional airport rail), pictograms in public/kiosks/airport_rail/
 skills/*.json             # learned kiosk skills (committed after human review)
 learner/                  # KIBO Learn (offline, Playwright)
 ```
@@ -362,7 +363,7 @@ Firestore Native mode in `asia-northeast3` (the location cannot be changed later
 kind: "direct", domain (food|ticket), brand, theme{colors, logo}, locale (default), locales[] (ko|en the kiosk screen offers; default ["ko"]),
 dineOptions?{eat_in, take_out: {name{ko,en}, image}} (absent: the kiosk never asks eat-in or take-out),
 vocabulary?{item, add, cart: name{ko,en}} (domain words; default 메뉴/menu, 담기/Add, 장바구니/Cart), categories[],
-items[{itemId, name{ko,en}, subtitle?{ko,en}, category, image, kcal (int | null: hidden), badge (best|new|null), allergens[] (may be empty), soldOut,
+items[{itemId, name{ko,en}, subtitle?{ko,en}, category, image (/menu/ photo or /kiosks/<kioskId>/ pictogram), kcal (int | null: hidden), badge (best|new|null), allergens[] (may be empty), soldOut,
        availableHours ("HH:MM-HH:MM" KST | null),
        variants[{variant: single|set|largeSet, price}],
        optionGroups[{groupId, name{ko,en}, appliesTo[variant], required, min, max, defaultOptionIds[],
