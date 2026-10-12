@@ -4,6 +4,10 @@ import { MAX_QTY } from "./cart";
 
 // Every command body comes from a browser, so everything is bounded here before any logic runs.
 
+/** Session ids are 16 random bytes in base64url; every route that takes one checks this before the store sees it. */
+export const SESSION_ID = /^[A-Za-z0-9_-]{16,64}$/;
+export const sessionId = z.string().regex(SESSION_ID);
+
 const id = z.string().min(1).max(64).regex(/^[a-z0-9_]+$/);
 const variant = z.enum(["single", "set", "largeSet"]);
 const qty = z.number().int().min(1).max(MAX_QTY);
@@ -13,7 +17,7 @@ const selections = z
 const empty = z.strictObject({});
 
 const envelope = {
-  sessionId: z.string().min(1).max(64),
+  sessionId,
   commandId: z.string().min(1).max(128),
   cartVersion: z.number().int().min(0).optional(),
   utteranceSeq: z.number().int().min(0).optional(),

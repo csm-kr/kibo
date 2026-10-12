@@ -1,10 +1,10 @@
 import { CommandError } from "@/lib/commands/errors";
+import { SESSION_ID } from "@/lib/commands/schemas";
 import { clientIp, fail } from "@/lib/http";
 import { checkIpLimit } from "@/lib/limits/ip";
 import { toPublicSession } from "@/lib/session/public";
 import { getStore } from "@/lib/store";
 
-const SESSION_ID = /^[A-Za-z0-9_-]{16,64}$/;
 const KEEPALIVE_MS = 25_000;
 
 // ADR-010: screens read the session only through this stream; the server holds the store listener.
@@ -43,12 +43,20 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
         }
       };
       req.signal.addEventListener("abort", close);
-      unsubscribe = getStore().subscribe(id, (s) => {
-        if (s) return send(`data: ${JSON.stringify(toPublicSession(s))}\n\n`);
-        // Unknown or deleted session. EventSource drops events without data, hence the empty object.
-        send("event: gone\ndata: {}\n\n");
-        close();
-      });
+      unsubscribe = getStore().subscribe(
+        id,
+        (s) => {
+          if (s) return send(`data: ${JSON.stringify(toPublicSession(s))}\n\n`);
+          // Unknown or deleted session. EventSource drops events without data, hence the empty object.
+          send("event: gone\ndata: {}\n\n");
+          close();
+        },
+        (e) => {
+          // The store listener stopped. Ending the stream makes EventSource reconnect and subscribe again.
+          console.error("sse listener error:", e instanceof Error ? e.name : typeof e);
+          close();
+        },
+      );
       // The listener may have closed the stream before subscribe returned.
       if (closed) unsubscribe();
       if (req.signal.aborted) close();

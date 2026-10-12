@@ -1,7 +1,7 @@
 import { randomBytes, randomInt } from "node:crypto";
 import { getKiosk, isKioskId } from "@/lib/adapters/catalog";
 import { CommandError } from "@/lib/commands/errors";
-import { applyCommand, type CommandResult } from "@/lib/commands/machine";
+import { applyCommand, BEFORE_PAYING, type CommandResult } from "@/lib/commands/machine";
 import { parseCommand } from "@/lib/commands/schemas";
 import { newSession, SESSION_TTL_MS } from "@/lib/commands/session";
 import type { SessionSecrets, SessionStore } from "@/lib/store/types";
@@ -28,6 +28,9 @@ export interface CommandResponse {
   result?: CommandResult & { claimToken?: string };
   duplicate?: boolean;
 }
+
+/** How many command results sessionSecrets keeps for retries (`recentCommandIds` keeps 30 ids). */
+export const RECENT_RESULTS = 10;
 
 const NOT_FOUND = "This order could not be found.";
 const GONE = "This order has ended. Please start again at the kiosk.";
@@ -147,17 +150,35 @@ export async function runCommand(
       cartVersion: session.cartVersion,
       result,
     };
-    if (duplicate) return { value: { ok: { ...response, duplicate: true } } };
+    // [Connect another phone]: the old phone's token stops working and a new QR can be claimed.
+    const rotate = (sess: Session, secs: SessionSecrets, token: string) => {
+      response.result = { ...response.result, claimToken: token };
+      return {
+        session: { ...sess, phoneConnectedAt: null },
+        secrets: { ...secs, claimTokenHash: hashToken(token), claimed: false, deviceTokenHash: null },
+      };
+    };
+
+    if (duplicate) {
+      const stored = sec.recentResults?.find((r) => r.commandId === cmd.commandId);
+      response.result = stored?.result ?? result;
+      response.duplicate = true;
+      // The first answer's claim token was never stored. Its QR is already void, so rotating again is safe,
+      // but only in the states where reissueClaim itself is accepted.
+      if (claimToken && stored && BEFORE_PAYING.includes(s.status) && !isExpired(s, now)) {
+        return { ...rotate(s, sec, claimToken), value: { ok: response } };
+      }
+      return { value: { ok: response } };
+    }
 
     // Secrets expire with the session (TTL), so they move with every extension.
     let secrets: SessionSecrets = { ...sec, expiresAt: session.expiresAt };
-    let next = session;
-    if (claimToken) {
-      // [Connect another phone]: the old phone's token stops working and a new QR can be claimed.
-      secrets = { ...secrets, claimTokenHash: hashToken(claimToken), claimed: false, deviceTokenHash: null };
-      next = { ...session, phoneConnectedAt: null };
-      response.result = { ...result, claimToken };
+    if (claimToken || Object.keys(result).length > 0) {
+      const entry = { commandId: cmd.commandId, result };
+      secrets.recentResults = [...(sec.recentResults ?? []), entry].slice(-RECENT_RESULTS);
     }
+    let next = session;
+    if (claimToken) ({ session: next, secrets } = rotate(session, secrets, claimToken));
     return { session: next, secrets, value: { ok: response } };
   });
   return unwrap(out);

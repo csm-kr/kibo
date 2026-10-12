@@ -101,7 +101,7 @@ describe("runCommand", () => {
     const { store, sessionId } = await setup();
     expect(await code(runCommand(store, { body: body(sessionId, "startTouch"), bearer: null }, T0))).toBe("UNAUTHORIZED");
     expect(await code(runCommand(store, { body: body(sessionId, "startTouch"), bearer: "wrong" }, T0))).toBe("UNAUTHORIZED");
-    expect(await code(runCommand(store, { body: body("nope", "startTouch"), bearer: "x" }, T0))).toBe("NOT_FOUND");
+    expect(await code(runCommand(store, { body: body("A".repeat(22), "startTouch"), bearer: "x" }, T0))).toBe("NOT_FOUND");
     expect(await code(runCommand(store, { body: { sessionId }, bearer: "x" }, T0))).toBe("BAD_REQUEST");
   });
 
@@ -182,6 +182,80 @@ describe("runCommand", () => {
     const fresh = await claimSession(store, { sessionId, claimToken: newClaim! }, T0 + 4);
     const res = await runCommand(store, { body: body(sessionId, "callStaff", { reasonCode: "stuck" }, { source: "button" }), bearer: fresh.deviceToken }, T0 + 5);
     expect(res.ok).toBe(true);
+  });
+
+  it("a retried addToCart returns the first response's lineId and upsell, and applies nothing", async () => {
+    const { store, sessionId, kioskToken } = await setup();
+    await runCommand(store, { body: body(sessionId, "startTouch"), bearer: kioskToken }, T0);
+    const b = body(sessionId, "addToCart", SET_ORDER);
+    const first = await runCommand(store, { body: b, bearer: kioskToken }, T0 + 1);
+    expect(first.result?.upsell?.offerItemIds.length).toBeGreaterThan(0);
+    await runCommand(store, { body: body(sessionId, "addToCart", { itemId: "cola" }), bearer: kioskToken }, T0 + 2);
+    const retry = await runCommand(store, { body: b, bearer: kioskToken }, T0 + 3);
+    expect(retry.duplicate).toBe(true);
+    expect(retry.result).toEqual(first.result);
+    expect(retry.cartVersion).toBe(2);
+  });
+
+  it("keeps the results of the last 10 commands in sessionSecrets only", async () => {
+    const { store, sessionId, kioskToken } = await setup();
+    await runCommand(store, { body: body(sessionId, "startTouch"), bearer: kioskToken }, T0);
+    const bodies = Array.from({ length: 12 }, () => body(sessionId, "addToCart", { itemId: "cola" }));
+    for (const b of bodies) {
+      await runCommand(store, { body: b, bearer: kioskToken }, T0 + 1);
+      // Undo has no result, so it is not stored; it keeps the cola under the 10-per-item limit.
+      await runCommand(store, { body: body(sessionId, "undoLastChange"), bearer: kioskToken }, T0 + 1);
+    }
+    const sec = await store.transact(sessionId, (_s, sec) => ({ value: sec! }));
+    expect(sec.recentResults?.map((r) => r.commandId)).toEqual(bodies.slice(-10).map((b) => b.commandId));
+    // Older than the last 10 results but still in recentCommandIds: applies nothing, no result.
+    const old = await runCommand(store, { body: bodies[0], bearer: kioskToken }, T0 + 2);
+    expect(old.duplicate).toBe(true);
+    expect(old.result).toEqual({});
+    expect(JSON.stringify(await store.get(sessionId))).not.toContain("recentResults");
+  });
+
+  it("a retried reissueClaim rotates again and returns a fresh claim token that works", async () => {
+    const { store, sessionId, kioskToken } = await setup();
+    const b = body(sessionId, "reissueClaim");
+    const first = await runCommand(store, { body: b, bearer: kioskToken }, T0 + 1);
+    const retry = await runCommand(store, { body: b, bearer: kioskToken }, T0 + 2);
+    expect(retry.duplicate).toBe(true);
+    const fresh = retry.result?.claimToken;
+    expect(fresh).toMatch(/^[A-Za-z0-9_-]{43}$/);
+    expect(fresh).not.toBe(first.result?.claimToken);
+    expect(await code(claimSession(store, { sessionId, claimToken: first.result!.claimToken! }, T0 + 3))).toBe("UNAUTHORIZED");
+    expect((await claimSession(store, { sessionId, claimToken: fresh! }, T0 + 4)).deviceToken).toBeDefined();
+    const sec = await store.transact(sessionId, (_s, sec) => ({ value: sec! }));
+    expect(JSON.stringify(sec.recentResults)).not.toContain(fresh);
+  });
+
+  it("a retried reissueClaim after payment started rotates nothing", async () => {
+    const { store, sessionId, kioskToken } = await setup();
+    const run = (b: object, at: number) => runCommand(store, { body: b, bearer: kioskToken }, at);
+    const reissue = body(sessionId, "reissueClaim");
+    const first = await run(reissue, T0 + 1);
+    const { deviceToken } = await claimSession(store, { sessionId, claimToken: first.result!.claimToken! }, T0 + 2);
+    await run(body(sessionId, "startTouch"), T0 + 3);
+    await run(body(sessionId, "setDineOption", { option: "eat_in" }), T0 + 3);
+    const added = await run(body(sessionId, "addToCart", SET_ORDER), T0 + 3);
+    await run(body(sessionId, "requestCheckout"), T0 + 4);
+    await run(body(sessionId, "confirmCheckout", {}, { cartVersion: added.cartVersion }), T0 + 5);
+    const retry = await run(reissue, T0 + 6);
+    expect(retry.duplicate).toBe(true);
+    expect(retry.result?.claimToken).toBeUndefined();
+    const staff = body(sessionId, "callStaff", { reasonCode: "stuck" }, { source: "button" });
+    expect((await runCommand(store, { body: staff, bearer: deviceToken }, T0 + 7)).status).toBe("paying");
+  });
+
+  it("binds source to the actor: the kiosk sends only touch, the phone never touch", async () => {
+    const { store, sessionId, claimToken, kioskToken } = await setup();
+    const { deviceToken } = await claimSession(store, { sessionId, claimToken }, T0);
+    const staff = (source: string) => body(sessionId, "callStaff", { reasonCode: "stuck" }, { source });
+    expect(await code(runCommand(store, { body: staff("voice"), bearer: kioskToken }, T0 + 1))).toBe("BAD_REQUEST");
+    expect(await code(runCommand(store, { body: staff("touch"), bearer: deviceToken }, T0 + 1))).toBe("BAD_REQUEST");
+    expect((await runCommand(store, { body: staff("touch"), bearer: kioskToken }, T0 + 1)).ok).toBe(true);
+    expect((await runCommand(store, { body: staff("text"), bearer: deviceToken }, T0 + 1)).ok).toBe(true);
   });
 });
 

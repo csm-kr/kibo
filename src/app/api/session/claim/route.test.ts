@@ -33,6 +33,15 @@ describe("POST /api/session/claim", () => {
     expect(missing.body.error.code).toBe("NOT_FOUND");
   });
 
+  it("BAD_REQUEST for a sessionId with characters outside base64url", async () => {
+    const s = await newSession();
+    for (const sessionId of ["a/b", `${"A".repeat(20)}/b`]) {
+      const { status, body } = await read(await POST(jsonRequest("/api/session/claim", { ...s, sessionId })));
+      expect(status).toBe(400);
+      expect(body.error.code).toBe("BAD_REQUEST");
+    }
+  });
+
   it("refuses a body without a claim token", async () => {
     const s = await newSession();
     expect((await POST(jsonRequest("/api/session/claim", { sessionId: s.sessionId }))).status).toBe(400);

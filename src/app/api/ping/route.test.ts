@@ -25,4 +25,13 @@ describe("POST /api/ping", () => {
     expect((await POST(jsonRequest("/api/ping", { sessionId, active: true }))).status).toBe(401);
     expect((await POST(jsonRequest("/api/ping", { sessionId, active: "yes" }, auth(created.body.kioskToken)))).status).toBe(400);
   });
+
+  it("BAD_REQUEST for a sessionId with characters outside base64url", async () => {
+    const created = await read(await createSession(jsonRequest("/api/session", { kioskId: "malo" })));
+    for (const sessionId of ["a/b", `${"A".repeat(20)}/b`]) {
+      const { status, body } = await read(await POST(jsonRequest("/api/ping", { sessionId, active: true }, auth(created.body.kioskToken))));
+      expect(status).toBe(400);
+      expect(body.error.code).toBe("BAD_REQUEST");
+    }
+  });
 });

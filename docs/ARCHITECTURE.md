@@ -132,7 +132,7 @@ flowchart TB
 
 ## Patterns
 - Server Components by default; Client Components only for interactive screens and Firestore subscriptions.
-- All writes through `POST /api/command` with `commandId`, actor token and zod-validated arguments; Firestore transaction; `recentCommandIds` (last 30) for idempotency.
+- All writes through `POST /api/command` with `commandId`, actor token and zod-validated arguments; Firestore transaction; `recentCommandIds` (last 30) for idempotency, and `sessionSecrets.recentResults` (last 10) so a retry gets the first `result`.
 - Clients never touch Firestore (ADR-010). They read the session through `GET /api/session/{id}/events` (SSE), which the server feeds from a Firestore `onSnapshot` listener. Firestore rules deny every client read and write.
 - Storage goes through `lib/store` (`SessionStore`). `STORE=firestore` in production; `STORE=memory` for unit tests and local E2E (single process only). Domain code uses epoch milliseconds for times; FirestoreStore writes `expiresAt` as a Firestore Timestamp so the TTL policy can delete it.
 - Agent definitions live once in `lib/agent` and are used by both the Live session (pinned via the token) and `/api/chat`.
@@ -312,11 +312,11 @@ Pages: `/kiosk?k=<kioskId>` (`&demo=1` shows the tap counter and timer), `/assis
 |---|---|---|
 | `POST /api/session` | `{ kioskId, demo? }` | `{ sessionId, claimUrl, kioskToken, expiresAt }`; with `demo: true` also `deviceToken` |
 | `POST /api/session/claim` | `{ sessionId, claimToken }` | `{ deviceToken, status }`. A second claim gets `CONFLICT`; the same phone reconnects with its stored `deviceToken` instead of claiming again |
-| `POST /api/command` | `{ sessionId, commandId (string, 1–128), type, args, cartVersion?, utteranceSeq?, source: "voice"\|"text"\|"button"\|"touch" }`. `commandId`: `<liveSessionId>:<functionCallId>` for voice, `<chatRequestId>:<n>` for text, a uuid for buttons and touch | `{ ok, status, cart, total, cartVersion, result? }`; a repeated `commandId` returns the current state with `duplicate: true` and applies nothing; `reissueClaim` also returns `claimUrl` |
+| `POST /api/command` | `{ sessionId, commandId (string, 1–128), type, args, cartVersion?, utteranceSeq?, source: "voice"\|"text"\|"button"\|"touch" }`. `source` is bound to the actor: the phone sends `voice`, `text` or `button`, the kiosk (and the learned-kiosk bridge) only `touch`; anything else is `BAD_REQUEST`. `commandId`: `<liveSessionId>:<functionCallId>` for voice, `<chatRequestId>:<n>` for text, a uuid for buttons and touch | `{ ok, status, cart, total, cartVersion, result? }`; a repeated `commandId` returns the current state with `duplicate: true` and applies nothing, with the first response's `result` when it is among the last 10 kept in `sessionSecrets.recentResults` (else `{}`); `reissueClaim` also returns `claimUrl`, and a repeated `reissueClaim` (before `paying`) rotates again and returns a fresh one, because the first token is never stored |
 | `POST /api/live-token` | `{ sessionId }` | `{ token, expiresAt }` (model, instructions and tools pinned in the token) |
 | `POST /api/chat` | `{ sessionId, chatRequestId (uuid), message (≤ 500 chars), history (last 10 turns of user and model text, kept on the phone; tool turns are rejected), utteranceSeq, cartVersion? (the version shown on the confirm card), locale }` + device token | `{ reply, status, cart, total, cartVersion }` after ≤ 5 tool rounds; choice buttons come from `pendingChoice` in the stream. One request is one user utterance: every command in it carries the request's `utteranceSeq`, so `confirmCheckout` is refused in the request that ran `requestCheckout` |
 | `POST /api/ping` | `{ sessionId, active }` | `{ status, expiresAt, serverTime }`; `active: true` extends the session; `serverTime` lets screens correct for clock offset |
-| `GET /api/session/{id}/events` | — | SSE; each change is `data: <public session JSON>`; an unknown or deleted session gets one `event: gone` (`data: {}`) and the stream closes, so the client should close its `EventSource` |
+| `GET /api/session/{id}/events` | — | SSE; each change is `data: <public session JSON>`; an unknown or deleted session gets one `event: gone` (`data: {}`) and the stream closes, so the client should close its `EventSource`. If the server's Firestore listener fails, the stream ends without `gone` and `EventSource` reconnects |
 | `GET /api/health` | — | `{ ok, service, version, store, revision, time }` |
 
 ### Commands and actors
@@ -325,7 +325,7 @@ Pages: `/kiosk?k=<kioskId>` (`&demo=1` shows the tap counter and timer), `/assis
 | Command | Phone | Kiosk | State rule |
 |---|---|---|---|
 | `startTouch` | | ✓ | `idle → ordering`; in `connected` or `ordering` accepted without a change |
-| `setDineOption` | ✓ | ✓ | `connected → ordering` (kiosk also from `idle`), or update in `ordering` or `confirming` |
+| `setDineOption` | ✓ | ✓ | `connected → ordering` (kiosk also from `idle`), or update in `ordering` or `confirming`; a change in `confirming` adds 1 to `cartVersion`, because the confirm card shows the dine option |
 | `addToCart`, `updateCart`, `removeFromCart` | ✓ | ✓ | `ordering`; from `connected` the first cart change moves to `ordering` (the dine option can come later; `requestCheckout` asks for it); in `confirming` the change sends the session back to `ordering` |
 | `clearCart` | | ✓ | `ordering` or `confirming` → `ordering` with an empty cart (kiosk "clear all") |
 | `undoLastChange` | ✓ | ✓ | not in `paying` or `paid` |
@@ -344,10 +344,10 @@ Pages: `/kiosk?k=<kioskId>` (`&demo=1` shows the tap counter and timer), `/assis
 - **Learned kiosks:** a cart command is stored in `pendingBridgeCommand` and answered `{ ok: true, pending: true }`; the phone waits for the bridge's `bridgeReport` through `onSnapshot`. After 15 s without a report the phone shows "Please check the kiosk screen" and offers staff. A second command while one is pending gets `CONFLICT`. Learned sessions end at `confirming`: the user pays on the kiosk itself.
 
 ### `/api/command` processing order
-1. Parse with zod (`BAD_REQUEST`).
+1. Parse with zod (`BAD_REQUEST`); `sessionId` must match `^[A-Za-z0-9_-]{16,64}$` (the same check on every route that takes one).
 2. In one Firestore transaction read `sessions/{id}` and `sessionSecrets/{id}`.
-3. Match the token hash to an actor (`UNAUTHORIZED`), check the actor table (`FORBIDDEN`).
-4. If `commandId` is in `recentCommandIds`, return the current state, write nothing.
+3. Match the token hash to an actor (`UNAUTHORIZED`), check the actor table (`FORBIDDEN`) and the actor's allowed `source` (`BAD_REQUEST`).
+4. If `commandId` is in `recentCommandIds`, return the current state with the stored `result` from `sessionSecrets.recentResults`, write nothing (except a repeated `reissueClaim`, which rotates the claim again).
 5. Check the state machine (`CONFLICT`, `GONE`).
 6. Validate against the adapter's catalog: item exists, options belong to the item, required groups, min/max, hours, sold out (`NEEDS_CHOICE`, `SOLD_OUT`, `UNAVAILABLE`).
 7. For commands that change the cart: build the new cart (prices and total come from menu data, never from arguments), `cartVersion + 1`, push the old cart on `undoStack`, set `lastChange`. For every accepted command: set `status` and `screen`, clear `pendingChoice`, append `commandId`, extend `expiresAt`.
@@ -401,7 +401,7 @@ LearnedAdapter normalizes the catalog into the items shape: ids generated from l
 Worst case (20 lines × 6 carts) stays far below the 1 MiB document limit. Sessions hold no personal data: the session id is printed in a public QR, so anyone holding it can read the cart.
 
 ### `sessionSecrets/{sessionId}` — server only
-`claimTokenHash`, `claimed`, `deviceTokenHash`, `kioskTokenHash`, `chatCount`, `liveTokenCount`, `createdAt`, `expiresAt` (TTL). The per-session limits count here, where no client can see or change them.
+`claimTokenHash`, `claimed`, `deviceTokenHash`, `kioskTokenHash`, `recentResults` (last 10 `{ commandId, result }` of commands that returned a `result`, so a retry gets the same `lineId` or `upsell`; `reissueClaim` is kept with an empty result, never its claim token), `chatCount`, `liveTokenCount`, `createdAt`, `expiresAt` (TTL). The per-session limits count here, where no client can see or change them.
 
 ### `usage/{yyyy-mm-dd}` (KST) — server only
 `voiceSessions`, `chatMessages`, incremented with `FieldValue.increment` inside the limit check. Per-IP limits are kept in memory per Cloud Run instance; with `max-instances=3` the effective limit is at most 3× the configured value.
@@ -449,7 +449,7 @@ Anti-hallucination: names, prices and options exist only in menu data; the serve
 - `/demo` per session: 3 min of voice, 30 messages; then [Try again].
 - Daily: 200 voice sessions; after that text only. `/api/chat`: 60 messages per session, 3,000 per day.
 - `/demo` voice: the Live token's `newSessionExpireTime` is 3 min and the server issues at most 2 tokens per session.
-- Per IP: 60 API requests per minute and 10 new sessions per minute, keyed on the **last** `X-Forwarded-For` value (the one Cloud Run appends).
+- Per IP: 60 API requests per minute and 10 new sessions per minute, keyed on the **last** `X-Forwarded-For` value (the one Cloud Run appends); an IPv6 address counts by its /64 prefix, since one client can rotate addresses inside it.
 - These are starting values; adjust them after the cost-per-session measurement (`docs/TESTING.md`).
 - Input ≤ 500 characters, ≤ 5 tool rounds per request, capped output tokens.
 - Cloud Run `max-instances=3`; Gemini per-minute quota capped in GCP. Budget alerts notify but never stop spending, so these caps are the real limit.

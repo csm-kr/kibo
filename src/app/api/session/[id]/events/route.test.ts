@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { resetLimits } from "@/lib/limits/ip";
 import { getStore } from "@/lib/store";
+import type { MemoryStore } from "@/lib/store/memory";
 import { POST as command } from "../../../command/route";
 import { POST as createSession } from "../../route";
 import { auth, BASE, commandBody, HERO_LINE, jsonRequest, read } from "../../../testing";
@@ -117,6 +118,26 @@ describe("GET /api/session/[id]/events", () => {
     const stream = events(await open(s.sessionId));
     await stream.next();
     await stream.cancel();
+    expect(unsubscribe).toHaveBeenCalledTimes(1);
+  });
+
+  it("closes the stream and unsubscribes when the store listener fails, so EventSource reconnects", async () => {
+    const s = await newSession();
+    const store = getStore() as MemoryStore;
+    const unsubscribe = vi.fn();
+    const original = store.subscribe.bind(store);
+    vi.spyOn(store, "subscribe").mockImplementation((id, onChange, onError) => {
+      const off = original(id, onChange, onError);
+      return () => {
+        unsubscribe();
+        off();
+      };
+    });
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const stream = events(await open(s.sessionId));
+    await stream.next();
+    store.failSubscribers(s.sessionId, new Error("listen failed"));
+    expect(await stream.next()).toBeNull();
     expect(unsubscribe).toHaveBeenCalledTimes(1);
   });
 

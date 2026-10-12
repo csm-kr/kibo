@@ -1,7 +1,7 @@
 import { findItem, isAvailableNow } from "@/lib/adapters/catalog";
 import type { KioskData } from "@/types/menu";
 import type { Actor, CartLine, ChangeKind, Session, SessionStatus } from "@/types/session";
-import { ACTOR_COMMANDS } from "./actors";
+import { ACTOR_COMMANDS, ACTOR_SOURCES } from "./actors";
 import { addLine, cartTotal, removeLine, updateLine } from "./cart";
 import { type ChoiceRef, CommandError } from "./errors";
 import type { Command } from "./schemas";
@@ -28,7 +28,7 @@ export interface CommandResult {
   lineId?: string;
 }
 
-const BEFORE_PAYING: SessionStatus[] = ["idle", "connected", "ordering", "confirming"];
+export const BEFORE_PAYING: SessionStatus[] = ["idle", "connected", "ordering", "confirming"];
 const CART_EDITABLE: SessionStatus[] = ["connected", "ordering", "confirming"];
 
 function requireStatus(s: Session, allowed: SessionStatus[], message: string): void {
@@ -115,7 +115,10 @@ function transition(s: Session, cmd: Command, ctx: CommandContext): { next: Sess
       const allowed: SessionStatus[] = ctx.actor === "kiosk" ? ["idle", ...CART_EDITABLE] : CART_EDITABLE;
       requireStatus(s, allowed, "The order can no longer be changed.");
       const status = s.status === "confirming" ? "confirming" : "ordering";
-      return { next: { ...s, status, dineOption: cmd.args.option }, result: {} };
+      // The confirm card shows the dine option, so a change during the review must make an open card stale.
+      const changed = s.status === "confirming" && s.dineOption !== cmd.args.option;
+      const cartVersion = changed ? s.cartVersion + 1 : s.cartVersion;
+      return { next: { ...s, status, dineOption: cmd.args.option, cartVersion }, result: {} };
     }
 
     case "addToCart": {
@@ -230,6 +233,9 @@ export function applyCommand(
 ): { session: Session; result: CommandResult; duplicate: boolean } {
   if (!ACTOR_COMMANDS[ctx.actor].has(cmd.type)) {
     throw new CommandError("FORBIDDEN", "This action is not allowed here.");
+  }
+  if (!ACTOR_SOURCES[ctx.actor].includes(cmd.source)) {
+    throw new CommandError("BAD_REQUEST", "That request could not be understood.");
   }
   if (s.recentCommandIds.includes(cmd.commandId)) return { session: s, result: {}, duplicate: true };
   if (s.status === "expired" || ctx.now > s.expiresAt) {

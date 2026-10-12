@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
   output: "standalone",
   cacheComponents: true,
   partialPrefetching: true,
+  // The dev "N" badge would show in QA screenshots and demo footage.
+  devIndicators: false,
   async headers() {
     return [
       {

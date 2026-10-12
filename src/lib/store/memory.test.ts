@@ -98,6 +98,22 @@ describe("MemoryStore", () => {
     expect(seen).toEqual([0, 1]);
   });
 
+  it("failSubscribers calls onError and stops the listener, like a failed Firestore listener", async () => {
+    const store = new MemoryStore();
+    await store.create(seed().session, seed().secrets);
+    const seen: unknown[] = [];
+    const errors: unknown[] = [];
+    store.subscribe("s1", (s) => seen.push(s?.cartVersion), (e) => errors.push(e));
+    await tick();
+    const boom = new Error("listen failed");
+    store.failSubscribers("s1", boom);
+    await tick();
+    expect(errors).toEqual([boom]);
+    await store.transact("s1", (s) => ({ session: { ...s!, cartVersion: 1 }, value: null }));
+    await tick();
+    expect(seen).toEqual([0]);
+  });
+
   it("subscribe on a missing session sends null", async () => {
     const store = new MemoryStore();
     const seen: unknown[] = [];

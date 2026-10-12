@@ -7,17 +7,14 @@ import type { SessionSecrets, SessionStore, TransactResult } from "./types";
 
 type FirestoreModule = typeof import("firebase-admin/firestore");
 
-let loaded: Promise<{ db: Firestore; fs: FirestoreModule }> | null = null;
+export type Loaded = { db: Firestore; fs: FirestoreModule };
 
-function load() {
-  loaded ??= (async () => {
-    const app = await import("firebase-admin/app");
-    const fs = await import("firebase-admin/firestore");
-    // Application default credentials; project from GOOGLE_CLOUD_PROJECT or the credentials' default.
-    const instance = app.getApps()[0] ?? app.initializeApp({ projectId: process.env.GOOGLE_CLOUD_PROJECT });
-    return { db: fs.getFirestore(instance), fs };
-  })();
-  return loaded;
+async function connect(): Promise<Loaded> {
+  const app = await import("firebase-admin/app");
+  const fs = await import("firebase-admin/firestore");
+  // Application default credentials; project from GOOGLE_CLOUD_PROJECT or the credentials' default.
+  const instance = app.getApps()[0] ?? app.initializeApp({ projectId: process.env.GOOGLE_CLOUD_PROJECT });
+  return { db: fs.getFirestore(instance), fs };
 }
 
 // Epoch ms in domain code; `createdAt` and `expiresAt` are Timestamps in Firestore so the TTL policy can delete them.
@@ -48,8 +45,22 @@ function secretsFromDoc(d: DocumentData): SessionSecrets {
 }
 
 export class FirestoreStore implements SessionStore {
+  private loaded: Promise<Loaded> | null = null;
+
+  /** `init` is injectable for tests; production uses the Admin SDK. */
+  constructor(private readonly init: () => Promise<Loaded> = connect) {}
+
+  /** Caches a successful init only: a failed one (no credentials yet, a network blip) is retried next time. */
+  private load(): Promise<Loaded> {
+    this.loaded ??= this.init().catch((e: unknown) => {
+      this.loaded = null;
+      throw e;
+    });
+    return this.loaded;
+  }
+
   async create(session: Session, secrets: SessionSecrets): Promise<void> {
-    const { db, fs } = await load();
+    const { db, fs } = await this.load();
     const batch = db.batch();
     batch.create(db.collection("sessions").doc(session.sessionId), sessionToDoc(fs, session));
     batch.create(db.collection("sessionSecrets").doc(session.sessionId), secretsToDoc(fs, secrets));
@@ -57,13 +68,13 @@ export class FirestoreStore implements SessionStore {
   }
 
   async get(sessionId: string): Promise<Session | null> {
-    const { db } = await load();
+    const { db } = await this.load();
     const snap = await db.collection("sessions").doc(sessionId).get();
     return snap.exists ? sessionFromDoc(snap.data()!) : null;
   }
 
   async transact<T>(sessionId: string, fn: (s: Session | null, sec: SessionSecrets | null) => TransactResult<T>): Promise<T> {
-    const { db, fs } = await load();
+    const { db, fs } = await this.load();
     const sRef = db.collection("sessions").doc(sessionId);
     const secRef = db.collection("sessionSecrets").doc(sessionId);
     return db.runTransaction(async (tx) => {
@@ -75,16 +86,20 @@ export class FirestoreStore implements SessionStore {
     });
   }
 
-  subscribe(sessionId: string, onChange: (s: Session | null) => void): () => void {
+  subscribe(sessionId: string, onChange: (s: Session | null) => void, onError?: (e: unknown) => void): () => void {
     let stop: (() => void) | null = null;
     let closed = false;
-    void load().then(({ db }) => {
+    // A broken listener sends no more snapshots; without this the SSE keepalive would hide it.
+    const fail = (e: unknown) => {
+      if (!closed) onError?.(e);
+    };
+    this.load().then(({ db }) => {
       if (closed) return;
       stop = db
         .collection("sessions")
         .doc(sessionId)
-        .onSnapshot((snap) => onChange(snap.exists ? sessionFromDoc(snap.data()!) : null));
-    });
+        .onSnapshot((snap) => onChange(snap.exists ? sessionFromDoc(snap.data()!) : null), fail);
+    }, fail);
     return () => {
       closed = true;
       stop?.();

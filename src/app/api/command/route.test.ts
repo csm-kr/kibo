@@ -76,6 +76,15 @@ describe("POST /api/command", () => {
     expect(body.error.code).toBe("NOT_FOUND");
   });
 
+  it("BAD_REQUEST for a sessionId with characters outside base64url", async () => {
+    const s = await claimed();
+    for (const id of ["a/b", `${"A".repeat(20)}/b`]) {
+      const { status, body } = await read(await POST(jsonRequest("/api/command", commandBody(id, "startTouch"), auth(s.kioskToken))));
+      expect(status).toBe(400);
+      expect(body.error.code).toBe("BAD_REQUEST");
+    }
+  });
+
   it("CONFLICT: checkout with an empty cart", async () => {
     const s = await claimed();
     await POST(jsonRequest("/api/command", commandBody(s.sessionId, "setDineOption", { option: "eat_in" }), auth(s.kioskToken)));

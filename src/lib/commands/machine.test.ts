@@ -12,10 +12,12 @@ const k = getKiosk("malo");
 const T0 = Date.UTC(2026, 9, 12, 5, 0);
 
 const SET_ORDER = { itemId: "cheese_burger", variant: "set", selections: { drink: ["cola"] } };
+/** Same shape as a real session id (16 random bytes, base64url). */
+const SID = "s1AAAAAAAAAAAAAAAAAAAA";
 
 let seq = 0;
 function cmd(type: string, args: object = {}, extra: Record<string, unknown> = {}): Command {
-  return parseCommand({ sessionId: "s1", commandId: `c${++seq}`, type, args, source: "touch", ...extra });
+  return parseCommand({ sessionId: SID, commandId: `c${++seq}`, type, args, source: "touch", ...extra });
 }
 
 function ctx(actor: Actor, now = T0 + 1000): CommandContext {
@@ -42,7 +44,7 @@ function deepFreeze<T>(o: T): T {
 }
 
 function fresh(): Session {
-  return newSession({ sessionId: "s1", kioskId: "malo", demo: false, now: T0 });
+  return newSession({ sessionId: SID, kioskId: "malo", demo: false, now: T0 });
 }
 
 /** Applies commands in order and returns the final session. */
@@ -88,7 +90,7 @@ describe("newSession", () => {
 });
 
 describe("parseCommand", () => {
-  const base = { sessionId: "s1", commandId: "c1", source: "touch" };
+  const base = { sessionId: SID, commandId: "c1", source: "touch" };
 
   it("accepts a valid addToCart", () => {
     const c = parseCommand({ ...base, type: "addToCart", args: { itemId: "cheese_burger", variant: "set", qty: 2 } });
@@ -122,6 +124,9 @@ describe("parseCommand", () => {
     ["free-text staff reason", { ...base, type: "callStaff", args: { reasonCode: "my halal question" } }],
     ["bad dine option", { ...base, type: "setDineOption", args: { option: "drive_thru" } }],
     ["bad source", { ...base, source: "ai", type: "startTouch", args: {} }],
+    ["sessionId with a slash", { ...base, sessionId: "aaaaaaaa/bbbbbbbbbb", type: "startTouch", args: {} }],
+    ["short sessionId", { ...base, sessionId: "a/b", type: "startTouch", args: {} }],
+    ["long sessionId", { ...base, sessionId: "a".repeat(65), type: "startTouch", args: {} }],
     ["empty commandId", { ...base, commandId: "", type: "startTouch", args: {} }],
     ["long commandId", { ...base, commandId: "x".repeat(129), type: "startTouch", args: {} }],
     ["negative cartVersion", { ...base, type: "confirmCheckout", args: {}, cartVersion: -1 }],
@@ -151,6 +156,24 @@ describe("actors", () => {
   it("a kiosk cannot send offerChoices", () => {
     const c = cmd("offerChoices", { templateId: "pick_item", choices: [{ kind: "item", id: "cola" }] });
     expect(catchError(() => applyCommand(ordering(), c, ctx("kiosk"))).code).toBe("FORBIDDEN");
+  });
+
+  it.each(["voice", "text", "button"])("a kiosk command with source %s → BAD_REQUEST", (source) => {
+    expect(catchError(() => applyCommand(ordering(), cmd("callStaff", { reasonCode: "stuck" }, { source }), ctx("kiosk"))).code).toBe(
+      "BAD_REQUEST",
+    );
+  });
+
+  it("a phone command with source touch → BAD_REQUEST", () => {
+    const s: Session = { ...fresh(), status: "ordering" };
+    expect(catchError(() => applyCommand(s, cmd("callStaff", { reasonCode: "stuck" }, { source: "touch" }), ctx("phone"))).code).toBe(
+      "BAD_REQUEST",
+    );
+  });
+
+  it.each(["voice", "text", "button"])("a phone command with source %s is accepted", (source) => {
+    const s: Session = { ...fresh(), status: "ordering" };
+    expect(applyCommand(s, cmd("callStaff", { reasonCode: "stuck" }, { source }), ctx("phone")).session.staffCalled).not.toBeNull();
   });
 });
 
@@ -280,7 +303,26 @@ describe("payment safety", () => {
 
   it("a kiosk confirm must come from touch", () => {
     const s = applyCommand(ordering(), cmd("requestCheckout"), ctx("kiosk")).session;
-    expect(catchError(() => confirm(s, "kiosk", "voice", T0 + 10000, { utteranceSeq: 9 })).code).toBe("CONFLICT");
+    expect(catchError(() => confirm(s, "kiosk", "voice", T0 + 10000, { utteranceSeq: 9 })).code).toBe("BAD_REQUEST");
+  });
+
+  it("changing the dine option in confirming bumps cartVersion, so a stale confirm card is refused", () => {
+    const s = phoneConfirming();
+    const changed = applyCommand(s, cmd("setDineOption", { option: "eat_in" }, { source: "button" }), ctx("phone")).session;
+    expect(changed.status).toBe("confirming");
+    expect(changed.cartVersion).toBe(s.cartVersion + 1);
+    const stale = catchError(() => confirm(changed, "phone", "button", T0 + 5000, { cartVersion: s.cartVersion }));
+    expect(stale.code).toBe("CONFLICT");
+    expect(confirm(changed, "phone", "button", T0 + 5000).session.status).toBe("paying");
+  });
+
+  it("the same dine option in confirming keeps cartVersion; in ordering it never bumps", () => {
+    const s = phoneConfirming();
+    const same = applyCommand(s, cmd("setDineOption", { option: "take_out" }, { source: "button" }), ctx("phone")).session;
+    expect(same.cartVersion).toBe(s.cartVersion);
+    const o = ordering();
+    const changed = applyCommand(o, cmd("setDineOption", { option: "take_out" }), ctx("kiosk")).session;
+    expect(changed.cartVersion).toBe(o.cartVersion);
   });
 
   it("requestCheckout on an empty cart → CONFLICT", () => {

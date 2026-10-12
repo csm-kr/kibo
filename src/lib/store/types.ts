@@ -1,3 +1,4 @@
+import type { CommandResult } from "@/lib/commands/machine";
 import type { Session } from "@/types/session";
 
 /** Server only: lives in `sessionSecrets/{id}`, never in the public session document. */
@@ -6,6 +7,11 @@ export interface SessionSecrets {
   claimed: boolean;
   deviceTokenHash: string | null;
   kioskTokenHash: string;
+  /**
+   * Results of the last 10 accepted commands that had one, so a retried commandId gets the same answer.
+   * `reissueClaim` is stored with an empty result: the claim token itself is never kept. Absent until the first one.
+   */
+  recentResults?: { commandId: string; result: CommandResult }[];
   /** Epoch ms. */
   createdAt: number;
   expiresAt: number;
@@ -25,6 +31,9 @@ export interface SessionStore {
    * Throwing inside fn aborts the transaction and rethrows.
    */
   transact<T>(sessionId: string, fn: (s: Session | null, sec: SessionSecrets | null) => TransactResult<T>): Promise<T>;
-  /** Calls onChange with the current value first, then after every committed write. Returns unsubscribe. */
-  subscribe(sessionId: string, onChange: (s: Session | null) => void): () => void;
+  /**
+   * Calls onChange with the current value first, then after every committed write. Returns unsubscribe.
+   * onError means the listener has stopped for good (no more onChange); the caller should unsubscribe.
+   */
+  subscribe(sessionId: string, onChange: (s: Session | null) => void, onError?: (e: unknown) => void): () => void;
 }

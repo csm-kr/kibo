@@ -34,6 +34,20 @@ describe("checkIpLimit", () => {
     expect(rateLimited(() => checkIpLimit("1.1.1.1", "session", T0 + 60_000))).toBe(false);
   });
 
+  it("counts IPv6 addresses in the same /64 as one client", () => {
+    for (let i = 0; i < 10; i++) checkIpLimit(`2001:db8:1:2::${i + 1}`, "session", T0);
+    expect(rateLimited(() => checkIpLimit("2001:db8:1:2:ffff:1:2:3", "session", T0))).toBe(true);
+    expect(rateLimited(() => checkIpLimit("2001:0db8:0001:0002::abcd", "session", T0))).toBe(true);
+    expect(rateLimited(() => checkIpLimit("2001:db8:1:3::1", "session", T0))).toBe(false);
+  });
+
+  it("keeps IPv4 and IPv4-mapped IPv6 addresses separate per address", () => {
+    for (let i = 0; i < 10; i++) checkIpLimit("::ffff:1.1.1.1", "session", T0);
+    expect(rateLimited(() => checkIpLimit("::ffff:1.1.1.1", "session", T0))).toBe(true);
+    expect(rateLimited(() => checkIpLimit("::ffff:1.1.1.2", "session", T0))).toBe(false);
+    expect(rateLimited(() => checkIpLimit("1.1.1.2", "session", T0))).toBe(false);
+  });
+
   it("uses a plain message", () => {
     for (let i = 0; i < 10; i++) checkIpLimit("1.1.1.1", "session", T0);
     expect(() => checkIpLimit("1.1.1.1", "session", T0)).toThrow("Too many requests. Please wait a moment.");

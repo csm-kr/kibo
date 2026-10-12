@@ -80,3 +80,10 @@ body {
   color: var(--foreground);
   font-family: var(--font-plex-kr), system-ui, sans-serif;
 }
+
+/* Korean wraps between any two syllables by default ("포장하시나 / 요?"); wrap between words, and break a word
+   only when it would overflow on its own. */
+:lang(ko) {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}

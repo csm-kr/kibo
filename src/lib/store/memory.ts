@@ -3,7 +3,7 @@ import type { SessionSecrets, SessionStore, TransactResult } from "./types";
 
 // Single-process store for unit tests and local E2E (STORE=memory). Not for Cloud Run with more than one instance.
 
-type Listener = (s: Session | null) => void;
+type Listener = { onChange: (s: Session | null) => void; onError?: (e: unknown) => void };
 
 export class MemoryStore implements SessionStore {
   private sessions = new Map<string, Session>();
@@ -38,16 +38,26 @@ export class MemoryStore implements SessionStore {
     return run;
   }
 
-  subscribe(sessionId: string, onChange: Listener): () => void {
+  subscribe(sessionId: string, onChange: Listener["onChange"], onError?: Listener["onError"]): () => void {
     let set = this.listeners.get(sessionId);
     if (!set) this.listeners.set(sessionId, (set = new Set()));
-    set.add(onChange);
+    const listener: Listener = { onChange, onError };
+    set.add(listener);
     queueMicrotask(() => {
-      if (set.has(onChange)) onChange(this.read(sessionId));
+      if (set.has(listener)) onChange(this.read(sessionId));
     });
     return () => {
-      set.delete(onChange);
+      set.delete(listener);
     };
+  }
+
+  /** Tests only: fails every listener on the session, as Firestore does when a listener breaks. */
+  failSubscribers(sessionId: string, error: unknown): void {
+    const set = this.listeners.get(sessionId);
+    for (const listener of set ?? []) {
+      set!.delete(listener);
+      queueMicrotask(() => listener.onError?.(error));
+    }
   }
 
   private read(sessionId: string): Session | null {
@@ -58,7 +68,7 @@ export class MemoryStore implements SessionStore {
   private notify(sessionId: string): void {
     const snapshot = this.sessions.get(sessionId);
     for (const listener of this.listeners.get(sessionId) ?? []) {
-      queueMicrotask(() => listener(snapshot ? structuredClone(snapshot) : null));
+      queueMicrotask(() => listener.onChange(snapshot ? structuredClone(snapshot) : null));
     }
   }
 }
