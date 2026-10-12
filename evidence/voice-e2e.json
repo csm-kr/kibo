@@ -2,24 +2,24 @@
   "about": "Voice order E2E on /demo with real Gemini Live (e2e/voice.live.spec.ts, `npm run test:e2e:live`). Synthetic TTS voice (Gemini TTS, e2e/fixtures) through Chromium's fake microphone on a laptop, not a real phone. End of speech = the last voiced 40 ms mic frame sent to Live before the model's first output; the page sends the looping fixture once. (a) end of speech → first AI audio chunk; (b) end of speech → first 2 s highlight ring on the kiosk half. Medians over passing runs.",
   "model": "gemini-3.8-live",
   "firstRun": "2026-10-12T17:51:42.293Z",
-  "lastRun": "2026-10-12T17:53:52.099Z",
+  "lastRun": "2026-10-12T23:29:24.104Z",
   "summary": {
-    "runs": 6,
-    "passed": 6,
+    "runs": 8,
+    "passed": 8,
     "aMedianMs": 2070,
-    "bMedianMs": 1084,
+    "bMedianMs": 974,
     "byFixture": {
       "hero-en": {
-        "runs": 3,
-        "passed": 3,
-        "aMedianMs": 2164,
-        "bMedianMs": 1142
+        "runs": 4,
+        "passed": 4,
+        "aMedianMs": 2196,
+        "bMedianMs": 1093
       },
       "hero-ko": {
-        "runs": 3,
-        "passed": 3,
-        "aMedianMs": 1772,
-        "bMedianMs": 896
+        "runs": 4,
+        "passed": 4,
+        "aMedianMs": 1688,
+        "bMedianMs": 796
       }
     }
   },
@@ -98,6 +98,33 @@
       "aMs": 1530,
       "bMs": 896,
       "toolMs": 844,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ]
+    },
+    {
+      "at": "2026-10-12T23:29:00.225Z",
+      "fixture": "hero-en",
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 2959,
+      "bMs": 905,
+      "toolMs": 848,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok",
+        "offerChoices:ok"
+      ]
+    },
+    {
+      "at": "2026-10-12T23:29:24.104Z",
+      "fixture": "hero-ko",
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 1603,
+      "bMs": 652,
+      "toolMs": 597,
       "commands": [
         "addToCart:ok",
         "addToCart:ok"
