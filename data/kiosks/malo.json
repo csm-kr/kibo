@@ -51,7 +51,7 @@
         "ko": "치킨",
         "en": "Chicken"
       },
-      "icon": "/menu/burger_chicken.jpg"
+      "icon": "/menu/chicken_nuggets.jpg"
     },
     {
       "categoryId": "side",
@@ -75,7 +75,7 @@
         "ko": "커피",
         "en": "Coffee"
       },
-      "icon": "/menu/iced_coffee.jpg"
+      "icon": "/menu/hot_coffee.jpg"
     },
     {
       "categoryId": "dessert",
@@ -91,7 +91,7 @@
         "ko": "아침 메뉴",
         "en": "Breakfast"
       },
-      "icon": "/menu/burger_cheese.jpg"
+      "icon": "/menu/egg_muffin.jpg"
     }
   ],
   "items": [
@@ -1130,7 +1130,7 @@
         "en": "Classic burger"
       },
       "category": "burger",
-      "image": "/menu/burger_cheese.jpg",
+      "image": "/menu/classic_burger.jpg",
       "kcal": 480,
       "badge": null,
       "allergens": [
@@ -1335,7 +1335,7 @@
         "en": "Bacon cheeseburger"
       },
       "category": "burger",
-      "image": "/menu/burger_double.jpg",
+      "image": "/menu/bacon_cheese_burger.jpg",
       "kcal": 690,
       "badge": null,
       "allergens": [
@@ -1542,7 +1542,7 @@
         "en": "Crispy chicken burger"
       },
       "category": "burger",
-      "image": "/menu/burger_chicken.jpg",
+      "image": "/menu/crispy_chicken_burger.jpg",
       "kcal": 590,
       "badge": null,
       "allergens": [
@@ -1747,7 +1747,7 @@
         "en": "Chicken nuggets (6)"
       },
       "category": "chicken",
-      "image": "/menu/cheese_sticks.jpg",
+      "image": "/menu/chicken_nuggets.jpg",
       "kcal": 280,
       "badge": null,
       "allergens": [
@@ -1816,7 +1816,7 @@
         "en": "Chicken tenders (3)"
       },
       "category": "chicken",
-      "image": "/menu/cheese_sticks.jpg",
+      "image": "/menu/chicken_tenders.jpg",
       "kcal": 340,
       "badge": null,
       "allergens": [
@@ -1842,7 +1842,7 @@
         "en": "Spicy wings (4)"
       },
       "category": "chicken",
-      "image": "/menu/burger_chicken.jpg",
+      "image": "/menu/spicy_wings.jpg",
       "kcal": 390,
       "badge": null,
       "allergens": [
@@ -1867,7 +1867,7 @@
         "en": "Popcorn chicken"
       },
       "category": "chicken",
-      "image": "/menu/cheese_sticks.jpg",
+      "image": "/menu/popcorn_chicken.jpg",
       "kcal": 300,
       "badge": null,
       "allergens": [
@@ -1892,7 +1892,7 @@
         "en": "Chicken snack wrap"
       },
       "category": "chicken",
-      "image": "/menu/burger_chicken.jpg",
+      "image": "/menu/chicken_wrap.jpg",
       "kcal": 330,
       "badge": null,
       "allergens": [
@@ -1940,7 +1940,7 @@
         "en": "Fries (L)"
       },
       "category": "side",
-      "image": "/menu/fries.jpg",
+      "image": "/menu/fries_l.jpg",
       "kcal": 440,
       "badge": null,
       "allergens": [],
@@ -2009,7 +2009,7 @@
         "en": "Corn salad"
       },
       "category": "side",
-      "image": "/menu/coleslaw.jpg",
+      "image": "/menu/corn_salad.jpg",
       "kcal": 160,
       "badge": null,
       "allergens": [
@@ -2033,7 +2033,7 @@
         "en": "Onion rings"
       },
       "category": "side",
-      "image": "/menu/fries.jpg",
+      "image": "/menu/onion_rings.jpg",
       "kcal": 310,
       "badge": null,
       "allergens": [
@@ -2231,7 +2231,7 @@
         "en": "Lemonade"
       },
       "category": "drink",
-      "image": "/menu/cider.jpg",
+      "image": "/menu/lemonade.jpg",
       "kcal": 170,
       "badge": null,
       "allergens": [],
@@ -2252,7 +2252,7 @@
         "en": "Orange juice"
       },
       "category": "drink",
-      "image": "/menu/cider.jpg",
+      "image": "/menu/orange_juice.jpg",
       "kcal": 160,
       "badge": null,
       "allergens": [],
@@ -2273,7 +2273,7 @@
         "en": "Iced tea"
       },
       "category": "drink",
-      "image": "/menu/iced_coffee.jpg",
+      "image": "/menu/iced_tea.jpg",
       "kcal": 120,
       "badge": null,
       "allergens": [],
@@ -2315,7 +2315,7 @@
         "en": "Hot coffee"
       },
       "category": "coffee",
-      "image": "/menu/iced_coffee.jpg",
+      "image": "/menu/hot_coffee.jpg",
       "kcal": 10,
       "badge": null,
       "allergens": [],
@@ -2336,7 +2336,7 @@
         "en": "Cafe latte"
       },
       "category": "coffee",
-      "image": "/menu/iced_coffee.jpg",
+      "image": "/menu/cafe_latte.jpg",
       "kcal": 180,
       "badge": null,
       "allergens": [
@@ -2409,7 +2409,7 @@
         "en": "Chocolate sundae"
       },
       "category": "dessert",
-      "image": "/menu/soft_cone.jpg",
+      "image": "/menu/choco_sundae.jpg",
       "kcal": 320,
       "badge": null,
       "allergens": [
@@ -2433,7 +2433,7 @@
         "en": "Chocolate chip cookie"
       },
       "category": "dessert",
-      "image": "/menu/apple_pie.jpg",
+      "image": "/menu/choco_cookie.jpg",
       "kcal": 210,
       "badge": null,
       "allergens": [
@@ -2459,7 +2459,7 @@
         "en": "Egg muffin"
       },
       "category": "morning",
-      "image": "/menu/burger_cheese.jpg",
+      "image": "/menu/egg_muffin.jpg",
       "kcal": 300,
       "badge": null,
       "allergens": [
@@ -2486,7 +2486,7 @@
         "en": "Sausage muffin"
       },
       "category": "morning",
-      "image": "/menu/burger_double.jpg",
+      "image": "/menu/sausage_muffin.jpg",
       "kcal": 400,
       "badge": null,
       "allergens": [
@@ -2512,7 +2512,7 @@
         "en": "Hash brown"
       },
       "category": "morning",
-      "image": "/menu/fries.jpg",
+      "image": "/menu/hash_brown.jpg",
       "kcal": 150,
       "badge": null,
       "allergens": [],
