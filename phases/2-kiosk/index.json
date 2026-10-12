@@ -16,7 +16,7 @@
       "status": "completed",
       "started_at": "2026-10-12T23:20:06+0900",
       "summary": "/kiosk shell. src/lib/client/api.ts: createSession, sendCommand (uuid commandId, Bearer), ping; ApiError with NETWORK on fetch failure and INTERNAL on non-JSON or unknown code. src/hooks/useSessionStream.ts: EventSource, snapshot keyed by sessionId. src/hooks/useKioskSession.ts: localStorage 'kibo.kiosk.<id>' via useSyncExternalStore; new session when absent, gone, expired, or resumed as paid; 10 s retry; 30 s ping, active = pointerdown in last 30 s; clockOffset; setClaimUrl. src/lib/kiosk/screen.ts kioskScreen() (unit-tested). src/lib/i18n/kiosk.ts kt(). src/components/kiosk/KioskCanvas.tsx: 1080x1920 scaled, --k-* vars, lang. KioskScreen.tsx: K1 attract (QR img with data-claim-url, startTouch, language row, large-text toggle via --k-fs 1.15), K2 dine (setDineOption, phone-connected line), one-line placeholder for menu/review/payment/done, errorCopy alert bar; root has data-screen. Kiosk text uses k-text-40/48/56/72 utilities in globals.css. src/app/kiosk/page.tsx reads searchParams under Suspense and passes KioskData to client KioskApp.tsx. I-033 logged (stream not reopened after a hard close). Not checked in a real browser yet (no Playwright until step 5).",
-      "completed_at": "2026-10-12T23:31:00+0900"
+      "completed_at": "2026-10-12T23:27:43+0900"
     },
     {
       "step": 2,
