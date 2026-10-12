@@ -125,4 +125,8 @@ describe("doneCountdown", () => {
   it("uses server time", () => {
     expect(doneCountdown(T, T, 4_000)).toBe(6);
   });
+
+  it("never shows more than 10 s when the clock offset runs behind the server", () => {
+    expect(doneCountdown(T + 600, T, 0)).toBe(10);
+  });
 });

@@ -33,5 +33,8 @@ export function staffBannerVisible(session: Session, now: number, clockOffset: n
 
 /** Seconds left of the 10 s before the kiosk returns to the attract screen. */
 export function doneCountdown(paidAt: number, now: number, clockOffset: number): number {
-  return Math.max(0, Math.ceil((paidAt + DONE_MS - (now + clockOffset)) / 1000));
+  // The offset is measured on arrival of a ping, so it can trail the server by the network delay; capped so the
+  // screen never shows "11".
+  const left = Math.ceil((paidAt + DONE_MS - (now + clockOffset)) / 1000);
+  return Math.min(DONE_MS / 1000, Math.max(0, left));
 }

@@ -45,7 +45,8 @@ export function KioskCanvas({ theme, locale, children }: { theme: KioskTheme; lo
         data-kiosk-canvas
         lang={locale}
         style={vars}
-        className="absolute top-1/2 left-1/2 origin-center overflow-hidden bg-(--k-bg) font-sans text-[#1E1B18]"
+        // break-keep: Korean otherwise wraps between any two syllables and strands a single "요" (I-044).
+        className="absolute top-1/2 left-1/2 origin-center overflow-hidden bg-(--k-bg) font-sans break-keep text-[#1E1B18]"
       >
         {children}
       </div>
