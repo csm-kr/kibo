@@ -1,46 +1,38 @@
-# Step 4: environment-demo
+# Step 4: agent-domains
 
 ## Read first
-- `CLAUDE.md` and `docs/*.md` are in your prompt. Sections: UX "Flow C", USER_JOURNEY J2 (Mei) and J3 (judge), UI_QA angle H; PRD "Kiosks in the demo", "Business model".
-- Code: `src/app/demo/page.tsx`, `src/components/demo/*`, `src/app/page.tsx` (landing), `src/lib/agent/examples.ts`, `src/components/assistant/AssistantPanel.tsx`, `src/components/learned/LearnedKioskHost.tsx`, `e2e/demo*.spec.ts`, `e2e/qa/*`.
+- `CLAUDE.md` and `docs/*.md` are in your prompt. Sections: ARCHITECTURE "Agent tools (9)"; PRD "Data principle"; TESTING "Agent evaluation set"; RULE R-001.
+- Code: `src/lib/agent/*` (instructions, tools, menu, mapping, choices, chat, live), `evals/agent-cases.json`, `scripts/eval-agent.ts`, `evals/results/*`, `data/kiosks/airport_rail.json`.
 
 Shell: only `npm`, `npx`, `node`, `python3`, `ls`, `mkdir`, `git status|diff|add|commit|log`.
 
 ## Task
-Let a judge pick an environment and see the same phone experience drive a different kiosk.
+The agent must sound right and act right on every kiosk, not only the burger shop.
 
-### `/demo` environment picker (D1)
-Replace the small kiosk choice with three equal cards, each a real screenshot or pictogram, a title, one line, and the persona it serves:
-1. **Burger shop** — "MALO BURGER · connected directly" — Sunja (72) orders lunch in one sentence. (`/demo?k=malo`, default)
-2. **Airport rail** — "SKYLINE AIRPORT RAIL · ticket machine" — Mei, a visitor, buys tickets in English while the machine shows Korean. (`/demo?k=airport_rail`)
-3. **Pizza shop, no integration** — "Doughhouse · learned by KIBO Learn" — KIBO learned this third-party screen once and replays orders without AI. (`/demo?k=doughhouse`)
-[Start] uses the selected card; the URL carries the choice so links work. Keep the D1 rule: one primary action, readable in 20 seconds.
-- D2 shows the matching kiosk on the left (`KioskScreen` for direct kiosks, `LearnedKioskHost` for learned), the assistant on the right with `examplesFor(kioskId, "en")`, and the caption bar naming the environment.
-- D3's end card offers "Try another place" with the two other environments.
+### Instructions and tools
+- `buildInstructions` uses the kiosk's `domain` and `vocabulary`: for `ticket` kiosks, talk about tickets, destinations and passengers; never ask "eat here or take out"; map "two adults and a child" to two `addToCart` calls (`passenger` adult qty 2, child qty 1); ask which destination when unclear (`offerChoices` pick_item with the matching trains); for a transit card ask the top-up amount; information not in the data (platform numbers, train times, delays, luggage rules) → say the machine does not have that information and call staff (`unknown_info`).
+- `toolDeclarations` omits `setDineOption` when the kiosk has no `dineOptions`.
+- Example sentences per kiosk come from one place (`src/lib/agent/examples.ts`: `examplesFor(kioskId, locale)`), used by `/demo` and the phone: MALO (existing), Doughhouse (existing pizza lines), airport_rail ("Two adult tickets to City Center on the express, please.", "Add one child ticket too.", "Which platform is it?", "I'll pay."; Korean versions).
+- `choiceQuestion` covers the new groups (passenger, seat, top-up) in ko and en.
 
-### Landing page
-Add a section "One phone, many kiosks" with the three environments (real screenshots captured by `npm run shots:landing`, extended for airport_rail), each linking to its `/demo?k=…`. Mention roadmap places (hospitals, civil-service offices, cinemas) as roadmap in one plain line, no claims.
-
-### Tests and QA
-- E2E `e2e/demo-airport.spec.ts` (no model): `/demo?k=airport_rail` → Start → API-sent tickets via the demo's device token appear on both halves → confirm card → stand-in card → reference number.
-- `@live` (skipped unless `E2E_LIVE=1`): type "Two adult tickets to City Center on the express" → two adult express tickets in the cart.
-- QA: D1 with the three cards and D2 for airport_rail at 1440×900, 1280×720, 1920×1080; landing section at 1440×900 and 390×844.
+### Evaluation
+- Add 8–10 airport cases to `evals/agent-cases.json` (ko and en): adults + child, destination ambiguity, transit card without top-up (choices), sold-out item (alternatives), platform question (staff), a request for a real-world thing not in data (refuse), "I'll pay" (status `confirming`). The runner must support a `kioskId` per case (default `malo`).
+- Run `npm run eval:agent` (real Gemini). Tune instructions at most 2 rounds if airport cases fail; MALO's pass rate must not drop. Update the TESTING ledger row with the new overall and per-kiosk pass rates and the result file (R-001).
 
 ## Acceptance criteria
 ```bash
 npm run lint
 npm run build
 npm run test
-npm run test:e2e
-npm run qa:ui
+npm run eval:agent
 ```
 
 ## Verify
-1. Run the AC commands; run `npm run test:e2e:live` once and report.
-2. As a cold judge at 1440×900: can you tell in 20 seconds that these are three different places and the phone works the same in each?
+1. Run the AC commands; report per-kiosk pass rates in the summary.
+2. Check: no instructions mention real stations, operators or schedules; replies are grounded in data.
 3. Update this step in `phases/7-environments/index.json` (completed + summary / error / blocked).
 
 ## Do not
-- Do not fake environments with screenshots only; each card opens a working kiosk.
-- Do not add more than one primary button on D1.
+- Do not change server rules to make cases pass.
+- Do not add languages beyond Korean and English.
 - Break existing tests.

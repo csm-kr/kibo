@@ -1,46 +1,42 @@
-# Step 2: kiosk-generalize
+# Step 2: airport-rail-data
 
 ## Read first
-- `CLAUDE.md` and `docs/*.md` are in your prompt. Sections: UI_GUIDE (all; kiosk text ≥ 40px on the 1080×1920 canvas), UX "Screen map" K1–K8, "Copy"; ISSUE I-019 (English kiosk UI, deferred until now: the user asked for broader environments, and airport machines offer English); UI_QA "KIBO numbers".
-- Code: `src/components/kiosk/*`, `src/lib/kiosk/*`, `src/lib/i18n/{kiosk,errors}.ts`, `src/app/kiosk/page.tsx`, `data/kiosks/airport_rail.json`, `public/kiosks/airport_rail/*`, `e2e/kiosk-*.spec.ts`, `e2e/qa/kiosk.qa.spec.ts`.
+- `CLAUDE.md` and `docs/*.md` are in your prompt. Sections: PRD "Users" (Mei, a tourist; older travellers), "Data principle"; UI_GUIDE "Anti-patterns" (no emoji icons; stroke SVG icons); CLAUDE.md (no real brands, logos or store screens).
+- Code: `src/types/menu.ts`, `src/lib/adapters/catalog.ts` (+ tests, `allKioskIds`), `data/kiosks/malo.json` (format reference).
 
 Shell: only `npm`, `npx`, `node`, `python3`, `ls`, `mkdir`, `git status|diff|add|commit|log`.
 
 ## Task
-Make the kiosk screens work for any direct kiosk in the data, and give the kiosk an English mode.
+Add a fictional airport rail ticket machine as a direct-adapter kiosk.
 
-### Ticket domain
-- `kioskScreen()` skips K2 when the kiosk has no `dineOptions` (touch start goes straight to the menu; tests first).
-- Tiles: pictogram or photo (`object-fit: contain` for SVG pictograms on a tinted panel), name, `subtitle` line when present, price (fares show "부터"/"from" only if the item has cheaper passenger options), kcal only when not null.
-- K4 sheet: no variant step when an item has one variant; steps from option groups (`passenger`, `seat`, `top_up`) with the same step label; quantity on the last step labelled by the vocabulary ("승차권 수" / "Tickets").
-- Cart bar, review, payment and done screens use `vocabulary` words (no "메뉴 담기" on a ticket machine); the done screen for tickets says "승차권을 받아 가세요" / "Please take your tickets" with the order number as a reference number.
-- Theme colors come from `--k-*` variables already; check nothing is hard-coded to MALO teal or mustard.
+### `data/kiosks/airport_rail.json` (`kioskId: "airport_rail"`, `domain: "ticket"`)
+- Brand: `{ ko: "스카이라인 공항철도", en: "SKYLINE AIRPORT RAIL" }` (fictional; no real operator, line or station names; no real logos); tagline for K1 (e.g. "도심까지 가장 빠른 길" / "The fastest way downtown").
+- Theme: deep navy primary with a sky-blue tint and a warm yellow accent; every text/background pair ≥ 4.5:1 (check with a small contrast function in the test). Background stays light.
+- `locale: "ko"`, `locales: ["ko", "en"]`, no `dineOptions`, `vocabulary` for tickets.
+- **Categories (3):** `express` (직통열차 / Express, non-stop to the city), `all_stop` (일반열차 / All-stop), `pass` (교통카드·이용권 / Cards and passes).
+- **Items (10–14), fictional stations:** e.g. Express to "City Center" (adult 11,000); all-stop trains to "City Center", "Harbor Gate", "Expo Park", "Riverside", "Old Town" (fares between 1,450 and 4,750, multiples of 10); passes: "1-day pass" (15,000), "rechargeable transit card" (card 4,000 with a required `top_up` group: 0, 10,000, 20,000, 30,000 as price deltas).
+- **Groups:** every train ticket has a required `passenger` group (min 1, max 1, default `adult`): `adult` +0, `teen` (13–18) and `child` (6–12) with negative deltas that keep the fare ≥ 0, `senior` (65+). Express also has an optional `seat` group (`window`, `aisle`, +0). Use `qty` for the number of tickets of the same kind ("two adults and one child" = two lines).
+- `subtitle` for trains: "직통 · 43분" / "Non-stop · 43 min", "12개 역 · 59분" / "12 stops · 59 min" (fictional; these are product data, not claims about a real line).
+- `kcal: null`, `allergens: []`, `badge` where sensible ("best" on the express), `soldOut` on one item (e.g. a sold-out "late-night limousine bus combo" or one pass) so the alternatives flow works; `availableHours: null` everywhere (judges test at any hour).
+- `upsellRules`: none, or one sensible rule (express ticket → offer the rechargeable card) if it reads like a real machine; keep it once per order.
+- Images: no photos. Make simple stroke pictograms as SVG files in `public/kiosks/airport_rail/` (train front, express train, ticket, card, pass), 24px grid scaled up, 1.5–2px stroke, theme navy on transparent; tiles use them with the name, as real ticket machines do. Category icons likewise.
 
-### English kiosk mode (I-019)
-- K1's language row: 한국어 / English buttons that work (local state for this order; reset to the kiosk's default `locale` when a new session starts). Only languages in `kiosk.locales`.
-- Every kiosk string in `src/lib/i18n/kiosk.ts` must have a natural English version; names from `name.en`; prices "₩4,900" in English mode and "4,900원" in Korean.
-- MALO gets `locales: ["ko", "en"]` in its data. The killer scene still works: the kiosk starts in Korean, and the phone speaks the user's language; switching the kiosk to English is the kiosk's own feature. Update I-019 to "fixed" with this decision and adjust `docs/PRD.md` "Languages" and `docs/USER_JOURNEY.md` J2 in one sentence each (R-002).
-
-### Tests and QA
-- Unit: `kioskScreen` without dine options; price formatting per locale; every kiosk string has ko and en.
-- E2E: `e2e/kiosk-rail.spec.ts`: `/kiosk?k=airport_rail` touch flow: express → passenger adult → qty 2 → select; all-stop to Harbor Gate → child → select; review shows both lines and the server total; card → reference number. And one MALO run in English mode (K1 → English → order a cheeseburger set with zero cola → English review).
-- QA: extend `e2e/qa/kiosk.qa.spec.ts` with airport_rail K1, K3, K4 (passenger step), K6 and MALO K1/K3 in English at 1080×1920; all H checks must pass (text ≥ 40px on the canvas, targets, contrast with the navy theme).
+### Tests
+The generic catalog checks from step 1 now cover this kiosk; add specific ones: 3 categories, every train has `passenger` with default `adult`, every resolved fare ≥ 0, the transit card needs a `top_up` choice (`NEEDS_CHOICE`), "2 adult + 1 child express" resolves to the right total.
 
 ## Acceptance criteria
 ```bash
 npm run lint
 npm run build
 npm run test
-npm run test:e2e
-npm run qa:ui
 ```
 
 ## Verify
-1. Run the AC commands; fix H failures on the changed kiosk screens.
-2. Look at the airport K1 and K3 screenshots: does it read like a real ticket machine, not a burger kiosk with a new color?
+1. Run the AC commands.
+2. Check: no real operator, line, station, card or brand names; no emoji; contrast of theme pairs ≥ 4.5:1.
 3. Update this step in `phases/7-environments/index.json` (completed + summary / error / blocked).
 
 ## Do not
-- Do not fork the kiosk components per kiosk; one set of components driven by data.
-- Do not change MALO's Korean default or its flow.
+- Do not use real airport, railway or transit card names or logos (third-party IP disqualifies the entry).
+- Do not add time limits to items (`availableHours` null).
 - Break existing tests.

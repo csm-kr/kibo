@@ -2,11 +2,40 @@
   "project": "KIBO",
   "phase": "7-environments",
   "steps": [
-    { "step": 0, "name": "domain-model", "status": "pending" },
-    { "step": 1, "name": "airport-rail-data", "status": "pending" },
-    { "step": 2, "name": "kiosk-generalize", "status": "pending" },
-    { "step": 3, "name": "agent-domains", "status": "pending" },
-    { "step": 4, "name": "environment-demo", "status": "pending" },
-    { "step": 5, "name": "qa", "status": "pending" }
+    {
+      "step": 0,
+      "name": "gemini-backend",
+      "status": "pending"
+    },
+    {
+      "step": 1,
+      "name": "domain-model",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "name": "airport-rail-data",
+      "status": "pending"
+    },
+    {
+      "step": 3,
+      "name": "kiosk-generalize",
+      "status": "pending"
+    },
+    {
+      "step": 4,
+      "name": "agent-domains",
+      "status": "pending"
+    },
+    {
+      "step": 5,
+      "name": "environment-demo",
+      "status": "pending"
+    },
+    {
+      "step": 6,
+      "name": "qa",
+      "status": "pending"
+    }
   ]
 }

@@ -1,38 +1,46 @@
-# Step 3: agent-domains
+# Step 3: kiosk-generalize
 
 ## Read first
-- `CLAUDE.md` and `docs/*.md` are in your prompt. Sections: ARCHITECTURE "Agent tools (9)"; PRD "Data principle"; TESTING "Agent evaluation set"; RULE R-001.
-- Code: `src/lib/agent/*` (instructions, tools, menu, mapping, choices, chat, live), `evals/agent-cases.json`, `scripts/eval-agent.ts`, `evals/results/*`, `data/kiosks/airport_rail.json`.
+- `CLAUDE.md` and `docs/*.md` are in your prompt. Sections: UI_GUIDE (all; kiosk text ≥ 40px on the 1080×1920 canvas), UX "Screen map" K1–K8, "Copy"; ISSUE I-019 (English kiosk UI, deferred until now: the user asked for broader environments, and airport machines offer English); UI_QA "KIBO numbers".
+- Code: `src/components/kiosk/*`, `src/lib/kiosk/*`, `src/lib/i18n/{kiosk,errors}.ts`, `src/app/kiosk/page.tsx`, `data/kiosks/airport_rail.json`, `public/kiosks/airport_rail/*`, `e2e/kiosk-*.spec.ts`, `e2e/qa/kiosk.qa.spec.ts`.
 
 Shell: only `npm`, `npx`, `node`, `python3`, `ls`, `mkdir`, `git status|diff|add|commit|log`.
 
 ## Task
-The agent must sound right and act right on every kiosk, not only the burger shop.
+Make the kiosk screens work for any direct kiosk in the data, and give the kiosk an English mode.
 
-### Instructions and tools
-- `buildInstructions` uses the kiosk's `domain` and `vocabulary`: for `ticket` kiosks, talk about tickets, destinations and passengers; never ask "eat here or take out"; map "two adults and a child" to two `addToCart` calls (`passenger` adult qty 2, child qty 1); ask which destination when unclear (`offerChoices` pick_item with the matching trains); for a transit card ask the top-up amount; information not in the data (platform numbers, train times, delays, luggage rules) → say the machine does not have that information and call staff (`unknown_info`).
-- `toolDeclarations` omits `setDineOption` when the kiosk has no `dineOptions`.
-- Example sentences per kiosk come from one place (`src/lib/agent/examples.ts`: `examplesFor(kioskId, locale)`), used by `/demo` and the phone: MALO (existing), Doughhouse (existing pizza lines), airport_rail ("Two adult tickets to City Center on the express, please.", "Add one child ticket too.", "Which platform is it?", "I'll pay."; Korean versions).
-- `choiceQuestion` covers the new groups (passenger, seat, top-up) in ko and en.
+### Ticket domain
+- `kioskScreen()` skips K2 when the kiosk has no `dineOptions` (touch start goes straight to the menu; tests first).
+- Tiles: pictogram or photo (`object-fit: contain` for SVG pictograms on a tinted panel), name, `subtitle` line when present, price (fares show "부터"/"from" only if the item has cheaper passenger options), kcal only when not null.
+- K4 sheet: no variant step when an item has one variant; steps from option groups (`passenger`, `seat`, `top_up`) with the same step label; quantity on the last step labelled by the vocabulary ("승차권 수" / "Tickets").
+- Cart bar, review, payment and done screens use `vocabulary` words (no "메뉴 담기" on a ticket machine); the done screen for tickets says "승차권을 받아 가세요" / "Please take your tickets" with the order number as a reference number.
+- Theme colors come from `--k-*` variables already; check nothing is hard-coded to MALO teal or mustard.
 
-### Evaluation
-- Add 8–10 airport cases to `evals/agent-cases.json` (ko and en): adults + child, destination ambiguity, transit card without top-up (choices), sold-out item (alternatives), platform question (staff), a request for a real-world thing not in data (refuse), "I'll pay" (status `confirming`). The runner must support a `kioskId` per case (default `malo`).
-- Run `npm run eval:agent` (real Gemini). Tune instructions at most 2 rounds if airport cases fail; MALO's pass rate must not drop. Update the TESTING ledger row with the new overall and per-kiosk pass rates and the result file (R-001).
+### English kiosk mode (I-019)
+- K1's language row: 한국어 / English buttons that work (local state for this order; reset to the kiosk's default `locale` when a new session starts). Only languages in `kiosk.locales`.
+- Every kiosk string in `src/lib/i18n/kiosk.ts` must have a natural English version; names from `name.en`; prices "₩4,900" in English mode and "4,900원" in Korean.
+- MALO gets `locales: ["ko", "en"]` in its data. The killer scene still works: the kiosk starts in Korean, and the phone speaks the user's language; switching the kiosk to English is the kiosk's own feature. Update I-019 to "fixed" with this decision and adjust `docs/PRD.md` "Languages" and `docs/USER_JOURNEY.md` J2 in one sentence each (R-002).
+
+### Tests and QA
+- Unit: `kioskScreen` without dine options; price formatting per locale; every kiosk string has ko and en.
+- E2E: `e2e/kiosk-rail.spec.ts`: `/kiosk?k=airport_rail` touch flow: express → passenger adult → qty 2 → select; all-stop to Harbor Gate → child → select; review shows both lines and the server total; card → reference number. And one MALO run in English mode (K1 → English → order a cheeseburger set with zero cola → English review).
+- QA: extend `e2e/qa/kiosk.qa.spec.ts` with airport_rail K1, K3, K4 (passenger step), K6 and MALO K1/K3 in English at 1080×1920; all H checks must pass (text ≥ 40px on the canvas, targets, contrast with the navy theme).
 
 ## Acceptance criteria
 ```bash
 npm run lint
 npm run build
 npm run test
-npm run eval:agent
+npm run test:e2e
+npm run qa:ui
 ```
 
 ## Verify
-1. Run the AC commands; report per-kiosk pass rates in the summary.
-2. Check: no instructions mention real stations, operators or schedules; replies are grounded in data.
+1. Run the AC commands; fix H failures on the changed kiosk screens.
+2. Look at the airport K1 and K3 screenshots: does it read like a real ticket machine, not a burger kiosk with a new color?
 3. Update this step in `phases/7-environments/index.json` (completed + summary / error / blocked).
 
 ## Do not
-- Do not change server rules to make cases pass.
-- Do not add languages beyond Korean and English.
+- Do not fork the kiosk components per kiosk; one set of components driven by data.
+- Do not change MALO's Korean default or its flow.
 - Break existing tests.
