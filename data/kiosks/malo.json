@@ -1,0 +1,2545 @@
+{
+  "kioskId": "malo",
+  "kind": "direct",
+  "brand": {
+    "name": {
+      "ko": "말로 버거",
+      "en": "MALO BURGER"
+    },
+    "tagline": {
+      "ko": "말 한마디로 주문하세요",
+      "en": "Just say your order"
+    }
+  },
+  "theme": {
+    "primary": "#0E5E5A",
+    "primaryDark": "#083E3B",
+    "primaryTint": "#DDF0EE",
+    "accent": "#F2B13D",
+    "background": "#FBF7EF"
+  },
+  "locale": "ko",
+  "currency": "KRW",
+  "dineOptions": {
+    "eat_in": {
+      "name": {
+        "ko": "매장에서 먹기",
+        "en": "Eat here"
+      },
+      "image": "/menu/dine_in.jpg"
+    },
+    "take_out": {
+      "name": {
+        "ko": "포장하기",
+        "en": "Take out"
+      },
+      "image": "/menu/take_out.jpg"
+    }
+  },
+  "categories": [
+    {
+      "categoryId": "burger",
+      "name": {
+        "ko": "버거",
+        "en": "Burgers"
+      },
+      "icon": "/menu/burger_cheese.jpg"
+    },
+    {
+      "categoryId": "chicken",
+      "name": {
+        "ko": "치킨",
+        "en": "Chicken"
+      },
+      "icon": "/menu/burger_chicken.jpg"
+    },
+    {
+      "categoryId": "side",
+      "name": {
+        "ko": "사이드",
+        "en": "Sides"
+      },
+      "icon": "/menu/fries.jpg"
+    },
+    {
+      "categoryId": "drink",
+      "name": {
+        "ko": "음료",
+        "en": "Drinks"
+      },
+      "icon": "/menu/cola.jpg"
+    },
+    {
+      "categoryId": "coffee",
+      "name": {
+        "ko": "커피",
+        "en": "Coffee"
+      },
+      "icon": "/menu/iced_coffee.jpg"
+    },
+    {
+      "categoryId": "dessert",
+      "name": {
+        "ko": "디저트",
+        "en": "Desserts"
+      },
+      "icon": "/menu/soft_cone.jpg"
+    },
+    {
+      "categoryId": "morning",
+      "name": {
+        "ko": "아침 메뉴",
+        "en": "Breakfast"
+      },
+      "icon": "/menu/burger_cheese.jpg"
+    }
+  ],
+  "items": [
+    {
+      "itemId": "cheese_burger",
+      "name": {
+        "ko": "치즈버거",
+        "en": "Cheeseburger"
+      },
+      "category": "burger",
+      "image": "/menu/burger_cheese.jpg",
+      "kcal": 520,
+      "badge": "best",
+      "allergens": [
+        "wheat",
+        "milk",
+        "egg",
+        "soy",
+        "beef"
+      ],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 4900
+        },
+        {
+          "variant": "set",
+          "price": 6900
+        },
+        {
+          "variant": "largeSet",
+          "price": 7600
+        }
+      ],
+      "optionGroups": [
+        {
+          "groupId": "side",
+          "name": {
+            "ko": "사이드",
+            "en": "Side"
+          },
+          "appliesTo": [
+            "set",
+            "largeSet"
+          ],
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [
+            "fries_m"
+          ],
+          "options": [
+            {
+              "optionId": "fries_m",
+              "name": {
+                "ko": "감자튀김 M",
+                "en": "Fries (M)"
+              },
+              "image": "/menu/fries.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "fries_l",
+              "name": {
+                "ko": "감자튀김 L",
+                "en": "Fries (L)"
+              },
+              "image": "/menu/fries.jpg",
+              "priceDelta": 500,
+              "soldOut": false
+            },
+            {
+              "optionId": "cheese_sticks",
+              "name": {
+                "ko": "치즈스틱",
+                "en": "Cheese sticks"
+              },
+              "image": "/menu/cheese_sticks.jpg",
+              "priceDelta": 1000,
+              "soldOut": false
+            },
+            {
+              "optionId": "coleslaw",
+              "name": {
+                "ko": "코울슬로",
+                "en": "Coleslaw"
+              },
+              "image": "/menu/coleslaw.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            }
+          ]
+        },
+        {
+          "groupId": "drink",
+          "name": {
+            "ko": "음료",
+            "en": "Drink"
+          },
+          "appliesTo": [
+            "set",
+            "largeSet"
+          ],
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "cola",
+              "name": {
+                "ko": "콜라",
+                "en": "Cola"
+              },
+              "image": "/menu/cola.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "zero_cola",
+              "name": {
+                "ko": "제로콜라",
+                "en": "Zero cola"
+              },
+              "image": "/menu/zero_cola.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "cider",
+              "name": {
+                "ko": "사이다",
+                "en": "Cider"
+              },
+              "image": "/menu/cider.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "iced_coffee",
+              "name": {
+                "ko": "아이스커피",
+                "en": "Iced coffee"
+              },
+              "image": "/menu/iced_coffee.jpg",
+              "priceDelta": 500,
+              "soldOut": false
+            }
+          ]
+        },
+        {
+          "groupId": "ingredients",
+          "name": {
+            "ko": "재료 변경",
+            "en": "Ingredients"
+          },
+          "appliesTo": [
+            "single",
+            "set",
+            "largeSet"
+          ],
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "no_pickles",
+              "name": {
+                "ko": "피클 빼기",
+                "en": "No pickles"
+              },
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "no_onion",
+              "name": {
+                "ko": "양파 빼기",
+                "en": "No onion"
+              },
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "extra_cheese",
+              "name": {
+                "ko": "치즈 추가",
+                "en": "Extra cheese"
+              },
+              "priceDelta": 500,
+              "soldOut": false
+            },
+            {
+              "optionId": "extra_patty",
+              "name": {
+                "ko": "패티 추가",
+                "en": "Extra patty"
+              },
+              "priceDelta": 1500,
+              "soldOut": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "bulgogi_burger",
+      "name": {
+        "ko": "불고기버거",
+        "en": "Bulgogi burger"
+      },
+      "category": "burger",
+      "image": "/menu/burger_bulgogi.jpg",
+      "kcal": 560,
+      "badge": null,
+      "allergens": [
+        "wheat",
+        "egg",
+        "soy",
+        "beef",
+        "pork"
+      ],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 5200
+        },
+        {
+          "variant": "set",
+          "price": 7200
+        },
+        {
+          "variant": "largeSet",
+          "price": 7900
+        }
+      ],
+      "optionGroups": [
+        {
+          "groupId": "side",
+          "name": {
+            "ko": "사이드",
+            "en": "Side"
+          },
+          "appliesTo": [
+            "set",
+            "largeSet"
+          ],
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [
+            "fries_m"
+          ],
+          "options": [
+            {
+              "optionId": "fries_m",
+              "name": {
+                "ko": "감자튀김 M",
+                "en": "Fries (M)"
+              },
+              "image": "/menu/fries.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "fries_l",
+              "name": {
+                "ko": "감자튀김 L",
+                "en": "Fries (L)"
+              },
+              "image": "/menu/fries.jpg",
+              "priceDelta": 500,
+              "soldOut": false
+            },
+            {
+              "optionId": "cheese_sticks",
+              "name": {
+                "ko": "치즈스틱",
+                "en": "Cheese sticks"
+              },
+              "image": "/menu/cheese_sticks.jpg",
+              "priceDelta": 1000,
+              "soldOut": false
+            },
+            {
+              "optionId": "coleslaw",
+              "name": {
+                "ko": "코울슬로",
+                "en": "Coleslaw"
+              },
+              "image": "/menu/coleslaw.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            }
+          ]
+        },
+        {
+          "groupId": "drink",
+          "name": {
+            "ko": "음료",
+            "en": "Drink"
+          },
+          "appliesTo": [
+            "set",
+            "largeSet"
+          ],
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "cola",
+              "name": {
+                "ko": "콜라",
+                "en": "Cola"
+              },
+              "image": "/menu/cola.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "zero_cola",
+              "name": {
+                "ko": "제로콜라",
+                "en": "Zero cola"
+              },
+              "image": "/menu/zero_cola.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "cider",
+              "name": {
+                "ko": "사이다",
+                "en": "Cider"
+              },
+              "image": "/menu/cider.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "iced_coffee",
+              "name": {
+                "ko": "아이스커피",
+                "en": "Iced coffee"
+              },
+              "image": "/menu/iced_coffee.jpg",
+              "priceDelta": 500,
+              "soldOut": false
+            }
+          ]
+        },
+        {
+          "groupId": "ingredients",
+          "name": {
+            "ko": "재료 변경",
+            "en": "Ingredients"
+          },
+          "appliesTo": [
+            "single",
+            "set",
+            "largeSet"
+          ],
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "no_pickles",
+              "name": {
+                "ko": "피클 빼기",
+                "en": "No pickles"
+              },
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "no_onion",
+              "name": {
+                "ko": "양파 빼기",
+                "en": "No onion"
+              },
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "extra_cheese",
+              "name": {
+                "ko": "치즈 추가",
+                "en": "Extra cheese"
+              },
+              "priceDelta": 500,
+              "soldOut": false
+            },
+            {
+              "optionId": "extra_patty",
+              "name": {
+                "ko": "패티 추가",
+                "en": "Extra patty"
+              },
+              "priceDelta": 1500,
+              "soldOut": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "double_cheese_burger",
+      "name": {
+        "ko": "더블치즈버거",
+        "en": "Double cheeseburger"
+      },
+      "category": "burger",
+      "image": "/menu/burger_double.jpg",
+      "kcal": 760,
+      "badge": null,
+      "allergens": [
+        "wheat",
+        "milk",
+        "egg",
+        "soy",
+        "beef"
+      ],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 6400
+        },
+        {
+          "variant": "set",
+          "price": 8400
+        },
+        {
+          "variant": "largeSet",
+          "price": 9100
+        }
+      ],
+      "optionGroups": [
+        {
+          "groupId": "side",
+          "name": {
+            "ko": "사이드",
+            "en": "Side"
+          },
+          "appliesTo": [
+            "set",
+            "largeSet"
+          ],
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [
+            "fries_m"
+          ],
+          "options": [
+            {
+              "optionId": "fries_m",
+              "name": {
+                "ko": "감자튀김 M",
+                "en": "Fries (M)"
+              },
+              "image": "/menu/fries.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "fries_l",
+              "name": {
+                "ko": "감자튀김 L",
+                "en": "Fries (L)"
+              },
+              "image": "/menu/fries.jpg",
+              "priceDelta": 500,
+              "soldOut": false
+            },
+            {
+              "optionId": "cheese_sticks",
+              "name": {
+                "ko": "치즈스틱",
+                "en": "Cheese sticks"
+              },
+              "image": "/menu/cheese_sticks.jpg",
+              "priceDelta": 1000,
+              "soldOut": false
+            },
+            {
+              "optionId": "coleslaw",
+              "name": {
+                "ko": "코울슬로",
+                "en": "Coleslaw"
+              },
+              "image": "/menu/coleslaw.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            }
+          ]
+        },
+        {
+          "groupId": "drink",
+          "name": {
+            "ko": "음료",
+            "en": "Drink"
+          },
+          "appliesTo": [
+            "set",
+            "largeSet"
+          ],
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "cola",
+              "name": {
+                "ko": "콜라",
+                "en": "Cola"
+              },
+              "image": "/menu/cola.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "zero_cola",
+              "name": {
+                "ko": "제로콜라",
+                "en": "Zero cola"
+              },
+              "image": "/menu/zero_cola.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "cider",
+              "name": {
+                "ko": "사이다",
+                "en": "Cider"
+              },
+              "image": "/menu/cider.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "iced_coffee",
+              "name": {
+                "ko": "아이스커피",
+                "en": "Iced coffee"
+              },
+              "image": "/menu/iced_coffee.jpg",
+              "priceDelta": 500,
+              "soldOut": false
+            }
+          ]
+        },
+        {
+          "groupId": "ingredients",
+          "name": {
+            "ko": "재료 변경",
+            "en": "Ingredients"
+          },
+          "appliesTo": [
+            "single",
+            "set",
+            "largeSet"
+          ],
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "no_pickles",
+              "name": {
+                "ko": "피클 빼기",
+                "en": "No pickles"
+              },
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "no_onion",
+              "name": {
+                "ko": "양파 빼기",
+                "en": "No onion"
+              },
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "extra_cheese",
+              "name": {
+                "ko": "치즈 추가",
+                "en": "Extra cheese"
+              },
+              "priceDelta": 500,
+              "soldOut": false
+            },
+            {
+              "optionId": "extra_patty",
+              "name": {
+                "ko": "패티 추가",
+                "en": "Extra patty"
+              },
+              "priceDelta": 1500,
+              "soldOut": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "spicy_chicken_burger",
+      "name": {
+        "ko": "매콤 치킨버거",
+        "en": "Spicy chicken burger"
+      },
+      "category": "burger",
+      "image": "/menu/burger_chicken.jpg",
+      "kcal": 610,
+      "badge": "new",
+      "allergens": [
+        "wheat",
+        "egg",
+        "soy",
+        "chicken"
+      ],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 5600
+        },
+        {
+          "variant": "set",
+          "price": 7600
+        },
+        {
+          "variant": "largeSet",
+          "price": 8300
+        }
+      ],
+      "optionGroups": [
+        {
+          "groupId": "side",
+          "name": {
+            "ko": "사이드",
+            "en": "Side"
+          },
+          "appliesTo": [
+            "set",
+            "largeSet"
+          ],
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [
+            "fries_m"
+          ],
+          "options": [
+            {
+              "optionId": "fries_m",
+              "name": {
+                "ko": "감자튀김 M",
+                "en": "Fries (M)"
+              },
+              "image": "/menu/fries.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "fries_l",
+              "name": {
+                "ko": "감자튀김 L",
+                "en": "Fries (L)"
+              },
+              "image": "/menu/fries.jpg",
+              "priceDelta": 500,
+              "soldOut": false
+            },
+            {
+              "optionId": "cheese_sticks",
+              "name": {
+                "ko": "치즈스틱",
+                "en": "Cheese sticks"
+              },
+              "image": "/menu/cheese_sticks.jpg",
+              "priceDelta": 1000,
+              "soldOut": false
+            },
+            {
+              "optionId": "coleslaw",
+              "name": {
+                "ko": "코울슬로",
+                "en": "Coleslaw"
+              },
+              "image": "/menu/coleslaw.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            }
+          ]
+        },
+        {
+          "groupId": "drink",
+          "name": {
+            "ko": "음료",
+            "en": "Drink"
+          },
+          "appliesTo": [
+            "set",
+            "largeSet"
+          ],
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "cola",
+              "name": {
+                "ko": "콜라",
+                "en": "Cola"
+              },
+              "image": "/menu/cola.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "zero_cola",
+              "name": {
+                "ko": "제로콜라",
+                "en": "Zero cola"
+              },
+              "image": "/menu/zero_cola.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "cider",
+              "name": {
+                "ko": "사이다",
+                "en": "Cider"
+              },
+              "image": "/menu/cider.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "iced_coffee",
+              "name": {
+                "ko": "아이스커피",
+                "en": "Iced coffee"
+              },
+              "image": "/menu/iced_coffee.jpg",
+              "priceDelta": 500,
+              "soldOut": false
+            }
+          ]
+        },
+        {
+          "groupId": "ingredients",
+          "name": {
+            "ko": "재료 변경",
+            "en": "Ingredients"
+          },
+          "appliesTo": [
+            "single",
+            "set",
+            "largeSet"
+          ],
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "no_pickles",
+              "name": {
+                "ko": "피클 빼기",
+                "en": "No pickles"
+              },
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "no_onion",
+              "name": {
+                "ko": "양파 빼기",
+                "en": "No onion"
+              },
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "extra_cheese",
+              "name": {
+                "ko": "치즈 추가",
+                "en": "Extra cheese"
+              },
+              "priceDelta": 500,
+              "soldOut": false
+            },
+            {
+              "optionId": "extra_patty",
+              "name": {
+                "ko": "패티 추가",
+                "en": "Extra patty"
+              },
+              "priceDelta": 1500,
+              "soldOut": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "shrimp_burger",
+      "name": {
+        "ko": "새우버거",
+        "en": "Shrimp burger"
+      },
+      "category": "burger",
+      "image": "/menu/burger_shrimp.jpg",
+      "kcal": 540,
+      "badge": null,
+      "allergens": [
+        "wheat",
+        "egg",
+        "soy",
+        "shrimp"
+      ],
+      "soldOut": true,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 5500
+        },
+        {
+          "variant": "set",
+          "price": 7500
+        },
+        {
+          "variant": "largeSet",
+          "price": 8200
+        }
+      ],
+      "optionGroups": [
+        {
+          "groupId": "side",
+          "name": {
+            "ko": "사이드",
+            "en": "Side"
+          },
+          "appliesTo": [
+            "set",
+            "largeSet"
+          ],
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [
+            "fries_m"
+          ],
+          "options": [
+            {
+              "optionId": "fries_m",
+              "name": {
+                "ko": "감자튀김 M",
+                "en": "Fries (M)"
+              },
+              "image": "/menu/fries.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "fries_l",
+              "name": {
+                "ko": "감자튀김 L",
+                "en": "Fries (L)"
+              },
+              "image": "/menu/fries.jpg",
+              "priceDelta": 500,
+              "soldOut": false
+            },
+            {
+              "optionId": "cheese_sticks",
+              "name": {
+                "ko": "치즈스틱",
+                "en": "Cheese sticks"
+              },
+              "image": "/menu/cheese_sticks.jpg",
+              "priceDelta": 1000,
+              "soldOut": false
+            },
+            {
+              "optionId": "coleslaw",
+              "name": {
+                "ko": "코울슬로",
+                "en": "Coleslaw"
+              },
+              "image": "/menu/coleslaw.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            }
+          ]
+        },
+        {
+          "groupId": "drink",
+          "name": {
+            "ko": "음료",
+            "en": "Drink"
+          },
+          "appliesTo": [
+            "set",
+            "largeSet"
+          ],
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "cola",
+              "name": {
+                "ko": "콜라",
+                "en": "Cola"
+              },
+              "image": "/menu/cola.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "zero_cola",
+              "name": {
+                "ko": "제로콜라",
+                "en": "Zero cola"
+              },
+              "image": "/menu/zero_cola.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "cider",
+              "name": {
+                "ko": "사이다",
+                "en": "Cider"
+              },
+              "image": "/menu/cider.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "iced_coffee",
+              "name": {
+                "ko": "아이스커피",
+                "en": "Iced coffee"
+              },
+              "image": "/menu/iced_coffee.jpg",
+              "priceDelta": 500,
+              "soldOut": false
+            }
+          ]
+        },
+        {
+          "groupId": "ingredients",
+          "name": {
+            "ko": "재료 변경",
+            "en": "Ingredients"
+          },
+          "appliesTo": [
+            "single",
+            "set",
+            "largeSet"
+          ],
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "no_pickles",
+              "name": {
+                "ko": "피클 빼기",
+                "en": "No pickles"
+              },
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "no_onion",
+              "name": {
+                "ko": "양파 빼기",
+                "en": "No onion"
+              },
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "extra_cheese",
+              "name": {
+                "ko": "치즈 추가",
+                "en": "Extra cheese"
+              },
+              "priceDelta": 500,
+              "soldOut": false
+            },
+            {
+              "optionId": "extra_patty",
+              "name": {
+                "ko": "패티 추가",
+                "en": "Extra patty"
+              },
+              "priceDelta": 1500,
+              "soldOut": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "classic_burger",
+      "name": {
+        "ko": "클래식버거",
+        "en": "Classic burger"
+      },
+      "category": "burger",
+      "image": "/menu/burger_cheese.jpg",
+      "kcal": 480,
+      "badge": null,
+      "allergens": [
+        "wheat",
+        "egg",
+        "soy",
+        "beef"
+      ],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 4500
+        },
+        {
+          "variant": "set",
+          "price": 6500
+        },
+        {
+          "variant": "largeSet",
+          "price": 7200
+        }
+      ],
+      "optionGroups": [
+        {
+          "groupId": "side",
+          "name": {
+            "ko": "사이드",
+            "en": "Side"
+          },
+          "appliesTo": [
+            "set",
+            "largeSet"
+          ],
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [
+            "fries_m"
+          ],
+          "options": [
+            {
+              "optionId": "fries_m",
+              "name": {
+                "ko": "감자튀김 M",
+                "en": "Fries (M)"
+              },
+              "image": "/menu/fries.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "fries_l",
+              "name": {
+                "ko": "감자튀김 L",
+                "en": "Fries (L)"
+              },
+              "image": "/menu/fries.jpg",
+              "priceDelta": 500,
+              "soldOut": false
+            },
+            {
+              "optionId": "cheese_sticks",
+              "name": {
+                "ko": "치즈스틱",
+                "en": "Cheese sticks"
+              },
+              "image": "/menu/cheese_sticks.jpg",
+              "priceDelta": 1000,
+              "soldOut": false
+            },
+            {
+              "optionId": "coleslaw",
+              "name": {
+                "ko": "코울슬로",
+                "en": "Coleslaw"
+              },
+              "image": "/menu/coleslaw.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            }
+          ]
+        },
+        {
+          "groupId": "drink",
+          "name": {
+            "ko": "음료",
+            "en": "Drink"
+          },
+          "appliesTo": [
+            "set",
+            "largeSet"
+          ],
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "cola",
+              "name": {
+                "ko": "콜라",
+                "en": "Cola"
+              },
+              "image": "/menu/cola.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "zero_cola",
+              "name": {
+                "ko": "제로콜라",
+                "en": "Zero cola"
+              },
+              "image": "/menu/zero_cola.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "cider",
+              "name": {
+                "ko": "사이다",
+                "en": "Cider"
+              },
+              "image": "/menu/cider.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "iced_coffee",
+              "name": {
+                "ko": "아이스커피",
+                "en": "Iced coffee"
+              },
+              "image": "/menu/iced_coffee.jpg",
+              "priceDelta": 500,
+              "soldOut": false
+            }
+          ]
+        },
+        {
+          "groupId": "ingredients",
+          "name": {
+            "ko": "재료 변경",
+            "en": "Ingredients"
+          },
+          "appliesTo": [
+            "single",
+            "set",
+            "largeSet"
+          ],
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "no_pickles",
+              "name": {
+                "ko": "피클 빼기",
+                "en": "No pickles"
+              },
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "no_onion",
+              "name": {
+                "ko": "양파 빼기",
+                "en": "No onion"
+              },
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "extra_cheese",
+              "name": {
+                "ko": "치즈 추가",
+                "en": "Extra cheese"
+              },
+              "priceDelta": 500,
+              "soldOut": false
+            },
+            {
+              "optionId": "extra_patty",
+              "name": {
+                "ko": "패티 추가",
+                "en": "Extra patty"
+              },
+              "priceDelta": 1500,
+              "soldOut": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "bacon_cheese_burger",
+      "name": {
+        "ko": "베이컨치즈버거",
+        "en": "Bacon cheeseburger"
+      },
+      "category": "burger",
+      "image": "/menu/burger_double.jpg",
+      "kcal": 690,
+      "badge": null,
+      "allergens": [
+        "wheat",
+        "milk",
+        "egg",
+        "soy",
+        "beef",
+        "pork"
+      ],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 6200
+        },
+        {
+          "variant": "set",
+          "price": 8200
+        },
+        {
+          "variant": "largeSet",
+          "price": 8900
+        }
+      ],
+      "optionGroups": [
+        {
+          "groupId": "side",
+          "name": {
+            "ko": "사이드",
+            "en": "Side"
+          },
+          "appliesTo": [
+            "set",
+            "largeSet"
+          ],
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [
+            "fries_m"
+          ],
+          "options": [
+            {
+              "optionId": "fries_m",
+              "name": {
+                "ko": "감자튀김 M",
+                "en": "Fries (M)"
+              },
+              "image": "/menu/fries.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "fries_l",
+              "name": {
+                "ko": "감자튀김 L",
+                "en": "Fries (L)"
+              },
+              "image": "/menu/fries.jpg",
+              "priceDelta": 500,
+              "soldOut": false
+            },
+            {
+              "optionId": "cheese_sticks",
+              "name": {
+                "ko": "치즈스틱",
+                "en": "Cheese sticks"
+              },
+              "image": "/menu/cheese_sticks.jpg",
+              "priceDelta": 1000,
+              "soldOut": false
+            },
+            {
+              "optionId": "coleslaw",
+              "name": {
+                "ko": "코울슬로",
+                "en": "Coleslaw"
+              },
+              "image": "/menu/coleslaw.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            }
+          ]
+        },
+        {
+          "groupId": "drink",
+          "name": {
+            "ko": "음료",
+            "en": "Drink"
+          },
+          "appliesTo": [
+            "set",
+            "largeSet"
+          ],
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "cola",
+              "name": {
+                "ko": "콜라",
+                "en": "Cola"
+              },
+              "image": "/menu/cola.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "zero_cola",
+              "name": {
+                "ko": "제로콜라",
+                "en": "Zero cola"
+              },
+              "image": "/menu/zero_cola.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "cider",
+              "name": {
+                "ko": "사이다",
+                "en": "Cider"
+              },
+              "image": "/menu/cider.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "iced_coffee",
+              "name": {
+                "ko": "아이스커피",
+                "en": "Iced coffee"
+              },
+              "image": "/menu/iced_coffee.jpg",
+              "priceDelta": 500,
+              "soldOut": false
+            }
+          ]
+        },
+        {
+          "groupId": "ingredients",
+          "name": {
+            "ko": "재료 변경",
+            "en": "Ingredients"
+          },
+          "appliesTo": [
+            "single",
+            "set",
+            "largeSet"
+          ],
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "no_pickles",
+              "name": {
+                "ko": "피클 빼기",
+                "en": "No pickles"
+              },
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "no_onion",
+              "name": {
+                "ko": "양파 빼기",
+                "en": "No onion"
+              },
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "extra_cheese",
+              "name": {
+                "ko": "치즈 추가",
+                "en": "Extra cheese"
+              },
+              "priceDelta": 500,
+              "soldOut": false
+            },
+            {
+              "optionId": "extra_patty",
+              "name": {
+                "ko": "패티 추가",
+                "en": "Extra patty"
+              },
+              "priceDelta": 1500,
+              "soldOut": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "crispy_chicken_burger",
+      "name": {
+        "ko": "크리스피 치킨버거",
+        "en": "Crispy chicken burger"
+      },
+      "category": "burger",
+      "image": "/menu/burger_chicken.jpg",
+      "kcal": 590,
+      "badge": null,
+      "allergens": [
+        "wheat",
+        "egg",
+        "soy",
+        "chicken"
+      ],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 5400
+        },
+        {
+          "variant": "set",
+          "price": 7400
+        },
+        {
+          "variant": "largeSet",
+          "price": 8100
+        }
+      ],
+      "optionGroups": [
+        {
+          "groupId": "side",
+          "name": {
+            "ko": "사이드",
+            "en": "Side"
+          },
+          "appliesTo": [
+            "set",
+            "largeSet"
+          ],
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [
+            "fries_m"
+          ],
+          "options": [
+            {
+              "optionId": "fries_m",
+              "name": {
+                "ko": "감자튀김 M",
+                "en": "Fries (M)"
+              },
+              "image": "/menu/fries.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "fries_l",
+              "name": {
+                "ko": "감자튀김 L",
+                "en": "Fries (L)"
+              },
+              "image": "/menu/fries.jpg",
+              "priceDelta": 500,
+              "soldOut": false
+            },
+            {
+              "optionId": "cheese_sticks",
+              "name": {
+                "ko": "치즈스틱",
+                "en": "Cheese sticks"
+              },
+              "image": "/menu/cheese_sticks.jpg",
+              "priceDelta": 1000,
+              "soldOut": false
+            },
+            {
+              "optionId": "coleslaw",
+              "name": {
+                "ko": "코울슬로",
+                "en": "Coleslaw"
+              },
+              "image": "/menu/coleslaw.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            }
+          ]
+        },
+        {
+          "groupId": "drink",
+          "name": {
+            "ko": "음료",
+            "en": "Drink"
+          },
+          "appliesTo": [
+            "set",
+            "largeSet"
+          ],
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "cola",
+              "name": {
+                "ko": "콜라",
+                "en": "Cola"
+              },
+              "image": "/menu/cola.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "zero_cola",
+              "name": {
+                "ko": "제로콜라",
+                "en": "Zero cola"
+              },
+              "image": "/menu/zero_cola.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "cider",
+              "name": {
+                "ko": "사이다",
+                "en": "Cider"
+              },
+              "image": "/menu/cider.jpg",
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "iced_coffee",
+              "name": {
+                "ko": "아이스커피",
+                "en": "Iced coffee"
+              },
+              "image": "/menu/iced_coffee.jpg",
+              "priceDelta": 500,
+              "soldOut": false
+            }
+          ]
+        },
+        {
+          "groupId": "ingredients",
+          "name": {
+            "ko": "재료 변경",
+            "en": "Ingredients"
+          },
+          "appliesTo": [
+            "single",
+            "set",
+            "largeSet"
+          ],
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "no_pickles",
+              "name": {
+                "ko": "피클 빼기",
+                "en": "No pickles"
+              },
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "no_onion",
+              "name": {
+                "ko": "양파 빼기",
+                "en": "No onion"
+              },
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "extra_cheese",
+              "name": {
+                "ko": "치즈 추가",
+                "en": "Extra cheese"
+              },
+              "priceDelta": 500,
+              "soldOut": false
+            },
+            {
+              "optionId": "extra_patty",
+              "name": {
+                "ko": "패티 추가",
+                "en": "Extra patty"
+              },
+              "priceDelta": 1500,
+              "soldOut": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "chicken_nuggets",
+      "name": {
+        "ko": "치킨너겟 6조각",
+        "en": "Chicken nuggets (6)"
+      },
+      "category": "chicken",
+      "image": "/menu/cheese_sticks.jpg",
+      "kcal": 280,
+      "badge": null,
+      "allergens": [
+        "wheat",
+        "soy",
+        "chicken"
+      ],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 3000
+        }
+      ],
+      "optionGroups": [
+        {
+          "groupId": "sauce",
+          "name": {
+            "ko": "소스",
+            "en": "Sauce"
+          },
+          "appliesTo": [
+            "single"
+          ],
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "sweet_chili",
+              "name": {
+                "ko": "스위트칠리",
+                "en": "Sweet chili"
+              },
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "honey_mustard",
+              "name": {
+                "ko": "허니머스터드",
+                "en": "Honey mustard"
+              },
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "bbq",
+              "name": {
+                "ko": "바비큐",
+                "en": "BBQ"
+              },
+              "priceDelta": 0,
+              "soldOut": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "chicken_tenders",
+      "name": {
+        "ko": "치킨텐더 3조각",
+        "en": "Chicken tenders (3)"
+      },
+      "category": "chicken",
+      "image": "/menu/cheese_sticks.jpg",
+      "kcal": 340,
+      "badge": null,
+      "allergens": [
+        "wheat",
+        "egg",
+        "soy",
+        "chicken"
+      ],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 3800
+        }
+      ],
+      "optionGroups": []
+    },
+    {
+      "itemId": "spicy_wings",
+      "name": {
+        "ko": "매콤 윙 4조각",
+        "en": "Spicy wings (4)"
+      },
+      "category": "chicken",
+      "image": "/menu/burger_chicken.jpg",
+      "kcal": 390,
+      "badge": null,
+      "allergens": [
+        "wheat",
+        "soy",
+        "chicken"
+      ],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 4200
+        }
+      ],
+      "optionGroups": []
+    },
+    {
+      "itemId": "popcorn_chicken",
+      "name": {
+        "ko": "팝콘치킨",
+        "en": "Popcorn chicken"
+      },
+      "category": "chicken",
+      "image": "/menu/cheese_sticks.jpg",
+      "kcal": 300,
+      "badge": null,
+      "allergens": [
+        "wheat",
+        "soy",
+        "chicken"
+      ],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 2700
+        }
+      ],
+      "optionGroups": []
+    },
+    {
+      "itemId": "chicken_wrap",
+      "name": {
+        "ko": "치킨 스낵랩",
+        "en": "Chicken snack wrap"
+      },
+      "category": "chicken",
+      "image": "/menu/burger_chicken.jpg",
+      "kcal": 330,
+      "badge": null,
+      "allergens": [
+        "wheat",
+        "milk",
+        "egg",
+        "soy",
+        "chicken"
+      ],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 2900
+        }
+      ],
+      "optionGroups": []
+    },
+    {
+      "itemId": "fries_m",
+      "name": {
+        "ko": "감자튀김 M",
+        "en": "Fries (M)"
+      },
+      "category": "side",
+      "image": "/menu/fries.jpg",
+      "kcal": 330,
+      "badge": null,
+      "allergens": [],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 2000
+        }
+      ],
+      "optionGroups": []
+    },
+    {
+      "itemId": "fries_l",
+      "name": {
+        "ko": "감자튀김 L",
+        "en": "Fries (L)"
+      },
+      "category": "side",
+      "image": "/menu/fries.jpg",
+      "kcal": 440,
+      "badge": null,
+      "allergens": [],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 2500
+        }
+      ],
+      "optionGroups": []
+    },
+    {
+      "itemId": "cheese_sticks",
+      "name": {
+        "ko": "치즈스틱",
+        "en": "Cheese sticks"
+      },
+      "category": "side",
+      "image": "/menu/cheese_sticks.jpg",
+      "kcal": 290,
+      "badge": null,
+      "allergens": [
+        "wheat",
+        "milk",
+        "egg"
+      ],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 2500
+        }
+      ],
+      "optionGroups": []
+    },
+    {
+      "itemId": "coleslaw",
+      "name": {
+        "ko": "코울슬로",
+        "en": "Coleslaw"
+      },
+      "category": "side",
+      "image": "/menu/coleslaw.jpg",
+      "kcal": 180,
+      "badge": null,
+      "allergens": [
+        "egg"
+      ],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 1800
+        }
+      ],
+      "optionGroups": []
+    },
+    {
+      "itemId": "corn_salad",
+      "name": {
+        "ko": "콘샐러드",
+        "en": "Corn salad"
+      },
+      "category": "side",
+      "image": "/menu/coleslaw.jpg",
+      "kcal": 160,
+      "badge": null,
+      "allergens": [
+        "egg",
+        "milk"
+      ],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 1900
+        }
+      ],
+      "optionGroups": []
+    },
+    {
+      "itemId": "onion_rings",
+      "name": {
+        "ko": "어니언링",
+        "en": "Onion rings"
+      },
+      "category": "side",
+      "image": "/menu/fries.jpg",
+      "kcal": 310,
+      "badge": null,
+      "allergens": [
+        "wheat",
+        "egg"
+      ],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 2300
+        }
+      ],
+      "optionGroups": []
+    },
+    {
+      "itemId": "cola",
+      "name": {
+        "ko": "콜라",
+        "en": "Cola"
+      },
+      "category": "drink",
+      "image": "/menu/cola.jpg",
+      "kcal": 150,
+      "badge": null,
+      "allergens": [],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 1800
+        }
+      ],
+      "optionGroups": [
+        {
+          "groupId": "size",
+          "name": {
+            "ko": "사이즈",
+            "en": "Size"
+          },
+          "appliesTo": [
+            "single"
+          ],
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [
+            "m"
+          ],
+          "options": [
+            {
+              "optionId": "m",
+              "name": {
+                "ko": "M",
+                "en": "M"
+              },
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "l",
+              "name": {
+                "ko": "L",
+                "en": "L"
+              },
+              "priceDelta": 500,
+              "soldOut": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "zero_cola",
+      "name": {
+        "ko": "제로콜라",
+        "en": "Zero cola"
+      },
+      "category": "drink",
+      "image": "/menu/zero_cola.jpg",
+      "kcal": 0,
+      "badge": null,
+      "allergens": [],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 1800
+        }
+      ],
+      "optionGroups": [
+        {
+          "groupId": "size",
+          "name": {
+            "ko": "사이즈",
+            "en": "Size"
+          },
+          "appliesTo": [
+            "single"
+          ],
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [
+            "m"
+          ],
+          "options": [
+            {
+              "optionId": "m",
+              "name": {
+                "ko": "M",
+                "en": "M"
+              },
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "l",
+              "name": {
+                "ko": "L",
+                "en": "L"
+              },
+              "priceDelta": 500,
+              "soldOut": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "cider",
+      "name": {
+        "ko": "사이다",
+        "en": "Cider"
+      },
+      "category": "drink",
+      "image": "/menu/cider.jpg",
+      "kcal": 140,
+      "badge": null,
+      "allergens": [],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 1800
+        }
+      ],
+      "optionGroups": [
+        {
+          "groupId": "size",
+          "name": {
+            "ko": "사이즈",
+            "en": "Size"
+          },
+          "appliesTo": [
+            "single"
+          ],
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [
+            "m"
+          ],
+          "options": [
+            {
+              "optionId": "m",
+              "name": {
+                "ko": "M",
+                "en": "M"
+              },
+              "priceDelta": 0,
+              "soldOut": false
+            },
+            {
+              "optionId": "l",
+              "name": {
+                "ko": "L",
+                "en": "L"
+              },
+              "priceDelta": 500,
+              "soldOut": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "lemonade",
+      "name": {
+        "ko": "레몬에이드",
+        "en": "Lemonade"
+      },
+      "category": "drink",
+      "image": "/menu/cider.jpg",
+      "kcal": 170,
+      "badge": null,
+      "allergens": [],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 2500
+        }
+      ],
+      "optionGroups": []
+    },
+    {
+      "itemId": "orange_juice",
+      "name": {
+        "ko": "오렌지주스",
+        "en": "Orange juice"
+      },
+      "category": "drink",
+      "image": "/menu/cider.jpg",
+      "kcal": 160,
+      "badge": null,
+      "allergens": [],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 2500
+        }
+      ],
+      "optionGroups": []
+    },
+    {
+      "itemId": "iced_tea",
+      "name": {
+        "ko": "아이스티",
+        "en": "Iced tea"
+      },
+      "category": "drink",
+      "image": "/menu/iced_coffee.jpg",
+      "kcal": 120,
+      "badge": null,
+      "allergens": [],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 2000
+        }
+      ],
+      "optionGroups": []
+    },
+    {
+      "itemId": "iced_coffee",
+      "name": {
+        "ko": "아이스커피",
+        "en": "Iced coffee"
+      },
+      "category": "coffee",
+      "image": "/menu/iced_coffee.jpg",
+      "kcal": 10,
+      "badge": null,
+      "allergens": [],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 2300
+        }
+      ],
+      "optionGroups": []
+    },
+    {
+      "itemId": "hot_coffee",
+      "name": {
+        "ko": "따뜻한 커피",
+        "en": "Hot coffee"
+      },
+      "category": "coffee",
+      "image": "/menu/iced_coffee.jpg",
+      "kcal": 10,
+      "badge": null,
+      "allergens": [],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 2000
+        }
+      ],
+      "optionGroups": []
+    },
+    {
+      "itemId": "cafe_latte",
+      "name": {
+        "ko": "카페라떼",
+        "en": "Cafe latte"
+      },
+      "category": "coffee",
+      "image": "/menu/iced_coffee.jpg",
+      "kcal": 180,
+      "badge": null,
+      "allergens": [
+        "milk"
+      ],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 2800
+        }
+      ],
+      "optionGroups": []
+    },
+    {
+      "itemId": "soft_cone",
+      "name": {
+        "ko": "소프트콘",
+        "en": "Soft cone"
+      },
+      "category": "dessert",
+      "image": "/menu/soft_cone.jpg",
+      "kcal": 160,
+      "badge": "best",
+      "allergens": [
+        "wheat",
+        "milk"
+      ],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 1000
+        }
+      ],
+      "optionGroups": []
+    },
+    {
+      "itemId": "apple_pie",
+      "name": {
+        "ko": "애플파이",
+        "en": "Apple pie"
+      },
+      "category": "dessert",
+      "image": "/menu/apple_pie.jpg",
+      "kcal": 250,
+      "badge": null,
+      "allergens": [
+        "wheat",
+        "milk",
+        "egg",
+        "soy"
+      ],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 1600
+        }
+      ],
+      "optionGroups": []
+    },
+    {
+      "itemId": "choco_sundae",
+      "name": {
+        "ko": "초코 선데",
+        "en": "Chocolate sundae"
+      },
+      "category": "dessert",
+      "image": "/menu/soft_cone.jpg",
+      "kcal": 320,
+      "badge": null,
+      "allergens": [
+        "milk",
+        "soy"
+      ],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 2200
+        }
+      ],
+      "optionGroups": []
+    },
+    {
+      "itemId": "choco_cookie",
+      "name": {
+        "ko": "초코칩 쿠키",
+        "en": "Chocolate chip cookie"
+      },
+      "category": "dessert",
+      "image": "/menu/apple_pie.jpg",
+      "kcal": 210,
+      "badge": null,
+      "allergens": [
+        "wheat",
+        "milk",
+        "egg",
+        "soy"
+      ],
+      "soldOut": false,
+      "availableHours": null,
+      "variants": [
+        {
+          "variant": "single",
+          "price": 1200
+        }
+      ],
+      "optionGroups": []
+    },
+    {
+      "itemId": "egg_muffin",
+      "name": {
+        "ko": "에그 머핀",
+        "en": "Egg muffin"
+      },
+      "category": "morning",
+      "image": "/menu/burger_cheese.jpg",
+      "kcal": 300,
+      "badge": null,
+      "allergens": [
+        "wheat",
+        "milk",
+        "egg",
+        "soy",
+        "pork"
+      ],
+      "soldOut": false,
+      "availableHours": "05:00-10:30",
+      "variants": [
+        {
+          "variant": "single",
+          "price": 3200
+        }
+      ],
+      "optionGroups": []
+    },
+    {
+      "itemId": "sausage_muffin",
+      "name": {
+        "ko": "소시지 머핀",
+        "en": "Sausage muffin"
+      },
+      "category": "morning",
+      "image": "/menu/burger_double.jpg",
+      "kcal": 400,
+      "badge": null,
+      "allergens": [
+        "wheat",
+        "milk",
+        "soy",
+        "pork"
+      ],
+      "soldOut": false,
+      "availableHours": "05:00-10:30",
+      "variants": [
+        {
+          "variant": "single",
+          "price": 3500
+        }
+      ],
+      "optionGroups": []
+    },
+    {
+      "itemId": "hash_brown",
+      "name": {
+        "ko": "해시브라운",
+        "en": "Hash brown"
+      },
+      "category": "morning",
+      "image": "/menu/fries.jpg",
+      "kcal": 150,
+      "badge": null,
+      "allergens": [],
+      "soldOut": false,
+      "availableHours": "05:00-10:30",
+      "variants": [
+        {
+          "variant": "single",
+          "price": 1500
+        }
+      ],
+      "optionGroups": []
+    }
+  ],
+  "upsellRules": [
+    {
+      "whenCategory": "burger",
+      "offerItemIds": [
+        "soft_cone",
+        "apple_pie"
+      ]
+    },
+    {
+      "whenCategory": "chicken",
+      "offerItemIds": [
+        "soft_cone"
+      ]
+    }
+  ]
+}
