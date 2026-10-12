@@ -101,7 +101,7 @@ test.describe(() => {
   // Its own address: this test adds sessions on top of the two above (R-005).
   test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.27" } });
 
-  test("D1 and D2 with the airport rail ticket machine", async ({ page, request }, info) => {
+  test("D1 to D3 with the airport rail ticket machine", async ({ page, request }, info) => {
     await page.goto("/demo?k=airport_rail");
     await expect(page.getByRole("link", { name: /SKYLINE AIRPORT RAIL/ })).toHaveAttribute("aria-current", "true", { timeout: 60_000 });
     await check(page, info, "D1-intro-rail");
@@ -126,6 +126,27 @@ test.describe(() => {
       });
       await expect(page.getByRole("region", { name: "Your order" }).locator("li")).toHaveCount(seq);
     });
+
+    await command(request, s.deviceToken, {
+      sessionId: s.sessionId,
+      type: "requestCheckout",
+      args: {},
+      source: "voice",
+      utteranceSeq: ++seq,
+    });
+    await expect(page.getByRole("heading", { name: "Please check your order" })).toBeVisible();
+    await expect(kioskRoot(page)).toHaveAttribute("data-screen", "review");
+    await check(page, info, "D2-rail-confirm");
+
+    await page.getByRole("button", { name: "Yes, pay now" }).click();
+    await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "pay");
+    await check(page, info, "D2-rail-payment");
+
+    await page.getByRole("button", { name: "Tap the card on the kiosk" }).click();
+    await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "done");
+    await page.getByRole("button", { name: "출력 안 함" }).click();
+    await expect(page.locator("[data-demo-end]")).toBeVisible();
+    await check(page, info, "D3-rail-done");
   });
 });
 

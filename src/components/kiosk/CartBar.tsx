@@ -48,7 +48,7 @@ export function CartBar(props: {
           return (
             <li
               key={ring ? `${line.lineId}:${props.ringKey}` : line.lineId}
-              className={`flex max-w-130 flex-none flex-col justify-center rounded-[32px] border-4 px-8 ${
+              className={`flex max-w-full flex-none flex-col justify-center rounded-[32px] border-4 px-8 ${
                 pending ? "border-dashed border-[#4B463F] bg-(--k-panel)" : "border-[#E2DACB] bg-(--k-bg)"
               } ${ring ? "k-ring" : ""}`}
             >

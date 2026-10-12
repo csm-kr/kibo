@@ -108,7 +108,12 @@ export type KioskTextKey = keyof typeof KIOSK_TEXT;
 /** A ticket machine sells tickets: no menu, no order, no counter pickup. */
 export const TICKET_TEXT: Partial<Record<KioskTextKey, Record<Locale, string>>> = {
   talkTitle: { ko: "휴대폰으로 말해서 구매 (QR)", en: "Buy by talking (QR)" },
+  qrAlt: { ko: "휴대폰으로 구매하는 QR 코드", en: "QR code to buy with your phone" },
   touchTitle: { ko: "화면을 눌러서 구매", en: "Buy by touch" },
+  phoneConnected: {
+    ko: "휴대폰이 연결됐어요. 휴대폰에서 구매하거나 여기서 눌러도 돼요.",
+    en: "Your phone is connected. Buy on your phone, or tap here.",
+  },
   openQr: { ko: "휴대폰으로 말해서 구매", en: "Buy by talking" },
   qrSheetHint: { ko: "고른 승차권은 그대로 남아요", en: "Your tickets stay as they are" },
   categories: { ko: "승차권 종류", en: "Ticket types" },
@@ -127,6 +132,7 @@ export const TICKET_TEXT: Partial<Record<KioskTextKey, Record<Locale, string>>> 
   editOrder: { ko: "승차권 수정", en: "Change tickets" },
   orderNumber: { ko: "참조 번호", en: "Reference number" },
   pickupHint: { ko: "승차권을 받아 가세요", en: "Please take your tickets" },
+  idleQuestion: { ko: "계속 구매하시겠어요?", en: "Still buying?" },
 };
 
 export function kt(key: KioskTextKey, locale: Locale, domain: KioskDomain = "food"): string {
@@ -159,8 +165,10 @@ export function backInSeconds(seconds: number, locale: Locale): string {
 }
 
 /** "10초 후 주문 번호로 넘어가요": nobody answered the receipt question. */
-export function receiptInSeconds(seconds: number, locale: Locale): string {
-  return locale === "ko" ? `${seconds}초 후 주문 번호로 넘어가요` : `Showing your number in ${seconds} s`;
+export function receiptInSeconds(seconds: number, locale: Locale, domain: KioskDomain = "food"): string {
+  return locale === "ko"
+    ? `${seconds}초 후 ${kt("orderNumber", locale, domain)}로 넘어가요`
+    : `Showing your number in ${seconds} s`;
 }
 
 /** Demo-only counter (`&demo=1`): "터치 12번 · 34초". */

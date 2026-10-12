@@ -145,7 +145,8 @@ test.describe("other kiosk data", () => {
   // Their own address, so these two sessions do not count against the three tests above (docs/RULE.md R-005).
   test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.25" } });
 
-  test("airport rail ticket machine: K1, K3, K4 passenger step, K6", async ({ page }, info) => {
+  test("airport rail ticket machine: K1, K3, K4 passenger step, K6 to K8", async ({ page }, info) => {
+    await page.clock.install();
     await page.goto("/kiosk?k=airport_rail");
     const root = kioskRoot(page);
     await readClaim(page);
@@ -171,9 +172,24 @@ test.describe("other kiosk data", () => {
     await page.getByRole("button", { name: "구매하기", exact: true }).click();
     await expect(root).toHaveAttribute("data-screen", "review");
     await check(page, info, "K6-rail-review");
+
+    await page.getByRole("button", { name: "결제하기" }).click();
+    await page.getByRole("button", { name: "카드", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "카드를 아래 투입구에 넣어 주세요" })).toBeVisible();
+    await check(page, info, "K7-rail-card-insert");
+
+    await page.getByRole("button", { name: "카드 넣기" }).click();
+    await expect(root).toHaveAttribute("data-screen", "done");
+    await check(page, info, "K8-rail-receipt");
+    await page.getByRole("button", { name: "출력 안 함" }).click();
+    await expect(page.getByRole("heading", { name: "참조 번호" })).toBeVisible();
+    await check(page, info, "K8-rail-reference-number", async () =>
+      page.clock.setSystemTime((await page.evaluate(() => Date.now())) - 60_000),
+    );
   });
 
-  test("MALO in English: K1 and K3", async ({ page }, info) => {
+  test("MALO in English: K1 to K8", async ({ page }, info) => {
+    await page.clock.install();
     await page.goto("/kiosk?k=malo");
     const root = kioskRoot(page);
     await readClaim(page);
@@ -182,9 +198,50 @@ test.describe("other kiosk data", () => {
     await check(page, info, "K1-attract-en");
 
     await page.getByRole("button", { name: /Order by touch/ }).click();
+    await expect(root).toHaveAttribute("data-screen", "dine");
+    await check(page, info, "K2-dine-en");
+
     await page.getByRole("button", { name: "Eat here" }).click();
     await expect(root).toHaveAttribute("data-screen", "menu");
     await expect(buttonWithText(page, "Cheeseburger")).toBeVisible();
     await check(page, info, "K3-menu-en");
+
+    await buttonWithText(page, "Cheeseburger").click();
+    const sheet = page.getByRole("dialog", { name: "Cheeseburger" });
+    await expect(sheet.getByText("Make it a set?")).toBeVisible();
+    await check(page, info, "K4-variant-en");
+    await buttonWithText(sheet, "set").click();
+    await sheet.getByRole("button", { name: "Next", exact: true }).click();
+    await sheet.getByRole("button", { name: "Next", exact: true }).click();
+    await check(page, info, "K4-drink-empty-en");
+    await buttonWithText(sheet, "Zero cola").click();
+    await sheet.getByRole("button", { name: "Next", exact: true }).click();
+    await check(page, info, "K4-ingredients-en");
+    await sheet.getByRole("button", { name: "Add", exact: true }).click();
+
+    const upsell = page.getByRole("dialog", { name: "Would you like a dessert too?" });
+    await expect(upsell).toBeVisible();
+    await check(page, info, "K5-upsell-en");
+    await upsell.getByRole("button", { name: "No, thanks" }).click();
+
+    await page.getByRole("button", { name: "Order", exact: true }).click();
+    await expect(root).toHaveAttribute("data-screen", "review");
+    await check(page, info, "K6-review-en");
+
+    await page.getByRole("button", { name: "Pay" }).click();
+    await expect(page.getByRole("heading", { name: "Choose how to pay" })).toBeVisible();
+    await check(page, info, "K7-pay-method-en");
+    await page.getByRole("button", { name: "Card", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Insert your card below" })).toBeVisible();
+    await check(page, info, "K7-card-insert-en");
+
+    await page.getByRole("button", { name: "Insert card" }).click();
+    await expect(root).toHaveAttribute("data-screen", "done");
+    await check(page, info, "K8-receipt-en");
+    await page.getByRole("button", { name: "No receipt" }).click();
+    await expect(page.getByRole("heading", { name: "Order number" })).toBeVisible();
+    await check(page, info, "K8-order-number-en", async () =>
+      page.clock.setSystemTime((await page.evaluate(() => Date.now())) - 60_000),
+    );
   });
 });

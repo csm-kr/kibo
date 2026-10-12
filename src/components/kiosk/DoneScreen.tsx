@@ -64,7 +64,7 @@ export function DoneScreen(props: {
             </button>
           </div>
           <p role="timer" className="k-text-40 text-[#4B463F]">
-            {receiptInSeconds(receiptLeft, locale)}
+            {receiptInSeconds(receiptLeft, locale, domain)}
           </p>
         </div>
       ) : (

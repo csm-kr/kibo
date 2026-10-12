@@ -115,7 +115,7 @@ function QrSheet(props: { kiosk: KioskData; claimUrl: string | null; onClose(): 
         {src && props.claimUrl ? (
           // A data URL, so next/image would add nothing.
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={src} alt={kt("qrAlt", locale)} data-claim-url={props.claimUrl} width={600} height={600} className="size-150" />
+          <img src={src} alt={kt("qrAlt", locale, domain)} data-claim-url={props.claimUrl} width={600} height={600} className="size-150" />
         ) : (
           <p className="k-text-40 flex size-150 items-center justify-center rounded-[32px] bg-(--k-panel) p-8 text-[#4B463F]">
             {kt("qrLoading", locale)}

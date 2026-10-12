@@ -252,7 +252,7 @@ function Attract(props: {
           {qrSrc && claimUrl ? (
             // A data URL, so next/image would add nothing.
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={qrSrc} alt={kt("qrAlt", locale)} data-claim-url={claimUrl} width={380} height={380} className="size-95" />
+            <img src={qrSrc} alt={kt("qrAlt", locale, domain)} data-claim-url={claimUrl} width={380} height={380} className="size-95" />
           ) : (
             <p className="k-text-40 flex size-95 items-center justify-center rounded-[24px] bg-(--k-panel) p-8 text-[#4B463F]">
               {kt("qrLoading", locale)}

@@ -54,7 +54,7 @@ export function KioskBanners(props: { kiosk: KioskData; session: Session; kioskT
         <ModalLayer className="absolute inset-0 z-30 flex items-center justify-center bg-[#1E1B18]/60 p-12">
           <section role="alertdialog" aria-modal aria-labelledby="idle-title" className="flex w-full flex-col items-center gap-10 rounded-[48px] bg-(--k-bg) p-12 text-center">
             <h2 id="idle-title" className="k-text-72 font-bold">
-              {kt("idleQuestion", locale)}
+              {kt("idleQuestion", locale, kiosk.domain)}
             </h2>
             <p role="timer" className="k-text-56 font-display font-bold text-[#7A2E0E]">
               {secondsLeftText(idle.secondsLeft, locale)}
