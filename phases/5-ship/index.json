@@ -16,7 +16,7 @@
       "status": "completed",
       "started_at": "2026-10-13T03:13:00+0900",
       "summary": "Root page / rewritten (src/app/page.tsx, server component): hero with [Try the live demo] → /demo and [Two-device mode] → /kiosk plus the /demo capture, who it is for (3 PRD personas, no numbers), how it works (3 steps with real captures), safe by design, works with kiosks that exist (direct adapter + KIBO Learn; 4 numbers each with its evidence path: eval 32/32, voice highlight median 1.1 s, replay 4/4 at 0.7–5.2 s, blind café 40/40 items with orders 2/5 and 3/5), built on Google Cloud (inline SVG diagram in a sideways-scroll region on phones + one line per service), accessibility, footer (fictional brands, AI-generated photos, team malo, contest). Title is 'KIBO — talk to the kiosk', not 'any kiosk' (I-088). Captures from scripts/landing-shots.ts (`npm run shots:landing`: own dev server on port 3300 with STORE=memory, API-driven, no model calls, WebP via the browser's canvas encoder, each < 80 KB) in public/landing/ (demo, kiosk-attract, kiosk-ai-highlight, phone-talk, phone-confirm). e2e/qa/landing.qa.spec.ts checks each data-landing-section at 1440×900, 1280×720, 390×844, 320×700 with reflow (0 H); the old root test left demo.qa.spec.ts; kiosk.qa.spec.ts got its own X-Forwarded-For (I-068 again). Open: Open Graph metadataBase unset until the deploy URL exists (I-087)",
-      "completed_at": "2026-10-13T03:40:00+0900"
+      "completed_at": "2026-10-13T03:28:53+0900"
     },
     {
       "step": 2,
