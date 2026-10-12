@@ -15,7 +15,13 @@ export function errorText(e: unknown, locale: Locale): string {
 }
 
 /** The text conversation with /api/chat. Kept in React state only; nothing of it is stored. */
-export function useChat(opts: { sessionId: string | null; token: string | null; locale: Locale }) {
+export function useChat(opts: {
+  sessionId: string | null;
+  token: string | null;
+  locale: Locale;
+  /** Takes the next utteranceSeq from the counter shared with voice (I-079); without it the chat counts on its own. */
+  nextSeq?: () => number;
+}) {
   const [state, dispatch] = useReducer(chatReducer, initialChat);
   // When the current request started, for the "Working…" line after 1 s.
   const [sentAt, setSentAt] = useState(0);
@@ -24,7 +30,7 @@ export function useChat(opts: { sessionId: string | null; token: string | null; 
     const message = text.trim().slice(0, 500);
     if (!message || !opts.sessionId || !opts.token || state.busy) return;
     const history = historyFor(state.messages);
-    const utteranceSeq = state.utteranceSeq + 1;
+    const utteranceSeq = opts.nextSeq ? opts.nextSeq() : state.utteranceSeq + 1;
     dispatch({ type: "send", text: message });
     setSentAt(Date.now());
     try {
@@ -51,6 +57,8 @@ export function useChat(opts: { sessionId: string | null; token: string | null; 
     sentAt,
     send,
     notice: (text: string) => dispatch({ type: "notice", text }),
+    /** What voice heard or said, into the same conversation. */
+    voice: (role: "user" | "model", text: string) => dispatch({ type: "voice", role, text }),
     reset: () => dispatch({ type: "reset" }),
   };
 }

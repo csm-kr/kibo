@@ -7,7 +7,7 @@ import { errorCopy } from "@/lib/i18n/errors";
 import { pt } from "@/lib/i18n/phone";
 import { base64ToFloat32, downsampleTo16k, int16ToBase64 } from "@/lib/voice/pcm";
 import { runToolCalls } from "@/lib/voice/toolRunner";
-import { initialTurns, turnEvents, turnsReducer } from "@/lib/voice/turns";
+import { initialTurns, noiseStep, raiseSeq, turnEvents, turnsReducer, type TurnEvent } from "@/lib/voice/turns";
 import type { KioskData, Locale } from "@/types/menu";
 import type { SessionStatus } from "@/types/session";
 
@@ -32,7 +32,11 @@ export interface LiveVoiceOptions {
   onAiText(text: string): void;
   /** Voice stopped for good; the screen switches to text and shows `reason`. */
   onFallback(reason: string): void;
+  /** Two spoken turns in a row did nothing (UX "Noise"): suggest typing or the buttons. */
+  onNoise(): void;
   voiceOutput: boolean;
+  /** The last utteranceSeq used by typed or spoken turns, shared with the chat so the server sees one counter. */
+  utterances: { current: number };
 }
 
 const OUTPUT_RATE = 24000;
@@ -63,6 +67,10 @@ interface Run {
   userText: string;
   aiText: string;
   stopped: boolean;
+  /** For UX "Noise": the running response answered something the user said, and ran a tool. */
+  respHeard: boolean;
+  respTools: boolean;
+  misses: number;
 }
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -215,14 +223,31 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     });
   }
 
+  /** Counts on from the shared counter and writes back, so typed and spoken turns never reuse a seq. */
+  function countTurns(events: TurnEvent[]) {
+    turns = events.reduce(turnsReducer, raiseSeq(turns, o.utterances.current));
+    o.utterances.current = Math.max(o.utterances.current, turns.seq);
+  }
+
   function onMessage(r: Run, id: string, m: LiveServerMessage) {
     const events = turnEvents(m);
-    turns = events.reduce(turnsReducer, turns);
+    countTurns(events);
     const sc = m.serverContent;
 
     if (m.setupComplete) {
       r.retries = 0;
       setState("listening");
+    }
+    if (events.some((e) => e.type === "userSpeech")) r.respHeard = true;
+    if (m.toolCall?.functionCalls?.length) r.respTools = true;
+    if (sc?.turnComplete) {
+      const n = noiseStep(r.misses, { heard: r.respHeard, tools: r.respTools });
+      r.misses = n.misses;
+      if (n.suggest) o.onNoise();
+    }
+    if (sc?.turnComplete || sc?.interrupted) {
+      r.respHeard = false;
+      r.respTools = false;
     }
     if (sc?.inputTranscription?.text) r.userText += sc.inputTranscription.text;
     if (events.some((e) => e.type === "modelOutput")) flushUser(r);
@@ -347,6 +372,9 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
       userText: "",
       aiText: "",
       stopped: false,
+      respHeard: false,
+      respTools: false,
+      misses: 0,
     };
     run = r;
     setState("connecting");
@@ -380,8 +408,24 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     }
   }
 
+  /** A tapped answer (a choice button) as one user turn on the open connection; false when there is none. */
+  function sendText(text: string): boolean {
+    const r = run;
+    if (!r?.live || r.stopped) return false;
+    try {
+      r.live.sendClientContent({ turns: [{ role: "user", parts: [{ text }] }], turnComplete: true });
+    } catch {
+      return false;
+    }
+    flushUser(r);
+    countTurns([{ type: "userSpeech" }]);
+    r.respHeard = true;
+    return true;
+  }
+
   return {
     start,
+    sendText,
     stop() {
       if (run) end(run, "off");
     },
@@ -397,6 +441,8 @@ export function useLiveVoice(opts: LiveVoiceOptions): {
   /** Call from a tap: iOS needs a user gesture to start audio. */
   start(): Promise<void>;
   stop(): void;
+  /** A tapped answer as one user turn on the open connection; false when there is none (send it as text). */
+  sendText(text: string): boolean;
   secondsLeft: number | null;
 } {
   const [state, setState] = useState<VoiceState>("off");
@@ -414,5 +460,5 @@ export function useLiveVoice(opts: LiveVoiceOptions): {
     if (opts.status === "paid" || opts.status === "expired") voice.stop();
   }, [opts.status, voice]);
 
-  return { state, start: voice.start, stop: voice.stop, secondsLeft };
+  return { state, start: voice.start, stop: voice.stop, sendText: voice.sendText, secondsLeft };
 }

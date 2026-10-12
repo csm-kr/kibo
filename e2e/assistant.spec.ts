@@ -32,6 +32,10 @@ test("phone claims the QR, mirrors the cart, confirms and gets the order number"
   await expect(kioskRoot(kiosk)).toHaveAttribute("data-screen", "dine");
 
   await phone.getByRole("button", { name: "Start" }).click();
+  // P1, first time in this browser: the microphone hint; typing skips the microphone.
+  await expect(phone.getByRole("heading", { name: "Turn on the microphone to talk" })).toBeVisible();
+  await phone.getByRole("button", { name: "Type instead" }).click();
+  await expect(phone.getByRole("textbox", { name: "Type your order" })).toBeFocused();
   await phone.getByRole("button", { name: "Eat here" }).click();
   await expect(phone.locator("[data-phone-screen]")).toHaveAttribute("data-phone-screen", "talk");
   await expect(kioskRoot(kiosk)).toHaveAttribute("data-screen", "menu");

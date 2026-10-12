@@ -42,7 +42,8 @@ function dropFragment() {
  * fragment's one-use token and removes it from the URL (docs/SECURITY.md "Identity and permissions"). Reads the
  * session through the stream and pings every 30 s, `active` when the user did something in the last 30 s.
  */
-export function usePhoneSession(sessionId: string | null) {
+export function usePhoneSession(sessionId: string | null, opts: { holdClaim?: boolean } = {}) {
+  const holdClaim = opts.holdClaim ?? false;
   const key = sessionId ? `kibo.phone.${sessionId}` : null;
   const deviceToken = useSyncExternalStore(
     subscribe,
@@ -63,6 +64,8 @@ export function usePhoneSession(sessionId: string | null) {
     if (!claimToken) return;
     // The same phone scanned the same QR again: it reconnects with its stored token; the claim token just goes.
     if (deviceToken) return dropFragment();
+    // An in-app browser waits on P1: the link the user copies must still hold an unused claim token.
+    if (holdClaim) return;
     claiming.current = true;
     claim({ sessionId, claimToken })
       .then((r) => {
@@ -85,7 +88,7 @@ export function usePhoneSession(sessionId: string | null) {
       .finally(() => {
         claiming.current = false;
       });
-  }, [key, sessionId, deviceToken, retryTick]);
+  }, [key, sessionId, deviceToken, retryTick, holdClaim]);
 
   const sendPing = useCallback(
     async (active: boolean) => {
@@ -136,5 +139,7 @@ export function usePhoneSession(sessionId: string | null) {
     streamState: state,
     claimError: error,
     clockOffset,
+    /** A claim is waiting for `holdClaim` to end. */
+    claimHeld: holdClaim && !!hashToken && !deviceToken && !error,
   };
 }

@@ -66,6 +66,37 @@ const PHONE_TEXT = {
   },
   twoDeviceOpen: { ko: "키오스크와 휴대폰으로 해 보기", en: "Open two-device mode" },
   backToIntro: { ko: "처음 안내로 돌아가기", en: "Back to the intro" },
+  // P1 microphone hint, before the browser asks
+  micHintTitle: { ko: "말로 주문하려면 마이크를 켜 주세요", en: "Turn on the microphone to talk" },
+  micHintPre: { ko: "다음 화면에서 ", en: "Tap " },
+  micHintAllow: { ko: "허용", en: "Allow" },
+  micHintPost: { ko: "을 눌러 주세요.", en: " on the next screen." },
+  allowPicTitle: { ko: "마이크 사용", en: "Use your microphone" },
+  allowPicBlock: { ko: "차단", en: "Block" },
+  micTurnOn: { ko: "마이크 켜기", en: "Turn on the microphone" },
+  typeInstead: { ko: "글자로 입력할게요", en: "Type instead" },
+  // P1 in an in-app browser
+  inAppTitle: { ko: "이 앱에서는 마이크가 잘 안 될 때가 많아요.", en: "Microphones often don't work in this app." },
+  inAppOpen: { ko: "Safari나 Chrome에서 열어 주세요.", en: "Open in Safari or Chrome." },
+  copyLink: { ko: "링크 복사", en: "Copy link" },
+  linkCopied: { ko: "복사했어요. Safari나 Chrome 주소창에 붙여 넣어 주세요.", en: "Copied. Paste it into Safari or Chrome." },
+  copyFailed: {
+    ko: "복사하지 못했어요. 앱 메뉴에서 '다른 브라우저로 열기'를 눌러 주세요.",
+    en: "Couldn't copy. Use this app's menu to open the page in your browser.",
+  },
+  stayHere: { ko: "여기서 글자로 주문하기", en: "Order here by typing" },
+  inAppTyping: { ko: "글자로는 여기서도 주문할 수 있어요.", en: "Typing works here." },
+  // Mic button: the label names the state, not only the color (docs/UI_QA.md "Color")
+  micTap: { ko: "눌러서 말하기", en: "Tap to talk" },
+  micConnecting: { ko: "연결하고 있어요…", en: "Connecting…" },
+  micListening: { ko: "듣고 있어요…", en: "Listening…" },
+  micThinking: { ko: "생각하고 있어요…", en: "Thinking…" },
+  micSpeaking: { ko: "말하고 있어요…", en: "Speaking…" },
+  micStop: { ko: "누르면 멈춰요", en: "Tap to stop" },
+  aiVoice: { ko: "AI 목소리", en: "AI voice" },
+  on: { ko: "켜짐", en: "On" },
+  off: { ko: "꺼짐", en: "Off" },
+  voiceNoise: { ko: "잘 안 들리면 글자로 입력하거나 버튼을 눌러 주세요.", en: "Having trouble? Try typing or tapping a button." },
   // Voice, when it gives way to text
   voiceBusy: { ko: "지금은 음성 주문이 붐벼요. 글자로 입력해 주세요.", en: "Voice is busy right now. Please type instead." },
   voiceFailed: { ko: "음성 연결이 안 돼요. 글자로 입력해 주세요.", en: "Voice isn't working right now. Please type instead." },
@@ -104,6 +135,11 @@ export function cartAnnouncement(count: number, total: number, locale: Locale): 
 /** "45초 남았어요" */
 export function phoneSecondsLeft(seconds: number, locale: Locale): string {
   return locale === "ko" ? `${seconds}초 남았어요` : `${seconds} s left`;
+}
+
+/** "음성 45초 남았어요": voice time left on a /demo order. */
+export function voiceSecondsLeft(seconds: number, locale: Locale): string {
+  return locale === "ko" ? `음성 ${seconds}초 남았어요` : `Voice: ${seconds} s left`;
 }
 
 /** Example sentences on /demo (docs/UX.md Flow C2): a short first order before the hero order. */

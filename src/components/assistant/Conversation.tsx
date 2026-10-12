@@ -93,7 +93,15 @@ export function Examples(props: { examples: string[]; locale: Locale; disabled: 
 }
 
 /** Text input + [Send]; 500 characters, like /api/chat. */
-export function Composer(props: { locale: Locale; disabled: boolean; hint?: string; onSend(text: string): void }) {
+export function Composer(props: {
+  locale: Locale;
+  disabled: boolean;
+  hint?: string;
+  onSend(text: string): void;
+  /** Receives the input element, so the panel can focus it when voice gives way to text. */
+  inputElement?: (el: HTMLInputElement | null) => void;
+}) {
+  const { inputElement } = props;
   const [text, setText] = useState("");
   const inputId = useId();
   const hintId = useId();
@@ -115,6 +123,7 @@ export function Composer(props: { locale: Locale; disabled: boolean; hint?: stri
           {pt("inputLabel", props.locale)}
         </label>
         <input
+          ref={inputElement}
           id={inputId}
           value={text}
           onChange={(e) => setText(e.target.value)}

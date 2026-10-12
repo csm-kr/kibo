@@ -39,7 +39,7 @@ const MAX_MOTION_MS = 500;
 /** UI_GUIDE allows the 2 s AI highlight fade. */
 const MOTION_ALLOW = [".k-ring"];
 /** Status indicators whose reduced-motion behaviour is an H rule (UI_QA "Motion", WCAG 2.2.2). */
-const MOTION_HARD = ["k-card-insert"];
+const MOTION_HARD = ["k-card-insert", "kibo-listen"];
 /** Order numbers and similar display figures are not counted as text sizes (UI_QA "Type"). */
 const DISPLAY_FONT = 100;
 /** Entries kept per check in the report. */

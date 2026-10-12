@@ -32,6 +32,21 @@ export function turnEvents(msg: LiveMessage): TurnEvent[] {
   return events;
 }
 
+/** Typed and spoken turns share one counter (I-079): the voice counter catches up with a seq the chat used. */
+export function raiseSeq(s: TurnState, floor: number): TurnState {
+  return floor > s.seq ? { ...s, seq: floor } : s;
+}
+
+/**
+ * UX "Noise": after two responses in a row to something the user said that ran no tool, suggest typing or the
+ * buttons. A question the menu answers counts too; the suggestion is worded so that does no harm.
+ */
+export function noiseStep(misses: number, response: { heard: boolean; tools: boolean }): { misses: number; suggest: boolean } {
+  if (response.tools) return { misses: 0, suggest: false };
+  if (!response.heard) return { misses, suggest: false };
+  return misses + 1 >= 2 ? { misses: 0, suggest: true } : { misses: misses + 1, suggest: false };
+}
+
 export function turnsReducer(s: TurnState, e: TurnEvent): TurnState {
   switch (e.type) {
     case "userSpeech":

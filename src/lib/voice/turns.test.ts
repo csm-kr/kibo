@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { initialTurns, turnEvents, turnsReducer, type LiveMessage, type TurnState } from "./turns";
+import { initialTurns, noiseStep, raiseSeq, turnEvents, turnsReducer, type LiveMessage, type TurnState } from "./turns";
 
 function feed(state: TurnState, ...messages: LiveMessage[]): TurnState {
   return messages.flatMap(turnEvents).reduce(turnsReducer, state);
@@ -67,5 +67,37 @@ describe("turnsReducer (utteranceSeq)", () => {
 
   it("starts from a given seq, so the counter never goes back", () => {
     expect(feed(initialTurns(7), heard("yes"), audio).seq).toBe(8);
+  });
+});
+
+describe("raiseSeq (one counter for typed and spoken turns, I-079)", () => {
+  it("lifts the voice counter to a seq the typed chat already used", () => {
+    expect(raiseSeq(initialTurns(2), 5).seq).toBe(5);
+  });
+
+  it("never lowers it", () => {
+    expect(raiseSeq(initialTurns(7), 5).seq).toBe(7);
+  });
+
+  it("the next spoken turn then counts past the typed one", () => {
+    expect(feed(raiseSeq(initialTurns(2), 5), heard("yes"), said("Okay")).seq).toBe(6);
+  });
+});
+
+describe("noiseStep (UX exception 'Noise')", () => {
+  const miss = { heard: true, tools: false };
+
+  it("suggests typing after two heard turns in a row that did nothing, then starts over", () => {
+    const one = noiseStep(0, miss);
+    expect(one).toEqual({ misses: 1, suggest: false });
+    expect(noiseStep(one.misses, miss)).toEqual({ misses: 0, suggest: true });
+  });
+
+  it("a turn with a tool call resets the count", () => {
+    expect(noiseStep(1, { heard: true, tools: true })).toEqual({ misses: 0, suggest: false });
+  });
+
+  it("a response to nothing the user said does not count", () => {
+    expect(noiseStep(1, { heard: false, tools: false })).toEqual({ misses: 1, suggest: false });
   });
 });

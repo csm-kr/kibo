@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { ModalLayer } from "@/components/kiosk/ModalLayer";
 import { useChat, errorText } from "@/hooks/useChat";
+import { useLiveVoice } from "@/hooks/useLiveVoice";
 import { useNow } from "@/hooks/useNow";
 import type { StreamState } from "@/hooks/useSessionStream";
 import { ping, sendCommand } from "@/lib/client/api";
@@ -18,9 +19,17 @@ import { CartCard, CartLines, TotalRow } from "./CartCard";
 import { ChoiceButtons } from "./ChoiceButtons";
 import { Composer, Conversation, Examples, LastMessage } from "./Conversation";
 import { CARD, FOCUS, PRIMARY, SECONDARY, SMALL } from "./styles";
+import { MicIcon, VoiceControls, voiceActive } from "./VoiceControls";
 
-// The phone screen (docs/UX.md P1–P7, PX), shared by /assistant and /demo. Text mode; voice comes in phase 4.
-// Phone buttons send `source: "button"` only from real taps: the server trusts it as a tap (docs/SECURITY.md).
+// The phone screen (docs/UX.md P1–P7, PX), shared by /assistant and /demo: voice (Gemini Live) with text as the
+// fallback. Phone buttons send `source: "button"` only from real taps: the server trusts it as a tap
+// (docs/SECURITY.md). The microphone starts only from a tap.
+
+/** P1 is shown once per browser (docs/UX.md A3). */
+const MIC_HINT_KEY = "kibo.phone.micHintSeen";
+const noSubscribe = () => () => {};
+/** Under this many seconds a /demo order shows its voice time left. */
+const SHOW_VOICE_LEFT = 60;
 
 interface Props {
   kiosk: KioskData;
@@ -42,6 +51,8 @@ interface Props {
   onTryAgain?: () => void;
   /** /demo only: shown next to the order number and on the ended screen (Flow C5). */
   endCard?: ReactNode;
+  /** /assistant in an in-app browser: `held` while the claim waits for the user's choice on P1. */
+  inApp?: { held: boolean; onStay(): void };
 }
 
 /** The parent keys this by session id, so local flags never carry over to a new session. */
@@ -52,11 +63,77 @@ export function AssistantPanel(props: Props) {
   const [startSeen, setStartSeen] = useState(mode === "demo");
   const [doneDismissed, setDoneDismissed] = useState(false);
   const [sending, setSending] = useState(false);
-  const chat = useChat({ sessionId: session?.sessionId ?? null, token: deviceToken, locale });
+  // Typed and spoken turns share one utteranceSeq (I-079).
+  const utterances = useRef(0);
+  const chat = useChat({ sessionId: session?.sessionId ?? null, token: deviceToken, locale, nextSeq: () => ++utterances.current });
   const now = useNow();
-  const screen = phoneScreen(session, { claimError: props.claimError ?? null, startSeen, doneDismissed });
+
+  // /demo has its own intro and a judge may have no microphone, so only the phone shows P1.
+  const micHintStored = useSyncExternalStore(noSubscribe, () => localStorage.getItem(MIC_HINT_KEY) !== null, () => true);
+  const [micHintDone, setMicHintDone] = useState(false);
+  const micHint = mode === "phone" && !micHintStored && !micHintDone;
+  function finishMicHint() {
+    localStorage.setItem(MIC_HINT_KEY, "1");
+    setMicHintDone(true);
+  }
+
+  const screen = phoneScreen(session, {
+    claimError: props.claimError ?? null,
+    startSeen,
+    doneDismissed,
+    micHint,
+    inAppHold: props.inApp?.held ?? false,
+  });
   const busy = chat.busy || sending || !deviceToken;
   const limited = props.chatLimit !== undefined && chat.sent >= props.chatLimit;
+
+  // The text input gets focus when voice gives way to text; if it is not on screen yet, as soon as it mounts.
+  const input = useRef<HTMLInputElement | null>(null);
+  const focusPending = useRef(false);
+  const inputElement = useCallback((el: HTMLInputElement | null) => {
+    input.current = el;
+    if (el && focusPending.current) {
+      focusPending.current = false;
+      el.focus();
+    }
+  }, []);
+  function focusText() {
+    if (input.current) input.current.focus();
+    else focusPending.current = true;
+  }
+
+  const [voiceOutput, setVoiceOutput] = useState(true);
+  /** One plain sentence above the text input: why voice stopped, or the noise suggestion. */
+  const [voiceNote, setVoiceNote] = useState<string | null>(null);
+  const voice = useLiveVoice({
+    sessionId: session?.sessionId ?? null,
+    deviceToken,
+    kiosk,
+    locale,
+    status: session?.status ?? null,
+    getCartVersion: () => session?.cartVersion ?? 0,
+    onUserText: (text) => chat.voice("user", text),
+    onAiText: (text) => chat.voice("model", text),
+    onFallback: (reason) => {
+      setVoiceNote(reason);
+      focusText();
+    },
+    onNoise: () => setVoiceNote(pt("voiceNoise", locale)),
+    voiceOutput,
+    utterances,
+  });
+  const voiceOpen = voice.state === "listening" || voice.state === "thinking" || voice.state === "speaking";
+
+  /** Starts voice; call only from a tap (the microphone and iOS audio need a user gesture). */
+  function startVoice() {
+    setVoiceNote(null);
+    void voice.start();
+  }
+
+  function toggleVoice() {
+    if (voiceActive(voice.state)) voice.stop();
+    else startVoice();
+  }
 
   async function command(type: CommandType, args: object, cartVersion?: number): Promise<boolean> {
     if (!session || !deviceToken || sending) return false;
@@ -72,8 +149,16 @@ export function AssistantPanel(props: Props) {
     }
   }
 
-  /** The confirm card shows `cartVersion`; a spoken "yes" carries it so the server can match it. */
+  /**
+   * While voice is open, a typed line, an example or a choice tap is one user turn on the same Live conversation, so
+   * the voice model never misses a change. Otherwise it goes to /api/chat. The confirm card shows `cartVersion`; a
+   * typed "yes" carries it so the server can match it (voice reads it from the session itself).
+   */
   function say(text: string) {
+    if (voiceOpen && voice.sendText(text)) {
+      chat.voice("user", text);
+      return;
+    }
     if (limited) return;
     void chat.send(text, session?.status === "confirming" ? session.cartVersion : undefined);
   }
@@ -110,8 +195,20 @@ export function AssistantPanel(props: Props) {
         </div>
       );
     }
-    return <Composer locale={locale} disabled={busy} hint={hint} onSend={say} />;
+    return <Composer locale={locale} disabled={busy} hint={voiceNote ?? hint} onSend={say} inputElement={inputElement} />;
   }
+
+  const voiceControls = (
+    <VoiceControls
+      state={voice.state}
+      locale={locale}
+      disabled={!session || !deviceToken}
+      onMic={toggleVoice}
+      voiceOutput={voiceOutput}
+      onVoiceOutput={setVoiceOutput}
+      secondsLeft={mode === "demo" && voice.secondsLeft !== null && voice.secondsLeft < SHOW_VOICE_LEFT ? voice.secondsLeft : null}
+    />
+  );
 
   let body: ReactNode;
   switch (screen) {
@@ -126,6 +223,52 @@ export function AssistantPanel(props: Props) {
       break;
     case "start":
       body = <StartScreen locale={locale} onStart={() => setStartSeen(true)} />;
+      break;
+    case "inapp":
+      body = (
+        <InAppScreen
+          locale={locale}
+          onStay={() => {
+            finishMicHint();
+            props.inApp?.onStay();
+            focusText();
+          }}
+        />
+      );
+      break;
+    case "mic":
+      body = (
+        <Scroll>
+          <h1 className="text-2xl font-bold">{pt("micHintTitle", locale)}</h1>
+          <AllowPicture locale={locale} />
+          <p className="text-xl">
+            {pt("micHintPre", locale)}
+            <strong>{pt("micHintAllow", locale)}</strong>
+            {pt("micHintPost", locale)}
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              finishMicHint();
+              startVoice();
+            }}
+            className={`${PRIMARY} min-h-22 text-2xl`}
+          >
+            <MicIcon />
+            {pt("micTurnOn", locale)}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              finishMicHint();
+              focusText();
+            }}
+            className={SECONDARY}
+          >
+            {pt("typeInstead", locale)}
+          </button>
+        </Scroll>
+      );
       break;
     case "dine":
       body = (
@@ -151,7 +294,7 @@ export function AssistantPanel(props: Props) {
             <LastMessage messages={fresh} locale={locale} />
           </Scroll>
           <Footer>
-            {/* Mic slot (phase 4, voice): the large mic button goes here, above the text input. */}
+            {voiceControls}
             {composer(pt("dineOrTalk", locale))}
           </Footer>
         </>
@@ -177,7 +320,7 @@ export function AssistantPanel(props: Props) {
             {!limited && <Examples examples={props.examples ?? []} locale={locale} disabled={busy} onPick={say} />}
           </Scroll>
           <Footer>
-            {/* Mic slot (phase 4, voice): the large mic button goes here, above the text input. */}
+            {voiceControls}
             {composer()}
           </Footer>
         </>
@@ -202,7 +345,8 @@ export function AssistantPanel(props: Props) {
             <LastMessage messages={fresh} locale={locale} />
           </Scroll>
           <Footer>
-            {/* Mic slot (phase 4, voice): a spoken "yes" confirms too. */}
+            {/* A spoken "yes" confirms too, after the card appeared (docs/ARCHITECTURE.md "Commands and actors"). */}
+            {voiceControls}
             {composer(pt("sayYes", locale))}
           </Footer>
         </>
@@ -303,9 +447,14 @@ export function AssistantPanel(props: Props) {
           {pt("reconnecting", locale)}
         </p>
       )}
+      {!ended && props.inApp && !props.inApp.held && (
+        <p role="note" className="flex-none bg-[#F3EEE4] px-4 py-3 text-base font-bold text-[#4B463F]">
+          {pt("inAppTitle", locale)} {pt("inAppTyping", locale)}
+        </p>
+      )}
       {body}
-      {/* Cart changes for screen readers (docs/UI_GUIDE.md "Accessibility"); voice comes in phase 4. */}
-      <p aria-live="polite" className="sr-only">
+      {/* Cart changes for screen readers (docs/UI_GUIDE.md "Accessibility"); silent while the AI voice speaks. */}
+      <p aria-live={voiceOutput && voice.state === "speaking" ? "off" : "polite"} className="sr-only">
         {session && session.cart.length > 0 ? cartAnnouncement(session.cart.reduce((n, l) => n + l.qty, 0), session.total, locale) : ""}
       </p>
       {!ended && idle.show && session && deviceToken && (
@@ -360,6 +509,67 @@ function StartScreen({ locale, onStart }: { locale: Locale; onStart(): void }) {
         {pt("start", locale)}
       </button>
     </Scroll>
+  );
+}
+
+/**
+ * P1 in an in-app browser. The claim waits until the user chooses, so the copied link (with its one-use code)
+ * still connects in Safari or Chrome; staying here claims and goes on by typing.
+ */
+function InAppScreen({ locale, onStay }: { locale: Locale; onStay(): void }) {
+  const [copied, setCopied] = useState<"linkCopied" | "copyFailed" | null>(null);
+  function copy() {
+    navigator.clipboard
+      .writeText(window.location.href)
+      .then(() => setCopied("linkCopied"))
+      .catch(() => setCopied("copyFailed"));
+  }
+  return (
+    <Scroll>
+      <h1 className="text-2xl font-bold">{pt("inAppTitle", locale)}</h1>
+      <p className="text-xl">{pt("inAppOpen", locale)}</p>
+      <button type="button" onClick={copy} className={PRIMARY}>
+        <LinkIcon />
+        {pt("copyLink", locale)}
+      </button>
+      <p role="status" className="text-xl font-bold">
+        {copied && pt(copied, locale)}
+      </p>
+      <button type="button" onClick={onStay} className={SECONDARY}>
+        {pt("stayHere", locale)}
+      </button>
+    </Scroll>
+  );
+}
+
+/** P1: a browser permission prompt with its Allow button marked, so the real prompt looks familiar. */
+function AllowPicture({ locale }: { locale: Locale }) {
+  return (
+    <div aria-hidden className="flex flex-col gap-3 self-center rounded-[18px] border-2 border-[#15171C] bg-white p-4 shadow-[0_8px_0_#E2DACB]">
+      <div className="flex items-center gap-2 text-base font-bold">
+        <span className="flex size-10 items-center justify-center rounded-full bg-[#EEF0FD] text-[#3446D4]">
+          <MicIcon />
+        </span>
+        {pt("allowPicTitle", locale)}
+      </div>
+      <div className="flex gap-3">
+        <span className="flex min-h-12 flex-1 items-center justify-center rounded-full border-2 border-[#E2DACB] px-4 text-base text-[#4B463F]">
+          {pt("allowPicBlock", locale)}
+        </span>
+        <span className="flex min-h-12 flex-1 items-center justify-center rounded-full bg-[#3446D4] px-4 text-base font-bold text-white outline-[3px] outline-offset-4 outline-[#15171C] outline-dashed">
+          {pt("micHintAllow", locale)}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function LinkIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-none">
+      <path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1" />
+      <path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1" />
+    </svg>
   );
 }
 

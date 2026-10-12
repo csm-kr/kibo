@@ -442,6 +442,7 @@ Anti-hallucination: names, prices and options exist only in menu data; the serve
 - **Decision test:** 10 Korean and English utterances; accept if first audio reply ≤ 2 s and ≥ 9/10 menu names recognized. If Live fails it, the demo uses the text agent (Fallback below).
 - **Reconnect:** fetch a new token automatically; the new session's instructions include the current cart marked "already applied"; after two failures switch to text.
 - **iOS:** prepare audio playback on the first mic tap (no sound without a user gesture); echo cancellation and half-duplex.
+- **One conversation:** while a Live session is open, a typed line, an example or a choice tap goes to it as one user turn (`sendClientContent`), not to `/api/chat`, so the voice model sees every change. Typed and spoken turns share one `utteranceSeq` counter on the phone (I-079). A typed turn through `sendClientContent` got a tool call from `gemini-3.8-live` on 10-13 (manual check, no saved log).
 - **Fallback:** if Live is not stable by 2026-10-14, demo with the text agent (`/api/chat`), which is built first.
 - Model ids are environment variables so a deprecated preview model can be swapped without code changes: `GEMINI_LIVE_MODEL=gemini-3.8-live` (fallback `gemini-3.1-flash-live-preview`), `GEMINI_TEXT_MODEL=gemini-3.8-flash` (ADR-011).
 

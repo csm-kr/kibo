@@ -45,6 +45,32 @@ describe("chatReducer", () => {
   });
 });
 
+describe("chatReducer voice turns", () => {
+  it("adds what voice heard and said without busy and without counting a typed message", () => {
+    const heard = chatReducer(initialChat, { type: "voice", role: "user", text: "one cheeseburger set" });
+    const said = chatReducer(heard, { type: "voice", role: "model", text: "Added." });
+    expect(said.messages).toEqual([
+      { id: 1, role: "user", text: "one cheeseburger set" },
+      { id: 2, role: "model", text: "Added." },
+    ]);
+    expect(said.busy).toBe(false);
+    expect(said.utteranceSeq).toBe(0);
+  });
+
+  it("leaves a typed request busy while voice turns arrive", () => {
+    const sent = chatReducer(initialChat, { type: "send", text: "hi" });
+    expect(chatReducer(sent, { type: "voice", role: "model", text: "Hello" }).busy).toBe(true);
+  });
+
+  it("voice turns go into the /api/chat history", () => {
+    const s = chatReducer(chatReducer(initialChat, { type: "voice", role: "user", text: "a" }), { type: "voice", role: "model", text: "b" });
+    expect(historyFor(s.messages)).toEqual([
+      { role: "user", text: "a" },
+      { role: "model", text: "b" },
+    ]);
+  });
+});
+
 describe("historyFor", () => {
   it("sends user and model text only, without notices", () => {
     let s = sendAndReply(initialChat, "hi", "Hello");

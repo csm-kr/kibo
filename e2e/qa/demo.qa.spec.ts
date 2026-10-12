@@ -52,6 +52,22 @@ test("D1 to D3", async ({ page, request }, info) => {
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "dine");
   await check(page, info, "D2-empty");
 
+  // C3: Live refuses (here a mocked 429, no model call), and the text input comes forward with one sentence.
+  await page.route("**/api/live-token", (route) =>
+    route.fulfill({
+      status: 429,
+      json: { ok: false, error: { code: "RATE_LIMITED", message: "Voice is busy right now. Please type instead." } },
+    }),
+  );
+  const mic = page.locator("[data-voice-state]");
+  await expect(mic).toHaveAccessibleName(/Tap to talk/);
+  expect((await mic.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(88);
+  await mic.click();
+  await expect(page.getByText("Voice is busy right now. Please type instead.")).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Type your order" })).toBeFocused();
+  await check(page, info, "D2-voice-fallback");
+  await page.unroute("**/api/live-token");
+
   const ai = (type: string, args: object, utteranceSeq: number) =>
     command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "voice", utteranceSeq });
   await ai("setDineOption", { option: "eat_in" }, 1);

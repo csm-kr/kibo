@@ -20,6 +20,8 @@ export type ChatAction =
   | { type: "send"; text: string }
   | { type: "reply"; text: string }
   | { type: "notice"; text: string }
+  /** What voice heard or said: shown and kept as history, but not a typed message (no busy, no count). */
+  | { type: "voice"; role: "user" | "model"; text: string }
   | { type: "reset" };
 
 export const initialChat: ChatState = { messages: [], utteranceSeq: 0, busy: false, nextId: 1 };
@@ -41,6 +43,8 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
       return { ...state, ...add(state, "model", action.text), busy: false };
     case "notice":
       return { ...state, ...add(state, "notice", action.text), busy: false };
+    case "voice":
+      return { ...state, ...add(state, action.role, action.text) };
     case "reset":
       // utteranceSeq never goes back: the server compares it with the seq recorded at requestCheckout.
       return { ...initialChat, utteranceSeq: state.utteranceSeq, nextId: state.nextId };

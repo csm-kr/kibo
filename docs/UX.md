@@ -130,7 +130,7 @@ Every screen and state that a QA pass must look at (`docs/UI_QA.md`). Ids are us
 - **Screen readers:** every control labelled; cart changes announced with `aria-live` when AI voice is off (suppressed while the AI speaks, to avoid overlap).
 - **Voice replies:** short, one thing at a time, slightly slow; can be turned off. Half-duplex (mic paused while the AI speaks) to avoid self-interruption.
 - **Language:** phone UI and AI voice support Korean and English, follow the browser language (anything else falls back to English) and can be changed; the kiosk stays Korean for now.
-- **In-app browsers** (KakaoTalk, Naver) have unreliable microphones: detect and suggest opening in Safari/Chrome.
+- **In-app browsers** (KakaoTalk, Naver, Instagram, Facebook, LINE) have unreliable microphones: detect and suggest opening in Safari/Chrome. P1 shows [Copy link] before the phone claims the QR, so the copied link still connects in the other browser; [Order here by typing] claims in the app and a banner stays.
 
 ## Copy
 - Polite, short sentences, one piece of information per sentence.

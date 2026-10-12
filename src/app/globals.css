@@ -75,6 +75,24 @@
   }
 }
 
+/* Phone listening pulse (docs/UI_GUIDE.md "Motion"): a ring that breathes only while the mic listens (a status
+   indicator, docs/UI_QA.md), and a still ring with reduced motion. */
+@keyframes kibo-listen {
+  from {
+    box-shadow: 0 0 0 0 rgb(52 70 212 / 0.45);
+  }
+  to {
+    box-shadow: 0 0 0 12px rgb(52 70 212 / 0.15);
+  }
+}
+@utility kibo-listen {
+  box-shadow: 0 0 0 6px rgb(52 70 212 / 0.3);
+  animation: kibo-listen 0.5s ease-out infinite alternate;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

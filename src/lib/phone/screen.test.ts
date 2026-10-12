@@ -32,7 +32,7 @@ function session(status: SessionStatus, over: Partial<Session> = {}): Session {
   };
 }
 
-const fresh: PhoneLocal = { claimError: null, startSeen: false, doneDismissed: false };
+const fresh: PhoneLocal = { claimError: null, startSeen: false, doneDismissed: false, micHint: false, inAppHold: false };
 const started: PhoneLocal = { ...fresh, startSeen: true };
 
 describe("phoneScreen", () => {
@@ -69,5 +69,19 @@ describe("phoneScreen", () => {
 
   it("expired ends the order", () => {
     expect(phoneScreen(session("expired"), started)).toBe("ended");
+  });
+
+  it("P1: the microphone hint comes after start and before the dine question or talking", () => {
+    const hint: PhoneLocal = { ...started, micHint: true };
+    expect(phoneScreen(session("connected"), { ...fresh, micHint: true })).toBe("start");
+    expect(phoneScreen(session("connected"), hint)).toBe("mic");
+    // Scanned mid-order (Flow B): no start screen, the hint first.
+    expect(phoneScreen(session("ordering"), { ...fresh, micHint: true })).toBe("mic");
+    expect(phoneScreen(session("confirming"), hint)).toBe("confirm");
+  });
+
+  it("P1 in an in-app browser: the warning before the claim, so the copied link still claims", () => {
+    expect(phoneScreen(null, { ...fresh, inAppHold: true })).toBe("inapp");
+    expect(phoneScreen(null, { ...fresh, inAppHold: true, claimError: "gone" })).toBe("ended");
   });
 });

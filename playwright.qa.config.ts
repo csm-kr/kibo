@@ -31,7 +31,16 @@ export default defineConfig({
     baseURL: "http://localhost:3200",
     trace: "retain-on-failure",
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [
+    {
+      name: "chromium",
+      use: {
+        ...devices["Desktop Chrome"],
+        // A fake microphone that is always allowed, so the voice states can be reached without a person.
+        launchOptions: { args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"] },
+      },
+    },
+  ],
   webServer: {
     command: "npm run dev -- --port 3200",
     url: "http://localhost:3200/api/health",

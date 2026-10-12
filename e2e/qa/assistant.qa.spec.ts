@@ -61,7 +61,12 @@ test("phone path: start to order number", async ({ page, request }, info) => {
   await check(page, info, "P-start");
 
   await page.getByRole("button", { name: "Start" }).click();
+  await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "mic");
+  await check(page, info, "P1-mic-hint");
+
+  await page.getByRole("button", { name: "Type instead" }).click();
   await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "dine");
+  await expect(page.getByRole("textbox", { name: "Type your order" })).toBeFocused();
   await check(page, info, "P2-dine");
 
   await page.getByRole("button", { name: "Eat here" }).click();
@@ -111,6 +116,131 @@ test("phone path: start to order number", async ({ page, request }, info) => {
   await check(page, info, "P6-done");
 });
 
+/**
+ * Stands in for Gemini Live with no network: the token route answers, and the socket answers the setup message
+ * with setupComplete, which is all "Listening…" needs. Returns a function that releases the held token reply.
+ */
+async function fakeLive(page: Page) {
+  let release = () => {};
+  const held = new Promise<void>((r) => (release = r));
+  await page.route("**/api/live-token", async (route) => {
+    await held;
+    await route.fulfill({
+      json: { ok: true, token: "fake", model: "gemini-3.8-live", expiresAt: Date.now() + 180_000, voiceSeconds: 600 },
+    });
+  });
+  await page.routeWebSocket(/generativelanguage\.googleapis\.com/, (ws) => {
+    let setup = false;
+    ws.onMessage(() => {
+      if (setup) return;
+      setup = true;
+      ws.send(JSON.stringify({ setupComplete: {} }));
+    });
+  });
+  return release;
+}
+
+const micButton = (page: Page) => page.locator("[data-voice-state]");
+
+/** The mic button: ≥ 88px tall with its state in words (docs/UI_QA.md "Phone targets"), and a ≥ 2px focus ring. */
+async function checkMicButton(page: Page, label: RegExp) {
+  const mic = micButton(page);
+  await expect(mic).toHaveAccessibleName(label);
+  expect((await mic.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(88);
+  // Reach it by keyboard, so :focus-visible applies as it would for a keyboard user.
+  await mic.focus();
+  await page.keyboard.press("Shift+Tab");
+  await page.keyboard.press("Tab");
+  await expect(mic).toBeFocused();
+  const outline = await mic.evaluate((el) => parseFloat(getComputedStyle(el).outlineWidth));
+  expect(outline).toBeGreaterThanOrEqual(2);
+}
+
+const pulseRunning = (page: Page) =>
+  page.evaluate(() => document.getAnimations().some((a) => a instanceof CSSAnimation && a.animationName === "kibo-listen" && a.playState === "running"));
+
+test("P1 to P3 by voice: connecting, listening, stop", async ({ page, request }, info) => {
+  const release = await fakeLive(page);
+  await openPhone(page, request);
+  await page.getByRole("button", { name: "Start" }).click();
+  await page.getByRole("button", { name: "Turn on the microphone" }).click();
+  await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "dine");
+  await expect(micButton(page)).toHaveAttribute("data-voice-state", "connecting");
+  await checkMicButton(page, /Connecting…/);
+  await check(page, info, "P2-mic-connecting");
+
+  release();
+  await expect(micButton(page)).toHaveAttribute("data-voice-state", "listening");
+  await page.getByRole("button", { name: "Eat here" }).click();
+  await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
+  await checkMicButton(page, /Listening…/);
+  // The pulse runs only while listening, and not at all with reduced motion (checks.ts makes that an H rule too).
+  expect(await pulseRunning(page)).toBe(true);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  expect(await pulseRunning(page)).toBe(false);
+  await page.emulateMedia({ reducedMotion: null });
+  await check(page, info, "P3-listening");
+
+  await page.getByRole("switch", { name: "AI voice" }).click();
+  await expect(page.getByRole("switch", { name: "AI voice" })).toHaveAttribute("aria-checked", "false");
+  await micButton(page).click();
+  await expect(micButton(page)).toHaveAttribute("data-voice-state", "off");
+  await checkMicButton(page, /Tap to talk/);
+  expect(await pulseRunning(page)).toBe(false);
+});
+
+test("P3: voice gives way to text when it is busy", async ({ page, request }, info) => {
+  await page.route("**/api/live-token", (route) =>
+    route.fulfill({
+      status: 429,
+      json: { ok: false, error: { code: "RATE_LIMITED", message: "Voice is busy right now. Please type instead." } },
+    }),
+  );
+  await openPhone(page, request);
+  await page.getByRole("button", { name: "Start" }).click();
+  await page.getByRole("button", { name: "Type instead" }).click();
+  await page.getByRole("button", { name: "Eat here" }).click();
+  await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
+
+  await micButton(page).click();
+  await expect(page.getByText("Voice is busy right now. Please type instead.")).toBeVisible();
+  await expect(micButton(page)).toHaveAttribute("data-voice-state", "error");
+  const input = page.getByRole("textbox", { name: "Type your order" });
+  await expect(input).toBeFocused();
+  await expect(input).toBeEnabled();
+  await check(page, info, "P3-voice-fallback");
+});
+
+test("P1 in an in-app browser: copy the link or order here by typing", async ({ browser, request }, info) => {
+  const ctx = await browser.newContext({
+    viewport: VIEWPORTS[0],
+    locale: "en-US",
+    isMobile: true,
+    hasTouch: true,
+    userAgent:
+      "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 KAKAOTALK 10.8.0",
+  });
+  const page = await ctx.newPage();
+  const res = await request.post("/api/session", { data: { kioskId: "malo" } });
+  const { claimUrl } = (await res.json()) as { claimUrl: string };
+  await page.goto(claimUrl);
+  await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "inapp");
+  // The claim waits, so the link the user copies still connects in Safari or Chrome.
+  expect(page.url()).toContain("#t=");
+  await check(page, info, "P1-in-app");
+
+  await page.getByRole("button", { name: "Copy link" }).click();
+  await expect(page.getByRole("status").filter({ hasText: /Copied|Couldn't copy/ })).toBeVisible();
+  await page.getByRole("button", { name: "Order here by typing" }).click();
+  await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "start");
+  await page.getByRole("button", { name: "Start" }).click();
+  // The user already chose typing, so no microphone hint; the banner stays.
+  await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "dine");
+  await expect(page.getByRole("note")).toHaveText(/Microphones often don't work in this app/);
+  await check(page, info, "P2-in-app-banner", [VIEWPORTS[0], VIEWPORTS[3]]);
+  await ctx.close();
+});
+
 test("P7: someone else is using this kiosk", async ({ page, request }, info) => {
   const res = await request.post("/api/session", { data: { kioskId: "malo" } });
   const { sessionId, claimUrl } = (await res.json()) as { sessionId: string; claimUrl: string };
@@ -125,6 +255,7 @@ test("PX: idle warning one minute before expiry", async ({ page, request }, info
   await page.clock.install();
   const s = await openPhone(page, request);
   await page.getByRole("button", { name: "Start" }).click();
+  await page.getByRole("button", { name: "Type instead" }).click();
   await page.getByRole("button", { name: "Eat here" }).click();
   await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
   expect(s.sessionId).toBeTruthy();
