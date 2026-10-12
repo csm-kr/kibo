@@ -4,6 +4,7 @@ import type { Actor, Session, Source } from "@/types/session";
 import { ACTOR_COMMANDS } from "./actors";
 import { CommandError } from "./errors";
 import { applyCommand, type CommandContext } from "./machine";
+import { learnedUndoLine } from "./undo";
 import { type Command, parseCommand } from "./schemas";
 import { newSession, SESSION_TTL_MS } from "./session";
 
@@ -796,6 +797,13 @@ describe("learned kiosk (doughhouse)", () => {
     }
     expect(s.cart[0].qty).toBe(2);
     expect(catchError(() => applyCommand(s, voice("undoLastChange"), lctx("phone", T0 + 6000))).code).toBe("CONFLICT");
+    expect(learnedUndoLine(s)).toBeNull();
+  });
+
+  it("learnedUndoLine names the line an undo would remove, so the phone shows [Undo] only then", () => {
+    const one = oneLine();
+    expect(learnedUndoLine(one)).toEqual({ lineId: one.cart[0].lineId, lineIndex: 0 });
+    expect(learnedUndoLine(learnedOrdering())).toBeNull();
   });
 
   it("requestCheckout works as usual; nothing reaches paying or paid", () => {

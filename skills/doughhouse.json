@@ -812,6 +812,13 @@
     "결제",
     "카드"
   ],
+  "checkout": {
+    "label": "주문하기",
+    "name": {
+      "ko": "주문하기",
+      "en": "Order"
+    }
+  },
   "recipes": {
     "startOrder": [
       {

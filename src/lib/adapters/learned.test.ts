@@ -156,6 +156,13 @@ describe("learnedToKiosk", () => {
     expect(l.recipes).toEqual(skill.recipes);
   });
 
+  it("names the kiosk's own checkout label for the phone, and the bridge never clicks it", () => {
+    expect(kiosk.learned!.checkout).toEqual({ label: "주문하기", name: { ko: "주문하기", en: "Order" } });
+    expect(isForbiddenLabel(skill.checkout.label, skill.forbiddenLabels)).toBe(true);
+    const clickable = { ...skill, checkout: { ...skill.checkout, label: "장바구니 담기" } };
+    expect(skillSchema.safeParse(clickable).success).toBe(false);
+  });
+
   it("contains no real brand names", () => {
     const text = JSON.stringify(raw).toLowerCase();
     for (const b of ["coca", "pepsi", "sprite", "chilsung", "domino", "pizza hut", "papa john", "mr. pizza",

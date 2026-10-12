@@ -10,10 +10,11 @@ import type { StreamState } from "@/hooks/useSessionStream";
 import { ping, sendCommand } from "@/lib/client/api";
 import type { ChoiceRef } from "@/lib/commands/errors";
 import type { CommandType } from "@/lib/commands/schemas";
-import { cartAnnouncement, phoneSecondsLeft, pt } from "@/lib/i18n/phone";
+import { learnedUndoLine } from "@/lib/commands/undo";
+import { cartAnnouncement, learnedPayHint, phoneSecondsLeft, pt } from "@/lib/i18n/phone";
 import { idleWarning, staffBannerVisible } from "@/lib/kiosk/timers";
-import { phoneScreen, type PhoneLocal } from "@/lib/phone/screen";
-import type { KioskData, Locale } from "@/types/menu";
+import { bridgeNotice, phoneScreen, type BridgeNotice, type PhoneLocal } from "@/lib/phone/screen";
+import type { KioskData, Locale, LocalizedName } from "@/types/menu";
 import type { DineOption, Session } from "@/types/session";
 import { CartCard, CartLines, TotalRow } from "./CartCard";
 import { ChoiceButtons } from "./ChoiceButtons";
@@ -77,13 +78,19 @@ export function AssistantPanel(props: Props) {
     setMicHintDone(true);
   }
 
-  const screen = phoneScreen(session, {
-    claimError: props.claimError ?? null,
-    startSeen,
-    doneDismissed,
-    micHint,
-    inAppHold: props.inApp?.held ?? false,
-  });
+  // A learned kiosk (KIBO Learn): the bridge enters each change on the kiosk page, and the user pays on the kiosk.
+  const learned = kiosk.kind === "learned";
+  const screen = phoneScreen(
+    session,
+    {
+      claimError: props.claimError ?? null,
+      startSeen,
+      doneDismissed,
+      micHint,
+      inAppHold: props.inApp?.held ?? false,
+    },
+    learned,
+  );
   const busy = chat.busy || sending || !deviceToken;
   const limited = props.chatLimit !== undefined && chat.sent >= props.chatLimit;
 
@@ -176,7 +183,9 @@ export function AssistantPanel(props: Props) {
 
   const otherLocale: Locale = locale === "ko" ? "en" : "ko";
   const working = chat.busy && chat.sentAt > 0 && now - chat.sentAt >= 1000;
-  const staffVisible = session !== null && staffBannerVisible(session, now, clockOffset);
+  const notice = learned && session ? bridgeNotice(session, now, clockOffset) : null;
+  // The mismatch line already says staff is on the way.
+  const staffVisible = session !== null && notice !== "mismatch" && staffBannerVisible(session, now, clockOffset);
   const idle = session ? idleWarning(session, now, clockOffset) : { show: false, secondsLeft: 0 };
   const reconnecting = session !== null && props.streamState !== undefined && props.streamState !== "open";
   const ended = screen === "ended" || screen === "taken";
@@ -195,8 +204,24 @@ export function AssistantPanel(props: Props) {
         </div>
       );
     }
-    return <Composer locale={locale} disabled={busy} hint={voiceNote ?? hint} onSend={say} inputElement={inputElement} />;
+    return (
+      <Composer
+        locale={locale}
+        disabled={busy}
+        hint={voiceNote ?? hint}
+        placeholder={learned ? pt("learnedPlaceholder", locale) : undefined}
+        onSend={say}
+        inputElement={inputElement}
+      />
+    );
   }
+
+  const bridgeLine = notice && (
+    <BridgeLine notice={notice} locale={locale} onCallStaff={() => void command("callStaff", { reasonCode: "user_request" })} />
+  );
+  // A learned kiosk undoes only the last add that made a new line, and nothing while the kiosk is still busy.
+  const waiting = notice === "pending" || notice === "slow";
+  const undoable = session !== null && (learned ? learnedUndoLine(session) !== null : session.undoStack.length > 0);
 
   const voiceControls = (
     <VoiceControls
@@ -291,6 +316,7 @@ export function AssistantPanel(props: Props) {
                 </button>
               ))}
             </div>
+            {bridgeLine}
             <LastMessage messages={fresh} locale={locale} />
           </Scroll>
           <Footer>
@@ -314,8 +340,9 @@ export function AssistantPanel(props: Props) {
               cart={session.cart}
               total={session.total}
               locale={locale}
-              canUndo={!busy && session.undoStack.length > 0}
-              onUndo={() => void command("undoLastChange", {})}
+              canUndo={!busy && !waiting && undoable}
+              onUndo={learned && !undoable ? undefined : () => void command("undoLastChange", {})}
+              status={bridgeLine}
             />
             {!limited && <Examples examples={props.examples ?? []} locale={locale} disabled={busy} onPick={say} />}
           </Scroll>
@@ -348,6 +375,27 @@ export function AssistantPanel(props: Props) {
             {/* A spoken "yes" confirms too, after the card appeared (docs/ARCHITECTURE.md "Commands and actors"). */}
             {voiceControls}
             {composer(pt("sayYes", locale))}
+          </Footer>
+        </>
+      );
+      break;
+    case "confirmLearned":
+      // A learned kiosk's order ends here: no pay button, the user taps the kiosk's own checkout button and pays there.
+      body = session && kiosk.learned && (
+        <>
+          <Scroll>
+            <ConfirmCard kiosk={kiosk} session={session} locale={locale} />
+            <PayOnKiosk checkout={kiosk.learned.checkout} locale={locale} />
+            <button type="button" disabled={busy || waiting} onClick={() => void command("cancelCheckout", {})} className={SECONDARY}>
+              {pt("pickMore", locale)}
+            </button>
+            {bridgeLine}
+            <LastMessage messages={fresh} locale={locale} />
+            {mode === "demo" && props.endCard}
+          </Scroll>
+          <Footer>
+            {voiceControls}
+            {composer()}
           </Footer>
         </>
       );
@@ -586,6 +634,44 @@ function ConfirmCard({ kiosk, session, locale }: { kiosk: KioskData; session: Se
       <CartLines kiosk={kiosk} cart={session.cart} locale={locale} />
       <TotalRow total={session.total} locale={locale} />
     </section>
+  );
+}
+
+/** P4 on a learned kiosk: where to finish. The label is the kiosk's own checkout button from the reviewed skill. */
+function PayOnKiosk({ checkout, locale }: { checkout: { label: string; name: LocalizedName }; locale: Locale }) {
+  const hint = learnedPayHint(checkout, locale);
+  return (
+    <p data-pay-on-kiosk className="rounded-[18px] bg-[#EEF0FD] px-4 py-3 text-xl">
+      {hint.pre}
+      <strong lang="ko">{hint.label}</strong>
+      {hint.gloss}
+      {hint.post}
+    </p>
+  );
+}
+
+/**
+ * What a learned kiosk is doing with the last change. Plain text while it works (it usually takes under a second);
+ * after 15 s or a mismatch, what to do next.
+ */
+function BridgeLine({ notice, locale, onCallStaff }: { notice: BridgeNotice; locale: Locale; onCallStaff(): void }) {
+  if (notice === "pending") {
+    return (
+      <p role="status" data-bridge-notice={notice} className="text-base font-bold text-[#4B463F]">
+        {pt("bridgePending", locale)}
+      </p>
+    );
+  }
+  return (
+    <div role="status" data-bridge-notice={notice} className="flex flex-col gap-3 rounded-[18px] bg-[#FFF1CC] px-4 py-3 text-[#7A2E0E]">
+      <p className="text-xl font-bold">{pt(notice === "slow" ? "bridgeSlow" : "bridgeMismatch", locale)}</p>
+      {notice === "slow" && (
+        <button type="button" onClick={onCallStaff} className={SECONDARY}>
+          <BellIcon />
+          {pt("callStaff", locale)}
+        </button>
+      )}
+    </div>
   );
 }
 

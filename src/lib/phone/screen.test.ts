@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Session, SessionStatus } from "@/types/session";
-import { phoneScreen, type PhoneLocal } from "./screen";
+import { BRIDGE_SLOW_MS, bridgeNotice, phoneScreen, type PhoneLocal } from "./screen";
 
 function session(status: SessionStatus, over: Partial<Session> = {}): Session {
   return {
@@ -85,5 +85,46 @@ describe("phoneScreen", () => {
   it("P1 in an in-app browser: the warning before the claim, so the copied link still claims", () => {
     expect(phoneScreen(null, { ...fresh, inAppHold: true })).toBe("inapp");
     expect(phoneScreen(null, { ...fresh, inAppHold: true, claimError: "gone" })).toBe("ended");
+  });
+
+  it("a learned kiosk's review is its own screen: the user pays on the kiosk, never on the phone", () => {
+    expect(phoneScreen(session("confirming", { kioskId: "doughhouse" }), started, true)).toBe("confirmLearned");
+    expect(phoneScreen(session("ordering", { kioskId: "doughhouse" }), started, true)).toBe("talk");
+    expect(phoneScreen(session("confirming"), started, false)).toBe("confirm");
+  });
+});
+
+describe("bridgeNotice (learned kiosks)", () => {
+  const T = 1_000_000;
+  const pending = (at: number): Partial<Session> => ({
+    pendingBridgeCommand: { commandId: "c1", type: "addToCart", args: { itemId: "cola", qty: 1, selections: {} }, source: "voice", at },
+  });
+
+  it("nothing while the kiosk is idle or the last replay matched", () => {
+    expect(bridgeNotice(session("ordering"), T)).toBeNull();
+    expect(bridgeNotice(session("ordering", { bridgeStatus: { lastOk: true, at: T - 10 } }), T)).toBeNull();
+  });
+
+  it("pending: the kiosk is entering it; after 15 s without a report, check the kiosk screen", () => {
+    expect(bridgeNotice(session("ordering", pending(T - 1000)), T)).toBe("pending");
+    expect(bridgeNotice(session("ordering", pending(T - BRIDGE_SLOW_MS + 1)), T)).toBe("pending");
+    expect(bridgeNotice(session("ordering", pending(T - BRIDGE_SLOW_MS)), T)).toBe("slow");
+    // Session times are server time: a phone clock 5 s behind still waits 15 s of server time.
+    expect(bridgeNotice(session("ordering", pending(T - 11_000)), T - 5000, 5000)).toBe("pending");
+    expect(bridgeNotice(session("ordering", pending(T - 16_000)), T - 5000, 5000)).toBe("slow");
+  });
+
+  it("mismatch: the last replay failed, or staff was called for a mismatch after the last good replay", () => {
+    expect(bridgeNotice(session("ordering", { bridgeStatus: { lastOk: false, at: T - 10 } }), T)).toBe("mismatch");
+    const mismatch = { staffCalled: { reasonCode: "learned_mismatch" as const, at: T - 100 } };
+    expect(bridgeNotice(session("ordering", mismatch), T)).toBe("mismatch");
+    expect(bridgeNotice(session("ordering", { ...mismatch, bridgeStatus: { lastOk: true, at: T - 50 } }), T)).toBeNull();
+    // A user's own staff call is not a mismatch.
+    expect(bridgeNotice(session("ordering", { staffCalled: { reasonCode: "user_request", at: T } }), T)).toBeNull();
+  });
+
+  it("a new change waiting for the kiosk replaces the old mismatch notice", () => {
+    const s = session("ordering", { ...pending(T - 500), bridgeStatus: { lastOk: false, at: T - 1000 } });
+    expect(bridgeNotice(s, T)).toBe("pending");
   });
 });

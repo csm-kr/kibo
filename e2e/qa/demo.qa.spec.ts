@@ -21,8 +21,8 @@ test.use({
   extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.11" },
 });
 
-async function check(page: Page, info: TestInfo, state: string, before?: () => Promise<void>) {
-  for (const vp of VIEWPORTS) {
+async function check(page: Page, info: TestInfo, state: string, before?: () => Promise<void>, viewports = VIEWPORTS) {
+  for (const vp of viewports) {
     await page.setViewportSize(vp);
     await before?.();
     const f: Findings = await qaState(page, info, DEMO, state);
@@ -95,4 +95,31 @@ test("D1 to D3", async ({ page, request }, info) => {
   await page.getByRole("button", { name: "출력 안 함" }).click();
   await expect(page.locator("[data-demo-end]")).toBeVisible();
   await check(page, info, "D3-done");
+});
+
+test("D1 to D3 with the learned pizza kiosk", async ({ page, request }, info) => {
+  const judge = [VIEWPORTS[0]];
+  await page.goto("/demo?k=doughhouse");
+  await expect(page.getByRole("link", { name: /Doughhouse Pizza/ })).toHaveAttribute("aria-current", "true", { timeout: 60_000 });
+  await check(page, info, "D1-intro-learned", undefined, judge);
+
+  const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
+  await page.getByRole("button", { name: "Start", exact: true }).click();
+  const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
+  const widget = page.locator("[data-learned-widget]");
+  let seq = 0;
+  const ai = (type: string, args: object = {}) =>
+    command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "voice", utteranceSeq: ++seq });
+
+  await ai("setDineOption", { option: "eat_in" });
+  await expect(widget).toHaveAttribute("data-bridge-ok", "true");
+  await ai("addToCart", { itemId: "pepperoni", qty: 1, selections: { size: ["large"], dough: ["thin"], toppings: ["bacon"] } });
+  await expect(page.getByRole("region", { name: "Your order" }).getByText("Pepperoni", { exact: true })).toBeVisible();
+  await expect(widget).toContainText("Added: Pepperoni");
+  await check(page, info, "D2-learned-added", undefined, judge);
+
+  await ai("requestCheckout");
+  await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "confirmLearned");
+  await expect(page.locator("[data-demo-end]")).toBeVisible();
+  await check(page, info, "D3-learned-confirm", undefined, judge);
 });

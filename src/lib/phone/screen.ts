@@ -8,6 +8,7 @@ export type PhoneScreenId =
   | "dine"
   | "talk"
   | "confirm"
+  | "confirmLearned"
   | "pay"
   | "done"
   | "ended"
@@ -27,8 +28,11 @@ export interface PhoneLocal {
   inAppHold: boolean;
 }
 
-/** Which phone screen to show (docs/UX.md screen map P1–P7). The session status decides; local flags fill the gaps. */
-export function phoneScreen(session: Session | null, local: PhoneLocal): PhoneScreenId {
+/**
+ * Which phone screen to show (docs/UX.md screen map P1–P7). The session status decides; local flags fill the gaps.
+ * A learned kiosk's order ends at its review: the user pays on the kiosk itself, so P4 there has no pay button.
+ */
+export function phoneScreen(session: Session | null, local: PhoneLocal, learned = false): PhoneScreenId {
   if (local.claimError === "taken") return "taken";
   if (local.claimError === "gone") return "ended";
   if (local.inAppHold) return "inapp";
@@ -45,7 +49,7 @@ export function phoneScreen(session: Session | null, local: PhoneLocal): PhoneSc
       // Scanned mid-order (Flow B) or the dine option is set: straight to talking, after the mic hint.
       return local.micHint ? "mic" : "talk";
     case "confirming":
-      return "confirm";
+      return learned ? "confirmLearned" : "confirm";
     case "paying":
       return "pay";
     case "paid":
@@ -53,4 +57,23 @@ export function phoneScreen(session: Session | null, local: PhoneLocal): PhoneSc
     case "expired":
       return "ended";
   }
+}
+
+/** After this long without the bridge's report, the phone asks the user to look at the kiosk (ARCHITECTURE "Commands and actors"). */
+export const BRIDGE_SLOW_MS = 15_000;
+
+/** What a learned kiosk is doing with the user's last change, for the phone's status line. */
+export type BridgeNotice = "pending" | "slow" | "mismatch";
+
+/** `now` is the phone's clock; session times are server time, so `clockOffset` (server minus local) corrects it. */
+export function bridgeNotice(session: Session, now: number, clockOffset = 0): BridgeNotice | null {
+  const pending = session.pendingBridgeCommand;
+  if (pending) return now + clockOffset - pending.at >= BRIDGE_SLOW_MS ? "slow" : "pending";
+  const status = session.bridgeStatus;
+  if (status && !status.lastOk) return "mismatch";
+  // A pending change that timed out on the server calls staff too; a later good replay clears the notice.
+  const staff = session.staffCalled;
+  const okAt = status?.lastOk ? status.at : -Infinity;
+  if (staff?.reasonCode === "learned_mismatch" && staff.at > okAt) return "mismatch";
+  return null;
 }

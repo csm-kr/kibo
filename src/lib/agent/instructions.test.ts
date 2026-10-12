@@ -96,6 +96,8 @@ describe("buildInstructions", () => {
       "Changes take a few seconds.",
       "To change an item, remove it and add it again.",
       "The user pays on the kiosk itself after the confirm card.",
+      // The kiosk asks eat-in or take-out once, before its menu (I-095).
+      "If the dine option is not chosen yet, ask eat here or take out and call setDineOption before the first addToCart; this kiosk cannot change it later.",
     ];
     const learned = buildInstructions(getKiosk("doughhouse"), { locale: "en" });
     for (const line of LEARNED) {

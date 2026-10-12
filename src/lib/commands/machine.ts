@@ -16,6 +16,7 @@ import { addLine, cartTotal, removeLine, updateLine } from "./cart";
 import { type ChoiceRef, CommandError } from "./errors";
 import type { Command, CommandType } from "./schemas";
 import { SESSION_TTL_MS } from "./session";
+import { learnedUndoLine } from "./undo";
 
 // Pure session state machine: no clock, env or storage; everything comes through ctx.
 // Safety promise: only confirmCheckout in `confirming` reaches `paying`, and only the kiosk's cardAction reaches `paid`.
@@ -321,14 +322,9 @@ function learnedTransition(s: Session, cmd: Command, ctx: CommandContext): { nex
 
     case "undoLastChange": {
       requireStatus(base, BEFORE_PAYING, "The order can no longer be changed.");
-      const lineId = base.lastChange?.kind === "add" ? base.lastChange.lineId : null;
-      const lineIndex = base.cart.findIndex((l) => l.lineId === lineId);
-      const before = base.undoStack.at(-1);
-      // Removing the line undoes only an add that made a new line; an add that raised a quantity would lose more.
-      if (lineId === null || lineIndex < 0 || !before || before.some((l) => l.lineId === lineId)) {
-        throw new CommandError("CONFLICT", "On this kiosk, only the last added item can be undone.");
-      }
-      return wait({ type: "removeFromCart", args: { lineId }, lineIndex });
+      const line = learnedUndoLine(base);
+      if (!line) throw new CommandError("CONFLICT", "On this kiosk, only the last added item can be undone.");
+      return wait({ type: "removeFromCart", args: { lineId: line.lineId }, lineIndex: line.lineIndex });
     }
 
     case "updateCart":

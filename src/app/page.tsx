@@ -189,6 +189,9 @@ export default function Home() {
               detail="example orders: 2 of 5 and 3 of 5 passed; the rest were refused before running"
               path="spikes/blind-kiosk/results/v3run1/grade.txt, spikes/blind-kiosk/results/holdout.log"
             />
+            <Link href="/demo?k=doughhouse" className={SECONDARY}>
+              Try the learned pizza kiosk
+            </Link>
           </article>
         </div>
       </section>

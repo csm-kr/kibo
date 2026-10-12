@@ -22,5 +22,5 @@ async function AssistantRoute({ searchParams }: Pick<PageProps<"/assistant">, "s
   const sp = await searchParams;
   const s = typeof sp.s === "string" && SESSION_ID.test(sp.s) ? sp.s : null;
   // The session names its kiosk; every kiosk the server knows is listed here.
-  return <AssistantApp sessionId={s} kiosks={{ malo: getKiosk("malo") }} />;
+  return <AssistantApp sessionId={s} kiosks={{ malo: getKiosk("malo"), doughhouse: getKiosk("doughhouse") }} />;
 }

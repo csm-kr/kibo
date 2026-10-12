@@ -79,6 +79,8 @@ export interface LearnedKiosk {
   uiLabels: string[];
   /** A label containing any of these is never clicked (payment, card, checkout). */
   forbiddenLabels: string[];
+  /** The kiosk's own button that ends the order, named on the phone; one of the forbidden labels. */
+  checkout: { label: string; name: LocalizedName };
   cartTotalPattern: string;
   cartLinePattern: string;
   labels: {

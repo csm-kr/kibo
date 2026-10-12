@@ -377,6 +377,7 @@ categories[{categoryId, name{ko,en}, label}],
 catalog[{itemId, name{ko,en}, label, category, price, soldOut,
          optionGroups[{groupId, name{ko,en}, label, required, min, max, defaultOptionIds[], options[{optionId, name{ko,en}, label, priceDelta}]}]}],
 uiLabels[], forbiddenLabels[] (a label containing any entry is never clicked: payment, card, checkout),
+checkout{label, name{ko,en}} (the kiosk's own button that ends the order, one of the forbidden labels; the phone's review says "tap 주문하기 on the kiosk and pay there"),
 recipes{startOrder, addToCart, removeLine, ...}, cartTotalPattern, cartLinePattern
 ```
 `label` is the exact text the kiosk shows; ids (ASCII snake_case) and `name.en` are added during human review. `skillSchema` (`src/lib/adapters/learned.ts`) checks it (names ≤ 40 chars, single line, integer prices); `learnedToKiosk` normalizes it into the items shape (one `single` variant per item, a neutral placeholder image, no upsell rules) plus `learned` (page, recipes, labels by id) for the bridge.

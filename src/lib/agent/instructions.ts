@@ -68,6 +68,7 @@ export function buildInstructions(
           "This kiosk is operated by replaying its own screens. Changes take a few seconds.",
           "To change an item, remove it and add it again.",
           "The user pays on the kiosk itself after the confirm card.",
+          "If the dine option is not chosen yet, ask eat here or take out and call setDineOption before the first addToCart; this kiosk cannot change it later.",
           "",
         ]
       : []),

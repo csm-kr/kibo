@@ -97,6 +97,8 @@ export function Composer(props: {
   locale: Locale;
   disabled: boolean;
   hint?: string;
+  /** Defaults to a MALO BURGER example; a learned kiosk passes one from its own menu. */
+  placeholder?: string;
   onSend(text: string): void;
   /** Receives the input element, so the panel can focus it when voice gives way to text. */
   inputElement?: (el: HTMLInputElement | null) => void;
@@ -130,7 +132,7 @@ export function Composer(props: {
           maxLength={500}
           enterKeyHint="send"
           autoComplete="off"
-          placeholder={pt("inputPlaceholder", props.locale)}
+          placeholder={props.placeholder ?? pt("inputPlaceholder", props.locale)}
           aria-describedby={props.hint ? hintId : undefined}
           className={`min-h-14 min-w-0 flex-1 rounded-[18px] border-2 border-[#15171C] bg-white px-4 text-xl placeholder:text-[#6B655C] ${FOCUS}`}
         />

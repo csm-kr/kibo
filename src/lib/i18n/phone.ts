@@ -1,4 +1,4 @@
-import type { Locale } from "@/types/menu";
+import type { Locale, LocalizedName } from "@/types/menu";
 
 // Every phone string (docs/UX.md "Copy"): plain, polite, one idea per sentence; buttons are verbs.
 // Words like session, token or agent never appear (heuristic 2).
@@ -34,6 +34,7 @@ const PHONE_TEXT = {
   examples: { ko: "이렇게 말해 보세요", en: "Try saying" },
   inputLabel: { ko: "주문을 글자로 입력", en: "Type your order" },
   inputPlaceholder: { ko: "예: 치즈버거 세트 하나", en: "e.g. One cheeseburger set" },
+  learnedPlaceholder: { ko: "예: 페퍼로니 라지 하나", en: "e.g. One large pepperoni" },
   send: { ko: "보내기", en: "Send" },
   useButtons: {
     ko: "여기 버튼을 누르거나 키오스크 화면에서 주문할 수 있어요.",
@@ -44,6 +45,13 @@ const PHONE_TEXT = {
   payNow: { ko: "네, 결제할게요", en: "Yes, pay now" },
   pickMore: { ko: "더 고를게요", en: "Pick more" },
   sayYes: { ko: "\"네\"라고 말해도 돼요.", en: "You can also say yes." },
+  // Learned kiosk (KIBO Learn): the kiosk page is driven by the bridge, and the user pays on the kiosk itself
+  bridgePending: { ko: "키오스크에 입력하고 있어요…", en: "The kiosk is entering it…" },
+  bridgeSlow: { ko: "키오스크 화면을 확인해 주세요.", en: "Please check the kiosk screen." },
+  bridgeMismatch: {
+    ko: "키오스크에 반영되지 않았어요. 키오스크 화면을 확인해 주세요. 직원을 불렀어요.",
+    en: "The kiosk did not take that change. Please check the kiosk screen. Staff is on the way.",
+  },
   // Pay
   payTitle: { ko: "키오스크에 카드를 넣어 주세요", en: "Insert your card into the kiosk" },
   payHint: { ko: "결제는 키오스크에서 해요.", en: "You pay at the kiosk." },
@@ -66,6 +74,11 @@ const PHONE_TEXT = {
   },
   twoDeviceOpen: { ko: "키오스크와 휴대폰으로 해 보기", en: "Open two-device mode" },
   backToIntro: { ko: "처음 안내로 돌아가기", en: "Back to the intro" },
+  learnedDemoEnd: {
+    ko: "실제 매장이라면 이제 키오스크에서 직접 결제해요. KIBO는 결제하지 않아요.",
+    en: "In a real store, you would now pay on the kiosk itself. KIBO never pays for you.",
+  },
+  tryMalo: { ko: "MALO BURGER로 해 보기", en: "Try MALO BURGER" },
   // P1 microphone hint, before the browser asks
   micHintTitle: { ko: "말로 주문하려면 마이크를 켜 주세요", en: "Turn on the microphone to talk" },
   micHintPre: { ko: "다음 화면에서 ", en: "Tap " },
@@ -153,6 +166,23 @@ export function demoExamples(locale: Locale): string[] {
         "Is this halal?",
         "I'll pay",
       ];
+}
+
+/** P4 on a learned kiosk: the kiosk's own checkout label, quoted as the kiosk shows it, with its meaning in English. */
+export function learnedPayHint(
+  checkout: { label: string; name: LocalizedName },
+  locale: Locale,
+): { pre: string; label: string; gloss: string; post: string } {
+  return locale === "ko"
+    ? { pre: "주문이 키오스크에 담겼어요. 키오스크에서 '", label: checkout.label, gloss: "", post: "' 버튼을 누르고 결제해 주세요." }
+    : { pre: "Your order is on the kiosk. Tap ", label: checkout.label, gloss: ` (${checkout.name.en})`, post: " on the kiosk and pay there." };
+}
+
+/** Example sentences for the learned pizza kiosk, on /demo and /assistant (items and options from skills/doughhouse.json). */
+export function learnedExamples(locale: Locale): string[] {
+  return locale === "ko"
+    ? ["페퍼로니 라지, 씬 도우에 베이컨 추가해 줘.", "콜라 1.25L 하나 추가해 줘.", "콜라는 빼 줘.", "다 골랐어요."]
+    : ["A large pepperoni with thin dough and extra bacon", "Add a cola, 1.25 liters", "Remove the cola", "I'm done"];
 }
 
 /** Example sentences on /assistant. */

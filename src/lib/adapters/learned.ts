@@ -28,48 +28,55 @@ const recipeStep: z.ZodType<RecipeStep> = z.lazy(() =>
   }),
 );
 
-export const skillSchema = z.strictObject({
-  kioskId: id,
-  kind: z.literal("learned"),
-  brand: name,
-  locale: z.enum(["ko", "en"]),
-  currency: z.literal("KRW"),
-  page: z.string().regex(/^\/learned-kiosks\/[a-z0-9_-]+\/[a-z0-9_.-]+$/),
-  provenance: z.strictObject({
-    learnedBy: z.string().max(64),
-    evidence: z.string().max(200),
-    reviewed: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  }),
-  dineOptions: z.strictObject({ eat_in: text, take_out: text }),
-  categories: z.array(z.strictObject({ categoryId: id, name, label: text })).min(1),
-  catalog: z.array(
-    z.strictObject({
-      itemId: id,
-      name,
-      label: text,
-      category: id,
-      price: won.min(0),
-      soldOut: z.boolean(),
-      optionGroups: z.array(
-        z.strictObject({
-          groupId: id,
-          name,
-          label: text,
-          required: z.boolean(),
-          min: z.number().int().min(0),
-          max: z.number().int().min(1),
-          defaultOptionIds: z.array(id),
-          options: z.array(z.strictObject({ optionId: id, name, label: text, priceDelta: won })).min(1),
-        }),
-      ),
+export const skillSchema = z
+  .strictObject({
+    kioskId: id,
+    kind: z.literal("learned"),
+    brand: name,
+    locale: z.enum(["ko", "en"]),
+    currency: z.literal("KRW"),
+    page: z.string().regex(/^\/learned-kiosks\/[a-z0-9_-]+\/[a-z0-9_.-]+$/),
+    provenance: z.strictObject({
+      learnedBy: z.string().max(64),
+      evidence: z.string().max(200),
+      reviewed: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     }),
-  ).min(1),
-  uiLabels: z.array(text),
-  forbiddenLabels: z.array(text).min(1),
-  recipes: z.record(varName, z.array(recipeStep)),
-  cartTotalPattern: z.string().max(200),
-  cartLinePattern: z.string().max(200),
-});
+    dineOptions: z.strictObject({ eat_in: text, take_out: text }),
+    categories: z.array(z.strictObject({ categoryId: id, name, label: text })).min(1),
+    catalog: z.array(
+      z.strictObject({
+        itemId: id,
+        name,
+        label: text,
+        category: id,
+        price: won.min(0),
+        soldOut: z.boolean(),
+        optionGroups: z.array(
+          z.strictObject({
+            groupId: id,
+            name,
+            label: text,
+            required: z.boolean(),
+            min: z.number().int().min(0),
+            max: z.number().int().min(1),
+            defaultOptionIds: z.array(id),
+            options: z.array(z.strictObject({ optionId: id, name, label: text, priceDelta: won })).min(1),
+          }),
+        ),
+      }),
+    ).min(1),
+    uiLabels: z.array(text),
+    forbiddenLabels: z.array(text).min(1),
+    // The kiosk's own button that ends the order; the phone names it ("tap 주문하기 and pay there"), the bridge never clicks it.
+    checkout: z.strictObject({ label: text, name }),
+    recipes: z.record(varName, z.array(recipeStep)),
+    cartTotalPattern: z.string().max(200),
+    cartLinePattern: z.string().max(200),
+  })
+  .refine((s) => isForbiddenLabel(s.checkout.label, s.forbiddenLabels), {
+    message: "checkout.label must be a forbidden label",
+    path: ["checkout", "label"],
+  });
 
 export type Skill = z.infer<typeof skillSchema>;
 
@@ -106,6 +113,7 @@ export function learnedToKiosk(skill: Skill): KioskData {
     dineLabels: skill.dineOptions,
     uiLabels: skill.uiLabels,
     forbiddenLabels: skill.forbiddenLabels,
+    checkout: skill.checkout,
     cartTotalPattern: skill.cartTotalPattern,
     cartLinePattern: skill.cartLinePattern,
     labels: {

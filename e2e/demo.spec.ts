@@ -31,7 +31,9 @@ const phoneScreen = (page: Page) => page.locator("[data-phone-screen]");
 test("judge path: intro, order on both halves, confirm, card stand-in, order number, try again", async ({ page, request }) => {
   await page.goto("/demo");
   await expect(page.getByRole("heading", { name: "Don't learn the kiosk. Just talk." })).toBeVisible({ timeout: 60_000 });
-  await expect(page.getByRole("list").getByRole("listitem")).toHaveCount(3);
+  await expect(page.locator("ol > li")).toHaveCount(3);
+  // The kiosk picker under [Start] defaults to MALO BURGER.
+  await expect(page.getByRole("link", { name: /MALO BURGER/ })).toHaveAttribute("aria-current", "true");
 
   const s = await startDemo(page, "Start");
   expect(s.deviceToken).toBeTruthy();

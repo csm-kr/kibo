@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useId } from "react";
+import { useId, type ReactNode } from "react";
 import { findItem } from "@/lib/adapters/catalog";
 import { phonePrice, pt, qtyText } from "@/lib/i18n/phone";
 import { lineLabel } from "@/lib/kiosk/menu";
@@ -46,14 +46,18 @@ export function TotalRow({ total, locale }: { total: number; locale: Locale }) {
   );
 }
 
-/** P3 cart card: the whole order and total, readable on the phone alone, with [Undo]. */
+/**
+ * P3 cart card: the whole order and total, readable on the phone alone, with [Undo] (left out where the server would
+ * refuse it). `status` is a line about the kiosk, under the title.
+ */
 export function CartCard(props: {
   kiosk: KioskData;
   cart: CartLine[];
   total: number;
   locale: Locale;
   canUndo: boolean;
-  onUndo(): void;
+  onUndo?: () => void;
+  status?: ReactNode;
 }) {
   const { kiosk, cart, total, locale } = props;
   const titleId = useId();
@@ -63,11 +67,14 @@ export function CartCard(props: {
         <h2 id={titleId} className="text-xl font-bold">
           {pt("cartTitle", locale)}
         </h2>
-        <button type="button" onClick={props.onUndo} disabled={!props.canUndo} className={SMALL}>
-          <UndoIcon />
-          {pt("undo", locale)}
-        </button>
+        {props.onUndo && (
+          <button type="button" onClick={props.onUndo} disabled={!props.canUndo} className={SMALL}>
+            <UndoIcon />
+            {pt("undo", locale)}
+          </button>
+        )}
       </div>
+      {props.status}
       {cart.length === 0 ? (
         <p className="py-3 text-xl text-[#4B463F]">{pt("cartEmpty", locale)}</p>
       ) : (
