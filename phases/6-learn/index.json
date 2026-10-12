@@ -45,7 +45,9 @@
     {
       "step": 5,
       "name": "qa",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-13T04:45:34+0900",
+      "summary": "QA pass on /learned/doughhouse (widget), D1 picker, D2/D3 learned, phone learned states (pending, slow, mismatch, learned confirm): 0 H, 0 T on all changed screens (phases/6-learn/qa/ui-qa.jsonl, screenshots); REPORT.md has angles A-I, security spot checks and the R-001 table (every run-3, audit and bridge-replay number matches its file). Added one unit test (bridge.test.ts: an unknown pending item clicks nothing and reports ok:false). Logged I-101 (demo widget covers two kiosk tiles; overlay-covers-content 3rd occurrence -> R-006 proposed in RULE.md, I-045 linked), I-102 (SECURITY says the bridge re-adds the cart after a restart; code only restarts and the line check calls staff), I-103 (placeholder ring as learned dine/line photos; MALO P2 dine photos blank in QA shots, unverified). Evidence files rewritten by test:e2e restored (I-099). AC: lint, build, test 567 pass, test:e2e 8 pass (4 @live skipped), e2e_check 42 pass, qa:ui 16 pass."
     }
   ],
   "created_at": "2026-10-13T03:41:50+0900"

@@ -1,7 +1,7 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { getKiosk } from "@/lib/adapters/catalog";
-import type { CartLine } from "@/types/session";
-import { BridgeError, changeVars, expectedLines } from "./bridge";
+import type { CartLine, PendingBridgeCommand, Session } from "@/types/session";
+import { BridgeError, changeVars, createBridge, expectedLines } from "./bridge";
 
 const kiosk = getKiosk("doughhouse");
 
@@ -46,6 +46,32 @@ describe("changeVars", () => {
     expect(add({ itemId: "cola", selections: { volume: ["large"] } })).toThrow(BridgeError);
     expect(add({ itemId: "cola", qty: 11, selections: { volume: ["ml_500"] } })).toThrow(BridgeError);
     expect(() => changeVars(kiosk, { type: "removeFromCart", args: { lineId: "a1" }, lineIndex: -1 })).toThrow(BridgeError);
+  });
+
+  it("a pending item that is not in the skill never reaches a click, and is reported as failed", async () => {
+    // A page with the home-screen tile and the category the recipe would tap first.
+    const el = (text: string) => ({
+      tagName: "BUTTON",
+      onclick: null,
+      parentElement: null,
+      innerText: text,
+      getAttribute: () => null,
+      getBoundingClientRect: () => ({ width: 100, height: 100 }),
+      click: vi.fn(),
+    });
+    const els = [el("화면을 터치하여 주문을 시작하세요"), el("피자")];
+    const doc = {
+      defaultView: { getComputedStyle: () => ({ visibility: "visible", cursor: "pointer" }) },
+      body: { innerText: "도우하우스", querySelectorAll: () => els },
+      createTreeWalker: () => ({ nextNode: () => null }),
+    } as unknown as Document;
+    const send = vi.fn().mockResolvedValue({});
+    const bridge = createBridge({ doc, kiosk, sessionId: "s", kioskToken: "k", send });
+    const pending = { commandId: "c1", type: "addToCart", args: { itemId: "hawaiian" }, source: "voice", at: 0 } as PendingBridgeCommand;
+    const out = await bridge.handle(pending, { cart: [], dineOption: null } as unknown as Session);
+    expect(out).toMatchObject({ commandId: "c1", ok: false });
+    for (const e of els) expect(e.click).not.toHaveBeenCalled();
+    expect(send).toHaveBeenCalledWith(expect.objectContaining({ type: "bridgeReport", args: expect.objectContaining({ ok: false }) }));
   });
 
   it("refuses a direct kiosk", () => {

@@ -42,3 +42,8 @@ When an issue class in `docs/ISSUE.md` is seen for the **3rd time**, it becomes 
 - From: `shared-rate-limit` — I-068 (seen 10-13/3-assistant:4, 10-13/5-ship:1, 10-13/6-learn:2)
 - Why: all specs share the dev server's per-IP limits (60 API requests and 10 new sessions a minute), so a new spec passes alone and fails the full run, or makes another spec fail.
 - Check: `grep -L "X-Forwarded-For" e2e/*.spec.ts e2e/qa/*.qa.spec.ts` lists only specs that make few API calls; a new spec picks an unused `192.0.2.x` (`grep -rn "192.0.2" e2e/`).
+
+### R-006 (proposed): A banner, pill or widget shown over a screen gets its own space, or the QA report names what it covers
+- From: `overlay-covers-content` — I-045 (seen 10-13/2-kiosk:5, 10-13/2-kiosk:6), I-101 (10-13/6-learn:5)
+- Why: overlays placed with `absolute` on top of content (AI pill, staff banner, the learned-kiosk widget in `/demo`) hid tiles the user or judge needs, and no automated check catches it because the covered controls stay partly visible or are not focusable.
+- Check: on every QA screenshot that shows an overlay, look at what lies under it; if a tile, control or price is covered at any captured viewport, move the overlay into its own row or log it in `docs/ISSUE.md` with the screenshot name.
