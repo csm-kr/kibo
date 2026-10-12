@@ -1,3 +1,4 @@
+# The image needs package*.json, next.config.ts, tsconfig.json, src/, data/, public/ (and skills/ once it exists).
 node_modules
 .next
 .git
@@ -10,4 +11,14 @@ videos
 scripts
 .claude
 docs
+phases
+evals
+evidence
+e2e
+qa-output
+test-results
+playwright-report
+playwright*.config.ts
+vitest.config.ts
+*.tsbuildinfo
 *.mp4

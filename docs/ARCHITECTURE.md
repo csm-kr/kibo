@@ -284,7 +284,7 @@ stateDiagram-v2
 | `POST /api/chat` | Phone, `/demo` | Text agent (Gemini Flash function-calling loop) |
 | `GET /api/session/{id}/events` | Phone, kiosk, bridge, `/demo` | SSE stream: the public session JSON on connect and after every change; a comment line every 25 s keeps the connection open; `EventSource` reconnects when Cloud Run ends the request |
 | `POST /api/ping` | Phone, kiosk | 30 s heartbeat with an "active in the last 30 s" flag; the kiosk pings in touch-only sessions |
-| `GET /api/health` | Monitoring | Liveness; later also probes token issue and a tiny Gemini call |
+| `GET /api/health` | Monitoring | Liveness; `?deep=1` also checks the store and that both Gemini model ids are served (uptime check, `docs/plan/OPERATIONS.md` "Deploy") |
 
 Pages: `/kiosk?k=<kioskId>` (`&demo=1` shows the tap counter and timer), `/assistant?s=<sessionId>#t=<claim>` (token in the fragment, removed from the URL right after claiming), `/demo` (creates a session with `demo: true` and claims it in the same page, so it holds both tokens), `/learned/<kiosk>/`, `/mic-test` (development only, not linked: microphone permission check on real phones).
 
@@ -317,7 +317,7 @@ Pages: `/kiosk?k=<kioskId>` (`&demo=1` shows the tap counter and timer), `/assis
 | `POST /api/chat` | `{ sessionId, chatRequestId (uuid), message (≤ 500 chars), history (last 10 turns of user and model text, kept on the phone; tool turns are rejected), utteranceSeq, cartVersion? (the version shown on the confirm card), locale }` + device token | `{ reply, status, cart, total, cartVersion }` after ≤ 5 tool rounds; choice buttons come from `pendingChoice` in the stream. One request is one user utterance: every command in it carries the request's `utteranceSeq`, so `confirmCheckout` is refused in the request that ran `requestCheckout` |
 | `POST /api/ping` | `{ sessionId, active }` | `{ status, expiresAt, serverTime }`; `active: true` extends the session; `serverTime` lets screens correct for clock offset |
 | `GET /api/session/{id}/events` | — | SSE; each change is `data: <public session JSON>`; an unknown or deleted session gets one `event: gone` (`data: {}`) and the stream closes, so the client should close its `EventSource`. If the server's Firestore listener fails, the stream ends without `gone` and `EventSource` reconnects |
-| `GET /api/health` | — | `{ ok, service, version, store, revision, time }` |
+| `GET /api/health` | — | `{ ok, service, version, store, revision, time }`. With `?deep=1`: `{ ok, checks: { store, textModel, liveModel } }` (each `ok` or `fail`; a store `get` of an id that never exists must return null, `models.get` for each model id; 5 s timeout each, result cached 60 s per instance), 200 when all pass, else 503 |
 
 ### Commands and actors
 `type` in `/api/command`. The AI tools ("Agent tools" below) are the phone's commands; the kiosk adds touch and payment commands. On a learned kiosk the bridge in the kiosk page acts as the kiosk, with the `kioskToken`.
@@ -467,7 +467,7 @@ Anti-hallucination: names, prices and options exist only in menu data; the serve
 | `GEMINI_API_KEY` | `.env` locally; Secret Manager `gemini-api-key` on Cloud Run | server only, never sent to a browser |
 | `GEMINI_TEXT_MODEL`, `GEMINI_LIVE_MODEL` | env | ADR-011 |
 | `GEMINI_TEXT_THINKING` | env | text agent thinking level: `low` (default), `medium` or `high`; `gemini-3.8-flash` rejects `minimal`. `low` was chosen for latency (I-059, `evals/results/2026-10-13T01-38.md`); temperature stays the model default |
-| `STORE` | env | `firestore` (default when `NODE_ENV=production`) or `memory` (default otherwise; tests, local E2E, `npm run qa:ui`) |
+| `STORE` | env | `firestore` (default when `NODE_ENV=production`) or `memory` (default otherwise; tests, local E2E, `npm run qa:ui`). In production `memory` is refused unless `ALLOW_MEMORY_STORE=1` (single instance only) |
 | `GOOGLE_CLOUD_PROJECT` | env | `kibo-2026`; locally the Admin SDK uses gcloud application default credentials |
 
 ## State management

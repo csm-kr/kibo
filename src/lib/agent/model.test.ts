@@ -71,4 +71,19 @@ describe("geminiClient", () => {
     expect(err2).toMatchObject({ code: "UPSTREAM" });
     expect(err2.message).not.toContain("secret");
   });
+
+  it("without GEMINI_API_KEY the real client is UPSTREAM with the plain message", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.stubEnv("GEMINI_API_KEY", "");
+    try {
+      const err = await geminiClient().generate(REQ).catch((e) => e);
+      expect(err).toBeInstanceOf(CommandError);
+      expect(err).toMatchObject({
+        code: "UPSTREAM",
+        message: "The assistant is not available right now. Please use the buttons or try again.",
+      });
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
 });

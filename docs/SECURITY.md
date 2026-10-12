@@ -54,4 +54,4 @@ KIBO is a public demo that must stay up for three weeks of judging, handles a (s
 - Phone heartbeat every 30 s; the kiosk shows "connection paused" after 60 s. Expiry is extended only when the user was active in the last 30 s; the kiosk corrects for server clock offset.
 - Live reconnect with a fresh token; GoAway handled; `/demo` falls back to text automatically.
 - Only one tab per phone holds a Live session (`navigator.locks`); [Try again] and `paid` close the Live session.
-- `/api/health` + Cloud Monitoring uptime check with email alerts to both team members. Model ids in environment variables.
+- `/api/health` + Cloud Monitoring uptime check on `/api/health?deep=1` (store and both model ids) with email alerts to both team members. Model ids in environment variables.

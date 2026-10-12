@@ -2,9 +2,28 @@
   "project": "KIBO",
   "phase": "5-ship",
   "steps": [
-    { "step": 0, "name": "deploy-ready", "status": "pending" },
-    { "step": 1, "name": "landing", "status": "pending" },
-    { "step": 2, "name": "readme", "status": "pending" },
-    { "step": 3, "name": "qa", "status": "pending" }
-  ]
+    {
+      "step": 0,
+      "name": "deploy-ready",
+      "status": "completed",
+      "started_at": "2026-10-13T03:08:51+0900",
+      "summary": "scripts/deploy.sh (run with `sh`, gcloud run deploy --source with --region asia-northeast3, secret from Secret Manager, then curls /api/health); .dockerignore/.gcloudignore also drop phases, evals, evidence, e2e, test outputs and test configs; GET /api/health?deep=1 via src/lib/health.ts createDeepHealth (store get of a never-issued id must be null, models.get for text and live ids, 5 s timeout each, 60 s cache, 200/503, checks ok|fail); getStore refuses STORE=memory in production unless ALLOW_MEMORY_STORE=1; missing GEMINI_API_KEY already gives UPSTREAM (tests added); OPERATIONS.md Deploy section (flags, rollback, uptime check); ARCHITECTURE/SECURITY health rows updated; Docker build and deep health on Cloud Run unverified (I-086)"
+    },
+    {
+      "step": 1,
+      "name": "landing",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "name": "readme",
+      "status": "pending"
+    },
+    {
+      "step": 3,
+      "name": "qa",
+      "status": "pending"
+    }
+  ],
+  "created_at": "2026-10-13T03:08:51+0900"
 }

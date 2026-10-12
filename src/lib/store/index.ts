@@ -15,7 +15,13 @@ export function storeKind(): "firestore" | "memory" {
 }
 
 export function getStore(): SessionStore {
+  if (store) return store;
+  const kind = storeKind();
+  // The memory store lives in one process; with more than one Cloud Run instance, sessions would split.
+  if (kind === "memory" && process.env.NODE_ENV === "production" && process.env.ALLOW_MEMORY_STORE !== "1") {
+    throw new Error("STORE=memory is refused in production; set ALLOW_MEMORY_STORE=1 to allow it on a single instance");
+  }
   // FirestoreStore loads firebase-admin on first use, so the memory branch never loads it.
-  if (!store) store = storeKind() === "firestore" ? new FirestoreStore() : new MemoryStore();
+  store = kind === "firestore" ? new FirestoreStore() : new MemoryStore();
   return store;
 }

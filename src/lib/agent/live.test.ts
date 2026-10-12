@@ -224,6 +224,17 @@ describe("geminiTokenIssuer", () => {
     expect(JSON.stringify(log.mock.calls)).not.toContain("AIza");
   });
 
+  it("without GEMINI_API_KEY the real client is UPSTREAM with the plain message", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.stubEnv("GEMINI_API_KEY", "");
+    try {
+      const e = await errorOf(geminiTokenIssuer().create(INPUT));
+      expect(e).toMatchObject({ code: "UPSTREAM", message: "Voice is not available right now. Please type instead." });
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
   it("a reply without a token name is UPSTREAM", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     const create = vi.fn().mockResolvedValue({});

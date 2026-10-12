@@ -2,6 +2,27 @@
 
 Not injected into harness steps (lives under `docs/plan/`).
 
+## Deploy
+Run `sh scripts/deploy.sh` (needs `gcloud` logged in to `kibo-2026`). It runs `gcloud run deploy kibo --source .` (Cloud Build builds the `Dockerfile`; `.gcloudignore` and `.dockerignore` keep `.env*`, docs, evidence, tests and videos out of the upload), prints the service URL and curls `/api/health`.
+
+| Flag | Why |
+|---|---|
+| `--project kibo-2026 --region asia-northeast3` | Region is mandatory: the local gcloud default points elsewhere, and Firestore is in `asia-northeast3` |
+| `--service-account kibo-runtime@…` | Runtime account with only `datastore.user` and access to `gemini-api-key` |
+| `--allow-unauthenticated` | Judges and phones open the app without a Google login; the API's actor tokens and limits protect it |
+| `--min-instances 1 --max-instances 3` | No cold start during judging; cost ceiling (the per-IP limit is per instance, so at most 3×) |
+| `--concurrency 80` | Each open screen holds one SSE request (ADR-010) |
+| `--timeout 3600` | SSE streams stay open up to an hour; `EventSource` reconnects after |
+| `--cpu 1 --memory 1Gi` | Enough for the Next.js server and the Firestore listeners |
+| `--set-secrets GEMINI_API_KEY=gemini-api-key:latest` | The key comes from Secret Manager, never from a file or flag value |
+| `--set-env-vars STORE=firestore,…` | Firestore store (the app refuses `STORE=memory` in production unless `ALLOW_MEMORY_STORE=1`), project, model ids (ADR-011), text thinking `low` |
+
+Without `GEMINI_API_KEY`, `/api/chat` and `/api/live-token` answer `UPSTREAM` with a plain message; touch ordering on the kiosk still works.
+
+**Roll back:** list revisions with `gcloud run revisions list --service kibo --region asia-northeast3`, then `gcloud run services update-traffic kibo --to-revisions <rev>=100 --region asia-northeast3`. A later deploy sends traffic to the new revision again.
+
+**Uptime check:** in Cloud Monitoring, an HTTPS uptime check on `<service URL>/api/health?deep=1` every 5 min from at least 3 regions, alerting both team members by email. The deep check reads the store (a session id that never exists must come back empty) and asks Gemini for the text and live model ids; 200 when all pass, 503 otherwise, body `{ ok, checks: { store, textModel, liveModel } }`. Results are cached for 60 s per instance, so the check costs at most three upstream calls a minute. Plain `/api/health` is the cheap liveness probe.
+
 ## Judging period (2026-10-19 to 11-06)
 - Cloud Run `min-instances=1` (no cold start) and `max-instances=3` (cost ceiling).
 - Gemini per-minute quota checked and capped. **Early finding:** generating six images in parallel hit HTTP 429 right away on our project, so check Live and Flash quotas and request increases if needed; the app turns 429 into "try again" plus text mode.
