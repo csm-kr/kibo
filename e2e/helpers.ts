@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { expect, type APIRequestContext, type Locator, type Page } from "@playwright/test";
+import { expect, type APIRequestContext, type Browser, type Locator, type Page } from "@playwright/test";
 
 // Shared steps for the kiosk E2E specs. The "phone" here is plain HTTP calls with the device token,
 // the same calls /assistant will make.
@@ -41,6 +41,23 @@ export async function command(
   const json = await res.json();
   expect(json.ok, `${body.type}: ${JSON.stringify(json.error)}`).toBe(true);
   return json as { status: string; total: number; cartVersion: number; cart: unknown[] };
+}
+
+/**
+ * The dev server compiles a route on its first request and may reload the page while it does, which can cut a
+ * claim in half. Specs that open /assistant first load it once with no session and touch the routes it calls.
+ */
+export async function warmPhone(browser: Browser, request: APIRequestContext) {
+  await Promise.all([
+    request.post("/api/session/claim", { data: {} }),
+    request.post("/api/ping", { data: {} }),
+    request.post("/api/chat", { data: {} }),
+    request.get(`/api/session/${"x".repeat(22)}/events`),
+  ]);
+  const page = await browser.newPage();
+  await page.goto("/assistant");
+  await expect(page.locator('[data-phone-screen="ended"]')).toBeVisible({ timeout: 60_000 });
+  await page.close();
 }
 
 /** The standalone kiosk keeps {sessionId, kioskToken, claimUrl} in localStorage (useKioskSession). */

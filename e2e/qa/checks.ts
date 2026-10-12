@@ -141,8 +141,20 @@ export async function targets(page: Page, p: Profile): Promise<Findings> {
       // Only controls a finger can reach: not under a scrim, not scrolled out of view.
       const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
       if (!hit || !el.contains(hit)) return [];
+      // A control half-scrolled out of a scroll area can only be touched where it shows; the gap check uses that part.
+      // The size check below still uses the full box.
+      const v = { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+      for (let a = el.parentElement; a; a = a.parentElement) {
+        const cs = getComputedStyle(a);
+        if (cs.overflowX === "visible" && cs.overflowY === "visible") continue;
+        const c = a.getBoundingClientRect();
+        v.left = Math.max(v.left, c.left);
+        v.top = Math.max(v.top, c.top);
+        v.right = Math.min(v.right, c.right);
+        v.bottom = Math.min(v.bottom, c.bottom);
+      }
       const name = (el.getAttribute("aria-label") ?? el.textContent ?? "").trim().slice(0, 24);
-      return [{ label: `${el.tagName.toLowerCase()} "${name}"`, left: r.left, top: r.top, right: r.right, bottom: r.bottom }];
+      return [{ label: `${el.tagName.toLowerCase()} "${name}"`, left: r.left, top: r.top, right: r.right, bottom: r.bottom, v }];
     });
   }, p.root);
 
@@ -157,13 +169,15 @@ export async function targets(page: Page, p: Profile): Promise<Findings> {
   const close: string[] = [];
   for (let i = 0; i < boxes.length; i++) {
     for (let j = i + 1; j < boxes.length; j++) {
-      const a = boxes[i];
-      const b = boxes[j];
+      const a = boxes[i].v;
+      const b = boxes[j].v;
       const dx = Math.max(0, b.left - a.right, a.left - b.right);
       const dy = Math.max(0, b.top - a.bottom, a.top - b.bottom);
       const gap = Math.max(dx, dy) / scale;
       // 0.01 px absorbs float error only.
-      if (gap < MIN_GAP - 0.01) close.push(`target gap ${Math.round(gap * 10) / 10}px < ${MIN_GAP}px: ${a.label} / ${b.label}`);
+      if (gap < MIN_GAP - 0.01) {
+        close.push(`target gap ${Math.round(gap * 10) / 10}px < ${MIN_GAP}px: ${boxes[i].label} / ${boxes[j].label}`);
+      }
     }
   }
   h.push(...capped(close));
@@ -193,6 +207,9 @@ export async function textSpacing(page: Page, p: Profile): Promise<Findings> {
       const cs = getComputedStyle(el);
       const text = (el.textContent ?? "").trim();
       if (!text || !el.checkVisibility()) continue;
+      // Screen-reader-only text (a 1px clipped box) is hidden on purpose; the other checks skip it too.
+      const box = el.getBoundingClientRect();
+      if (box.width <= 1 || box.height <= 1) continue;
       const hideX = cs.overflowX === "hidden" || cs.overflowX === "clip";
       const hideY = cs.overflowY === "hidden" || cs.overflowY === "clip";
       // 1px absorbs subpixel rounding.
@@ -250,6 +267,9 @@ export async function tokens(page: Page, p: Profile): Promise<Findings> {
       const spacing = new Map<number, string>();
       for (const el of root ? [...root.querySelectorAll<HTMLElement>("*")] : []) {
         if (!el.checkVisibility()) continue;
+        // Screen-reader-only boxes use a -1px margin on purpose.
+        const box = el.getBoundingClientRect();
+        if (box.width <= 1 || box.height <= 1) continue;
         const cs = getComputedStyle(el);
         const label = `${el.tagName.toLowerCase()}.${[...el.classList].slice(0, 3).join(".")}`;
         if (!allow.some((sel) => el.matches(sel))) {

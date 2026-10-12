@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { ApiError, createSession, ping, sendCommand } from "./api";
+import { ApiError, chat, claim, createSession, ping, sendCommand } from "./api";
 
 const fetchMock = vi.fn();
 
@@ -124,5 +124,42 @@ describe("createSession and ping", () => {
     expect(new Headers(init.headers).get("Authorization")).toBe("Bearer k");
     expect(body).toEqual({ sessionId: "s", active: true });
     expect(r.serverTime).toBe(42);
+  });
+});
+
+describe("claim and chat", () => {
+  it("claim posts the claim token without a bearer and returns the device token", async () => {
+    fetchMock.mockResolvedValue(reply(200, { ok: true, deviceToken: "d", status: "connected" }));
+    const r = await claim({ sessionId: "s", claimToken: "c" });
+    const { url, init, body } = lastCall();
+    expect(url).toBe("/api/session/claim");
+    expect(new Headers(init.headers).has("Authorization")).toBe(false);
+    expect(body).toEqual({ sessionId: "s", claimToken: "c" });
+    expect(r.deviceToken).toBe("d");
+  });
+
+  it("claim maps a second phone to CONFLICT", async () => {
+    fetchMock.mockResolvedValue(reply(409, { ok: false, error: { code: "CONFLICT", message: "Someone else is using this kiosk." } }));
+    await expect(claim({ sessionId: "s", claimToken: "c" })).rejects.toMatchObject({ code: "CONFLICT" });
+  });
+
+  it("chat posts the utterance with a fresh chatRequestId and the device token", async () => {
+    fetchMock.mockResolvedValue(reply(200, { ok: true, reply: "Done", status: "ordering", cart: [], total: 0, cartVersion: 1 }));
+    const r = await chat({
+      sessionId: "s",
+      token: "d",
+      message: "one cola",
+      history: [{ role: "user", text: "hi" }],
+      utteranceSeq: 2,
+      locale: "en",
+    });
+    const { url, init, body } = lastCall();
+    expect(url).toBe("/api/chat");
+    expect(new Headers(init.headers).get("Authorization")).toBe("Bearer d");
+    expect(body).toMatchObject({ sessionId: "s", message: "one cola", utteranceSeq: 2, locale: "en" });
+    expect(body.chatRequestId).toMatch(/^[0-9a-f-]{36}$/);
+    expect(body).not.toHaveProperty("token");
+    expect(body).not.toHaveProperty("cartVersion");
+    expect(r.reply).toBe("Done");
   });
 });

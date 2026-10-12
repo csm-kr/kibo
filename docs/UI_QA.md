@@ -128,6 +128,8 @@ Until then the `qa` step checks the angles from code and the prototype and says 
 
 **In place (10-13, 2-kiosk:5):** `playwright.qa.config.ts` (port 3200), checks in `e2e/qa/checks.ts`, kiosk states in `e2e/qa/kiosk.qa.spec.ts` (K1, K2, K3 with a sold-out tile and with an AI highlight, K4 variant / empty drink / ingredients, K5, K6, K7 card insert, K8 receipt and order number, KX staff banner and idle warning, plus one K1 screenshot at the 600×1067 `/demo` size). Output goes to `phases/<phase>/qa/` on a `feat-<phase>` branch, else `qa-output/`. The phone thresholds (`PHONE` profile, 320px reflow) are ready for `/assistant`.
 
+**Phone (10-13, 3-assistant:3):** `e2e/qa/assistant.qa.spec.ts` checks P-start, P2, P3 (empty, two lines, choice buttons, error), P4, P5, P6, P7 taken at 390×844, 360×800, 430×932 and 320×700 (each with the reflow check), and PX idle warning at 390×844. English only so far (I-065).
+
 **What the script checks:**
 - **axe-core** (H) with the WCAG 2.0/2.1/2.2 A and AA tags, with `target-size` turned on explicitly (off by default). Contrast results marked "incomplete" (text over images) go to human review.
 - **Computed styles:** minimum font size per route and every interactive element's box ≥ the route's target size and ≥ 8px from its neighbor (H); body line-height ≥ 1.5, margins, paddings and gaps on the 4/8 scale, radius, font family and weight from the tokens, ≤ 4 font sizes per screen, transitions ≤ 500ms unless allowlisted (T).

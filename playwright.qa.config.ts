@@ -35,7 +35,7 @@ export default defineConfig({
   webServer: {
     command: "npm run dev -- --port 3200",
     url: "http://localhost:3200/api/health",
-    env: { STORE: "memory" },
+    env: { STORE: "memory", KIBO_DEV_CACHE: "off" },
     reuseExistingServer: false,
     timeout: 120_000,
   },
