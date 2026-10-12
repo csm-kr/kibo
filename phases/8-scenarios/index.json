@@ -5,7 +5,9 @@
     {
       "step": 0,
       "name": "text-fallback",
-      "status": "pending"
+      "status": "completed",
+      "summary": "GEMINI_TEXT_BACKEND=auto (new default, deploy.sh): src/lib/agent/model.ts tries the Gemini API key, retries the same generateContent once on Vertex only on 402/429/5xx/network (never 400), pins each per-request geminiClient to the backend of its first call (no switch or retry after a tool ran), and an in-memory circuit sends auto straight to Vertex for 10 min after 3x402 in 5 min; health textGenerate uses textModels() (same path); eval makes a client per request and records modelCallsByBackend. Eval 42/42 on the key, median 5.9 s / p90 10.7 s vs Vertex 05-51 36/42, 8.2 / 23.0 s (local .env pins api, so auto itself is unit-tested only, I-125). Live token pins inputAudioTranscription.languageCodes (ko-KR/en-US from locale) and automaticActivityDetection END_SENSITIVITY_HIGH + silenceDurationMs 700; both voice hero runs pass. scripts/wav.ts ttsPcm strips the TTS WAV header (I-124). Docs: ARCHITECTURE, ADR-011, OPERATIONS, README, TESTING (voice-compare row); I-104 fixed, I-105 updated.",
+      "started_at": "2026-10-13T07:38:53+0900"
     },
     {
       "step": 1,
@@ -27,5 +29,6 @@
       "name": "qa",
       "status": "pending"
     }
-  ]
+  ],
+  "created_at": "2026-10-13T07:38:53+0900"
 }

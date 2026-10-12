@@ -10,19 +10,25 @@ import {
 import { CommandError } from "@/lib/commands/errors";
 
 // The text agent's model (ADR-011). Server only: GEMINI_API_KEY never leaves this module.
-// Since 10-13 the text agent runs on Vertex AI (billed to the GCP account, credentials from the runtime
-// service account or gcloud ADC); GEMINI_TEXT_BACKEND=api switches back to the Gemini API key for comparison.
+// GEMINI_TEXT_BACKEND=auto (default): the Gemini API key first, because it was faster (I-105), and Vertex AI
+// (billed to the GCP account, runtime service account or gcloud ADC) as the safety net when the key's
+// prepaid credits run out (402, I-104), it is rate limited (429) or Gemini is down (5xx, network).
+// `api` and `vertex` pin one backend.
 
 export interface ModelTurn {
   role: "user" | "model";
   parts: unknown[];
 }
 
+export type TextBackend = "api" | "vertex";
+
 export interface ModelClient {
   generate(req: { system: string; contents: ModelTurn[]; tools: object[] }): Promise<{
     content: ModelTurn;
     functionCalls: { id?: string; name: string; args: unknown }[];
     text: string;
+    /** The backend that answered (the eval counts them). */
+    backend?: TextBackend;
   }>;
 }
 
@@ -41,8 +47,13 @@ function thinkingLevel(): ThinkingLevel {
   return v !== undefined && Object.hasOwn(THINKING, v) ? THINKING[v] : ThinkingLevel.LOW;
 }
 
-export function textClientOptions(): GoogleGenAIOptions {
-  if (process.env.GEMINI_TEXT_BACKEND === "api") {
+export function textBackendSetting(): TextBackend | "auto" {
+  const v = process.env.GEMINI_TEXT_BACKEND;
+  return v === "api" || v === "vertex" ? v : "auto";
+}
+
+export function textClientOptions(backend: TextBackend): GoogleGenAIOptions {
+  if (backend === "api") {
     if (!process.env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not set");
     return { apiKey: process.env.GEMINI_API_KEY };
   }
@@ -54,14 +65,88 @@ export function textClientOptions(): GoogleGenAIOptions {
   };
 }
 
-let shared: { options: string; ai: GoogleGenAI } | null = null;
+const shared = new Map<TextBackend, { options: string; ai: GoogleGenAI }>();
 
-/** One client per configuration, so Vertex reuses its access token instead of fetching one per request. */
-export function textGenAI(): GoogleGenAI {
-  const options = textClientOptions();
+/** One client per backend and configuration, so Vertex reuses its access token instead of fetching one per request. */
+function textGenAI(backend: TextBackend): GoogleGenAI {
+  const options = textClientOptions(backend);
   const key = JSON.stringify(options);
-  if (shared?.options !== key) shared = { options: key, ai: new GoogleGenAI(options) };
-  return shared.ai;
+  let entry = shared.get(backend);
+  if (entry?.options !== key) shared.set(backend, (entry = { options: key, ai: new GoogleGenAI(options) }));
+  return entry.ai;
+}
+
+type Models = Pick<GoogleGenAI["models"], "generateContent">;
+type GenerateParams = Parameters<Models["generateContent"]>[0];
+type GenerateResponse = Awaited<ReturnType<Models["generateContent"]>>;
+
+const OUTAGE_WINDOW_MS = 5 * 60_000;
+const OUTAGE_COUNT = 3;
+const VERTEX_ONLY_MS = 10 * 60_000;
+
+export interface Circuit {
+  open(now: number): boolean;
+  billingFailure(now: number): void;
+}
+
+/** After 3 billing errors (402) within 5 min, auto skips the API key for 10 min, so a credit outage
+ *  does not cost every request a failed call first. In memory, per instance. */
+export function createCircuit(): Circuit {
+  let failures: number[] = [];
+  let openUntil = 0;
+  return {
+    open: (now) => now < openUntil,
+    billingFailure(now) {
+      failures = [...failures.filter((t) => now - t < OUTAGE_WINDOW_MS), now];
+      if (failures.length >= OUTAGE_COUNT) {
+        openUntil = now + VERTEX_ONLY_MS;
+        failures = [];
+      }
+    },
+  };
+}
+
+const circuit = createCircuit();
+
+export interface TextDeps {
+  backend: TextBackend | "auto";
+  models: (backend: TextBackend) => Models;
+  circuit: Circuit;
+  now: () => number;
+}
+
+function defaultTextDeps(): TextDeps {
+  return { backend: textBackendSetting(), models: (b) => textGenAI(b).models, circuit, now: Date.now };
+}
+
+/** The status worth a retry on Vertex, or null: billing, quota, server and network errors only, never a bad request. */
+function fallbackStatus(e: unknown): string | null {
+  if (!(e instanceof ApiError)) return "network";
+  return e.status === 402 || e.status === 429 || e.status >= 500 ? String(e.status) : null;
+}
+
+/** One generateContent. With `pinned`, only that backend; otherwise auto may retry once on Vertex. */
+async function generateOn(
+  deps: TextDeps,
+  params: GenerateParams,
+  pinned?: TextBackend,
+): Promise<{ res: GenerateResponse; backend: TextBackend }> {
+  const auto = deps.backend === "auto" && pinned === undefined;
+  const first = pinned ?? (deps.backend !== "auto" ? deps.backend : deps.circuit.open(deps.now()) ? "vertex" : "api");
+  try {
+    return { res: await deps.models(first).generateContent(params), backend: first };
+  } catch (e) {
+    const status = auto && first === "api" ? fallbackStatus(e) : null;
+    if (status === null) throw e;
+    if (status === "402") deps.circuit.billingFailure(deps.now());
+    console.error(`gemini text fallback api->vertex (${status})`);
+    return { res: await deps.models("vertex").generateContent(params), backend: "vertex" };
+  }
+}
+
+/** The text backend for one-off calls (the deep health check), with the same fallback as the agent. */
+export function textModels(): Models {
+  return { generateContent: async (params) => (await generateOn(defaultTextDeps(), params)).res };
 }
 
 /** Upstream messages can hold request data, so callers only ever see these fixed ones. */
@@ -73,15 +158,20 @@ function modelError(e: unknown): CommandError {
   return new CommandError("UPSTREAM", "The assistant is not available right now. Please use the buttons or try again.");
 }
 
-/** `ai` is injectable for tests; production gets the shared client on first use, so a missing key is an UPSTREAM error. */
-export function geminiClient(ai?: Pick<GoogleGenAI, "models">): ModelClient {
+/**
+ * One client per chat request. Its first call picks the backend (auto: the API key, or Vertex after a fallback
+ * or while the circuit is open); every later call stays there without fallback, because tools may already have
+ * run, so a request never switches backends after a command was applied. `overrides` are for tests; production
+ * builds the shared clients on first use, so a missing key is an UPSTREAM error.
+ */
+export function geminiClient(overrides: Partial<TextDeps> = {}): ModelClient {
   const model = process.env.GEMINI_TEXT_MODEL ?? "gemini-3.8-flash";
+  let pinned: TextBackend | undefined;
   return {
     async generate({ system, contents, tools }) {
-      let res;
+      let out;
       try {
-        ai ??= textGenAI();
-        res = await ai.models.generateContent({
+        out = await generateOn({ ...defaultTextDeps(), ...overrides }, {
           model,
           // Gemini 3 returns thought signatures with function calls; the caller sends `content` back unchanged.
           contents: contents as Content[],
@@ -92,10 +182,12 @@ export function geminiClient(ai?: Pick<GoogleGenAI, "models">): ModelClient {
             // Temperature stays the model default, as Google advises for Gemini 3.
             thinkingConfig: { thinkingLevel: thinkingLevel() },
           },
-        });
+        }, pinned);
       } catch (e) {
         throw modelError(e);
       }
+      const { res, backend } = out;
+      pinned = backend;
       // A finished turn can come back with no parts at all (seen with gemini-3.8-flash after tool results).
       const reply = res.candidates?.[0]?.content;
       const content: ModelTurn = { ...reply, role: "model", parts: reply?.parts ?? [] };
@@ -105,7 +197,7 @@ export function geminiClient(ai?: Pick<GoogleGenAI, "models">): ModelClient {
         .map((p) => p.text)
         .join("");
       const functionCalls = (res.functionCalls ?? []).map((c) => ({ id: c.id, name: c.name ?? "", args: c.args ?? {} }));
-      return { content, functionCalls, text };
+      return { content, functionCalls, text, backend };
     },
   };
 }

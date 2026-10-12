@@ -57,6 +57,6 @@ Ship one vertical demo that works end to end and survives three weeks of judging
 
 ### ADR-011: Model ids
 **Decision** (10-12): text agent `gemini-3.8-flash`, voice `gemini-3.8-live` (fallback `gemini-3.1-flash-live-preview`), set by `GEMINI_TEXT_MODEL` and `GEMINI_LIVE_MODEL`. Both appear in the Gemini API `models.list` for our key on 10-12, and an ephemeral token with `liveConnectConstraints` connected to `gemini-3.8-live` and returned audio on 10-12 (manual check, no saved log).
-**Backend** (10-13): text agent on Vertex AI since 10-13 (the Gemini API key's prepaid credits ran out, I-104); voice on the Gemini API for ephemeral tokens.
+**Backend** (10-13): text agent on Vertex AI since 10-13 (the Gemini API key's prepaid credits ran out, I-104); voice on the Gemini API for ephemeral tokens. Later on 10-13 (credits topped up): text agent `GEMINI_TEXT_BACKEND=auto`, the Gemini API key first because it was faster and Vertex returned 429s during an eval (I-105, I-111), and Vertex AI once per call on 402, 429 or 5xx/network errors, so a credit outage no longer stops text ordering; voice cannot fall back, it needs the key.
 **Why**: `gemini-3.8-live` is not a preview id, which matters for three weeks of judging.
 **Trade-off**: Re-check `models.list` before the deadline and before judging starts.

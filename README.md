@@ -181,11 +181,11 @@ The KIBO Learn runs above predate the learner's finish gate (≥ 3 passing self-
 Needs Node 24.
 ```bash
 npm ci
-echo "GEMINI_API_KEY=<your key>" > .env   # git-ignored; never commit it; used for voice
-gcloud auth application-default login      # the text agent runs on Vertex AI (project kibo-2026)
+echo "GEMINI_API_KEY=<your key>" > .env   # git-ignored; never commit it; used for voice and the text agent
+gcloud auth application-default login      # the text agent's Vertex AI fallback (project kibo-2026)
 npm run dev                                # http://localhost:3000, in-memory store by default
 ```
-Without a key voice answers with an error; without Vertex AI credentials the text agent does. `GEMINI_TEXT_BACKEND=api` in `.env` runs the text agent on the key instead.
+Without a key voice answers with an error and the text agent falls back to Vertex AI. `GEMINI_TEXT_BACKEND=api` or `vertex` in `.env` pins the text agent to one backend.
 
 Tests:
 ```bash

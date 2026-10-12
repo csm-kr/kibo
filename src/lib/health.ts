@@ -30,7 +30,7 @@ export interface DeepHealthDeps {
   store: () => Pick<SessionStore, "get">;
   /** The Gemini API key's client: model id lookups (Vertex refuses `models.get`) and voice billing. */
   api: () => Generate & { get(params: { model: string }): Promise<unknown> };
-  /** The text agent's backend (GEMINI_TEXT_BACKEND: Vertex AI or the Gemini API). */
+  /** The text agent's backend (GEMINI_TEXT_BACKEND: auto, Vertex AI or the Gemini API). */
   text: () => Generate;
   liveTokens: () => {
     create(params: {

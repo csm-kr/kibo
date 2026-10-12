@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import pkg from "../../../../package.json";
-import { textGenAI } from "@/lib/agent/model";
+import { textModels } from "@/lib/agent/model";
 import { createDeepHealth } from "@/lib/health";
 import { clientIp, fail, ok } from "@/lib/http";
 import { checkIpLimit } from "@/lib/limits/ip";
@@ -22,8 +22,8 @@ function apiKey(): string {
 const deepHealth = createDeepHealth({
   store: getStore,
   api: () => (keyAi ??= new GoogleGenAI({ apiKey: apiKey() })).models,
-  // The same client the text agent uses: Vertex AI by default, the Gemini API with GEMINI_TEXT_BACKEND=api.
-  text: () => textGenAI().models,
+  // The text agent's path (GEMINI_TEXT_BACKEND): with auto, the API key with Vertex AI as the fallback.
+  text: textModels,
   // Ephemeral tokens exist only in v1alpha, as in src/lib/agent/live.ts.
   liveTokens: () => (tokenAi ??= new GoogleGenAI({ apiKey: apiKey(), httpOptions: { apiVersion: "v1alpha" } })).authTokens,
   textModel: process.env.GEMINI_TEXT_MODEL ?? "gemini-3.8-flash",

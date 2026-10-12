@@ -5,9 +5,10 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { GoogleGenAI } from "@google/genai";
+import { ttsPcm } from "./wav";
 
 const MODEL = process.env.GEMINI_TTS_MODEL ?? "gemini-3.8-flash-tts";
-// Gemini TTS returns raw 16-bit little-endian PCM at 24 kHz.
+// Gemini TTS returns 16-bit little-endian PCM at 24 kHz, now with a WAV header (ttsPcm skips it).
 const TTS_RATE = 24_000;
 const OUT_RATE = 48_000;
 const LEAD_S = 1;
@@ -69,8 +70,7 @@ async function main() {
     });
     const b64 = res.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data)?.inlineData?.data;
     if (!b64) throw new Error(`no audio for ${f.file}`);
-    const raw = Buffer.from(b64, "base64");
-    const pcm = new Int16Array(raw.buffer, raw.byteOffset, Math.floor(raw.length / 2));
+    const pcm = ttsPcm(Buffer.from(b64, "base64"));
     writeFileSync(join(dir, f.file), toWav(pcm));
     console.log(`${f.file}: ${(pcm.length / TTS_RATE).toFixed(2)} s of speech`);
   }

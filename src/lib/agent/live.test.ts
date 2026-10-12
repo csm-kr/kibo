@@ -1,4 +1,4 @@
-import { ApiError, Modality, type GoogleGenAI } from "@google/genai";
+import { ApiError, EndSensitivity, Modality, type GoogleGenAI } from "@google/genai";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getKiosk } from "@/lib/adapters/catalog";
 import { CommandError } from "@/lib/commands/errors";
@@ -170,6 +170,19 @@ describe("liveConfig", () => {
     expect(ko.system).toContain("The user's phone is set to Korean");
     expect(ko.system).toContain("Cart: empty");
   });
+
+  it("the speech recognizer's language follows the phone locale: ko-KR or en-US", () => {
+    const k = getKiosk("malo");
+    const opts = { cart: [], status: "connected" as const, dineOption: null };
+    expect(liveConfig(k, { ...opts, locale: "ko" }).languageCode).toBe("ko-KR");
+    expect(liveConfig(k, { ...opts, locale: "en" }).languageCode).toBe("en-US");
+  });
+
+  it("issueLiveToken passes the locale's language code to the issuer", async () => {
+    const s = await demo();
+    await issueLiveToken(deps(), { sessionId: s.sessionId, bearer: s.deviceToken, locale: "ko" });
+    expect(issued[0].languageCode).toBe("ko-KR");
+  });
 });
 
 function fakeAi(create: (req: unknown) => Promise<unknown>) {
@@ -180,12 +193,13 @@ const INPUT = {
   model: "gemini-3.8-live",
   system: "sys",
   tools: [{ functionDeclarations: [] }],
+  languageCode: "ko-KR",
   expireTime: "2026-10-13T03:03:00.000Z",
   newSessionExpireTime: "2026-10-13T03:01:00.000Z",
 };
 
 describe("geminiTokenIssuer", () => {
-  it("one use, times, and model, instructions, tools, audio and transcription pinned", async () => {
+  it("one use, times, and model, instructions, tools, audio, transcription language and end of speech pinned", async () => {
     const create = vi.fn().mockResolvedValue({ name: "auth_tokens/abc" });
     expect(await geminiTokenIssuer(fakeAi(create)).create(INPUT)).toEqual({ name: "auth_tokens/abc" });
     const { config } = create.mock.calls[0][0];
@@ -200,8 +214,12 @@ describe("geminiTokenIssuer", () => {
         responseModalities: [Modality.AUDIO],
         systemInstruction: "sys",
         tools: INPUT.tools,
-        inputAudioTranscription: {},
+        // Without a language, short Korean answers ("네") came back empty or in another language (voice-compare).
+        inputAudioTranscription: { languageCodes: ["ko-KR"] },
         outputAudioTranscription: {},
+        realtimeInputConfig: {
+          automaticActivityDetection: { endOfSpeechSensitivity: EndSensitivity.END_SENSITIVITY_HIGH, silenceDurationMs: 700 },
+        },
       },
     });
     expect(config.httpOptions).toEqual({ apiVersion: "v1alpha" });

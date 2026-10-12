@@ -1,4 +1,4 @@
-import { ApiError, GoogleGenAI, Modality, type ToolListUnion } from "@google/genai";
+import { ApiError, EndSensitivity, GoogleGenAI, Modality, type ToolListUnion } from "@google/genai";
 import { z } from "zod";
 import { getKiosk } from "@/lib/adapters/catalog";
 import { CommandError } from "@/lib/commands/errors";
@@ -18,7 +18,14 @@ import { toolDeclarations } from "./tools";
 export const liveTokenRequest = z.strictObject({ sessionId, locale: z.enum(["ko", "en"]) });
 
 export interface LiveTokenIssuer {
-  create(input: { model: string; system: string; tools: object[]; expireTime: string; newSessionExpireTime: string }): Promise<{ name: string }>;
+  create(input: {
+    model: string;
+    system: string;
+    tools: object[];
+    languageCode: string;
+    expireTime: string;
+    newSessionExpireTime: string;
+  }): Promise<{ name: string }>;
 }
 
 export interface LiveTokenDeps {
@@ -37,6 +44,10 @@ const DEMO_VOICE_SECONDS = 180;
 /** The phone connects right after it gets the token. */
 const NEW_SESSION_MS = 60_000;
 const BUSY = "Voice is busy right now. Please type instead.";
+const LANGUAGE_CODES: Record<Locale, string> = { ko: "ko-KR", en: "en-US" };
+/** End of speech after 700 ms of silence: short answers ("네") sometimes waited 3.5–8.9 s with the default
+ *  (spikes/voice-compare/RESULTS.md); not shorter, so slow speakers' pauses do not end their turn. */
+const SILENCE_MS = 700;
 
 function tokenError(e: unknown): CommandError {
   if (e instanceof ApiError && e.status === 429) return new CommandError("RATE_LIMITED", BUSY);
@@ -49,7 +60,7 @@ function tokenError(e: unknown): CommandError {
 /** `ai` is injectable for tests; production builds the client on first use, so a missing key is an UPSTREAM error. */
 export function geminiTokenIssuer(ai?: Pick<GoogleGenAI, "authTokens">): LiveTokenIssuer {
   return {
-    async create({ model, system, tools, expireTime, newSessionExpireTime }) {
+    async create({ model, system, tools, languageCode, expireTime, newSessionExpireTime }) {
       let token;
       try {
         // Ephemeral tokens exist only in v1alpha.
@@ -66,9 +77,13 @@ export function geminiTokenIssuer(ai?: Pick<GoogleGenAI, "authTokens">): LiveTok
                 responseModalities: [Modality.AUDIO],
                 systemInstruction: system,
                 tools: tools as ToolListUnion,
-                // The phone shows what it heard and what the AI said.
-                inputAudioTranscription: {},
+                // The phone shows what it heard and what the AI said. Without a language, short Korean answers
+                // ("네") came back empty or in another language and menu names were misheard in noise (voice-compare).
+                inputAudioTranscription: { languageCodes: [languageCode] },
                 outputAudioTranscription: {},
+                realtimeInputConfig: {
+                  automaticActivityDetection: { endOfSpeechSensitivity: EndSensitivity.END_SENSITIVITY_HIGH, silenceDurationMs: SILENCE_MS },
+                },
               },
             },
             httpOptions: { apiVersion: "v1alpha" },
@@ -86,12 +101,13 @@ export function geminiTokenIssuer(ai?: Pick<GoogleGenAI, "authTokens">): LiveTok
 export function liveConfig(
   kiosk: KioskData,
   opts: { cart: CartLine[]; status: SessionStatus; dineOption: DineOption | null; locale: Locale },
-): { model: string; system: string; tools: object[] } {
+): { model: string; system: string; tools: object[]; languageCode: string } {
   return {
     model: process.env.GEMINI_LIVE_MODEL ?? "gemini-3.8-live",
     // The current cart is in the instructions, marked already applied, so a reconnect does not add it again.
     system: buildInstructions(kiosk, opts),
     tools: [{ functionDeclarations: toolDeclarations(kiosk) }],
+    languageCode: LANGUAGE_CODES[opts.locale],
   };
 }
 

@@ -2,14 +2,14 @@
 // through runChat, exactly as POST /api/chat does, and saves the result as evidence in evals/results/.
 // Results hold ids, codes and timings only: no reply text, no utterances, no key. Reply cases keep only the
 // grounding verdict and the deny-list words it matched.
-// Run with `npm run eval:agent`: the text agent's backend, Vertex AI through gcloud application default credentials
-// by default; `GEMINI_TEXT_BACKEND=api npm run eval:agent` runs it on the Gemini API key in .env for comparison.
+// Run with `npm run eval:agent`: the text agent's backend, `auto` by default (the Gemini API key in .env, Vertex AI
+// through gcloud application default credentials as the fallback); `GEMINI_TEXT_BACKEND=api|vertex` pins one.
 
 import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { runChat } from "@/lib/agent/chat";
-import { geminiClient, type ModelClient } from "@/lib/agent/model";
+import { geminiClient, textBackendSetting, type ModelClient, type TextBackend } from "@/lib/agent/model";
 import { CommandError } from "@/lib/commands/errors";
 import { MemoryUsageStore } from "@/lib/limits/usage";
 import { chatReducer, historyFor, initialChat } from "@/lib/phone/chat";
@@ -67,7 +67,16 @@ const EVAL_CLOCK = Date.parse("2026-10-13T05:00:00Z");
 const PAUSE_MS = 1500;
 const RETRY_WAIT_MS = 30_000;
 
+const BACKEND_NAMES = {
+  api: "the Gemini API",
+  vertex: "Vertex AI",
+  auto: "auto (the Gemini API, Vertex AI on billing, quota or server errors)",
+};
+
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Model calls per backend that answered, so an auto run says how much Vertex served. */
+const served: Record<TextBackend, number> = { api: 0, vertex: 0 };
 
 /** Records each tool call and the result code the model received for it. */
 function recording(inner: ModelClient, calls: ToolCall[]): ModelClient {
@@ -83,6 +92,7 @@ function recording(inner: ModelClient, calls: ToolCall[]): ModelClient {
         if (waiting[i]) waiting[i].code = code;
       });
       const out = await inner.generate(req);
+      if (out.backend) served[out.backend]++;
       for (const c of out.functionCalls) calls.push({ name: c.name, code: "unsent" });
       return out;
     },
@@ -131,7 +141,7 @@ function judge(c: Case, final: Session, before: CartLine[], calls: ToolCall[], g
   return calls.some((t) => t.code === "BAD_REQUEST") ? "a tool call failed with BAD_REQUEST" : null;
 }
 
-async function runCase(c: Case, model: ModelClient) {
+async function runCase(c: Case) {
   const store = new MemoryStore();
   const usage = new MemoryUsageStore();
   const started = Date.now();
@@ -171,15 +181,16 @@ async function runCase(c: Case, model: ModelClient) {
     });
     const log: RequestLog = { ms: 0, firstToolMs: null, tools: calls };
     try {
-      const deps = { store, model: recording(model, calls), usage, now };
+      // A new client per request, as the route makes one: it keeps one request on one backend.
+      const deps = () => ({ store, model: recording(geminiClient(), calls), usage, now });
       let reply: string;
       try {
-        reply = (await runChat(deps, input)).reply;
+        reply = (await runChat(deps(), input)).reply;
       } catch (e) {
         if (!(e instanceof CommandError && e.code === "RATE_LIMITED")) throw e;
         // Same chatRequestId: commands already applied come back as duplicates instead of applying twice.
         await sleep(RETRY_WAIT_MS);
-        reply = (await runChat(deps, input)).reply;
+        reply = (await runChat(deps(), input)).reply;
       }
       chat = chatReducer(chat, { type: "reply", text: reply });
       lastReply = reply;
@@ -229,9 +240,9 @@ function kstStamp(ms: number): string {
 }
 
 async function main() {
-  const backend = process.env.GEMINI_TEXT_BACKEND === "api" ? "api" : "vertex";
-  if (backend === "api" && !process.env.GEMINI_API_KEY) {
-    console.error("GEMINI_TEXT_BACKEND=api needs GEMINI_API_KEY (.env).");
+  const backend = textBackendSetting();
+  if (backend !== "vertex" && !process.env.GEMINI_API_KEY) {
+    console.error(`GEMINI_TEXT_BACKEND=${backend} needs GEMINI_API_KEY (.env).`);
     process.exit(1);
   }
   const file = JSON.parse(readFileSync(join(ROOT, "evals/agent-cases.json"), "utf8")) as {
@@ -242,12 +253,11 @@ async function main() {
   const cases = only.length > 0 ? file.cases.filter((c) => only.includes(c.id)) : file.cases;
   const modelId = process.env.GEMINI_TEXT_MODEL ?? "gemini-3.8-flash";
   const thinking = process.env.GEMINI_TEXT_THINKING ?? "low";
-  const model = geminiClient();
   const startedAt = Date.now();
 
   const results = [];
   for (const c of cases) {
-    const r = await runCase(c, model);
+    const r = await runCase(c);
     console.log(`${r.pass ? "PASS" : "FAIL"} ${c.id}${r.reason ? ` (${r.reason})` : ""}`);
     results.push(r);
   }
@@ -289,6 +299,7 @@ async function main() {
     date: new Date(startedAt).toISOString(),
     model: modelId,
     backend,
+    modelCallsByBackend: served,
     thinkingLevel: thinking,
     evalClock: "14:00 KST",
     // Case ids given on the command line: a partial run, not a pass rate for the whole set.
@@ -307,7 +318,8 @@ async function main() {
     `# Agent evaluation ${stamp} (KST)`,
     "",
     ...(only.length > 0 ? [`**Partial run** of ${only.length} case(s), not the whole set.`, ""] : []),
-    `- Model: \`${modelId}\` on ${backend === "vertex" ? "Vertex AI" : "the Gemini API"}, thinking level \`${thinking}\`, default temperature`,
+    `- Model: \`${modelId}\` on ${BACKEND_NAMES[backend]}, thinking level \`${thinking}\`, default temperature`,
+    `- Model calls answered: Gemini API ${served.api}, Vertex AI ${served.vertex}`,
     `- Date: ${summary.date}; eval clock 14:00 KST; cases from \`evals/agent-cases.json\` (written by the KIBO team, not an external benchmark)`,
     `- Overall: **${passed}/${results.length} (${pct(passed, results.length || 1)})**`,
     `- Latency per request (${latency.requests} requests): median ${latency.totalMedianMs} ms, p90 ${latency.totalP90Ms} ms`,
