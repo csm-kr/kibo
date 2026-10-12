@@ -211,6 +211,89 @@ test("P3: voice gives way to text when it is busy", async ({ page, request }, in
   await check(page, info, "P3-voice-fallback");
 });
 
+test("P3: noise hint, voice reconnecting, then text after the retries fail", async ({ page, request }, info) => {
+  // A fake Live socket the test can talk through and drop; the first token comes at once, later ones wait.
+  let socket: { send(m: string): void; close(): void } | null = null;
+  let release = () => {};
+  const held = new Promise<void>((r) => (release = r));
+  let tokens = 0;
+  await page.route("**/api/live-token", async (route) => {
+    tokens++;
+    if (tokens === 1) {
+      return route.fulfill({
+        json: { ok: true, token: "fake", model: "gemini-3.8-live", expiresAt: Date.now() + 180_000, voiceSeconds: 600 },
+      });
+    }
+    await held;
+    await route.fulfill({ status: 500, json: { ok: false, error: { code: "INTERNAL", message: "Something went wrong." } } });
+  });
+  await page.routeWebSocket(/generativelanguage\.googleapis\.com/, (ws) => {
+    let setup = false;
+    ws.onMessage(() => {
+      if (setup) return;
+      setup = true;
+      socket = ws;
+      ws.send(JSON.stringify({ setupComplete: {} }));
+    });
+  });
+
+  await openPhone(page, request);
+  await page.getByRole("button", { name: "Start" }).click();
+  await page.getByRole("button", { name: "Type instead" }).click();
+  await page.getByRole("button", { name: "Eat here" }).click();
+  await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
+  await micButton(page).click();
+  await expect(micButton(page)).toHaveAttribute("data-voice-state", "listening");
+
+  // UX "Noise": two heard turns in a row that run no tool.
+  for (let i = 0; i < 2; i++) {
+    socket!.send(JSON.stringify({ serverContent: { inputTranscription: { text: "mm hmm" } } }));
+    socket!.send(JSON.stringify({ serverContent: { outputTranscription: { text: "Sorry, could you say that again?" } } }));
+    socket!.send(JSON.stringify({ serverContent: { turnComplete: true } }));
+  }
+  await expect(page.getByText("Having trouble? Try typing or tapping a button.")).toBeVisible();
+  await check(page, info, "P3-voice-noise");
+
+  // PX: the Live socket drops; the phone fetches a new token and says so on the mic button.
+  socket!.close();
+  await expect(micButton(page)).toHaveAttribute("data-voice-state", "reconnecting");
+  await checkMicButton(page, /Reconnecting…/);
+  await check(page, info, "P3-voice-reconnecting");
+
+  // Two failed retries: text takes over with a plain reason and the input focused.
+  release();
+  await expect(page.getByText("Voice isn't working right now. Please type instead.")).toBeVisible();
+  await expect(micButton(page)).toHaveAttribute("data-voice-state", "error");
+  await expect(page.getByRole("textbox", { name: "Type your order" })).toBeFocused();
+  await check(page, info, "P3-voice-failed");
+});
+
+test("PX: the session stream drops, and the same phone continues after a reload", async ({ page, request, baseURL }, info) => {
+  const s = await openPhone(page, request);
+  await page.getByRole("button", { name: "Start" }).click();
+  await page.getByRole("button", { name: "Type instead" }).click();
+  await page.getByRole("button", { name: "Eat here" }).click();
+  await s.phone("addToCart", cheeseSet("cider"), { utteranceSeq: 1 });
+  await expect(page.getByRole("region", { name: "Your order" }).locator("li")).toHaveCount(1);
+
+  // From now on the stream sends one snapshot and ends, with a long retry, so EventSource stays "connecting".
+  await page.route("**/api/session/*/events", async (route) => {
+    const ctrl = new AbortController();
+    const res = await fetch(new URL(new URL(route.request().url()).pathname, baseURL), { signal: ctrl.signal });
+    const reader = res.body!.getReader();
+    let text = "";
+    while (!text.includes("\n\n")) text += new TextDecoder().decode((await reader.read()).value);
+    ctrl.abort();
+    await route.fulfill({ contentType: "text/event-stream", body: `retry: 3600000\n${text.slice(0, text.indexOf("\n\n") + 2)}` });
+  });
+  // "Phone screen off / disconnected": reopening on the same phone keeps the token, the screen and the cart.
+  await page.reload();
+  await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
+  await expect(page.getByRole("region", { name: "Your order" }).locator("li")).toHaveCount(1);
+  await expect(page.getByRole("status").filter({ hasText: "Reconnecting…" })).toBeVisible();
+  await check(page, info, "PX-reconnecting", [VIEWPORTS[0], VIEWPORTS[3]]);
+});
+
 test("P1 in an in-app browser: copy the link or order here by typing", async ({ browser, request }, info) => {
   const ctx = await browser.newContext({
     viewport: VIEWPORTS[0],
