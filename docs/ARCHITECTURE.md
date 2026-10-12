@@ -7,7 +7,7 @@ src/
 │   ├── kiosk/            # MALO BURGER kiosk simulator (portrait)
 │   ├── assistant/        # phone UI opened from the QR
 │   ├── demo/             # judge mode: kiosk + assistant side by side
-│   ├── learned/          # static learned kiosks (doughhouse, gureum) + bridge script
+│   ├── learned/          # /learned/<kioskId>: the learned kiosk page (public/learned-kiosks/, unchanged) in a same-origin iframe + KIBO widget; the bridge drives it
 │   └── api/
 │       ├── session/      # create session, claim QR token; [id]/events = SSE stream of the session
 │       ├── command/      # every state change (AI tools, phone buttons, kiosk touch)
@@ -22,6 +22,7 @@ src/
 │   ├── store/            # SessionStore interface: FirestoreStore (production), MemoryStore (tests, local E2E)
 │   ├── session/          # create, claim, run command, ping: store transaction + state machine
 │   ├── adapters/         # KioskAdapter: DirectAdapter (MALO), LearnedAdapter (skill + bridge)
+│   ├── bridge/           # browser bridge for learned kiosks: tappable labels, recipe replay, total and line checks
 │   └── limits/           # per-session, per-day and per-IP limits
 └── types/
 data/kiosks/malo.json     # direct-adapter menu with option groups and upsell rules

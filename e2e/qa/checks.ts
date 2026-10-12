@@ -22,6 +22,8 @@ export const KIOSK: Profile = { route: "/kiosk", root: "[data-kiosk-canvas]", ca
 export const PHONE: Profile = { route: "/assistant", root: "body", minFont: 16, minTarget: 56 };
 /** /demo: the intro, or the phone column of the split. The kiosk half is the scaled canvas, measured at full size by KIOSK. */
 export const DEMO: Profile = { route: "/demo", root: "[data-demo-check]", minFont: 16, minTarget: 56 };
+/** /learned/<kiosk>: KIBO's corner widget only; the learned kiosk page in the iframe is third-party and unchanged. */
+export const LEARNED: Profile = { route: "/learned", root: "[data-learned-widget]", minFont: 16, minTarget: 56 };
 /** The root landing page `/`, judged by the phone numbers (a judge may open it on either device). */
 export const HOME: Profile = { route: "/", root: "body", minFont: 16, minTarget: 56 };
 

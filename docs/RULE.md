@@ -37,3 +37,8 @@ When an issue class in `docs/ISSUE.md` is seen for the **3rd time**, it becomes 
 - From: `checker-false-positive` — I-061 (seen 10-13/3-assistant:3), I-075 (10-13/3-assistant:6, 10-13/5-ship:3)
 - Why: false positives from `e2e/qa/checks.ts` (screen-reader-only text, `auto` margins) come back on every run, and unexplained T noise hides the real misses.
 - Check: in `phases/<phase>/qa/REPORT.md`, every kind of T miss in `ui-qa.jsonl` on a changed screen is either a real miss with an issue id or a false positive with an issue id (`grep checker-false-positive docs/ISSUE.md`).
+
+### R-005 (proposed): Every Playwright spec that calls the API sends its own `X-Forwarded-For` address
+- From: `shared-rate-limit` — I-068 (seen 10-13/3-assistant:4, 10-13/5-ship:1, 10-13/6-learn:2)
+- Why: all specs share the dev server's per-IP limits (60 API requests and 10 new sessions a minute), so a new spec passes alone and fails the full run, or makes another spec fail.
+- Check: `grep -L "X-Forwarded-For" e2e/*.spec.ts e2e/qa/*.qa.spec.ts` lists only specs that make few API calls; a new spec picks an unused `192.0.2.x` (`grep -rn "192.0.2" e2e/`).

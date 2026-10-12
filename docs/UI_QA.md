@@ -132,6 +132,8 @@ Until then the `qa` step checks the angles from code and the prototype and says 
 
 **Demo (10-13, 3-assistant:4):** `e2e/qa/demo.qa.spec.ts` checks D1, D2 (empty, AI highlight, confirm card, payment) and D3 at 1440×900, 1280×720 and 1920×1080, plus no page scroll. Profile `DEMO` measures the intro and the phone column (`[data-demo-check]`); the scaled kiosk half is judged on the screenshots, its sizes are checked at full size by the kiosk spec. The root page `/` has its own spec since 5-ship:1: `e2e/qa/landing.qa.spec.ts` (profile `HOME`) at 1440×900, 1280×720, 390×844 and 320×700 with reflow, one check and screenshot per section (`data-landing-section`), because the target checks only measure what is on screen. Its pictures are real captures from `npm run shots:landing` (`scripts/landing-shots.ts`, in-memory store, no model calls) in `public/landing/`.
 
+**Learned kiosk (10-13, 6-learn:2):** `e2e/qa/learned.qa.spec.ts` checks `/learned/doughhouse` (QR, then an item the bridge entered) at 1440×900, 1280×720 and 1920×1080. Profile `LEARNED` measures only KIBO's widget (`[data-learned-widget]`); the learned kiosk page in the iframe is third-party and unchanged, so it is judged on the screenshots.
+
 **What the script checks:**
 - **axe-core** (H) with the WCAG 2.0/2.1/2.2 A and AA tags, with `target-size` turned on explicitly (off by default). Contrast results marked "incomplete" (text over images) go to human review.
 - **Computed styles:** minimum font size per route and every interactive element's box ≥ the route's target size and ≥ 8px from its neighbor (H); body line-height ≥ 1.5, margins, paddings and gaps on the 4/8 scale, radius, font family and weight from the tokens, ≤ 4 font sizes per screen, transitions ≤ 500ms unless allowlisted (T).
