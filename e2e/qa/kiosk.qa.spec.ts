@@ -6,7 +6,12 @@ import { KIOSK, qaShot, qaState, type Findings } from "./checks";
 // reached through the real UI and the API, never by mocking components. H failures fail the run; T misses only
 // with QA_ALL=1.
 
-test.use({ viewport: { width: 1080, height: 1920 } });
+test.use({
+  viewport: { width: 1080, height: 1920 },
+  // Its own address for the dev server's per-IP limits (10 new sessions a minute), shared with the assistant spec
+  // that runs just before it otherwise (docs/ISSUE.md I-068).
+  extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.12" },
+});
 
 const STRICT = process.env.QA_ALL === "1";
 
