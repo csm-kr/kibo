@@ -1,0 +1,5 @@
+blind-sol2 #1 PASS {"kioskShows":9400,"answerKey":9400,"skillPredicts":9400,"ms":781}
+blind-sol2 #2 NOT EXPRESSIBLE (catalog lacks: 샷 추가)
+blind-sol2 #3 FAIL {"answerKey":6700,"error":"locator.click: Timeout 3000ms exceeded."}
+blind-sol2 #4 PASS {"kioskShows":10900,"answerKey":10900,"skillPredicts":10900,"ms":747}
+blind-sol2 #5 NOT EXPRESSIBLE (catalog lacks: 샷 추가)

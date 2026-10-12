@@ -1,0 +1,34 @@
+# secrets
+.env
+.env.*
+
+# not for the public hackathon repo
+photo-moments*.mp4
+videos/moments/
+plan.md
+
+node_modules/
+.next/
+out/
+
+# Harness tooling adapted from github.com/jha0313/harness_framework (no license file, written
+# before the hackathon). Local dev tool only; kept out of the public repo per the fresh-code rule.
+scripts/execute.py
+scripts/test_execute.py
+.claude/commands/harness.md
+.claude/commands/review.md
+
+# harness run outputs
+phases/**/phase*-output.json
+phases/**/step*-output.json
+
+# from create-next-app
+/coverage
+.DS_Store
+*.pem
+npm-debug.log*
+*.tsbuildinfo
+next-env.d.ts
+
+.pytest_cache/
+__pycache__/

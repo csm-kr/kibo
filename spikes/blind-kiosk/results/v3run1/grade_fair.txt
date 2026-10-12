@@ -1,0 +1,8 @@
+{"openableItemsWithOptions": 29, "exact": 22}
+diff: 유자차 | missing [('ICED', 0)] | extra []
+diff: 페퍼민트 티 | missing [] | extra [('ICED', 0)]
+diff: 레몬에이드 | missing [('라지', 700), ('레귤러', 0)] | extra [('강하게', 0)]
+diff: 자몽에이드 | missing [('라지', 700), ('레귤러', 0)] | extra [('강하게', 0)]
+diff: 청포도에이드 | missing [('라지', 700), ('레귤러', 0)] | extra [('강하게', 0)]
+diff: 딸기 요거트 스무디 | missing [('많이올려주세요', 500), ('빼주세요', 0), ('올려주세요', 0)] | extra []
+diff: 플레인 베이글 | missing [('크림치즈추가', 1000)] | extra []

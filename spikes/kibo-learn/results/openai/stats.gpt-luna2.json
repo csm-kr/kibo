@@ -1,0 +1,12 @@
+{
+  "provider": "openai",
+  "model": "gpt-6-luna",
+  "cachedInputTokens": 72737,
+  "finished": true,
+  "turns": 36,
+  "acts": 18,
+  "tests": 2,
+  "inputTokens": 139269,
+  "outputTokens": 8151,
+  "minutes": "2.0"
+}

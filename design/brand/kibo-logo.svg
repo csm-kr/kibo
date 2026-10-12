@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 236 64" width="236" height="64" role="img" aria-label="KIBO">
+  <rect x="26" y="6" width="30" height="46" rx="7" fill="none" stroke="#15171C" stroke-width="4.5"/>
+  <line x1="41" y1="52" x2="41" y2="59" stroke="#15171C" stroke-width="4.5" stroke-linecap="round"/>
+  <line x1="33" y1="59" x2="49" y2="59" stroke="#15171C" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M6 14a8 8 0 0 1 8-8h18a8 8 0 0 1 8 8v12a8 8 0 0 1-8 8H17l-7 6v-6.6A8 8 0 0 1 6 26z" fill="#3446D4"/>
+  <rect x="14" y="16" width="3.6" height="8" rx="1.8" fill="#FFFFFF"/>
+  <rect x="20.2" y="12.5" width="3.6" height="15" rx="1.8" fill="#FFFFFF"/>
+  <rect x="26.4" y="15" width="3.6" height="10" rx="1.8" fill="#FFFFFF"/>
+  <!-- wordmark drawn as paths so it renders the same without any font installed -->
+  <g fill="#15171C">
+    <path d="M74 12h8.5v16.2L96.6 12h10.2L92.4 28.2 107.6 52H97.4L86.6 34.6l-4.1 4.5V52H74z"/>
+    <path d="M113 12h8.5v40H113z"/>
+    <path d="M129 12h16.6c8.4 0 13 3.9 13 10.1 0 4-2.1 6.8-5.5 8 4.3 1 7 4.3 7 8.9 0 6.7-5 13-14.3 13H129zm8.5 6.9v9.3h7.2c3.4 0 5.4-1.6 5.4-4.7s-2-4.6-5.4-4.6zm0 15.6v10.6h8.4c3.7 0 5.8-1.9 5.8-5.3 0-3.4-2.1-5.3-5.8-5.3z"/>
+    <path d="M187.2 11.2c11.6 0 20.2 8.7 20.2 20.8S198.8 52.8 187.2 52.8 167 44.1 167 32s8.6-20.8 20.2-20.8zm0 7.7c-6.7 0-11.5 5.4-11.5 13.1s4.8 13.1 11.5 13.1 11.5-5.4 11.5-13.1-4.8-13.1-11.5-13.1z"/>
+  </g>
+  <circle cx="218" cy="48" r="4" fill="#3446D4"/>
+</svg>

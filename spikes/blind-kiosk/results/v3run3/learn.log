@@ -1,0 +1,260 @@
+#1 act {"label":"구름다락 커피","op":"click"}
+#2 act {"op":"click","label":"매장"}
+#3 act {"label":"밤 크림 라떼","op":"click"}
+#4 act {"op":"click","label":"취소"}
+#5 act {"op":"click","label":"홍시 스무디"}
+#6 act {"op":"click","label":"취소"}
+#7 act {"label":"애플 시나몬 티","op":"click"}
+#8 act {"label":"취소","op":"click"}
+#9 act {"op":"click","label":"커피"}
+#10 act {"op":"click","label":"›"}
+#11 act {"label":"커피","op":"click"}
+#12 act {"label":"아메리카노","op":"click"}
+#13 act {"role":"button","op":"click","name":"+"}
+#14 act {"label":"+","op":"click"}
+#15 act {"text":"에스프레소 샷 추가","op":"click"}
+#16 act {"text":"+","op":"click"}
+#17 act {"role":"button","op":"click","name":"샷 추가"}
+#18 act {"label":"취소","op":"click"}
+#19 act {"op":"click","label":"아메리카노"}
+#20 act {"label":"HOT","op":"click"}
+#21 act {"label":"레귤러","op":"click"}
+#22 act {"label":"다락 블렌드","op":"click"}
+#23 act {"op":"click","label":"장바구니 담기"}
+#24 act {"op":"click","label":"아메리카노"}
+#25 act {"op":"click","label":"HOT"}
+#26 act {"op":"click","label":"레귤러"}
+#27 act {"label":"다락 블렌드","op":"click"}
+#28 act {"op":"click","label":"장바구니 담기"}
+#29 act {"op":"click","name":"수량 증가","role":"button"}
+#30 act {"op":"click","name":"샷","role":"button"}
+#31 act {"label":"아메리카노","op":"click"}
+#32 act {"op":"click","name":"수량","role":"button"}
+#33 testSkill 
+  test #1: FAIL
+#34 testSkill 
+  test #2: PASS
+#35 act {"label":"취소","op":"click"}
+#36 act {"op":"click","label":"전체 취소"}
+#37 act {"label":"삭제","op":"click"}
+#38 act {"op":"click","label":"아메리카노"}
+#39 act {"op":"click","label":"취소"}
+#40 act {"op":"click","label":"베이커리·디저트"}
+#41 act {"op":"click","label":"버터 크루아상"}
+#42 act {"label":"취소","op":"click"}
+#43 act {"op":"click","label":"커피"}
+#44 act {"op":"click","label":"아메리카노"}
+#45 act undefined
+#46 act {"exact":true,"text":"+","op":"click"}
+#47 act {"op":"click","label":"+"}
+#48 act {"label":"+\"]:nth-of-type(2)","op":"click"}
+#49 act {"op":"click","label":"+\"][class*=\""}
+#50 act {"label":"취소","op":"click"}
+#51 act {"label":"세트","op":"click"}
+#52 act {"op":"click","label":"브런치 세트"}
+#53 act {"op":"click","label":"아메리카노"}
+#54 act {"op":"click","label":"HOT"}
+#55 act {"label":"다음","op":"click"}
+#56 act {"label":"✕","op":"click"}
+#57 act {"label":"베이커리·디저트","op":"click"}
+#58 act {"op":"click","label":"초코칩 쿠키"}
+#59 act {"label":"주문하기","op":"click"}
+#60 act {"label":"결제하기","op":"click"}
+#61 reload 
+#62 act {"op":"click","label":"구름다락 커피"}
+#63 act {"label":"매장","op":"click"}
+#64 act {"label":"밤 크림 라떼","op":"click"}
+#65 act {"op":"invalid"}
+#66 act {"op":"click","exact":true,"text":""}
+#67 act {"op":"check","label":"+"}
+#68 act {"role":"spinbutton","op":"click"}
+#69 act {"exact":true,"op":"click","text":"0"}
+#70 act {"label":"취소","op":"click"}
+#71 act {"op":"click","label":"홍시 스무디"}
+#72 act {"op":"click","label":"HOT"}
+#73 act {"op":"click","label":"+"}
+#74 act {"label":"취소","op":"click"}
+#75 act {"op":"click","label":"애플 시나몬 티"}
+#76 act {"op":"click","label":"취소"}
+#77 act {"label":"논커피","op":"click"}
+#78 act {"label":"초코라떼","op":"click"}
+#79 act {"label":"취소","op":"click"}
+#80 act {"op":"click","label":"녹차라떼"}
+#81 act {"label":"취소","op":"click"}
+#82 act {"op":"click","label":"딸기우유"}
+#83 act {"label":"HOT","op":"click"}
+#84 act {"label":"취소","op":"click"}
+#85 act {"label":"티","op":"click"}
+#86 act {"label":"얼그레이 티","op":"click"}
+#87 act {"label":"취소","op":"click"}
+#88 act {"label":"캐모마일 티","op":"click"}
+#89 act {"op":"click","label":"취소"}
+#90 act {"op":"click","label":"유자차"}
+#91 act {"label":"ICED","op":"click"}
+#92 act {"op":"click","label":"HOT"}
+#93 act {"op":"click","label":"취소"}
+#94 act {"op":"click","label":"페퍼민트 티"}
+#95 act {"label":"취소","op":"click"}
+#96 act {"label":"에이드·스무디","op":"click"}
+#97 act {"op":"click","label":"레몬에이드"}
+#98 act {"op":"click","label":"HOT"}
+#99 act {"label":"취소","op":"click"}
+#100 act {"op":"click","label":"딸기 요거트 스무디"}
+#101 act {"op":"click","label":"취소"}
+#102 act {"op":"click","label":"망고 스무디"}
+#103 act {"label":"취소","op":"click"}
+#104 act {"op":"click","label":"베이커리·디저트"}
+#105 act {"op":"click","label":"플레인 베이글"}
+#106 act {"label":"취소","op":"click"}
+#107 act {"op":"click","label":"초코 머핀"}
+#108 act {"label":"취소","op":"click"}
+#109 act {"label":"뉴욕 치즈케이크","op":"click"}
+#110 act {"label":"✕","op":"click"}
+#111 act {"op":"click","label":"티라미수"}
+#112 act {"op":"click","label":"✕"}
+#113 act {"label":"마카롱 (3개입)","op":"click"}
+#114 act {"op":"click","label":"✕"}
+#115 act {"op":"click","label":"세트"}
+#116 act {"label":"브런치 세트","op":"click"}
+#117 act {"label":"카페라떼","op":"click"}
+#118 act {"op":"click","label":"HOT"}
+#119 act {"op":"click","label":"다음"}
+#120 act {"label":"✕","op":"click"}
+#121 act {"label":"케이크 세트","op":"click"}
+#122 act {"label":"아메리카노","op":"click"}
+#123 act {"label":"HOT","op":"click"}
+#124 act {"label":"다음","op":"click"}
+#125 act {"op":"click","label":"✕"}
+#126 act {"op":"click","label":"투게더 세트"}
+#127 act {"label":"✕","op":"click"}
+#128 act {"op":"click","label":"커피"}
+#129 act {"op":"click","label":"카페라떼"}
+#130 act {"label":"취소","op":"click"}
+#131 act {"op":"click","label":"바닐라라떼"}
+#132 act {"op":"click","label":"취소"}
+#133 act {"op":"click","label":"카라멜 마키아토"}
+#134 act {"label":"취소","op":"click"}
+#135 act {"label":"카푸치노","op":"click"}
+#136 act {"op":"click","label":"ICED"}
+#137 act {"label":"취소","op":"click"}
+#138 act {"label":"콜드브루","op":"click"}
+#139 act {"op":"click","label":"취소"}
+#140 act {"op":"click","label":"콜드브루 라떼"}
+#141 act {"label":"취소","op":"click"}
+#142 act {"label":"›","op":"click"}
+#143 act {"label":"카페모카","op":"click"}
+#144 act {"op":"click","label":"취소"}
+#145 act {"op":"click","label":"에스프레소"}
+#146 act {"op":"click","label":"취소"}
+#147 act {"label":"연유라떼","op":"click"}
+#148 act {"op":"click","label":"취소"}
+#149 act {"op":"click","label":"헤이즐넛 아메리카노"}
+#150 act {"op":"click","label":"취소"}
+#151 act {"op":"click","label":"베이커리·디저트"}
+#152 act {"op":"click","label":"초코칩 쿠키"}
+#153 act {"op":"click","label":"초코칩 쿠키"}
+#154 act {"label":"+\" >> nth=1 >> [data-x=\"","op":"click"}
+#155 act {"label":"+\"] >> nth=1, [data-none=\"","op":"click"}
+#156 reload 
+#157 act {"label":"구름다락 커피","op":"click"}
+#158 act {"op":"click","label":"매장"}
+#159 act {"label":"밤 크림 라떼","op":"click"}
+#160 act {"label":"HOT","op":"click"}
+#161 act {"op":"click","label":"레귤러"}
+#162 act {"op":"click","label":"다락 블렌드"}
+#163 act {"label":"일반 우유","op":"click"}
+#164 act {"op":"click","label":"올려주세요"}
+#165 act {"label":"장바구니 담기","op":"click"}
+#166 act {"op":"click","label":"주문하기"}
+#167 act {"op":"click","label":"주문 계속하기"}
+#168 act {"label":"이전","op":"click"}
+#169 act {"op":"click","label":"전체 취소"}
+#170 act {"op":"click","label":"삭제"}
+#171 act {"op":"click","label":"커피"}
+#172 act {"op":"click","label":"아메리카노"}
+#173 testSkill 
+  test #3: PASS
+#174 testSkill 
+  test #4: FAIL
+#175 testSkill 
+  test #5: PASS
+#176 act {"op":"click","label":"취소"}
+#177 act {"op":"click","label":"세트"}
+#178 act {"op":"click","label":"투게더 세트"}
+#179 act {"op":"click","label":"아메리카노"}
+#180 act {"label":"HOT","op":"click"}
+#181 act {"label":"다음","op":"click"}
+#182 act {"op":"click","label":"카페라떼"}
+#183 act {"op":"click","label":"HOT"}
+#184 act {"op":"click","label":"다음"}
+#185 act {"op":"click","label":"✕"}
+#186 act {"op":"click","label":"밤 크림 라떼"}
+#187 act {"label":"시즌 한정","op":"click"}
+#188 act {"label":"밤 크림 라떼","op":"click"}
+#189 act {"label":"취소","op":"click"}
+#190 act {"op":"click","label":"홍시 스무디"}
+#191 act {"label":"취소","op":"click"}
+#192 act {"label":"애플 시나몬 티","op":"click"}
+#193 act {"op":"click","label":"취소"}
+#194 act {"op":"click","label":"커피"}
+#195 act {"op":"click","label":"카페라떼"}
+#196 act {"op":"click","label":"취소"}
+#197 act {"op":"click","label":"바닐라라떼"}
+#198 act {"label":"취소","op":"click"}
+#199 act {"op":"click","label":"카라멜 마키아토"}
+#200 act {"label":"취소","op":"click"}
+#201 act {"label":"카푸치노","op":"click"}
+#202 act {"label":"취소","op":"click"}
+#203 act {"op":"click","label":"콜드브루"}
+#204 act {"label":"취소","op":"click"}
+#205 act {"op":"click","label":"콜드브루 라떼"}
+#206 act {"op":"click","label":"취소"}
+#207 act {"label":"›","op":"click"}
+#208 act {"op":"click","label":"카페모카"}
+#209 act {"label":"취소","op":"click"}
+#210 act {"label":"에스프레소","op":"click"}
+#211 act {"label":"취소","op":"click"}
+#212 act {"label":"연유라떼","op":"click"}
+#213 act {"op":"click","label":"취소"}
+#214 act {"label":"헤이즐넛 아메리카노","op":"click"}
+#215 act {"label":"취소","op":"click"}
+#216 act {"label":"에이드·스무디","op":"click"}
+#217 act {"op":"click","label":"자몽에이드"}
+#218 act {"op":"click","label":"취소"}
+#219 act {"op":"click","label":"청포도에이드"}
+#220 act {"label":"취소","op":"click"}
+#221 act {"label":"세트","op":"click"}
+#222 testSkill 
+  test #6: FAIL
+#223 reload 
+#224 act {"label":"구름다락 커피","op":"click"}
+#225 act {"op":"click","label":"매장"}
+#226 act {"op":"click","label":"세트"}
+#227 act {"op":"click","label":"브런치 세트"}
+#228 act {"label":"아메리카노","op":"click"}
+#229 act {"label":"다음","op":"click"}
+#230 act {"op":"click","label":"HOT"}
+#231 act {"op":"click","label":"다음"}
+#232 testSkill 
+  test #7: FAIL
+#233 act {"op":"click","label":"버터 크루아상"}
+#234 act {"label":"데워주세요","op":"click"}
+#235 act {"label":"장바구니 담기","op":"click"}
+#236 testSkill 
+  test #8: PASS
+#237 reload 
+#238 act {"op":"click","label":"구름다락 커피"}
+#239 act {"label":"매장","op":"click"}
+#240 act {"label":"세트","op":"click"}
+#241 act {"op":"click","label":"투게더 세트"}
+#242 act {"label":"아메리카노","op":"click"}
+#243 act {"op":"click","label":"HOT"}
+#244 act {"op":"click","label":"다음"}
+#245 act {"op":"click","label":"카페라떼"}
+#246 act {"label":"ICED","op":"click"}
+#247 act {"op":"click","label":"다음"}
+#248 act {"op":"click","label":"✕"}
+#249 act {"label":"케이크 세트","op":"click"}
+#250 act {"label":"아메리카노","op":"click"}
+{"model":"gemini-3.8-flash","finished":false,"turns":250,"acts":238,"tests":8,"inputTokens":6791102,"outputTokens":12566,"minutes":"14.6"}
+EXIT 0

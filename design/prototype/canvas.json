@@ -1,0 +1,1 @@
+{"v": 3, "createdOnFiles": {"v": 1, "at": "2026-10-11T15:30:00Z"}, "title": "KIBO E2E Prototype", "launch": {"view": "focused", "file": "Main.dc.html"}, "pages": [], "boards": {"Main.dc.html": {"x": 0, "y": 0, "w": 1640, "h": 1160, "title": "KIBO E2E: real kiosk flow + voice", "is_interactive": true, "radius": 12}}, "order": ["Main.dc.html"], "notes": {}, "designSystems": []}

@@ -1,0 +1,5 @@
+blind-sol #1 PASS {"kioskShows":9400,"answerKey":9400,"skillPredicts":9400,"ms":698}
+blind-sol #2 NOT EXPRESSIBLE (catalog lacks: 샷 추가)
+blind-sol #3 NOT EXPRESSIBLE (catalog lacks: 카페라떼, ICED, 버터 크루아상, 데워주세요)
+blind-sol #4 NOT EXPRESSIBLE (catalog lacks: 데워주세요, 크림치즈 추가, 그대로 주세요)
+blind-sol #5 NOT EXPRESSIBLE (catalog lacks: 샷 추가, 아메리카노, HOT, 바닐라라떼, ICED, 티라미수)

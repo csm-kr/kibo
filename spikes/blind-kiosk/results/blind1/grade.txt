@@ -1,0 +1,11 @@
+{"items": 40, "found": 37, "price": 37, "category": 37, "soldOut": 36, "optionItems": 32, "optionItemsExact": 3}
+missing: ['브런치 세트', '케이크 세트', '투게더 세트']
+extra: []
+options mismatch: 밤 크림 라떼 | missing [('많이', 0), ('보통', 0), ('적게', 0)] | extra []
+options mismatch: 홍시 스무디 | missing [('HOT', 0)] | extra []
+options mismatch: 애플 시나몬 티 | missing [('많이', 0), ('보통', 0), ('적게', 0)] | extra []
+options mismatch: 아메리카노 | missing [('많이', 0), ('보통', 0), ('적게', 0)] | extra []
+options mismatch: 카페라떼 | missing [('많이', 0), ('보통', 0), ('적게', 0)] | extra []
+options mismatch: 바닐라라떼 | missing [('많이', 0), ('보통', 0), ('적게', 0)] | extra []
+options mismatch: 카라멜 마키아토 | missing [('많이', 0), ('보통', 0), ('적게', 0)] | extra []
+options mismatch: 카푸치노 | missing [('ICED', 0)] | extra []

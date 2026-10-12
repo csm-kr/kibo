@@ -1,0 +1,9 @@
+{"openableItemsWithOptions": 29, "exact": 21}
+diff: 연유라떼 | missing [] | extra [('바닐라시럽', 500), ('스테비아(저당)', 300), ('카라멜시럽', 500), ('헤이즐넛시럽', 500)]
+diff: 헤이즐넛 아메리카노 | missing [('바닐라시럽', 500), ('스테비아(저당)', 300), ('카라멜시럽', 500), ('헤이즐넛시럽', 500)] | extra []
+diff: 페퍼민트 티 | missing [('꿀추가', 500)] | extra [('ICED', 0)]
+diff: 레몬에이드 | missing [('ICED', 0)] | extra []
+diff: 자몽에이드 | missing [('ICED', 0)] | extra []
+diff: 청포도에이드 | missing [('ICED', 0)] | extra []
+diff: 딸기 요거트 스무디 | missing [('ICED', 0), ('많이올려주세요', 500), ('빼주세요', 0), ('올려주세요', 0)] | extra []
+diff: 망고 스무디 | missing [('ICED', 0)] | extra []

@@ -1,0 +1,10 @@
+{
+  "model": "gemini-3.8-flash",
+  "finished": true,
+  "turns": 220,
+  "acts": 211,
+  "tests": 6,
+  "inputTokens": 5297868,
+  "outputTokens": 45300,
+  "minutes": "15.1"
+}

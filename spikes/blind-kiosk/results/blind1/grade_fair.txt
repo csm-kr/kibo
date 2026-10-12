@@ -1,0 +1,2 @@
+{"openableItemsWithOptions": 29, "exact": 28}
+diff: 녹차라떼 | missing [] | extra [('많이올려주세요', 500), ('빼주세요', 0), ('올려주세요', 0)]

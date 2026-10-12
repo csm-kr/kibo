@@ -1,0 +1,10 @@
+v3run1 #1 PASS {"kioskShows":9400,"answerKey":9400,"skillPredicts":9400,"ms":3712}
+v3run1 #2 NOT EXPRESSIBLE (catalog lacks: 샷 추가)
+v3run1 #3 PASS {"kioskShows":6700,"answerKey":6700,"skillPredicts":6700,"ms":1327}
+v3run1 #4 NOT EXPRESSIBLE (catalog lacks: 크림치즈 추가)
+v3run1 #5 NOT EXPRESSIBLE (catalog lacks: 샷 추가)
+v3run2 #1 PASS {"kioskShows":9400,"answerKey":9400,"skillPredicts":9400,"ms":1250}
+v3run2 #2 NOT EXPRESSIBLE (catalog lacks: 샷 추가)
+v3run2 #3 PASS {"kioskShows":6700,"answerKey":6700,"skillPredicts":6700,"ms":711}
+v3run2 #4 PASS {"kioskShows":10900,"answerKey":10900,"skillPredicts":10900,"ms":820}
+v3run2 #5 NOT EXPRESSIBLE (catalog lacks: 샷 추가)

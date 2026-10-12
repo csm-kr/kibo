@@ -1,0 +1,163 @@
+#1 snapshot 
+#2 act {"op":"click","label":"구름다락 커피","role":"","name":"","text":"","exact":true}
+#3 act {"op":"click","label":"매장","role":"","name":"","text":"","exact":true}
+#4 record 
+#5 act {"op":"click","label":"밤 크림 라떼","role":"","name":"","text":"","exact":true}
+#6 record 
+#7 act {"op":"click","label":"","role":"button","name":"+","text":"","exact":true}
+#8 act {"op":"click","label":"+","role":"","name":"","text":"","exact":true}
+#9 act {"op":"click","label":"","role":"","name":"","text":"수량","exact":false}
+#10 act {"op":"click","label":"장바구니 담기","role":"","name":"","text":"","exact":true}
+#11 record 
+#12 act {"op":"click","label":"확인","role":"","name":"","text":"","exact":true}
+#13 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#14 act {"op":"click","label":"홍시 스무디","role":"","name":"","text":"","exact":true}
+#15 record 
+#16 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#17 act {"op":"click","label":"애플 시나몬 티","role":"","name":"","text":"","exact":true}
+#18 record 
+#19 act {"op":"click","label":"HOT","role":"","name":"","text":"","exact":true}
+#20 act {"op":"click","label":"장바구니 담기","role":"","name":"","text":"","exact":true}
+#21 act {"op":"click","label":"커피","role":"","name":"","text":"","exact":true}
+#22 act {"op":"click","label":"아메리카노","role":"","name":"","text":"","exact":true}
+#23 record 
+#24 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#25 act {"op":"click","label":"카페라떼","role":"","name":"","text":"","exact":true}
+#26 record 
+#27 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#28 act {"op":"click","label":"바닐라라떼","role":"","name":"","text":"","exact":true}
+#29 record 
+#30 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#31 act {"op":"click","label":"카라멜 마키아토","role":"","name":"","text":"","exact":true}
+#32 record 
+#33 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#34 act {"op":"click","label":"카푸치노","role":"","name":"","text":"","exact":true}
+#35 record 
+#36 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#37 act {"op":"click","label":"콜드브루","role":"","name":"","text":"","exact":true}
+#38 record 
+#39 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#40 act {"op":"click","label":"콜드브루 라떼","role":"","name":"","text":"","exact":true}
+#41 record 
+#42 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#43 act {"op":"click","label":"SOLD OUT","role":"","name":"","text":"","exact":true}
+#44 record 
+#45 act {"op":"click","label":"›","role":"","name":"","text":"","exact":true}
+#46 record 
+#47 act {"op":"click","label":"카페모카","role":"","name":"","text":"","exact":true}
+#48 record 
+#49 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#50 act {"op":"click","label":"에스프레소","role":"","name":"","text":"","exact":true}
+#51 record 
+#52 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#53 act {"op":"click","label":"연유라떼","role":"","name":"","text":"","exact":true}
+#54 record 
+#55 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#56 act {"op":"click","label":"헤이즐넛 아메리카노","role":"","name":"","text":"","exact":true}
+#57 record 
+#58 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#59 act {"op":"click","label":"논커피","role":"","name":"","text":"","exact":true}
+#60 act {"op":"click","label":"초코라떼","role":"","name":"","text":"","exact":true}
+#61 record 
+#62 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#63 act {"op":"click","label":"녹차라떼","role":"","name":"","text":"","exact":true}
+#64 record 
+#65 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#66 act {"op":"click","label":"SOLD OUT","role":"","name":"","text":"","exact":true}
+#67 record 
+#68 act {"op":"click","label":"딸기우유","role":"","name":"","text":"","exact":true}
+#69 record 
+#70 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#71 act {"op":"click","label":"티","role":"","name":"","text":"","exact":true}
+#72 act {"op":"click","label":"얼그레이 티","role":"","name":"","text":"","exact":true}
+#73 record 
+#74 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#75 act {"op":"click","label":"캐모마일 티","role":"","name":"","text":"","exact":true}
+#76 record 
+#77 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#78 act {"op":"click","label":"유자차","role":"","name":"","text":"","exact":true}
+#79 record 
+#80 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#81 records 
+#82 testSkill 
+  test #1: PASS PASS FAIL
+#84 snapshot 
+#85 act {"op":"click","label":"페퍼민트 티","role":"","name":"","text":"","exact":true}
+#86 record 
+#87 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#88 act {"op":"click","label":"에이드·스무디","role":"","name":"","text":"","exact":true}
+#89 act {"op":"click","label":"레몬에이드","role":"","name":"","text":"","exact":true}
+#90 record 
+#91 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#92 act {"op":"click","label":"자몽에이드","role":"","name":"","text":"","exact":true}
+#93 record 
+#94 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#95 act {"op":"click","label":"청포도에이드","role":"","name":"","text":"","exact":true}
+#96 record 
+#97 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#98 act {"op":"click","label":"딸기 요거트 스무디","role":"","name":"","text":"","exact":true}
+#99 record 
+#100 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#101 act {"op":"click","label":"망고 스무디","role":"","name":"","text":"","exact":true}
+#102 record 
+#103 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#104 act {"op":"click","label":"베이커리·디저트","role":"","name":"","text":"","exact":true}
+#105 act {"op":"click","label":"버터 크루아상","role":"","name":"","text":"","exact":true}
+#106 record 
+#107 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#108 act {"op":"click","label":"플레인 베이글","role":"","name":"","text":"","exact":true}
+#109 record 
+#110 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#111 act {"op":"click","label":"SOLD OUT","role":"","name":"","text":"","exact":true}
+#112 record 
+#113 act {"op":"click","label":"초코 머핀","role":"","name":"","text":"","exact":true}
+#114 record 
+#115 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#116 act {"op":"click","label":"뉴욕 치즈케이크","role":"","name":"","text":"","exact":true}
+#117 record 
+#118 act {"op":"click","label":"티라미수","role":"","name":"","text":"","exact":true}
+#119 record 
+#120 act {"op":"click","label":"마카롱 (3개입)","role":"","name":"","text":"","exact":true}
+#121 record 
+#122 act {"op":"click","label":"초코칩 쿠키","role":"","name":"","text":"","exact":true}
+#123 record 
+#124 act {"op":"click","label":"세트","role":"","name":"","text":"","exact":true}
+#125 act {"op":"click","label":"브런치 세트","role":"","name":"","text":"","exact":true}
+#126 act {"op":"click","label":"카페라떼","role":"","name":"","text":"","exact":true}
+#127 act {"op":"click","label":"ICED","role":"","name":"","text":"","exact":true}
+#128 act {"op":"click","label":"다음","role":"","name":"","text":"","exact":true}
+#129 act {"op":"click","label":"플레인 베이글","role":"","name":"","text":"","exact":true}
+#130 record 
+#131 act {"op":"click","label":"데워주세요","role":"","name":"","text":"","exact":true}
+#132 act {"op":"click","label":"장바구니 담기","role":"","name":"","text":"","exact":true}
+#133 act {"op":"click","label":"케이크 세트","role":"","name":"","text":"","exact":true}
+#134 act {"op":"click","label":"바닐라라떼","role":"","name":"","text":"","exact":true}
+#135 act {"op":"click","label":"HOT","role":"","name":"","text":"","exact":true}
+#136 act {"op":"click","label":"다음","role":"","name":"","text":"","exact":true}
+#137 record 
+#138 act {"op":"click","label":"이전","role":"","name":"","text":"","exact":true}
+#139 act {"op":"click","label":"취소","role":"","name":"","text":"","exact":true}
+#140 act {"op":"click","label":"투게더 세트","role":"","name":"","text":"","exact":true}
+#141 act {"op":"click","label":"카페라떼","role":"","name":"","text":"","exact":true}
+#142 act {"op":"click","label":"ICED","role":"","name":"","text":"","exact":true}
+#143 act {"op":"click","label":"다음","role":"","name":"","text":"","exact":true}
+#144 act {"op":"click","label":"아메리카노","role":"","name":"","text":"","exact":true}
+#145 act {"op":"click","label":"HOT","role":"","name":"","text":"","exact":true}
+#146 act {"op":"click","label":"다음","role":"","name":"","text":"","exact":true}
+#147 record 
+#148 act {"op":"click","label":"티라미수","role":"","name":"","text":"","exact":true}
+#149 act {"op":"click","label":"장바구니 담기","role":"","name":"","text":"","exact":true}
+#150 act {"op":"click","label":"준비중","role":"","name":"","text":"","exact":true}
+#151 record 
+#152 record 
+#153 act {"op":"click","label":"확인","role":"","name":"","text":"","exact":true}
+#154 act {"op":"click","label":"주문하기","role":"","name":"","text":"","exact":true}
+#155 act {"op":"click","label":"결제하기","role":"","name":"","text":"","exact":true}
+#156 record 
+#157 testSkill 
+  test #2: PASS PASS PASS
+#158 audit 
+  audit #1: OK missing=0 unknown=0 hidden=0
+#159 finish 
+  finish audit: OK
+{"provider":"openai","model":"gpt-6.1-sol","cachedInputTokens":1030197,"finished":true,"turns":159,"acts":106,"tests":2,"inputTokens":2932197,"outputTokens":46755,"minutes":"16.1"}

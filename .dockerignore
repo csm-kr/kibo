@@ -1,0 +1,13 @@
+node_modules
+.next
+.git
+.env
+.env.*
+plan.md
+spikes
+design
+videos
+scripts
+.claude
+docs
+*.mp4

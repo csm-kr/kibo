@@ -1,0 +1,11 @@
+{"items": 40, "found": 23, "price": 23, "category": 23, "soldOut": 23, "optionItems": 23, "optionItemsExact": 5}
+missing: ['레몬에이드', '자몽에이드', '청포도에이드', '딸기 요거트 스무디', '망고 스무디', '버터 크루아상', '플레인 베이글', '소금빵', '초코 머핀', '뉴욕 치즈케이크', '티라미수', '마카롱 (3개입)', '초코칩 쿠키', '브런치 세트', '케이크 세트', '투게더 세트', '모닝 세트']
+extra: []
+options mismatch: 밤 크림 라떼 | missing [('많이', 0), ('보통', 0), ('적게', 0)] | extra [('+', 500)]
+options mismatch: 애플 시나몬 티 | missing [('많이', 0), ('보통', 0), ('적게', 0)] | extra []
+options mismatch: 아메리카노 | missing [('많이', 0), ('보통', 0), ('적게', 0)] | extra [('+', 500)]
+options mismatch: 카페라떼 | missing [('많이', 0), ('보통', 0), ('적게', 0)] | extra [('+', 500)]
+options mismatch: 바닐라라떼 | missing [('많이', 0), ('보통', 0), ('적게', 0)] | extra [('+', 500)]
+options mismatch: 카라멜 마키아토 | missing [('많이', 0), ('보통', 0), ('적게', 0)] | extra [('+', 500)]
+options mismatch: 카푸치노 | missing [] | extra [('+', 500)]
+options mismatch: 아인슈페너 | missing [('HOT', 0), ('ICED', 0), ('다락블렌드', 0), ('디카페인', 500)] | extra []

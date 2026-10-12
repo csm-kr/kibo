@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="KIBO">
+  <!-- kiosk: a tall rounded screen on a short stand -->
+  <rect x="26" y="6" width="30" height="46" rx="7" fill="none" stroke="#15171C" stroke-width="4.5"/>
+  <line x1="41" y1="52" x2="41" y2="59" stroke="#15171C" stroke-width="4.5" stroke-linecap="round"/>
+  <line x1="33" y1="59" x2="49" y2="59" stroke="#15171C" stroke-width="4.5" stroke-linecap="round"/>
+  <!-- voice: a speech bubble crossing onto the kiosk screen -->
+  <path d="M6 14a8 8 0 0 1 8-8h18a8 8 0 0 1 8 8v12a8 8 0 0 1-8 8H17l-7 6v-6.6A8 8 0 0 1 6 26z" fill="#3446D4"/>
+  <rect x="14" y="16" width="3.6" height="8" rx="1.8" fill="#FFFFFF"/>
+  <rect x="20.2" y="12.5" width="3.6" height="15" rx="1.8" fill="#FFFFFF"/>
+  <rect x="26.4" y="15" width="3.6" height="10" rx="1.8" fill="#FFFFFF"/>
+</svg>

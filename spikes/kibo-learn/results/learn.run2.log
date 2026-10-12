@@ -1,0 +1,76 @@
+#1 act {"op":"click","label":"주문하기"}
+#2 act {"label":"화면을 터치하여 주문을 시작하세요","op":"click"}
+#3 act {"label":"🍽 먹고 갈게요","op":"click"}
+#4 act {"label":"마르게리따","op":"click"}
+#5 act {"op":"click","label":"닫기"}
+#6 act {"op":"click","label":"사이드"}
+#7 act {"label":"치즈 오븐 스파게티","op":"click"}
+#8 act {"label":"닫기","op":"click"}
+#9 act {"label":"갈릭디핑소스","op":"click"}
+#10 act {"op":"click","label":"닫기"}
+#11 act {"label":"버팔로 윙 6조각","op":"click"}
+#12 act {"op":"click","label":"닫기"}
+#13 act {"label":"음료","op":"click"}
+#14 act {"label":"콜라","op":"click"}
+#15 act {"label":"장바구니 담기","op":"click"}
+#16 act {"name":"1.25L","op":"click"}
+#17 act {"role":"radio","op":"click","name":"1.25L"}
+#18 act {"name":"500ml","op":"clickIfVisible","role":"checkbox"}
+#19 act {"role":"radio","name":"500ml","op":"clickIfVisible"}
+#20 act {"op":"click","label":"장바구니 담기"}
+#21 reload 
+#22 act {"op":"click","label":"화면을 터치하여 주문을 시작하세요"}
+#23 act {"label":"🍽 먹고 갈게요","op":"click"}
+#24 act {"label":"마르게리따","op":"click"}
+#25 act {"label":"닫기","op":"click"}
+#26 act {"label":"페퍼로니","op":"click"}
+#27 act {"op":"click","label":"닫기"}
+#28 act {"label":"불고기 피자","op":"click"}
+#29 act {"label":"닫기","op":"click"}
+#30 act {"op":"click","label":"포테이토 피자"}
+#31 act {"op":"click","label":"사이드"}
+#32 act {"label":"치즈 오븐 스파게티","op":"click"}
+#33 act {"op":"click","label":"닫기"}
+#34 act {"label":"음료","op":"click"}
+#35 act {"label":"제로콜라","op":"click"}
+#36 act {"op":"click","label":"닫기"}
+#37 act {"label":"사이다","op":"click"}
+#38 act {"op":"click","label":"닫기"}
+#39 act {"op":"click","label":"사이드"}
+#40 act {"label":"치즈 오븐 스파게티","op":"click"}
+#41 act {"op":"click","label":"장바구니 담기"}
+#42 act {"op":"click","label":"주문하기"}
+#43 reload 
+#44 act {"op":"click","label":"화면을 터치하여 주문을 시작하세요"}
+#45 act {"label":"🍽 먹고 갈게요","op":"click"}
+#46 act {"label":"마르게리따","op":"click"}
+#47 act {"op":"click","name":"레귤러","role":"radio"}
+#48 act {"name":"오리지널","op":"click","role":"radio"}
+#49 act {"op":"click","label":"장바구니 담기"}
+#50 act {"label":"아니요, 괜찮아요","op":"clickIfVisible"}
+#51 act {"label":"주문하기","op":"click"}
+#52 reload 
+#53 act {"label":"화면을 터치하여 주문을 시작하세요","op":"click"}
+#54 act {"op":"click","label":"🍽 먹고 갈게요"}
+#55 act {"label":"불고기 피자","op":"click"}
+#56 act {"label":"닫기","op":"click"}
+#57 act {"op":"click","label":"사이드"}
+#58 act {"op":"click","label":"음료"}
+#59 act {"label":"음료","op":"click"}
+#60 act {"op":"click","label":"피자"}
+#61 act {"label":"마르게리따","op":"click"}
+#62 act {"role":"radio","name":"레귤러","op":"clickIfVisible"}
+#63 act {"name":"씬","op":"clickIfVisible","role":"radio"}
+#64 act {"op":"click","label":"장바구니 담기"}
+#65 act {"label":"아니요, 괜찮아요","op":"clickIfVisible"}
+#66 act {"op":"click","label":"페퍼로니"}
+#67 act {"name":"레귤러","op":"clickIfVisible","role":"radio"}
+#68 act {"role":"radio","op":"clickIfVisible","name":"오리지널"}
+#69 act {"op":"click","label":"장바구니 담기"}
+#70 testSkill 
+  test #1: PASS PASS PASS
+#71 testSkill 
+  test #2: PASS
+#72 finish 
+{"model":"gemini-3.8-flash","finished":true,"turns":72,"acts":66,"tests":2,"inputTokens":635725,"outputTokens":10063,"minutes":"5.5"}
+EXIT 0

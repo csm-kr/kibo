@@ -1,0 +1,12 @@
+{
+  "provider": "openai",
+  "model": "gpt-6.1-sol",
+  "cachedInputTokens": 62671,
+  "finished": true,
+  "turns": 44,
+  "acts": 29,
+  "tests": 1,
+  "inputTokens": 180780,
+  "outputTokens": 6292,
+  "minutes": "3.1"
+}
