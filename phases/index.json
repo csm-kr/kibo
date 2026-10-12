@@ -1,5 +1,28 @@
 {
   "phases": [
-    { "dir": "1-core", "status": "pending" }
+    {
+      "dir": "1-core",
+      "status": "pending"
+    },
+    {
+      "dir": "2-kiosk",
+      "status": "pending"
+    },
+    {
+      "dir": "3-assistant",
+      "status": "pending"
+    },
+    {
+      "dir": "4-voice",
+      "status": "pending"
+    },
+    {
+      "dir": "5-ship",
+      "status": "pending"
+    },
+    {
+      "dir": "6-learn",
+      "status": "pending"
+    }
   ]
 }
