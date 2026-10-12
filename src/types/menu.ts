@@ -61,6 +61,8 @@ export interface KioskTheme {
   primaryTint: string;
   accent: string;
   background: string;
+  /** Category rail, toolbar and quiet panels; absent: the shared cream panel #F3EEE4. */
+  panel?: string;
 }
 
 /** One recipe step for the learned-kiosk bridge. String fields may hold `{placeholders}`. */
@@ -108,6 +110,8 @@ export interface KioskData {
   kind: "direct" | "learned";
   domain: KioskDomain;
   brand: { name: LocalizedName; tagline: LocalizedName };
+  /** K1 attract picture: a photo, or an SVG drawn on the theme tint; absent shows the tint alone. */
+  hero?: string;
   theme: KioskTheme;
   /** The kiosk screen's default language. */
   locale: Locale;

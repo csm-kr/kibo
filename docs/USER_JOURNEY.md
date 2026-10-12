@@ -45,7 +45,7 @@ journey
 |---|---|---|---|
 | Connect | "Is this in my language?" | Phone shows Korean | Phone UI and voice follow the browser language |
 | Ask | "Can I trust what it says about food?" | AI guesses about halal or allergens | Answers only from menu data; otherwise calls staff (exception "Not in kiosk data") |
-| Order | "Which drink did I get?" | Names only in Korean | `name.en` on the phone; kiosk stays Korean and the 2 s highlight shows where |
+| Order | "Which drink did I get?" | Names only in Korean | `name.en` on the phone; the kiosk starts in Korean (it has an English button on K1, but Mei never needs it) and the 2 s highlight shows where |
 | Pay | "Where do I put the card?" | Kiosk payment text is Korean | Phone says "Insert your card into the kiosk" with an arrow (A9) |
 
 ## J3. Judge on `/demo`, laptop, about 3 minutes

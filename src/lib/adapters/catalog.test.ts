@@ -87,6 +87,7 @@ describe.each(allKioskIds())("kiosk %s (generic checks)", (id) => {
   it("points every image at a file under public/", () => {
     const paths = [...k.categories.map((c) => c.icon)];
     if (k.dineOptions) paths.push(k.dineOptions.eat_in.image, k.dineOptions.take_out.image);
+    if (k.hero) paths.push(k.hero);
     for (const item of k.items) {
       paths.push(item.image);
       for (const g of item.optionGroups) {
@@ -161,7 +162,9 @@ describe("kioskSchema (domain model)", () => {
   });
 
   it("defaults locales to Korean only and rejects other languages", () => {
-    expect(kioskSchema.parse(raw).locales).toEqual(["ko"]);
+    const noLocales = structuredClone(raw) as Record<string, unknown>;
+    delete noLocales.locales;
+    expect(kioskSchema.parse(noLocales).locales).toEqual(["ko"]);
     expect(kioskSchema.safeParse({ ...ticketRaw(), locales: ["ko", "ja"] }).success).toBe(false);
   });
 
@@ -405,6 +408,14 @@ describe("airport_rail.json", () => {
     ];
     for (const [fg, bg] of pairs) expect(contrast(fg, bg), `${fg} on ${bg}`).toBeGreaterThanOrEqual(4.5);
     expect(luminance(background)).toBeGreaterThan(0.8);
+  });
+
+  it("has a cool panel color that keeps rail and toolbar text readable", () => {
+    const panel = rail.theme.panel ?? "";
+    // Category rail, toolbar and secondary text sit on the panel (src/components/kiosk).
+    for (const fg of [rail.theme.primaryDark, "#33302B", "#4B463F", "#1E1B18"]) {
+      expect(contrast(fg, panel), `${fg} on ${panel}`).toBeGreaterThanOrEqual(4.5);
+    }
   });
 
   it("names no real airport, line, station, operator or transit card", () => {

@@ -1,13 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { useMemo, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { useQrSrc } from "@/hooks/useQrSrc";
 import { ApiError, sendCommand, type CommandReply } from "@/lib/client/api";
 import type { ErrorDetail } from "@/lib/commands/errors";
 import type { CommandType } from "@/lib/commands/schemas";
 import { errorCopy, type ScreenErrorCode } from "@/lib/i18n/errors";
-import { kt } from "@/lib/i18n/kiosk";
+import { kt, languageName } from "@/lib/i18n/kiosk";
 import { kioskScreen } from "@/lib/kiosk/screen";
 import type { KioskData, Locale } from "@/types/menu";
 import type { DineOption, Session } from "@/types/session";
@@ -17,6 +17,7 @@ import { KioskBanners } from "./KioskBanners";
 import { MenuScreen } from "./MenuScreen";
 import { PaymentScreen } from "./PaymentScreen";
 import { ReviewScreen } from "./ReviewScreen";
+import { KioskImage } from "./KioskImage";
 import { FOCUS } from "./styles";
 
 // All sizes are 1080x1920 canvas px (docs/UI_GUIDE.md). Text uses the k-text-* utilities (>= 40px).
@@ -40,9 +41,18 @@ interface Props {
 }
 
 export function KioskScreen(props: Props) {
-  const { kiosk, session, kioskToken, claimUrl, demo, clockOffset, onNewSession, onClaimUrl } = props;
-  const locale = kiosk.locale;
+  const { session, kioskToken, claimUrl, demo, clockOffset, onNewSession, onClaimUrl } = props;
   const sessionId = session?.sessionId ?? null;
+  // The language row on K1 picks the screen language for this order; a new session starts in the kiosk's default.
+  const [lang, setLang] = useState<{ forId: string | null; locale: Locale }>({ forId: null, locale: props.kiosk.locale });
+  // A choice made before the first session arrived belongs to that session.
+  if (lang.forId === null && sessionId !== null) setLang({ forId: sessionId, locale: lang.locale });
+  const locale = lang.forId === sessionId || lang.forId === null ? lang.locale : props.kiosk.locale;
+  // Every screen reads kiosk.locale, so the kiosk passed down carries the chosen language.
+  const kiosk = useMemo(
+    () => (locale === props.kiosk.locale ? props.kiosk : { ...props.kiosk, locale }),
+    [props.kiosk, locale],
+  );
   // Keyed by session, so a new session starts without the previous one's touch start.
   const [touch, setTouch] = useState<{ forId: string | null; started: boolean }>({ forId: null, started: false });
   const [large, setLarge] = useState(false);
@@ -55,7 +65,7 @@ export function KioskScreen(props: Props) {
   });
 
   const touchStarted = touch.forId === sessionId && touch.started;
-  const screen = kioskScreen(session, { touchStarted });
+  const screen = kioskScreen(session, { touchStarted }, kiosk);
 
   /** Sends a touch command; on failure shows the error copy and returns null. */
   async function send(type: CommandType, args: object, opts?: { cartVersion?: number }): Promise<CommandReply | null> {
@@ -99,6 +109,7 @@ export function KioskScreen(props: Props) {
     <div
       className="relative flex h-full flex-col"
       style={style}
+      lang={locale}
       data-screen={screen}
       data-demo={demo || undefined}
       onPointerDownCapture={countTap}
@@ -109,6 +120,7 @@ export function KioskScreen(props: Props) {
           claimUrl={claimUrl}
           canStart={Boolean(session && kioskToken)}
           large={large}
+          onLocale={(l: Locale) => setLang({ forId: sessionId, locale: l })}
           onTouch={startTouch}
           onLarge={() => setLarge((v) => !v)}
         />
@@ -217,31 +229,32 @@ function Attract(props: {
   claimUrl: string | null;
   canStart: boolean;
   large: boolean;
+  onLocale(locale: Locale): void;
   onTouch(): void;
   onLarge(): void;
 }) {
   const { kiosk, claimUrl, canStart, large } = props;
-  const locale: Locale = kiosk.locale;
+  const { locale, domain } = kiosk;
   const qrSrc = useQrSrc(claimUrl);
 
   return (
     <>
       <Header kiosk={kiosk} />
-      <div className="relative min-h-0 flex-1">
-        <Image src="/menu/hero.jpg" alt="" fill sizes="1080px" preload className="object-cover" />
+      <div className="relative min-h-0 flex-1 bg-(--k-primary-tint)">
+        {kiosk.hero && <KioskImage src={kiosk.hero} sizes="1080px" inset="p-12" preload />}
       </div>
       <h1 className="k-text-72 flex-none px-16 pt-12 pb-10 font-bold text-(--k-primary-dark)">
         {kiosk.brand.tagline[locale]}
       </h1>
       <div className="grid flex-none grid-cols-2 gap-8 px-12">
         <div className="flex flex-col items-center gap-6 rounded-[32px] border-[6px] border-(--k-primary) bg-white p-8 text-center">
-          <h2 className="k-text-48 font-bold text-(--k-primary)">{kt("talkTitle", locale)}</h2>
+          <h2 className="k-text-48 font-bold text-(--k-primary)">{kt("talkTitle", locale, domain)}</h2>
           {qrSrc && claimUrl ? (
             // A data URL, so next/image would add nothing.
             // eslint-disable-next-line @next/next/no-img-element
             <img src={qrSrc} alt={kt("qrAlt", locale)} data-claim-url={claimUrl} width={380} height={380} className="size-95" />
           ) : (
-            <p className="k-text-40 flex size-95 items-center justify-center rounded-[24px] bg-[#F3EEE4] p-8 text-[#4B463F]">
+            <p className="k-text-40 flex size-95 items-center justify-center rounded-[24px] bg-(--k-panel) p-8 text-[#4B463F]">
               {kt("qrLoading", locale)}
             </p>
           )}
@@ -258,27 +271,31 @@ function Attract(props: {
             <path d="M12 10V4.5a1.5 1.5 0 0 1 3 0V11" />
             <path d="M15 10.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1a6 6 0 0 1-5-2.7L3.5 14a1.5 1.5 0 0 1 2.4-1.8L9 15" />
           </svg>
-          <span className="k-text-48 font-bold">{kt("touchTitle", locale)}</span>
+          <span className="k-text-48 font-bold">{kt("touchTitle", locale, domain)}</span>
           <span className="k-text-40 text-(--k-primary-tint)">{kt("touchHint", locale)}</span>
         </button>
       </div>
       <div className="flex flex-none flex-wrap items-center justify-between gap-4 px-12 py-10">
-        <div role="group" aria-label={kt("language", locale)} className="flex gap-4">
-          <button
-            type="button"
-            aria-pressed
-            className={`k-text-40 min-h-22 rounded-[24px] bg-[#1E1B18] px-8 font-bold text-white ${FOCUS}`}
-          >
-            {kt("langKo", locale)}
-          </button>
-          <button
-            type="button"
-            disabled
-            className="k-text-40 min-h-22 rounded-[24px] bg-[#F3EEE4] px-8 text-[#4B463F]"
-          >
-            {kt("langEn", locale)} · {kt("comingSoon", locale)}
-          </button>
-        </div>
+        {kiosk.locales.length > 1 ? (
+          <div role="group" aria-label={kt("language", locale)} className="flex gap-4">
+            {kiosk.locales.map((l) => (
+              <button
+                key={l}
+                type="button"
+                lang={l}
+                aria-pressed={l === locale}
+                onClick={() => props.onLocale(l)}
+                className={`k-text-40 min-h-22 rounded-[24px] border-4 border-[#1E1B18] px-8 font-bold ${
+                  l === locale ? "bg-[#1E1B18] text-white" : "bg-white"
+                } ${FOCUS}`}
+              >
+                {languageName(l)}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <span />
+        )}
         <button
           type="button"
           aria-pressed={large}

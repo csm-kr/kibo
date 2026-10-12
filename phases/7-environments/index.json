@@ -29,7 +29,10 @@
     {
       "step": 3,
       "name": "kiosk-generalize",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-13T05:20:06+0900",
+      "summary": "One set of kiosk components driven by data. kioskScreen(session, local, kiosk) skips K2 when the kiosk has no dineOptions. KioskScreen holds the K1 language (한국어/English buttons for kiosk.locales, keyed by session so a new session resets to kiosk.locale) and passes children a kiosk copy with that locale, so every screen still reads kiosk.locale; root gets lang. src/lib/i18n/kiosk.ts: KIOSK_TEXT exported (comingSoon/langKo/langEn removed), TICKET_TEXT overrides for domain ticket (구매하기/Buy, 승차권 수/Tickets, 매진, 참조 번호/Reference number, 승차권을 받아 가세요/Please take your tickets, no 메뉴 anywhere), kt(key, locale, domain='food'), languageName(). menu.ts: formatWon(n, locale) 4,900원 / ₩4,900, formatFrom (5,500원부터 / from ₩5,500), lowestPrice(item) (tile shows 'from' only when a passenger option is cheaper than variants[0]), sheetSteps(..., domain) for the qty label. New KioskImage: photos cover, SVG pictograms contain on --k-primary-tint (unoptimized). Tiles: subtitle line, kcal only when not null; K4 shows signed deltas (−5,500원), add button = vocabularyOf(kiosk).add; cart bar aria-label = vocabulary.cart; review hides the dine row without dineOptions. Data: optional hero (malo /menu/hero.jpg; rail public/kiosks/airport_rail/hero.svg plane+skyline+train), optional theme.panel → --k-panel replacing hard-coded #F3EEE4 in kiosk components (rail #E4EBF4, default cream so MALO unchanged, I-110); malo locales [ko,en]. Tests: screen (no dine), menu (price per locale, lowestPrice, ticket steps), i18n/kiosk.test.ts (ko+en, no Hangul in en, ticket never says menu), catalog (hero path, panel contrast); e2e/kiosk-rail.spec.ts (rail touch flow 22,720원 to reference number; MALO English set to English review; XFF 192.0.2.24); kiosk.qa.spec.ts adds rail K1/K3/K4 passenger/K6 and MALO K1/K3 English (XFF 192.0.2.25), 0 H. Docs: I-019 fixed, I-109 (age range wraps at en dash, open), I-110; ARCHITECTURE schema, PRD Languages, USER_JOURNEY J2, UX, UI_GUIDE. lint, build, 627 unit, e2e 9 passed/5 skipped, qa:ui 18 passed; evidence/*.json restored (I-099).",
+      "completed_at": "2026-10-13T05:50:00+0900"
     },
     {
       "step": 4,

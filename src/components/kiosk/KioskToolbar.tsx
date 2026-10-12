@@ -21,7 +21,7 @@ export function KioskToolbar(props: {
   onClaimUrl(claimUrl: string): void;
 }) {
   const { kiosk, session } = props;
-  const locale = kiosk.locale;
+  const { locale, domain } = kiosk;
   const [qrOpen, setQrOpen] = useState(false);
   // The server refuses a new QR once payment has started.
   const canReissue = session.status !== "paying" && session.status !== "paid";
@@ -35,7 +35,7 @@ export function KioskToolbar(props: {
   }
 
   return (
-    <div className="flex h-28 flex-none items-center justify-between gap-6 bg-[#F3EEE4] px-12">
+    <div className="flex h-28 flex-none items-center justify-between gap-6 bg-(--k-panel) px-12">
       {session.dineOption ? (
         <span className="k-text-40 rounded-full bg-(--k-primary) px-8 py-2 font-bold text-white">
           {kt(session.dineOption === "eat_in" ? "dineChip" : "takeOutChip", locale)}
@@ -60,7 +60,7 @@ export function KioskToolbar(props: {
           )}
         </div>
       ) : (
-        <SmallQrButton claimUrl={props.claimUrl} label={kt("openQr", locale)} onOpen={() => setQrOpen(true)} />
+        <SmallQrButton claimUrl={props.claimUrl} label={kt("openQr", locale, domain)} onOpen={() => setQrOpen(true)} />
       )}
       {qrOpen && <QrSheet kiosk={kiosk} claimUrl={props.claimUrl} onClose={() => setQrOpen(false)} />}
     </div>
@@ -98,7 +98,7 @@ function SmallQrButton(props: { claimUrl: string | null; label: string; onOpen()
 }
 
 function QrSheet(props: { kiosk: KioskData; claimUrl: string | null; onClose(): void }) {
-  const locale = props.kiosk.locale;
+  const { locale, domain } = props.kiosk;
   const src = useQrSrc(props.claimUrl);
   return (
     <ModalLayer className={`${SCRIM} flex items-center justify-center p-12`} onClick={props.onClose}>
@@ -117,11 +117,11 @@ function QrSheet(props: { kiosk: KioskData; claimUrl: string | null; onClose(): 
           // eslint-disable-next-line @next/next/no-img-element
           <img src={src} alt={kt("qrAlt", locale)} data-claim-url={props.claimUrl} width={600} height={600} className="size-150" />
         ) : (
-          <p className="k-text-40 flex size-150 items-center justify-center rounded-[32px] bg-[#F3EEE4] p-8 text-[#4B463F]">
+          <p className="k-text-40 flex size-150 items-center justify-center rounded-[32px] bg-(--k-panel) p-8 text-[#4B463F]">
             {kt("qrLoading", locale)}
           </p>
         )}
-        <p className="k-text-40 text-[#4B463F]">{kt("qrSheetHint", locale)}</p>
+        <p className="k-text-40 text-[#4B463F]">{kt("qrSheetHint", locale, domain)}</p>
         <button
           type="button"
           onClick={props.onClose}

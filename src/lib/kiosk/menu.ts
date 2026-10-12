@@ -1,13 +1,36 @@
 import { findItem, findOption, groupsFor } from "@/lib/adapters/catalog";
 import { unitPriceOf } from "@/lib/commands/cart";
 import { kt, variantWord } from "@/lib/i18n/kiosk";
-import type { KioskData, Locale, MenuItem, OptionGroup, Variant } from "@/types/menu";
+import type { KioskData, KioskDomain, Locale, MenuItem, OptionGroup, Variant } from "@/types/menu";
 import type { CartLine } from "@/types/session";
 
 // Pure helpers for the kiosk menu (K3) and product sheet (K4). Names and prices come only from menu data.
 
-export function formatWon(n: number): string {
-  return `${n.toLocaleString("en-US")}원`;
+/** "4,900원" in Korean, "₩4,900" in English. */
+export function formatWon(n: number, locale: Locale): string {
+  const digits = n.toLocaleString("en-US");
+  return locale === "ko" ? `${digits}원` : `₩${digits}`;
+}
+
+/** "5,500원부터" / "from ₩5,500": the lowest price an option allows (a child fare). */
+export function formatFrom(n: number, locale: Locale): string {
+  return locale === "ko" ? `${formatWon(n, locale)}부터` : `from ${formatWon(n, locale)}`;
+}
+
+/**
+ * The cheapest unit price of the first variant (the one a tile shows): each group's `min` cheapest options,
+ * plus any further discounts up to `max`. Equal to the variant price when no option is negative.
+ */
+export function lowestPrice(item: MenuItem): number {
+  const { variant, price } = item.variants[0];
+  let lowest = price;
+  for (const g of groupsFor(item, variant)) {
+    const deltas = g.options.filter((o) => !o.soldOut).map((o) => o.priceDelta).sort((a, b) => a - b);
+    deltas.slice(0, g.max).forEach((d, i) => {
+      if (i < g.min || d < 0) lowest += d;
+    });
+  }
+  return lowest;
 }
 
 /** "치즈버거 세트" and "감자튀김 M · 제로콜라 · 피클 빼기": groups in menu order, options in menu order. */
@@ -43,11 +66,11 @@ function sheetGroups(item: MenuItem, variant: Variant | null): OptionGroup[] {
  * K4 steps: the variant (only when there are several), then one step per option group in menu order
  * (side, drink, ingredients). The last step also holds the quantity; an item with no choices gets a quantity step.
  */
-export function sheetSteps(item: MenuItem, variant: Variant | null, locale: Locale): SheetStep[] {
+export function sheetSteps(item: MenuItem, variant: Variant | null, locale: Locale, domain: KioskDomain = "food"): SheetStep[] {
   const steps: Omit<SheetStep, "index" | "count">[] = [];
   if (item.variants.length > 1) steps.push({ kind: "variant", label: kt("stepVariant", locale) });
   for (const g of sheetGroups(item, variant)) steps.push({ kind: "group", groupId: g.groupId, label: g.name[locale] });
-  if (steps.length === 0) steps.push({ kind: "qty", label: kt("stepQty", locale) });
+  if (steps.length === 0) steps.push({ kind: "qty", label: kt("stepQty", locale, domain) });
   return steps.map((s, i) => ({ ...s, index: i + 1, count: steps.length }));
 }
 

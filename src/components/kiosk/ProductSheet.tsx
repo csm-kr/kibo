@@ -1,12 +1,13 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
+import { vocabularyOf } from "@/lib/adapters/catalog";
 import { MAX_QTY } from "@/lib/commands/cart";
 import { kt, stepLabel, variantWord } from "@/lib/i18n/kiosk";
 import { draftSelections, formatWon, sheetPrice, sheetSteps, type SheetDraft } from "@/lib/kiosk/menu";
-import type { KioskData, MenuItem, MenuOption, Variant } from "@/types/menu";
+import type { KioskData, Locale, MenuItem, MenuOption, Variant } from "@/types/menu";
 import type { LineInput } from "@/types/session";
+import { KioskImage } from "./KioskImage";
 import { ModalLayer } from "./ModalLayer";
 import { FOCUS, SCRIM } from "./styles";
 
@@ -33,11 +34,11 @@ export function ProductSheet(props: {
   onAdd(input: Required<LineInput>, unitPrice: number): void;
 }) {
   const { kiosk, item } = props;
-  const locale = kiosk.locale;
+  const { locale, domain } = kiosk;
   const [draft, setDraft] = useState(() => initialDraft(item));
   const [stepIndex, setStepIndex] = useState(0);
 
-  const steps = sheetSteps(item, draft.variant, locale);
+  const steps = sheetSteps(item, draft.variant, locale, domain);
   const step = steps[Math.min(stepIndex, steps.length - 1)];
   const isLast = step.index === steps.length;
   const group = step.groupId ? item.optionGroups.find((g) => g.groupId === step.groupId) : undefined;
@@ -81,7 +82,7 @@ export function ProductSheet(props: {
       >
         <div className="flex flex-none items-center gap-8 border-b-4 border-[#E2DACB] px-12 pt-12 pb-8">
           <span className="relative size-50 flex-none overflow-hidden rounded-[32px] bg-white">
-            <Image src={item.image} alt="" fill sizes="200px" className="object-cover" />
+            <KioskImage src={item.image} sizes="200px" />
           </span>
           <div className="min-w-0 flex-1">
             <h2 id={titleId} className="k-text-56 font-bold">
@@ -92,7 +93,7 @@ export function ProductSheet(props: {
           <button
             type="button"
             onClick={props.onClose}
-            className={`k-text-40 min-h-22 flex-none self-start rounded-full bg-[#F3EEE4] px-8 font-bold ${FOCUS}`}
+            className={`k-text-40 min-h-22 flex-none self-start rounded-full bg-(--k-panel) px-8 font-bold ${FOCUS}`}
           >
             {kt("close", locale)}
           </button>
@@ -108,7 +109,7 @@ export function ProductSheet(props: {
                     key={v.variant}
                     selected={draft.variant === v.variant}
                     name={variantWord(v.variant, locale)}
-                    sub={formatWon(v.price)}
+                    sub={formatWon(v.price, locale)}
                     locale={locale}
                     onPick={() => pickVariant(v.variant)}
                   />
@@ -140,7 +141,7 @@ export function ProductSheet(props: {
                       soldOut={o.soldOut}
                       image={o.image}
                       name={o.name[locale]}
-                      sub={o.priceDelta > 0 ? `+${formatWon(o.priceDelta)}` : undefined}
+                      sub={signedDelta(o.priceDelta, locale)}
                       locale={locale}
                       onPick={() => toggleOption(o)}
                     />
@@ -151,7 +152,7 @@ export function ProductSheet(props: {
           )}
           {isLast && (
             <div className="mt-10 flex items-center justify-between rounded-[32px] bg-white p-8">
-              <span className="k-text-48 font-bold">{kt("quantity", locale)}</span>
+              <span className="k-text-48 font-bold">{kt("quantity", locale, domain)}</span>
               <div className="flex items-center gap-8">
                 <button
                   type="button"
@@ -189,19 +190,25 @@ export function ProductSheet(props: {
               {kt("back", locale)}
             </button>
           )}
-          <span className="k-text-56 flex-1 text-right font-display font-bold text-(--k-primary)">{formatWon(price)}</span>
+          <span className="k-text-56 flex-1 text-right font-display font-bold text-(--k-primary)">{formatWon(price, locale)}</span>
           <button
             type="button"
             disabled={!canGoOn}
             onClick={isLast ? add : () => setStepIndex((i) => i + 1)}
             className={`k-text-48 min-h-32 min-w-80 rounded-full bg-(--k-accent) px-12 font-bold text-[#1E1B18] disabled:bg-[#E2DACB] disabled:text-[#4B463F] ${FOCUS}`}
           >
-            {isLast ? kt("addToCart", locale) : kt("next", locale)}
+            {isLast ? vocabularyOf(kiosk).add[locale] : kt("next", locale)}
           </button>
         </div>
       </section>
     </ModalLayer>
   );
+}
+
+/** "+500원" for a surcharge, "−5,500원" for a discount (a child fare), nothing when the price stays. */
+function signedDelta(delta: number, locale: Locale): string | undefined {
+  if (delta === 0) return undefined;
+  return `${delta > 0 ? "+" : "−"}${formatWon(Math.abs(delta), locale)}`;
 }
 
 function Choice(props: {
@@ -227,7 +234,7 @@ function Choice(props: {
     >
       {image && (
         <span className="relative block h-50 w-full flex-none">
-          <Image src={image} alt="" fill sizes="300px" className="object-cover" />
+          <KioskImage src={image} sizes="300px" />
         </span>
       )}
       <span className="k-text-40 block px-6 pt-4 font-bold">{props.name}</span>

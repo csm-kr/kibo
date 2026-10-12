@@ -1,3 +1,4 @@
+import type { KioskData } from "@/types/menu";
 import type { Session } from "@/types/session";
 
 export type KioskScreenId = "attract" | "dine" | "menu" | "review" | "payment" | "done";
@@ -8,18 +9,26 @@ export interface KioskLocal {
   touchStarted: boolean;
 }
 
-/** Which kiosk screen to show. The session status decides; local state only fills the gaps it leaves. */
-export function kioskScreen(session: Session | null, local: KioskLocal): KioskScreenId {
+/**
+ * Which kiosk screen to show. The session status decides; local state only fills the gaps it leaves.
+ * A kiosk without dine options (tickets) has no K2 and goes straight to the menu.
+ */
+export function kioskScreen(
+  session: Session | null,
+  local: KioskLocal,
+  kiosk: Pick<KioskData, "dineOptions">,
+): KioskScreenId {
   if (!session) return "attract";
+  const dine = kiosk.dineOptions ? "dine" : "menu";
   switch (session.status) {
     case "idle":
-      // Shows the dine question right away instead of waiting for startTouch to come back.
-      return local.touchStarted ? "dine" : "attract";
+      // Shows the next screen right away instead of waiting for startTouch to come back.
+      return local.touchStarted ? dine : "attract";
     case "connected":
-      return "dine";
+      return dine;
     case "ordering":
       // A phone can add items before the dine option (requestCheckout asks for it later).
-      return local.touchStarted && session.dineOption === null && session.cart.length === 0 ? "dine" : "menu";
+      return local.touchStarted && session.dineOption === null && session.cart.length === 0 ? dine : "menu";
     case "confirming":
       return "review";
     case "paying":

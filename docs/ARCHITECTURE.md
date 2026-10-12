@@ -360,7 +360,7 @@ Firestore Native mode in `asia-northeast3` (the location cannot be changed later
 
 ### `data/kiosks/{kioskId}.json` (repo, read-only)
 ```
-kind: "direct", domain (food|ticket), brand, theme{colors, logo}, locale (default), locales[] (ko|en the kiosk screen offers; default ["ko"]),
+kind: "direct", domain (food|ticket), brand, hero? (K1 picture: photo, or SVG on the theme tint), theme{colors, panel? (rail and toolbar; default cream)}, locale (default), locales[] (ko|en the kiosk screen offers on K1's language row, reset to `locale` for each new session; default ["ko"]),
 dineOptions?{eat_in, take_out: {name{ko,en}, image}} (absent: the kiosk never asks eat-in or take-out),
 vocabulary?{item, add, cart: name{ko,en}} (domain words; default 메뉴/menu, 담기/Add, 장바구니/Cart), categories[],
 items[{itemId, name{ko,en}, subtitle?{ko,en}, category, image (/menu/ photo or /kiosks/<kioskId>/ pictogram), kcal (int | null: hidden), badge (best|new|null), allergens[] (may be empty), soldOut,

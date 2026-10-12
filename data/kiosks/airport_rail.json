@@ -6,12 +6,14 @@
     "name": { "ko": "스카이라인 공항열차", "en": "SKYLINE AIRPORT RAIL" },
     "tagline": { "ko": "도심까지 가장 빠른 길", "en": "The fastest way downtown" }
   },
+  "hero": "/kiosks/airport_rail/hero.svg",
   "theme": {
     "primary": "#163A70",
     "primaryDark": "#0C2449",
     "primaryTint": "#DCEBF9",
     "accent": "#F6C445",
-    "background": "#F6F8FB"
+    "background": "#F6F8FB",
+    "panel": "#E4EBF4"
   },
   "locale": "ko",
   "locales": ["ko", "en"],

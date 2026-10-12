@@ -1,16 +1,16 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { CommandReply } from "@/lib/client/api";
 import { findItem, isAvailableNow } from "@/lib/adapters/catalog";
 import type { CommandType } from "@/lib/commands/schemas";
 import { kt, type KioskTextKey } from "@/lib/i18n/kiosk";
-import { formatWon, lineLabel } from "@/lib/kiosk/menu";
+import { formatFrom, formatWon, lineLabel, lowestPrice } from "@/lib/kiosk/menu";
 import type { KioskData, MenuItem } from "@/types/menu";
 import type { CartLine, ChangeKind, LineInput, Session } from "@/types/session";
 import { CartBar } from "./CartBar";
 import { Header } from "./KioskScreen";
+import { KioskImage } from "./KioskImage";
 import { KioskToolbar } from "./KioskToolbar";
 import { ModalLayer } from "./ModalLayer";
 import { ProductSheet } from "./ProductSheet";
@@ -63,7 +63,7 @@ export function MenuScreen(props: {
   onClaimUrl(claimUrl: string): void;
 }) {
   const { kiosk, session, send } = props;
-  const locale = kiosk.locale;
+  const { locale, domain } = kiosk;
   const now = useSyncExternalStore(subscribeMinute, minuteNow, () => 0);
 
   const [category, setCategory] = useState(session.screen.category ?? kiosk.categories[0].categoryId);
@@ -90,7 +90,7 @@ export function MenuScreen(props: {
       const itemId = lc.kind === "undo" || lc.kind === "clear" ? null : (session.screen.itemId ?? null);
       const line = session.cart.find((l) => l.lineId === lc.lineId);
       const name = line ? lineLabel(kiosk, line, locale).title : itemId ? (findItem(kiosk, itemId)?.name[locale] ?? "") : "";
-      const text = kt(AI_TEXT[lc.kind], locale);
+      const text = kt(AI_TEXT[lc.kind], locale, domain);
       setFlash({ key: changeKey, lineId: lc.lineId, itemId, status: ai ? (name ? `${text}: ${name}` : text) : null });
       // Never move the screen under someone choosing (sheet open or a touch in the last 5 s).
       const target = session.screen.category;
@@ -141,7 +141,7 @@ export function MenuScreen(props: {
       <KioskToolbar kiosk={kiosk} session={session} claimUrl={props.claimUrl} send={send} onClaimUrl={props.onClaimUrl} />
 
       <div className="relative flex min-h-0 flex-1">
-        <nav aria-label={kt("categories", locale)} className="flex w-65 flex-none flex-col gap-2 overflow-y-auto bg-[#F3EEE4] py-4">
+        <nav aria-label={kt("categories", locale, domain)} className="flex w-65 flex-none flex-col gap-2 overflow-y-auto bg-(--k-panel) py-4">
           {kiosk.categories.map((c) => {
             const current = c.categoryId === category;
             return (
@@ -155,7 +155,7 @@ export function MenuScreen(props: {
                 } ${FOCUS}`}
               >
                 <span className="relative size-20 overflow-hidden rounded-full bg-white">
-                  <Image src={c.icon} alt="" fill sizes="80px" className="object-cover" />
+                  <KioskImage src={c.icon} sizes="80px" inset="p-3" />
                 </span>
                 <span className="k-text-40">{c.name[locale]}</span>
               </button>
@@ -240,8 +240,11 @@ export function MenuScreen(props: {
 
 function ProductTile(props: { kiosk: KioskData; item: MenuItem; available: boolean; ring: boolean; onOpen(): void }) {
   const { item } = props;
-  const locale = props.kiosk.locale;
-  const blocked = item.soldOut ? kt("soldOut", locale) : !props.available ? kt("notNow", locale) : null;
+  const { locale, domain } = props.kiosk;
+  const blocked = item.soldOut ? kt("soldOut", locale, domain) : !props.available ? kt("notNow", locale) : null;
+  const price = item.variants[0].price;
+  // A fare with cheaper passenger options shows its lowest price, marked "from".
+  const lowest = lowestPrice(item);
   return (
     <button
       type="button"
@@ -252,7 +255,7 @@ function ProductTile(props: { kiosk: KioskData; item: MenuItem; available: boole
       } ${FOCUS}`}
     >
       <span className="relative block h-68 w-full flex-none">
-        <Image src={item.image} alt="" fill sizes="380px" className="object-cover" />
+        <KioskImage src={item.image} sizes="380px" />
         {blocked && (
           <span className="k-text-48 absolute inset-0 flex items-center justify-center bg-[#FFF1CC]/90 px-6 text-center font-bold text-[#7A2E0E]">
             {blocked}
@@ -270,22 +273,27 @@ function ProductTile(props: { kiosk: KioskData; item: MenuItem; available: boole
       )}
       <span className="flex flex-col px-6 pt-4 pb-6">
         <span className="k-text-40 font-bold">{item.name[locale]}</span>
-        <span className="k-text-40 font-bold text-(--k-primary)">{formatWon(item.variants[0].price)}</span>
-        <span className="k-text-40 text-[#4B463F]">
-          {item.kcal} {kt("kcal", locale)}
+        {item.subtitle && <span className="k-text-40 text-[#4B463F]">{item.subtitle[locale]}</span>}
+        <span className="k-text-40 font-bold text-(--k-primary)">
+          {lowest < price ? formatFrom(lowest, locale) : formatWon(price, locale)}
         </span>
+        {item.kcal !== null && (
+          <span className="k-text-40 text-[#4B463F]">
+            {item.kcal} {kt("kcal", locale)}
+          </span>
+        )}
       </span>
     </button>
   );
 }
 
 function ConfirmClear(props: { kiosk: KioskData; onCancel(): void; onConfirm(): void }) {
-  const locale = props.kiosk.locale;
+  const { locale, domain } = props.kiosk;
   return (
     <ModalLayer className={`${SCRIM} flex items-center justify-center p-12`}>
       <section role="alertdialog" aria-modal aria-labelledby="clear-title" className="flex w-full flex-col gap-10 rounded-[48px] bg-(--k-bg) p-12">
         <h2 id="clear-title" className="k-text-56 text-center font-bold">
-          {kt("clearConfirm", locale)}
+          {kt("clearConfirm", locale, domain)}
         </h2>
         <div className="grid grid-cols-2 gap-8">
           <button

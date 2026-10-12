@@ -140,3 +140,51 @@ test("idle warning one minute before expiry", async ({ page }, info) => {
   await expect(page.getByRole("alertdialog", { name: "계속 주문하시겠어요?" })).toBeVisible();
   await check(page, info, "KX-idle-warning");
 });
+
+test.describe("other kiosk data", () => {
+  // Their own address, so these two sessions do not count against the three tests above (docs/RULE.md R-005).
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.25" } });
+
+  test("airport rail ticket machine: K1, K3, K4 passenger step, K6", async ({ page }, info) => {
+    await page.goto("/kiosk?k=airport_rail");
+    const root = kioskRoot(page);
+    await readClaim(page);
+    await expect(page.getByRole("button", { name: /화면을 눌러서 구매/ })).toBeEnabled();
+    await check(page, info, "K1-rail-attract");
+
+    await page.getByRole("button", { name: /화면을 눌러서 구매/ }).click();
+    await expect(root).toHaveAttribute("data-screen", "menu");
+    await expect(buttonWithText(page, "직통열차 시티센터")).toBeVisible();
+    await check(page, info, "K3-rail-menu");
+
+    await buttonWithText(page, "직통열차 시티센터").click();
+    const sheet = page.getByRole("dialog", { name: "직통열차 시티센터" });
+    await buttonWithText(sheet, "어린이 (6–12세)").click();
+    await check(page, info, "K4-rail-passenger");
+
+    await sheet.getByRole("button", { name: "다음", exact: true }).click();
+    await sheet.getByRole("button", { name: "선택", exact: true }).click();
+    await page.getByRole("button", { name: "교통카드·이용권", exact: true }).click();
+    await buttonWithText(page, "1일 이용권").click();
+    await page.getByRole("dialog", { name: "1일 이용권" }).getByRole("button", { name: "선택", exact: true }).click();
+    await expect(page.getByText(/장 선택$/)).toHaveText("2장 선택");
+    await page.getByRole("button", { name: "구매하기", exact: true }).click();
+    await expect(root).toHaveAttribute("data-screen", "review");
+    await check(page, info, "K6-rail-review");
+  });
+
+  test("MALO in English: K1 and K3", async ({ page }, info) => {
+    await page.goto("/kiosk?k=malo");
+    const root = kioskRoot(page);
+    await readClaim(page);
+    await page.getByRole("button", { name: "English" }).click();
+    await expect(page.getByRole("button", { name: /Order by touch/ })).toBeEnabled();
+    await check(page, info, "K1-attract-en");
+
+    await page.getByRole("button", { name: /Order by touch/ }).click();
+    await page.getByRole("button", { name: "Eat here" }).click();
+    await expect(root).toHaveAttribute("data-screen", "menu");
+    await expect(buttonWithText(page, "Cheeseburger")).toBeVisible();
+    await check(page, info, "K3-menu-en");
+  });
+});

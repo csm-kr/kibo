@@ -19,7 +19,9 @@
     "accent": "#F2B13D",
     "background": "#FBF7EF"
   },
+  "hero": "/menu/hero.jpg",
   "locale": "ko",
+  "locales": ["ko", "en"],
   "currency": "KRW",
   "dineOptions": {
     "eat_in": {

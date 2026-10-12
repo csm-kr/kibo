@@ -29,7 +29,7 @@ export function PaymentScreen(props: {
   cardTap?: EventTarget;
 }) {
   const { kiosk, session, send, cardTap } = props;
-  const locale = kiosk.locale;
+  const { locale, domain } = kiosk;
   const [step, setStep] = useState<Step>("method");
   const [busy, setBusy] = useState(false);
   const approveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -104,7 +104,7 @@ export function PaymentScreen(props: {
       <section className="flex flex-none flex-col gap-8 border-t-4 border-[#E2DACB] bg-white px-12 py-10">
         <div className="flex items-baseline justify-between gap-6">
           <span className="k-text-48 font-bold">{kt("total", locale)}</span>
-          <span className="k-text-72 font-display font-bold text-(--k-primary)">{formatWon(session.total)}</span>
+          <span className="k-text-72 font-display font-bold text-(--k-primary)">{formatWon(session.total, locale)}</span>
         </div>
         {step !== "approving" && (
           <button
@@ -113,7 +113,7 @@ export function PaymentScreen(props: {
             onClick={() => void editOrder()}
             className={`k-text-48 min-h-32 rounded-full border-4 border-[#1E1B18] bg-white px-12 font-bold disabled:opacity-60 ${FOCUS}`}
           >
-            {kt("editOrder", locale)}
+            {kt("editOrder", locale, domain)}
           </button>
         )}
       </section>
@@ -131,7 +131,7 @@ function MethodButton(props: { label: string; note?: string; icon: ReactNode; on
       className={`flex min-h-100 flex-col items-center justify-center gap-6 rounded-[32px] border-[6px] p-6 text-center ${
         enabled
           ? "border-(--k-primary) bg-white text-(--k-primary-dark) active:bg-(--k-primary-tint)"
-          : "border-[#E2DACB] bg-[#F3EEE4] text-[#4B463F]"
+          : "border-[#E2DACB] bg-(--k-panel) text-[#4B463F]"
       } ${FOCUS}`}
     >
       {props.icon}

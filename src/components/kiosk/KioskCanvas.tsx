@@ -32,6 +32,7 @@ export function KioskCanvas({ theme, locale, children }: { theme: KioskTheme; lo
     "--k-primary-tint": theme.primaryTint,
     "--k-accent": theme.accent,
     "--k-bg": theme.background,
+    "--k-panel": theme.panel ?? "#F3EEE4",
     width: CANVAS_W,
     height: CANVAS_H,
     transform: `translate(-50%, -50%) scale(${scale})`,

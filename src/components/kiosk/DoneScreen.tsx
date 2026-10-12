@@ -21,7 +21,7 @@ export function DoneScreen(props: {
   onNewSession(): void;
 }) {
   const { kiosk, session, clockOffset } = props;
-  const locale = kiosk.locale;
+  const { locale, domain } = kiosk;
   const now = useNow();
   // Server time when the order number appeared; the 10 s run from there, not from payment.
   const [numberAt, setNumberAt] = useState<number | null>(null);
@@ -69,11 +69,11 @@ export function DoneScreen(props: {
         </div>
       ) : (
         <div className="flex flex-1 flex-col items-center justify-center gap-10 px-12 text-center">
-          <h1 className="k-text-56 font-bold text-[#4B463F]">{kt("orderNumber", locale)}</h1>
+          <h1 className="k-text-56 font-bold text-[#4B463F]">{kt("orderNumber", locale, domain)}</h1>
           <p className="font-display text-[240px] leading-none font-bold text-(--k-primary)">{session.orderNumber}</p>
-          <p className="k-text-56 font-bold">{kt("pickupHint", locale)}</p>
+          <p className="k-text-56 font-bold">{kt("pickupHint", locale, domain)}</p>
           {!keepNumber && (
-            <p role="timer" className="k-text-48 mt-12 rounded-full bg-[#F3EEE4] px-12 py-6 font-bold text-[#33302B]">
+            <p role="timer" className="k-text-48 mt-12 rounded-full bg-(--k-panel) px-12 py-6 font-bold text-[#33302B]">
               {backInSeconds(left, locale)}
             </p>
           )}

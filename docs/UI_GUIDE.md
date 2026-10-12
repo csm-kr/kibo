@@ -12,7 +12,7 @@ Reference prototype: `design/prototype/Main.dc.html` (Claude Design). Menu photo
 ## Kiosk flow to follow
 Attract screen (language, large-text / low-screen button, "talk (QR)" and "touch") → dine-in / take-out photo cards → left category rail + photo menu grid (badges, kcal, sold out) → "Make it a set?" (single / set / large set) → side → drink → ingredients and quantity → dessert suggestion (once per order) → bottom cart bar (preview, clear all, order) → order review (quantity) → payment method → card insert and approval → receipt? → order number.
 
-Copy follows real kiosk wording: "Make it a set?", "Insert your card below", "Print a receipt?". Korean UI on the kiosk; the phone uses the user's language.
+Copy follows real kiosk wording: "Make it a set?", "Insert your card below", "Print a receipt?". The kiosk starts in Korean and offers English on K1 (`src/lib/i18n/kiosk.ts`, ticket machines use ticket words); the phone uses the user's language.
 
 ## Anti-patterns (do not use)
 | Avoid | Why |

@@ -38,7 +38,7 @@ Principle: **the user only looks at and talks to the phone; the kiosk is a mirro
 KIBO creates no data of its own. Adapters read what the kiosk already has (menu, prices, options, sold-out state, allergens if present) and the AI answers only from that. If the kiosk has no answer (e.g. halal status), the AI does not guess; it calls staff and the kiosk shows a banner. Promotions, suggestions and AI replies never mention items that are not in the data.
 
 ## Languages
-The kiosk stays in Korean; the phone speaks the user's language. That contrast is the value proposition. Supported languages are Korean and English. An English kiosk UI is planned for later because viewers of an early video could not follow Korean screens (`docs/ISSUE.md` I-019). Menu data keeps `name{ko,en}` so English speech maps to items; the kiosk locale is a setting (`ko` by default). The demo video adds English captions over the kiosk.
+The kiosk stays in Korean; the phone speaks the user's language. That contrast is the value proposition. Supported languages are Korean and English. Since 10-13 the kiosk also has its own English mode (K1 language row, for kiosks whose data lists `en`; I-019), but it starts in Korean, so the killer scene still holds. Menu data keeps `name{ko,en}` so English speech maps to items; the kiosk locale is a setting (`ko` by default). The demo video adds English captions over the kiosk.
 
 ## Demo scenario (hero order)
 1. On the laptop, `/kiosk` runs full-screen in portrait.

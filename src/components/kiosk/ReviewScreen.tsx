@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 import type { CommandReply } from "@/lib/client/api";
 import { findItem } from "@/lib/adapters/catalog";
@@ -10,6 +9,7 @@ import { formatWon, lineLabel } from "@/lib/kiosk/menu";
 import type { KioskData } from "@/types/menu";
 import type { CartLine, Session } from "@/types/session";
 import { Header } from "./KioskScreen";
+import { KioskImage } from "./KioskImage";
 import { KioskToolbar } from "./KioskToolbar";
 import { ModalLayer } from "./ModalLayer";
 import { FOCUS, SCRIM } from "./styles";
@@ -27,7 +27,7 @@ export function ReviewScreen(props: {
   onClaimUrl(claimUrl: string): void;
 }) {
   const { kiosk, session } = props;
-  const locale = kiosk.locale;
+  const { locale, domain } = kiosk;
   const [busy, setBusy] = useState(false);
   const [removing, setRemoving] = useState<CartLine | null>(null);
 
@@ -43,7 +43,7 @@ export function ReviewScreen(props: {
     <div className="relative flex h-full flex-col">
       <Header kiosk={kiosk} />
       <KioskToolbar kiosk={kiosk} session={session} claimUrl={props.claimUrl} send={props.send} onClaimUrl={props.onClaimUrl} />
-      <h1 className="k-text-72 flex-none px-12 pt-12 pb-8 font-bold">{kt("reviewTitle", locale)}</h1>
+      <h1 className="k-text-72 flex-none px-12 pt-12 pb-8 font-bold">{kt("reviewTitle", locale, domain)}</h1>
 
       <ul className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-12 pb-8">
         {session.cart.map((line) => (
@@ -61,17 +61,17 @@ export function ReviewScreen(props: {
       </ul>
 
       <section className="flex flex-none flex-col gap-8 border-t-4 border-[#E2DACB] bg-white px-12 py-10">
-        <div className="flex items-baseline justify-between gap-6">
-          <span className="k-text-40 text-[#4B463F]">{kt("dineLabel", locale)}</span>
-          <span className="k-text-48 font-bold">
-            {session.dineOption
-              ? kiosk.dineOptions?.[session.dineOption].name[locale]
-              : kt("dineNotSet", locale)}
-          </span>
-        </div>
+        {kiosk.dineOptions && (
+          <div className="flex items-baseline justify-between gap-6">
+            <span className="k-text-40 text-[#4B463F]">{kt("dineLabel", locale)}</span>
+            <span className="k-text-48 font-bold">
+              {session.dineOption ? kiosk.dineOptions[session.dineOption].name[locale] : kt("dineNotSet", locale)}
+            </span>
+          </div>
+        )}
         <div className="flex items-baseline justify-between gap-6">
           <span className="k-text-48 font-bold">{kt("total", locale)}</span>
-          <span className="k-text-72 font-display font-bold text-(--k-primary)">{formatWon(session.total)}</span>
+          <span className="k-text-72 font-display font-bold text-(--k-primary)">{formatWon(session.total, locale)}</span>
         </div>
         <div className="flex gap-8">
           <button
@@ -80,7 +80,7 @@ export function ReviewScreen(props: {
             onClick={() => void run("cancelCheckout", {})}
             className={`k-text-48 min-h-32 rounded-full border-4 border-[#1E1B18] bg-white px-12 font-bold disabled:opacity-60 ${FOCUS}`}
           >
-            {kt("pickMore", locale)}
+            {kt("pickMore", locale, domain)}
           </button>
           <button
             type="button"
@@ -97,7 +97,7 @@ export function ReviewScreen(props: {
         <ModalLayer className={`${SCRIM} flex items-center justify-center p-12`}>
           <section role="alertdialog" aria-modal aria-labelledby="remove-title" className="flex w-full flex-col gap-10 rounded-[48px] bg-(--k-bg) p-12">
             <h2 id="remove-title" className="k-text-56 text-center font-bold">
-              {kt("removeAsk", locale)}
+              {kt("removeAsk", locale, domain)}
             </h2>
             <p className="k-text-48 text-center">{lineLabel(kiosk, removing, locale).title}</p>
             <div className="grid grid-cols-2 gap-8">
@@ -128,19 +128,19 @@ export function ReviewScreen(props: {
 
 function ReviewLine(props: { kiosk: KioskData; line: CartLine; disabled: boolean; onLess(): void; onMore(): void }) {
   const { kiosk, line } = props;
-  const locale = kiosk.locale;
+  const { locale, domain } = kiosk;
   const item = findItem(kiosk, line.itemId);
   const label = lineLabel(kiosk, line, locale);
   return (
     <li className="flex flex-none gap-8 rounded-[32px] border-4 border-[#E2DACB] bg-white p-6">
-      <span className="relative size-40 flex-none overflow-hidden rounded-[24px] bg-[#F3EEE4]">
-        {item && <Image src={item.image} alt="" fill sizes="160px" className="object-cover" />}
+      <span className="relative size-40 flex-none overflow-hidden rounded-[24px] bg-(--k-panel)">
+        {item && <KioskImage src={item.image} sizes="160px" />}
       </span>
       <div className="flex min-w-0 flex-1 flex-col gap-4">
         <p className="k-text-48 font-bold">{label.title}</p>
         {label.detail && <p className="k-text-40 text-[#4B463F]">{label.detail}</p>}
         <div className="flex items-center justify-between gap-6">
-          <div className="flex items-center gap-4" role="group" aria-label={kt("quantity", locale)}>
+          <div className="flex items-center gap-4" role="group" aria-label={kt("quantity", locale, domain)}>
             <button
               type="button"
               disabled={props.disabled}
@@ -161,7 +161,7 @@ function ReviewLine(props: { kiosk: KioskData; line: CartLine; disabled: boolean
               +
             </button>
           </div>
-          <span className="k-text-48 font-display font-bold">{formatWon(line.unitPrice * line.qty)}</span>
+          <span className="k-text-48 font-display font-bold">{formatWon(line.unitPrice * line.qty, locale)}</span>
         </div>
       </div>
     </li>

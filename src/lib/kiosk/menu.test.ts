@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 import { getKiosk } from "@/lib/adapters/catalog";
 import type { MenuItem } from "@/types/menu";
 import type { CartLine } from "@/types/session";
-import { formatWon, lineLabel, sheetPrice, sheetSteps } from "./menu";
+import { formatFrom, formatWon, lineLabel, lowestPrice, sheetPrice, sheetSteps } from "./menu";
 
 const k = getKiosk("malo");
+const rail = getKiosk("airport_rail");
+const railItem = (id: string): MenuItem => rail.items.find((i) => i.itemId === id)!;
 const item = (id: string): MenuItem => k.items.find((i) => i.itemId === id)!;
 
 function line(over: Partial<CartLine>): CartLine {
@@ -12,10 +14,40 @@ function line(over: Partial<CartLine>): CartLine {
 }
 
 describe("formatWon", () => {
-  it("adds thousands separators and the won suffix", () => {
-    expect(formatWon(4900)).toBe("4,900원");
-    expect(formatWon(0)).toBe("0원");
-    expect(formatWon(1234567)).toBe("1,234,567원");
+  it("Korean: thousands separators and the won suffix", () => {
+    expect(formatWon(4900, "ko")).toBe("4,900원");
+    expect(formatWon(0, "ko")).toBe("0원");
+    expect(formatWon(1234567, "ko")).toBe("1,234,567원");
+  });
+
+  it("English: the won sign in front", () => {
+    expect(formatWon(4900, "en")).toBe("₩4,900");
+    expect(formatWon(0, "en")).toBe("₩0");
+    expect(formatWon(1234567, "en")).toBe("₩1,234,567");
+  });
+});
+
+describe("formatFrom", () => {
+  it("marks the price as the lowest one", () => {
+    expect(formatFrom(5500, "ko")).toBe("5,500원부터");
+    expect(formatFrom(5500, "en")).toBe("from ₩5,500");
+  });
+});
+
+describe("lowestPrice", () => {
+  it("the cheapest fare a passenger option allows", () => {
+    // Express 11,000 with child -5,500; Harbor Gate 1,450 with child -730 (data/kiosks/airport_rail.json).
+    expect(lowestPrice(railItem("express_city_center"))).toBe(5500);
+    expect(lowestPrice(railItem("all_stop_harbor_gate"))).toBe(720);
+  });
+
+  it("a required group with only surcharges keeps the base price", () => {
+    expect(lowestPrice(railItem("transit_card"))).toBe(4000);
+    expect(lowestPrice(railItem("day_pass"))).toBe(15000);
+  });
+
+  it("MALO items keep their first variant's price (no discounts)", () => {
+    for (const i of k.items) expect(lowestPrice(i), i.itemId).toBe(i.variants[0].price);
   });
 });
 
@@ -74,6 +106,18 @@ describe("sheetSteps", () => {
   it("single-variant item with a group skips the variant step", () => {
     const steps = sheetSteps(item("chicken_nuggets"), "single", "ko");
     expect(steps).toEqual([{ kind: "group", groupId: "sauce", label: "소스", index: 1, count: 1 }]);
+  });
+
+  it("ticket: no variant step, one step per group, quantity named by the domain", () => {
+    const steps = sheetSteps(railItem("express_city_center"), "single", "ko", "ticket");
+    expect(steps.map((s) => [s.groupId, s.label])).toEqual([
+      ["passenger", "승객"],
+      ["seat", "좌석"],
+    ]);
+    expect(sheetSteps(railItem("day_pass"), "single", "ko", "ticket")).toEqual([
+      { kind: "qty", label: "승차권 수", index: 1, count: 1 },
+    ]);
+    expect(sheetSteps(railItem("day_pass"), "single", "en", "ticket")[0].label).toBe("Tickets");
   });
 
   it("item without choices still has one step for the quantity", () => {

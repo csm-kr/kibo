@@ -1,9 +1,9 @@
-import type { Locale, Variant } from "@/types/menu";
+import type { KioskDomain, Locale, Variant } from "@/types/menu";
 
-// Every kiosk string lives here, so an English kiosk (docs/ISSUE.md I-019) is a locale switch, not a rewrite.
-// Wording follows real kiosks (docs/UX.md "Copy").
+// Every kiosk string lives here in Korean and English; the kiosk's language row switches between them (I-019).
+// Wording follows real kiosks (docs/UX.md "Copy"). TICKET_TEXT replaces the food words on ticket machines.
 
-const KIOSK_TEXT = {
+export const KIOSK_TEXT = {
   talkTitle: { ko: "휴대폰으로 말해서 주문 (QR)", en: "Order by talking (QR)" },
   talkHint: { ko: "휴대폰 카메라로 찍으세요", en: "Scan with your phone camera" },
   qrAlt: { ko: "휴대폰으로 주문하는 QR 코드", en: "QR code to order with your phone" },
@@ -11,9 +11,6 @@ const KIOSK_TEXT = {
   touchTitle: { ko: "화면을 눌러서 주문", en: "Order by touch" },
   touchHint: { ko: "기존 방식 그대로", en: "The usual way" },
   language: { ko: "언어", en: "Language" },
-  langKo: { ko: "한국어", en: "한국어" },
-  langEn: { ko: "English", en: "English" },
-  comingSoon: { ko: "준비 중", en: "Coming soon" },
   largeText: { ko: "큰 글씨 · 낮은 화면", en: "Large text · lower screen" },
   dineQuestion: { ko: "매장에서 드시나요, 포장하시나요?", en: "Eat here or take out?" },
   phoneConnected: {
@@ -108,8 +105,39 @@ const KIOSK_TEXT = {
 
 export type KioskTextKey = keyof typeof KIOSK_TEXT;
 
-export function kt(key: KioskTextKey, locale: Locale): string {
-  return KIOSK_TEXT[key][locale];
+/** A ticket machine sells tickets: no menu, no order, no counter pickup. */
+export const TICKET_TEXT: Partial<Record<KioskTextKey, Record<Locale, string>>> = {
+  talkTitle: { ko: "휴대폰으로 말해서 구매 (QR)", en: "Buy by talking (QR)" },
+  touchTitle: { ko: "화면을 눌러서 구매", en: "Buy by touch" },
+  openQr: { ko: "휴대폰으로 말해서 구매", en: "Buy by talking" },
+  qrSheetHint: { ko: "고른 승차권은 그대로 남아요", en: "Your tickets stay as they are" },
+  categories: { ko: "승차권 종류", en: "Ticket types" },
+  soldOut: { ko: "매진", en: "Sold out" },
+  cartEmpty: { ko: "승차권을 골라 주세요", en: "Please choose a ticket" },
+  cartCount: { ko: "장 선택", en: " selected" },
+  pending: { ko: "고르는 중", en: "Selecting" },
+  clearConfirm: { ko: "고른 승차권을 모두 지울까요?", en: "Remove all selected tickets?" },
+  order: { ko: "구매하기", en: "Buy" },
+  aiAdd: { ko: "AI가 골랐어요", en: "Chosen by AI" },
+  stepQty: { ko: "승차권 수", en: "Tickets" },
+  quantity: { ko: "승차권 수", en: "Tickets" },
+  reviewTitle: { ko: "구매 내역을 확인해 주세요", en: "Please check your tickets" },
+  pickMore: { ko: "승차권 더 고르기", en: "Add more tickets" },
+  removeAsk: { ko: "이 승차권을 뺄까요?", en: "Remove this ticket?" },
+  editOrder: { ko: "승차권 수정", en: "Change tickets" },
+  orderNumber: { ko: "참조 번호", en: "Reference number" },
+  pickupHint: { ko: "승차권을 받아 가세요", en: "Please take your tickets" },
+};
+
+export function kt(key: KioskTextKey, locale: Locale, domain: KioskDomain = "food"): string {
+  return ((domain === "ticket" && TICKET_TEXT[key]) || KIOSK_TEXT[key])[locale];
+}
+
+const LANGUAGE_NAME: Record<Locale, string> = { ko: "한국어", en: "English" };
+
+/** Each language named in itself, as kiosks label their language buttons. */
+export function languageName(locale: Locale): string {
+  return LANGUAGE_NAME[locale];
 }
 
 const VARIANT_WORD: Record<Variant, Record<Locale, string>> = {
