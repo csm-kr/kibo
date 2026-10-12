@@ -21,12 +21,12 @@ interface DemoSession {
 async function startLearnedDemo(page: Page): Promise<DemoSession> {
   await page.goto("/demo?k=doughhouse");
   await expect(page.getByRole("heading", { name: "Don't learn the kiosk. Just talk." })).toBeVisible({ timeout: 60_000 });
-  await expect(page.getByRole("link", { name: /Doughhouse Pizza/ })).toHaveAttribute("aria-current", "true");
+  await expect(page.getByRole("link", { name: /Doughhouse/ })).toHaveAttribute("aria-current", "true");
   const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
   await page.getByRole("button", { name: "Start", exact: true }).click();
   const json = (await (await created).json()) as DemoSession & { ok: boolean };
   expect(json.ok).toBe(true);
-  await expect(page.getByRole("heading", { name: "Kiosk (unchanged third-party screen, learned once by KIBO Learn)" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pizza shop kiosk (learned by KIBO Learn)" })).toBeVisible();
   return json;
 }
 
@@ -63,9 +63,11 @@ test("learned pizza kiosk on /demo: the bridge enters the order, the phone never
   await expect(page.locator("[data-pay-on-kiosk]")).toHaveText("Your order is on the kiosk. Tap 주문하기 (Order) on the kiosk and pay there.");
   await expect(page.getByRole("button", { name: "Yes, pay now" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Tap the card on the kiosk" })).toHaveCount(0);
-  // D3 for a learned kiosk: what happens next, [Try again] and the other kiosk.
+  // D3 for a learned kiosk: what happens next, [Try again] and the two other places.
   await expect(page.locator("[data-demo-end]")).toContainText("you would now pay on the kiosk itself");
-  await expect(page.getByRole("link", { name: "Try MALO BURGER" })).toHaveAttribute("href", "/demo");
+  const others = page.getByRole("navigation", { name: "Try another place" });
+  await expect(others.getByRole("link", { name: "Burger shop" })).toHaveAttribute("href", "/demo?k=malo");
+  await expect(others.getByRole("link", { name: "Airport rail" })).toHaveAttribute("href", "/demo?k=airport_rail");
 
   await page.getByRole("button", { name: "Pick more" }).click();
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "talk");

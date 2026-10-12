@@ -28,13 +28,14 @@ const PHONE_TEXT = {
   assistant: { ko: "KIBO", en: "KIBO" },
   working: { ko: "처리하고 있어요…", en: "Working…" },
   cartTitle: { ko: "내 주문", en: "Your order" },
-  cartEmpty: { ko: "아직 담은 메뉴가 없어요.", en: "Nothing in your order yet." },
+  cartEmpty: { ko: "아직 담은 것이 없어요.", en: "Nothing in your order yet." },
   total: { ko: "합계", en: "Total" },
   undo: { ko: "되돌리기", en: "Undo" },
   examples: { ko: "이렇게 말해 보세요", en: "Try saying" },
   inputLabel: { ko: "주문을 글자로 입력", en: "Type your order" },
   inputPlaceholder: { ko: "예: 치즈버거 세트 하나", en: "e.g. One cheeseburger set" },
   learnedPlaceholder: { ko: "예: 페퍼로니 라지 하나", en: "e.g. One large pepperoni" },
+  ticketPlaceholder: { ko: "예: 시티센터 어른 두 장", en: "e.g. Two adult tickets to City Center" },
   send: { ko: "보내기", en: "Send" },
   useButtons: {
     ko: "여기 버튼을 누르거나 키오스크 화면에서 주문할 수 있어요.",
@@ -59,6 +60,9 @@ const PHONE_TEXT = {
   // Done
   orderNumber: { ko: "주문 번호", en: "Order number" },
   pickup: { ko: "카운터에서 번호를 부르면 받아 가세요.", en: "We'll call your number at the counter." },
+  // A ticket machine (domain ticket) prints the tickets itself, as its K8 says (src/lib/i18n/kiosk.ts).
+  referenceNumber: { ko: "참조 번호", en: "Reference number" },
+  takeTickets: { ko: "키오스크에서 승차권을 받아 가세요.", en: "Please take your tickets from the machine." },
   done: { ko: "확인", en: "Done" },
   // Ended, taken
   endedTitle: { ko: "주문이 끝났어요.", en: "This order has ended." },
@@ -78,7 +82,7 @@ const PHONE_TEXT = {
     ko: "실제 매장이라면 이제 키오스크에서 직접 결제해요. KIBO는 결제하지 않아요.",
     en: "In a real store, you would now pay on the kiosk itself. KIBO never pays for you.",
   },
-  tryMalo: { ko: "MALO BURGER로 해 보기", en: "Try MALO BURGER" },
+  tryAnotherPlace: { ko: "다른 곳에서 해 보기", en: "Try another place" },
   // P1 microphone hint, before the browser asks
   micHintTitle: { ko: "말로 주문하려면 마이크를 켜 주세요", en: "Turn on the microphone to talk" },
   micHintPre: { ko: "다음 화면에서 ", en: "Tap " },

@@ -37,7 +37,7 @@ test("judge path: intro, order on both halves, confirm, card stand-in, order num
 
   const s = await startDemo(page, "Start");
   expect(s.deviceToken).toBeTruthy();
-  await expect(page.getByRole("heading", { name: "Kiosk (unchanged, Korean only)" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Burger shop kiosk (unchanged)" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Your phone (KIBO)" })).toBeVisible();
   // The demo's phone is connected from the start, so both halves ask for the dine option.
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "dine");
@@ -71,7 +71,11 @@ test("judge path: intro, order on both halves, confirm, card stand-in, order num
   expect(phoneNumber).toMatch(/^\d{3}$/);
   await page.getByRole("button", { name: "출력 안 함" }).click();
   await expect(page.locator("[data-kiosk-canvas]").getByText(phoneNumber, { exact: true })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Open two-device mode" })).toHaveAttribute("href", "/kiosk");
+  await expect(page.getByRole("link", { name: "Open two-device mode" })).toHaveAttribute("href", "/kiosk?k=malo");
+  // D3: the two other places.
+  const others = page.getByRole("navigation", { name: "Try another place" });
+  await expect(others.getByRole("link", { name: "Airport rail" })).toHaveAttribute("href", "/demo?k=airport_rail");
+  await expect(others.getByRole("link", { name: "Pizza shop, no integration" })).toHaveAttribute("href", "/demo?k=doughhouse");
 
   const next = await startDemo(page, "Try again");
   expect(next.sessionId).not.toBe(s.sessionId);

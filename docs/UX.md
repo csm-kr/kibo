@@ -62,11 +62,11 @@ What each persona goes through, where they could give up, and which moment must 
 Pressing "Order by touch" runs the familiar kiosk flow (dine option → category → item → set → side → drink → ingredients → review → payment). **The user can switch to voice at any time by scanning the small QR on every screen; the cart is kept.**
 
 ## Flow C: judges on `/demo`
-- **C1** One-sentence intro and a **3-step guide**: ① talk or type on the right ② watch the kiosk on the left move ③ confirm to pay. **[Start]**. Under it, a small choice of kiosk: MALO BURGER (connected directly, default) or Doughhouse Pizza (learned by KIBO Learn); the choice is in the URL (`/demo?k=doughhouse`).
-- **C2** The assistant on the right is **the same component** as `/assistant`, in English, with example sentences ("One cheeseburger set with zero cola", "Make the fries large", "Is this halal?").
+- **C1** One-sentence intro and a **3-step guide**: ① talk or type on the right ② watch the kiosk on the left move ③ confirm to pay. Three equal **place cards**, each with a capture of its kiosk, a title, one line and the persona it serves: Burger shop (MALO BURGER, connected directly, default), Airport rail (SKYLINE AIRPORT RAIL ticket machine) and Pizza shop, no integration (Doughhouse, learned by KIBO Learn). **[Start]** opens the selected card; the choice is in the URL (`/demo?k=malo|airport_rail|doughhouse`). The kiosk half's caption names the place.
+- **C2** The assistant on the right is **the same component** as `/assistant`, in English, with the place's example sentences (`examplesFor(kioskId, "en")`; MALO: "One cheeseburger set with zero cola", "Make the fries large", "Is this halal?"). On the ticket machine the phone skips the dine question and goes straight to talking.
 - **C3** If there is no mic or it is denied, or the Live connection fails, text input comes forward automatically.
 - **C4** At payment, a "Tap the card on the kiosk" button stands in for the card action.
-- **C5** At the end: **[Try again]**, and a link to the real two-device mode (`/kiosk`). With the learned pizza kiosk the order ends at the review (the user would pay on the kiosk itself): **[Try again]** and **[Try MALO BURGER]**.
+- **C5** At the end: **[Try again]**, **Try another place** with the two other places, and a link to the real two-device mode of the same kiosk (`/kiosk?k=<kioskId>`). The ticket machine ends with a reference number ("Please take your tickets from the machine."). With the learned pizza kiosk the order ends at the review (the user would pay on the kiosk itself): **[Try again]** and **Try another place**.
 
 ## Exception flows
 | Situation | Phone | Kiosk | Heuristics |
@@ -98,16 +98,16 @@ Every screen and state that a QA pass must look at (`docs/UI_QA.md`). Ids are us
 | K8 | Kiosk receipt? → order number | `paid` | K1 after 10 s |
 | KX | Kiosk banners: staff called, AI highlight + status line, connection paused, idle warning | any | — |
 | P1 | Phone mic hint (or in-app browser warning) | `connected`, or `ordering` when scanned mid-order | P2, or P3 when the dine option is already set; text mode if denied |
-| P2 | Phone dine option | `connected` | P3 |
+| P2 | Phone dine option (not on a kiosk without dine options, such as the ticket machine: P3 directly) | `connected` | P3 |
 | P3 | Phone talk: mic, transcript, last two messages, cart card, choices, [Undo] | `ordering` | P4 |
 | P4 | Phone confirm card. On a learned kiosk: no [Yes, pay now]; "Tap 주문하기 (Order) on the kiosk and pay there." (label from the skill) and [Pick more] | `confirming` | P5 or P3 (learned: ends here) |
 | P5 | Phone "insert your card into the kiosk" | `paying` | P6 |
 | P6 | Phone order number, kept until the user closes it | `paid` | P7 |
 | P7 | Phone session ended / someone else is using this kiosk | `expired` / other | — |
 | PX | Phone overlays: idle warning, staff called, reconnecting, "Please check the kiosk screen" (learned kiosk) | any | — |
-| D1 | `/demo` intro with 3-step guide and the kiosk choice | — | D2 |
+| D1 | `/demo` intro with 3-step guide and three place cards (burger shop, airport rail, pizza shop) | — | D2 |
 | D2 | `/demo` split: kiosk left, assistant right, example sentences, card stand-in | all | D3 |
-| D3 | `/demo` end: [Try again], link to `/kiosk`; learned kiosk: at the review, [Try again], [Try MALO BURGER] | `paid` (learned: `confirming`) | D1 |
+| D3 | `/demo` end: [Try again], Try another place (the two other places), link to `/kiosk?k=<kioskId>`; learned kiosk: at the review, [Try again], Try another place | `paid` (learned: `confirming`) | D1 |
 
 ## Nielsen's 10 heuristics, as KIBO rules
 | # | Heuristic | KIBO rule |

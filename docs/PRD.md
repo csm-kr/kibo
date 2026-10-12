@@ -75,6 +75,7 @@ Proof: (1) the complex hero order, (2) a field count of screens/taps/time for th
 | Kiosk | Connection | Proves |
 |---|---|---|
 | MALO BURGER (fictional, ~35 items) | Direct adapter | Full flow, touch vs voice comparison |
+| SKYLINE AIRPORT RAIL (fictional ticket machine, 11 tickets and passes) | Direct adapter | The same phone works at a different kind of place: tickets, passenger fares, no dine question (Mei's journey) |
 | Doughhouse pizza (fictional, built by us) | KIBO Learn, voice order | No integration code needed |
 | Gureum Darak Coffee (fictional, built blind by a separate agent) | KIBO Learn, evidence only | Learns a kiosk whose structure we did not know |
 

@@ -168,6 +168,36 @@ async function main() {
     await demo.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
     await saveWebp(encoder, await demo.screenshot(), "demo", 1440, 900);
     await demoCtx.close();
+
+    // One picture per place on /demo and the landing page: the top 4:3 of each kiosk's first menu screen, in Korean.
+    const top = { x: 0, y: 0, width: 1080, height: 810 };
+    const placeCtx = await browser.newContext({ viewport: { width: 1080, height: 1920 } });
+    const place = await placeCtx.newPage();
+    for (const [kioskId, touch, dine] of [
+      ["malo", /화면을 눌러서 주문/, "매장에서 먹기"],
+      ["airport_rail", /화면을 눌러서 구매/, null],
+    ] as const) {
+      await place.goto(`${BASE}/kiosk?k=${kioskId}`);
+      const start = place.getByRole("button", { name: touch }).and(place.locator(":enabled"));
+      await start.waitFor({ timeout: 120_000 });
+      await start.click();
+      if (dine) await place.getByRole("button", { name: dine }).click();
+      await place.locator('[data-screen="menu"]').waitFor();
+      await settled(place);
+      await saveWebp(encoder, await place.screenshot({ clip: top }), `place-${kioskId}`, 800, 600);
+    }
+    await placeCtx.close();
+    // The learned kiosk is the third-party page itself, unchanged. Its small tiles leave a 1080-wide frame almost
+    // empty, so it is taken 540 wide at 2x, where the pizza tiles fill the picture.
+    const learnedCtx = await browser.newContext({ viewport: { width: 540, height: 405 }, deviceScaleFactor: 2 });
+    const learned = await learnedCtx.newPage();
+    await learned.goto(`${BASE}/learned-kiosks/doughhouse/index.html`);
+    await learned.locator("#startBtn").click();
+    await learned.getByText("🍽 먹고 갈게요").click();
+    await learned.locator("#menu.on").waitFor();
+    await settled(learned);
+    await saveWebp(encoder, await learned.screenshot(), "place-doughhouse", 800, 600);
+    await learnedCtx.close();
   } finally {
     await browser.close();
     if (server.pid) process.kill(-server.pid);

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { FOCUS, PRIMARY, SECONDARY } from "@/components/assistant/styles";
+import { DEMO_ENVIRONMENTS, demoHref } from "@/components/demo/environments";
 
 // The root landing page: the first thing a judge sees after the video. Every picture is a capture of the running
 // app (`npm run shots:landing`), and every number names its evidence file (docs/RULE.md R-001).
@@ -133,6 +134,34 @@ export default function Home() {
         </ol>
       </section>
 
+      <section data-landing-section="places" aria-labelledby="places" className="flex flex-col gap-6">
+        <h2 id="places" className={H2}>
+          One phone, many kiosks
+        </h2>
+        <p>The same phone, the same way of talking, three different places. Each one opens a working kiosk.</p>
+        <ul className="grid gap-6 lg:grid-cols-3">
+          {DEMO_ENVIRONMENTS.map((env) => (
+            <li key={env.kioskId} className={`${CARD} flex flex-col gap-4`}>
+              <Image
+                src={env.image}
+                alt={`The top of the ${env.short} kiosk screen, in Korean`}
+                width={800}
+                height={600}
+                unoptimized
+                className="h-auto w-full rounded-[12px] border border-[#E2DACB]"
+              />
+              <h3 className="font-bold text-[#15171C]">{env.place.en}</h3>
+              <p className="font-bold">{env.how}</p>
+              <p>{env.persona}</p>
+              <Link href={demoHref(env.kioskId)} className={`${SECONDARY} mt-auto`}>
+                Try the {env.short}
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <p className={EVIDENCE}>On the roadmap, not built yet: hospitals, civil-service offices and cinemas.</p>
+      </section>
+
       <section data-landing-section="safety" aria-labelledby="safety" className="grid gap-6 lg:grid-cols-2">
         <div className="flex flex-col gap-4">
           <h2 id="safety" className={H2}>
@@ -234,8 +263,8 @@ export default function Home() {
 
       <footer data-landing-section="footer" className={`flex flex-col gap-2 border-t border-[#E2DACB] pt-6 ${EVIDENCE}`}>
         <p>
-          MALO BURGER, Doughhouse and Gureum Darak Coffee are fictional brands made for this demo. Menu photos are
-          AI-generated.
+          MALO BURGER, SKYLINE AIRPORT RAIL, Doughhouse and Gureum Darak Coffee are fictional brands made for this
+          demo. Menu photos are AI-generated.
         </p>
         <p>Team malo · Google Cloud AI Builder Cup 2026</p>
       </footer>

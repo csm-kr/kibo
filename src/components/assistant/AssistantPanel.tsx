@@ -80,6 +80,7 @@ export function AssistantPanel(props: Props) {
 
   // A learned kiosk (KIBO Learn): the bridge enters each change on the kiosk page, and the user pays on the kiosk.
   const learned = kiosk.kind === "learned";
+  const ticket = kiosk.domain === "ticket";
   const screen = phoneScreen(
     session,
     {
@@ -90,6 +91,7 @@ export function AssistantPanel(props: Props) {
       inAppHold: props.inApp?.held ?? false,
     },
     learned,
+    kiosk.dineOptions !== undefined,
   );
   const busy = chat.busy || sending || !deviceToken;
   const limited = props.chatLimit !== undefined && chat.sent >= props.chatLimit;
@@ -209,7 +211,7 @@ export function AssistantPanel(props: Props) {
         locale={locale}
         disabled={busy}
         hint={voiceNote ?? hint}
-        placeholder={learned ? pt("learnedPlaceholder", locale) : undefined}
+        placeholder={learned ? pt("learnedPlaceholder", locale) : ticket ? pt("ticketPlaceholder", locale) : undefined}
         onSend={say}
         inputElement={inputElement}
       />
@@ -421,9 +423,9 @@ export function AssistantPanel(props: Props) {
       body = session && (
         <Scroll>
           <div className="flex flex-col items-center gap-2 py-6 text-center">
-            <h1 className="text-xl font-bold">{pt("orderNumber", locale)}</h1>
+            <h1 className="text-xl font-bold">{pt(ticket ? "referenceNumber" : "orderNumber", locale)}</h1>
             <p className="font-display text-[7.5rem] leading-none font-bold text-[#3446D4]">{session.orderNumber}</p>
-            <p className="text-xl">{pt("pickup", locale)}</p>
+            <p className="text-xl">{pt(ticket ? "takeTickets" : "pickup", locale)}</p>
           </div>
           {mode === "demo" && props.endCard ? (
             props.endCard

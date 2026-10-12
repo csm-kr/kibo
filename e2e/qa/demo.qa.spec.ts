@@ -97,10 +97,42 @@ test("D1 to D3", async ({ page, request }, info) => {
   await check(page, info, "D3-done");
 });
 
+test.describe(() => {
+  // Its own address: this test adds sessions on top of the two above (R-005).
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.27" } });
+
+  test("D1 and D2 with the airport rail ticket machine", async ({ page, request }, info) => {
+    await page.goto("/demo?k=airport_rail");
+    await expect(page.getByRole("link", { name: /SKYLINE AIRPORT RAIL/ })).toHaveAttribute("aria-current", "true", { timeout: 60_000 });
+    await check(page, info, "D1-intro-rail");
+
+    const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
+    await page.getByRole("button", { name: "Start", exact: true }).click();
+    const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
+    await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "talk");
+    await check(page, info, "D2-rail-empty");
+
+    // A new line per viewport, so each screenshot falls inside its own 2 s highlight.
+    const passengers = ["adult", "child", "senior"];
+    let seq = 0;
+    await check(page, info, "D2-rail-added", async () => {
+      const passenger = passengers[seq];
+      await command(request, s.deviceToken, {
+        sessionId: s.sessionId,
+        type: "addToCart",
+        args: { itemId: "express_city_center", variant: "single", qty: 1, selections: { passenger: [passenger] } },
+        source: "voice",
+        utteranceSeq: ++seq,
+      });
+      await expect(page.getByRole("region", { name: "Your order" }).locator("li")).toHaveCount(seq);
+    });
+  });
+});
+
 test("D1 to D3 with the learned pizza kiosk", async ({ page, request }, info) => {
   const judge = [VIEWPORTS[0]];
   await page.goto("/demo?k=doughhouse");
-  await expect(page.getByRole("link", { name: /Doughhouse Pizza/ })).toHaveAttribute("aria-current", "true", { timeout: 60_000 });
+  await expect(page.getByRole("link", { name: /Doughhouse/ })).toHaveAttribute("aria-current", "true", { timeout: 60_000 });
   await check(page, info, "D1-intro-learned", undefined, judge);
 
   const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");

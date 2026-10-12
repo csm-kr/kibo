@@ -12,7 +12,7 @@ const VIEWPORTS = [
   { width: 320, height: 700 },
 ];
 
-const SECTIONS = ["hero", "people", "how", "safety", "kiosks", "cloud", "access", "footer"];
+const SECTIONS = ["hero", "people", "how", "places", "safety", "kiosks", "cloud", "access", "footer"];
 
 const STRICT = process.env.QA_ALL === "1";
 
@@ -23,6 +23,10 @@ test("root landing page", async ({ page }, info) => {
   await expect(page.getByRole("link", { name: "Try the live demo" })).toBeVisible({ timeout: 60_000 });
   await expect(page.getByRole("link", { name: "Try the live demo" })).toHaveAttribute("href", "/demo");
   await expect(page.getByRole("link", { name: "Two-device mode" })).toHaveAttribute("href", "/kiosk");
+  // "One phone, many kiosks": each place opens its working demo.
+  for (const [name, k] of [["burger shop", "malo"], ["airport rail", "airport_rail"], ["pizza shop", "doughhouse"]]) {
+    await expect(page.getByRole("link", { name: `Try the ${name}` })).toHaveAttribute("href", `/demo?k=${k}`);
+  }
   // Every capture on the page loads (the step forbids mockups; a missing file would show a broken image).
   // Lazy images below the fold have not loaded yet, so each file is fetched instead.
   const srcs = await page.locator("img").evaluateAll((imgs) => imgs.map((img) => (img as HTMLImageElement).src));

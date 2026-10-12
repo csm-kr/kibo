@@ -31,8 +31,9 @@ export interface PhoneLocal {
 /**
  * Which phone screen to show (docs/UX.md screen map P1–P7). The session status decides; local flags fill the gaps.
  * A learned kiosk's order ends at its review: the user pays on the kiosk itself, so P4 there has no pay button.
+ * A kiosk without dine options (a ticket machine) never asks P2; the phone goes straight to talking.
  */
-export function phoneScreen(session: Session | null, local: PhoneLocal, learned = false): PhoneScreenId {
+export function phoneScreen(session: Session | null, local: PhoneLocal, learned = false, dine = true): PhoneScreenId {
   if (local.claimError === "taken") return "taken";
   if (local.claimError === "gone") return "ended";
   if (local.inAppHold) return "inapp";
@@ -44,7 +45,8 @@ export function phoneScreen(session: Session | null, local: PhoneLocal, learned 
     case "connected":
       // No dine option yet (the first one moves to ordering). The dine screen also lets the user just talk.
       if (!local.startSeen) return "start";
-      return local.micHint ? "mic" : "dine";
+      if (local.micHint) return "mic";
+      return dine ? "dine" : "talk";
     case "ordering":
       // Scanned mid-order (Flow B) or the dine option is set: straight to talking, after the mic hint.
       return local.micHint ? "mic" : "talk";

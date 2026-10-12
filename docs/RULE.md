@@ -47,3 +47,8 @@ When an issue class in `docs/ISSUE.md` is seen for the **3rd time**, it becomes 
 - From: `overlay-covers-content` — I-045 (seen 10-13/2-kiosk:5, 10-13/2-kiosk:6), I-101 (10-13/6-learn:5)
 - Why: overlays placed with `absolute` on top of content (AI pill, staff banner, the learned-kiosk widget in `/demo`) hid tiles the user or judge needs, and no automated check catches it because the covered controls stay partly visible or are not focusable.
 - Check: on every QA screenshot that shows an overlay, look at what lies under it; if a tile, control or price is covered at any captured viewport, move the overlay into its own row or log it in `docs/ISSUE.md` with the screenshot name.
+
+### R-007 (proposed): A step that adds a kiosk, or a new kind of kiosk data, walks every phone screen with that kiosk and checks each line of copy against its data and domain
+- From: `wrong-kiosk-copy` — I-098 (seen 10-13/6-learn:3, 10-13/7-environments:4), I-114 (10-13/7-environments:5)
+- Why: the phone was written for MALO, so a new kiosk (pizza, ticket machine) kept burger examples, a dine question and "we'll call your number at the counter", and no check failed because the words are valid English.
+- Check: for the new kiosk, an E2E or QA spec reaches P2 (or its skip), P3, P4, P5 and P6 on the phone; read each screenshot and grep `src/lib/i18n/phone.ts` for food words (burger, cheeseburger, counter, eat) used on that kiosk's screens.

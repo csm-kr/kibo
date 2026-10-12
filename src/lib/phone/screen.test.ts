@@ -54,6 +54,12 @@ describe("phoneScreen", () => {
     expect(phoneScreen(session("connected"), started)).toBe("dine");
   });
 
+  it("connected on a kiosk without dine options (tickets): straight to talking, never the dine question", () => {
+    expect(phoneScreen(session("connected"), fresh, false, false)).toBe("start");
+    expect(phoneScreen(session("connected"), started, false, false)).toBe("talk");
+    expect(phoneScreen(session("connected"), { ...started, micHint: true }, false, false)).toBe("mic");
+  });
+
   it("ordering goes straight to talking, also when scanned mid-order", () => {
     expect(phoneScreen(session("ordering"), fresh)).toBe("talk");
     expect(phoneScreen(session("ordering", { dineOption: "eat_in" }), started)).toBe("talk");

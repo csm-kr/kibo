@@ -65,7 +65,7 @@ journey
 ```
 | Stage | Thinking | Drop-off risk | What must work |
 |---|---|---|---|
-| Land | "What am I looking at?" | Wall of text, nothing to click | One sentence, 3 steps, one [Start] (Flow C1) |
+| Land | "What am I looking at?" | Wall of text, nothing to click | One sentence, 3 steps, three place cards that say who each serves, one [Start] (Flow C1) |
 | Try | "Does the AI really drive the kiosk?" | Mic denied, Live down, quota hit | Text input comes forward automatically; clear "try again in a moment" on 429 (Flow C3) |
 | Judge | "Is this safe and real?" | AI seems to pay by itself; fake screens | Confirm card visible; kiosk highlight is the proof; no mock video inside the app |
 | Leave | "Can I see more?" | Dead end | [Try again] and a link to two-device mode (Flow C5) |

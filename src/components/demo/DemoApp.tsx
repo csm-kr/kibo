@@ -10,6 +10,7 @@ import { examplesFor } from "@/lib/agent/examples";
 import type { KioskData, Locale } from "@/types/menu";
 import { DemoEndCard } from "./DemoEndCard";
 import { DemoIntro } from "./DemoIntro";
+import { environmentOf } from "./environments";
 
 // /demo (docs/UX.md Flow C, screen map D1–D3): the real KioskScreen (or a learned kiosk page with the bridge) and
 // AssistantPanel on one real session. Nothing is recorded or simulated beyond the card reader, and the stand-in goes
@@ -39,10 +40,7 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
         aria-labelledby="demo-kiosk-caption"
         className={`flex h-full flex-none flex-col gap-2 ${learned ? "w-[calc((100dvh-72px)*27/40)]" : "w-[calc((100dvh-72px)*9/16)]"}`}
       >
-        <Caption
-          id="demo-kiosk-caption"
-          text={learned ? "Kiosk (unchanged third-party screen, learned once by KIBO Learn)" : "Kiosk (unchanged, Korean only)"}
-        />
+        <Caption id="demo-kiosk-caption" text={environmentOf(kiosk.kioskId).caption} />
         <div className="min-h-0 flex-1 overflow-hidden rounded-[18px]">
           {learned ? (
             // Keyed by session: [Try again] reloads the kiosk page, so the new order never starts on the old cart.
@@ -89,7 +87,9 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
             clockOffset={demo.clockOffset}
             chatLimit={DEMO_CHAT_LIMIT}
             onTryAgain={tryAgain}
-            endCard={<DemoEndCard locale={locale} learned={learned} onTryAgain={tryAgain} onIntro={demo.stop} />}
+            endCard={
+              <DemoEndCard kioskId={kiosk.kioskId} locale={locale} learned={learned} onTryAgain={tryAgain} onIntro={demo.stop} />
+            }
           />
         </div>
       </section>
