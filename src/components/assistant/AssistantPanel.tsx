@@ -36,19 +36,27 @@ interface Props {
   streamState?: StreamState;
   /** Server time minus local time, from ping; session times are server time. */
   clockOffset?: number;
+  /** /demo only: messages allowed per order (the server's demo limit); then the input gives way to [Try again]. */
+  chatLimit?: number;
+  /** /demo only: a new demo order. */
+  onTryAgain?: () => void;
+  /** /demo only: shown next to the order number and on the ended screen (Flow C5). */
+  endCard?: ReactNode;
 }
 
 /** The parent keys this by session id, so local flags never carry over to a new session. */
 export function AssistantPanel(props: Props) {
   const { kiosk, session, deviceToken, locale, mode } = props;
   const clockOffset = props.clockOffset ?? 0;
-  const [startSeen, setStartSeen] = useState(false);
+  // /demo explains the three steps before it starts, so its phone skips the start screen.
+  const [startSeen, setStartSeen] = useState(mode === "demo");
   const [doneDismissed, setDoneDismissed] = useState(false);
   const [sending, setSending] = useState(false);
   const chat = useChat({ sessionId: session?.sessionId ?? null, token: deviceToken, locale });
   const now = useNow();
   const screen = phoneScreen(session, { claimError: props.claimError ?? null, startSeen, doneDismissed });
   const busy = chat.busy || sending || !deviceToken;
+  const limited = props.chatLimit !== undefined && chat.sent >= props.chatLimit;
 
   async function command(type: CommandType, args: object, cartVersion?: number): Promise<boolean> {
     if (!session || !deviceToken || sending) return false;
@@ -66,6 +74,7 @@ export function AssistantPanel(props: Props) {
 
   /** The confirm card shows `cartVersion`; a spoken "yes" carries it so the server can match it. */
   function say(text: string) {
+    if (limited) return;
     void chat.send(text, session?.status === "confirming" ? session.cartVersion : undefined);
   }
 
@@ -86,6 +95,23 @@ export function AssistantPanel(props: Props) {
   const idle = session ? idleWarning(session, now, clockOffset) : { show: false, secondsLeft: 0 };
   const reconnecting = session !== null && props.streamState !== undefined && props.streamState !== "open";
   const ended = screen === "ended" || screen === "taken";
+
+  /** The text input, or after the demo limit a plain notice with [Try again]. */
+  function composer(hint?: string) {
+    if (limited) {
+      return (
+        <div role="status" className="flex flex-col gap-2">
+          <p className="text-xl font-bold">{pt("demoLimit", locale)}</p>
+          {props.onTryAgain && (
+            <button type="button" onClick={props.onTryAgain} className={PRIMARY}>
+              {pt("tryAgain", locale)}
+            </button>
+          )}
+        </div>
+      );
+    }
+    return <Composer locale={locale} disabled={busy} hint={hint} onSend={say} />;
+  }
 
   let body: ReactNode;
   switch (screen) {
@@ -126,7 +152,7 @@ export function AssistantPanel(props: Props) {
           </Scroll>
           <Footer>
             {/* Mic slot (phase 4, voice): the large mic button goes here, above the text input. */}
-            <Composer locale={locale} disabled={busy} hint={pt("dineOrTalk", locale)} onSend={say} />
+            {composer(pt("dineOrTalk", locale))}
           </Footer>
         </>
       );
@@ -148,11 +174,11 @@ export function AssistantPanel(props: Props) {
               canUndo={!busy && session.undoStack.length > 0}
               onUndo={() => void command("undoLastChange", {})}
             />
-            <Examples examples={props.examples ?? []} locale={locale} disabled={busy} onPick={say} />
+            {!limited && <Examples examples={props.examples ?? []} locale={locale} disabled={busy} onPick={say} />}
           </Scroll>
           <Footer>
             {/* Mic slot (phase 4, voice): the large mic button goes here, above the text input. */}
-            <Composer locale={locale} disabled={busy} onSend={say} />
+            {composer()}
           </Footer>
         </>
       );
@@ -177,7 +203,7 @@ export function AssistantPanel(props: Props) {
           </Scroll>
           <Footer>
             {/* Mic slot (phase 4, voice): a spoken "yes" confirms too. */}
-            <Composer locale={locale} disabled={busy} hint={pt("sayYes", locale)} onSend={say} />
+            {composer(pt("sayYes", locale))}
           </Footer>
         </>
       );
@@ -206,16 +232,20 @@ export function AssistantPanel(props: Props) {
             <p className="font-display text-[7.5rem] leading-none font-bold text-[#3446D4]">{session.orderNumber}</p>
             <p className="text-xl">{pt("pickup", locale)}</p>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              setDoneDismissed(true);
-              chat.reset();
-            }}
-            className={PRIMARY}
-          >
-            {pt("done", locale)}
-          </button>
+          {mode === "demo" && props.endCard ? (
+            props.endCard
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                setDoneDismissed(true);
+                chat.reset();
+              }}
+              className={PRIMARY}
+            >
+              {pt("done", locale)}
+            </button>
+          )}
         </Scroll>
       );
       break;
@@ -226,8 +256,11 @@ export function AssistantPanel(props: Props) {
           <div className="flex flex-col items-center gap-4 py-12 text-center">
             <EndIcon />
             <h1 className="text-2xl font-bold">{pt(screen === "taken" ? "takenTitle" : "endedTitle", locale)}</h1>
-            <p className="text-xl text-[#4B463F]">{pt(screen === "taken" ? "takenNext" : "endedNext", locale)}</p>
+            {!(mode === "demo" && props.endCard) && (
+              <p className="text-xl text-[#4B463F]">{pt(screen === "taken" ? "takenNext" : "endedNext", locale)}</p>
+            )}
           </div>
+          {mode === "demo" && props.endCard}
         </Scroll>
       );
       break;

@@ -12,7 +12,14 @@ import { FOCUS } from "./styles";
 // K8 (status `paid`, docs/UX.md A10–A11): receipt question, then the order number with a visible 10 s countdown
 // before the attract screen (WCAG 2.2.1). Nothing prints. Canvas px.
 
-export function DoneScreen(props: { kiosk: KioskData; session: Session; clockOffset: number; onNewSession(): void }) {
+export function DoneScreen(props: {
+  kiosk: KioskData;
+  session: Session;
+  clockOffset: number;
+  /** /demo: no countdown back to K1; the order number stays until the demo moves on. */
+  keepNumber: boolean;
+  onNewSession(): void;
+}) {
   const { kiosk, session, clockOffset } = props;
   const locale = kiosk.locale;
   const now = useNow();
@@ -26,12 +33,12 @@ export function DoneScreen(props: { kiosk: KioskData; session: Session; clockOff
   const left = doneCountdown(numberAt ?? now + clockOffset, now, clockOffset);
   if (showNumber && numberAt === null) setNumberAt(now + clockOffset);
 
-  const { onNewSession } = props;
+  const { onNewSession, keepNumber } = props;
   useEffect(() => {
-    if (numberAt === null || left > 0 || ended.current) return;
+    if (keepNumber || numberAt === null || left > 0 || ended.current) return;
     ended.current = true;
     onNewSession();
-  }, [numberAt, left, onNewSession]);
+  }, [keepNumber, numberAt, left, onNewSession]);
 
   return (
     <div className="relative flex h-full flex-col">
@@ -65,9 +72,11 @@ export function DoneScreen(props: { kiosk: KioskData; session: Session; clockOff
           <h1 className="k-text-56 font-bold text-[#4B463F]">{kt("orderNumber", locale)}</h1>
           <p className="font-display text-[240px] leading-none font-bold text-(--k-primary)">{session.orderNumber}</p>
           <p className="k-text-56 font-bold">{kt("pickupHint", locale)}</p>
-          <p role="timer" className="k-text-48 mt-12 rounded-full bg-[#F3EEE4] px-12 py-6 font-bold text-[#33302B]">
-            {backInSeconds(left, locale)}
-          </p>
+          {!keepNumber && (
+            <p role="timer" className="k-text-48 mt-12 rounded-full bg-[#F3EEE4] px-12 py-6 font-bold text-[#33302B]">
+              {backInSeconds(left, locale)}
+            </p>
+          )}
         </div>
       )}
     </div>

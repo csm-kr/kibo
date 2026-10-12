@@ -36,7 +36,8 @@ export function CartBar(props: {
         </span>
         <span className="k-text-56 font-display font-bold text-(--k-primary)">{formatWon(props.total)}</span>
       </div>
-      <ul className="flex h-38 gap-6 overflow-x-auto px-2 py-2">
+      {/* Focusable: with three or more lines the row scrolls, and a keyboard must reach it too (WCAG 2.1.1). */}
+      <ul tabIndex={0} className={`flex h-38 gap-6 overflow-x-auto px-2 py-2 ${FOCUS}`}>
         {lines.length === 0 && (
           <li className="k-text-40 flex items-center text-[#4B463F]">{kt("cartEmpty", locale)}</li>
         )}

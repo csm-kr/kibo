@@ -27,6 +27,7 @@ About 20 utterances in Korean and English (the supported languages), each with t
 Report pass rate per type.
 
 ## End to end
+- `npm run test:e2e`: Playwright against the dev server with the in-memory store, no model calls. `npm run test:e2e:live` runs only the `@live` tests (`/demo` typed order to real Gemini; needs `GEMINI_API_KEY` in `.env`).
 - Real phones (iOS Safari, Android Chrome) from QR scan to order number; three consecutive passes the day before recording.
 - iOS checks: mic permission persistence across visits, silent switch, volume, AI voice feeding back into the mic, KakaoTalk/Naver in-app browsers.
 - Live reconnect (network switch, screen lock).

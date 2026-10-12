@@ -57,6 +57,15 @@ const PHONE_TEXT = {
   endedNext: { ko: "다시 주문하려면 키오스크의 QR을 찍어 주세요.", en: "To order again, scan the QR on the kiosk." },
   takenTitle: { ko: "다른 분이 이 키오스크를 쓰고 있어요.", en: "Someone else is using this kiosk." },
   takenNext: { ko: "끝날 때까지 기다리거나 직원에게 물어보세요.", en: "Please wait until they finish, or ask staff." },
+  // /demo only (docs/UX.md Flow C)
+  demoLimit: { ko: "이번 주문의 데모 메시지를 다 썼어요.", en: "Demo limit reached for this order." },
+  tryAgain: { ko: "다시 해 보기", en: "Try again" },
+  twoDeviceHint: {
+    ko: "실제처럼 해 보려면 이 화면에서 키오스크를 열고, 휴대폰으로 QR을 찍으세요.",
+    en: "To try it for real, open the kiosk on this screen and scan its QR with your phone.",
+  },
+  twoDeviceOpen: { ko: "키오스크와 휴대폰으로 해 보기", en: "Open two-device mode" },
+  backToIntro: { ko: "처음 안내로 돌아가기", en: "Back to the intro" },
   // Idle
   idleQuestion: { ko: "계속 주문하시겠어요?", en: "Still ordering?" },
   idleContinue: { ko: "계속하기", en: "Continue" },
@@ -91,7 +100,20 @@ export function phoneSecondsLeft(seconds: number, locale: Locale): string {
   return locale === "ko" ? `${seconds}초 남았어요` : `${seconds} s left`;
 }
 
-/** Example sentences on /assistant (docs/UX.md Flow C2 uses the same ones on /demo). */
+/** Example sentences on /demo (docs/UX.md Flow C2): a short first order before the hero order. */
+export function demoExamples(locale: Locale): string[] {
+  return locale === "ko"
+    ? ["치즈버거 세트 하나, 음료는 제로콜라.", ...phoneExamples(locale)]
+    : [
+        "One cheeseburger set with zero cola",
+        "Two cheeseburger sets, one without pickles. Drinks zero cola and cider.",
+        "Make both fries large",
+        "Is this halal?",
+        "I'll pay",
+      ];
+}
+
+/** Example sentences on /assistant. */
 export function phoneExamples(locale: Locale): string[] {
   return locale === "ko"
     ? ["치즈버거 세트 두 개, 하나는 피클 빼고. 음료는 제로콜라랑 사이다.", "감자튀김 둘 다 라지로 바꿔 줘.", "이거 할랄이에요?", "결제할게요."]

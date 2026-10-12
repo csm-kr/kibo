@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useEffectEvent, useRef, useState, type ReactNode } from "react";
 import type { CommandReply } from "@/lib/client/api";
 import type { CommandType } from "@/lib/commands/schemas";
 import { kt } from "@/lib/i18n/kiosk";
@@ -25,8 +25,10 @@ export function PaymentScreen(props: {
   claimUrl: string | null;
   send(type: CommandType, args: object): Promise<CommandReply | null>;
   onClaimUrl(claimUrl: string): void;
+  /** /demo's card stand-in: each "tap" event inserts the card as if the button below were pressed. */
+  cardTap?: EventTarget;
 }) {
-  const { kiosk, session, send } = props;
+  const { kiosk, session, send, cardTap } = props;
   const locale = kiosk.locale;
   const [step, setStep] = useState<Step>("method");
   const [busy, setBusy] = useState(false);
@@ -41,6 +43,16 @@ export function PaymentScreen(props: {
       if (!(await send("cardAction", {}))) setStep("insert");
     }, APPROVE_MS);
   }
+
+  const onCardTap = useEffectEvent(() => {
+    if (step !== "approving") insertCard();
+  });
+  useEffect(() => {
+    if (!cardTap) return;
+    const on = () => onCardTap();
+    cardTap.addEventListener("tap", on);
+    return () => cardTap.removeEventListener("tap", on);
+  }, [cardTap]);
 
   async function editOrder() {
     if (busy) return;

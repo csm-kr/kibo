@@ -33,9 +33,14 @@ interface Props {
   onNewSession(): void;
   /** [Connect another phone] issued a new QR; the owner stores it. */
   onClaimUrl(claimUrl: string): void;
+  /** /demo only: a "tap" event inserts the card on K7, the same path as the kiosk's own button (Flow C4). */
+  cardTap?: EventTarget;
+  /** /demo only: K8 keeps the order number instead of counting back to K1; the demo's end card moves on. */
+  keepOrderNumber?: boolean;
 }
 
-export function KioskScreen({ kiosk, session, kioskToken, claimUrl, demo, clockOffset, onNewSession, onClaimUrl }: Props) {
+export function KioskScreen(props: Props) {
+  const { kiosk, session, kioskToken, claimUrl, demo, clockOffset, onNewSession, onClaimUrl } = props;
   const locale = kiosk.locale;
   const sessionId = session?.sessionId ?? null;
   // Keyed by session, so a new session starts without the previous one's touch start.
@@ -119,9 +124,23 @@ export function KioskScreen({ kiosk, session, kioskToken, claimUrl, demo, clockO
       ) : screen === "review" && session ? (
         <ReviewScreen kiosk={kiosk} session={session} claimUrl={claimUrl} send={send} onClaimUrl={onClaimUrl} />
       ) : screen === "payment" && session ? (
-        <PaymentScreen kiosk={kiosk} session={session} claimUrl={claimUrl} send={send} onClaimUrl={onClaimUrl} />
+        <PaymentScreen
+          kiosk={kiosk}
+          session={session}
+          claimUrl={claimUrl}
+          send={send}
+          onClaimUrl={onClaimUrl}
+          cardTap={props.cardTap}
+        />
       ) : screen === "done" && session ? (
-        <DoneScreen key={session.sessionId} kiosk={kiosk} session={session} clockOffset={clockOffset} onNewSession={onNewSession} />
+        <DoneScreen
+          key={session.sessionId}
+          kiosk={kiosk}
+          session={session}
+          clockOffset={clockOffset}
+          keepNumber={props.keepOrderNumber ?? false}
+          onNewSession={onNewSession}
+        />
       ) : (
         <>
           <Header kiosk={kiosk} />

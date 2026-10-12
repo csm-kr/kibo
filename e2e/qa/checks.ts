@@ -20,6 +20,8 @@ export interface Profile {
 
 export const KIOSK: Profile = { route: "/kiosk", root: "[data-kiosk-canvas]", canvasWidth: 1080, minFont: 40, minTarget: 40 };
 export const PHONE: Profile = { route: "/assistant", root: "body", minFont: 16, minTarget: 56 };
+/** /demo: the intro, or the phone column of the split. The kiosk half is the scaled canvas, measured at full size by KIOSK. */
+export const DEMO: Profile = { route: "/demo", root: "[data-demo-check]", minFont: 16, minTarget: 56 };
 
 export interface Findings {
   h: string[];
@@ -231,7 +233,8 @@ export async function textSpacing(page: Page, p: Profile): Promise<Findings> {
 export async function focus(page: Page, p: Profile): Promise<Findings> {
   const h: string[] = [];
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
-  const max = Math.min(80, (await page.locator(`${p.root} button:not(:disabled), ${p.root} a[href], ${p.root} input`).count()) + 4);
+  // Counted on the whole page: on /demo the kiosk half's controls come before the checked column in tab order.
+  const max = Math.min(80, (await page.locator("button:not(:disabled), a[href], input").count()) + 4);
   let first: string | null = null;
   for (let i = 0; i < max; i++) {
     await page.keyboard.press("Tab");

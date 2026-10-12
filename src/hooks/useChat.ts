@@ -46,6 +46,8 @@ export function useChat(opts: { sessionId: string | null; token: string | null; 
   return {
     messages: state.messages,
     busy: state.busy,
+    /** Messages sent so far; never goes back, like the server's per-session count. */
+    sent: state.utteranceSeq,
     sentAt,
     send,
     notice: (text: string) => dispatch({ type: "notice", text }),

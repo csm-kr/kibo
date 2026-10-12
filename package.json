@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "vitest run --passWithNoTests",
     "test:e2e": "playwright test",
+    "test:e2e:live": "E2E_LIVE=1 playwright test --grep @live",
     "test:firestore": "FIRESTORE_IT=1 STORE=firestore vitest run src/lib/store/firestore.it.test.ts",
     "qa:ui": "playwright test -c playwright.qa.config.ts"
   },
