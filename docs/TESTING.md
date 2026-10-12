@@ -51,13 +51,15 @@ python3 design/prototype/e2e_check.py   # prototype state logic (42 checks)
 ## Evidence ledger
 | Claim | Value | Evidence | Status |
 |---|---|---|---|
-| Learn a non-blind pizza kiosk (Gemini 3.8 Flash) | 5.5 min, 72 turns, 635,725 input tokens | `spikes/kibo-learn/results/stats.run2.json`, `learn.run2.log` | measured |
-| Replay unseen pizza orders | 4/4 + 1 rule violation detected | `spikes/kibo-learn/results/holdout.run2.log` | measured |
+| Learn a non-blind pizza kiosk (Gemini 3.8 Flash), run 3, **with the finish gate and coverage audit** | finished: 4.8 min, 63 turns, 482,553 input tokens; self-test 3/3 orders (one call); audit passed (0 missing, 0 unknown, 0 hidden), 10-13 | `spikes/kibo-learn/results/run3/learn-stats.json`, `learn.log`, `skill.json` | measured |
+| Replay unseen pizza orders, run 3 skill | 4/4 + 1 rule violation detected; 546–697 ms per order | `spikes/kibo-learn/results/run3/holdout.log` | measured |
+| Learn a non-blind pizza kiosk (Gemini 3.8 Flash), run 2, before the gate and audit | 5.5 min, 72 turns, 635,725 input tokens | `spikes/kibo-learn/results/stats.run2.json`, `learn.run2.log` | measured |
+| Replay unseen pizza orders, run 2 skill | 4/4 + 1 rule violation detected | `spikes/kibo-learn/results/holdout.run2.log` | measured |
 | Blind cafe learning success (Gemini) | 2/3 (10.3 min, 15.1 min) | `spikes/blind-kiosk/results/v3run{1,2,3}/learn-stats.json` | measured |
 | Blind cafe catalog accuracy (Gemini) | items 40/40; options 22/29 and 21/29 | `spikes/blind-kiosk/results/v3run{1,2}/grade.txt`, `grade_fair.txt` | measured |
 | Blind cafe example orders (Gemini) | 2/5 and 3/5 pass; rest refused before execution | `spikes/blind-kiosk/results/holdout.log` | measured |
 | Blind cafe with coverage audit (gpt-6.1-sol, dev only) | items 40/40, audit passed, example orders 2/5 | `spikes/blind-kiosk/results/blind-sol2/` | measured, dev only |
-| Coverage audit regression | 4/4 | `spikes/kibo-learn/test_audit.mjs` | measured |
+| Coverage audit regression | 4/4, 10-13 | `spikes/kibo-learn/results/test_audit.2026-10-13.log` (`spikes/kibo-learn/test_audit.mjs`) | measured |
 | Prototype hero order (reference only) | touch 19 taps vs 5 utterances + 4 phone taps + 3 kiosk taps | `design/prototype/e2e_check.py` | measured, not for the deck |
 | Touch hero order on `/kiosk` (automated tap count) | 41 taps, total 14,800원. Path: both sets added with fries M, then [전체 삭제] and both re-added with fries L, because the kiosk cannot change options on a cart line. The run's 3 s is Playwright speed, not a human timing | `evidence/touch-hero.json` (`e2e/kiosk-touch.spec.ts`, 10-12) | measured, taps only |
 | Bridge replay on the learned pizza kiosk (`/learned/doughhouse`) | 4 commands replayed and verified (dine option, two adds, one remove): replay 68–528 ms each, phone command to accepted report 86–799 ms; a cart edited by hand on the kiosk was caught (`ok: false`, staff called). One automated Playwright run on a laptop, dev server, memory store, no AI, 10-13 | `evidence/bridge-replay.json` (`e2e/learned.spec.ts`) | measured, automated |

@@ -1,0 +1,69 @@
+#1 act {"op":"click","label":"주문하기"}
+#2 act {"label":"화면을 터치하여 주문을 시작하세요","op":"click"}
+#3 record 
+#4 act {"op":"click","label":"🍽 먹고 갈게요"}
+#5 act {"op":"click","label":"마르게리따"}
+#6 act {"op":"click","name":"라지"}
+#7 act {"name":"라지","op":"click","role":"radio"}
+#8 act {"role":"checkbox","name":"베이컨","op":"clickIfVisible"}
+#9 act {"text":"레귤러","op":"clickIfVisible"}
+#10 act {"op":"clickIfVisible","text":"라지"}
+#11 act {"label":"장바구니 담기","op":"click"}
+#12 act {"role":"radio","name":"오리지널","op":"click"}
+#13 act {"op":"click","label":"+"}
+#14 act {"label":"장바구니 담기","op":"click"}
+#15 record 
+#16 act {"label":"아니요, 괜찮아요","op":"click"}
+#17 act {"label":"페퍼로니","op":"click"}
+#18 record 
+#19 act {"label":"닫기","op":"click"}
+#20 act {"label":"불고기 피자","op":"click"}
+#21 record 
+#22 act {"op":"click","label":"닫기"}
+#23 act {"op":"click","label":"품절"}
+#24 record 
+#25 act {"op":"click","label":"사이드"}
+#26 act {"label":"치즈 오븐 스파게티","op":"click"}
+#27 record 
+#28 act {"label":"닫기","op":"click"}
+#29 act {"label":"갈릭디핑소스","op":"click"}
+#30 record 
+#31 act {"op":"click","label":"닫기"}
+#32 act {"op":"click","label":"버팔로 윙 6조각"}
+#33 record 
+#34 act {"op":"click","label":"닫기"}
+#35 act {"op":"click","label":"음료"}
+#36 act {"label":"콜라","op":"click"}
+#37 record 
+#38 act {"op":"click","label":"닫기"}
+#39 act {"op":"click","label":"제로콜라"}
+#40 record 
+#41 act {"op":"click","label":"닫기"}
+#42 act {"op":"click","label":"사이다"}
+#43 record 
+#44 act {"op":"click","label":"닫기"}
+#45 act {"label":"주문하기","op":"click"}
+#46 records 
+#47 reload 
+#48 act {"label":"화면을 터치하여 주문을 시작하세요","op":"click"}
+#49 act {"label":"🍽 먹고 갈게요","op":"click"}
+#50 act {"op":"click","label":"사이드"}
+#51 act {"op":"click","label":"갈릭디핑소스"}
+#52 act {"op":"click","label":"장바구니 담기"}
+#53 act {"op":"click","label":"피자"}
+#54 act {"label":"마르게리따","op":"click"}
+#55 act {"role":"radio","name":"레귤러","op":"click"}
+#56 act {"op":"click","role":"radio","name":"오리지널"}
+#57 act {"op":"click","label":"장바구니 담기"}
+#58 act {"label":"아니요, 괜찮아요","op":"click"}
+#59 act {"op":"click","label":"음료"}
+#60 act {"op":"click","label":"콜라"}
+#61 testSkill 
+  test #1: PASS PASS PASS
+#62 audit 
+  audit #1: OK missing=0 unknown=0 hidden=0
+#63 finish 
+  finish audit: OK
+{"provider":"gemini","model":"gemini-3.8-flash","cachedInputTokens":0,"finished":true,"turns":63,"acts":47,"tests":1,"inputTokens":482553,"outputTokens":9905,"minutes":"4.8"}
+
+[exited with code 0]

@@ -1,0 +1,7 @@
+# 2026-10-13, cwd spikes/kibo-learn, Chrome headless (playwright-core)
+# node test_audit.mjs file://.../spikes/kibo-learn/kiosk/index.html file://.../spikes/blind-kiosk/app/index.html
+# stdout copied verbatim (the harness shell does not allow redirects); process exited 0
+PASS complete pizza skill passes
+PASS skill missing three categories is rejected
+PASS complete 40-item cafe skill passes
+PASS category disguised as a button is caught

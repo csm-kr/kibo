@@ -37,7 +37,10 @@
     {
       "step": 4,
       "name": "learn-rerun",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-13T04:32:44+0900",
+      "summary": "Audit regression (I-022 fixed): 4/4 in spikes/kibo-learn/results/test_audit.2026-10-13.log. Gemini re-run on Doughhouse (PROVIDER=gemini, gemini-3.8-flash, default 2M token cap, one attempt) in spikes/kibo-learn/results/run3/ (learn.log, learn-stats.json, skill.json, holdout.log): finished through the gate, 4.8 min, 63 turns, 47 acts, 482,553 input / 9,905 output tokens, one testSkill call 3/3 orders, audit OK (0 missing/unknown/hidden), finish audit OK; holdout 4/4 PASS + rule violation DETECTED, 546-697 ms per order. Docs: KIBO_LEARN 'Results so far' gains the run-3 row and says only run 3 includes the gate (blind cafe not re-run); TESTING ledger gains run-3 learn and holdout rows (run-2 rows kept, marked 'before the gate'), audit row points to the log. Diff vs reviewed skills/doughhouse.json (not replaced): catalog names, prices, soldOut, option names, deltas, min/max and the startOrder/addToCart recipes are identical; run 3 group names keep UI hints ('사이즈 (필수)', '토핑 추가 (최대 3개)'); sold-out 포테이토 피자 has no option groups (reviewed copies the pizza groups, as run 2 did); uiLabels include 주문하기 (checkout, forbidden in the reviewed skill) and 품절 and omit the start-screen label; no removeLine recipe, cartLinePattern, forbiddenLabels, checkout, ids or English names (added in review); cartTotalPattern '합계 ([0-9,]+)원' vs reviewed '합계\\\\s*([0-9,]+)원'. Scripts ran via node -e wrappers (cwd results/run3, KIOSK_URL set) because env prefixes and redirects are blocked; logs were copied verbatim. No ya29./AIza in results. spikes/kibo-learn/package-lock.json from npm install left untracked. AC: lint, build, test (566 pass) green.",
+      "completed_at": "2026-10-13T04:42:00+0900"
     },
     {
       "step": 5,

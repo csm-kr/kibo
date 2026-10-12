@@ -59,14 +59,15 @@ Tool call → arguments validated against the skill catalog → the in-page brid
 ## Results so far
 | Run | Model | Result |
 |---|---|---|
-| Doughhouse (10 items, ours) | Gemini 3.8 Flash | 5.5 min, 636k input tokens; catalog exact; unseen orders 4/4 + rule violation detected |
+| Doughhouse, run 3 (10-13, **with the finish gate and audit**) | Gemini 3.8 Flash | finished: 4.8 min, 63 turns, 482,553 input tokens; one self-test call of 3 orders 3/3; audit passed (0 missing, 0 unknown, 0 hidden); items, prices and options match the reviewed skill (the sold-out pizza has no options, it cannot be opened); unseen orders 4/4 + rule violation detected, 546–697 ms each (`results/run3/`) |
+| Doughhouse (10 items, ours), run 2 | Gemini 3.8 Flash | 5.5 min, 636k input tokens; catalog exact; unseen orders 4/4 + rule violation detected |
 | Doughhouse | gpt-6.1-sol (dev) | 3.1 min, 181k input tokens; unseen orders 4/4 + violation detected |
 | Gureum Darak Coffee (40 items, blind) | Gemini 3.8 Flash ×3 | 2/3 finished; items 40/40; options 21–22/29 exact |
 | Gureum Darak Coffee | gpt-6.1-sol, no audit (dev) | finished early with only 23/40 items |
 | Gureum Darak Coffee | gpt-6.1-sol + audit (dev) | 16.1 min; **40/40 items**; audit passed; example orders 2/5 |
 | Doughhouse | Gemini Flash-Lite / gpt-6-luna | failed or shallow; not suitable |
 
-The Gemini runs above were made before the ≥ 3 self-test finish gate and the coverage audit existed (`stats.run2.json` records 2 tests). A Gemini re-run with both is planned for 10/15.
+Only run 3 includes the ≥ 3 self-test finish gate and the coverage audit (`spikes/kibo-learn/results/run3/learn-stats.json`, `learn.log`). The other Gemini runs above were made before both existed (`stats.run2.json` records 2 tests). The blind Gureum Darak Coffee kiosk has not been re-run with Gemini under the gate.
 
 Evidence files are listed in `docs/TESTING.md`.
 
