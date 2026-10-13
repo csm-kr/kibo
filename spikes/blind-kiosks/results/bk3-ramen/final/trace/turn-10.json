@@ -1,0 +1,35 @@
+{
+  "n": 10,
+  "at": "2026-10-13T21:00:54.497Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "매운 돈코츠 라멘"
+      }
+    ]
+  },
+  "resultSummary": "tapped 매운 돈코츠 라멘",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "매운 돈코츠 라멘"
+          }
+        ]
+      },
+      "resultSummary": "tapped 매운 돈코츠 라멘"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 5105,
+  "outputTokens": 28
+}

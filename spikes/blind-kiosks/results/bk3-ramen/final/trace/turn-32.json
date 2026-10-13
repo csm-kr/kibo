@@ -1,0 +1,59 @@
+{
+  "n": 32,
+  "at": "2026-10-13T21:02:18.740Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "전체 취소"
+      },
+      {
+        "op": "click",
+        "label": "모두 취소"
+      },
+      {
+        "op": "click",
+        "label": "덮밥"
+      },
+      {
+        "op": "click",
+        "label": "차슈 덮밥"
+      }
+    ]
+  },
+  "resultSummary": "tapped 전체 취소 → 모두 취소 → 덮밥 → 차슈 덮밥",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "전체 취소"
+          },
+          {
+            "op": "click",
+            "label": "모두 취소"
+          },
+          {
+            "op": "click",
+            "label": "덮밥"
+          },
+          {
+            "op": "click",
+            "label": "차슈 덮밥"
+          }
+        ]
+      },
+      "resultSummary": "tapped 전체 취소 → 모두 취소 → 덮밥 → 차슈 덮밥"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 6969,
+  "outputTokens": 70
+}

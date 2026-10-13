@@ -1,0 +1,41 @@
+{
+  "n": 43,
+  "at": "2026-10-13T21:03:04.496Z",
+  "tool": "record",
+  "args": {
+    "kind": "item",
+    "names": [
+      "여행용 목베개",
+      "멀티 여행 어댑터",
+      "휴대용 보조배터리",
+      "일회용 마스크 5매",
+      "여행용 세면도구 키트",
+      "수면 안대"
+    ]
+  },
+  "resultSummary": "recorded item 여행용 목베개, 멀티 여행 어댑터, 휴대용 보조배터리, 일회용 마스크 5매, 여행용 세면도구 키트, 수면 안대",
+  "calls": [
+    {
+      "tool": "record",
+      "args": {
+        "kind": "item",
+        "names": [
+          "여행용 목베개",
+          "멀티 여행 어댑터",
+          "휴대용 보조배터리",
+          "일회용 마스크 5매",
+          "여행용 세면도구 키트",
+          "수면 안대"
+        ]
+      },
+      "resultSummary": "recorded item 여행용 목베개, 멀티 여행 어댑터, 휴대용 보조배터리, 일회용 마스크 5매, 여행용 세면도구 키트, 수면 안대"
+    }
+  ],
+  "discoveries": {
+    "items": 32,
+    "optionGroups": 14,
+    "categories": 5
+  },
+  "inputTokens": 12385,
+  "outputTokens": 313
+}

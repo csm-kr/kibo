@@ -1,0 +1,18 @@
+{
+  "kioskId": "bk3-ramen",
+  "provider": "gemini",
+  "model": "gemini-3.8-flash",
+  "startedAt": "2026-10-13T20:59:14.596Z",
+  "endedAt": "2026-10-13T21:07:13.702Z",
+  "gate": {
+    "tests": 1,
+    "testsPassedForFinish": true,
+    "audits": 2,
+    "auditOk": true,
+    "finished": true
+  },
+  "turns": 46,
+  "inputTokens": 437774,
+  "cachedInputTokens": 227679,
+  "outputTokens": 19472
+}

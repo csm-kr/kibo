@@ -1,0 +1,705 @@
+{
+  "kiosk": "하늘곳간",
+  "categories": [
+    "김밥·도시락",
+    "샌드위치·베이커리",
+    "음료",
+    "간식",
+    "여행용품",
+    "기념품"
+  ],
+  "uiLabels": [
+    "화면을 터치하여 주문을 시작하세요",
+    "한국어",
+    "English",
+    "처음으로",
+    "전체 삭제",
+    "취소",
+    "예",
+    "아니요",
+    "🛒 장바구니",
+    "닫기 ✕",
+    "+",
+    "−",
+    "✕"
+  ],
+  "forbiddenLabels": [
+    "주문하기"
+  ],
+  "dineOptions": {
+    "take_out": "화면을 터치하여 주문을 시작하세요",
+    "eat_in": "화면을 터치하여 주문을 시작하세요"
+  },
+  "recipes": {
+    "startOrder": [
+      {
+        "op": "click",
+        "label": "화면을 터치하여 주문을 시작하세요"
+      }
+    ],
+    "addToCart": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "clickIfVisible",
+        "label": "예"
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "label": "{item}"
+          }
+        ]
+      }
+    ],
+    "withOptions": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "chooseOptions",
+        "steps": [
+          {
+            "op": "click",
+            "label": "{option}"
+          }
+        ]
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "label": "+",
+            "within": "수량"
+          }
+        ]
+      },
+      {
+        "op": "click",
+        "role": "button",
+        "name": "담기",
+        "within": "취소"
+      }
+    ]
+  },
+  "cartTotalPattern": "합계[^\\d]*([0-9,]+)원",
+  "notes": [
+    "포장 전용 매장입니다. 시작 화면을 터치하여 바로 메뉴로 진입합니다.",
+    "주류(활주로 라거) 주문 시 '만 19세 이상입니까?' 팝업이 뜨며 '예'를 눌러야 합니다.",
+    "음료 1+1 상품(꿀바나나우유, 제주감귤주스)은 담을 때 증정품이 자동으로 장바구니에 추가됩니다."
+  ],
+  "catalog": [
+    {
+      "name": "야채김밥",
+      "category": "김밥·도시락",
+      "price": 3500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "참치김밥",
+      "category": "김밥·도시락",
+      "price": 4200,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "불고기김밥",
+      "category": "김밥·도시락",
+      "price": 4500,
+      "soldOut": true,
+      "optionGroups": []
+    },
+    {
+      "name": "아침 한정 계란김밥 세트",
+      "category": "김밥·도시락",
+      "price": 5500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "제육도시락",
+      "category": "김밥·도시락",
+      "price": 6900,
+      "soldOut": false,
+      "recipe": "withOptions",
+      "optionGroups": [
+        {
+          "name": "데우기 여부",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "데워 주세요",
+              "priceDelta": 0
+            },
+            {
+              "name": "데우지 않음",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "치킨마요덮밥",
+      "category": "김밥·도시락",
+      "price": 6500,
+      "soldOut": false,
+      "recipe": "withOptions",
+      "optionGroups": [
+        {
+          "name": "데우기 여부",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "데워 주세요",
+              "priceDelta": 0
+            },
+            {
+              "name": "데우지 않음",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "유부초밥 4입",
+      "category": "김밥·도시락",
+      "price": 4000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "햄치즈 샌드위치",
+      "category": "샌드위치·베이커리",
+      "price": 4300,
+      "soldOut": false,
+      "recipe": "withOptions",
+      "optionGroups": [
+        {
+          "name": "데우기 여부",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "데워 주세요",
+              "priceDelta": 0
+            },
+            {
+              "name": "데우지 않음",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "에그마요 샌드위치",
+      "category": "샌드위치·베이커리",
+      "price": 3900,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "치킨 랩",
+      "category": "샌드위치·베이커리",
+      "price": 5200,
+      "soldOut": false,
+      "recipe": "withOptions",
+      "optionGroups": [
+        {
+          "name": "데우기 여부",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "데워 주세요",
+              "priceDelta": 0
+            },
+            {
+              "name": "데우지 않음",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "소스 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "허니머스타드",
+              "priceDelta": 0
+            },
+            {
+              "name": "스위트칠리",
+              "priceDelta": 0
+            },
+            {
+              "name": "갈릭마요",
+              "priceDelta": 300
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "버터 크루아상",
+      "category": "샌드위치·베이커리",
+      "price": 2800,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "블루베리 머핀",
+      "category": "샌드위치·베이커리",
+      "price": 3200,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "클래식 핫도그",
+      "category": "샌드위치·베이커리",
+      "price": 3800,
+      "soldOut": false,
+      "recipe": "withOptions",
+      "optionGroups": [
+        {
+          "name": "소스 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "허니머스타드",
+              "priceDelta": 0
+            },
+            {
+              "name": "스위트칠리",
+              "priceDelta": 0
+            },
+            {
+              "name": "갈릭마요",
+              "priceDelta": 300
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "아메리카노",
+      "category": "음료",
+      "price": 2500,
+      "soldOut": false,
+      "recipe": "withOptions",
+      "optionGroups": [
+        {
+          "name": "온도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "HOT 따뜻하게",
+              "priceDelta": 0
+            },
+            {
+              "name": "ICE 차갑게",
+              "priceDelta": 300
+            }
+          ]
+        },
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "레귤러",
+              "priceDelta": 0
+            },
+            {
+              "name": "라지",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "샷 추가",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "에스프레소 샷 +500원"
+            }
+          ],
+          "options": [
+            {
+              "name": "에스프레소 샷",
+              "priceDelta": 500,
+              "maxQty": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "카페라떼",
+      "category": "음료",
+      "price": 3200,
+      "soldOut": false,
+      "recipe": "withOptions",
+      "optionGroups": [
+        {
+          "name": "온도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "HOT 따뜻하게",
+              "priceDelta": 0
+            },
+            {
+              "name": "ICE 차갑게",
+              "priceDelta": 300
+            }
+          ]
+        },
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "레귤러",
+              "priceDelta": 0
+            },
+            {
+              "name": "라지",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "샷 추가",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "에스프레소 샷 +500원"
+            }
+          ],
+          "options": [
+            {
+              "name": "에스프레소 샷",
+              "priceDelta": 500,
+              "maxQty": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "생수 500ml",
+      "category": "음료",
+      "price": 1000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "꿀바나나우유",
+      "category": "음료",
+      "price": 1800,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "제주감귤주스",
+      "category": "음료",
+      "price": 2400,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "레몬 탄산수",
+      "category": "음료",
+      "price": 1600,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "활주로 라거 500ml",
+      "category": "음료",
+      "price": 4500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "버터감자칩",
+      "category": "간식",
+      "price": 2000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "초코 크런치바",
+      "category": "간식",
+      "price": 1500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "젤리 믹스",
+      "category": "간식",
+      "price": 2200,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "견과류 한줌",
+      "category": "간식",
+      "price": 2500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "치킨텐더 4조각",
+      "category": "간식",
+      "price": 5500,
+      "soldOut": false,
+      "recipe": "withOptions",
+      "optionGroups": [
+        {
+          "name": "소스 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "허니머스타드",
+              "priceDelta": 0
+            },
+            {
+              "name": "스위트칠리",
+              "priceDelta": 0
+            },
+            {
+              "name": "갈릭마요",
+              "priceDelta": 300
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "구운 달걀 2입",
+      "category": "간식",
+      "price": 2000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "여행용 목베개",
+      "category": "여행용품",
+      "price": 15000,
+      "soldOut": false,
+      "recipe": "withOptions",
+      "optionGroups": [
+        {
+          "name": "색상",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "네이비",
+              "priceDelta": 0
+            },
+            {
+              "name": "그레이",
+              "priceDelta": 0
+            },
+            {
+              "name": "베이지",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "멀티 여행 어댑터",
+      "category": "여행용품",
+      "price": 18000,
+      "soldOut": true,
+      "optionGroups": []
+    },
+    {
+      "name": "휴대용 보조배터리",
+      "category": "여행용품",
+      "price": 25000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "일회용 마스크 5매",
+      "category": "여행용품",
+      "price": 3000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "여행용 세면도구 키트",
+      "category": "여행용품",
+      "price": 8500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "수면 안대",
+      "category": "여행용품",
+      "price": 6000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "한복 곰 키링",
+      "category": "기념품",
+      "price": 9000,
+      "soldOut": false,
+      "recipe": "withOptions",
+      "optionGroups": [
+        {
+          "name": "선물 포장",
+          "required": false,
+          "min": 0,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "포장 안 함",
+              "priceDelta": 0
+            },
+            {
+              "name": "선물 포장",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "전통 문양 손거울",
+      "category": "기념품",
+      "price": 12000,
+      "soldOut": false,
+      "recipe": "withOptions",
+      "optionGroups": [
+        {
+          "name": "선물 포장",
+          "required": false,
+          "min": 0,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "포장 안 함",
+              "priceDelta": 0
+            },
+            {
+              "name": "선물 포장",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "꿀약과 6입",
+      "category": "기념품",
+      "price": 7500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "서울 엽서 세트",
+      "category": "기념품",
+      "price": 5000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "자개 책갈피",
+      "category": "기념품",
+      "price": 8000,
+      "soldOut": false,
+      "recipe": "withOptions",
+      "optionGroups": [
+        {
+          "name": "선물 포장",
+          "required": false,
+          "min": 0,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "포장 안 함",
+              "priceDelta": 0
+            },
+            {
+              "name": "선물 포장",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

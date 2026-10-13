@@ -1,0 +1,846 @@
+{
+  "kioskId": "bk3-ramen",
+  "label": "baseline/regrade-step4",
+  "gradedAt": "2026-10-13T21:08:11.884Z",
+  "skill": "present",
+  "files": {
+    "skill": "spikes/blind-kiosks/results/bk3-ramen/baseline/skill.json",
+    "key": "spikes/blind-kiosks/bk3-ramen/answer-key.json",
+    "app": "spikes/blind-kiosks/bk3-ramen/app/index.html"
+  },
+  "summary": "bk3-ramen/baseline/regrade-step4: learning finished, 20.6 min, 95 turns, 1582965 input tokens; items 25/25 (precision 1), price 25/25, options exact 4/14 (openable 4/13); orders correct 2, safe refusal 6, unsafe 2 of 10 (cart lines read in 0)",
+  "learning": {
+    "provider": "gemini",
+    "model": "gemini-3.8-flash",
+    "cachedInputTokens": 0,
+    "finished": true,
+    "turns": 95,
+    "acts": 80,
+    "tests": 8,
+    "inputTokens": 1582965,
+    "outputTokens": 20044,
+    "minutes": "20.6"
+  },
+  "catalog": {
+    "items": {
+      "key": 25,
+      "skill": 25,
+      "matched": 25,
+      "recall": 1,
+      "precision": 1,
+      "missing": [],
+      "extra": []
+    },
+    "price": {
+      "correct": 25,
+      "of": 25
+    },
+    "category": {
+      "correct": 25,
+      "of": 25
+    },
+    "soldOut": {
+      "correct": 25,
+      "of": 25
+    },
+    "options": {
+      "itemsExact": 4,
+      "items": 14,
+      "openableExact": 4,
+      "openable": 13,
+      "groups": 28,
+      "groupsFound": 11,
+      "groupLabelsExact": 11,
+      "groupRulesCorrect": 11,
+      "quantityGroups": 8,
+      "quantityRecognized": 0,
+      "conditionalGroups": 0,
+      "conditionalFound": 0
+    },
+    "perItem": [
+      {
+        "name": "돈코츠 라멘",
+        "skillName": "돈코츠 라멘",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "차슈 2000",
+            "계란 1000",
+            "김 500",
+            "숙주 500",
+            "멘마 1000",
+            "콘버터 1500"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "매운 돈코츠 라멘",
+        "skillName": "매운 돈코츠 라멘",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "차슈 2000",
+            "계란 1000",
+            "김 500",
+            "숙주 500",
+            "멘마 1000",
+            "콘버터 1500"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "쇼유 라멘",
+        "skillName": "쇼유 라멘",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "차슈 2000",
+            "계란 1000",
+            "김 500",
+            "숙주 500",
+            "멘마 1000",
+            "콘버터 1500"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "시오 라멘",
+        "skillName": "시오 라멘",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "차슈 2000",
+            "계란 1000",
+            "김 500",
+            "숙주 500",
+            "멘마 1000",
+            "콘버터 1500"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "미소 라멘",
+        "skillName": "미소 라멘",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "차슈 2000",
+            "계란 1000",
+            "김 500",
+            "숙주 500",
+            "멘마 1000",
+            "콘버터 1500"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "탄탄멘",
+        "skillName": "탄탄멘",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "차슈 2000",
+            "계란 1000",
+            "김 500",
+            "숙주 500",
+            "멘마 1000",
+            "콘버터 1500"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "차슈 듬뿍 라멘",
+        "skillName": "차슈 듬뿍 라멘",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "차슈 2000",
+            "계란 1000",
+            "김 500",
+            "숙주 500",
+            "멘마 1000",
+            "콘버터 1500"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "츠케멘",
+        "skillName": "츠케멘",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "꼬들 0",
+            "보통 0",
+            "부드럽게 0",
+            "차슈 2000",
+            "계란 1000",
+            "김 500",
+            "숙주 500",
+            "멘마 1000",
+            "콘버터 1500"
+          ],
+          "extra": []
+        }
+      },
+      {
+        "name": "차슈 덮밥",
+        "skillName": "차슈 덮밥",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "규동",
+        "skillName": "규동",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "치킨 마요 덮밥",
+        "skillName": "치킨 마요 덮밥",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "연어 덮밥",
+        "skillName": "연어 덮밥",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "교자 (5개)",
+        "skillName": "교자 (5개)",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "가라아게 (4조각)",
+        "skillName": "가라아게 (4조각)",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "타코야키 (6개)",
+        "skillName": "타코야키 (6개)",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "미니 차슈덮밥",
+        "skillName": "미니 차슈덮밥",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "공기밥",
+        "skillName": "공기밥",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "에다마메",
+        "skillName": "에다마메",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "콜라",
+        "skillName": "콜라",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "사이다",
+        "skillName": "사이다",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "제로 콜라",
+        "skillName": "제로 콜라",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "우롱차",
+        "skillName": "우롱차",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "유자 에이드",
+        "skillName": "유자 에이드",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "라멘 기본 세트",
+        "skillName": "라멘 기본 세트",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "돈코츠 라멘 0",
+            "쇼유 라멘 0",
+            "시오 라멘 0",
+            "미소 라멘 0",
+            "매운 돈코츠 라멘 500",
+            "탄탄멘 1000",
+            "차슈 듬뿍 라멘 3000",
+            "꼬들 0",
+            "보통 0",
+            "부드럽게 0",
+            "교자 (5개) 0",
+            "에다마메 0",
+            "가라아게 (4조각) 1000",
+            "콜라 0",
+            "사이다 0",
+            "제로 콜라 0",
+            "우롱차 500",
+            "유자 에이드 1500"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "라멘 든든 세트",
+        "skillName": "라멘 든든 세트",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "돈코츠 라멘 0",
+            "쇼유 라멘 0",
+            "시오 라멘 0",
+            "미소 라멘 0",
+            "매운 돈코츠 라멘 500",
+            "탄탄멘 1000",
+            "차슈 듬뿍 라멘 3000",
+            "꼬들 0",
+            "보통 0",
+            "부드럽게 0",
+            "가라아게 (4조각) 0",
+            "미니 차슈덮밥 0",
+            "콜라 0",
+            "사이다 0",
+            "제로 콜라 0",
+            "우롱차 500",
+            "유자 에이드 1500"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      }
+    ],
+    "perGroup": [
+      {
+        "item": "돈코츠 라멘",
+        "group": "firmness",
+        "found": true,
+        "skillGroup": "면 익힘 정도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "돈코츠 라멘",
+        "group": "toppings",
+        "found": false,
+        "skillGroup": null,
+        "quantity": false
+      },
+      {
+        "item": "매운 돈코츠 라멘",
+        "group": "firmness",
+        "found": true,
+        "skillGroup": "면 익힘 정도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "매운 돈코츠 라멘",
+        "group": "toppings",
+        "found": false,
+        "skillGroup": null,
+        "quantity": false
+      },
+      {
+        "item": "쇼유 라멘",
+        "group": "firmness",
+        "found": true,
+        "skillGroup": "면 익힘 정도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "쇼유 라멘",
+        "group": "toppings",
+        "found": false,
+        "skillGroup": null,
+        "quantity": false
+      },
+      {
+        "item": "시오 라멘",
+        "group": "firmness",
+        "found": true,
+        "skillGroup": "면 익힘 정도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "시오 라멘",
+        "group": "toppings",
+        "found": false,
+        "skillGroup": null,
+        "quantity": false
+      },
+      {
+        "item": "미소 라멘",
+        "group": "firmness",
+        "found": true,
+        "skillGroup": "면 익힘 정도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "미소 라멘",
+        "group": "toppings",
+        "found": false,
+        "skillGroup": null,
+        "quantity": false
+      },
+      {
+        "item": "탄탄멘",
+        "group": "firmness",
+        "found": true,
+        "skillGroup": "면 익힘 정도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "탄탄멘",
+        "group": "toppings",
+        "found": false,
+        "skillGroup": null,
+        "quantity": false
+      },
+      {
+        "item": "차슈 듬뿍 라멘",
+        "group": "firmness",
+        "found": true,
+        "skillGroup": "면 익힘 정도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "차슈 듬뿍 라멘",
+        "group": "toppings",
+        "found": false,
+        "skillGroup": null,
+        "quantity": false
+      },
+      {
+        "item": "츠케멘",
+        "group": "firmness",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "츠케멘",
+        "group": "toppings",
+        "found": false,
+        "skillGroup": null,
+        "quantity": false
+      },
+      {
+        "item": "차슈 덮밥",
+        "group": "rice_size",
+        "found": true,
+        "skillGroup": "밥 양",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "규동",
+        "group": "rice_size",
+        "found": true,
+        "skillGroup": "밥 양",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "치킨 마요 덮밥",
+        "group": "rice_size",
+        "found": true,
+        "skillGroup": "밥 양",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "연어 덮밥",
+        "group": "rice_size",
+        "found": true,
+        "skillGroup": "밥 양",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "라멘 기본 세트",
+        "group": "set_ramen",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "라멘 기본 세트",
+        "group": "firmness",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "라멘 기본 세트",
+        "group": "set_side_basic",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "라멘 기본 세트",
+        "group": "set_drink",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "라멘 든든 세트",
+        "group": "set_ramen",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "라멘 든든 세트",
+        "group": "firmness",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "라멘 든든 세트",
+        "group": "set_side_hearty",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "라멘 든든 세트",
+        "group": "set_drink",
+        "found": false,
+        "skillGroup": null
+      }
+    ]
+  },
+  "orders": {
+    "total": 10,
+    "correct": 2,
+    "safeRefusal": 6,
+    "unsafe": 2,
+    "linesChecked": 0,
+    "results": [
+      {
+        "id": "h1",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": false,
+        "expectedTotal": 9000,
+        "kioskTotal": 9000,
+        "skillPredicts": 9000,
+        "ms": 365,
+        "totalCannotSee": [
+          "쇼유 라멘 › 보통"
+        ],
+        "order": {
+          "dineOption": "매장에서 먹어요",
+          "lines": [
+            {
+              "category": "라멘",
+              "item": "쇼유 라멘",
+              "options": [
+                "보통"
+              ],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h2",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 돈코츠 라멘 › 차슈",
+        "linesChecked": null,
+        "expectedTotal": 14500,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "돈코츠 라멘 › 꼬들",
+          "돈코츠 라멘 › 계란"
+        ],
+        "order": null
+      },
+      {
+        "id": "h3",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 라멘 기본 세트 › 탄탄멘",
+        "linesChecked": null,
+        "expectedTotal": 17000,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "라멘 기본 세트 › 부드럽게"
+        ],
+        "order": null
+      },
+      {
+        "id": "h4",
+        "outcome": "unsafe",
+        "reason": "a step failed: label \"수량 더하기\" matches 2 elements (near: 교자 (5개) | 콜라); add \"within\": \"<text near the one you mean>\"",
+        "linesChecked": null,
+        "expectedTotal": 13000,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [],
+        "order": {
+          "dineOption": "가져갈게요",
+          "lines": [
+            {
+              "category": "사이드",
+              "item": "교자 (5개)",
+              "options": [],
+              "qty": 2
+            },
+            {
+              "category": "음료",
+              "item": "콜라",
+              "options": [],
+              "qty": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "h5",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": false,
+        "expectedTotal": 16500,
+        "kioskTotal": 16500,
+        "skillPredicts": 16500,
+        "ms": 418,
+        "totalCannotSee": [],
+        "order": {
+          "dineOption": "매장에서 먹어요",
+          "lines": [
+            {
+              "category": "덮밥",
+              "item": "규동",
+              "options": [
+                "곱빼기 +1,000원"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "덮밥",
+              "item": "치킨 마요 덮밥",
+              "options": [
+                "보통"
+              ],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h6",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 미소 라멘 › 김",
+        "linesChecked": null,
+        "expectedTotal": 29500,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "미소 라멘 › 보통",
+          "미소 라멘 › 김",
+          "라멘 든든 세트 › 꼬들",
+          "라멘 든든 세트 › 미니 차슈덮밥"
+        ],
+        "order": null
+      },
+      {
+        "id": "h7",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 시오 라멘 › 숙주",
+        "linesChecked": null,
+        "expectedTotal": 19500,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "시오 라멘 › 보통",
+          "시오 라멘 › 보통",
+          "시오 라멘 › 숙주"
+        ],
+        "order": null
+      },
+      {
+        "id": "h8",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 매운 돈코츠 라멘 › 계란",
+        "linesChecked": null,
+        "expectedTotal": 25000,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "매운 돈코츠 라멘 › 꼬들",
+          "매운 돈코츠 라멘 › 계란"
+        ],
+        "order": null
+      },
+      {
+        "id": "h9",
+        "outcome": "unsafe",
+        "reason": "a step failed: label \"수량 더하기\" matches 3 elements (near: 차슈 덮밥 | 에다마메 | 사이다); add \"within\": \"<text near the one you mean>\"",
+        "linesChecked": null,
+        "expectedTotal": 17500,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [],
+        "order": {
+          "dineOption": "가져갈게요",
+          "lines": [
+            {
+              "category": "덮밥",
+              "item": "차슈 덮밥",
+              "options": [
+                "보통"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "사이드",
+              "item": "에다마메",
+              "options": [],
+              "qty": 1
+            },
+            {
+              "category": "음료",
+              "item": "사이다",
+              "options": [],
+              "qty": 3
+            }
+          ]
+        }
+      },
+      {
+        "id": "h10",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 차슈 듬뿍 라멘 › 차슈",
+        "linesChecked": null,
+        "expectedTotal": 51500,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "차슈 듬뿍 라멘 › 부드럽게",
+          "차슈 듬뿍 라멘 › 계란",
+          "차슈 듬뿍 라멘 › 김",
+          "차슈 듬뿍 라멘 › 멘마",
+          "라멘 기본 세트 › 쇼유 라멘",
+          "라멘 기본 세트 › 보통",
+          "라멘 기본 세트 › 교자 (5개)",
+          "라멘 기본 세트 › 제로 콜라"
+        ],
+        "order": null
+      }
+    ]
+  }
+}

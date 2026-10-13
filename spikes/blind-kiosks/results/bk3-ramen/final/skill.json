@@ -1,0 +1,1048 @@
+{
+  "kiosk": "면구름 라멘",
+  "categories": [
+    "라멘",
+    "덮밥",
+    "사이드",
+    "음료",
+    "세트"
+  ],
+  "uiLabels": [
+    "전체",
+    "처음으로",
+    "전체 취소",
+    "모두 취소",
+    "취소",
+    "담기",
+    "다음",
+    "이전",
+    "수량 빼기",
+    "수량 더하기",
+    "-",
+    "+",
+    "품절"
+  ],
+  "forbiddenLabels": [
+    "주문하기"
+  ],
+  "dineOptions": {
+    "eat_in": "매장에서 먹어요",
+    "take_out": "가져갈게요"
+  },
+  "catalog": [
+    {
+      "name": "돈코츠 라멘",
+      "category": "라멘",
+      "price": 9500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "면 익힘 정도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "꼬들",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "부드럽게",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑 추가",
+          "required": false,
+          "min": 0,
+          "max": 18,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "{option}"
+            }
+          ],
+          "options": [
+            {
+              "name": "차슈",
+              "priceDelta": 2000,
+              "maxQty": 3
+            },
+            {
+              "name": "계란",
+              "priceDelta": 1000,
+              "maxQty": 3
+            },
+            {
+              "name": "김",
+              "priceDelta": 500,
+              "maxQty": 3
+            },
+            {
+              "name": "숙주",
+              "priceDelta": 500,
+              "maxQty": 3
+            },
+            {
+              "name": "멘마",
+              "priceDelta": 1000,
+              "maxQty": 3
+            },
+            {
+              "name": "콘버터",
+              "priceDelta": 1500,
+              "maxQty": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "매운 돈코츠 라멘",
+      "category": "라멘",
+      "price": 10000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "면 익힘 정도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "꼬들",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "부드럽게",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑 추가",
+          "required": false,
+          "min": 0,
+          "max": 18,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "{option}"
+            }
+          ],
+          "options": [
+            {
+              "name": "차슈",
+              "priceDelta": 2000,
+              "maxQty": 3
+            },
+            {
+              "name": "계란",
+              "priceDelta": 1000,
+              "maxQty": 3
+            },
+            {
+              "name": "김",
+              "priceDelta": 500,
+              "maxQty": 3
+            },
+            {
+              "name": "숙주",
+              "priceDelta": 500,
+              "maxQty": 3
+            },
+            {
+              "name": "멘마",
+              "priceDelta": 1000,
+              "maxQty": 3
+            },
+            {
+              "name": "콘버터",
+              "priceDelta": 1500,
+              "maxQty": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "쇼유 라멘",
+      "category": "라멘",
+      "price": 9000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "면 익힘 정도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "꼬들",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "부드럽게",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑 추가",
+          "required": false,
+          "min": 0,
+          "max": 18,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "{option}"
+            }
+          ],
+          "options": [
+            {
+              "name": "차슈",
+              "priceDelta": 2000,
+              "maxQty": 3
+            },
+            {
+              "name": "계란",
+              "priceDelta": 1000,
+              "maxQty": 3
+            },
+            {
+              "name": "김",
+              "priceDelta": 500,
+              "maxQty": 3
+            },
+            {
+              "name": "숙주",
+              "priceDelta": 500,
+              "maxQty": 3
+            },
+            {
+              "name": "멘마",
+              "priceDelta": 1000,
+              "maxQty": 3
+            },
+            {
+              "name": "콘버터",
+              "priceDelta": 1500,
+              "maxQty": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "시오 라멘",
+      "category": "라멘",
+      "price": 9000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "면 익힘 정도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "꼬들",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "부드럽게",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑 추가",
+          "required": false,
+          "min": 0,
+          "max": 18,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "{option}"
+            }
+          ],
+          "options": [
+            {
+              "name": "차슈",
+              "priceDelta": 2000,
+              "maxQty": 3
+            },
+            {
+              "name": "계란",
+              "priceDelta": 1000,
+              "maxQty": 3
+            },
+            {
+              "name": "김",
+              "priceDelta": 500,
+              "maxQty": 3
+            },
+            {
+              "name": "숙주",
+              "priceDelta": 500,
+              "maxQty": 3
+            },
+            {
+              "name": "멘마",
+              "priceDelta": 1000,
+              "maxQty": 3
+            },
+            {
+              "name": "콘버터",
+              "priceDelta": 1500,
+              "maxQty": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "미소 라멘",
+      "category": "라멘",
+      "price": 9500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "면 익힘 정도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "꼬들",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "부드럽게",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑 추가",
+          "required": false,
+          "min": 0,
+          "max": 18,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "{option}"
+            }
+          ],
+          "options": [
+            {
+              "name": "차슈",
+              "priceDelta": 2000,
+              "maxQty": 3
+            },
+            {
+              "name": "계란",
+              "priceDelta": 1000,
+              "maxQty": 3
+            },
+            {
+              "name": "김",
+              "priceDelta": 500,
+              "maxQty": 3
+            },
+            {
+              "name": "숙주",
+              "priceDelta": 500,
+              "maxQty": 3
+            },
+            {
+              "name": "멘마",
+              "priceDelta": 1000,
+              "maxQty": 3
+            },
+            {
+              "name": "콘버터",
+              "priceDelta": 1500,
+              "maxQty": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "탄탄멘",
+      "category": "라멘",
+      "price": 10500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "면 익힘 정도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "꼬들",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "부드럽게",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑 추가",
+          "required": false,
+          "min": 0,
+          "max": 18,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "{option}"
+            }
+          ],
+          "options": [
+            {
+              "name": "차슈",
+              "priceDelta": 2000,
+              "maxQty": 3
+            },
+            {
+              "name": "계란",
+              "priceDelta": 1000,
+              "maxQty": 3
+            },
+            {
+              "name": "김",
+              "priceDelta": 500,
+              "maxQty": 3
+            },
+            {
+              "name": "숙주",
+              "priceDelta": 500,
+              "maxQty": 3
+            },
+            {
+              "name": "멘마",
+              "priceDelta": 1000,
+              "maxQty": 3
+            },
+            {
+              "name": "콘버터",
+              "priceDelta": 1500,
+              "maxQty": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "차슈 듬뿍 라멘",
+      "category": "라멘",
+      "price": 12500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "면 익힘 정도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "꼬들",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "부드럽게",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑 추가",
+          "required": false,
+          "min": 0,
+          "max": 18,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "{option}"
+            }
+          ],
+          "options": [
+            {
+              "name": "차슈",
+              "priceDelta": 2000,
+              "maxQty": 3
+            },
+            {
+              "name": "계란",
+              "priceDelta": 1000,
+              "maxQty": 3
+            },
+            {
+              "name": "김",
+              "priceDelta": 500,
+              "maxQty": 3
+            },
+            {
+              "name": "숙주",
+              "priceDelta": 500,
+              "maxQty": 3
+            },
+            {
+              "name": "멘마",
+              "priceDelta": 1000,
+              "maxQty": 3
+            },
+            {
+              "name": "콘버터",
+              "priceDelta": 1500,
+              "maxQty": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "츠케멘",
+      "category": "라멘",
+      "price": 11000,
+      "soldOut": true,
+      "optionGroups": []
+    },
+    {
+      "name": "차슈 덮밥",
+      "category": "덮밥",
+      "price": 8500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "밥 양",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "곱빼기 +1,000원",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "규동",
+      "category": "덮밥",
+      "price": 8000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "밥 양",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "곱빼기 +1,000원",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "치킨 마요 덮밥",
+      "category": "덮밥",
+      "price": 7500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "밥 양",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "곱빼기 +1,000원",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "연어 덮밥",
+      "category": "덮밥",
+      "price": 11000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "밥 양",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "곱빼기 +1,000원",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "교자 (5개)",
+      "category": "사이드",
+      "price": 4500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "가라아게 (4조각)",
+      "category": "사이드",
+      "price": 5500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "타코야키 (6개)",
+      "category": "사이드",
+      "price": 5000,
+      "soldOut": true,
+      "optionGroups": []
+    },
+    {
+      "name": "미니 차슈덮밥",
+      "category": "사이드",
+      "price": 4000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "공기밥",
+      "category": "사이드",
+      "price": 1000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "에다마메",
+      "category": "사이드",
+      "price": 3000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "콜라",
+      "category": "음료",
+      "price": 2000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "사이다",
+      "category": "음료",
+      "price": 2000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "제로 콜라",
+      "category": "음료",
+      "price": 2000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "우롱차",
+      "category": "음료",
+      "price": 2500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "유자 에이드",
+      "category": "음료",
+      "price": 3500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "라멘 기본 세트",
+      "category": "세트",
+      "price": 13500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "라멘 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "돈코츠 라멘",
+              "priceDelta": 0
+            },
+            {
+              "name": "쇼유 라멘",
+              "priceDelta": 0
+            },
+            {
+              "name": "시오 라멘",
+              "priceDelta": 0
+            },
+            {
+              "name": "미소 라멘",
+              "priceDelta": 0
+            },
+            {
+              "name": "매운 돈코츠 라멘",
+              "priceDelta": 500
+            },
+            {
+              "name": "탄탄멘",
+              "priceDelta": 1000
+            },
+            {
+              "name": "차슈 듬뿍 라멘",
+              "priceDelta": 3000
+            }
+          ]
+        },
+        {
+          "name": "면 익힘 정도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "after": [
+            {
+              "op": "click",
+              "label": "다음"
+            }
+          ],
+          "options": [
+            {
+              "name": "꼬들",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "부드럽게",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "사이드 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "after": [
+            {
+              "op": "click",
+              "label": "다음"
+            }
+          ],
+          "options": [
+            {
+              "name": "교자 (5개)",
+              "priceDelta": 0
+            },
+            {
+              "name": "에다마메",
+              "priceDelta": 0
+            },
+            {
+              "name": "가라아게 (4조각)",
+              "priceDelta": 1000
+            }
+          ]
+        },
+        {
+          "name": "음료 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "콜라",
+              "priceDelta": 0
+            },
+            {
+              "name": "사이다",
+              "priceDelta": 0
+            },
+            {
+              "name": "제로 콜라",
+              "priceDelta": 0
+            },
+            {
+              "name": "우롱차",
+              "priceDelta": 500
+            },
+            {
+              "name": "유자 에이드",
+              "priceDelta": 1500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "라멘 든든 세트",
+      "category": "세트",
+      "price": 15000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "라멘 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "돈코츠 라멘",
+              "priceDelta": 0
+            },
+            {
+              "name": "쇼유 라멘",
+              "priceDelta": 0
+            },
+            {
+              "name": "시오 라멘",
+              "priceDelta": 0
+            },
+            {
+              "name": "미소 라멘",
+              "priceDelta": 0
+            },
+            {
+              "name": "매운 돈코츠 라멘",
+              "priceDelta": 500
+            },
+            {
+              "name": "탄탄멘",
+              "priceDelta": 1000
+            },
+            {
+              "name": "차슈 듬뿍 라멘",
+              "priceDelta": 3000
+            }
+          ]
+        },
+        {
+          "name": "면 익힘 정도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "after": [
+            {
+              "op": "click",
+              "label": "다음"
+            }
+          ],
+          "options": [
+            {
+              "name": "꼬들",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "부드럽게",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "사이드 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "after": [
+            {
+              "op": "click",
+              "label": "다음"
+            }
+          ],
+          "options": [
+            {
+              "name": "가라아게 (4조각)",
+              "priceDelta": 0
+            },
+            {
+              "name": "미니 차슈덮밥",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "음료 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "콜라",
+              "priceDelta": 0
+            },
+            {
+              "name": "사이다",
+              "priceDelta": 0
+            },
+            {
+              "name": "제로 콜라",
+              "priceDelta": 0
+            },
+            {
+              "name": "우롱차",
+              "priceDelta": 500
+            },
+            {
+              "name": "유자 에이드",
+              "priceDelta": 1500
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "recipes": {
+    "startOrder": [
+      {
+        "op": "clickIfVisible",
+        "label": "면구름 라멘"
+      },
+      {
+        "op": "clickIfVisible",
+        "label": "{dineOption}"
+      }
+    ],
+    "addToCart": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "chooseOptions",
+        "steps": [
+          {
+            "op": "click",
+            "label": "{option}"
+          }
+        ]
+      },
+      {
+        "op": "clickIfVisible",
+        "label": "담기"
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "label": "수량 더하기",
+            "within": "{item}"
+          }
+        ]
+      }
+    ]
+  },
+  "cartTotalPattern": "합계[^\\d]*([0-9,]+)원",
+  "notes": [
+    "면구름 라멘 kiosk: touch anywhere or title to enter dine options.",
+    "Dine options: 매장에서 먹어요 or 가져갈게요.",
+    "Set items are 3-step dialogs with 다음 buttons.",
+    "Ramen toppings use stepper buttons (+/-) with max qty 3."
+  ]
+}

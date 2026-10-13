@@ -1,0 +1,25 @@
+{
+  "n": 39,
+  "at": "2026-10-13T21:03:42.080Z",
+  "tool": "record",
+  "args": {
+    "kind": "flow"
+  },
+  "resultSummary": "recorded a flow fact",
+  "calls": [
+    {
+      "tool": "record",
+      "args": {
+        "kind": "flow"
+      },
+      "resultSummary": "recorded a flow fact"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 15937,
+  "outputTokens": 54
+}

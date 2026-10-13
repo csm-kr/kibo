@@ -1,0 +1,41 @@
+{
+  "n": 39,
+  "at": "2026-10-13T21:02:52.898Z",
+  "tool": "record",
+  "args": {
+    "kind": "item",
+    "names": [
+      "버터감자칩",
+      "초코 크런치바",
+      "젤리 믹스",
+      "견과류 한줌",
+      "치킨텐더 4조각",
+      "구운 달걀 2입"
+    ]
+  },
+  "resultSummary": "recorded item 버터감자칩, 초코 크런치바, 젤리 믹스, 견과류 한줌, 치킨텐더 4조각, 구운 달걀 2입",
+  "calls": [
+    {
+      "tool": "record",
+      "args": {
+        "kind": "item",
+        "names": [
+          "버터감자칩",
+          "초코 크런치바",
+          "젤리 믹스",
+          "견과류 한줌",
+          "치킨텐더 4조각",
+          "구운 달걀 2입"
+        ]
+      },
+      "resultSummary": "recorded item 버터감자칩, 초코 크런치바, 젤리 믹스, 견과류 한줌, 치킨텐더 4조각, 구운 달걀 2입"
+    }
+  ],
+  "discoveries": {
+    "items": 26,
+    "optionGroups": 13,
+    "categories": 4
+  },
+  "inputTokens": 11845,
+  "outputTokens": 308
+}

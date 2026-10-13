@@ -1,0 +1,43 @@
+{
+  "n": 35,
+  "at": "2026-10-13T21:02:42.446Z",
+  "tool": "record",
+  "args": {
+    "kind": "item",
+    "names": [
+      "아메리카노",
+      "카페라떼",
+      "생수 500ml",
+      "꿀바나나우유",
+      "제주감귤주스",
+      "레몬 탄산수",
+      "활주로 라거 500ml"
+    ]
+  },
+  "resultSummary": "recorded item 아메리카노, 카페라떼, 생수 500ml, 꿀바나나우유, 제주감귤주스, 레몬 탄산수, 활주로 라거 500ml",
+  "calls": [
+    {
+      "tool": "record",
+      "args": {
+        "kind": "item",
+        "names": [
+          "아메리카노",
+          "카페라떼",
+          "생수 500ml",
+          "꿀바나나우유",
+          "제주감귤주스",
+          "레몬 탄산수",
+          "활주로 라거 500ml"
+        ]
+      },
+      "resultSummary": "recorded item 아메리카노, 카페라떼, 생수 500ml, 꿀바나나우유, 제주감귤주스, 레몬 탄산수, 활주로 라거 500ml"
+    }
+  ],
+  "discoveries": {
+    "items": 20,
+    "optionGroups": 12,
+    "categories": 3
+  },
+  "inputTokens": 11034,
+  "outputTokens": 666
+}

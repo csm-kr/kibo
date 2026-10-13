@@ -1,0 +1,41 @@
+{
+  "n": 25,
+  "at": "2026-10-13T21:01:50.222Z",
+  "tool": "record",
+  "args": {
+    "kind": "item",
+    "names": [
+      "햄치즈 샌드위치",
+      "에그마요 샌드위치",
+      "치킨 랩",
+      "버터 크루아상",
+      "블루베리 머핀",
+      "클래식 핫도그"
+    ]
+  },
+  "resultSummary": "recorded item 햄치즈 샌드위치, 에그마요 샌드위치, 치킨 랩, 버터 크루아상, 블루베리 머핀, 클래식 핫도그",
+  "calls": [
+    {
+      "tool": "record",
+      "args": {
+        "kind": "item",
+        "names": [
+          "햄치즈 샌드위치",
+          "에그마요 샌드위치",
+          "치킨 랩",
+          "버터 크루아상",
+          "블루베리 머핀",
+          "클래식 핫도그"
+        ]
+      },
+      "resultSummary": "recorded item 햄치즈 샌드위치, 에그마요 샌드위치, 치킨 랩, 버터 크루아상, 블루베리 머핀, 클래식 핫도그"
+    }
+  ],
+  "discoveries": {
+    "items": 13,
+    "optionGroups": 6,
+    "categories": 2
+  },
+  "inputTokens": 8533,
+  "outputTokens": 570
+}

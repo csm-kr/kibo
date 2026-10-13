@@ -1,0 +1,45 @@
+{
+  "n": 40,
+  "at": "2026-10-13T21:03:53.971Z",
+  "tool": "record",
+  "args": {
+    "kind": "item",
+    "names": [
+      "돈코츠 라멘",
+      "매운 돈코츠 라멘",
+      "쇼유 라멘",
+      "시오 라멘",
+      "미소 라멘",
+      "탄탄멘",
+      "차슈 듬뿍 라멘",
+      "츠케멘"
+    ]
+  },
+  "resultSummary": "recorded item 돈코츠 라멘, 매운 돈코츠 라멘, 쇼유 라멘, 시오 라멘, 미소 라멘, 탄탄멘, 차슈 듬뿍 라멘, 츠케멘",
+  "calls": [
+    {
+      "tool": "record",
+      "args": {
+        "kind": "item",
+        "names": [
+          "돈코츠 라멘",
+          "매운 돈코츠 라멘",
+          "쇼유 라멘",
+          "시오 라멘",
+          "미소 라멘",
+          "탄탄멘",
+          "차슈 듬뿍 라멘",
+          "츠케멘"
+        ]
+      },
+      "resultSummary": "recorded item 돈코츠 라멘, 매운 돈코츠 라멘, 쇼유 라멘, 시오 라멘, 미소 라멘, 탄탄멘, 차슈 듬뿍 라멘, 츠케멘"
+    }
+  ],
+  "discoveries": {
+    "items": 8,
+    "optionGroups": 14,
+    "categories": 1
+  },
+  "inputTokens": 17325,
+  "outputTokens": 1713
+}

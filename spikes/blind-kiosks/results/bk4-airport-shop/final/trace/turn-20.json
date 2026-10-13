@@ -1,0 +1,35 @@
+{
+  "n": 20,
+  "at": "2026-10-13T21:01:24.714Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "샌드위치·베이커리"
+      }
+    ]
+  },
+  "resultSummary": "tapped 샌드위치·베이커리",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "샌드위치·베이커리"
+          }
+        ]
+      },
+      "resultSummary": "tapped 샌드위치·베이커리"
+    }
+  ],
+  "discoveries": {
+    "items": 7,
+    "optionGroups": 2,
+    "categories": 1
+  },
+  "inputTokens": 7446,
+  "outputTokens": 30
+}

@@ -1,0 +1,51 @@
+#1 act {"label":"면구름 라멘","op":"click"}
+#2 act {"label":"매장에서 먹어요","op":"click"}
+#3 act {"op":"click","label":"라멘"}
+#4 act {"op":"click","label":"덮밥"}
+#5 act {"op":"click","label":"사이드"}
+#6 act {"label":"음료","op":"click"}
+#7 act {"op":"click","label":"세트"}
+#8 act [{"label":"라멘","op":"click"},{"op":"click","label":"돈코츠 라멘"}]
+#9 act {"op":"click","label":"취소"}
+#10 act {"label":"매운 돈코츠 라멘","op":"click"}
+#11 act [{"label":"취소","op":"click"},{"label":"쇼유 라멘","op":"click"}]
+#12 act [{"label":"취소","op":"click"},{"op":"click","label":"탄탄멘"}]
+#13 act [{"label":"취소","op":"click"},{"op":"click","label":"덮밥"},{"label":"차슈 덮밥","op":"click"}]
+#14 act [{"label":"취소","op":"click"},{"op":"click","label":"규동"}]
+#15 act [{"label":"취소","op":"click"},{"op":"click","label":"치킨 마요 덮밥"}]
+#16 act [{"label":"취소","op":"click"},{"label":"연어 덮밥","op":"click"}]
+#17 act [{"label":"취소","op":"click"},{"label":"사이드","op":"click"},{"op":"click","label":"교자 (5개)"}]
+#18 act {"label":"전체 취소","op":"click"}
+#19 act {"op":"click","label":"모두 취소"}
+#20 act {"op":"click","label":"음료"}
+#21 act {"op":"click","label":"콜라"}
+#22 act {"label":"세트","op":"click"}
+#23 act {"label":"라멘 기본 세트","op":"click"}
+#24 act [{"op":"click","label":"돈코츠 라멘"},{"label":"꼬들","op":"click"},{"op":"click","label":"다음"}]
+#25 act [{"op":"click","label":"교자 (5개)"},{"label":"다음","op":"click"}]
+#26 reload 
+#27 act [{"op":"click","label":"면구름 라멘"},{"label":"매장에서 먹어요","op":"click"},{"op":"click","label":"세트"},{"label":"라멘 든든 세트","op":"click"}]
+#28 act [{"op":"click","label":"돈코츠 라멘"},{"label":"꼬들","op":"click"},{"op":"click","label":"다음"}]
+#29 act [{"op":"click","label":"가라아게 (4조각)"},{"op":"click","label":"다음"}]
+#30 act [{"op":"click","label":"콜라"},{"label":"담기","op":"click"}]
+#31 act [{"label":"음료","op":"click"},{"op":"click","label":"콜라"}]
+#32 act [{"op":"click","label":"전체 취소"},{"op":"click","label":"모두 취소"},{"label":"덮밥","op":"click"},{"op":"click","label":"차슈 덮밥"}]
+#33 act [{"label":"취소","op":"click"},{"op":"click","label":"라멘"},{"label":"돈코츠 라멘","op":"click"}]
+#34 act {"label":"담기","op":"click"}
+#35 act [{"op":"click","label":"취소"},{"op":"click","label":"세트"},{"label":"라멘 기본 세트","op":"click"}]
+#36 act [{"op":"click","label":"돈코츠 라멘"},{"op":"click","label":"다음"}]
+#37 reload 
+#38 act [{"label":"면구름 라멘","op":"click"},{"label":"가져갈게요","op":"click"}]
+#39 record 
+#40 record 
+#41 record 
+#42 records 
+#43 audit 
+  audit #1: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=0
+#44 testSkill 
+  test #1: PASS PASS PASS
+#45 audit 
+  audit #2: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=0
+#46 finish 
+  finish audit: OK
+{"provider":"gemini","model":"gemini-3.8-flash","cachedInputTokens":227679,"finished":true,"turns":46,"acts":66,"tests":1,"inputTokens":437774,"outputTokens":19472,"minutes":"8.0"}

@@ -1,0 +1,35 @@
+{
+  "n": 2,
+  "at": "2026-10-13T21:00:28.694Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "매장에서 먹어요"
+      }
+    ]
+  },
+  "resultSummary": "tapped 매장에서 먹어요",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "매장에서 먹어요"
+          }
+        ]
+      },
+      "resultSummary": "tapped 매장에서 먹어요"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 1988,
+  "outputTokens": 25
+}

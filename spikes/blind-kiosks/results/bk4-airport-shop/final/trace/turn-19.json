@@ -1,0 +1,43 @@
+{
+  "n": 19,
+  "at": "2026-10-13T21:01:20.981Z",
+  "tool": "record",
+  "args": {
+    "kind": "item",
+    "names": [
+      "야채김밥",
+      "참치김밥",
+      "불고기김밥",
+      "아침 한정 계란김밥 세트",
+      "제육도시락",
+      "치킨마요덮밥",
+      "유부초밥 4입"
+    ]
+  },
+  "resultSummary": "recorded item 야채김밥, 참치김밥, 불고기김밥, 아침 한정 계란김밥 세트, 제육도시락, 치킨마요덮밥, 유부초밥 4입",
+  "calls": [
+    {
+      "tool": "record",
+      "args": {
+        "kind": "item",
+        "names": [
+          "야채김밥",
+          "참치김밥",
+          "불고기김밥",
+          "아침 한정 계란김밥 세트",
+          "제육도시락",
+          "치킨마요덮밥",
+          "유부초밥 4입"
+        ]
+      },
+      "resultSummary": "recorded item 야채김밥, 참치김밥, 불고기김밥, 아침 한정 계란김밥 세트, 제육도시락, 치킨마요덮밥, 유부초밥 4입"
+    }
+  ],
+  "discoveries": {
+    "items": 7,
+    "optionGroups": 2,
+    "categories": 1
+  },
+  "inputTokens": 8213,
+  "outputTokens": 414
+}

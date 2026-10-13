@@ -1,0 +1,21 @@
+{
+  "n": 61,
+  "at": "2026-10-13T21:04:26.044Z",
+  "tool": "records",
+  "args": {},
+  "resultSummary": "listed 37 items, 0 facts",
+  "calls": [
+    {
+      "tool": "records",
+      "args": {},
+      "resultSummary": "listed 37 items, 0 facts"
+    }
+  ],
+  "discoveries": {
+    "items": 37,
+    "optionGroups": 17,
+    "categories": 6
+  },
+  "inputTokens": 15834,
+  "outputTokens": 8
+}

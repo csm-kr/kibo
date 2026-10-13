@@ -1,0 +1,18 @@
+{
+  "kioskId": "bk4-airport-shop",
+  "provider": "gemini",
+  "model": "gemini-3.8-flash",
+  "startedAt": "2026-10-13T20:59:14.988Z",
+  "endedAt": "2026-10-13T21:07:18.627Z",
+  "gate": {
+    "tests": 1,
+    "testsPassedForFinish": true,
+    "audits": 1,
+    "auditOk": true,
+    "finished": true
+  },
+  "turns": 64,
+  "inputTokens": 666077,
+  "cachedInputTokens": 394579,
+  "outputTokens": 13569
+}
