@@ -35,6 +35,15 @@ Run `sh scripts/deploy.sh` (needs `gcloud` logged in to `kibo-2026`). It runs `n
 - Freeze deploys to `main` during judging.
 - Check the payment card's expiry and limit.
 
+## Two-device demo
+A laptop stands in for the kiosk and a real phone orders (USER_JOURNEY J1, J2). Checked end to end by `e2e/two-device.spec.ts` (two browsers through the real API; the `@live` test speaks `hero-ko.wav` to Gemini Live).
+1. **Laptop:** open `<service URL>/kiosk?k=malo` in Chrome, full screen (F11 or ⌃⌘F), landscape. KIBO's pairing panel beside the kiosk shows a large QR, `<host>/app` and a 6-digit code, and "Waiting for a phone".
+2. **Phone:** scan the QR with the camera app and tap the link; or open `<host>/app` (installable from the browser menu) and tap [Scan a kiosk], or type the 6-digit code and tap [Connect].
+3. **Allow** the camera (only for [Scan a kiosk]) and the microphone when the phone asks. The panel now says "Phone connected at <time>".
+4. **Talk:** [Start], [Turn on the microphone], [Eat here], then say the order. The kiosk lights up the lines; say "I'll pay", tap [Yes, pay now] on the phone, then on the laptop tap 카드 and 카드 넣기. The order number shows on both.
+5. **KakaoTalk, NAVER and other in-app browsers** often block the microphone and camera. The phone shows a note: open the link in Safari or Chrome (the in-app menu's "open in browser"), or copy it on the microphone screen before connecting. [Order here by typing] still works in the app.
+6. **Stuck or a lost phone:** [다른 휴대폰 연결] on the kiosk issues a new QR and code and releases the old phone. Voice needs the Gemini API key's credits (`keyGenerate` ok in `/api/health?deep=1`); without them the phone falls back to typing.
+
 ## Cost notes
 - 10/1–10/11: about KRW 10k net on Gemini, almost all from KIBO Learn experiments that resent the whole conversation every turn.
 - Fixes: memory tool, last 4 screens only, per-run token cap, finish gate. Experiments now run on OpenAI development credits; published numbers are re-measured with Gemini.

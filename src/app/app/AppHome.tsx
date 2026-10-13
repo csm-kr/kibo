@@ -50,10 +50,12 @@ export function AppHome() {
 
         <div className="flex flex-col gap-2">
           <p className="text-base font-semibold text-muted">{pt("pairOrScan", locale)}</p>
-          <Link href="/app/scan" className={SECONDARY}>
+          {/* A full page load, not <Link>: a client-side navigation keeps /app's `camera=()` header, so the
+              scanner's camera would be refused (I-171). */}
+          <a href="/app/scan" className={SECONDARY}>
             <ScanLine {...ICON} />
             {pt("scanKiosk", locale)}
-          </Link>
+          </a>
         </div>
 
         <section aria-labelledby="how" className={`${CARD} flex flex-col gap-3`}>

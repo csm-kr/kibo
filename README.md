@@ -15,7 +15,12 @@
 4. Say "I'll pay", then confirm on the card ("Yes, pay now").
 5. Tap the card stand-in on the kiosk side to "pay" and get an order number. No real payment happens.
 
-**Two-device mode:** open [`/kiosk`](https://kibo-407514467119.asia-northeast3.run.app/kiosk) on a laptop (portrait looks best) and scan its QR code with a phone. The phone becomes the assistant; the laptop is the kiosk.
+**Two-device demo:** a laptop is the kiosk, your phone is the assistant.
+1. Open [`/kiosk`](https://kibo-407514467119.asia-northeast3.run.app/kiosk) on a laptop, full screen. Beside the kiosk, a panel shows a QR code and a 6-digit code.
+2. On the phone, scan the QR with the camera app, or open `/app` and tap **Scan a kiosk** or type the code.
+3. Allow the camera and the microphone when asked; the panel says "Phone connected".
+4. Tap **Start** and **Turn on the microphone**, choose eat here or take out, and say your order. Confirm on the phone, then tap 카드 and 카드 넣기 on the laptop.
+5. In KakaoTalk, NAVER or another in-app browser, the microphone and camera often do not work: open the link in Safari or Chrome.
 
 ## What it does
 - **QR connect, no install.** The kiosk start screen offers "order by talking (QR)" and "order by touch".
