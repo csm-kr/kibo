@@ -32,18 +32,22 @@ export function VoiceControls(props: {
   onVoiceOutput(on: boolean): void;
   /** Shown when set (a /demo order under 60 s of voice). */
   secondsLeft: number | null;
+  /** P4: the mic only, with this line under its label while voice is off; the AI voice switch stays on P3. */
+  compactHint?: string;
 }) {
   const { state, locale } = props;
   const active = voiceActive(state);
+  const compact = props.compactHint !== undefined;
   return (
     <div className="flex flex-col gap-2">
+      {/* 10rem: at 320px wide the mic and the AI voice switch still share one row (I-084). */}
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
           data-voice-state={state}
           disabled={props.disabled}
           onClick={props.onMic}
-          className={`flex min-h-22 flex-[1_1_14rem] items-center gap-3 rounded-full px-3 py-3 text-left disabled:opacity-60 ${
+          className={`flex min-h-22 flex-[1_1_10rem] items-center gap-3 rounded-full px-3 py-3 text-left disabled:opacity-60 ${
             active ? "border-[3px] border-[#3446D4] bg-white text-[#15171C]" : "bg-[#3446D4] text-white active:bg-[#2735A8]"
           } ${FOCUS}`}
         >
@@ -56,22 +60,28 @@ export function VoiceControls(props: {
           </span>
           <span className="flex min-w-0 flex-col">
             <span className="text-xl font-bold">{pt(LABEL[state], locale)}</span>
-            {active && <span className="text-base text-[#4B463F]">{pt("micStop", locale)}</span>}
+            {active ? (
+              <span className="text-base text-[#4B463F]">{pt("micStop", locale)}</span>
+            ) : (
+              compact && <span className="text-base">{props.compactHint}</span>
+            )}
           </span>
         </button>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={props.voiceOutput}
-          onClick={() => props.onVoiceOutput(!props.voiceOutput)}
-          className={`flex min-h-22 min-w-22 flex-none flex-col items-center justify-center rounded-[18px] border-2 border-[#15171C] bg-white px-3 text-base font-bold text-[#15171C] active:bg-[#F3EEE4] ${FOCUS}`}
-        >
-          <SpeakerIcon off={!props.voiceOutput} />
-          <span>{pt("aiVoice", locale)}</span>
-          <span aria-hidden className="font-normal">
-            {pt(props.voiceOutput ? "on" : "off", locale)}
-          </span>
-        </button>
+        {!compact && (
+          <button
+            type="button"
+            role="switch"
+            aria-checked={props.voiceOutput}
+            onClick={() => props.onVoiceOutput(!props.voiceOutput)}
+            className={`flex min-h-22 min-w-22 flex-none flex-col items-center justify-center rounded-[18px] border-2 border-[#15171C] bg-white px-3 text-base font-bold text-[#15171C] active:bg-[#F3EEE4] ${FOCUS}`}
+          >
+            <SpeakerIcon off={!props.voiceOutput} />
+            <span>{pt("aiVoice", locale)}</span>
+            <span aria-hidden className="font-normal">
+              {pt(props.voiceOutput ? "on" : "off", locale)}
+            </span>
+          </button>
+        )}
       </div>
       {props.secondsLeft !== null && (
         <p role="timer" className="text-base font-bold text-[#7A2E0E]">

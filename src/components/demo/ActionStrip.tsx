@@ -11,31 +11,29 @@ import type { SessionStatus } from "@/types/session";
 // D2 "What the AI did" (/demo only): each tool call Gemini made and what the KIBO server answered, in plain words
 // from menu data plus the tool name and result code. Not announced (aria-live): the cart announcements already are.
 
-/** Open by default where it fits next to the phone without crowding it (docs/UI_QA.md judge laptop 1440×900). */
-const OPEN_FROM = "(min-width: 1440px)";
-
 interface Props {
   kiosk: KioskData;
   actions: AgentAction[];
   locale: Locale;
   status: SessionStatus | null;
+  /** In the scenario column beside the phone (from 1440px wide), so it never takes the phone's height (I-084). */
+  beside: boolean;
 }
 
-export function ActionStrip({ kiosk, actions, locale, status }: Props) {
-  // Mounted only after the demo order starts, so the browser width is known.
-  const [open, setOpen] = useState(() => typeof window !== "undefined" && window.matchMedia(OPEN_FROM).matches);
+export function ActionStrip({ kiosk, actions, locale, status, beside }: Props) {
+  const [open, setOpen] = useState(beside);
   const newestFirst = [...actions].reverse();
 
-  // The confirm card needs the phone's full height: even folded, the strip pushed [Yes, pay now] below the fold at
-  // 1440×900 (I-129, R-009). It steps aside until the order leaves the review, then comes back as it was.
-  if (status === "confirming") return null;
+  // Under the phone, the confirm card needs the phone's full height: even folded, the strip pushed [Yes, pay now]
+  // below the fold (I-129, R-009). It steps aside until the order leaves the review, then comes back as it was.
+  if (status === "confirming" && !beside) return null;
 
   return (
     <section
       data-action-strip
       aria-labelledby="demo-actions-title"
-      // Shrinks (down to its toggle) before the phone above it does; the phone keeps its own minimum (DemoApp).
-      className="flex max-h-[36%] min-h-18 shrink flex-col gap-2 rounded-[26px] border border-[#E2DACB] bg-white p-2 text-[#15171C]"
+      // Shrinks (down to its toggle) before the phone or the guide above it does; the phone keeps its own minimum (DemoApp).
+      className="flex max-h-[40%] min-h-18 shrink flex-col gap-2 rounded-[26px] border border-[#E2DACB] bg-white p-2 text-[#15171C]"
     >
       <button
         type="button"

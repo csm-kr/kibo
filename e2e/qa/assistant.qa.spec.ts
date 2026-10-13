@@ -22,9 +22,10 @@ test.beforeAll(async ({ browser, request }) => {
   await warmPhone(browser, request);
 });
 
-async function check(page: Page, info: TestInfo, state: string, viewports = VIEWPORTS) {
+async function check(page: Page, info: TestInfo, state: string, viewports = VIEWPORTS, each?: () => Promise<void>) {
   for (const vp of viewports) {
     await page.setViewportSize(vp);
+    await each?.();
     const f: Findings = await qaState(page, info, PHONE, state, { reflow: true });
     expect.soft(f.h, `${state} ${vp.width}x${vp.height}: H failures`).toEqual([]);
     if (STRICT) expect.soft(f.t, `${state} ${vp.width}x${vp.height}: T misses`).toEqual([]);
@@ -105,7 +106,18 @@ test("phone path: start to order number", async ({ page, request }, info) => {
   const checkout = await s.phone("requestCheckout", {}, { utteranceSeq: 2 });
   await expect(page.getByRole("heading", { name: "Please check your order" })).toBeVisible();
   expect(checkout.status).toBe("confirming");
-  await check(page, info, "P4-confirm");
+  // The total and the whole [Yes, pay now] at every phone size, 320×700 included (I-134, R-009).
+  await check(page, info, "P4-confirm", VIEWPORTS, async () => {
+    await expect(page.getByRole("button", { name: "Yes, pay now" })).toBeInViewport({ ratio: 1 });
+    await expect(page.getByText("Total", { exact: true })).toBeInViewport({ ratio: 1 });
+  });
+
+  // [Type] brings the text input forward on P4 for a typed "yes".
+  await page.getByRole("button", { name: "Type", exact: true }).click();
+  await expect(page.getByRole("textbox", { name: "Type your order" })).toBeFocused();
+  await check(page, info, "P4-confirm-typing", [VIEWPORTS[0], VIEWPORTS[3]], async () => {
+    await expect(page.getByRole("button", { name: "Yes, pay now" })).toBeInViewport({ ratio: 1 });
+  });
 
   await page.getByRole("button", { name: "Yes, pay now" }).click();
   await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "pay");

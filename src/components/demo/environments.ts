@@ -40,9 +40,10 @@ export const DEMO_ENVIRONMENTS: DemoEnvironment[] = [
   },
   {
     kioskId: "doughhouse",
-    place: { en: "Pizza shop, no integration", ko: "피자 가게, 연동 없음" },
+    // One-line titles keep the three cards' lines level (I-123); "no integration" moves to the second line.
+    place: { en: "Pizza shop", ko: "피자 가게" },
     short: "pizza shop",
-    how: "Doughhouse · learned by KIBO Learn",
+    how: "Doughhouse · no integration, learned by KIBO Learn",
     persona: "KIBO learned this third-party screen once and replays orders without AI.",
     caption: "Pizza shop kiosk (learned by KIBO Learn)",
     image: "/landing/place-doughhouse.webp",

@@ -18,6 +18,10 @@ export const KIOSK_TEXT = {
     en: "Your phone is connected. Order on your phone, or tap here.",
   },
   close: { ko: "닫기", en: "Close" },
+  startOver: { ko: "처음으로", en: "Start over" },
+  startOverAsk: { ko: "주문을 취소하고 처음으로 갈까요?", en: "Cancel this order and start over?" },
+  startOverYes: { ko: "취소하고 처음으로", en: "Cancel and start over" },
+  keepOrdering: { ko: "계속 주문", en: "Keep ordering" },
   // K3 menu
   dineChip: { ko: "매장", en: "Eat here" },
   takeOutChip: { ko: "포장", en: "Take out" },
@@ -133,6 +137,8 @@ export const TICKET_TEXT: Partial<Record<KioskTextKey, Record<Locale, string>>> 
   orderNumber: { ko: "참조 번호", en: "Reference number" },
   pickupHint: { ko: "승차권을 받아 가세요", en: "Please take your tickets" },
   idleQuestion: { ko: "계속 구매하시겠어요?", en: "Still buying?" },
+  startOverAsk: { ko: "구매를 취소하고 처음으로 갈까요?", en: "Cancel and start over?" },
+  keepOrdering: { ko: "계속 고르기", en: "Keep choosing" },
 };
 
 export function kt(key: KioskTextKey, locale: Locale, domain: KioskDomain = "food"): string {

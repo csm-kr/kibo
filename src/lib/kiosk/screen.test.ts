@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { CartLine, Session, SessionStatus } from "@/types/session";
 import { getKiosk } from "@/lib/adapters/catalog";
-import { kioskScreen } from "./screen";
+import { kioskScreen, startOverStep } from "./screen";
 
 const line: CartLine = { lineId: "l1", itemId: "burger_cheese", variant: "single", qty: 1, selections: {}, unitPrice: 5000 };
 
@@ -94,5 +94,21 @@ describe("kioskScreen", () => {
     expect(kioskScreen(s("connected"), none, rail)).toBe("menu");
     expect(kioskScreen(s("ordering"), touch, rail)).toBe("menu");
     expect(kioskScreen(s("confirming"), none, rail)).toBe("review");
+  });
+});
+
+describe("startOverStep ([처음으로], I-048)", () => {
+  it("is offered only before checkout: K2 and K3 (K4 is a sheet on K3)", () => {
+    expect(startOverStep("dine", session("ordering"))).toBe("now");
+    expect(startOverStep("menu", session("ordering"))).toBe("now");
+    for (const screen of ["attract", "review", "payment", "done"] as const) {
+      expect(startOverStep(screen, session("ordering", { cart: [line] })), screen).toBeNull();
+    }
+    expect(startOverStep("menu", null)).toBeNull();
+  });
+
+  it("asks first when the cart has items", () => {
+    expect(startOverStep("menu", session("ordering", { cart: [line] }))).toBe("ask");
+    expect(startOverStep("menu", session("ordering", { cart: [] }))).toBe("now");
   });
 });

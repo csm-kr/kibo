@@ -19,6 +19,7 @@ export function KioskApp({ kiosk, demo }: { kiosk: KioskData; demo: boolean }) {
         clockOffset={ks.clockOffset}
         onNewSession={() => void ks.newSession()}
         onClaimUrl={ks.setClaimUrl}
+        onStartOver={() => void ks.newSession()}
       />
     </KioskCanvas>
   );

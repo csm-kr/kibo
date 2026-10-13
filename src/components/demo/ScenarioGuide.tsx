@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { SayFn } from "@/components/assistant/AssistantPanel";
 import { CHIP, FOCUS, PRIMARY, SECONDARY, SMALL } from "@/components/assistant/styles";
 import { canSend, playScenario, type PlayerState } from "@/lib/demo/player";
@@ -9,7 +9,7 @@ import { playStep, pt, type PhoneTextKey } from "@/lib/i18n/phone";
 import type { KioskData, Locale } from "@/types/menu";
 import type { Session } from "@/types/session";
 
-// D2 scenario guide (docs/UX.md Flow C): an optional column, closed by default, that lists what to try on this kiosk.
+// D2 scenario guide (docs/UX.md Flow C): an optional column, open by default from 1440px wide, that lists what to try on this kiosk.
 // Choosing one starts a fresh order; each step's sentence is a chip that sends it as the user's message, and the check
 // mark ticks from the live session. [Play it for me] sends the same sentences through the same path, one per step, and
 // stops at the confirm card: nothing here confirms or pays.
@@ -33,12 +33,16 @@ interface Props {
   startFailed: boolean;
   /** A fresh demo order, the same as [Try again]. */
   onFresh(): void;
+  /** From 1440px wide: open at first (I-132), with "What the AI did" under it instead of under the phone (I-084). */
+  wide: boolean;
+  aside?: ReactNode;
 }
 
 export function ScenarioGuide(props: Props) {
   const { locale } = props;
   const scenarios = scenariosFor(props.kiosk.kioskId);
-  const [open, setOpen] = useState(false);
+  // Mounted only after the demo order starts, so `wide` is the real width here.
+  const [open, setOpen] = useState(props.wide);
   const [chosen, setChosen] = useState<{ id: string; from: string } | null>(null);
   const scenario = scenarios.find((s) => s.id === chosen?.id);
 
@@ -101,7 +105,7 @@ export function ScenarioGuide(props: Props) {
 
   if (scenarios.length === 0) return null;
   return (
-    <section data-scenario-guide aria-label={pt("scenarios", locale)} className={`flex h-full flex-none flex-col gap-2 ${open ? "w-80" : ""}`}>
+    <section data-scenario-guide aria-label={pt("scenarios", locale)} className={`flex h-full flex-none flex-col gap-2 ${open || props.aside ? "w-80" : ""}`}>
       <button
         type="button"
         aria-expanded={open}
@@ -118,6 +122,7 @@ export function ScenarioGuide(props: Props) {
           {body}
         </div>
       )}
+      {props.aside}
     </section>
   );
 }
@@ -143,6 +148,11 @@ function Checklist(props: Props & { scenario: Scenario }) {
 
   const playing = play.phase === "sending" || play.phase === "waiting" || play.phase === "paused";
   const finished = done >= scenario.steps.length;
+  // The last tick can leave "Your turn" under the column's bottom edge (I-131): bring it into view once.
+  const yourTurn = useRef<HTMLParagraphElement>(null);
+  useEffect(() => {
+    if (finished) yourTurn.current?.scrollIntoView({ block: "nearest" });
+  }, [finished]);
   const sendable = live !== null && canSend(live.status);
   // Scenarios assume the dine option is set first (src/lib/demo/scenarios.ts); otherwise checkout would ask for it.
   const dineFirst = props.kiosk.dineOptions !== undefined && live !== null && live.dineOption === null;
@@ -210,7 +220,7 @@ function Checklist(props: Props & { scenario: Scenario }) {
         })}
       </ol>
       {finished && (
-        <p data-scenario-your-turn className="rounded-[18px] bg-[#EEF0FD] px-4 py-3 text-xl">
+        <p ref={yourTurn} data-scenario-your-turn className="rounded-[18px] bg-[#EEF0FD] px-4 py-3 text-xl">
           {learned ? (
             pt("yourTurnLearned", locale)
           ) : (

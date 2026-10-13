@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { command } from "./helpers";
+import { command, openScenarios } from "./helpers";
 
 // /demo scenario guide (D2): closed by default; choosing a scenario starts a fresh order; a sentence chip sends the
 // sentence as the user's message; a step ticks from the live session. No model calls here: /api/chat is answered by
@@ -29,13 +29,16 @@ async function newSession(page: Page, click: () => Promise<void>): Promise<DemoS
 const guide = (page: Page) => page.locator("[data-scenario-guide]");
 const phoneScreen = (page: Page) => page.locator("[data-phone-screen]");
 
-test("scenario guide: closed by default, a chosen scenario starts fresh, its step ticks from the session", async ({ page, request }) => {
+test("scenario guide: open by default at 1440 wide, a chosen scenario starts fresh, its step ticks from the session", async ({ page, request }) => {
   await page.goto("/demo");
   await expect(page.getByRole("heading", { name: "Don't learn the kiosk. Just talk." })).toBeVisible({ timeout: 60_000 });
   const first = await newSession(page, () => page.getByRole("button", { name: "Start", exact: true }).click());
 
+  // Open from 1440px wide, where the column fits beside the phone (I-132); the toggle still closes it.
   const toggle = guide(page).getByRole("button", { name: "Scenarios", exact: true });
-  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await expect(page.locator("[data-scenario]")).toHaveCount(6);
+  await toggle.click();
   await expect(page.locator("[data-scenario]")).toHaveCount(0);
   await toggle.click();
   await expect(toggle).toHaveAttribute("aria-expanded", "true");
@@ -86,7 +89,7 @@ test("@live Play it for me: Sunja's lunch reaches the confirm card with two sets
   await page.goto("/demo");
   await expect(page.getByRole("heading", { name: "Don't learn the kiosk. Just talk." })).toBeVisible({ timeout: 60_000 });
   await newSession(page, () => page.getByRole("button", { name: "Start", exact: true }).click());
-  await guide(page).getByRole("button", { name: "Scenarios", exact: true }).click();
+  await openScenarios(page);
   await newSession(page, () => page.locator('[data-scenario="sunja-lunch"]').click());
 
   // The scenarios assume the dine option comes first.
@@ -130,7 +133,7 @@ PLAYED.forEach((p, i) => {
       await page.goto(`/demo?k=${p.kioskId}`);
       await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible({ timeout: 60_000 });
       await newSession(page, () => page.getByRole("button", { name: "Start", exact: true }).click());
-      await guide(page).getByRole("button", { name: "Scenarios", exact: true }).click();
+      await openScenarios(page);
       await newSession(page, () => page.locator(`[data-scenario="${p.id}"]`).click());
       if (p.dine) await phoneScreen(page).getByRole("button", { name: "Eat here" }).click();
 

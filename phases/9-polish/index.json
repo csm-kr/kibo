@@ -21,7 +21,10 @@
     {
       "step": 2,
       "name": "polish-phone",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-13T09:49:35+0900",
+      "summary": "Decisions: I-048 fixed, standalone /kiosk has [처음으로] on K2 (bottom left) and K3 (first in the cart bar row; asks '주문을 취소하고 처음으로 갈까요?' when the cart has items), calls onNewSession(), hidden in /demo (no onStartOver); startOverStep in src/lib/kiosk/screen.ts tested, StartOver.tsx, E2E in kiosk-states.spec.ts, QA state K3-start-over-ask. I-039 decided won't do (delete and re-add; fair touch measurement in step 3). Fixed: X1/I-134 P4 bottom area = total + 88px [Yes, pay now] + compact mic with [Type] (text input on demand or after voice fallback), toBeInViewport({ratio:1}) at all 4 phone sizes and the /demo confirm states; X2/I-132 scenario guide open by default >=1440; X3/I-084 phone header one row at every width (globe-only language <400px, stacked Call staff), mic basis 10rem so AI voice shares the row at 320, 'What the AI did' moves into the guide column >=1440 (stays through the review there); X4/I-136 shots:landing crops /demo to kiosk+phone at 2x (1280x1168) shown full width under a headline+buttons row on /, one region per How-it-works step, all landing/D1 captures recaptured with the new fares; X5/I-123 partial (one-line titles 'Pizza shop', full-width Start; persona lines still uneven, pizza capture unchanged); X6/I-116 phone ticket wording via pt(key, locale, domain); X7/I-118+I-069 P5 'On the kiosk, tap 카드 (Card), then insert your card.', stand-in 'Insert the card at the kiosk', picture mirrored in /demo; X8/I-133 shorter ticket placeholder; X9/I-103 learned kiosk: no photo slot on dine buttons and cart lines; X10/I-137 phone prices use formatWon; X11/I-131 'Your turn' scrolls into view; X12/I-138+I-121 QA screenshots wait for on-screen images, focus check blurs its last control; X13/I-074 /demo below 900px shows 'Open this on a laptop' + /kiosk link. Remaining: I-123 card second lines/pizza capture, I-073 learned end card below the fold. Docs: UX (C2a, C2b, C4, K2, K3, P4, D2), UI_QA, ISSUE. Lint, build, 707 unit, e2e 14 passed (15 @live skipped), qa:ui 25 passed; evidence/*.json restored after e2e (I-099).",
+      "completed_at": "2026-10-13T10:20:00+0900"
     },
     {
       "step": 3,

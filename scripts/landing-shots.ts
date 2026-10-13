@@ -98,7 +98,11 @@ async function main() {
     await qr.waitFor({ timeout: 120_000 });
     await kiosk.getByRole("button", { name: /화면을 눌러서 주문/ }).and(kiosk.locator(":enabled")).waitFor();
     await settled(kiosk);
-    await saveWebp(encoder, await kiosk.screenshot(), "kiosk-attract", 540, 960);
+    // Each "How it works" picture is one region, not a whole screen, so its text stays readable on / (I-136).
+    const qrCard = await qr.locator("xpath=..").boundingBox();
+    if (!qrCard) throw new Error("no QR card");
+    const attract = { x: Math.max(0, qrCard.x - 24), y: qrCard.y - 24, width: 540, height: 810 };
+    await saveWebp(encoder, await kiosk.screenshot({ clip: attract }), "kiosk-attract", 540, 810);
 
     const claimUrl = new URL((await qr.getAttribute("data-claim-url")) ?? "");
     const sessionId = claimUrl.searchParams.get("s") ?? "";
@@ -114,7 +118,9 @@ async function main() {
     // Taken inside the 2 s highlight of the second line.
     await kiosk.locator(".k-ring").first().waitFor();
     await settled(kiosk);
-    await saveWebp(encoder, await kiosk.screenshot(), "kiosk-ai-highlight", 540, 960);
+    // Below the header, right of the category rail: the "AI가 담았어요" line and the ringed tile.
+    const highlight = { x: 260, y: 144, width: 820, height: 615 };
+    await saveWebp(encoder, await kiosk.screenshot({ clip: highlight }), "kiosk-ai-highlight", 820, 615);
     await kioskCtx.close();
 
     // Phone: P3 with the two-line cart, then P4 the confirm card. Text mode, so no Live connection is opened.
@@ -138,20 +144,28 @@ async function main() {
     const ai = phoneAi(created.sessionId, deviceToken);
     await ai("addToCart", heroLines[0], 1);
     await ai("addToCart", heroLines[1], 1);
-    await phone.getByRole("region", { name: "Your order" }).locator("li").nth(1).waitFor();
+    const cart = phone.getByRole("region", { name: "Your order" });
+    await cart.locator("li").nth(1).waitFor();
+    await cart.scrollIntoViewIfNeeded();
     await phone.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
     await settled(phone);
-    await saveWebp(encoder, await phone.screenshot(), "phone-talk", 780, 1688);
+    const cartBox = await cart.boundingBox();
+    if (!cartBox) throw new Error("no cart card");
+    // The cart card only (CSS px; the 2x device scale doubles it).
+    const talk = { x: 0, y: Math.max(0, cartBox.y - 16), width: 390, height: 420 };
+    await saveWebp(encoder, await phone.screenshot({ clip: talk }), "phone-talk", 780, 840);
 
     await ai("requestCheckout", {}, 2);
     await phone.getByRole("heading", { name: "Please check your order" }).waitFor();
     await settled(phone);
     await phone.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
-    await saveWebp(encoder, await phone.screenshot(), "phone-confirm", 780, 1688);
+    // The bottom of P4: the last line, the total, [Yes, pay now] and the mic.
+    await saveWebp(encoder, await phone.screenshot({ clip: { x: 0, y: 844 - 480, width: 390, height: 480 } }), "phone-confirm", 780, 960);
     await phoneCtx.close();
 
-    // /demo mid-order at the judge laptop size, inside the highlight of the second line.
-    const demoCtx = await browser.newContext({ viewport: { width: 1440, height: 900 }, locale: "en-US" });
+    // /demo mid-order at the judge laptop size, inside the highlight of the second line: the kiosk and phone columns
+    // only, at 2x, so the hero picture on / is readable (I-136).
+    const demoCtx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2, locale: "en-US" });
     const demo = await demoCtx.newPage();
     await demo.goto(`${BASE}/demo`);
     const started = demo.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
@@ -166,7 +180,13 @@ async function main() {
     await demo.locator(".k-ring").first().waitFor();
     await settled(demo);
     await demo.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
-    await saveWebp(encoder, await demo.screenshot(), "demo", 1440, 900);
+    const kioskCol = await demo.locator('section[aria-labelledby="demo-kiosk-caption"]').boundingBox();
+    const phoneCol = await demo.locator("[data-demo-check]").boundingBox();
+    if (!kioskCol || !phoneCol) throw new Error("no demo columns");
+    // Fixed 1280:1168 (the <Image> size on /), anchored on the kiosk column; the phone column ends inside it.
+    const heroWidth = phoneCol.x + phoneCol.width - kioskCol.x + 16;
+    const hero = { x: kioskCol.x - 8, y: kioskCol.y - 8, width: heroWidth, height: Math.round((heroWidth * 1168) / 1280) };
+    await saveWebp(encoder, await demo.screenshot({ clip: hero }), "demo", 1280, 1168);
     await demoCtx.close();
 
     // One picture per place on /demo and the landing page: the top 4:3 of each kiosk's first menu screen, in Korean.

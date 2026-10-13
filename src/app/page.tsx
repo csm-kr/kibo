@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "KIBO — talk to the kiosk",
     description: "Say your order to your own phone; the self-order kiosk in front of you fills itself.",
-    images: [{ url: "/landing/demo.webp", width: 1440, height: 900, alt: "The KIBO demo: a kiosk and a phone side by side" }],
+    images: [{ url: "/landing/demo.webp", width: 1280, height: 1168, alt: "The KIBO demo: a kiosk and a phone side by side" }],
   },
 };
 
@@ -68,38 +68,39 @@ export default function Home() {
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-16 px-6 py-16 text-xl leading-normal text-[#33302B]">
       <section data-landing-section="hero" className="flex flex-col gap-6">
         <Image src="/kibo-logo.svg" alt="KIBO" width={236} height={64} preload />
-        <h1 className="font-display text-[40px] leading-tight font-bold text-[#15171C] lg:text-[56px]">
-          <span className="block">Don&apos;t learn the kiosk.</span> <span className="block">Just talk.</span>
-        </h1>
-        <div className="grid items-start gap-12 lg:grid-cols-[2fr_3fr]">
+        {/* Headline and actions share one row, so the picture of the product is the largest thing on the first screen (I-136). */}
+        <div className="grid items-end gap-12 lg:grid-cols-[3fr_2fr]">
           <div className="flex flex-col gap-6">
+            <h1 className="font-display text-[40px] leading-tight font-bold text-[#15171C] lg:text-[56px]">
+              <span className="block">Don&apos;t learn the kiosk.</span> <span className="block">Just talk.</span>
+            </h1>
             <p>
               Say your order to your own phone; the self-order kiosk in front of you fills itself. No new hardware, no
               app to install.
             </p>
-            <div className="flex flex-col gap-4 sm:max-w-sm">
-              <Link href="/demo" className={PRIMARY}>
-                Try the live demo
-              </Link>
-              <Link href="/kiosk" className={SECONDARY}>
-                Two-device mode
-              </Link>
-            </div>
-            <p className={EVIDENCE}>
-              The live demo shows the kiosk and the phone side by side and works best on a laptop. Two-device mode opens
-              the kiosk; scan its QR code with your phone.
-            </p>
           </div>
-          <Image
-            src="/landing/demo.webp"
-            alt="The live demo: on the left the Korean kiosk with two cheeseburger sets the AI just added, highlighted; on the right the phone with the same order and total."
-            width={1440}
-            height={900}
-            unoptimized
-            preload
-            className="h-auto w-full rounded-[18px] border border-[#E2DACB]"
-          />
+          <div className="flex flex-col gap-4">
+            <Link href="/demo" className={PRIMARY}>
+              Try the live demo
+            </Link>
+            <Link href="/kiosk" className={SECONDARY}>
+              Two-device mode
+            </Link>
+          </div>
         </div>
+        <Image
+          src="/landing/demo.webp"
+          alt="The live demo: on the left the Korean kiosk with two cheeseburger sets the AI just added, highlighted; on the right the phone with the same order and total."
+          width={1280}
+          height={1168}
+          unoptimized
+          preload
+          className="mx-auto h-auto w-full max-w-5xl rounded-[18px] border border-[#E2DACB]"
+        />
+        <p className={EVIDENCE}>
+          The live demo shows the kiosk and the phone side by side and works best on a laptop. Two-device mode opens the
+          kiosk; scan its QR code with your phone.
+        </p>
       </section>
 
       <section data-landing-section="people" aria-labelledby="people" className="flex flex-col gap-6">
@@ -122,14 +123,19 @@ export default function Home() {
         </h2>
         <ol className="grid gap-6 lg:grid-cols-3">
           <Step n={1} title="Scan the QR" text="The kiosk shows a QR code. Your phone opens a web page; nothing to install.">
-            <Shot src="kiosk-attract" alt="Kiosk start screen with the QR code for ordering by talking" kiosk />
+            <Shot src="kiosk-attract" alt="The kiosk's QR code for ordering by talking" width={540} height={810} />
           </Step>
           <Step n={2} title="Talk or type" text="Say the order. The kiosk moves by itself and highlights each change for 2 seconds.">
-            <Shot src="phone-talk" alt="Phone with two cheeseburger sets in the order and the total" />
-            <Shot src="kiosk-ai-highlight" alt="Kiosk menu with the added cheeseburger highlighted and the note that the AI added it" kiosk />
+            <Shot src="phone-talk" alt="Phone with two cheeseburger sets in the order and the total" width={780} height={840} />
+            <Shot
+              src="kiosk-ai-highlight"
+              alt="Kiosk menu with the added cheeseburger highlighted and the note that the AI added it"
+              width={820}
+              height={615}
+            />
           </Step>
           <Step n={3} title="Confirm, then pay" text="Check the order on your phone and say yes or tap. Pay with your card at the kiosk.">
-            <Shot src="phone-confirm" alt="Phone confirm card with both lines, the total and a Yes, pay now button" />
+            <Shot src="phone-confirm" alt="Phone with the total and a Yes, pay now button" width={780} height={960} />
           </Step>
         </ol>
       </section>
@@ -288,21 +294,21 @@ function Step({ n, title, text, children }: { n: number; title: string; text: st
         </h3>
       </div>
       <p>{text}</p>
-      <div className="mt-auto flex items-start justify-center gap-4">{children}</div>
+      <div className="mt-auto flex flex-col items-center gap-4">{children}</div>
     </li>
   );
 }
 
-/** A capture from public/landing/: phone shots are 780x1688 (390x844 at 2x), kiosk shots 540x960. */
-function Shot({ src, alt, kiosk = false }: { src: string; alt: string; kiosk?: boolean }) {
+/** One cropped region from public/landing/ (`npm run shots:landing`), as wide as its card. */
+function Shot({ src, alt, width, height }: { src: string; alt: string; width: number; height: number }) {
   return (
     <Image
       src={`/landing/${src}.webp`}
       alt={alt}
-      width={kiosk ? 540 : 780}
-      height={kiosk ? 960 : 1688}
+      width={width}
+      height={height}
       unoptimized
-      className="h-auto w-full max-w-48 min-w-0 flex-1 rounded-[18px] border border-[#E2DACB]"
+      className="h-auto w-full max-w-sm rounded-[18px] border border-[#E2DACB]"
     />
   );
 }

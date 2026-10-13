@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { vocabularyOf } from "@/lib/adapters/catalog";
 import { kt } from "@/lib/i18n/kiosk";
 import { formatWon, lineLabel } from "@/lib/kiosk/menu";
@@ -23,6 +24,8 @@ export function CartBar(props: {
   ringKey: string | null;
   onClear(): void;
   onOrder(): void;
+  /** Standalone /kiosk: [처음으로], first in the button row (bottom left). */
+  startOver?: ReactNode;
 }) {
   const { kiosk, lines } = props;
   const { locale, domain } = kiosk;
@@ -63,6 +66,7 @@ export function CartBar(props: {
         })}
       </ul>
       <div className="flex gap-8">
+        {props.startOver}
         <button
           type="button"
           onClick={props.onClear}

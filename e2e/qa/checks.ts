@@ -263,6 +263,8 @@ export async function focus(page: Page, p: Profile): Promise<Findings> {
     if (!r.ring) h.push(`focus ring missing: ${r.label}`);
     if (!r.visible) h.push(`focus obscured: ${r.label}`);
   }
+  // The ring left by this check showed up in the next state's screenshot (I-121).
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
   return { h: capped(h), t: [] };
 }
 
@@ -342,7 +344,23 @@ async function screenshot(page: Page, info: TestInfo, p: Profile, state: string)
   const vp = page.viewportSize();
   const viewport = vp ? `${vp.width}x${vp.height}` : "unknown";
   await page.evaluate(() => document.fonts.ready);
-  const shot = `${out}/${p.route.replace(/\W/g, "") || "home"}-${state}-${viewport}.png`;
+  // Photos still loading came out blank in screenshots that feed the deck (I-138): wait for every image on screen.
+  await page
+    .waitForFunction(
+      () =>
+        [...document.images].every((img) => {
+          const b = img.getBoundingClientRect();
+          const onScreen = b.width > 0 && b.bottom > 0 && b.right > 0 && b.top < innerHeight && b.left < innerWidth;
+          return !onScreen || (img.complete && img.naturalWidth > 0);
+        }),
+      null,
+      { timeout: 5_000 },
+    )
+    .catch(() => {});
+  await page.evaluate(() =>
+    Promise.all([...document.images].filter((img) => img.complete && img.naturalWidth > 0).map((img) => img.decode().catch(() => {}))),
+  );
+  const shot =`${out}/${p.route.replace(/\W/g, "") || "home"}-${state}-${viewport}.png`;
   await page.screenshot({ path: shot });
   return { out, viewport, shot };
 }

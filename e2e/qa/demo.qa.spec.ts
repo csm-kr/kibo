@@ -1,5 +1,5 @@
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
-import { command, kioskRoot } from "../helpers";
+import { command, kioskRoot, openScenarios } from "../helpers";
 import { HERO_ACTIONS, RAIL_ACTIONS } from "../recordedActions";
 import { DEMO, DEMO_GUIDE, qaState, type Findings } from "./checks";
 
@@ -40,6 +40,11 @@ async function check(page: Page, info: TestInfo, state: string, before?: () => P
 }
 
 const phoneScreen = (page: Page) => page.locator("[data-phone-screen]");
+
+/** R-009, I-134: the whole [Yes, pay now], not a sliver of it, at every judge viewport. */
+const payInView = (page: Page) => async () => {
+  await expect(page.getByRole("button", { name: "Yes, pay now" })).toBeInViewport({ ratio: 1 });
+};
 
 test("D1 to D3", async ({ page, request }, info) => {
   await page.goto("/demo");
@@ -84,14 +89,14 @@ test("D1 to D3", async ({ page, request }, info) => {
   await ai("requestCheckout", {}, seq++);
   await expect(page.getByRole("heading", { name: "Please check your order" })).toBeVisible();
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "review");
-  await check(page, info, "D2-confirm");
+  await check(page, info, "D2-confirm", payInView(page));
 
   await page.getByRole("button", { name: "Yes, pay now" }).click();
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "payment");
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "pay");
   await check(page, info, "D2-payment");
 
-  await page.getByRole("button", { name: "Tap the card on the kiosk" }).click();
+  await page.getByRole("button", { name: "Insert the card at the kiosk" }).click();
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "done");
   await page.getByRole("button", { name: "출력 안 함" }).click();
   await expect(page.locator("[data-demo-end]")).toBeVisible();
@@ -125,7 +130,7 @@ test.describe(() => {
         source: "voice",
         utteranceSeq: ++seq,
       });
-      await expect(page.getByRole("region", { name: "Your order" }).locator("li")).toHaveCount(seq);
+      await expect(page.getByRole("region", { name: "Your tickets" }).locator("li")).toHaveCount(seq);
     });
 
     await command(request, s.deviceToken, {
@@ -135,15 +140,15 @@ test.describe(() => {
       source: "voice",
       utteranceSeq: ++seq,
     });
-    await expect(page.getByRole("heading", { name: "Please check your order" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Please check your tickets" })).toBeVisible();
     await expect(kioskRoot(page)).toHaveAttribute("data-screen", "review");
-    await check(page, info, "D2-rail-confirm");
+    await check(page, info, "D2-rail-confirm", payInView(page));
 
     await page.getByRole("button", { name: "Yes, pay now" }).click();
     await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "pay");
     await check(page, info, "D2-rail-payment");
 
-    await page.getByRole("button", { name: "Tap the card on the kiosk" }).click();
+    await page.getByRole("button", { name: "Insert the card at the kiosk" }).click();
     await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "done");
     await page.getByRole("button", { name: "출력 안 함" }).click();
     await expect(page.locator("[data-demo-end]")).toBeVisible();
@@ -161,7 +166,7 @@ test.describe(() => {
     await page.getByRole("button", { name: "Start", exact: true }).click();
     await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "dine");
     const guide = page.locator("[data-scenario-guide]");
-    await guide.getByRole("button", { name: "Scenarios", exact: true }).click();
+    await openScenarios(page);
     await check(page, info, "D2-scenarios-list");
     await check(page, info, "D2-scenarios-list-guide", undefined, VIEWPORTS, DEMO_GUIDE);
 
@@ -191,7 +196,7 @@ test.describe(() => {
     await page.getByRole("button", { name: "Start", exact: true }).click();
     await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "dine");
     const guide = page.locator("[data-scenario-guide]");
-    await guide.getByRole("button", { name: "Scenarios", exact: true }).click();
+    await openScenarios(page);
     const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
     await page.locator('[data-scenario="sunja-lunch"]').click();
     const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
@@ -222,7 +227,7 @@ async function chooseScenario(page: Page, kioskId: string, scenarioId: string) {
   await page.getByRole("button", { name: "Start", exact: true }).click();
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", /^(dine|talk)$/);
   const guide = page.locator("[data-scenario-guide]");
-  await guide.getByRole("button", { name: "Scenarios", exact: true }).click();
+  await openScenarios(page);
   const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
   await page.locator(`[data-scenario="${scenarioId}"]`).click();
   const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
@@ -247,8 +252,7 @@ test.describe(() => {
     await expect(guide.locator("[data-scenario-your-turn]")).toBeVisible();
     await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "confirm");
     // R-009: the guide column must not push the total and [Yes, pay now] off screen.
-    await expect(page.getByRole("button", { name: "Yes, pay now" })).toBeInViewport();
-    await check(page, info, "D2-scenario-finished");
+    await check(page, info, "D2-scenario-finished", payInView(page));
     await check(page, info, "D2-scenario-finished-guide", undefined, VIEWPORTS, DEMO_GUIDE);
   });
 });
@@ -316,8 +320,7 @@ test.describe(() => {
     await ai("addToCart", { itemId: "express_city_center", variant: "single", qty: 1, selections: { passenger: ["child"] } });
     await ai("requestCheckout", {});
     await expect(guide.locator("[data-scenario-your-turn]")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Yes, pay now" })).toBeInViewport();
-    await check(page, info, "D2-rail-scenario-finished", undefined, VIEWPORTS);
+    await check(page, info, "D2-rail-scenario-finished", payInView(page), VIEWPORTS);
 
     await guide.getByRole("button", { name: "All scenarios" }).click();
     await check(page, info, "D2-rail-scenarios-list-guide", undefined, [VIEWPORTS[0]], DEMO_GUIDE);

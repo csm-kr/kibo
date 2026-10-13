@@ -1,4 +1,5 @@
-import type { Locale, LocalizedName } from "@/types/menu";
+import type { KioskDomain, Locale, LocalizedName } from "@/types/menu";
+import { kt } from "./kiosk";
 
 // Every phone string (docs/UX.md "Copy"): plain, polite, one idea per sentence; buttons are verbs.
 // Words like session, token or agent never appear (heuristic 2).
@@ -35,7 +36,7 @@ const PHONE_TEXT = {
   inputLabel: { ko: "주문을 글자로 입력", en: "Type your order" },
   inputPlaceholder: { ko: "예: 치즈버거 세트 하나", en: "e.g. One cheeseburger set" },
   learnedPlaceholder: { ko: "예: 페퍼로니 라지 하나", en: "e.g. One large pepperoni" },
-  ticketPlaceholder: { ko: "예: 시티센터 어른 두 장", en: "e.g. Two adult tickets to City Center" },
+  ticketPlaceholder: { ko: "예: 시티센터 어른 두 장", en: "e.g. Two adults to City Center" },
   send: { ko: "보내기", en: "Send" },
   useButtons: {
     ko: "여기 버튼을 누르거나 키오스크 화면에서 주문할 수 있어요.",
@@ -46,6 +47,7 @@ const PHONE_TEXT = {
   payNow: { ko: "네, 결제할게요", en: "Yes, pay now" },
   pickMore: { ko: "더 고를게요", en: "Pick more" },
   sayYes: { ko: "\"네\"라고 말해도 돼요.", en: "You can also say yes." },
+  typeButton: { ko: "글자 입력", en: "Type" },
   // Learned kiosk (KIBO Learn): the kiosk page is driven by the bridge, and the user pays on the kiosk itself
   bridgePending: { ko: "키오스크에 입력하고 있어요…", en: "The kiosk is entering it…" },
   bridgeSlow: { ko: "키오스크 화면을 확인해 주세요.", en: "Please check the kiosk screen." },
@@ -55,8 +57,7 @@ const PHONE_TEXT = {
   },
   // Pay
   payTitle: { ko: "키오스크에 카드를 넣어 주세요", en: "Insert your card into the kiosk" },
-  payHint: { ko: "결제는 키오스크에서 해요.", en: "You pay at the kiosk." },
-  cardStandIn: { ko: "키오스크에 카드 대기", en: "Tap the card on the kiosk" },
+  cardStandIn: { ko: "키오스크에 카드 넣기", en: "Insert the card at the kiosk" },
   // Done
   orderNumber: { ko: "주문 번호", en: "Order number" },
   pickup: { ko: "카운터에서 번호를 부르면 받아 가세요.", en: "We'll call your number at the counter." },
@@ -167,8 +168,16 @@ const PHONE_TEXT = {
 
 export type PhoneTextKey = keyof typeof PHONE_TEXT;
 
-export function pt(key: PhoneTextKey, locale: Locale): string {
-  return PHONE_TEXT[key][locale];
+/** A ticket machine (domain ticket) sells tickets: these replace the order words, as the kiosk's TICKET_TEXT does. */
+const PHONE_TICKET_TEXT: Partial<Record<PhoneTextKey, Record<Locale, string>>> = {
+  cartTitle: { ko: "내 승차권", en: "Your tickets" },
+  cartEmpty: { ko: "아직 고른 승차권이 없어요.", en: "No tickets chosen yet." },
+  confirmTitle: { ko: "승차권을 확인해 주세요", en: "Please check your tickets" },
+  idleQuestion: { ko: "계속 구매하시겠어요?", en: "Still buying?" },
+};
+
+export function pt(key: PhoneTextKey, locale: Locale, domain?: KioskDomain): string {
+  return (domain === "ticket" && PHONE_TICKET_TEXT[key]?.[locale]) || PHONE_TEXT[key][locale];
 }
 
 /** The scenario guide while it plays: "Step 2 of 3: watch the kiosk…" (step counts from 1). */
@@ -204,6 +213,17 @@ export function phoneSecondsLeft(seconds: number, locale: Locale): string {
 /** "음성 45초 남았어요": voice time left on a /demo order. */
 export function voiceSecondsLeft(seconds: number, locale: Locale): string {
   return locale === "ko" ? `음성 ${seconds}초 남았어요` : `Voice: ${seconds} s left`;
+}
+
+/**
+ * P5: the kiosk first asks for the payment method in Korean, so name its own button, with its meaning in English
+ * (J2 Pay, I-118). The label is the kiosk's K7 button (src/lib/i18n/kiosk.ts `payCard`).
+ */
+export function payMethodHint(locale: Locale): { pre: string; label: string; gloss: string; post: string } {
+  const label = kt("payCard", "ko");
+  return locale === "ko"
+    ? { pre: "키오스크에서 '", label, gloss: "", post: "'를 누르고 카드를 넣어 주세요." }
+    : { pre: "On the kiosk, tap ", label, gloss: ` (${kt("payCard", "en")})`, post: ", then insert your card." };
 }
 
 /** P4 on a learned kiosk: the kiosk's own checkout label, quoted as the kiosk shows it, with its meaning in English. */

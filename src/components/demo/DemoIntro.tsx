@@ -88,7 +88,8 @@ export function DemoIntro(props: { kioskId: string; starting: boolean; error: Sc
             </ul>
           </nav>
           <div className="flex flex-col gap-2">
-            <button type="button" disabled={props.starting} onClick={props.onStart} className={`${PRIMARY} sm:max-w-sm`}>
+            {/* As wide as the card row above it, so it reads as the row's action (I-123). */}
+            <button type="button" disabled={props.starting} onClick={props.onStart} className={PRIMARY}>
               {props.starting ? "Starting…" : "Start"}
             </button>
             <p className="text-base text-[#4B463F]">Works in English and Korean. No microphone? Type instead.</p>

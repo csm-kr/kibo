@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import type { CommandReply } from "@/lib/client/api";
 import { findItem, isAvailableNow } from "@/lib/adapters/catalog";
 import type { CommandType } from "@/lib/commands/schemas";
@@ -61,6 +61,8 @@ export function MenuScreen(props: {
   clockOffset: number;
   send(type: CommandType, args: object): Promise<CommandReply | null>;
   onClaimUrl?(claimUrl: string): void;
+  /** Standalone /kiosk: [처음으로], bottom left of the cart bar. */
+  startOver?: ReactNode;
 }) {
   const { kiosk, session, send } = props;
   const { locale, domain } = kiosk;
@@ -197,6 +199,7 @@ export function MenuScreen(props: {
         ringKey={flash?.key ?? null}
         onClear={() => setClearOpen(true)}
         onOrder={() => void send("requestCheckout", {})}
+        startOver={props.startOver}
       />
 
       {sheetItem && (

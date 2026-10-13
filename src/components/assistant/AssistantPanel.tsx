@@ -13,7 +13,7 @@ import type { ChoiceRef } from "@/lib/commands/errors";
 import type { CommandType } from "@/lib/commands/schemas";
 import type { SendResult } from "@/lib/demo/player";
 import { learnedUndoLine } from "@/lib/commands/undo";
-import { cartAnnouncement, learnedPayHint, phoneSecondsLeft, pt } from "@/lib/i18n/phone";
+import { cartAnnouncement, learnedPayHint, payMethodHint, phoneSecondsLeft, pt } from "@/lib/i18n/phone";
 import { idleWarning, staffBannerVisible } from "@/lib/kiosk/timers";
 import { bridgeNotice, phoneScreen, type BridgeNotice, type PhoneLocal } from "@/lib/phone/screen";
 import type { KioskData, Locale, LocalizedName } from "@/types/menu";
@@ -208,6 +208,9 @@ export function AssistantPanel(props: Props) {
   const [opened, setOpened] = useState({ screen, count: chat.messages.length });
   if (opened.screen !== screen) setOpened({ screen, count: chat.messages.length });
   const fresh = chat.messages.slice(opened.screen === screen ? opened.count : chat.messages.length);
+  // P4's [Type] opens the text input for this visit to the screen only.
+  const [typingOn, setTypingOn] = useState<object | null>(null);
+  const typing = typingOn === opened;
 
   const otherLocale: Locale = locale === "ko" ? "en" : "ko";
   const working = chat.busy && chat.sentAt > 0 && now - chat.sentAt >= 1000;
@@ -336,11 +339,14 @@ export function AssistantPanel(props: Props) {
                   type="button"
                   disabled={busy}
                   onClick={() => void command("setDineOption", { option })}
-                  className={`overflow-hidden rounded-[18px] border-2 border-[#15171C] bg-white text-left active:border-[#3446D4] disabled:opacity-60 ${FOCUS}`}
+                  className={`min-h-15 overflow-hidden rounded-[18px] border-2 border-[#15171C] bg-white text-left active:border-[#3446D4] disabled:opacity-60 ${FOCUS}`}
                 >
-                  <span className="relative block aspect-[4/3]">
-                    <Image src={dineOptions[option].image} alt="" fill sizes="50vw" loading="eager" className="object-cover" />
-                  </span>
+                  {/* A learned kiosk's dine "photo" is only a placeholder ring: text-only buttons there (I-103). */}
+                  {!learned && (
+                    <span className="relative block aspect-[4/3]">
+                      <Image src={dineOptions[option].image} alt="" fill sizes="50vw" loading="eager" className="object-cover" />
+                    </span>
+                  )}
                   <span className="block px-3 py-3 text-xl font-bold">{dineOptions[option].name[locale]}</span>
                 </button>
               ))}
@@ -359,7 +365,7 @@ export function AssistantPanel(props: Props) {
       body = session && (
         <>
           <Scroll>
-            <h1 className="sr-only">{pt("cartTitle", locale)}</h1>
+            <h1 className="sr-only">{pt("cartTitle", locale, kiosk.domain)}</h1>
             <Conversation messages={chat.messages} locale={locale} working={working} />
             {session.pendingChoice && (
               <ChoiceButtons kiosk={kiosk} pending={session.pendingChoice} locale={locale} disabled={busy} onPick={pickChoice} />
@@ -383,10 +389,19 @@ export function AssistantPanel(props: Props) {
       );
       break;
     case "confirm":
+      // The total and [Yes, pay now] own the bottom area, so no footer pushes them off a small screen (I-134, R-009);
+      // the lines scroll above them. The text input waits behind [Type] unless voice already gave way to text.
       body = session && (
         <>
           <Scroll>
-            <ConfirmCard kiosk={kiosk} session={session} locale={locale} />
+            <ConfirmCard kiosk={kiosk} session={session} locale={locale} total={false} />
+            <button type="button" disabled={busy} onClick={() => void command("cancelCheckout", {})} className={SECONDARY}>
+              {pt("pickMore", locale)}
+            </button>
+            <LastMessage messages={fresh} locale={locale} />
+          </Scroll>
+          <Footer>
+            <TotalRow total={session.total} locale={locale} />
             <button
               type="button"
               disabled={busy}
@@ -395,15 +410,36 @@ export function AssistantPanel(props: Props) {
             >
               {pt("payNow", locale)}
             </button>
-            <button type="button" disabled={busy} onClick={() => void command("cancelCheckout", {})} className={SECONDARY}>
-              {pt("pickMore", locale)}
-            </button>
-            <LastMessage messages={fresh} locale={locale} />
-          </Scroll>
-          <Footer>
             {/* A spoken "yes" confirms too, after the card appeared (docs/ARCHITECTURE.md "Commands and actors"). */}
-            {voiceControls}
-            {composer(pt("sayYes", locale))}
+            {typing || voiceNote !== null || limited ? (
+              composer(pt("sayYes", locale))
+            ) : (
+              <div className="flex gap-2">
+                <div className="min-w-0 flex-1">
+                  <VoiceControls
+                    state={voice.state}
+                    locale={locale}
+                    disabled={!session || !deviceToken}
+                    onMic={toggleVoice}
+                    voiceOutput={voiceOutput}
+                    onVoiceOutput={setVoiceOutput}
+                    secondsLeft={null}
+                    compactHint={pt("sayYes", locale)}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTypingOn(opened);
+                    focusText();
+                  }}
+                  className={`flex min-h-22 min-w-22 flex-none flex-col items-center justify-center rounded-[18px] border-2 border-[#15171C] bg-white px-3 text-base font-bold text-[#15171C] active:bg-[#F3EEE4] ${FOCUS}`}
+                >
+                  <KeyboardIcon />
+                  {pt("typeButton", locale)}
+                </button>
+              </div>
+            )}
           </Footer>
         </>
       );
@@ -433,8 +469,9 @@ export function AssistantPanel(props: Props) {
       body = session && (
         <Scroll>
           <h1 className="text-2xl font-bold">{pt("payTitle", locale)}</h1>
-          <InsertCardPicture />
-          <p className="text-xl">{pt("payHint", locale)}</p>
+          {/* In /demo the kiosk is on the left, so the arrow points there (I-069). */}
+          <InsertCardPicture mirrored={mode === "demo"} />
+          <PayMethodLine locale={locale} />
           <TotalRow total={session.total} locale={locale} />
           {mode === "demo" && props.onCardStandIn && (
             <button type="button" onClick={props.onCardStandIn} className={PRIMARY}>
@@ -489,16 +526,17 @@ export function AssistantPanel(props: Props) {
 
   return (
     <div lang={locale} data-phone-screen={screen} data-mode={mode} className="relative flex h-full min-h-0 flex-col bg-[#FBF7EF] text-[#15171C]">
-      <header className="flex flex-none flex-wrap items-center gap-2 border-b border-[#E2DACB] bg-white px-4 py-2">
-        <div className="flex flex-1 items-center gap-2">
+      {/* One row at every phone width (I-084): below 400px the language button shows only its globe, and the brand may wrap. */}
+      <header className="flex flex-none items-center gap-2 border-b border-[#E2DACB] bg-white px-4 py-2">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
           {/* max-w-none: a percentage max-width lets the row count the logo as 0px wide and skip wrapping. */}
           <Image src="/kibo-mark.svg" alt="KIBO" width={32} height={32} unoptimized className="size-8 max-w-none flex-none" />
-          <span className="text-base font-bold">{kiosk.brand.name[locale]}</span>
+          <span className="min-w-0 text-base leading-tight font-bold [overflow-wrap:anywhere]">{kiosk.brand.name[locale]}</span>
         </div>
-        {/* One switch named in the other language, so a reader of either can find it; it fits one row at 390px. */}
+        {/* One switch named in the other language, so a reader of either can find it. */}
         <button type="button" lang={otherLocale} onClick={() => props.onLocaleChange(otherLocale)} className={`${SMALL} flex-none`}>
           <GlobeIcon />
-          {pt(otherLocale === "ko" ? "langKo" : "langEn", locale)}
+          <span className="max-[399px]:sr-only">{pt(otherLocale === "ko" ? "langKo" : "langEn", locale)}</span>
         </button>
         {!ended && (
           <button
@@ -506,7 +544,7 @@ export function AssistantPanel(props: Props) {
             disabled={!session || !deviceToken}
             onClick={() => void command("callStaff", { reasonCode: "user_request" })}
             // min-w-14 replaces the automatic minimum, so without flex-none the label would spill over the brand.
-            className={`${SMALL} flex-none`}
+            className={`${SMALL} flex-none max-[399px]:flex-col max-[399px]:gap-0 max-[399px]:rounded-[18px] max-[399px]:py-1 max-[399px]:leading-tight`}
           >
             <BellIcon />
             {pt("callStaff", locale)}
@@ -538,7 +576,7 @@ export function AssistantPanel(props: Props) {
         <ModalLayer className="absolute inset-0 z-20 flex items-end bg-[#15171C]/60 p-4">
           <section role="alertdialog" aria-modal aria-labelledby="phone-idle-title" className="flex w-full flex-col gap-4 rounded-[26px] bg-[#FBF7EF] p-6 text-center">
             <h2 id="phone-idle-title" className="text-2xl font-bold">
-              {pt("idleQuestion", locale)}
+              {pt("idleQuestion", locale, kiosk.domain)}
             </h2>
             <p role="timer" className="font-display text-[2rem] font-bold text-[#7A2E0E]">
               {phoneSecondsLeft(idle.secondsLeft, locale)}
@@ -660,17 +698,17 @@ function LinkIcon() {
 }
 
 /** P4: every line and the total in large type. Focus moves here when it opens. */
-function ConfirmCard({ kiosk, session, locale }: { kiosk: KioskData; session: Session; locale: Locale }) {
+function ConfirmCard({ kiosk, session, locale, total = true }: { kiosk: KioskData; session: Session; locale: Locale; total?: boolean }) {
   const titleRef = useRef<HTMLHeadingElement>(null);
   useEffect(() => titleRef.current?.focus(), []);
   return (
     <section aria-labelledby="phone-confirm-title" className="flex flex-col gap-2 rounded-[26px] border-2 border-[#3446D4] bg-white p-4">
       <h1 id="phone-confirm-title" ref={titleRef} tabIndex={-1} className="text-2xl font-bold outline-none">
-        {pt("confirmTitle", locale)}
+        {pt("confirmTitle", locale, kiosk.domain)}
       </h1>
       {session.dineOption && <p className="text-xl text-[#4B463F]">{kiosk.dineOptions?.[session.dineOption].name[locale]}</p>}
       <CartLines kiosk={kiosk} cart={session.cart} locale={locale} />
-      <TotalRow total={session.total} locale={locale} />
+      {total && <TotalRow total={session.total} locale={locale} />}
     </section>
   );
 }
@@ -713,16 +751,38 @@ function BridgeLine({ notice, locale, onCallStaff }: { notice: BridgeNotice; loc
   );
 }
 
-/** P5: a card going into the kiosk, with an arrow toward it. */
-function InsertCardPicture() {
+/** P5: the kiosk's own Korean card button, glossed, so the user can find it on a screen they may not read. */
+function PayMethodLine({ locale }: { locale: Locale }) {
+  const hint = payMethodHint(locale);
   return (
-    <svg viewBox="0 0 240 140" aria-hidden className="h-36 w-full max-w-72 self-center">
+    <p className="text-xl">
+      {hint.pre}
+      <strong lang="ko">{hint.label}</strong>
+      {hint.gloss}
+      {hint.post}
+    </p>
+  );
+}
+
+/** P5: a card going into the kiosk, with an arrow toward it. */
+function InsertCardPicture({ mirrored }: { mirrored: boolean }) {
+  return (
+    <svg viewBox="0 0 240 140" aria-hidden className={`h-36 w-full max-w-72 self-center ${mirrored ? "-scale-x-100" : ""}`}>
       <rect x="150" y="10" width="76" height="120" rx="10" fill="#FFFFFF" stroke="#15171C" strokeWidth="4" />
       <rect x="162" y="24" width="52" height="40" rx="4" fill="#EEF0FD" stroke="#15171C" strokeWidth="3" />
       <rect x="166" y="90" width="44" height="6" rx="3" fill="#15171C" />
       <rect x="40" y="76" width="72" height="44" rx="6" fill="#3446D4" />
       <rect x="40" y="86" width="72" height="8" fill="#1F2A8A" />
       <path d="M14 40h104m0 0-14-12m14 12-14 12" fill="none" stroke="#15171C" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function KeyboardIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-none">
+      <rect x="2.5" y="6" width="19" height="12" rx="2" />
+      <path d="M6.5 10h.01M10 10h.01M13.5 10h.01M17 10h.01M8 14h8" />
     </svg>
   );
 }

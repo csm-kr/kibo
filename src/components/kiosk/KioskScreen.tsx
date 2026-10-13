@@ -8,7 +8,7 @@ import type { ErrorDetail } from "@/lib/commands/errors";
 import type { CommandType } from "@/lib/commands/schemas";
 import { errorCopy, type ScreenErrorCode } from "@/lib/i18n/errors";
 import { kt, languageName } from "@/lib/i18n/kiosk";
-import { kioskScreen } from "@/lib/kiosk/screen";
+import { kioskScreen, startOverStep } from "@/lib/kiosk/screen";
 import type { KioskData, Locale } from "@/types/menu";
 import type { DineOption, Session } from "@/types/session";
 import { DemoCounter } from "./DemoCounter";
@@ -17,6 +17,7 @@ import { KioskBanners } from "./KioskBanners";
 import { MenuScreen } from "./MenuScreen";
 import { PaymentScreen } from "./PaymentScreen";
 import { ReviewScreen } from "./ReviewScreen";
+import { StartOver } from "./StartOver";
 import { KioskImage } from "./KioskImage";
 import { KioskToolbar } from "./KioskToolbar";
 import { FOCUS } from "./styles";
@@ -39,6 +40,11 @@ interface Props {
    * a new QR would void the demo's own phone (I-066).
    */
   onClaimUrl?(claimUrl: string): void;
+  /**
+   * Standalone /kiosk only: [처음으로] on K2 and K3 ends the touch order with a new session (I-048). /demo leaves it
+   * out, so the judge's session is never dropped.
+   */
+  onStartOver?(): void;
   /** /demo only: a "tap" event inserts the card on K7, the same path as the kiosk's own button (Flow C4). */
   cardTap?: EventTarget;
   /** /demo only: K8 keeps the order number instead of counting back to K1; the demo's end card moves on. */
@@ -71,6 +77,10 @@ export function KioskScreen(props: Props) {
 
   const touchStarted = touch.forId === sessionId && touch.started;
   const screen = kioskScreen(session, { touchStarted }, kiosk);
+  const startOverAt = props.onStartOver ? startOverStep(screen, session) : null;
+  const startOver = startOverAt && props.onStartOver && (
+    <StartOver key={sessionId} kiosk={kiosk} step={startOverAt} onStartOver={props.onStartOver} />
+  );
 
   /** Sends a touch command; on failure shows the error copy and returns null. */
   async function send(type: CommandType, args: object, opts?: { cartVersion?: number }): Promise<CommandReply | null> {
@@ -138,6 +148,7 @@ export function KioskScreen(props: Props) {
           clockOffset={clockOffset}
           send={send}
           onClaimUrl={onClaimUrl}
+          startOver={startOver}
         />
       ) : screen === "review" && session ? (
         <ReviewScreen kiosk={kiosk} session={session} claimUrl={claimUrl} send={send} onClaimUrl={onClaimUrl} />
@@ -168,6 +179,7 @@ export function KioskScreen(props: Props) {
             kiosk={kiosk}
             phoneConnected={session?.phoneConnectedAt != null}
             onPick={(option: DineOption) => void send("setDineOption", { option })}
+            startOver={startOver}
           />
         </>
       )}
@@ -316,7 +328,8 @@ function Attract(props: {
   );
 }
 
-function Dine({ kiosk, phoneConnected, onPick }: { kiosk: KioskData; phoneConnected: boolean; onPick(o: DineOption): void }) {
+function Dine(props: { kiosk: KioskData; phoneConnected: boolean; onPick(o: DineOption): void; startOver: ReactNode }) {
+  const { kiosk, phoneConnected, onPick } = props;
   const locale = kiosk.locale;
   const options: DineOption[] = ["eat_in", "take_out"];
   const dine = kiosk.dineOptions;
@@ -348,6 +361,7 @@ function Dine({ kiosk, phoneConnected, onPick }: { kiosk: KioskData; phoneConnec
           {kt("phoneConnected", locale)}
         </p>
       )}
+      {props.startOver && <div className="mt-auto flex pb-12">{props.startOver}</div>}
     </div>
   );
 }

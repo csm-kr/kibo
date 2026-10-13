@@ -61,11 +61,13 @@ test("open at 1440 wide: each action in plain words with its tool and code, newe
   expect(text).not.toContain(s.sessionId);
   expect(text).not.toContain(s.deviceToken);
 
-  // The confirm card needs the phone's full height: the strip steps aside there (R-009) and comes back after.
+  // From 1440 wide the strip sits in the scenario column, not under the phone: it stays through the review and the
+  // confirm card keeps the phone's full height (R-009, I-084).
+  await expect(page.locator("[data-scenario-guide] [data-action-strip]")).toHaveCount(1);
   await command(request, s.deviceToken, { sessionId: s.sessionId, type: "requestCheckout", args: {}, source: "text", utteranceSeq: 2 });
   await expect(page.locator("[data-phone-screen]")).toHaveAttribute("data-phone-screen", "confirm");
-  await expect(strip(page)).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Yes, pay now" })).toBeInViewport();
+  await expect(rows).toHaveCount(MIXED_ACTIONS.length);
+  await expect(page.getByRole("button", { name: "Yes, pay now" })).toBeInViewport({ ratio: 1 });
   await page.getByRole("button", { name: "Pick more" }).click();
   await expect(page.locator("[data-phone-screen]")).toHaveAttribute("data-phone-screen", "talk");
   await expect(rows).toHaveCount(MIXED_ACTIONS.length);
@@ -80,8 +82,9 @@ test("open at 1440 wide: each action in plain words with its tool and code, newe
 test.describe(() => {
   test.use({ viewport: { width: 1280, height: 720 } });
 
-  test("collapsed by default below 1440 wide", async ({ page }) => {
+  test("collapsed by default below 1440 wide, under the phone", async ({ page }) => {
     await start(page);
+    await expect(page.locator("[data-demo-check] [data-action-strip]")).toHaveCount(1);
     await expect(toggle(page)).toHaveAttribute("aria-expanded", "false");
     await expect(strip(page).locator("[data-action-count]")).toHaveCount(0);
     await toggle(page).click();

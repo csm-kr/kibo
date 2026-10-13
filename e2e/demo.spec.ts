@@ -65,7 +65,7 @@ test("judge path: intro, order on both halves, confirm, card stand-in, order num
   await page.getByRole("button", { name: "Yes, pay now" }).click();
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "payment");
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "pay");
-  await page.getByRole("button", { name: "Tap the card on the kiosk" }).click();
+  await page.getByRole("button", { name: "Insert the card at the kiosk" }).click();
   await expect(page.getByText("승인 중…")).toBeVisible();
 
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "done");
@@ -78,7 +78,7 @@ test("judge path: intro, order on both halves, confirm, card stand-in, order num
   // D3: the two other places.
   const others = page.getByRole("navigation", { name: "Try another place" });
   await expect(others.getByRole("link", { name: "Airport rail" })).toHaveAttribute("href", "/demo?k=airport_rail");
-  await expect(others.getByRole("link", { name: "Pizza shop, no integration" })).toHaveAttribute("href", "/demo?k=doughhouse");
+  await expect(others.getByRole("link", { name: "Pizza shop" })).toHaveAttribute("href", "/demo?k=doughhouse");
 
   const next = await startDemo(page, "Try again");
   expect(next.sessionId).not.toBe(s.sessionId);

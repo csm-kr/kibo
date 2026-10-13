@@ -38,14 +38,15 @@ test("airport rail on /demo: tickets on both halves, confirm, card stand-in, ref
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "talk");
   await expect(page.getByText("Eat here or take out?")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Two adult tickets to City Center on the express, please." })).toBeVisible();
-  await expect(page.getByRole("textbox", { name: "Type your order" })).toHaveAttribute("placeholder", "e.g. Two adult tickets to City Center");
+  await expect(page.getByRole("textbox", { name: "Type your order" })).toHaveAttribute("placeholder", "e.g. Two adults to City Center");
 
   let seq = 0;
   const ai = (type: string, args: object = {}) =>
     command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "voice", utteranceSeq: ++seq });
 
   await ai("addToCart", { itemId: "express_city_center", variant: "single", qty: 2, selections: { passenger: ["adult"] } });
-  const cart = page.getByRole("region", { name: "Your order" });
+  // Ticket words on the phone too (I-116, R-007).
+  const cart = page.getByRole("region", { name: "Your tickets" });
   await expect(cart.getByText("Express to City Center", { exact: true })).toBeVisible();
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "menu");
   const canvas = page.locator("[data-kiosk-canvas]");
@@ -53,13 +54,13 @@ test("airport rail on /demo: tickets on both halves, confirm, card stand-in, ref
   await expect(canvas.getByText("21,000원").first()).toBeVisible();
 
   await ai("requestCheckout");
-  await expect(page.getByRole("heading", { name: "Please check your order" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Please check your tickets" })).toBeVisible();
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "review");
 
   await page.getByRole("button", { name: "Yes, pay now" }).click();
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "payment");
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "pay");
-  await page.getByRole("button", { name: "Tap the card on the kiosk" }).click();
+  await page.getByRole("button", { name: "Insert the card at the kiosk" }).click();
 
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "done");
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "done");
@@ -74,7 +75,7 @@ test("airport rail on /demo: tickets on both halves, confirm, card stand-in, ref
   // D3: the two other places and the two-device mode of this kiosk.
   const others = page.getByRole("navigation", { name: "Try another place" });
   await expect(others.getByRole("link", { name: "Burger shop" })).toHaveAttribute("href", "/demo?k=malo");
-  await expect(others.getByRole("link", { name: "Pizza shop, no integration" })).toHaveAttribute("href", "/demo?k=doughhouse");
+  await expect(others.getByRole("link", { name: "Pizza shop" })).toHaveAttribute("href", "/demo?k=doughhouse");
   await expect(page.getByRole("link", { name: "Open two-device mode" })).toHaveAttribute("href", "/kiosk?k=airport_rail");
 });
 
@@ -84,7 +85,7 @@ test("@live typing a ticket order reaches real Gemini and two adult express tick
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "talk");
   await page.getByRole("textbox", { name: "Type your order" }).fill("Two adult tickets to City Center on the express");
   await page.getByRole("button", { name: "Send" }).click();
-  const cart = page.getByRole("region", { name: "Your order" });
+  const cart = page.getByRole("region", { name: "Your tickets" });
   await expect(cart.getByText("Express to City Center", { exact: true })).toBeVisible({ timeout: 90_000 });
   // 2 x 10,500 adult fare (data/kiosks/airport_rail.json): the kiosk's own total.
   await expect(page.locator("[data-kiosk-canvas]").getByText("21,000원").first()).toBeVisible();

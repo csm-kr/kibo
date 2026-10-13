@@ -39,3 +39,12 @@ export function kioskScreen(
       return "attract";
   }
 }
+
+/**
+ * The standalone kiosk's [처음으로] (I-048): offered on K2 and K3 (and so under K4's sheet), never once checkout
+ * started. With an empty cart it goes back at once; with items it asks first. Null: not offered.
+ */
+export function startOverStep(screen: KioskScreenId, session: Session | null): "now" | "ask" | null {
+  if (!session || (screen !== "dine" && screen !== "menu")) return null;
+  return session.cart.length > 0 ? "ask" : "now";
+}

@@ -3,8 +3,8 @@
 import Image from "next/image";
 import { useId, type ReactNode } from "react";
 import { findItem } from "@/lib/adapters/catalog";
-import { phonePrice, pt, qtyText } from "@/lib/i18n/phone";
-import { lineLabel } from "@/lib/kiosk/menu";
+import { pt, qtyText } from "@/lib/i18n/phone";
+import { formatWon, lineLabel } from "@/lib/kiosk/menu";
 import type { KioskData, Locale } from "@/types/menu";
 import type { CartLine } from "@/types/session";
 import { CARD, SMALL } from "./styles";
@@ -19,7 +19,8 @@ export function CartLines({ kiosk, cart, locale }: { kiosk: KioskData; cart: Car
         const { title, detail } = lineLabel(kiosk, line, locale);
         return (
           <li key={line.lineId} className="flex items-start gap-3 py-3">
-            {item && (
+            {/* A learned kiosk has no photos, only a placeholder ring that reads as a broken picture (I-103). */}
+            {item && kiosk.kind !== "learned" && (
               <Image src={item.image} alt="" width={64} height={64} className="size-16 flex-none rounded-[18px] object-cover" />
             )}
             <div className="min-w-0 flex-1">
@@ -28,7 +29,8 @@ export function CartLines({ kiosk, cart, locale }: { kiosk: KioskData; cart: Car
             </div>
             <div className="flex-none text-right">
               <p className="text-base text-[#4B463F]">{qtyText(line.qty, locale)}</p>
-              <p className="text-xl font-bold">{phonePrice(line.unitPrice * line.qty, locale)}</p>
+              {/* The kiosk's own price format, so phone and kiosk read the same (heuristic 4, I-137). */}
+              <p className="text-xl font-bold">{formatWon(line.unitPrice * line.qty, locale)}</p>
             </div>
           </li>
         );
@@ -41,7 +43,7 @@ export function TotalRow({ total, locale }: { total: number; locale: Locale }) {
   return (
     <div className="flex flex-wrap items-baseline justify-between gap-2 border-t-2 border-[#15171C] pt-3">
       <span className="text-xl font-bold">{pt("total", locale)}</span>
-      <span className="font-display text-[2rem] font-bold">{phonePrice(total, locale)}</span>
+      <span className="font-display text-[2rem] font-bold">{formatWon(total, locale)}</span>
     </div>
   );
 }
@@ -65,7 +67,7 @@ export function CartCard(props: {
     <section aria-labelledby={titleId} className={`${CARD} flex flex-col gap-2`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 id={titleId} className="text-xl font-bold">
-          {pt("cartTitle", locale)}
+          {pt("cartTitle", locale, kiosk.domain)}
         </h2>
         {props.onUndo && (
           <button type="button" onClick={props.onUndo} disabled={!props.canUndo} className={SMALL}>
@@ -76,7 +78,7 @@ export function CartCard(props: {
       </div>
       {props.status}
       {cart.length === 0 ? (
-        <p className="py-3 text-xl text-[#4B463F]">{pt("cartEmpty", locale)}</p>
+        <p className="py-3 text-xl text-[#4B463F]">{pt("cartEmpty", locale, kiosk.domain)}</p>
       ) : (
         <CartLines kiosk={kiosk} cart={cart} locale={locale} />
       )}

@@ -74,6 +74,13 @@ test("touch path: K1 to K8", async ({ page }, info) => {
   await buttonWithText(page, "감자튀김 M").click();
   await page.getByRole("dialog", { name: "감자튀김 M" }).getByRole("button", { name: "담기", exact: true }).click();
   await expect(page.getByText(/개 담음$/)).toHaveText("2개 담음");
+  // [처음으로] with items asks first (I-048); [계속 주문] keeps the order.
+  await page.getByRole("button", { name: "처음으로", exact: true }).click();
+  const startOver = page.getByRole("alertdialog", { name: "주문을 취소하고 처음으로 갈까요?" });
+  await expect(startOver).toBeVisible();
+  await check(page, info, "K3-start-over-ask");
+  await startOver.getByRole("button", { name: "계속 주문" }).click();
+  await expect(startOver).toBeHidden();
   await page.getByRole("button", { name: "주문하기", exact: true }).click();
   await expect(root).toHaveAttribute("data-screen", "review");
   await expect(page.locator('[data-screen="review"] ul > li')).toHaveCount(2);
