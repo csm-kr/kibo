@@ -102,8 +102,8 @@ describe("POST /api/live-token", () => {
     expect(text).not.toContain(KEY);
   });
 
-  // I-150: the per-session and daily counters are spent before the issuer answers, so an upstream blip costs a token.
-  it.skip("I-150: a token the issuer failed to create does not count against the session", async () => {
+  // I-150: the per-session and daily counters were spent before the issuer answered, so an upstream blip cost a token.
+  it("I-150: a token the issuer failed to create does not count against the session", async () => {
     const s = await demo();
     vi.spyOn(console, "error").mockImplementation(() => {});
     create.mockRejectedValueOnce(new CommandError("UPSTREAM", "Voice is not available right now. Please type instead."));
@@ -113,9 +113,9 @@ describe("POST /api/live-token", () => {
     expect((await tokenRequest(s.sessionId, s.deviceToken)).status).toBe(200);
   });
 
-  // I-148: the daily voice budget (200 tokens a day, shared by everyone) is the only cap above one session, and new
-  // sessions are free, so one address within its own per-IP limits spends the whole day's budget in minutes.
-  it.skip("I-148: one address staying inside its per-IP limits for 10 minutes leaves voice for everyone else", async () => {
+  // I-148: the daily voice budget (200 tokens a day, shared by everyone) was the only cap above one session, and new
+  // sessions are free, so one address within its own per-IP limits spent the whole day's budget in minutes.
+  it("I-148: one address staying inside its per-IP limits for 10 minutes leaves voice for everyone else", async () => {
     const t0 = Date.now();
     let now = t0;
     vi.spyOn(Date, "now").mockImplementation(() => now);

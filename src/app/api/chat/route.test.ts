@@ -32,6 +32,34 @@ function chatBody(sessionId: string, extra: Record<string, unknown> = {}) {
 }
 
 describe("POST /api/chat", () => {
+  // I-148: the 3,000-message day was shared by everyone, and one address at 60 a minute could spend it in under an hour.
+  it("I-148: one address gets 300 messages a KST day, another address still gets its own", async () => {
+    const t0 = Date.now();
+    let now = t0;
+    vi.spyOn(Date, "now").mockImplementation(() => now);
+    generate.mockResolvedValue({ content: { role: "model", parts: [{ text: "Okay." }] }, functionCalls: [], text: "Okay." });
+    const from = (ip: string) => ({ "x-forwarded-for": ip });
+    const session = async (ip: string) =>
+      (await read(await createSession(jsonRequest("/api/session", { kioskId: "malo", demo: true }, from(ip))))).body as { sessionId: string; deviceToken: string };
+    const send = async (s: { sessionId: string; deviceToken: string }, ip: string) =>
+      (await POST(jsonRequest("/api/chat", chatBody(s.sessionId), { ...auth(s.deviceToken), ...from(ip) }))).status;
+    try {
+      let s = await session("203.0.113.9");
+      for (let i = 0; i < 300; i++) {
+        // A demo session has 30 messages; the per-IP window 60 requests a minute.
+        if (i > 0 && i % 25 === 0) {
+          now += 61_000;
+          s = await session("203.0.113.9");
+        }
+        expect(await send(s, "203.0.113.9")).toBe(200);
+      }
+      expect(await send(s, "203.0.113.9")).toBe(429);
+      expect(await send(await session("198.51.100.7"), "198.51.100.7")).toBe(200);
+    } finally {
+      vi.restoreAllMocks();
+    }
+  });
+
   it("returns the reply and the session state", async () => {
     const s = await demo();
     generate.mockResolvedValueOnce({ content: { role: "model", parts: [{ text: "Hello." }] }, functionCalls: [], text: "Hello." });

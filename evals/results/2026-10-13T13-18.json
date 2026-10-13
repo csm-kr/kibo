@@ -1,0 +1,154 @@
+{
+  "date": "2026-10-13T04:18:10.904Z",
+  "model": "gemini-3.8-flash",
+  "backend": "api",
+  "modelCallsByBackend": {
+    "api": 8,
+    "vertex": 0
+  },
+  "thinkingLevel": "low",
+  "evalClock": "14:00 KST",
+  "subset": [
+    "lg-en-pay-on-kiosk",
+    "lg-ko-pay-on-kiosk"
+  ],
+  "cases": 2,
+  "passed": 0,
+  "passRate": 0,
+  "byKiosk": {
+    "doughhouse": {
+      "pass": 0,
+      "total": 2
+    }
+  },
+  "byType": {
+    "grounded-reply": {
+      "pass": 0,
+      "total": 2
+    }
+  },
+  "latency": {
+    "requests": 4,
+    "totalMedianMs": 3864,
+    "totalP90Ms": 7474,
+    "firstToolRequests": 4,
+    "firstToolMedianMs": 1782,
+    "firstToolP90Ms": 4450
+  },
+  "notCovered": [
+    {
+      "type": "7-count-limits",
+      "reason": "Count limits (max 3 toppings) need the learned Doughhouse kiosk, which has no LearnedAdapter yet."
+    }
+  ],
+  "results": [
+    {
+      "id": "lg-en-pay-on-kiosk",
+      "kioskId": "doughhouse",
+      "type": "grounded-reply",
+      "locale": "en",
+      "pass": false,
+      "reason": "cart changed",
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_oven_spaghetti",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": [
+          "cheese_oven_spaghetti"
+        ]
+      },
+      "requests": [
+        {
+          "ms": 7474,
+          "firstToolMs": 4450,
+          "tools": [
+            {
+              "name": "setDineOption",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "CONFLICT"
+            }
+          ]
+        },
+        {
+          "ms": 3700,
+          "firstToolMs": 1946,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lg-ko-pay-on-kiosk",
+      "kioskId": "doughhouse",
+      "type": "grounded-reply",
+      "locale": "ko",
+      "pass": false,
+      "reason": "cart changed",
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_oven_spaghetti",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": [
+          "cheese_oven_spaghetti"
+        ]
+      },
+      "requests": [
+        {
+          "ms": 3885,
+          "firstToolMs": 1752,
+          "tools": [
+            {
+              "name": "setDineOption",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "CONFLICT"
+            }
+          ]
+        },
+        {
+          "ms": 3864,
+          "firstToolMs": 1782,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "requestCheckout",
+              "code": "CONFLICT"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

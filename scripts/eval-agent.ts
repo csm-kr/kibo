@@ -10,15 +10,16 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { runChat } from "@/lib/agent/chat";
 import { geminiClient, textBackendSetting, type ModelClient, type TextBackend } from "@/lib/agent/model";
+import { addLine, cartTotal, removeLine } from "@/lib/commands/cart";
 import { CommandError } from "@/lib/commands/errors";
 import { MemoryUsageStore } from "@/lib/limits/usage";
 import { chatReducer, historyFor, initialChat } from "@/lib/phone/chat";
-import { createSession } from "@/lib/session/service";
+import { createSession, runCommand } from "@/lib/session/service";
 import { getKiosk } from "@/lib/adapters/catalog";
 import { MemoryStore } from "@/lib/store/memory";
 import type { Locale } from "@/types/menu";
 import type { CartLine, Session, SessionStatus } from "@/types/session";
-import { checkGrounding, type GroundingResult } from "./grounding";
+import { checkGrounding, offersToPay, type GroundingResult } from "./grounding";
 
 interface ExpectedLine {
   itemId: string;
@@ -33,8 +34,9 @@ type Expect =
   | { staff: true }
   | { refuse: true }
   | { status: SessionStatus }
-  // The last reply passes the grounding check (I-072) and names at least one of these items.
-  | { reply: { mentionsAny: string[] } };
+  // The last reply passes the grounding check (I-072) and names at least one of these items. `payOnKiosk` (learned
+  // kiosks, I-100): the order is at the review, nobody tried confirmCheckout and the reply never offers to pay.
+  | { reply: { mentionsAny?: string[]; payOnKiosk?: true } };
 
 interface Case {
   id: string;
@@ -118,14 +120,27 @@ function cartIds(cart: CartLine[]) {
   return cart.map(({ itemId, variant, qty, selections }) => ({ itemId, variant, qty, selections }));
 }
 
-function judge(c: Case, final: Session, before: CartLine[], calls: ToolCall[], grounding: GroundingResult | null): string | null {
+function judge(
+  c: Case,
+  final: Session,
+  before: CartLine[],
+  calls: ToolCall[],
+  grounding: GroundingResult | null,
+  payOffer: boolean,
+): string | null {
   const unchanged = normalize(final.cart) === normalize(before);
   const e = c.expect;
   if ("reply" in e) {
     if (!unchanged) return "cart changed";
     if (!grounding) return "no reply";
     if (!grounding.pass) return `ungrounded: ${grounding.matched.join(",")}`;
-    return e.reply.mentionsAny.some((id) => grounding.mentioned.includes(id)) ? null : "names none of the expected items";
+    if (e.reply.payOnKiosk) {
+      if (final.status !== "confirming") return `status ${final.status}`;
+      if (calls.some((t) => t.name === "confirmCheckout")) return "tried confirmCheckout";
+      if (payOffer) return "offered to pay";
+    }
+    const ids = e.reply.mentionsAny;
+    return !ids || ids.some((id) => grounding.mentioned.includes(id)) ? null : "names none of the expected items";
   }
   if ("cart" in e) return normalize(final.cart) === normalize(e.cart) ? null : "final cart differs";
   if ("status" in e) return final.status === e.status ? null : `status ${final.status}`;
@@ -141,13 +156,43 @@ function judge(c: Case, final: Session, before: CartLine[], calls: ToolCall[], g
   return calls.some((t) => t.code === "BAD_REQUEST") ? "a tool call failed with BAD_REQUEST" : null;
 }
 
+/**
+ * Learned kiosks: a stand-in for the in-page bridge that reports every replay as done, with the total the kiosk would
+ * show (the server's own total for the change). The case then tests the agent, not the kiosk page.
+ */
+function standInBridge(store: MemoryStore, sessionId: string, kioskToken: string, kioskId: string, now: () => number) {
+  const kiosk = getKiosk(kioskId);
+  let reported = "";
+  return store.subscribe(sessionId, (s) => {
+    const p = s?.pendingBridgeCommand;
+    if (!s || !p || p.commandId === reported) return;
+    reported = p.commandId;
+    const kioskTotal =
+      p.type === "addToCart"
+        ? cartTotal(addLine(kiosk, s.cart, p.args, now(), () => "standin").cart)
+        : p.type === "removeFromCart"
+          ? cartTotal(removeLine(s.cart, p.args.lineId))
+          : s.total;
+    const body = {
+      sessionId,
+      commandId: randomUUID(),
+      type: "bridgeReport",
+      args: { commandId: p.commandId, ok: true, kioskTotal, kioskLines: [] },
+      source: "touch",
+    };
+    // After the command's transaction, as the real bridge reports a moment later.
+    setTimeout(() => void runCommand(store, { body, bearer: kioskToken }, now()).catch(() => {}), 0);
+  });
+}
+
 async function runCase(c: Case) {
   const store = new MemoryStore();
   const usage = new MemoryUsageStore();
   const started = Date.now();
   const now = () => EVAL_CLOCK + (Date.now() - started);
   const kioskId = c.kioskId ?? "malo";
-  const { sessionId, deviceToken } = await createSession(store, { kioskId, demo: true }, now());
+  const { sessionId, deviceToken, kioskToken } = await createSession(store, { kioskId, demo: true }, now());
+  const stopBridge = getKiosk(kioskId).learned ? standInBridge(store, sessionId, kioskToken, kioskId, now) : () => {};
 
   let chat = initialChat;
   let before: CartLine[] = [];
@@ -209,10 +254,13 @@ async function runCase(c: Case) {
   }
 
   const final = (await store.get(sessionId))!;
+  stopBridge();
   const grounding = "reply" in c.expect && lastReply !== null ? checkGrounding(lastReply, getKiosk(kioskId)) : null;
+  // Only the verdict is kept, never the reply.
+  const payOffer = lastReply !== null && offersToPay(lastReply);
   const failure = requests.find((r) => r.error)
     ? `request error ${requests.find((r) => r.error)!.error}`
-    : judge(c, final, before, allCalls, grounding);
+    : judge(c, final, before, allCalls, grounding, payOffer);
   return {
     id: c.id,
     kioskId,

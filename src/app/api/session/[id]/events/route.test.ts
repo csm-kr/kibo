@@ -142,8 +142,8 @@ describe("GET /api/session/[id]/events", () => {
   });
 
   // I-149: each stream holds one Cloud Run request (concurrency 80 x max 3 instances = 240) for up to the 3600 s
-  // request timeout, and the only cap is the per-IP 60 requests a minute, so one address can hold every slot.
-  it.skip("I-149: one address cannot hold more than a few streams open at once", async () => {
+  // request timeout, and the only cap was the per-IP 60 requests a minute, so one address could hold every slot.
+  it("I-149: one address cannot hold more than a few streams open at once", async () => {
     const t0 = Date.now();
     let now = t0;
     vi.spyOn(Date, "now").mockImplementation(() => now);
@@ -161,6 +161,36 @@ describe("GET /api/session/[id]/events", () => {
     const held = open.length;
     await Promise.all(open.map((r) => r.body!.cancel()));
     expect(held, `streams one address held open at the same time`).toBeLessThanOrEqual(10);
+    // A closed stream frees its place (a minute later, past the per-IP request window).
+    now += 61_000;
+    const again = await GET(new Request(`${BASE}/api/session/${s.sessionId}/events`, { headers: { "x-forwarded-for": "203.0.113.9" } }), {
+      params: Promise.resolve({ id: s.sessionId }),
+    });
+    expect(again.status).toBe(200);
+    await again.body!.cancel();
+  });
+
+  it("I-149: a stream refused for too many open screens is 429 with a plain message", async () => {
+    const s = await newSession();
+    const req = () =>
+      GET(new Request(`${BASE}/api/session/${s.sessionId}/events`, { headers: { "x-forwarded-for": "203.0.113.10" } }), {
+        params: Promise.resolve({ id: s.sessionId }),
+      });
+    const open = [];
+    for (let i = 0; i < 10; i++) open.push(await req());
+    const { status, body } = await read(await req());
+    expect(status).toBe(429);
+    expect(body.error).toEqual({ code: "RATE_LIMITED", message: "Too many open screens. Please close one and try again." });
+    await Promise.all(open.map((r) => r.body!.cancel()));
+  });
+
+  it("I-149: a stream for a bad session id does not hold a place", async () => {
+    for (let i = 0; i < 12; i++) {
+      const res = await GET(new Request(`${BASE}/api/session/a.b/events`, { headers: { "x-forwarded-for": "203.0.113.11" } }), {
+        params: Promise.resolve({ id: "a.b" }),
+      });
+      expect(res.status).toBe(400);
+    }
   });
 
   it("sends a keepalive comment every 25 s", async () => {

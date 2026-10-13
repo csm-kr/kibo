@@ -8,7 +8,9 @@ import type { KioskData, LearnedKiosk, LocalizedName, RecipeStep } from "@/types
 const text = z.string().min(1).max(40).regex(/^[^\r\n]*$/);
 const id = z.string().regex(/^[a-z0-9_]+$/).max(64);
 const won = z.number().int();
-const name = z.strictObject({ ko: text, en: text });
+// Names reach the model's instructions; `<` and `>` could end the <menu_data> block (I-152). Labels never do.
+const nameText = text.regex(/^[^<>]*$/);
+const name = z.strictObject({ ko: nameText, en: nameText });
 // Recipe names and recipe variables are camelCase (startOrder, qtyMinus1).
 const varName = z.string().regex(/^[A-Za-z][A-Za-z0-9]*$/).max(40);
 

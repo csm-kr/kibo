@@ -38,6 +38,64 @@ export function checkIpLimit(ip: string, kind: keyof typeof LIMITS, now = Date.n
   if (w.count > LIMITS[kind]) throw new CommandError("RATE_LIMITED", "Too many requests. Please wait a moment.");
 }
 
+/**
+ * Per address and KST day (I-148): sessions are free, so without this one address could spend the whole day's global
+ * voice and chat budgets. Per instance, like the windows above: one address gets at most 3x these across instances.
+ */
+const DAILY = { voice: 24, chat: 300 } as const;
+const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
+const daily = new Map<string, number>();
+
+function dailyKey(ip: string, kind: keyof typeof DAILY, now: number): string {
+  return `${Math.floor((now + KST_OFFSET_MS) / DAY_MS)}:${kind}:${clientKey(ip)}`;
+}
+
+/** Takes one from the address's budget for today; false when it is used up. */
+export function takeDailyBudget(ip: string, kind: keyof typeof DAILY, now = Date.now()): boolean {
+  if (daily.size > SWEEP_AT) {
+    const today = `${Math.floor((now + KST_OFFSET_MS) / DAY_MS)}:`;
+    for (const key of daily.keys()) if (!key.startsWith(today)) daily.delete(key);
+  }
+  const key = dailyKey(ip, kind, now);
+  const n = daily.get(key) ?? 0;
+  if (n >= DAILY[kind]) return false;
+  daily.set(key, n + 1);
+  return true;
+}
+
+/** Gives one back when what it paid for was never delivered (a Live token the issuer failed to create, I-150). */
+export function giveBackDailyBudget(ip: string, kind: keyof typeof DAILY, now = Date.now()): void {
+  const key = dailyKey(ip, kind, now);
+  const n = daily.get(key) ?? 0;
+  if (n > 0) daily.set(key, n - 1);
+}
+
+/**
+ * Open event streams per address (I-149). Each stream holds one Cloud Run request (80 per instance, 3 instances) for up
+ * to the request timeout, so one address could otherwise hold every slot. A screen needs one stream; /demo two.
+ */
+const MAX_STREAMS = 10;
+const streams = new Map<string, number>();
+
+/** Counts one open stream for the address and returns the function that releases it; RATE_LIMITED over the cap. */
+export function openStream(ip: string): () => void {
+  const key = clientKey(ip);
+  const n = streams.get(key) ?? 0;
+  if (n >= MAX_STREAMS) throw new CommandError("RATE_LIMITED", "Too many open screens. Please close one and try again.");
+  streams.set(key, n + 1);
+  let released = false;
+  return () => {
+    if (released) return;
+    released = true;
+    const left = (streams.get(key) ?? 1) - 1;
+    if (left > 0) streams.set(key, left);
+    else streams.delete(key);
+  };
+}
+
 export function resetLimits(): void {
   windows.clear();
+  daily.clear();
+  streams.clear();
 }

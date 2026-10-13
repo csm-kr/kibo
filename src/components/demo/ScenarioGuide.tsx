@@ -221,7 +221,10 @@ function Checklist(props: Props & { scenario: Scenario }) {
       </ol>
       {finished && (
         <p ref={yourTurn} data-scenario-your-turn className="rounded-[18px] bg-[#EEF0FD] px-4 py-3 text-xl">
-          {learned ? (
+          {/* After payment the "tap Yes, pay now" step is done, so the line points on instead (I-144). */}
+          {live?.status === "paid" ? (
+            pt("scenarioPaid", locale)
+          ) : learned ? (
             pt("yourTurnLearned", locale)
           ) : (
             <>

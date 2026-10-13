@@ -1,6 +1,6 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import { mkdirSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { createServer } from "node:net";
 import { join } from "node:path";
 import { chromium, type Browser, type BrowserContextOptions, type Page } from "@playwright/test";
@@ -10,7 +10,7 @@ import type { Session } from "@/types/session";
 // Screen footage of the real app for the demo video (`npm run capture:footage`, docs/plan/FOOTAGE.md). Starts its own
 // dev server with the in-memory store, or records FOOTAGE_URL (e.g. the deployed app). Typed orders go to real Gemini
 // through /api/chat; nothing is mocked. Writes only to videos/footage/<date>/ (git-ignored): one .webm per clip, a PNG
-// at every key moment and manifest.json.
+// at every key moment and manifest.json. `npm run capture:footage -- <clip name>…` re-records only those clips.
 
 const DATE = new Date().toLocaleDateString("sv-SE");
 const OUT = join("videos", "footage", DATE);
@@ -47,6 +47,7 @@ interface ClipResult {
   durationMs: number;
   bytes: number;
   note?: string;
+  recordedAt: string;
   steps: Mark[];
 }
 
@@ -69,8 +70,25 @@ class Recorder {
 
   /** A key moment: timestamp, full-resolution screenshot, then a hold so the edit has room. */
   async mark(name: string, hold = HOLD_MS) {
-    const atMs = Date.now() - this.t0;
     await this.page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+    // Menu photos still loading came out blank (I-147), as in e2e/qa/checks.ts screenshot() (I-138).
+    await this.page
+      .waitForFunction(
+        () =>
+          [...document.images].every((img) => {
+            const b = img.getBoundingClientRect();
+            const onScreen = b.width > 0 && b.bottom > 0 && b.right > 0 && b.top < innerHeight && b.left < innerWidth;
+            return !onScreen || (img.complete && img.naturalWidth > 0);
+          }),
+        null,
+        { timeout: 5_000 },
+      )
+      .catch(() => {});
+    await this.page.evaluate(() =>
+      Promise.all([...document.images].filter((img) => img.complete && img.naturalWidth > 0).map((img) => img.decode().catch(() => {}))),
+    );
+    // After the wait, so the edit's timestamp shows the same frame as the screenshot.
+    const atMs = Date.now() - this.t0;
     const shot = `${this.clip}--${String(this.steps.length + 1).padStart(2, "0")}-${name}.png`;
     await this.page.screenshot({ path: join(OUT, shot) });
     this.steps.push({ name, atMs, shot });
@@ -358,7 +376,8 @@ const CLIPS: Clip[] = [
     name: "kiosk-touch-1080x1920",
     route: "/kiosk?k=malo&demo=1",
     usesModel: false,
-    note: "Edit path of e2e/kiosk-touch.spec.ts (clear all and add both sets again with large fries); the /demo card and deck cite the 24-tap efficient path (evidence/touch-hero-efficient.json).",
+    // The path the /demo card and deck cite (24 taps, I-143); the 41-tap edit path of e2e/kiosk-touch.spec.ts is a footnote only.
+    note: "Efficient path of e2e/kiosk-touch-efficient.spec.ts (large fries chosen while adding each set), the 24-tap path the /demo card and deck cite (evidence/touch-hero-efficient.json).",
     context: KIOSK,
     async run(page, rec) {
       await page.goto(`${BASE}/kiosk?k=malo&demo=1`);
@@ -369,16 +388,11 @@ const CLIPS: Clip[] = [
       await tap(page, page.getByRole("button", { name: "매장에서 먹기" }));
       await tap(page, page.getByRole("button", { name: "버거", exact: true }));
       await rec.mark("menu", 0);
-      await touchCheeseburgerSet(page, "감자튀김 M", "제로콜라", true);
+      await touchCheeseburgerSet(page, "감자튀김 L", "제로콜라", true);
       const upsell = page.getByRole("dialog", { name: "디저트도 함께 드릴까요?" });
       await upsell.waitFor();
       await rec.mark("upsell", 0);
       await tap(page, upsell.getByRole("button", { name: "괜찮아요" }));
-      await touchCheeseburgerSet(page, "감자튀김 M", "사이다", false);
-      await rec.mark("two-sets-medium", 0);
-      await tap(page, page.getByRole("button", { name: "전체 삭제" }));
-      await tap(page, page.getByRole("button", { name: "모두 지우기" }));
-      await touchCheeseburgerSet(page, "감자튀김 L", "제로콜라", true);
       await touchCheeseburgerSet(page, "감자튀김 L", "사이다", false);
       await rec.mark("two-sets-large", 0);
       await tap(page, page.getByRole("button", { name: "주문하기", exact: true }));
@@ -390,6 +404,9 @@ const CLIPS: Clip[] = [
       await page.locator('[data-screen="done"]').waitFor({ timeout: 30_000 });
       await tap(page, page.getByRole("button", { name: "출력 안 함" }));
       await page.getByRole("heading", { name: "주문 번호" }).waitFor();
+      // The same tap count as the cited run, so the clip's counter never contradicts the card.
+      const taps = Number(await page.locator("[data-demo-counter]").getAttribute("data-taps"));
+      if (taps !== 24) throw new Error(`touch clip took ${taps} taps, the cited efficient path is 24`);
       await rec.mark("order-number", 3000);
     },
   },
@@ -532,6 +549,7 @@ async function record(browser: Browser, clip: Clip): Promise<ClipResult> {
     durationMs: 0,
     bytes: 0,
     note: clip.note,
+    recordedAt: new Date().toISOString(),
     steps: [],
   };
   // The video is recorded at the CSS viewport size: a larger size with a 2x device scale only pads a 1x picture into
@@ -573,8 +591,25 @@ async function record(browser: Browser, clip: Clip): Promise<ClipResult> {
 }
 
 async function main() {
-  // A re-run replaces the day's folder, so no screenshot from an earlier take is left beside the new manifest.
-  rmSync(OUT, { recursive: true, force: true });
+  // Clip names on the command line re-record only those clips and keep the rest of the day's take.
+  const only = process.argv.slice(2);
+  const unknown = only.filter((n) => !CLIPS.some((c) => c.name === n));
+  if (unknown.length > 0) throw new Error(`unknown clip ${unknown.join(", ")}; clips: ${CLIPS.map((c) => c.name).join(", ")}`);
+  const selected = only.length > 0 ? CLIPS.filter((c) => only.includes(c.name)) : CLIPS;
+  const manifestPath = join(OUT, "manifest.json");
+  let kept: ClipResult[] = [];
+  if (only.length > 0) {
+    if (existsSync(manifestPath)) {
+      const old = JSON.parse(readFileSync(manifestPath, "utf8")) as { recordedAt: string; clips: ClipResult[] };
+      kept = old.clips.filter((c) => !only.includes(c.name)).map((c) => ({ ...c, recordedAt: c.recordedAt ?? old.recordedAt }));
+    }
+    for (const f of existsSync(OUT) ? readdirSync(OUT) : []) {
+      if (only.some((n) => f === `${n}.webm` || f.startsWith(`${n}--`))) rmSync(join(OUT, f));
+    }
+  } else {
+    // A full run replaces the day's folder, so no screenshot from an earlier take is left beside the new manifest.
+    rmSync(OUT, { recursive: true, force: true });
+  }
   mkdirSync(RAW, { recursive: true });
   let server: ChildProcess | null = null;
   if (process.env.FOOTAGE_URL) {
@@ -593,7 +628,7 @@ async function main() {
   try {
     await waitForServer(BASE);
     if (server) await warm(browser);
-    for (const clip of CLIPS) clips.push(await record(browser, clip));
+    for (const clip of selected) clips.push(await record(browser, clip));
   } finally {
     await browser.close();
     if (server?.pid) process.kill(-server.pid);
@@ -606,10 +641,11 @@ async function main() {
       models: { ...MODELS, source: process.env.FOOTAGE_URL ? "assumed, set on the deployment" : "local env" },
       typeDelayMs: TYPE_DELAY_MS,
       holdMs: HOLD_MS,
-      clips,
+      // In CLIPS order; a clip kept from an earlier take has its own recordedAt.
+      clips: CLIPS.flatMap((c) => [...kept, ...clips].filter((r) => r.name === c.name)),
     };
-    writeFileSync(join(OUT, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
-    console.log(`${join(OUT, "manifest.json")}: ${clips.filter((c) => c.ok).length}/${CLIPS.length} clips`);
+    writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+    console.log(`${manifestPath}: ${clips.filter((c) => c.ok).length}/${selected.length} clips recorded`);
   }
 }
 

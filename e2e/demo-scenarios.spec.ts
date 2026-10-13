@@ -79,6 +79,15 @@ test("scenario guide: open by default at 1440 wide, a chosen scenario starts fre
   // Nothing in the guide pays or confirms.
   await expect(guide(page).getByRole("button", { name: /pay|confirm|card/i })).toHaveCount(0);
 
+  // Once the order is paid, "Your turn" no longer asks for a step that is already done (I-144).
+  const kiosk = s as DemoSession & { kioskToken: string };
+  await command(request, s.deviceToken, { sessionId: s.sessionId, type: "addToCart", args: { itemId: "cola" }, source: "text", utteranceSeq: 2 });
+  const review = await command(request, s.deviceToken, { sessionId: s.sessionId, type: "requestCheckout", args: {}, source: "text", utteranceSeq: 3 });
+  await command(request, s.deviceToken, { sessionId: s.sessionId, type: "confirmCheckout", args: {}, source: "button", cartVersion: review.cartVersion });
+  await expect(guide(page).locator("[data-scenario-your-turn]")).toContainText("Yes, pay now");
+  await command(request, kiosk.kioskToken, { sessionId: s.sessionId, type: "cardAction", args: {}, source: "touch" });
+  await expect(guide(page).locator("[data-scenario-your-turn]")).toHaveText("Paid. Choose another scenario to try more.");
+
   await toggle.click();
   await expect(page.locator("[data-scenario-step]")).toHaveCount(0);
 });

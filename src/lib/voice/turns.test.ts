@@ -16,7 +16,7 @@ describe("turnEvents", () => {
     expect(turnEvents({ serverContent: { inputTranscription: { text: "hi" }, outputTranscription: { text: "Hello" }, turnComplete: true } })).toEqual([
       { type: "userSpeech" },
       { type: "modelOutput" },
-      { type: "responseEnd" },
+      { type: "responseEnd", complete: true },
     ]);
   });
 
@@ -51,18 +51,16 @@ describe("turnsReducer (utteranceSeq)", () => {
     expect(feed(initialTurns(), audio, done, audio, done).seq).toBe(0);
   });
 
-  it("holds speech heard during a response for the next response, so the model cannot chain inside one", () => {
+  it("speech heard during a response does not give that response a new seq, so the model cannot chain inside one", () => {
     let s = feed(initialTurns(), heard("I'll pay"), call("requestCheckout"));
     // A late transcription chunk while the same response is still running.
     s = feed(s, heard("now"), call("confirmCheckout"));
     expect(s.seq).toBe(1);
-    s = feed(s, done, audio);
-    expect(s.seq).toBe(2);
   });
 
   // I-151: a late chunk of the checkout sentence stays "heard" after the response completes, so the next model output,
   // with no new speech at all, gets a new seq and an AI confirmCheckout in it passes the server's fresh-utterance rule.
-  it.skip("I-151: a late chunk of the sentence that opened the review is not a new utterance after the response completes", () => {
+  it("I-151: a late chunk of the sentence that opened the review is not a new utterance after the response completes", () => {
     let s = feed(initialTurns(), heard("That's all,"), call("requestCheckout"));
     expect(s.seq).toBe(1);
     s = feed(s, heard(" I'll pay."), said("Please check the card."), done);

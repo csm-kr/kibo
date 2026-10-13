@@ -1,7 +1,7 @@
 import { CommandError } from "@/lib/commands/errors";
 import { SESSION_ID } from "@/lib/commands/schemas";
 import { clientIp, fail } from "@/lib/http";
-import { checkIpLimit } from "@/lib/limits/ip";
+import { checkIpLimit, openStream } from "@/lib/limits/ip";
 import { toPublicSession } from "@/lib/session/public";
 import { getStore } from "@/lib/store";
 
@@ -19,6 +19,13 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
   }
   const { id } = await ctx.params;
   if (!SESSION_ID.test(id)) return fail(new CommandError("BAD_REQUEST", "That request could not be understood."));
+  // Each open stream holds a Cloud Run request until it closes, so one address may hold only a few (I-149).
+  let release: () => void;
+  try {
+    release = openStream(ip);
+  } catch (e) {
+    return fail(e);
+  }
 
   const encoder = new TextEncoder();
   let close = () => {};
@@ -33,6 +40,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
       close = () => {
         if (closed) return;
         closed = true;
+        release();
         unsubscribe();
         clearInterval(timer);
         req.signal.removeEventListener("abort", close);

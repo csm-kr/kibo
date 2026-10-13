@@ -247,7 +247,7 @@ describe("runChat", () => {
   it("the daily limit is RATE_LIMITED", async () => {
     const s = await demo();
     const bump = vi.fn().mockResolvedValue(false);
-    const err = await errorOf(runChat({ ...deps(script("ok").model), usage: { bump } }, input(s)));
+    const err = await errorOf(runChat({ ...deps(script("ok").model), usage: { bump, refund: vi.fn() } }, input(s)));
     expect(err.code).toBe("RATE_LIMITED");
     expect(bump).toHaveBeenCalledWith("2026-10-13", "chatMessages", 3000);
   });

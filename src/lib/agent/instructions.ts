@@ -9,6 +9,9 @@ import { menuForModel } from "./menu";
 
 const LANGUAGE: Record<Locale, string> = { ko: "Korean", en: "English" };
 
+/** JSON with `<` and `>` escaped, so no name can end the <menu_data> block (I-152); the model reads it the same. */
+const dataJson = (value: unknown) => JSON.stringify(value).replace(/</g, "\\u003c").replace(/>/g, "\\u003e");
+
 export function buildInstructions(
   kiosk: KioskData,
   opts: { cart?: CartLine[]; status?: SessionStatus; dineOption?: DineOption | null; locale?: Locale },
@@ -94,19 +97,30 @@ export function buildInstructions(
         ]
       : []),
     "## Checkout",
-    "When the user is done or wants to pay, call requestCheckout. It shows a confirm card; ask the user to check the card.",
-    "Call confirmCheckout only when the user clearly says yes in a new turn after the card appeared.",
-    "Never call requestCheckout and confirmCheckout in the same turn.",
-    "If confirmCheckout is refused with \"Please confirm on the card.\", ask the user to tap [Yes, pay now] on the card. Do not retry.",
-    "Payment happens on the kiosk with a card. You never pay and cannot complete a payment.",
-    "Status confirming means the confirm card is showing; paying means the user is paying at the kiosk; do not change the cart then.",
+    ...(kiosk.learned
+      ? [
+          // A learned order ends at the review: the user pays on the kiosk itself (I-100). The checkout name, not the
+          // label, because names are the schema-checked text that may enter instructions (I-152).
+          "When the user is done, call requestCheckout. It shows the order on the phone for the user to check.",
+          `Then tell the user to tap ${kiosk.learned.checkout.name.ko} (${kiosk.learned.checkout.name.en}) on the kiosk and pay there.`,
+          "Never ask whether to pay now or offer to pay: you cannot pay or finish the order on this kiosk.",
+          "Status confirming means the order is ready on the kiosk; do not change the cart then unless the user asks.",
+        ]
+      : [
+          "When the user is done or wants to pay, call requestCheckout. It shows a confirm card; ask the user to check the card.",
+          "Call confirmCheckout only when the user clearly says yes in a new turn after the card appeared.",
+          "Never call requestCheckout and confirmCheckout in the same turn.",
+          "If confirmCheckout is refused with \"Please confirm on the card.\", ask the user to tap [Yes, pay now] on the card. Do not retry.",
+          "Payment happens on the kiosk with a card. You never pay and cannot complete a payment.",
+          "Status confirming means the confirm card is showing; paying means the user is paying at the kiosk; do not change the cart then.",
+        ]),
     "",
     ...(kiosk.kind === "learned"
       ? [
           "## This kiosk",
           "This kiosk is operated by replaying its own screens. Changes take a few seconds.",
           "To change an item, remove it and add it again.",
-          "The user pays on the kiosk itself after the confirm card.",
+          "The user pays on the kiosk itself.",
           "If the dine option is not chosen yet, ask eat here or take out and call setDineOption before the first addToCart; this kiosk cannot change it later.",
           "",
         ]
@@ -116,10 +130,10 @@ export function buildInstructions(
     ...(kiosk.dineOptions ? [`Dine option: ${opts.dineOption ?? "not chosen"}`] : []),
     cart.length === 0
       ? "Cart: empty"
-      : `Cart lines, already applied; do not add these again:\n${JSON.stringify(cartForModel(kiosk, cart, locale))}`,
+      : `Cart lines, already applied; do not add these again:\n${dataJson(cartForModel(kiosk, cart, locale))}`,
     "",
     "<menu_data>",
-    JSON.stringify(menuForModel(kiosk)),
+    dataJson(menuForModel(kiosk)),
     "</menu_data>",
   ].join("\n");
 }

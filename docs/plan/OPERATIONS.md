@@ -3,7 +3,7 @@
 Not injected into harness steps (lives under `docs/plan/`).
 
 ## Deploy
-Run `sh scripts/deploy.sh` (needs `gcloud` logged in to `kibo-2026`). It runs `gcloud run deploy kibo --source .` (Cloud Build builds the `Dockerfile`; `.gcloudignore` and `.dockerignore` keep `.env*`, docs, evidence, tests and videos out of the upload), prints the service URL and curls `/api/health`.
+Run `sh scripts/deploy.sh` (needs `gcloud` logged in to `kibo-2026`). It runs `npm run build` locally first and stops if it fails, notes the revision `/api/health` reports, runs `gcloud run deploy kibo --source .` (Cloud Build builds the `Dockerfile`; `.gcloudignore` and `.dockerignore` keep `.env*`, docs, tests and videos out of the upload but keep `evidence/`, `data/`, `skills/` and `package.json`, which `src/` imports; `scripts/build-context.test.ts` checks this), then waits up to a minute for `/api/health` to report a **new** revision. Its last line is `DEPLOYED <revision>` or `DEPLOY FAILED: <reason>`. A failed Cloud Build leaves the old revision serving, so `/api/health` alone answering is not proof of a deploy (10-13); read the last line. `scripts/deploy.test.ts` runs the script with fake `gcloud`, `curl` and `npm`.
 
 | Flag | Why |
 |---|---|

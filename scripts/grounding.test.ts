@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getKiosk } from "@/lib/adapters/catalog";
-import { checkGrounding } from "./grounding";
+import { checkGrounding, offersToPay } from "./grounding";
 
 const k = getKiosk("malo");
 
@@ -40,5 +40,29 @@ describe("checkGrounding", () => {
 
   it("flags food that is not on the menu", () => {
     expect(checkGrounding("Try a milkshake with your burger.", k).matched).toEqual(["off-menu:milkshake"]);
+  });
+
+  it("does not flag an off-menu word that the kiosk's own item names use", () => {
+    expect(checkGrounding("Your pizza is on the kiosk.", getKiosk("doughhouse")).pass).toBe(true);
+  });
+});
+
+describe("offersToPay (I-100: a learned kiosk's AI must not offer to pay)", () => {
+  it("catches the I-100 reply and other offers, in English and Korean", () => {
+    for (const reply of [
+      "Would you like to pay now?",
+      "Do you want to pay with a card?",
+      "Shall I pay for you?",
+      "I'll complete the payment.",
+      "결제해 드릴까요?",
+      "지금 결제하시겠어요?",
+    ]) {
+      expect(offersToPay(reply), reply).toBe(true);
+    }
+  });
+
+  it("passes telling the user to pay on the kiosk", () => {
+    expect(offersToPay("Please tap 주문하기 (Order) on the kiosk and pay there.")).toBe(false);
+    expect(offersToPay("키오스크에서 주문하기를 누르고 결제해 주세요.")).toBe(false);
   });
 });

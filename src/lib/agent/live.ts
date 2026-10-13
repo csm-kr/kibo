@@ -4,8 +4,9 @@ import { getKiosk } from "@/lib/adapters/catalog";
 import { CommandError } from "@/lib/commands/errors";
 import { BEFORE_PAYING } from "@/lib/commands/machine";
 import { sessionId } from "@/lib/commands/schemas";
+import { giveBackDailyBudget, takeDailyBudget } from "@/lib/limits/ip";
 import { kstDay, type UsageStore } from "@/lib/limits/usage";
-import { bumpSessionCounter } from "@/lib/session/service";
+import { bumpSessionCounter, refundSessionCounter } from "@/lib/session/service";
 import type { SessionStore } from "@/lib/store/types";
 import type { KioskData, Locale } from "@/types/menu";
 import type { CartLine, DineOption, SessionStatus } from "@/types/session";
@@ -117,35 +118,53 @@ export function liveConfig(
 
 export async function issueLiveToken(
   deps: LiveTokenDeps,
-  input: { sessionId: string; bearer: string | null; locale: Locale },
+  input: { sessionId: string; bearer: string | null; locale: Locale; ip: string },
 ): Promise<{ token: string; model: string; expiresAt: number; voiceSeconds: number }> {
   const { store, usage, issuer, now } = deps;
   const known = await store.get(input.sessionId);
   if (!known) throw new CommandError("NOT_FOUND", "This order could not be found.");
-  // Checks the device token and expiry, then counts the token in sessionSecrets.
+  // Checks the device token, expiry and state, then counts the token in sessionSecrets.
   const { allowed, session } = await bumpSessionCounter(
     store,
-    { sessionId: input.sessionId, bearer: input.bearer, field: "liveTokenCount", limit: known.demo ? DEMO_SESSION_LIMIT : SESSION_LIMIT },
+    {
+      sessionId: input.sessionId,
+      bearer: input.bearer,
+      field: "liveTokenCount",
+      limit: known.demo ? DEMO_SESSION_LIMIT : SESSION_LIMIT,
+      states: BEFORE_PAYING,
+    },
     now(),
   );
-  if (!BEFORE_PAYING.includes(session.status)) throw new CommandError("CONFLICT", "The order can no longer be changed.");
-  if (!allowed || !(await usage.bump(kstDay(now()), "voiceSessions", DAILY_LIMIT))) {
-    throw new CommandError("RATE_LIMITED", BUSY);
-  }
+  if (!allowed) throw new CommandError("RATE_LIMITED", BUSY);
 
-  const voiceSeconds = session.demo ? DEMO_VOICE_SECONDS : VOICE_SECONDS;
-  const t = now();
-  const expiresAt = t + voiceSeconds * 1000;
-  const config = liveConfig(getKiosk(session.kioskId), {
-    cart: session.cart,
-    status: session.status,
-    dineOption: session.dineOption,
-    locale: input.locale,
-  });
-  const { name } = await issuer.create({
-    ...config,
-    expireTime: new Date(expiresAt).toISOString(),
-    newSessionExpireTime: new Date(t + NEW_SESSION_MS).toISOString(),
-  });
-  return { token: name, model: config.model, expiresAt, voiceSeconds };
+  // Only a delivered token counts (I-150): every count taken below is given back if no token comes out.
+  const day = kstDay(now());
+  const giveBack: (() => unknown)[] = [() => refundSessionCounter(store, { sessionId: input.sessionId, field: "liveTokenCount" })];
+  try {
+    // One address may use only a small share of the day's budget (I-148).
+    if (!takeDailyBudget(input.ip, "voice", now())) throw new CommandError("RATE_LIMITED", BUSY);
+    giveBack.push(() => giveBackDailyBudget(input.ip, "voice", now()));
+    if (!(await usage.bump(day, "voiceSessions", DAILY_LIMIT))) throw new CommandError("RATE_LIMITED", BUSY);
+    giveBack.push(() => usage.refund(day, "voiceSessions"));
+
+    const voiceSeconds = session.demo ? DEMO_VOICE_SECONDS : VOICE_SECONDS;
+    const t = now();
+    const expiresAt = t + voiceSeconds * 1000;
+    const config = liveConfig(getKiosk(session.kioskId), {
+      cart: session.cart,
+      status: session.status,
+      dineOption: session.dineOption,
+      locale: input.locale,
+    });
+    const { name } = await issuer.create({
+      ...config,
+      expireTime: new Date(expiresAt).toISOString(),
+      newSessionExpireTime: new Date(t + NEW_SESSION_MS).toISOString(),
+    });
+    return { token: name, model: config.model, expiresAt, voiceSeconds };
+  } catch (e) {
+    // A failed give-back only leaves the count spent, as before; the caller still gets the original error.
+    await Promise.allSettled(giveBack.map(async (f) => f()));
+    throw e;
+  }
 }

@@ -2,6 +2,7 @@ import { ApiError, EndSensitivity, Modality, type GoogleGenAI } from "@google/ge
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getKiosk } from "@/lib/adapters/catalog";
 import { CommandError } from "@/lib/commands/errors";
+import { resetLimits } from "@/lib/limits/ip";
 import { MemoryUsageStore, type UsageStore } from "@/lib/limits/usage";
 import { claimSession, createSession, runCommand } from "@/lib/session/service";
 import { MemoryStore } from "@/lib/store/memory";
@@ -18,6 +19,7 @@ let issued: Parameters<LiveTokenIssuer["create"]>[0][];
 let issuer: LiveTokenIssuer;
 
 beforeEach(() => {
+  resetLimits();
   store = new MemoryStore();
   usage = new MemoryUsageStore();
   now = T0;
@@ -45,7 +47,7 @@ async function claimed() {
 }
 
 const issue = (s: { sessionId: string }, bearer: string | null) =>
-  issueLiveToken(deps(), { sessionId: s.sessionId, bearer, locale: "en" });
+  issueLiveToken(deps(), { sessionId: s.sessionId, bearer, locale: "en", ip: "192.0.2.1" });
 
 async function errorOf(p: Promise<unknown>): Promise<CommandError> {
   const e = await p.catch((x) => x);
@@ -154,6 +156,32 @@ describe("issueLiveToken", () => {
     expect(issued).toHaveLength(8);
   });
 
+  it("I-150: a token the issuer failed to create gives back the session, address and daily counts", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    for (let i = 0; i < 199; i++) await usage.bump("2026-10-13", "voiceSessions", 200);
+    const s = await demo();
+    issuer.create = async () => {
+      throw new CommandError("UPSTREAM", "Voice is not available right now. Please type instead.");
+    };
+    expect((await errorOf(issue(s, s.deviceToken))).code).toBe("UPSTREAM");
+    // The day's last token and both of the demo session's are still there.
+    expect(await usage.bump("2026-10-13", "voiceSessions", 200)).toBe(true);
+    await usage.refund("2026-10-13", "voiceSessions");
+    issuer.create = async () => ({ name: "auth_tokens/ok" });
+    await issue(s, s.deviceToken);
+    expect((await errorOf(issue(s, s.deviceToken))).code).toBe("RATE_LIMITED");
+  });
+
+  it("CONFLICT while paying, without counting the token", async () => {
+    const s = await demo();
+    await kiosk(s, "setDineOption", { option: "eat_in" });
+    const added = await kiosk(s, "addToCart", HERO_LINE);
+    await kiosk(s, "requestCheckout");
+    await kiosk(s, "confirmCheckout", {}, { cartVersion: added.cartVersion });
+    expect((await errorOf(issue(s, s.deviceToken))).code).toBe("CONFLICT");
+    expect(await store.transact(s.sessionId, (_s, sec) => ({ value: sec?.liveTokenCount ?? 0 }))).toBe(0);
+  });
+
   it("RATE_LIMITED after 200 voice sessions in a day", async () => {
     for (let i = 0; i < 200; i++) await usage.bump("2026-10-13", "voiceSessions", 200);
     const s = await demo();
@@ -180,7 +208,7 @@ describe("liveConfig", () => {
 
   it("issueLiveToken passes the locale's language code to the issuer", async () => {
     const s = await demo();
-    await issueLiveToken(deps(), { sessionId: s.sessionId, bearer: s.deviceToken, locale: "ko" });
+    await issueLiveToken(deps(), { sessionId: s.sessionId, bearer: s.deviceToken, locale: "ko", ip: "192.0.2.1" });
     expect(issued[0].languageCode).toBe("ko-KR");
   });
 });

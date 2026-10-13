@@ -6,6 +6,8 @@ import { storeKind } from "@/lib/store";
 export interface UsageStore {
   /** Atomically adds 1 to `field` of day `key` unless it is already at `limit`; false when over. */
   bump(key: string, field: string, limit: number): Promise<boolean>;
+  /** Takes back one bump whose work never happened (a Live token the issuer failed to create, I-150). */
+  refund(key: string, field: string): Promise<void>;
 }
 
 const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
@@ -24,6 +26,12 @@ export class MemoryUsageStore implements UsageStore {
     if (n >= limit) return false;
     this.counts.set(id, n + 1);
     return true;
+  }
+
+  async refund(key: string, field: string): Promise<void> {
+    const id = `${key}/${field}`;
+    const n = this.counts.get(id) ?? 0;
+    if (n > 0) this.counts.set(id, n - 1);
   }
 }
 
@@ -50,6 +58,11 @@ export class FirestoreUsageStore implements UsageStore {
       tx.set(ref, { [field]: fs.FieldValue.increment(1) }, { merge: true });
       return true;
     });
+  }
+
+  async refund(key: string, field: string): Promise<void> {
+    const { db, fs } = await this.load();
+    await db.collection("usage").doc(key).set({ [field]: fs.FieldValue.increment(-1) }, { merge: true });
   }
 }
 

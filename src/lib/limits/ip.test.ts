@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { CommandError } from "@/lib/commands/errors";
-import { checkIpLimit, resetLimits } from "./ip";
+import { checkIpLimit, giveBackDailyBudget, openStream, resetLimits, takeDailyBudget } from "./ip";
 
 const T0 = 1_000_000;
 
@@ -51,5 +51,44 @@ describe("checkIpLimit", () => {
   it("uses a plain message", () => {
     for (let i = 0; i < 10; i++) checkIpLimit("1.1.1.1", "session", T0);
     expect(() => checkIpLimit("1.1.1.1", "session", T0)).toThrow("Too many requests. Please wait a moment.");
+  });
+});
+
+describe("takeDailyBudget (I-148)", () => {
+  /** 2026-10-13 23:59 KST */
+  const NIGHT = Date.UTC(2026, 9, 13, 14, 59);
+
+  it("gives one address 24 Live tokens and 300 chat messages a KST day", () => {
+    for (let i = 0; i < 24; i++) expect(takeDailyBudget("1.1.1.1", "voice", NIGHT)).toBe(true);
+    expect(takeDailyBudget("1.1.1.1", "voice", NIGHT)).toBe(false);
+    expect(takeDailyBudget("2.2.2.2", "voice", NIGHT)).toBe(true);
+    for (let i = 0; i < 300; i++) expect(takeDailyBudget("1.1.1.1", "chat", NIGHT)).toBe(true);
+    expect(takeDailyBudget("1.1.1.1", "chat", NIGHT)).toBe(false);
+    // Midnight KST starts a new day.
+    expect(takeDailyBudget("1.1.1.1", "voice", NIGHT + 60_000)).toBe(true);
+  });
+
+  it("counts a /64 as one address", () => {
+    for (let i = 0; i < 24; i++) takeDailyBudget(`2001:db8:1:2::${i + 1}`, "voice", NIGHT);
+    expect(takeDailyBudget("2001:db8:1:2::ff", "voice", NIGHT)).toBe(false);
+  });
+
+  it("takes back what giveBackDailyBudget returns", () => {
+    for (let i = 0; i < 24; i++) takeDailyBudget("1.1.1.1", "voice", NIGHT);
+    giveBackDailyBudget("1.1.1.1", "voice", NIGHT);
+    expect(takeDailyBudget("1.1.1.1", "voice", NIGHT)).toBe(true);
+    expect(takeDailyBudget("1.1.1.1", "voice", NIGHT)).toBe(false);
+  });
+});
+
+describe("openStream (I-149)", () => {
+  it("allows 10 open streams per address and frees one on release, once", () => {
+    const releases = Array.from({ length: 10 }, () => openStream("1.1.1.1"));
+    expect(rateLimited(() => openStream("1.1.1.1"))).toBe(true);
+    expect(rateLimited(() => openStream("2.2.2.2"))).toBe(false);
+    releases[0]();
+    releases[0]();
+    expect(rateLimited(() => openStream("1.1.1.1"))).toBe(false);
+    expect(rateLimited(() => openStream("1.1.1.1"))).toBe(true);
   });
 });

@@ -29,15 +29,16 @@ KIBO is a public demo that must stay up for three weeks of judging, handles a (s
 - A cart change while confirming returns to `ordering`; a dine-option change while confirming adds 1 to `cartVersion`, so a card showing the old option cannot confirm. Undo is refused in `paying`/`paid`.
 
 ## Gemini Live tokens
-- `uses: 1`, short expiry, model/instructions/tools pinned with `liveConnectConstraints`, issued only to a valid `deviceToken`, counted per session and per day. (Check whether `expireTime` closes an already open connection.)
+- `uses: 1`, short expiry, model/instructions/tools pinned with `liveConnectConstraints`, issued only to a valid `deviceToken` before `paying`, counted per session, per address and per day only when a token was created (a failed issue gives the counts back). (Check whether `expireTime` closes an already open connection.)
 
 ## Abuse and cost
-- `max-instances=3`, per-IP rate limit (last `X-Forwarded-For` hop; IPv6 by /64 prefix), per-session and daily caps on voice and chat, input and output limits, Gemini per-minute quota cap. Details in `docs/ARCHITECTURE.md`.
+- `max-instances=3`, per-IP rate limit (last `X-Forwarded-For` hop; IPv6 by /64 prefix), per-session, per-address-per-day and daily caps on voice and chat (so one address cannot spend everyone's day), a cap on open session streams per address (so one address cannot hold every Cloud Run request slot), input and output limits, Gemini per-minute quota cap. Details in `docs/ARCHITECTURE.md`.
 - Unauthenticated `POST /api/session` is rate-limited; sessions expire via TTL.
 
 ## Learned kiosks (KIBO Learn)
-- Skills are validated against a schema (names ≤ 40 chars, no newlines, integer prices) and reviewed by a person before commit.
-- The menu goes into instructions as a JSON block marked as data.
+- Skills are validated against a schema (names ≤ 40 chars, no newlines, no `<` or `>`, integer prices) and reviewed by a person before commit.
+- The menu goes into instructions as a JSON block marked as data, with `<` and `>` escaped (`<`, `>`) in it and in the cart JSON, so no name can end the block (I-152). Only names enter the instructions, never kiosk labels.
+- The learned kiosk page (`public/learned-kiosks/<kiosk>/`) runs in a same-origin iframe without `sandbox`, because the bridge needs its `contentDocument`; its scripts therefore run with KIBO's origin and could read the kiosk and device tokens in `localStorage` and call `/api/command` (I-153). A page is copied there only after review, and the review checks that `grep -rnE "parent|top\.|localStorage|sessionStorage|fetch\(|XMLHttpRequest|WebSocket|<script[^>]+src=" public/learned-kiosks/<kiosk>/` finds nothing it cannot explain.
 - **No runtime self-healing:** a failing recipe stops; the cart is re-read from the kiosk and the user is offered staff or touch. No automatic retry (double-add risk).
 - Recipe variables are checked against the skill catalog **before** any click. The bridge refuses forbidden labels (pay, card, complete order).
 - The bridge sends only order values, never code; it authenticates with `kioskToken` in an `Authorization` header (no cookies, so no CSRF); CORS allows exact origins only.

@@ -45,6 +45,8 @@ export function checkGrounding(reply: string, kiosk: KioskData): GroundingResult
     for (const g of item.optionGroups) for (const o of g.options) for (const n of [o.name.ko, o.name.en]) names.push({ text: n, itemId: null });
   }
   names.sort((a, b) => b.text.length - a.text.length);
+  // "Your pizza" is fine on a pizza kiosk: off-menu words its own item names use do not count.
+  const ownWords = OFF_MENU.filter((w) => kiosk.items.some((i) => pattern(w).test(i.name.ko) || pattern(w).test(i.name.en)));
 
   const deny = new Set<string>();
   const offMenu = new Set<string>();
@@ -62,7 +64,7 @@ export function checkGrounding(reply: string, kiosk: KioskData): GroundingResult
     }
     here.forEach((id) => mentioned.add(id));
     for (const w of DENY) if (pattern(w).test(rest)) deny.add(w);
-    for (const w of OFF_MENU) if (pattern(w).test(rest)) offMenu.add(w);
+    for (const w of OFF_MENU) if (!ownWords.includes(w) && pattern(w).test(rest)) offMenu.add(w);
     if (POPULAR.some((w) => pattern(w).test(rest))) {
       for (const id of here) if (kiosk.items.find((i) => i.itemId === id)?.badge !== "best") popular.add(id);
     }
@@ -74,4 +76,23 @@ export function checkGrounding(reply: string, kiosk: KioskData): GroundingResult
     ...[...popular].map((id) => `popular:${id}`),
   ];
   return { pass: matched.length === 0, matched, mentioned: [...mentioned].sort() };
+}
+
+const PAY_OFFERS = [
+  /\b(would|do) you (like|want) to pay\b/i,
+  /\b(shall|should|can) i (pay|complete|proceed)\b/i,
+  /\bi('ll| will) (pay|complete the payment)\b/i,
+  /\bpay for you\b/i,
+  /결제해 ?드릴/,
+  /결제할까요/,
+  /결제하시겠/,
+  /결제를 진행할까요/,
+];
+
+/**
+ * True when a reply asks whether to pay or offers to pay (I-100). On a learned kiosk the order ends at the review and
+ * the user pays on the kiosk itself, so the AI may only tell them to do that.
+ */
+export function offersToPay(reply: string): boolean {
+  return PAY_OFFERS.some((re) => re.test(reply));
 }
