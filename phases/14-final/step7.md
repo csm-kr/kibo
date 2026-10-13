@@ -31,3 +31,9 @@ npm run test
 ## Do not
 - Do not rerun a measurement to get a better number.
 - Break existing tests.
+
+## Orchestrator notes (10-14 08:40, after phase 13 finished)
+- Learned-kiosk order results: take them from each run's `grade-v2.json` (grader v2, I-183); `grade.json` is the v1 grader and is wrong for `bk6-themepark` (0/0/10 vs 10/0/0). `spikes/blind-kiosks/RESULTS.md` and `phases/13-blind-kiosks/qa/REPORT.md` already recomputed every number; NUMBERS.md must match them.
+- R-014 (proposed) applies: every place that quotes learned-skill order results also says how often the skill's own total differed from the kiosk's (phase 13 QA counted 7 of 48).
+- `learn-cost.ts` must include the fresh hold-outs (`bk5-restarea/final`, `bk6-themepark/final`) and the `bk2-bakery/final-after-fix` rerun, and label the latter "informed by bk2" (it ran after the I-193 fix that bk2 itself exposed; I-202).
+- Keep the three groups apart wherever numbers appear: four test kiosks baseline → final (learner tuned on them), two fresh hold-outs (learner frozen), the Doughhouse development kiosk. Never add them into one headline total.

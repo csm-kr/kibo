@@ -1,4 +1,4 @@
-# Orchestrator handoff (updated 10-14 ~07:40 KST)
+# Orchestrator handoff (updated 10-14 ~08:45 KST)
 
 The orchestrating session has run `/harness` since 10-12 22:30. The user delegated all decisions ("don't ask, decide") except things only a person can do (payments, logins, publishing). Reply to the user in Korean, short, conclusion first; numbers only with their evidence file (R-001).
 
@@ -6,9 +6,9 @@ The orchestrating session has run `/harness` since 10-12 22:30. The user delegat
 | Phase | Status | Notes |
 |---|---|---|
 | 1-core … 12-phone-app | completed, deployed | `main` = 12-phone-app (`c72f7e4`) |
-| hotfix `hotfix/stream-limits` (`65b118c`, off `c72f7e4`) | **deployed** (`kibo-00013-d5g`), **not merged** | per-address limits 10→40 streams, 60→240 api/min; stream retry with "Busy right now. Reconnecting…"; worktree `.claude/worktrees/agent-af2b661da01baf837`. Merge into the phase 14 base before phase 14 runs (expect a `docs/ISSUE.md` conflict: it added I-189 while phase 13 also used I-18x/I-19x → renumber the hotfix row) |
-| 13-blind-kiosks | running (chain5, HARNESS_TIMEOUT=3600), at step 10 `report`, then 11 `qa` | 12 steps after orchestrator inserts: grader, baseline-a, crash-fix, baseline-b, learner-gaps, final-a, final-b, forbidden-fix, final-fresh, learn-viewer, report (+ grader drawer-cart fix, re-grade into `grade-v2.json`, `/learn` run choice), qa |
-| 14-final | **written, not started**: `phases/14-final/` (11 steps) | not yet in `phases/index.json`; start after phase 13 is deployed and the hotfix is merged |
+| hotfix `hotfix/stream-limits` (`65b118c`, off `c72f7e4`) | **merged** into 13-blind-kiosks as `ea164fe` (10-14 08:35; its I-189 row became I-206) | per-address limits 10→40 streams, 60→240 api/min; stream retry with "Busy right now. Reconnecting…"; worktree `.claude/worktrees/agent-af2b661da01baf837`. Merge into the phase 14 base before phase 14 runs (expect a `docs/ISSUE.md` conflict: it added I-189 while phase 13 also used I-18x/I-19x → renumber the hotfix row) |
+| 13-blind-kiosks | **completed 10-14 08:10** (`177c62c`); merge commit `ea164fe` deployed 10-14 ~08:45 (see the deploy log `scratchpad/deploy-ea164fe.log`) |
+| 14-final | **running** from 10-14 ~08:45 (`.harness-logs/chain6.log`, `.harness-logs/14-final.log`) on `feat-14-final` off `ea164fe` | steps 3, 7, 8 carry orchestrator notes from phase 13 |
 
 Production: `https://kibo-407514467119.asia-northeast3.run.app` (`kibo-00013-d5g`), voice relay `kibo-voice-00002-xfv` (`wss://kibo-voice-407514467119.asia-northeast3.run.app/ws`), short address `https://kibo-2026.web.app` (Firebase Hosting redirect; `firebase.json`; REST deploy script `videos/orchestrator/hosting-redirect.sh`). Deep health all ok after the AI Studio top-up.
 
@@ -16,14 +16,14 @@ Production: `https://kibo-407514467119.asia-northeast3.run.app` (`kibo-00013-d5g
 - Baseline (end-of-phase-12 learner + crash fixes): 2/4 learned, items 57/134, orders 5 correct / 10 refused / 5 unsafe of 40 (`BASELINE.md`).
 - Final (after step 4, patterns from the 4 test kiosks): bk1 6/4/0, bk2 5/0/5, bk3 10/0/0, bk4 10/0/0 → 31/4/5 of 40, items 134/134, 8–13 min and 0.44–0.98M input tokens each, 40–62% cached (`*/final/`).
 - bk2 rerun after the I-193 fix (labelled "informed by bk2", shown next to final): 6/0/4; the other 4 come from a mid-line "계속 주문하시겠어요?" modal (I-194, open).
-- Fresh hold-outs (built by separate agents, added after the learner fixes): bk5-restarea 4/3/3 (items 31/31); bk6-themepark graded 0/0/10 unsafe **but the kiosk total matched in 10/10**: the grader read category tabs as cart lines because the cart is a closed drawer (I-183 P1) → step 10 fixes the grader only and re-grades (`grade-v2.json`).
+- Fresh hold-outs (built by separate agents, added after the learner fixes): bk5-restarea 4/3/3 (items 31/31); bk6-themepark **10/0/0 with grader v2** (`grade-v2.json`; v1 graded 0/0/10 because it read category tabs as cart lines, I-183 fixed in the grader only). Full write-up: `spikes/blind-kiosks/RESULTS.md`.
 - Learning cost (orchestrator arithmetic: learn-stats × official prices in `evidence/cost-per-order.json`): finals $0.25–0.53 each; becomes `evidence/learn-cost.json` in phase 14 step 7.
 
 ## Next steps, in order
-1. Watch phase 13 to the end (`pgrep -fl chain.sh`; `.harness-logs/chain5.log`, `.harness-logs/13-blind-kiosks.log`; summaries in `phases/13-blind-kiosks/index.json`). After a Mac sleep the chain resumes by itself; a step killed at the 60 min limit retries (steps carry "if this is a retry" guidance).
-2. Deploy phase 13 from the clean worktree (below), check `/learn` and deep health, `git branch -f main feat-13-blind-kiosks`.
-3. Merge `hotfix/stream-limits` (resolve `docs/ISSUE.md`), run `npm run test`, commit.
-4. Add `{"dir": "14-final", "status": "pending"}` to `phases/index.json`, then in the background `HARNESS_TIMEOUT=3600 HARNESS_MAX_TURNS=300 sh .harness-logs/chain.sh 14-final > .harness-logs/chain6.log 2>&1`. Phase 14 reads `docs/plan/judges/*` and `docs/plan/SOURCES.md` (already in the repo). Watch each step, look at screenshots after UI steps.
+1. (done 08:10) Watch phase 13 to the end (`pgrep -fl chain.sh`; `.harness-logs/chain5.log`, `.harness-logs/13-blind-kiosks.log`; summaries in `phases/13-blind-kiosks/index.json`). After a Mac sleep the chain resumes by itself; a step killed at the 60 min limit retries (steps carry "if this is a retry" guidance).
+2. (done, `ea164fe`) Merge `hotfix/stream-limits` into `feat-13-blind-kiosks` (resolve `docs/ISSUE.md`: renumber the hotfix's I-189 row if taken), run `npm run lint && npm run build && npm run test`, commit.
+3. Deploy that merge commit from the clean worktree (below), check `/learn`, `/demo` and deep health, `git branch -f main feat-13-blind-kiosks`.
+4. (started) Add `{"dir": "14-final", "status": "pending"}` to `phases/index.json`, then in the background `HARNESS_TIMEOUT=3600 HARNESS_MAX_TURNS=300 sh .harness-logs/chain.sh 14-final > .harness-logs/chain6.log 2>&1`. Phase 14 reads `docs/plan/judges/*` and `docs/plan/SOURCES.md` (already in the repo). Watch each step, look at screenshots after UI steps.
 5. After phase 14: deploy (`sh scripts/deploy-voice.sh` only if `voice-relay/` changed; then `SHORT_APP_URL=kibo-2026.web.app VOICE_RELAY_URL=wss://kibo-voice-407514467119.asia-northeast3.run.app/ws sh scripts/deploy.sh`), check, `main` → phase 14.
 6. Deliverables: video v2 per `videos/submission-v2/PLAN.md` (rev. 2; `.claude/skills/motion-demo-video/`; capture from the live URL, headed Chromium for Live audio); deck final pass per `videos/deck-v2/NOTES.md` TODOs; a second judge round (3 fresh judge agents on the deployed build); code freeze 10-16 12:00; submission 10-17.
 

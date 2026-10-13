@@ -35,3 +35,8 @@ npm run qa:ui
 ## Do not
 - Do not change the learner or the skill format.
 - Break existing tests.
+
+## Orchestrator notes (10-14 08:40, after phase 13 finished)
+- `/learn` now has three real runs (`src/lib/learn/runs.ts`, `public/learn/*`): `themepark` (fresh hold-out bk6, first card), `airport-shop` (bk4, one of the four test kiosks the learner was tuned on), `doughhouse` (development kiosk). Keep the fresh hold-out first: it is the strongest answer to "isn't it tuned to the test kiosks?" (JUDGE_QA B3).
+- Open issues from phase 13 QA to close here: I-198 (trace screenshots unreadable at card and replay size) and I-199 (on 390×844 the current action and [Play] start below the fold). Proposed rules R-013 (a scaled third-party kiosk screen never carries meaning alone; KIBO's own readable text beside it says what it shows) and R-014 (wherever learned-skill order results are quoted, also say how often the skill's own total differed from the kiosk's) apply to every `/learn` surface you touch.
+- Order results come from `grade-v2.json` (grader v2), never `grade.json`.

@@ -24,3 +24,7 @@ npm run test
 
 ## Do not
 - Do not commit `videos/` (git-ignored).
+
+## Orchestrator notes (10-14 08:40, after phase 13 finished)
+- `/learn` replay clips: use the `themepark` run (fresh hold-out, first card) for the 16× replay; `airport-shop` only as a second example.
+- The production deploy at the start of phase 14 is `ea164fe` (phase 13 + stream-limits hotfix); capture from a local production build of this branch as written above.
