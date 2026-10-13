@@ -11,6 +11,8 @@ Shell: only `npm`, `npx`, `node`, `python3`, `ls`, `mkdir`, `git status|diff|add
 Exactly step 1's procedure for `bk3-ramen` and `bk4-airport-shop` (baseline: the learner with step 2's crash fix and nothing else, one run each, results under `spikes/blind-kiosks/results/<kioskId>/baseline/`).
 Then write `spikes/blind-kiosks/results/BASELINE.md`: one table with all four kiosks (finished through the gate, minutes, input tokens, item recall, price accuracy, option groups exact, orders correct / safe refusal / unsafe) (use the new `baseline/` runs; mention the crashed first runs in `baseline-crashed/` in one line) and a list of the **failure patterns** seen across kiosks (for example quantity options, navigation steps recorded as options, conditional groups, paging, icon-only tabs, native alerts, promotions), each with the kiosks and log lines where it happened. This list is the input for step 4, which must fix patterns, not kiosks.
 
+**If this is a retry after a timeout (orchestrator):** the previous session may have left learner runs behind. Do not start a new run for a kiosk whose `baseline/learn.log` already exists. If a `learner.mjs` process for it is still running (`ps`), wait for it (it writes `learn-stats.json` when it ends; kill it only if it has run more than 30 min), then grade, write `notes.md` and `BASELINE.md`.
+
 ## Acceptance criteria
 ```bash
 npm run lint

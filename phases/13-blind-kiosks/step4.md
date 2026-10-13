@@ -19,6 +19,18 @@ For each failure pattern in BASELINE.md, in order of how many kiosks it affected
 4. Re-run the learner on the dev set (Doughhouse and Gureum once each, **`PROVIDER=openai`** with its default model, 2M cap) to show no regression; save under `spikes/blind-kiosks/results/dev/`. The user decided on 10-13 to save Gemini spend on development work: every learner run in this step (iterations and these re-runs) uses `PROVIDER=openai`, which CLAUDE.md allows for learner experiments. Compare with the earlier OpenAI dev runs (`spikes/kibo-learn/results/openai/`, `spikes/blind-kiosk/results/blind-sol2/`), not with the Gemini runs. These results are dev-only and never published. The blind baselines and finals (steps 1, 2, 3, 5, 6) stay on Gemini because they are the published numbers.
 Record every change in `spikes/kibo-learn/CHANGES.md` with the pattern it addresses.
 
+### Reliability (orchestrator, 10-13)
+- I-188: bk4's first baseline run died at turn 127 with Vertex HTTP 401 because the learner reads one gcloud access token at start and it expired. Refresh the token on a 401 (and before it is 50 min old), with an AI-free test using the fake Vertex.
+- I-187 left open: `audit.mjs` `freshMenu` leaves a browser open when its start recipe fails; close it on every path.
+- Final runs (steps 5–6) will run under the same 1-hour step limit: aim for each learner run to finish in ≤ 15 min on the dev set.
+
+### Token cost (orchestrator, 10-13)
+Baselines cost 1.07M input tokens (bk1, 109 turns) and hit the 2M cap (bk2, 77 turns, about 26k tokens per turn) with `cachedInputTokens: 0`. Two causes in `learner.mjs`: every turn re-sends the instructions, the whole call history and the last 4 full screen trees; and `pruneOldTrees` rewrites an older turn on **every** turn, so the request prefix changes each time and Gemini's implicit cache (cached input is billed at about a tenth) can never apply. Without changing what the learner explores or decides:
+- Keep the prefix stable: prune old trees in blocks (for example every 8 turns, replacing all but the last 4) instead of every turn, and never edit earlier turns otherwise.
+- Shrink each tree if possible without losing labels (for example drop repeated decorative text), with an AI-free test on a dev fixture that every tappable label survives.
+- Record `cachedInputTokens` from `usageMetadata.cachedContentTokenCount` in `learn-stats.json` (Gemini path).
+Measure the effect with **one** short Gemini run on Doughhouse (cap 1M) before and after the change (two runs in total, the only Gemini runs allowed in this step) and record input, cached and estimated cost in `spikes/kibo-learn/CHANGES.md` (R-001: Vertex prices with URL and date, or leave the cost out if not read).
+
 ### Learning trace (for the `/learn` viewer in step 7)
 Add an opt-in trace to the learner: with `TRACE_DIR=<dir>`, after every turn save `turn-<n>.json` (`{ n, at, tool, args (labels and ids only; no prompts, no model reasoning text, no tokens or keys), resultSummary (one line: e.g. "opened 페퍼로니: 3 option groups", "recorded item 마르게리따", "testSkill 3/3 passed", "audit ok"), discoveries so far { items, optionGroups, categories }, inputTokens, outputTokens }`) and a screenshot `turn-<n>.jpg` of the kiosk viewport (JPEG, 720px wide, quality ~70). Also `trace.json` with the run's header (kiosk id, model, start/end, gate results). The trace must not change the learner's behavior; test it on a dev fixture.
 
