@@ -194,6 +194,7 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
                   }}
                   cardTap={cardTap}
                   keepOrderNumber
+                  retrying={demo.streamState === "retrying"}
                 />
               </KioskCanvas>
             )}

@@ -141,9 +141,10 @@ describe("GET /api/session/[id]/events", () => {
     expect(unsubscribe).toHaveBeenCalledTimes(1);
   });
 
-  // I-149: each stream holds one Cloud Run request (concurrency 80 x max 3 instances = 240) for up to the 3600 s
-  // request timeout, and the only cap was the per-IP 60 requests a minute, so one address could hold every slot.
-  it("I-149: one address cannot hold more than a few streams open at once", async () => {
+  // I-149: each stream holds one Cloud Run request (concurrency 80 x max 3 instances = 240) for up to the request
+  // timeout, and the only cap was the per-IP requests a minute, so one address could hold every slot. The cap is 40
+  // per address (shared office networks during judging, I-154), well below the 240 slots.
+  it("I-149: one address cannot hold more than 40 streams open at once", async () => {
     const t0 = Date.now();
     let now = t0;
     vi.spyOn(Date, "now").mockImplementation(() => now);
@@ -151,7 +152,7 @@ describe("GET /api/session/[id]/events", () => {
     const open: Response[] = [];
     for (let minute = 0; minute < 4; minute++) {
       now = t0 + minute * 61_000;
-      for (let k = 0; k < 60; k++) {
+      for (let k = 0; k < 240; k++) {
         const res = await GET(new Request(`${BASE}/api/session/${s.sessionId}/events`, { headers: { "x-forwarded-for": "203.0.113.9" } }), {
           params: Promise.resolve({ id: s.sessionId }),
         });
@@ -160,7 +161,7 @@ describe("GET /api/session/[id]/events", () => {
     }
     const held = open.length;
     await Promise.all(open.map((r) => r.body!.cancel()));
-    expect(held, `streams one address held open at the same time`).toBeLessThanOrEqual(10);
+    expect(held, `streams one address held open at the same time`).toBeLessThanOrEqual(40);
     // A closed stream frees its place (a minute later, past the per-IP request window).
     now += 61_000;
     const again = await GET(new Request(`${BASE}/api/session/${s.sessionId}/events`, { headers: { "x-forwarded-for": "203.0.113.9" } }), {
@@ -177,15 +178,64 @@ describe("GET /api/session/[id]/events", () => {
         params: Promise.resolve({ id: s.sessionId }),
       });
     const open = [];
-    for (let i = 0; i < 10; i++) open.push(await req());
+    for (let i = 0; i < 40; i++) open.push(await req());
     const { status, body } = await read(await req());
     expect(status).toBe(429);
     expect(body.error).toEqual({ code: "RATE_LIMITED", message: "Too many open screens. Please close one and try again." });
     await Promise.all(open.map((r) => r.body!.cancel()));
   });
 
+  // Live 10-13: places came back minutes after pages were closed. Every way a stream ends must free its place at
+  // once, and only once.
+  it("I-149: cancelling a stream frees its place at once, and an abort after it frees nothing more", async () => {
+    const s = await newSession();
+    const req = (signal?: AbortSignal) =>
+      GET(new Request(`${BASE}/api/session/${s.sessionId}/events`, { headers: { "x-forwarded-for": "203.0.113.13" }, signal }), {
+        params: Promise.resolve({ id: s.sessionId }),
+      });
+    const ac = new AbortController();
+    const first = await req(ac.signal);
+    const rest = [];
+    for (let i = 0; i < 39; i++) rest.push(await req());
+    expect((await req()).status).toBe(429);
+
+    await first.body!.cancel();
+    ac.abort();
+    const again = await req();
+    expect(again.status).toBe(200);
+    expect((await req()).status).toBe(429);
+    await Promise.all([again, ...rest].map((r) => r.body!.cancel()));
+  });
+
+  it("I-149: a write that fails (the client is gone, nothing cancelled) ends the stream and frees its place", async () => {
+    vi.useFakeTimers({ toFake: ["setInterval", "clearInterval", "setTimeout", "clearTimeout"] });
+    try {
+      const s = await newSession();
+      const req = () =>
+        GET(new Request(`${BASE}/api/session/${s.sessionId}/events`, { headers: { "x-forwarded-for": "203.0.113.14" } }), {
+          params: Promise.resolve({ id: s.sessionId }),
+        });
+      const open = [];
+      for (let i = 0; i < 40; i++) open.push(await req());
+      expect((await req()).status).toBe(429);
+
+      // The next keepalive cannot be written.
+      const enqueue = vi.spyOn(ReadableStreamDefaultController.prototype, "enqueue").mockImplementation(() => {
+        throw new TypeError("Invalid state: Controller is already closed");
+      });
+      vi.advanceTimersByTime(25_000);
+      enqueue.mockRestore();
+
+      const again = await req();
+      expect(again.status).toBe(200);
+      await Promise.all([again, ...open].map((r) => r.body!.cancel()));
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("I-149: a stream for a bad session id does not hold a place", async () => {
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 42; i++) {
       const res = await GET(new Request(`${BASE}/api/session/a.b/events`, { headers: { "x-forwarded-for": "203.0.113.11" } }), {
         params: Promise.resolve({ id: "a.b" }),
       });
@@ -212,9 +262,9 @@ describe("GET /api/session/[id]/events", () => {
       const ip = { headers: { "x-forwarded-for": "203.0.113.12" } };
       const req = () =>
         GET(new Request(`${BASE}/api/session/${s.sessionId}/events`, ip), { params: Promise.resolve({ id: s.sessionId }) });
-      // Fill this address's 10 places; the 15-minute end of the first must free one.
+      // Fill this address's 40 places; the 15-minute end of the first must free one.
       const first = events(await req());
-      for (let i = 0; i < 9; i++) expect((await req()).status).toBe(200);
+      for (let i = 0; i < 39; i++) expect((await req()).status).toBe(200);
       expect((await req()).status).toBe(429);
 
       await first.next();
@@ -227,8 +277,8 @@ describe("GET /api/session/[id]/events", () => {
       const tail: (string | null)[] = [];
       for (let e = await first.next(); e !== null; e = await first.next()) tail.push(e);
       expect(tail.at(-1)).toBe(": stream end");
-      // All ten were opened at the same (fake) moment, so all ten end together and free their places.
-      expect(unsubscribe).toHaveBeenCalledTimes(10);
+      // All forty were opened at the same (fake) moment, so all end together and free their places.
+      expect(unsubscribe).toHaveBeenCalledTimes(40);
 
       const again = await req();
       expect(again.status).toBe(200);

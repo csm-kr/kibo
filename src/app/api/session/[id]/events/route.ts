@@ -36,8 +36,16 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
     start(controller) {
       let closed = false;
       let unsubscribe = () => {};
+      // Every way the stream ends goes through close(), which frees the address's place once: the request's abort,
+      // cancel() from the reader, the 15 min cap, `gone`, a listener error, and a write that fails here.
       const send = (text: string) => {
-        if (!closed) controller.enqueue(encoder.encode(text));
+        if (closed) return;
+        try {
+          controller.enqueue(encoder.encode(text));
+        } catch {
+          // The client is gone and the stream can no longer be written.
+          close();
+        }
       };
       const timer = setInterval(() => send(": keepalive\n\n"), KEEPALIVE_MS);
       const cap = setTimeout(() => {

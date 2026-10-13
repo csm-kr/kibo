@@ -17,10 +17,10 @@ function rateLimited(fn: () => void): boolean {
 beforeEach(() => resetLimits());
 
 describe("checkIpLimit", () => {
-  it("allows 60 API requests per minute per IP, then refuses", () => {
-    for (let i = 0; i < 60; i++) expect(rateLimited(() => checkIpLimit("1.1.1.1", "api", T0 + i))).toBe(false);
-    expect(rateLimited(() => checkIpLimit("1.1.1.1", "api", T0 + 60))).toBe(true);
-    expect(rateLimited(() => checkIpLimit("2.2.2.2", "api", T0 + 60))).toBe(false);
+  it("allows 240 API requests per minute per IP, then refuses", () => {
+    for (let i = 0; i < 240; i++) expect(rateLimited(() => checkIpLimit("1.1.1.1", "api", T0 + i))).toBe(false);
+    expect(rateLimited(() => checkIpLimit("1.1.1.1", "api", T0 + 240))).toBe(true);
+    expect(rateLimited(() => checkIpLimit("2.2.2.2", "api", T0 + 240))).toBe(false);
   });
 
   it("allows 10 new sessions per minute per IP", () => {
@@ -82,8 +82,8 @@ describe("takeDailyBudget (I-148)", () => {
 });
 
 describe("openStream (I-149)", () => {
-  it("allows 10 open streams per address and frees one on release, once", () => {
-    const releases = Array.from({ length: 10 }, () => openStream("1.1.1.1"));
+  it("allows 40 open streams per address and frees one on release, once", () => {
+    const releases = Array.from({ length: 40 }, () => openStream("1.1.1.1"));
     expect(rateLimited(() => openStream("1.1.1.1"))).toBe(true);
     expect(rateLimited(() => openStream("2.2.2.2"))).toBe(false);
     releases[0]();

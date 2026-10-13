@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { HIDDEN_CLOSE_MS, IDLE_PAUSE_MS, StreamControl } from "./streamControl";
+import { HIDDEN_CLOSE_MS, IDLE_PAUSE_MS, RETRY_FIRST_MS, RETRY_MAX_MS, StreamControl } from "./streamControl";
 
 /** Stands in for EventSource: only open and close matter here. */
 class FakeSource {
@@ -141,6 +141,88 @@ describe("StreamControl: kiosk screens (idlePause off, I-172)", () => {
     expect(onPause).not.toHaveBeenCalled();
     expect(sources).toHaveLength(2);
     expect(openCount()).toBe(1);
+  });
+});
+
+describe("StreamControl: a stream refused for good (429, 503; I-033)", () => {
+  it("reopens after 3 s, then 6 s, 12 s, 24 s, and every 30 s after that", () => {
+    const { control, sources } = setup();
+    expect([RETRY_FIRST_MS, RETRY_MAX_MS]).toEqual([3_000, 30_000]);
+    const waits = [3_000, 6_000, 12_000, 24_000, 30_000, 30_000];
+    for (const [i, wait] of waits.entries()) {
+      control.failed();
+      expect(sources[i].closed).toBe(true);
+      vi.advanceTimersByTime(wait - 1);
+      expect(sources).toHaveLength(i + 1);
+      vi.advanceTimersByTime(1);
+      expect(sources).toHaveLength(i + 2);
+    }
+  });
+
+  it("a successful open starts the waits again at 3 s", () => {
+    const { control, sources } = setup();
+    control.failed();
+    vi.advanceTimersByTime(3_000);
+    control.failed();
+    vi.advanceTimersByTime(6_000);
+    expect(sources).toHaveLength(3);
+    control.opened();
+    control.failed();
+    vi.advanceTimersByTime(3_000);
+    expect(sources).toHaveLength(4);
+  });
+
+  it("does not reopen while hidden; reopens when the page is visible again", () => {
+    const { control, sources, openCount } = setup();
+    control.failed();
+    control.setHidden(true);
+    vi.advanceTimersByTime(HIDDEN_CLOSE_MS * 2);
+    expect(sources).toHaveLength(1);
+    control.setHidden(false);
+    expect(sources).toHaveLength(2);
+    expect(openCount()).toBe(1);
+  });
+
+  it("coming back within the wait does not cut it short", () => {
+    const { control, sources } = setup();
+    control.failed();
+    control.setHidden(true);
+    vi.advanceTimersByTime(1_000);
+    control.setHidden(false);
+    expect(sources).toHaveLength(1);
+    vi.advanceTimersByTime(2_000);
+    expect(sources).toHaveLength(2);
+  });
+
+  it("does not reopen while paused; resume() does", () => {
+    const { control, sources, onPause, openCount } = setup();
+    vi.advanceTimersByTime(IDLE_PAUSE_MS - 1_000);
+    control.failed();
+    vi.advanceTimersByTime(1_000);
+    expect(onPause).toHaveBeenCalledWith(true);
+    vi.advanceTimersByTime(RETRY_MAX_MS * 2);
+    expect(sources).toHaveLength(1);
+    control.resume();
+    expect(sources).toHaveLength(2);
+    expect(openCount()).toBe(1);
+  });
+
+  it("keeps retrying on a kiosk screen, which never pauses", () => {
+    const { control, sources } = setup({ idlePause: false });
+    for (let i = 0; i < 50; i++) {
+      control.failed();
+      vi.advanceTimersByTime(RETRY_MAX_MS);
+    }
+    expect(sources).toHaveLength(51);
+  });
+
+  it("stop() cancels a pending retry", () => {
+    const { control, sources } = setup();
+    control.failed();
+    control.stop();
+    vi.advanceTimersByTime(RETRY_MAX_MS * 2);
+    expect(sources).toHaveLength(1);
+    expect(vi.getTimerCount()).toBe(0);
   });
 });
 

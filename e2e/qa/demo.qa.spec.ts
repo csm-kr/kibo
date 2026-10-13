@@ -18,7 +18,7 @@ const STRICT = process.env.QA_ALL === "1";
 test.use({
   viewport: VIEWPORTS[0],
   locale: "en-US",
-  // Its own address for the dev server's per-IP limit (60 a minute), shared with the other QA specs otherwise.
+  // Its own address for the dev server's per-IP limit (240 a minute), shared with the other QA specs otherwise.
   extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.11" },
 });
 
