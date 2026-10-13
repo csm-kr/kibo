@@ -239,6 +239,14 @@ export async function textSpacing(page: Page, p: Profile): Promise<Findings> {
 export async function focus(page: Page, p: Profile): Promise<Findings> {
   const h: string[] = [];
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  // Tabbing scrolls containers (phone column, kiosk grid, scenario guide); the next state's screenshot inherited that
+  // scroll and showed half-scrolled cards and a hidden highlighted tile (I-121). Restored at the end.
+  await page.evaluate(() => {
+    const w = window as unknown as { __qaScroll?: [Element, number, number][] };
+    w.__qaScroll = [...document.querySelectorAll("*")]
+      .filter((el) => el.scrollTop !== 0 || el.scrollLeft !== 0 || el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth)
+      .map((el) => [el, el.scrollTop, el.scrollLeft]);
+  });
   // Counted on the whole page: on /demo the kiosk half's controls come before the checked column in tab order.
   const max = Math.min(80, (await page.locator("button:not(:disabled), a[href], input").count()) + 4);
   let first: string | null = null;
@@ -264,7 +272,12 @@ export async function focus(page: Page, p: Profile): Promise<Findings> {
     if (!r.visible) h.push(`focus obscured: ${r.label}`);
   }
   // The ring left by this check showed up in the next state's screenshot (I-121).
-  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  await page.evaluate(() => {
+    (document.activeElement as HTMLElement | null)?.blur();
+    const w = window as unknown as { __qaScroll?: [Element, number, number][] };
+    for (const [el, top, left] of w.__qaScroll ?? []) el.scrollTo({ top, left, behavior: "instant" });
+    delete w.__qaScroll;
+  });
   return { h: capped(h), t: [] };
 }
 

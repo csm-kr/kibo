@@ -54,7 +54,7 @@ export function KioskToolbar(props: {
         </div>
         <div aria-live="polite" className="pointer-events-none absolute inset-0 flex items-center">
           {status && (
-            <p className="k-text-40 w-full truncate rounded-full bg-(--k-primary-dark) px-10 py-3 text-center font-bold text-white">
+            <p className="k-text-40 w-full truncate rounded-full bg-(--k-primary-dark) px-12 py-3 text-center font-bold text-white">
               {status}
             </p>
           )}

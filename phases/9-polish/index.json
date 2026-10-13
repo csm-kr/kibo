@@ -53,7 +53,10 @@
     {
       "step": 6,
       "name": "qa",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-13T11:19:37+0900",
+      "summary": "QA pass on every screen the phase changed plus D3 compare card and /mic-test: lint, build, 738 unit, e2e 19 passed (14 @live skipped; evidence/*.json restored, I-099), prototype 42/42, qa:ui 26 passed, 260 states, 0 H. Fresh-eyes agent re-checked REVIEW.md: verified K1-K4, K7, K8, K10, X1, X3, X4, X6-X12; partial K5, K6, X2, X5 as reported; X13 not captured; K9 decided. Fixes: e2e/qa/checks.ts focus restores container scroll (later viewports showed D3 scrolled to the bottom and the KX grid past the ringed tile; I-121 reopened+fixed, R-010 proposed from qa-screenshot-artifact), KioskToolbar AI status pill px-10 -> px-12 (4/8 scale). Angle G/R-001: compare card states each source, names from menu data, no ratios; cost evidence matches TESTING (90,393 / 91,795 tokens, prices null). New issues I-140 (brand line-height checker false positive), I-141 (D3 card pushes [Try again] below the phone fold), I-142 (two filled blue buttons on P4); new occurrences I-075, I-123, I-133 (reopened, MALO placeholder cut below 390px). phases/9-polish/qa/REPORT.md.",
+      "completed_at": "2026-10-13T11:40:00+0900"
     }
   ],
   "created_at": "2026-10-13T09:20:09+0900"

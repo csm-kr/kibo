@@ -62,3 +62,8 @@ When an issue class in `docs/ISSUE.md` is seen for the **3rd time**, it becomes 
 - From: `below-fold-action` — I-073 (seen 10-13/3-assistant:6, 10-13/6-learn:3, 10-13/7-environments:6), I-129 (10-13/8-scenarios:3)
 - Why: the judge's key moment is the confirm card, and each addition to the phone column (more lines, the learned end card, the action strip) pushed its total and pay button below the fold without any check failing.
 - Check: `demo-D2-confirm-1440x900.png` (and the rail and learned variants) show the total and [Yes, pay now] without scrolling; a step that adds something to the phone column asserts `toBeInViewport()` on [Yes, pay now] in an E2E (as `e2e/demo-actions.spec.ts` does).
+
+### R-010 (proposed): A QA check that changes the page (focus, scroll, injected CSS, media) puts it back before the next screenshot
+- From: `qa-screenshot-artifact` — I-121 (seen 10-13/7-environments:6, 10-13/9-polish:6), I-138 (10-13/9-polish:0)
+- Why: QA screenshots feed the deck and the video, and leftovers from the previous check (focus rings, scrolled containers, images not yet loaded) made them show states no user would see, such as a highlighted tile scrolled out of view.
+- Check: a new check in `e2e/qa/checks.ts` restores what it changes (as `focus` restores scroll and `textSpacing` removes its style); after `npm run qa:ui`, the second and third viewport of a state show the same scroll position as the first (`demo-D3-done-*`, `kiosk-KX-staff-1080x1920.png`).
