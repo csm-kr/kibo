@@ -2,7 +2,8 @@
 // (the order, both fries large, no dessert, "I'll pay"), 3 times by text through runChat (as POST /api/chat) and
 // 3 times by voice on Gemini Live, and the tokens Gemini reports for each. Memory store, no network to our routes.
 // The evidence file holds model ids, counts and timings only: no utterances, replies, instructions or key.
-// Prices are left null on purpose: they are filled from the official pricing page on the day of the deck (R-001).
+// Prices are never read here (R-001): a run keeps the `prices` already in the evidence file (copied by hand from the
+// official pricing page, with its URL and date) and re-multiplies them with the new tokens (scripts/cost.ts).
 // Run with `npm run measure:cost` (GEMINI_API_KEY from .env; the text agent uses its usual backend).
 
 import { randomUUID } from "node:crypto";
@@ -21,6 +22,7 @@ import { MemoryStore } from "@/lib/store/memory";
 import { downsampleTo16k, int16ToBase64 } from "@/lib/voice/pcm";
 import { runToolCalls } from "@/lib/voice/toolRunner";
 import type { SessionStatus } from "@/types/session";
+import { costPerOrder, type Prices } from "./cost";
 import { ttsPcm } from "./wav";
 
 const ROOT = process.cwd();
@@ -299,6 +301,10 @@ async function main() {
   }
   if (voice.length < RUNS) throw new Error(`only ${voice.length} of ${RUNS} voice runs finished`);
 
+  const evidencePath = join(ROOT, "evidence/cost-per-order.json");
+  const previous = JSON.parse(readFileSync(evidencePath, "utf8"));
+  const prices: Prices = previous.prices;
+
   const out = {
     about:
       "Gemini tokens for one MALO hero order (scripts/measure-cost.ts, `npm run measure:cost`): 4 user turns (the order, both fries " +
@@ -330,16 +336,10 @@ async function main() {
       runs: voice,
       failedAttempts: voiceFailures,
     },
-    prices: {
-      textInputPerMTok: null,
-      textOutputPerMTok: null,
-      liveAudioInputPerMTok: null,
-      liveTextInputPerMTok: null,
-      liveAudioOutputPerMTok: null,
-      note: "Fill from the official Gemini API pricing page on the day of the deck; thinking tokens are billed as output. Not read here (R-001).",
-    },
+    costUsdPerOrder: { about: previous.costUsdPerOrder.about, ...costPerOrder({ prices, text: { runs: text }, voice: { runs: voice } }) },
+    prices,
   };
-  writeFileSync(join(ROOT, "evidence/cost-per-order.json"), JSON.stringify(out, null, 2) + "\n");
+  writeFileSync(evidencePath, JSON.stringify(out, null, 2) + "\n");
   console.log("Wrote evidence/cost-per-order.json");
 }
 

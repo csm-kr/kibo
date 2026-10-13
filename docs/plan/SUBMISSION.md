@@ -21,6 +21,16 @@ Not injected into harness steps (lives under `docs/plan/`).
 5. Demo video link: rules say strictly under 3 minutes → **≤ 2:50**, public YouTube, English captions
 6. Solution description ≤ 1,024 characters, naming how Firebase/Firestore, Cloud Run and Gemini are used
 
+## Solution description (draft)
+For form field 6. **998 / 1,024 characters**, counted by `scripts/submission.test.ts` (it fails if the text grows past 1,024 or this count goes stale). No pricing or sales pitch (T&C).
+
+```text
+KIBO lets anyone order at an existing self-order kiosk by talking to their own phone, without replacing the kiosk. It is built for older adults, people with low vision and visitors who cannot read Korean. They scan the kiosk's QR code and speak or type in Korean or English. Gemini Live (voice) and Gemini Flash (text) turn each sentence into function calls such as addToCart. A Next.js app on Cloud Run checks every call against the kiosk's own menu data and a server-side state machine, then applies it in a Firestore transaction. Cloud Run streams each Firestore change to the kiosk and the phone, so the kiosk fills its own cart and highlights what changed. The AI can open a confirm card but cannot pay: payment needs the user's own yes or tap, then the card at the kiosk. For kiosks with no integration, KIBO Learn uses Gemini once to explore the kiosk's web screen and write a skill, then replays orders without AI. On our 42-case Korean and English test set, the text agent passed 42 of 42.
+```
+<!-- Evidence for "42 of 42": evals/results/2026-10-13T07-43.md (gemini-3.8-flash on the Gemini API, 10-13; cases written by the KIBO team, evals/agent-cases.json). Re-run `npm run eval:agent` before submitting and update the number if it changes. -->
+
+**Elevator (2 sentences):** KIBO turns your own phone into the voice of the self-order kiosk in front of you: say the order, and the kiosk fills its own cart. Gemini decides, the KIBO server checks every action against the kiosk's own data, and only you can confirm the payment.
+
 ## Judging and what we show
 | Criterion | Weight | What we show |
 |---|---|---|
