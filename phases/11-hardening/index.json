@@ -16,7 +16,7 @@
       "status": "completed",
       "started_at": "2026-10-13T13:12:59+0900",
       "summary": "Fixed: I-156 deploy (scripts/deploy.sh builds locally first, fails unless /api/health reports a new revision, last line DEPLOYED/DEPLOY FAILED; scripts/deploy.test.ts with fake gcloud/curl/npm; scripts/build-context.test.ts checks .gcloudignore/.dockerignore keep every file src/ imports from outside src/). P1 I-148 per-address daily budget 24 Live tokens / 300 chat messages (takeDailyBudget, src/lib/limits/ip.ts); P1 I-149 at most 10 open SSE streams per address (openStream). P2 I-150 Live token counted only when issued (state checked first, refunds on issuer failure); I-151 turnComplete drops late transcript chunks; I-152 skill names refuse <>, instruction JSON escapes them; I-153 SECURITY documents learned-page origin + review grep. I-100 learned kiosks get their own checkout lines (never offer to pay) + 2 Doughhouse grounded-reply eval cases with a stand-in bridge (2/2, evals/results/2026-10-13T13-19); I-144 scenario guide says 'Paid. Choose another scenario' once paid; I-143 kiosk-touch footage re-taken alone on the 24-tap efficient path (capture:footage takes clip names, keeps other clips); I-147 footage marks wait for images. All five AUDIT it.skip tests turned on. Docs: ARCHITECTURE limits, SECURITY, TESTING, OPERATIONS, FOOTAGE. Remaining open: I-154 (needs measurement), new I-155 (learned kiosk: setDineOption+addToCart in one response gets CONFLICT). AC: lint, build, test 783 passed, test:e2e 19 passed/14 @live skipped, capture:footage run for the touch clip only.",
-      "completed_at": "2026-10-13T13:40:00+0900"
+      "completed_at": "2026-10-13T13:51:33+0900"
     },
     {
       "step": 2,
