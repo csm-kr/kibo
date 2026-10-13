@@ -1,12 +1,12 @@
-# Step 5: final-b
+# Step 5: final-a
 
 ## Read first
-- `phases/13-blind-kiosks/step4.md` and its summary in `phases/13-blind-kiosks/index.json`.
+- `phases/13-blind-kiosks/step1.md` (the run procedure), `spikes/blind-kiosks/PROTOCOL.md`, `spikes/kibo-learn/CHANGES.md` (step 4).
 
 Shell: only `npm`, `npx`, `node`, `python3`, `ls`, `mkdir`, `git status|diff|add|commit|log`.
 
 ## Task
-Step 4's procedure for `bk3-ramen` and `bk4-airport-shop` (improved learner, one run each, results under `spikes/blind-kiosks/results/<kioskId>/final/` with `TRACE_DIR=spikes/blind-kiosks/results/<kioskId>/final/trace` (step 3's trace) so step 6 can replay the learning).
+Step 1's procedure with the **improved** learner on `bk1-cinema` and `bk2-bakery`, results under `spikes/blind-kiosks/results/<kioskId>/final/` with `TRACE_DIR=spikes/blind-kiosks/results/<kioskId>/final/trace` (step 4's trace) so step 7 can replay the learning (same token cap, one run each, one rerun only after a crash). Grade with the same grader version as the baseline (if the grader changed in step 4, re-grade the baseline skills with the new grader too and keep both grades, labelled).
 
 ## Acceptance criteria
 ```bash
@@ -17,7 +17,7 @@ npm run test
 
 ## Verify
 1. Both final folders exist with logs, stats, grade and notes.
-2. Update this step in `phases/13-blind-kiosks/index.json` (completed + summary / error / blocked).
+2. Update this step in `phases/13-blind-kiosks/index.json` (completed + summary with baseline → final per kiosk / error / blocked).
 
 ## Do not
 - Do not change the learner in this step.
