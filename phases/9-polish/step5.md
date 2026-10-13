@@ -11,6 +11,8 @@ A small page the team opens on real phones to check microphone and audio behavio
 
 `/mic-test` (not linked from anywhere; `robots` noindex): shows the user agent family and whether it is an in-app browser; [Test microphone] (permission state before and after, a live level meter from the AudioWorklet, sample rate); [Test speaker] (plays a short generated tone through the same playback path at 24 kHz; reports whether the `AudioContext` started after the tap); "Permission remembered on reload?" instructions; a copyable one-line result summary (no audio is uploaded or stored). Phone layout rules apply (text ≥ 20px, targets ≥ 56px).
 
+Also fix ISSUE I-128 first: `src/lib/agent/live.test.ts` reaches the network (class `unmocked-external-call`, I-006: a test must never reach the network); inject or mock every external client so `npm run test` passes with the network off, and mark it fixed.
+
 Tests: a unit test for the in-app browser detector with sample user agents (KakaoTalk, NAVER, Instagram, Facebook, LINE, Safari, Chrome); an E2E with the fake media flags that the level meter moves and the result line appears.
 
 ## Acceptance criteria
