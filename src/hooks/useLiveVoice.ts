@@ -2,6 +2,7 @@
 
 import type { FunctionCall, FunctionResponse, LiveServerMessage, Session as LiveSession } from "@google/genai";
 import { useEffect, useState } from "react";
+import type { AgentAction } from "@/lib/agent/actions";
 import { ApiError, liveToken, sendCommand } from "@/lib/client/api";
 import { errorCopy } from "@/lib/i18n/errors";
 import { pt } from "@/lib/i18n/phone";
@@ -10,7 +11,7 @@ import { base64ToFloat32, downsampleTo16k, int16ToBase64 } from "@/lib/voice/pcm
 import { runToolCalls } from "@/lib/voice/toolRunner";
 import { initialTurns, noiseStep, raiseSeq, turnEvents, turnsReducer, type TurnEvent } from "@/lib/voice/turns";
 import type { KioskData, Locale } from "@/types/menu";
-import type { SessionStatus } from "@/types/session";
+import type { CartLine, SessionStatus } from "@/types/session";
 
 // The phone's Gemini Live connection (ADR-003, docs/ARCHITECTURE.md "Voice"): audio goes straight to Gemini with a
 // one-use token; tool calls go to /api/command. Half-duplex, reconnect, then text. Audio, transcripts and tokens
@@ -38,6 +39,10 @@ export interface LiveVoiceOptions {
   voiceOutput: boolean;
   /** The last utteranceSeq used by typed or spoken turns, shared with the chat so the server sees one counter. */
   utterances: { current: number };
+  /** The cart on the screen, so a reported remove or update can name its line. */
+  getCart?: () => CartLine[];
+  /** /demo: each tool call as ids and a result code, for "What the AI did". */
+  onAction?: (action: AgentAction) => void;
 }
 
 const OUTPUT_RATE = 24000;
@@ -216,6 +221,8 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
         kiosk: o.kiosk,
         locale: o.locale,
         send: (cmd) => sendCommand({ sessionId, token: deviceToken, ...cmd }),
+        cart: () => o.getCart?.() ?? [],
+        onAction: (action) => o.onAction?.(action),
       });
       // After a reconnect the new instructions already hold the cart, so a lost answer loses nothing.
       if (r.liveSessionId !== id || !r.live) return;

@@ -57,3 +57,8 @@ When an issue class in `docs/ISSUE.md` is seen for the **3rd time**, it becomes 
 - From: `flow-gap` — I-048 (seen 10-13/2-kiosk:6), I-064 (10-13/3-assistant:3), I-095 (10-13/6-learn:2); counted 10-13/7-environments:6
 - Why: screens were built one at a time from their own step, so a path the flows promise (small QR on every kiosk screen, checkout without the model, choosing a dine option after the first add) had no control on some screen, and no test walked that path.
 - Check: the step's QA report names, per changed screen id, the flows and exception rows of `docs/UX.md` walked through it, and each missing control has an issue id.
+
+### R-009 (proposed): On `/demo`, the confirm card's total and [Yes, pay now] stay on screen at 1440×900; anything added to the phone column gives way to them
+- From: `below-fold-action` — I-073 (seen 10-13/3-assistant:6, 10-13/6-learn:3, 10-13/7-environments:6), I-129 (10-13/8-scenarios:3)
+- Why: the judge's key moment is the confirm card, and each addition to the phone column (more lines, the learned end card, the action strip) pushed its total and pay button below the fold without any check failing.
+- Check: `demo-D2-confirm-1440x900.png` (and the rail and learned variants) show the total and [Yes, pay now] without scrolling; a step that adds something to the phone column asserts `toBeInViewport()` on [Yes, pay now] in an E2E (as `e2e/demo-actions.spec.ts` does).

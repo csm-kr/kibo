@@ -1,5 +1,6 @@
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
 import { command, kioskRoot } from "../helpers";
+import { HERO_ACTIONS } from "../recordedActions";
 import { DEMO, DEMO_GUIDE, qaState, type Findings } from "./checks";
 
 // UI QA of /demo (docs/UX.md screen map D1–D3) at the judge viewports in docs/UI_QA.md. The checks measure the
@@ -177,6 +178,40 @@ test.describe(() => {
     await expect(guide.locator('[data-scenario-step][data-done="true"]')).toHaveCount(1);
     await check(page, info, "D2-scenario-half");
     await check(page, info, "D2-scenario-half-guide", undefined, VIEWPORTS, DEMO_GUIDE);
+  });
+});
+
+test.describe(() => {
+  // Its own address: choosing a scenario creates a second session (R-005).
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.31" } });
+
+  test("D2 with 'What the AI did' open after a scenario step, and collapsed", async ({ page, request }, info) => {
+    await page.goto("/demo");
+    await expect(page.getByRole("heading", { name: "Don't learn the kiosk. Just talk." })).toBeVisible({ timeout: 60_000 });
+    await page.getByRole("button", { name: "Start", exact: true }).click();
+    await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "dine");
+    const guide = page.locator("[data-scenario-guide]");
+    await guide.getByRole("button", { name: "Scenarios", exact: true }).click();
+    const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
+    await page.locator('[data-scenario="sunja-lunch"]').click();
+    const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
+    await command(request, s.deviceToken, { sessionId: s.sessionId, type: "setDineOption", args: { option: "eat_in" }, source: "button" });
+
+    // Step 1 sent from its chip; the test answers /api/chat (no model) with what the agent did, as the route would.
+    await page.route("**/api/chat", async (route) => {
+      for (const a of HERO_ACTIONS) {
+        await command(request, s.deviceToken, { sessionId: s.sessionId, type: a.tool, args: a.args, source: "text", utteranceSeq: 1 });
+      }
+      await route.fulfill({ json: { ok: true, reply: "Added two cheeseburger sets.", status: "ordering", cart: [], total: 0, cartVersion: 2, actions: HERO_ACTIONS } });
+    });
+    await guide.locator('[data-scenario-step="0"]').getByRole("button").click();
+    await expect(guide.locator('[data-scenario-step][data-done="true"]')).toHaveCount(1);
+    const strip = page.locator("[data-action-strip]");
+    await expect(strip.getByRole("listitem")).toHaveCount(HERO_ACTIONS.length);
+    await check(page, info, "D2-actions-open", undefined, [VIEWPORTS[0]]);
+
+    await strip.getByRole("button", { name: /What the AI did/ }).click();
+    await check(page, info, "D2-actions-collapsed", undefined, [VIEWPORTS[1]]);
   });
 });
 

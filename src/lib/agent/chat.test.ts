@@ -156,6 +156,41 @@ describe("runChat", () => {
     expect(answer.functionResponse.response).toEqual({ ok: false, code: "CONFLICT", message: "Please confirm on the card." });
   });
 
+  it("actions: one per call, in order, ids and codes only (ok, NEEDS_CHOICE, CONFLICT)", async () => {
+    const s = await demo();
+    const secret = "my phone number is 010";
+    const { model } = script(
+      [{ name: "addToCart", args: { itemId: "cheese_burger", variant: "set" } }],
+      [
+        { name: "addToCart", args: { itemId: "cola" } },
+        { name: "offerChoices", args: { templateId: "pick_option", choices: [{ kind: "option", id: "cola" }] } },
+        { name: "confirmCheckout" },
+      ],
+      `Done. ${secret}`,
+    );
+    const out = await runChat(deps(model), input(s, { message: secret }));
+    expect(out.actions.map((a) => [a.tool, a.code])).toEqual([
+      ["addToCart", "NEEDS_CHOICE"],
+      ["addToCart", "ok"],
+      ["offerChoices", "ok"],
+      ["confirmCheckout", "CONFLICT"],
+    ]);
+    expect(out.actions[0].args).toEqual({ itemId: "cheese_burger", variant: "set" });
+    for (const a of out.actions) expect(a.ms).toBeGreaterThanOrEqual(0);
+    const text = JSON.stringify(out.actions);
+    expect(text).not.toContain(s.sessionId);
+    expect(text).not.toContain(s.deviceToken);
+    expect(text).not.toMatch(/phone number|Done|Please confirm/);
+  });
+
+  it("actions name the line a remove took out, from the cart before the call", async () => {
+    const s = await demo();
+    const first = await runChat(deps(script([{ name: "addToCart", args: { itemId: "cola" } }], "ok").model), input(s));
+    const lineId = first.cart[0].lineId;
+    const out = await runChat(deps(script([{ name: "removeFromCart", args: { lineId } }], "Removed.").model), input(s));
+    expect(out.actions).toEqual([{ tool: "removeFromCart", args: { lineId, itemId: "cola" }, code: "ok", ms: expect.any(Number) }]);
+  });
+
   it("stops after 5 rounds; the 6th is never executed", async () => {
     const s = await demo();
     const { model, requests } = script([{ name: "addToCart", args: { itemId: "cola" } }]);

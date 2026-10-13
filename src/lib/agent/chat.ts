@@ -6,6 +6,7 @@ import { kstDay, type UsageStore } from "@/lib/limits/usage";
 import { bumpSessionCounter, runCommand } from "@/lib/session/service";
 import type { SessionStore } from "@/lib/store/types";
 import type { CartLine, SessionStatus } from "@/types/session";
+import { agentAction, type AgentAction } from "./actions";
 import { buildInstructions } from "./instructions";
 import { toolCallToCommand, toolResult } from "./mapping";
 import type { ModelClient, ModelTurn } from "./model";
@@ -40,6 +41,8 @@ export interface ChatResponse {
   cart: CartLine[];
   total: number;
   cartVersion: number;
+  /** What the AI did in this request, for /demo (ids and codes only). */
+  actions: AgentAction[];
 }
 
 const MAX_ROUNDS = 5;
@@ -106,6 +109,9 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
     }
   };
 
+  // The cart before each call, so a remove or update can name its line.
+  let cart = session.cart;
+  const actions: AgentAction[] = [];
   let reply = "";
   for (let round = 0; round < MAX_ROUNDS; round++) {
     const out = await model.generate({ system, contents, tools });
@@ -115,7 +121,10 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
     contents.push(out.content);
     const parts = [];
     for (const call of out.functionCalls) {
+      const started = performance.now();
       const outcome = await execute(call.name, call.args);
+      actions.push(agentAction(call.name, call.args, outcome, performance.now() - started, cart));
+      if (outcome.ok) cart = outcome.response.cart;
       // Tool names and result codes only (SECURITY "Secrets and repo hygiene").
       console.info("chat tool:", toolNames.has(call.name) ? call.name : "unknown", outcome.ok ? "ok" : outcome.error.code);
       const response = toolResult(kiosk, input.locale, outcome);
@@ -132,5 +141,6 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
     cart: latest.cart,
     total: latest.total,
     cartVersion: latest.cartVersion,
+    actions,
   };
 }

@@ -1,3 +1,4 @@
+import type { AgentAction } from "@/lib/agent/actions";
 import { HTTP_STATUS, type ErrorDetail } from "@/lib/commands/errors";
 import type { CommandResult } from "@/lib/commands/machine";
 import type { CommandType } from "@/lib/commands/schemas";
@@ -112,6 +113,8 @@ export interface ChatReply {
   cart: CartLine[];
   total: number;
   cartVersion: number;
+  /** What the AI did in this request (ids and codes only), for /demo. */
+  actions: AgentAction[];
 }
 
 /** One user utterance to the text agent; `cartVersion` only when the confirm card is showing. */

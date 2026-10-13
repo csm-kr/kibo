@@ -1,6 +1,7 @@
 "use client";
 
 import { useReducer, useState } from "react";
+import type { AgentAction } from "@/lib/agent/actions";
 import { ApiError, chat } from "@/lib/client/api";
 import { errorCopy } from "@/lib/i18n/errors";
 import { pt } from "@/lib/i18n/phone";
@@ -21,6 +22,8 @@ export function useChat(opts: {
   locale: Locale;
   /** Takes the next utteranceSeq from the counter shared with voice (I-079); without it the chat counts on its own. */
   nextSeq?: () => number;
+  /** /demo: what the AI did for each answered message. */
+  onActions?: (actions: AgentAction[]) => void;
 }) {
   const [state, dispatch] = useReducer(chatReducer, initialChat);
   // When the current request started, for the "Working…" line after 1 s.
@@ -45,6 +48,7 @@ export function useChat(opts: {
         locale: opts.locale,
       });
       dispatch({ type: "reply", text: r.reply });
+      if (r.actions?.length) opts.onActions?.(r.actions);
       return true;
     } catch (e) {
       dispatch({ type: "notice", text: errorText(e, opts.locale) });

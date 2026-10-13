@@ -37,7 +37,7 @@ describe("POST /api/chat", () => {
     generate.mockResolvedValueOnce({ content: { role: "model", parts: [{ text: "Hello." }] }, functionCalls: [], text: "Hello." });
     const { status, body } = await read(await POST(jsonRequest("/api/chat", chatBody(s.sessionId), auth(s.deviceToken))));
     expect(status).toBe(200);
-    expect(body).toEqual({ ok: true, reply: "Hello.", status: "connected", cart: [], total: 0, cartVersion: 0 });
+    expect(body).toEqual({ ok: true, reply: "Hello.", status: "connected", cart: [], total: 0, cartVersion: 0, actions: [] });
   });
 
   it("BAD_REQUEST: a tool turn in history, an extra field, a 501-character message, a non-uuid id", async () => {

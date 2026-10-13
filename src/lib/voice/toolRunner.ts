@@ -1,9 +1,11 @@
 import type { FunctionCall } from "@google/genai";
+import { agentAction, type AgentAction } from "@/lib/agent/actions";
 import { toolCallToCommand, toolResult } from "@/lib/agent/mapping";
 import { ApiError, type CommandReply } from "@/lib/client/api";
 import { CommandError } from "@/lib/commands/errors";
 import type { CommandType } from "@/lib/commands/schemas";
 import type { KioskData, Locale } from "@/types/menu";
+import type { CartLine } from "@/types/session";
 
 // Runs Gemini Live tool calls against POST /api/command, which enforces every rule (ADR-003). The client only
 // executes the calls the model made; it never adds, chains or confirms anything itself.
@@ -27,6 +29,10 @@ export interface ToolContext {
   kiosk: KioskData;
   locale: Locale;
   send(cmd: VoiceCommand): Promise<CommandReply>;
+  /** The cart on the phone's screen, so a remove or update can name its line. */
+  cart?: () => CartLine[];
+  /** /demo: each call as ids and a result code, for "What the AI did". */
+  onAction?(action: AgentAction): void;
 }
 
 export interface ToolResponse {
@@ -62,8 +68,12 @@ async function runOne(call: FunctionCall, ctx: ToolContext): Promise<Outcome> {
 /** One at a time and in order: "remove the cola, add a cider" must not race. */
 export async function runToolCalls(calls: FunctionCall[], ctx: ToolContext): Promise<ToolResponse[]> {
   const out: ToolResponse[] = [];
+  let cart = ctx.cart?.() ?? [];
   for (const call of calls) {
+    const started = performance.now();
     const outcome = await runOne(call, ctx);
+    ctx.onAction?.(agentAction(call.name ?? "", call.args, outcome, performance.now() - started, cart));
+    if (outcome.ok) cart = outcome.response.cart;
     out.push({ ...(call.id ? { id: call.id } : {}), name: call.name ?? "", response: toolResult(ctx.kiosk, ctx.locale, outcome) });
   }
   return out;

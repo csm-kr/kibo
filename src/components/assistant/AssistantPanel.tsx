@@ -6,6 +6,7 @@ import { ModalLayer } from "@/components/kiosk/ModalLayer";
 import { useChat, errorText } from "@/hooks/useChat";
 import { useLiveVoice } from "@/hooks/useLiveVoice";
 import { useNow } from "@/hooks/useNow";
+import type { AgentAction } from "@/lib/agent/actions";
 import type { StreamState } from "@/hooks/useSessionStream";
 import { ping, sendCommand } from "@/lib/client/api";
 import type { ChoiceRef } from "@/lib/commands/errors";
@@ -57,6 +58,8 @@ interface Props {
   inApp?: { held: boolean; onStay(): void };
   /** /demo only: receives the panel's own send, for the scenario guide (src/components/demo/ScenarioGuide.tsx). */
   onSay?: (say: SayFn | null) => void;
+  /** /demo only: what the AI did (typed or spoken), for the "What the AI did" strip. The phone never shows it. */
+  onActions?: (actions: AgentAction[]) => void;
 }
 
 export type SayFn = (text: string) => Promise<SendResult>;
@@ -71,7 +74,13 @@ export function AssistantPanel(props: Props) {
   const [sending, setSending] = useState(false);
   // Typed and spoken turns share one utteranceSeq (I-079).
   const utterances = useRef(0);
-  const chat = useChat({ sessionId: session?.sessionId ?? null, token: deviceToken, locale, nextSeq: () => ++utterances.current });
+  const chat = useChat({
+    sessionId: session?.sessionId ?? null,
+    token: deviceToken,
+    locale,
+    nextSeq: () => ++utterances.current,
+    onActions: props.onActions,
+  });
   const now = useNow();
 
   // /demo has its own intro and a judge may have no microphone, so only the phone shows P1.
@@ -135,6 +144,8 @@ export function AssistantPanel(props: Props) {
     onNoise: () => setVoiceNote(pt("voiceNoise", locale)),
     voiceOutput,
     utterances,
+    getCart: () => session?.cart ?? [],
+    onAction: props.onActions ? (action) => props.onActions?.([action]) : undefined,
   });
   const voiceOpen = voice.state === "listening" || voice.state === "thinking" || voice.state === "speaking";
 

@@ -115,6 +115,14 @@ const PHONE_TEXT = {
   tagGrounding: { ko: "데이터로만 답해요", en: "Answers from data" },
   tagAccessibility: { ko: "접근성", en: "Accessibility" },
   tagLearned: { ko: "KIBO Learn", en: "KIBO Learn" },
+  // /demo "What the AI did" strip (src/components/demo/ActionStrip.tsx)
+  aiActions: { ko: "AI가 한 일", en: "What the AI did" },
+  aiActionsLegend: {
+    ko: "Gemini가 정하고, 키오스크가 움직이기 전에 KIBO 서버가 모든 동작을 키오스크 데이터와 규칙으로 확인해요.",
+    en: "Gemini decides; the KIBO server checks every action against the kiosk's data and rules before the kiosk moves.",
+  },
+  aiActionsEmpty: { ko: "아직 없어요. 휴대폰에서 말하거나 입력해 보세요.", en: "Nothing yet. Say or type an order on the phone." },
+  aiActionsList: { ko: "AI 동작, 최근 것부터", en: "AI actions, newest first" },
   // P1 microphone hint, before the browser asks
   micHintTitle: { ko: "말로 주문하려면 마이크를 켜 주세요", en: "Turn on the microphone to talk" },
   micHintPre: { ko: "다음 화면에서 ", en: "Tap " },

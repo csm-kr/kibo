@@ -6,8 +6,10 @@ import { KioskCanvas } from "@/components/kiosk/KioskCanvas";
 import { KioskScreen } from "@/components/kiosk/KioskScreen";
 import { LearnedKioskHost } from "@/components/learned/LearnedKioskHost";
 import { useDemoSession } from "@/hooks/useDemoSession";
+import type { AgentAction } from "@/lib/agent/actions";
 import { examplesFor } from "@/lib/agent/examples";
 import type { KioskData, Locale } from "@/types/menu";
+import { ActionStrip } from "./ActionStrip";
 import { DemoEndCard } from "./DemoEndCard";
 import { DemoIntro } from "./DemoIntro";
 import { environmentOf } from "./environments";
@@ -19,6 +21,8 @@ import { ScenarioGuide } from "./ScenarioGuide";
 
 /** The server's per-order chat limit for demo sessions (docs/ARCHITECTURE.md "Limits and cost"). */
 const DEMO_CHAT_LIMIT = 30;
+/** Rows kept in "What the AI did". */
+const MAX_ACTIONS = 50;
 
 export function DemoApp({ kiosk }: { kiosk: KioskData }) {
   const demo = useDemoSession(kiosk.kioskId);
@@ -32,6 +36,8 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
   }, []);
   const send = useCallback<SayFn>((text) => sayRef.current?.(text) ?? Promise.resolve("error"), []);
   const learned = kiosk.kind === "learned";
+  // What the AI did in this demo order; another session id means [Try again] started a new one.
+  const [actions, setActions] = useState<{ sessionId: string; list: AgentAction[] }>({ sessionId: "", list: [] });
 
   if (!demo.tokens) {
     return <DemoIntro kioskId={kiosk.kioskId} starting={demo.starting} error={demo.error} onStart={() => void demo.start()} />;
@@ -79,7 +85,8 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
         className="flex h-full w-[clamp(400px,32vw,480px)] flex-none flex-col gap-2"
       >
         <Caption id="demo-phone-caption" text="Your phone (KIBO)" />
-        <div className="min-h-0 flex-1 overflow-hidden rounded-[26px] border-2 border-[#15171C]">
+        {/* 480px: the phone header at 200% text needs about 450 (WCAG 1.4.4), so the open action strip gives way first. */}
+        <div className="min-h-[480px] flex-1 overflow-hidden rounded-[26px] border-2 border-[#15171C]">
           <AssistantPanel
             key={tokens.sessionId}
             kiosk={kiosk}
@@ -98,8 +105,20 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
               <DemoEndCard kioskId={kiosk.kioskId} locale={locale} learned={learned} onTryAgain={tryAgain} onIntro={demo.stop} />
             }
             onSay={onSay}
+            onActions={(list) =>
+              setActions((prev) => ({
+                sessionId: tokens.sessionId,
+                list: [...(prev.sessionId === tokens.sessionId ? prev.list : []), ...list].slice(-MAX_ACTIONS),
+              }))
+            }
           />
         </div>
+        <ActionStrip
+          kiosk={kiosk}
+          actions={actions.sessionId === tokens.sessionId ? actions.list : []}
+          locale={locale}
+          status={session?.status ?? null}
+        />
       </section>
       <ScenarioGuide
         kiosk={kiosk}

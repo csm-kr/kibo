@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { getKiosk } from "@/lib/adapters/catalog";
 import { ApiError, type CommandReply } from "@/lib/client/api";
+import type { AgentAction } from "@/lib/agent/actions";
 import { runToolCalls, type ToolContext, type VoiceCommand } from "./toolRunner";
 
 const kiosk = getKiosk("malo");
@@ -153,5 +154,32 @@ describe("runToolCalls", () => {
     });
     const [res] = await runToolCalls([{ id: "1", name: "undoLastChange", args: {} }], c);
     expect(res.response).toEqual({ ok: false, code: "INTERNAL", message: "Something went wrong. Please try again." });
+  });
+
+  it("reports each call to onAction with ids and codes only; a remove names its line from the phone's cart", async () => {
+    const actions: AgentAction[] = [];
+    let n = 0;
+    const c = ctx({
+      cart: () => [LINE],
+      onAction: (a) => actions.push(a),
+      send: async () => {
+        if (n++ === 1) throw new ApiError("CONFLICT", "Please confirm on the card.");
+        return { ...REPLY, cart: [] };
+      },
+    });
+    await runToolCalls(
+      [
+        { id: "1", name: "removeFromCart", args: { lineId: LINE.lineId } },
+        { id: "2", name: "confirmCheckout", args: {} },
+        { id: "3", name: "payNow", args: { note: "free text" } },
+      ],
+      c,
+    );
+    expect(actions).toEqual([
+      { tool: "removeFromCart", args: { lineId: LINE.lineId, itemId: "cheese_burger" }, code: "ok", ms: expect.any(Number) },
+      { tool: "confirmCheckout", args: {}, code: "CONFLICT", ms: expect.any(Number) },
+      { tool: "unknown", args: {}, code: "BAD_REQUEST", ms: expect.any(Number) },
+    ]);
+    expect(JSON.stringify(actions)).not.toMatch(/live-uuid|free text|Please confirm/);
   });
 });
