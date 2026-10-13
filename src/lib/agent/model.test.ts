@@ -1,7 +1,24 @@
 import { ApiError, type GoogleGenAI } from "@google/genai";
 import { describe, expect, it, vi } from "vitest";
 import { CommandError } from "@/lib/commands/errors";
-import { createCircuit, geminiClient, textBackendSetting, textClientOptions, type TextDeps } from "./model";
+import { createCircuit, geminiClient, textBackendSetting, textClientOptions, tokenUsage, type TextDeps } from "./model";
+
+describe("tokenUsage", () => {
+  it("reads generateContent and Live usage, missing counts are 0, no metadata is undefined", () => {
+    expect(tokenUsage({ promptTokenCount: 10, candidatesTokenCount: 2, totalTokenCount: 12 })).toEqual({
+      prompt: 10,
+      cached: 0,
+      candidates: 2,
+      thoughts: 0,
+      total: 12,
+    });
+    // Live messages name the output count responseTokenCount.
+    expect(
+      tokenUsage({ promptTokenCount: 10, cachedContentTokenCount: 8, responseTokenCount: 5, thoughtsTokenCount: 1, totalTokenCount: 16 }),
+    ).toEqual({ prompt: 10, cached: 8, candidates: 5, thoughts: 1, total: 16 });
+    expect(tokenUsage(undefined)).toBeUndefined();
+  });
+});
 
 describe("textBackendSetting", () => {
   it("defaults to auto; api and vertex pin one backend; anything else is auto", () => {
@@ -105,6 +122,12 @@ describe("geminiClient", () => {
     const configs = generate.mock.calls.map((c) => c[0].config);
     expect(configs.map((c) => c.thinkingConfig)).toEqual([{ thinkingLevel: "LOW" }, { thinkingLevel: "HIGH" }, { thinkingLevel: "LOW" }]);
     expect(configs[0]).not.toHaveProperty("temperature");
+  });
+
+  it("returns the call's token counts from usageMetadata, numbers only", async () => {
+    const usageMetadata = { promptTokenCount: 900, candidatesTokenCount: 40, thoughtsTokenCount: 60, totalTokenCount: 1000 };
+    const out = await on(fakeAi(async () => ({ candidates: [], usageMetadata }))).generate(REQ);
+    expect(out.usage).toEqual({ prompt: 900, cached: 0, candidates: 40, thoughts: 60, total: 1000 });
   });
 
   it("an empty answer is an empty model turn", async () => {

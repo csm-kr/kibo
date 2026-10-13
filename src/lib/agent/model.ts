@@ -22,6 +22,39 @@ export interface ModelTurn {
 
 export type TextBackend = "api" | "vertex";
 
+/** Token counts of one model call, for the cost measurement (scripts/measure-cost.ts). Numbers only, never content. */
+export interface TokenUsage {
+  prompt: number;
+  /** Part of `prompt` served from the implicit cache, which is billed at a lower rate. */
+  cached: number;
+  candidates: number;
+  thoughts: number;
+  total: number;
+}
+
+/** From generateContent's usageMetadata, or a Live message's (which names the output count responseTokenCount). */
+export function tokenUsage(
+  meta:
+    | {
+        promptTokenCount?: number;
+        cachedContentTokenCount?: number;
+        candidatesTokenCount?: number;
+        responseTokenCount?: number;
+        thoughtsTokenCount?: number;
+        totalTokenCount?: number;
+      }
+    | undefined,
+): TokenUsage | undefined {
+  if (!meta) return undefined;
+  return {
+    prompt: meta.promptTokenCount ?? 0,
+    cached: meta.cachedContentTokenCount ?? 0,
+    candidates: meta.candidatesTokenCount ?? meta.responseTokenCount ?? 0,
+    thoughts: meta.thoughtsTokenCount ?? 0,
+    total: meta.totalTokenCount ?? 0,
+  };
+}
+
 export interface ModelClient {
   generate(req: { system: string; contents: ModelTurn[]; tools: object[] }): Promise<{
     content: ModelTurn;
@@ -29,6 +62,7 @@ export interface ModelClient {
     text: string;
     /** The backend that answered (the eval counts them). */
     backend?: TextBackend;
+    usage?: TokenUsage;
   }>;
 }
 
@@ -197,7 +231,7 @@ export function geminiClient(overrides: Partial<TextDeps> = {}): ModelClient {
         .map((p) => p.text)
         .join("");
       const functionCalls = (res.functionCalls ?? []).map((c) => ({ id: c.id, name: c.name ?? "", args: c.args ?? {} }));
-      return { content, functionCalls, text, backend };
+      return { content, functionCalls, text, backend, usage: tokenUsage(res.usageMetadata) };
     },
   };
 }

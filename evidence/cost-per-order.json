@@ -1,0 +1,778 @@
+{
+  "about": "Gemini tokens for one MALO hero order (scripts/measure-cost.ts, `npm run measure:cost`): 4 user turns (the order, both fries large, no dessert, I'll pay), ending at the confirm card; payment needs no model call. Text: runChat as POST /api/chat, tokens from usageMetadata of every generateContent call, summed per order. Voice: one Gemini Live session with the config the ephemeral token pins, connected from Node with the API key; turns 1-2 spoken by the synthetic TTS fixtures hero-en.wav and fries-en.wav (e2e/fixtures), turns 3-4 typed into the same session; tokens from every usageMetadata message (one per model generation, sent with its turnComplete), summed per order. Medians per field are taken separately, so they need not add up. `cached` is the part of `prompt` served from the implicit cache. Live's totalTokenCount leaves out thoughtsTokenCount (seen in every message), so bill thoughts as output on top of it. Memory store, dine option tapped first. Counts only: no utterances, replies or instructions.",
+  "date": "2026-10-13T01:45:21.629Z",
+  "kioskId": "malo",
+  "runs": 3,
+  "text": {
+    "model": "gemini-3.8-flash",
+    "backendSetting": "api",
+    "thinkingLevel": "low",
+    "medianPerOrder": {
+      "prompt": 89696,
+      "cached": 7585,
+      "candidates": 367,
+      "thoughts": 292,
+      "total": 90393
+    },
+    "runs": [
+      {
+        "durationMs": 17963,
+        "status": "paying",
+        "heroCart": true,
+        "commands": [
+          "addToCart:ok",
+          "addToCart:ok",
+          "offerChoices:ok",
+          "updateCart:ok",
+          "updateCart:ok",
+          "requestCheckout:ok",
+          "confirmCheckout:ok"
+        ],
+        "calls": [
+          {
+            "turn": 1,
+            "backend": "api",
+            "prompt": 9620,
+            "cached": 7585,
+            "candidates": 140,
+            "thoughts": 0,
+            "total": 9760
+          },
+          {
+            "turn": 1,
+            "backend": "api",
+            "prompt": 10044,
+            "cached": 0,
+            "candidates": 48,
+            "thoughts": 0,
+            "total": 10092
+          },
+          {
+            "turn": 1,
+            "backend": "api",
+            "prompt": 10249,
+            "cached": 0,
+            "candidates": 30,
+            "thoughts": 0,
+            "total": 10279
+          },
+          {
+            "turn": 2,
+            "backend": "api",
+            "prompt": 9776,
+            "cached": 0,
+            "candidates": 98,
+            "thoughts": 0,
+            "total": 9874
+          },
+          {
+            "turn": 2,
+            "backend": "api",
+            "prompt": 10186,
+            "cached": 0,
+            "candidates": 10,
+            "thoughts": 0,
+            "total": 10196
+          },
+          {
+            "turn": 3,
+            "backend": "api",
+            "prompt": 9792,
+            "cached": 0,
+            "candidates": 9,
+            "thoughts": 0,
+            "total": 9801
+          },
+          {
+            "turn": 3,
+            "backend": "api",
+            "prompt": 9959,
+            "cached": 0,
+            "candidates": 9,
+            "thoughts": 0,
+            "total": 9968
+          },
+          {
+            "turn": 4,
+            "backend": "api",
+            "prompt": 9813,
+            "cached": 0,
+            "candidates": 9,
+            "thoughts": 0,
+            "total": 9822
+          },
+          {
+            "turn": 4,
+            "backend": "api",
+            "prompt": 9979,
+            "cached": 0,
+            "candidates": 14,
+            "thoughts": 0,
+            "total": 9993
+          }
+        ],
+        "order": {
+          "prompt": 89418,
+          "cached": 7585,
+          "candidates": 367,
+          "thoughts": 0,
+          "total": 89785
+        }
+      },
+      {
+        "durationMs": 23039,
+        "status": "paying",
+        "heroCart": true,
+        "commands": [
+          "addToCart:ok",
+          "addToCart:ok",
+          "offerChoices:ok",
+          "updateCart:ok",
+          "updateCart:ok",
+          "requestCheckout:ok",
+          "confirmCheckout:ok"
+        ],
+        "calls": [
+          {
+            "turn": 1,
+            "backend": "api",
+            "prompt": 9620,
+            "cached": 7585,
+            "candidates": 108,
+            "thoughts": 0,
+            "total": 9728
+          },
+          {
+            "turn": 1,
+            "backend": "api",
+            "prompt": 10008,
+            "cached": 0,
+            "candidates": 48,
+            "thoughts": 0,
+            "total": 10056
+          },
+          {
+            "turn": 1,
+            "backend": "api",
+            "prompt": 10211,
+            "cached": 0,
+            "candidates": 33,
+            "thoughts": 0,
+            "total": 10244
+          },
+          {
+            "turn": 2,
+            "backend": "api",
+            "prompt": 9777,
+            "cached": 0,
+            "candidates": 144,
+            "thoughts": 0,
+            "total": 9921
+          },
+          {
+            "turn": 2,
+            "backend": "api",
+            "prompt": 10229,
+            "cached": 0,
+            "candidates": 24,
+            "thoughts": 0,
+            "total": 10253
+          },
+          {
+            "turn": 3,
+            "backend": "api",
+            "prompt": 9807,
+            "cached": 0,
+            "candidates": 9,
+            "thoughts": 125,
+            "total": 9941
+          },
+          {
+            "turn": 3,
+            "backend": "api",
+            "prompt": 10097,
+            "cached": 0,
+            "candidates": 15,
+            "thoughts": 0,
+            "total": 10112
+          },
+          {
+            "turn": 4,
+            "backend": "api",
+            "prompt": 9834,
+            "cached": 0,
+            "candidates": 9,
+            "thoughts": 115,
+            "total": 9958
+          },
+          {
+            "turn": 4,
+            "backend": "api",
+            "prompt": 10113,
+            "cached": 0,
+            "candidates": 15,
+            "thoughts": 52,
+            "total": 10180
+          }
+        ],
+        "order": {
+          "prompt": 89696,
+          "cached": 7585,
+          "candidates": 405,
+          "thoughts": 292,
+          "total": 90393
+        }
+      },
+      {
+        "durationMs": 29738,
+        "status": "paying",
+        "heroCart": true,
+        "commands": [
+          "addToCart:ok",
+          "addToCart:ok",
+          "offerChoices:ok",
+          "updateCart:ok",
+          "updateCart:ok",
+          "requestCheckout:ok",
+          "confirmCheckout:ok"
+        ],
+        "calls": [
+          {
+            "turn": 1,
+            "backend": "api",
+            "prompt": 9620,
+            "cached": 7585,
+            "candidates": 108,
+            "thoughts": 0,
+            "total": 9728
+          },
+          {
+            "turn": 1,
+            "backend": "api",
+            "prompt": 10009,
+            "cached": 0,
+            "candidates": 48,
+            "thoughts": 0,
+            "total": 10057
+          },
+          {
+            "turn": 1,
+            "backend": "api",
+            "prompt": 10213,
+            "cached": 0,
+            "candidates": 35,
+            "thoughts": 0,
+            "total": 10248
+          },
+          {
+            "turn": 2,
+            "backend": "api",
+            "prompt": 9780,
+            "cached": 0,
+            "candidates": 97,
+            "thoughts": 244,
+            "total": 10121
+          },
+          {
+            "turn": 2,
+            "backend": "api",
+            "prompt": 10431,
+            "cached": 0,
+            "candidates": 16,
+            "thoughts": 0,
+            "total": 10447
+          },
+          {
+            "turn": 3,
+            "backend": "api",
+            "prompt": 9802,
+            "cached": 0,
+            "candidates": 9,
+            "thoughts": 0,
+            "total": 9811
+          },
+          {
+            "turn": 3,
+            "backend": "api",
+            "prompt": 9968,
+            "cached": 0,
+            "candidates": 16,
+            "thoughts": 0,
+            "total": 9984
+          },
+          {
+            "turn": 4,
+            "backend": "api",
+            "prompt": 9830,
+            "cached": 0,
+            "candidates": 9,
+            "thoughts": 203,
+            "total": 10042
+          },
+          {
+            "turn": 4,
+            "backend": "api",
+            "prompt": 10198,
+            "cached": 0,
+            "candidates": 14,
+            "thoughts": 0,
+            "total": 10212
+          }
+        ],
+        "order": {
+          "prompt": 89851,
+          "cached": 7585,
+          "candidates": 352,
+          "thoughts": 447,
+          "total": 90650
+        }
+      }
+    ]
+  },
+  "voice": {
+    "model": "gemini-3.8-live",
+    "usageExposed": true,
+    "summedOver": "every usageMetadata message of the session",
+    "medianPerOrder": {
+      "prompt": 91217,
+      "cached": 0,
+      "candidates": 578,
+      "thoughts": 700,
+      "total": 91795
+    },
+    "medianDurationMs": 34343,
+    "runs": [
+      {
+        "attempt": 1,
+        "durationMs": 34950,
+        "status": "confirming",
+        "heroCart": true,
+        "commands": [
+          "addToCart:ok",
+          "addToCart:ok",
+          "updateCart:ok",
+          "updateCart:ok",
+          "offerChoices:ok",
+          "requestCheckout:ok"
+        ],
+        "interruptions": 0,
+        "usageMessages": [
+          {
+            "turn": 1,
+            "prompt": 10307,
+            "cached": 0,
+            "candidates": 57,
+            "thoughts": 0,
+            "total": 10364,
+            "promptByModality": {
+              "TEXT": 9227,
+              "AUDIO": 361
+            },
+            "responseByModality": {}
+          },
+          {
+            "turn": 1,
+            "prompt": 10744,
+            "cached": 0,
+            "candidates": 192,
+            "thoughts": 128,
+            "total": 10936,
+            "promptByModality": {
+              "TEXT": 9452,
+              "AUDIO": 361
+            },
+            "responseByModality": {
+              "AUDIO": 192
+            }
+          },
+          {
+            "turn": 2,
+            "prompt": 11050,
+            "cached": 0,
+            "candidates": 60,
+            "thoughts": 0,
+            "total": 11110,
+            "promptByModality": {
+              "TEXT": 9486,
+              "AUDIO": 607
+            },
+            "responseByModality": {}
+          },
+          {
+            "turn": 2,
+            "prompt": 11523,
+            "cached": 0,
+            "candidates": 97,
+            "thoughts": 88,
+            "total": 11620,
+            "promptByModality": {
+              "TEXT": 9754,
+              "AUDIO": 607
+            },
+            "responseByModality": {
+              "AUDIO": 97
+            }
+          },
+          {
+            "turn": 3,
+            "prompt": 11656,
+            "cached": 0,
+            "candidates": 45,
+            "thoughts": 188,
+            "total": 11701,
+            "promptByModality": {
+              "TEXT": 9772,
+              "AUDIO": 704
+            },
+            "responseByModality": {}
+          },
+          {
+            "turn": 3,
+            "prompt": 11861,
+            "cached": 0,
+            "candidates": 59,
+            "thoughts": 215,
+            "total": 11920,
+            "promptByModality": {
+              "TEXT": 9886,
+              "AUDIO": 704
+            },
+            "responseByModality": {
+              "AUDIO": 59
+            }
+          },
+          {
+            "turn": 4,
+            "prompt": 11955,
+            "cached": 0,
+            "candidates": 5,
+            "thoughts": 166,
+            "total": 11960,
+            "promptByModality": {
+              "TEXT": 9905,
+              "AUDIO": 763
+            },
+            "responseByModality": {}
+          },
+          {
+            "turn": 4,
+            "prompt": 12121,
+            "cached": 0,
+            "candidates": 63,
+            "thoughts": 0,
+            "total": 12184,
+            "promptByModality": {
+              "TEXT": 10002,
+              "AUDIO": 763
+            },
+            "responseByModality": {
+              "AUDIO": 63
+            }
+          }
+        ],
+        "order": {
+          "prompt": 91217,
+          "cached": 0,
+          "candidates": 578,
+          "thoughts": 785,
+          "total": 91795
+        }
+      },
+      {
+        "attempt": 2,
+        "durationMs": 33457,
+        "status": "confirming",
+        "heroCart": true,
+        "commands": [
+          "addToCart:ok",
+          "addToCart:ok",
+          "updateCart:ok",
+          "updateCart:ok",
+          "setDineOption:ok",
+          "requestCheckout:ok"
+        ],
+        "interruptions": 0,
+        "usageMessages": [
+          {
+            "turn": 1,
+            "prompt": 10307,
+            "cached": 0,
+            "candidates": 57,
+            "thoughts": 0,
+            "total": 10364,
+            "promptByModality": {
+              "TEXT": 9227,
+              "AUDIO": 361
+            },
+            "responseByModality": {}
+          },
+          {
+            "turn": 1,
+            "prompt": 10740,
+            "cached": 0,
+            "candidates": 170,
+            "thoughts": 67,
+            "total": 10910,
+            "promptByModality": {
+              "TEXT": 9448,
+              "AUDIO": 361
+            },
+            "responseByModality": {
+              "AUDIO": 170
+            }
+          },
+          {
+            "turn": 2,
+            "prompt": 11026,
+            "cached": 0,
+            "candidates": 43,
+            "thoughts": 0,
+            "total": 11069,
+            "promptByModality": {
+              "TEXT": 9484,
+              "AUDIO": 585
+            },
+            "responseByModality": {}
+          },
+          {
+            "turn": 2,
+            "prompt": 11442,
+            "cached": 0,
+            "candidates": 97,
+            "thoughts": 0,
+            "total": 11539,
+            "promptByModality": {
+              "TEXT": 9722,
+              "AUDIO": 585
+            },
+            "responseByModality": {
+              "AUDIO": 97
+            }
+          },
+          {
+            "turn": 3,
+            "prompt": 11574,
+            "cached": 0,
+            "candidates": 68,
+            "thoughts": 256,
+            "total": 11642,
+            "promptByModality": {
+              "TEXT": 9739,
+              "AUDIO": 682
+            },
+            "responseByModality": {
+              "AUDIO": 68
+            }
+          },
+          {
+            "turn": 4,
+            "prompt": 11676,
+            "cached": 0,
+            "candidates": 5,
+            "thoughts": 0,
+            "total": 11681,
+            "promptByModality": {
+              "TEXT": 9759,
+              "AUDIO": 750
+            },
+            "responseByModality": {}
+          },
+          {
+            "turn": 4,
+            "prompt": 12029,
+            "cached": 0,
+            "candidates": 58,
+            "thoughts": 0,
+            "total": 12087,
+            "promptByModality": {
+              "TEXT": 9960,
+              "AUDIO": 750
+            },
+            "responseByModality": {
+              "AUDIO": 58
+            }
+          }
+        ],
+        "order": {
+          "prompt": 78794,
+          "cached": 0,
+          "candidates": 498,
+          "thoughts": 323,
+          "total": 79292
+        }
+      },
+      {
+        "attempt": 4,
+        "durationMs": 34343,
+        "status": "confirming",
+        "heroCart": false,
+        "commands": [
+          "addToCart:ok",
+          "addToCart:ok",
+          "offerChoices:ok",
+          "updateCart:ok",
+          "updateCart:ok",
+          "offerChoices:ok",
+          "requestCheckout:ok"
+        ],
+        "interruptions": 0,
+        "usageMessages": [
+          {
+            "turn": 1,
+            "prompt": 10307,
+            "cached": 0,
+            "candidates": 74,
+            "thoughts": 0,
+            "total": 10381,
+            "promptByModality": {
+              "TEXT": 9227,
+              "AUDIO": 361
+            },
+            "responseByModality": {}
+          },
+          {
+            "turn": 1,
+            "prompt": 10732,
+            "cached": 0,
+            "candidates": 229,
+            "thoughts": 276,
+            "total": 10961,
+            "promptByModality": {
+              "TEXT": 9443,
+              "AUDIO": 361
+            },
+            "responseByModality": {
+              "AUDIO": 185
+            }
+          },
+          {
+            "turn": 1,
+            "prompt": 11162,
+            "cached": 0,
+            "candidates": 29,
+            "thoughts": 67,
+            "total": 11191,
+            "promptByModality": {
+              "TEXT": 9583,
+              "AUDIO": 546
+            },
+            "responseByModality": {
+              "AUDIO": 29
+            }
+          },
+          {
+            "turn": 2,
+            "prompt": 11270,
+            "cached": 0,
+            "candidates": 74,
+            "thoughts": 0,
+            "total": 11344,
+            "promptByModality": {
+              "TEXT": 9594,
+              "AUDIO": 629
+            },
+            "responseByModality": {}
+          },
+          {
+            "turn": 2,
+            "prompt": 11728,
+            "cached": 0,
+            "candidates": 93,
+            "thoughts": 77,
+            "total": 11821,
+            "promptByModality": {
+              "TEXT": 9847,
+              "AUDIO": 629
+            },
+            "responseByModality": {
+              "AUDIO": 93
+            }
+          },
+          {
+            "turn": 3,
+            "prompt": 11854,
+            "cached": 0,
+            "candidates": 45,
+            "thoughts": 55,
+            "total": 11899,
+            "promptByModality": {
+              "TEXT": 9864,
+              "AUDIO": 722
+            },
+            "responseByModality": {}
+          },
+          {
+            "turn": 3,
+            "prompt": 12054,
+            "cached": 0,
+            "candidates": 50,
+            "thoughts": 49,
+            "total": 12104,
+            "promptByModality": {
+              "TEXT": 9973,
+              "AUDIO": 722
+            },
+            "responseByModality": {
+              "AUDIO": 50
+            }
+          },
+          {
+            "turn": 4,
+            "prompt": 12134,
+            "cached": 0,
+            "candidates": 5,
+            "thoughts": 176,
+            "total": 12139,
+            "promptByModality": {
+              "TEXT": 9989,
+              "AUDIO": 772
+            },
+            "responseByModality": {}
+          },
+          {
+            "turn": 4,
+            "prompt": 12295,
+            "cached": 0,
+            "candidates": 56,
+            "thoughts": 0,
+            "total": 12351,
+            "promptByModality": {
+              "TEXT": 10081,
+              "AUDIO": 772
+            },
+            "responseByModality": {
+              "AUDIO": 56
+            }
+          }
+        ],
+        "order": {
+          "prompt": 103536,
+          "cached": 0,
+          "candidates": 655,
+          "thoughts": 700,
+          "total": 104191
+        }
+      }
+    ],
+    "failedAttempts": [
+      {
+        "attempt": 3,
+        "failedTurn": 1,
+        "usageMessages": 2,
+        "commands": [
+          "addToCart:ok",
+          "addToCart:ok",
+          "offerChoices:ok"
+        ]
+      }
+    ]
+  },
+  "prices": {
+    "textInputPerMTok": null,
+    "textOutputPerMTok": null,
+    "liveAudioInputPerMTok": null,
+    "liveTextInputPerMTok": null,
+    "liveAudioOutputPerMTok": null,
+    "note": "Fill from the official Gemini API pricing page on the day of the deck; thinking tokens are billed as output. Not read here (R-001)."
+  }
+}

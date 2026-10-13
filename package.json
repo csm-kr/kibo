@@ -13,6 +13,7 @@
     "test:firestore": "FIRESTORE_IT=1 STORE=firestore vitest run src/lib/store/firestore.it.test.ts",
     "qa:ui": "playwright test -c playwright.qa.config.ts",
     "eval:agent": "tsx --env-file=.env scripts/eval-agent.ts",
+    "measure:cost": "tsx --env-file=.env scripts/measure-cost.ts",
     "fixtures:voice": "tsx --env-file=.env scripts/make-voice-fixtures.ts",
     "shots:landing": "tsx scripts/landing-shots.ts"
   },

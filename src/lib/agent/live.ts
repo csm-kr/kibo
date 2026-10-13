@@ -57,6 +57,22 @@ function tokenError(e: unknown): CommandError {
   return new CommandError("UPSTREAM", "Voice is not available right now. Please type instead.");
 }
 
+/** The Live session config the token pins; scripts/measure-cost.ts connects with the same one. */
+export function liveConnectConfig(system: string, tools: object[], languageCode: string) {
+  return {
+    responseModalities: [Modality.AUDIO],
+    systemInstruction: system,
+    tools: tools as ToolListUnion,
+    // The phone shows what it heard and what the AI said. Without a language, short Korean answers
+    // ("네") came back empty or in another language and menu names were misheard in noise (voice-compare).
+    inputAudioTranscription: { languageCodes: [languageCode] },
+    outputAudioTranscription: {},
+    realtimeInputConfig: {
+      automaticActivityDetection: { endOfSpeechSensitivity: EndSensitivity.END_SENSITIVITY_HIGH, silenceDurationMs: SILENCE_MS },
+    },
+  };
+}
+
 /** `ai` is injectable for tests; production builds the client on first use, so a missing key is an UPSTREAM error. */
 export function geminiTokenIssuer(ai?: Pick<GoogleGenAI, "authTokens">): LiveTokenIssuer {
   return {
@@ -71,21 +87,7 @@ export function geminiTokenIssuer(ai?: Pick<GoogleGenAI, "authTokens">): LiveTok
             expireTime,
             newSessionExpireTime,
             // With constraints and no lockAdditionalFields, the browser cannot change any LiveConnectConfig field.
-            liveConnectConstraints: {
-              model,
-              config: {
-                responseModalities: [Modality.AUDIO],
-                systemInstruction: system,
-                tools: tools as ToolListUnion,
-                // The phone shows what it heard and what the AI said. Without a language, short Korean answers
-                // ("네") came back empty or in another language and menu names were misheard in noise (voice-compare).
-                inputAudioTranscription: { languageCodes: [languageCode] },
-                outputAudioTranscription: {},
-                realtimeInputConfig: {
-                  automaticActivityDetection: { endOfSpeechSensitivity: EndSensitivity.END_SENSITIVITY_HIGH, silenceDurationMs: SILENCE_MS },
-                },
-              },
-            },
+            liveConnectConstraints: { model, config: liveConnectConfig(system, tools, languageCode) },
             httpOptions: { apiVersion: "v1alpha" },
           },
         });

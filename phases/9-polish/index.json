@@ -37,7 +37,10 @@
     {
       "step": 4,
       "name": "cost-measure",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-13T10:31:12+0900",
+      "summary": "Tokens per MALO hero order (4 turns: order, fries large, no dessert, I'll pay), 3 runs each, in evidence/cost-per-order.json (counts only, prices null 'fill from the official pricing page'). Text (gemini-3.8-flash, low, API key via .env I-125): median 90,393 tokens/order, 9 calls, prompt 89,696 (7,585 cached), output 367, thoughts 292, hero cart 3/3 (all ended paying: the AI opened the review on 'No, thanks' and its confirm on 'I'll pay' was accepted by the server rules). Voice (gemini-3.8-live, Live from Node with the token's config via new liveConnectConfig() in src/lib/agent/live.ts; turns 1-2 TTS fixtures, 3-4 typed): median 91,795 tokens/order (prompt 91,217, ~4,900 audio, 0 cached; output 578; thoughts 700 not in Live's total), ~34 s, hero cart 2/3; 1 of 4 attempts stalled on turn 1 (kept as failedAttempts, I-139). Code: tokenUsage() + ModelClient usage field in src/lib/agent/model.ts (tested), scripts/measure-cost.ts, npm run measure:cost. Live usage arrives with each generation's turnComplete; a turn ends at the first turnComplete without a tool call. Docs: TESTING Measurements + ledger row, ISSUE I-139. Lint, build, 720 unit passed, measure:cost ran.",
+      "completed_at": "2026-10-13T10:58:00+0900"
     },
     {
       "step": 5,
