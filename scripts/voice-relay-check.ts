@@ -1,5 +1,5 @@
 // npm run voice:relay-check: one real check of the kibo-voice relay (12-phone-app:8), cost about one short Live turn.
-// 1. The esbuild bundle (voice-relay/dist/server.cjs) starts and answers /healthz.
+// 1. The esbuild bundle (voice-relay/dist/server.cjs) starts and answers /health.
 // 2. The relay runs in this process with the memory store and real Vertex AI Live (gcloud application default
 //    credentials, VOICE_VERTEX_LOCATION or us-central1); a /demo session sends one text turn through it.
 // Prints timings and counts only: no audio, no transcript, no token.
@@ -21,7 +21,7 @@ async function bundleHealth(): Promise<boolean> {
   try {
     for (let i = 0; i < 50; i++) {
       await new Promise((r) => setTimeout(r, 200));
-      const res = await fetch(`http://127.0.0.1:${BUNDLE_PORT}/healthz`).catch(() => null);
+      const res = await fetch(`http://127.0.0.1:${BUNDLE_PORT}/health`).catch(() => null);
       if (res?.ok) return ((await res.json()) as { ok?: boolean }).ok === true;
     }
     return false;

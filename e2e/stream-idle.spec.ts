@@ -1,9 +1,10 @@
 import { expect, test, type Page } from "@playwright/test";
-import { buttonWithText, claim, command, kioskRoot, readClaim, storedKioskSession } from "./helpers";
+import { claim, command, kioskRoot, readClaim, storedKioskSession } from "./helpers";
 
-// 12-phone-app:7: a screen with no session change and no input closes its session stream and shows "Paused · Tap
-// to continue" (20 min in production, src/lib/client/streamControl.ts). Here the idle time is 3 s, set through the
-// E2E-only window value that useSessionStream reads.
+// 12-phone-app:7: a phone or /demo screen with no session change and no input closes its session stream and shows
+// "Paused · Tap to continue" (20 min in production, src/lib/client/streamControl.ts). Kiosk screens never pause
+// while visible (12-phone-app:10, I-172). Here the idle time is 3 s, set through the E2E-only window value that
+// useSessionStream reads.
 
 const IDLE_MS = 3_000;
 
@@ -17,7 +18,7 @@ async function shortIdle(page: Page) {
 
 const cheeseSet = { itemId: "cheese_burger", variant: "set", qty: 1, selections: { drink: ["zero_cola"] } };
 
-test("an idle kiosk pauses, resumes on the same screen with the cart, and the tap presses nothing under it", async ({ page, request }) => {
+test("a visible kiosk never pauses: after the idle time it still mirrors a change at once (I-172)", async ({ page, request }) => {
   await shortIdle(page);
   await page.goto("/kiosk?k=malo");
   const root = kioskRoot(page);
@@ -26,30 +27,23 @@ test("an idle kiosk pauses, resumes on the same screen with the cart, and the ta
   await page.getByRole("button", { name: "매장에서 먹기" }).click();
   await expect(root).toHaveAttribute("data-screen", "menu");
 
-  const layer = page.locator("[data-stream-paused]");
-  await expect(layer).toBeVisible({ timeout: IDLE_MS + 5_000 });
-  await expect(layer).toContainText("일시정지됨 · 화면을 누르면 계속합니다");
-  await expect(layer).toContainText("Paused · Tap to continue");
-  await expect(layer).toBeFocused();
-
-  // A change while paused does not reach the kiosk: its stream is closed.
+  // Well past the (shortened) idle time with no input, the stream is still open.
+  await page.waitForTimeout(IDLE_MS * 2);
+  await expect(page.locator("[data-stream-paused]")).toHaveCount(0);
   const { sessionId, kioskToken } = await storedKioskSession(page);
   await command(request, kioskToken, { sessionId, type: "addToCart", args: cheeseSet, source: "touch" });
-  const cart = page.getByRole("region", { name: "장바구니" });
-  // Time for a frame to arrive if the stream were still open.
-  await page.waitForTimeout(1_000);
-  await expect(cart.getByText(/치즈버거 세트/)).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "장바구니" }).getByText(/치즈버거 세트/)).toBeVisible();
+});
 
-  // Tap right where the cheeseburger tile lies: the layer takes the whole tap, so no product sheet opens.
-  const tile = await buttonWithText(page, "치즈버거").boundingBox();
-  expect(tile).not.toBeNull();
-  await page.mouse.click(tile!.x + tile!.width / 2, tile!.y + tile!.height / 2);
-  await expect(layer).toBeHidden();
-  await expect(page.getByRole("dialog")).toHaveCount(0);
-
-  // The reopened stream's first frame is a full snapshot: same screen, and the change made while paused.
-  await expect(root).toHaveAttribute("data-screen", "menu");
-  await expect(cart.getByText(/치즈버거 세트/)).toBeVisible();
+test("/demo Use my phone instead is the kiosk, so it never pauses either (I-172)", async ({ page }) => {
+  await shortIdle(page);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/demo?k=malo");
+  await page.getByRole("button", { name: "Use my phone instead" }).click();
+  await expect(page.locator("[data-panel-qr]")).toBeVisible();
+  await page.waitForTimeout(IDLE_MS * 2);
+  await expect(page.locator("[data-stream-paused]")).toHaveCount(0);
+  await expect(page.locator("[data-panel-qr]")).toBeVisible();
 });
 
 test("an idle phone pauses mid-order and resumes with the cart; a paid order keeps its number in view", async ({ page, request }) => {

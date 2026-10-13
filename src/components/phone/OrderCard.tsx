@@ -20,16 +20,18 @@ export function OrderLines({ kiosk, cart, locale }: { kiosk: KioskData; cart: Ca
         const item = findItem(kiosk, line.itemId);
         const { title, detail } = lineLabel(kiosk, line, locale);
         return (
-          <li key={line.lineId} className="flex items-start gap-3 py-3">
+          // The name never shrinks below its longest word; when the row cannot also hold the price (320px wide), the
+          // price wraps to its own row on the right instead of running into the name.
+          <li key={line.lineId} className="flex flex-wrap items-start gap-x-3 gap-y-1 py-3">
             {/* A learned kiosk has no photos, only a placeholder that reads as a broken picture (I-103). */}
             {item && kiosk.kind !== "learned" && (
               <Image src={item.image} alt="" width={48} height={48} className="size-12 flex-none rounded-[12px] bg-cream object-cover" />
             )}
-            <div className="min-w-0 flex-1">
+            <div className="flex-1">
               <p className="text-xl leading-snug font-semibold">{title}</p>
               {detail && <p className="text-base text-muted">{detail}</p>}
             </div>
-            <div className="flex flex-none flex-col items-end gap-1">
+            <div className="ml-auto flex flex-none flex-col items-end gap-1">
               <p className="text-xl font-semibold tabular-nums">{formatWon(line.unitPrice * line.qty, locale)}</p>
               <p className="rounded-full bg-cream px-2 text-base text-muted tabular-nums">{qtyText(line.qty, locale)}</p>
             </div>

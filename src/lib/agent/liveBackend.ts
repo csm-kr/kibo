@@ -34,11 +34,11 @@ export function voiceRelayUrl(): string | null {
   }
 }
 
-/** The relay's GET /healthz on the same host. */
-export function relayHealthzUrl(relayUrl: string): string {
+/** The relay's GET /health on the same host. */
+export function relayHealthUrl(relayUrl: string): string {
   const url = new URL(relayUrl);
   url.protocol = url.protocol === "wss:" ? "https:" : "http:";
-  url.pathname = "/healthz";
+  url.pathname = "/health";
   url.search = "";
   return url.toString();
 }

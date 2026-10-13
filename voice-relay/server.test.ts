@@ -45,9 +45,9 @@ function messages(ws: WebSocket, n: number): Promise<unknown[]> {
 }
 
 describe("kibo-voice server", () => {
-  it("GET /healthz answers ok; other paths 404", async () => {
+  it("GET /health answers ok; other paths 404", async () => {
     const host = await relay();
-    const health = await fetch(`http://${host}/healthz`);
+    const health = await fetch(`http://${host}/health`);
     expect(health.status).toBe(200);
     expect(await health.json()).toMatchObject({ ok: true, service: "kibo-voice" });
     expect((await fetch(`http://${host}/`)).status).toBe(404);

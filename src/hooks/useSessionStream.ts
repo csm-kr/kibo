@@ -23,10 +23,13 @@ function idleMsOverride(): number | undefined {
  * Reads the session through the server's SSE route (ADR-010). EventSource reconnects on its own. The stream closes
  * after 60 s in a hidden tab and reopens when it is visible; after 20 min with no session change and no input it
  * pauses (`paused`) until `resume()`, which the screen calls from its "Paused · Tap to continue" layer
- * (src/lib/client/streamControl.ts). The last session stays while closed; the first frame after reopening is a
- * full snapshot.
+ * (src/lib/client/streamControl.ts). Kiosk screens pass `idlePause: false` and never pause while visible (I-172).
+ * The last session stays while closed; the first frame after reopening is a full snapshot.
  */
-export function useSessionStream(sessionId: string | null): {
+export function useSessionStream(
+  sessionId: string | null,
+  { idlePause = true }: { idlePause?: boolean } = {},
+): {
   session: Session | null;
   state: StreamState;
   paused: boolean;
@@ -69,6 +72,7 @@ export function useSessionStream(sessionId: string | null): {
       open,
       onPause: (p) => setPausedFor(p ? sessionId : null),
       idleMs: idleMsOverride(),
+      idlePause,
     });
     control.current = ctl;
     const onVisibility = () => ctl.setHidden(document.visibilityState === "hidden");
@@ -84,7 +88,7 @@ export function useSessionStream(sessionId: string | null): {
       ctl.stop();
       if (control.current === ctl) control.current = null;
     };
-  }, [sessionId]);
+  }, [sessionId, idlePause]);
 
   const resume = useCallback(() => control.current?.resume(), []);
   const paused = sessionId !== null && pausedFor === sessionId;

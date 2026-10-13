@@ -34,7 +34,10 @@ export function useDemoSession(kioskId: string) {
   const [clockOffset, setClockOffset] = useState(0);
   const busy = useRef(false);
   const lastActive = useRef(0);
-  const { session, state, paused, resume } = useSessionStream(tokens?.sessionId ?? null);
+  // "Use my phone" makes this page the kiosk, which never pauses while visible (I-172); the judge view with the
+  // simulated phone keeps the 20 min pause.
+  const ownPhone = tokens !== null && !tokens.deviceToken;
+  const { session, state, paused, resume } = useSessionStream(tokens?.sessionId ?? null, { idlePause: !ownPhone });
 
   const start = useCallback(
     async (pairPhone = false) => {

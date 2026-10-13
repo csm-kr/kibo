@@ -19,9 +19,9 @@ fail() {
   exit 1
 }
 
-# Prints the revision /healthz reports at $1, or nothing.
+# Prints the revision /health reports at $1, or nothing.
 health_revision() {
-  curl -fsS --max-time 10 "$1/healthz" 2>/dev/null |
+  curl -fsS --max-time 10 "$1/health" 2>/dev/null |
     node -e 'let s="";process.stdin.on("data",(d)=>(s+=d)).on("end",()=>{try{process.stdout.write(JSON.parse(s).revision??"")}catch{}})'
 }
 
@@ -68,6 +68,6 @@ for _ in 1 2 3 4 5 6 7 8 9 10 11 12; do
   [ -n "$AFTER" ] && [ "$AFTER" != "$BEFORE" ] && break
   sleep 5
 done
-[ -n "$AFTER" ] || fail "/healthz did not answer"
-[ "$AFTER" != "$BEFORE" ] || fail "/healthz still reports the old revision $BEFORE"
+[ -n "$AFTER" ] || fail "/health did not answer"
+[ "$AFTER" != "$BEFORE" ] || fail "/health still reports the old revision $BEFORE"
 echo "DEPLOYED $AFTER"

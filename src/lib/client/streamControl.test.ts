@@ -9,7 +9,7 @@ class FakeSource {
   }
 }
 
-function setup(opts: { hidden?: boolean } = {}) {
+function setup(opts: { hidden?: boolean; idlePause?: boolean } = {}) {
   const sources: FakeSource[] = [];
   const onPause = vi.fn();
   const control = new StreamControl({
@@ -19,6 +19,7 @@ function setup(opts: { hidden?: boolean } = {}) {
       return s;
     },
     onPause,
+    ...(opts.idlePause === undefined ? {} : { idlePause: opts.idlePause }),
   });
   control.start(opts.hidden ?? false);
   const openCount = () => sources.filter((s) => !s.closed).length;
@@ -119,6 +120,27 @@ describe("StreamControl: idle screens", () => {
     control.setHidden(true);
     vi.advanceTimersByTime(IDLE_PAUSE_MS);
     expect(onPause).toHaveBeenCalledWith(true);
+  });
+});
+
+describe("StreamControl: kiosk screens (idlePause off, I-172)", () => {
+  it("never pauses a visible kiosk, so its QR stays up and its bridge keeps replaying", () => {
+    const { onPause, openCount } = setup({ idlePause: false });
+    vi.advanceTimersByTime(IDLE_PAUSE_MS * 3);
+    expect(onPause).not.toHaveBeenCalled();
+    expect(openCount()).toBe(1);
+  });
+
+  it("still closes after 60 s hidden and reopens when visible", () => {
+    const { control, sources, onPause, openCount } = setup({ idlePause: false });
+    control.setHidden(true);
+    vi.advanceTimersByTime(HIDDEN_CLOSE_MS);
+    expect(openCount()).toBe(0);
+    vi.advanceTimersByTime(IDLE_PAUSE_MS);
+    control.setHidden(false);
+    expect(onPause).not.toHaveBeenCalled();
+    expect(sources).toHaveLength(2);
+    expect(openCount()).toBe(1);
   });
 });
 

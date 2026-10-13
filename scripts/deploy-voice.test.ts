@@ -10,7 +10,7 @@ interface Run {
   build?: number;
   cloudBuild?: number;
   deploy?: number;
-  /** Revision /healthz reports after the deploy; absent keeps the old one. */
+  /** Revision /health reports after the deploy; absent keeps the old one. */
   newRevision?: string;
 }
 
@@ -77,9 +77,9 @@ describe("scripts/deploy-voice.sh", { timeout: 30_000 }, () => {
     expect(r.calls).not.toContain("gcloud run deploy");
   });
 
-  it("fails when the deploy returns but /healthz still reports the old revision", () => {
+  it("fails when the deploy returns but /health still reports the old revision", () => {
     const r = run({});
-    expect(r.last).toBe("DEPLOY FAILED: /healthz still reports the old revision kibo-voice-00001-old");
+    expect(r.last).toBe("DEPLOY FAILED: /health still reports the old revision kibo-voice-00001-old");
     expect(r.code).toBe(1);
   });
 });

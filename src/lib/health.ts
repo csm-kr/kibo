@@ -7,7 +7,7 @@ import type { SessionStore } from "@/lib/store/types";
 // API key, which voice uses) fail when billing does. Results are cached so a busy uptime check or a
 // curious visitor costs at most six upstream calls a minute.
 
-// liveRelay (12-phone-app:9): the Vertex voice relay's /healthz when VOICE_RELAY_URL is set, else "off". While
+// liveRelay (12-phone-app:9): the Vertex voice relay's /health when VOICE_RELAY_URL is set, else "off". While
 // it answers, voice works without the key (ADR-012), so a failing keyGenerate alone does not fail the check;
 // keyGenerate stays in the body so the key's state is still visible.
 

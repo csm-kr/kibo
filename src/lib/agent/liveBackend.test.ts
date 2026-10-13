@@ -6,7 +6,7 @@ import { MemoryUsageStore, type UsageStore } from "@/lib/limits/usage";
 import { claimSession, createSession } from "@/lib/session/service";
 import { MemoryStore } from "@/lib/store/memory";
 import { geminiTokenIssuer, KeyUnavailableError, type LiveTokenIssuer } from "./live";
-import { createKeyHealth, liveBackendSetting, relayHealthzUrl, startLiveVoice, voiceRelayUrl, type KeyHealth } from "./liveBackend";
+import { createKeyHealth, liveBackendSetting, relayHealthUrl, startLiveVoice, voiceRelayUrl, type KeyHealth } from "./liveBackend";
 
 const T0 = Date.UTC(2026, 9, 13, 9, 0);
 const RELAY = "wss://kibo-voice.example.run.app/ws";
@@ -74,9 +74,9 @@ describe("liveBackendSetting and voiceRelayUrl", () => {
     }
   });
 
-  it("the relay's health URL is /healthz on the same host over http(s)", () => {
-    expect(relayHealthzUrl(RELAY)).toBe("https://kibo-voice.example.run.app/healthz");
-    expect(relayHealthzUrl("ws://localhost:3111/ws")).toBe("http://localhost:3111/healthz");
+  it("the relay's health URL is /health on the same host over http(s)", () => {
+    expect(relayHealthUrl(RELAY)).toBe("https://kibo-voice.example.run.app/health");
+    expect(relayHealthUrl("ws://localhost:3111/ws")).toBe("http://localhost:3111/health");
   });
 });
 

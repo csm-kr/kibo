@@ -136,7 +136,7 @@ function PairForm({ locale }: { locale: Locale }) {
           setCode(e.target.value.replace(/\D/g, "").slice(0, 6));
           setError(null);
         }}
-        className={`min-h-18 w-full rounded-tile border border-field bg-white px-4 text-center font-[family-name:var(--font-grotesk)] text-[2rem] font-bold tracking-[0.3em] tabular-nums placeholder:text-muted/40 ${FOCUS}`}
+        className={`min-h-18 w-full rounded-tile border border-field bg-white px-4 text-center font-[family-name:var(--font-grotesk)] text-[2rem] font-bold tracking-[0.3em] tabular-nums placeholder:font-normal placeholder:text-[#6B655C] ${FOCUS}`}
       />
       {error && (
         <p id="pair-error" role="alert" className="text-xl text-staff-ink">

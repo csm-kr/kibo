@@ -64,7 +64,9 @@ export function useKioskSession(kioskId: string) {
   );
   const stored = useMemo(() => parseStored(raw), [raw]);
   const [clockOffset, setClockOffset] = useState(0);
-  const { session, state, paused, resume } = useSessionStream(stored?.sessionId ?? null);
+  // A kiosk never pauses while visible: it waits on K1 with its QR, and a learned kiosk's bridge replays from this
+  // stream (I-172). The hidden-tab close and the server's 15 min cap still apply.
+  const { session, state } = useSessionStream(stored?.sessionId ?? null, { idlePause: false });
 
   const creating = useRef(false);
   const retryTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -154,8 +156,6 @@ export function useKioskSession(kioskId: string) {
     pairUrl: stored?.pairUrl ?? null,
     session,
     streamState: state,
-    paused,
-    resume,
     clockOffset,
     newSession,
     setClaimUrl,

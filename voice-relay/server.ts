@@ -8,7 +8,7 @@ import { getStore } from "@/lib/store";
 import { relayConnection, type OpenLive } from "./relay";
 
 // kibo-voice: a small Cloud Run service next to the Next.js app (which cannot accept WebSocket upgrades).
-// GET /healthz for checks, /ws for the browser's voice connection (voice-relay/relay.ts).
+// GET /health for checks, /ws for the browser's voice connection (voice-relay/relay.ts).
 
 /** Audio frames are a few KB; anything far larger is not a voice message. */
 const MAX_PAYLOAD = 256 * 1024;
@@ -51,7 +51,7 @@ function ipOf(req: IncomingMessage): string {
 export async function startRelay(opts: { port: number; openLive?: OpenLive }): Promise<{ port: number; close(): Promise<void> }> {
   const openLive = opts.openLive ?? vertexOpenLive();
   const server = createServer((req, res) => {
-    if (req.method === "GET" && req.url === "/healthz") {
+    if (req.method === "GET" && req.url === "/health") {
       res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" });
       res.end(JSON.stringify({ ok: true, service: "kibo-voice", revision: process.env.K_REVISION ?? "local" }));
       return;

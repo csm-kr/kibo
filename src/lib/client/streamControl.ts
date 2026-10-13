@@ -1,6 +1,8 @@
 // When a screen's session stream is open (12-phone-app:7). An open stream keeps a Cloud Run instance billed as
 // active, so a tab nobody looks at must not hold one: a hidden tab closes it after 60 s, and a screen with no
-// session change and no input for 20 min pauses until someone taps it. Plain timers, no DOM, so it is unit-tested.
+// session change and no input for 20 min pauses until someone taps it. Kiosk screens turn the idle pause off
+// (I-172): a kiosk waits on K1 with its QR for a phone, and a learned kiosk's bridge must replay as soon as a phone
+// orders. Plain timers, no DOM, so it is unit-tested.
 
 export const HIDDEN_CLOSE_MS = 60_000;
 export const IDLE_PAUSE_MS = 20 * 60_000;
@@ -23,6 +25,8 @@ export class StreamControl {
       open: () => Closable;
       onPause: (paused: boolean) => void;
       idleMs?: number;
+      /** False on kiosk screens: never pause while visible; the hidden close still applies. Default true. */
+      idlePause?: boolean;
     },
   ) {}
 
@@ -63,6 +67,7 @@ export class StreamControl {
 
   private armIdle(): void {
     clearTimeout(this.idleTimer);
+    if (this.opts.idlePause === false) return;
     this.idleTimer = setTimeout(() => {
       this.paused = true;
       clearTimeout(this.hiddenTimer);

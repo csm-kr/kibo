@@ -1,9 +1,10 @@
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
-import { claim, kioskRoot, readClaim } from "../helpers";
-import { DEMO, KIOSK, PHONE, qaState, type Findings, type Profile } from "./checks";
+import { claim } from "../helpers";
+import { DEMO, PHONE, qaState, type Findings, type Profile } from "./checks";
 
-// UI QA of the "Paused · Tap to continue" layer (12-phone-app:7) over K1, K3, the phone's P3 and /demo D2. The
-// checks scan the layer itself; the screen under it is inert. Idle time is 3 s through the E2E-only window value.
+// UI QA of the "Paused · Tap to continue" layer (12-phone-app:7) over the phone's P3 and /demo D2; kiosk screens
+// never pause (I-172). The checks scan the layer itself; the screen under it is inert. Idle time is 3 s through the
+// E2E-only window value.
 
 const IDLE_MS = 3_000;
 const STRICT = process.env.QA_ALL === "1";
@@ -11,8 +12,6 @@ const STRICT = process.env.QA_ALL === "1";
 test.use({ locale: "en-US", extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.49" } });
 
 const ROOT = "[data-stream-paused]";
-// A full-viewport layer over the kiosk, not on the scaled canvas: kiosk sizes in CSS px.
-const KIOSK_PAUSED: Profile = { route: KIOSK.route, root: ROOT, minFont: 40, minTarget: 40 };
 const PHONE_PAUSED: Profile = { ...PHONE, root: ROOT };
 const DEMO_PAUSED: Profile = { ...DEMO, root: ROOT };
 
@@ -28,20 +27,6 @@ async function checkPaused(page: Page, info: TestInfo, p: Profile, state: string
   expect.soft(f.h, `${state}: H failures`).toEqual([]);
   if (STRICT) expect.soft(f.t, `${state}: T misses`).toEqual([]);
 }
-
-test("kiosk K1 and K3 paused", async ({ page }, info) => {
-  await page.setViewportSize({ width: 1080, height: 1920 });
-  await shortIdle(page);
-  await page.goto("/kiosk?k=malo");
-  await readClaim(page);
-  await checkPaused(page, info, KIOSK_PAUSED, "K1-paused");
-
-  await page.locator(ROOT).click();
-  await page.getByRole("button", { name: /화면을 눌러서 주문/ }).click();
-  await page.getByRole("button", { name: "매장에서 먹기" }).click();
-  await expect(kioskRoot(page)).toHaveAttribute("data-screen", "menu");
-  await checkPaused(page, info, KIOSK_PAUSED, "K3-paused");
-});
 
 test("phone P3 paused", async ({ page, request }, info) => {
   await page.setViewportSize({ width: 390, height: 844 });
