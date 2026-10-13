@@ -18,6 +18,8 @@ const eslintConfig = defineConfig([
     "scripts/**",
     "videos/**",
     ".claude/**",
+    // Generated kibo-voice bundle (npm run voice:build).
+    "voice-relay/dist/**",
   ]),
 ]);
 

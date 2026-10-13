@@ -11,6 +11,8 @@ plan.md
 node_modules/
 .next/
 out/
+# kibo-voice bundle (npm run voice:build)
+voice-relay/dist/
 
 # Harness tooling adapted from github.com/jha0313/harness_framework (no license file, written
 # before the hackathon). Local dev tool only; kept out of the public repo per the fresh-code rule.

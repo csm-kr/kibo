@@ -1,0 +1,19 @@
+# kibo-voice: the voice relay (voice-relay/) as one bundled file. Built by scripts/deploy-voice.sh; the Next.js
+# service keeps ./Dockerfile.
+FROM node:24-slim AS build
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY . .
+RUN npm run voice:build
+# firebase-admin stays outside the bundle (it loads its own files at runtime); install the locked version alone.
+RUN mkdir /out && cp voice-relay/dist/server.cjs /out/ && cd /out && npm init -y >/dev/null && \
+  npm install --omit=dev --no-audit --no-fund "firebase-admin@$(node -p "require('/app/node_modules/firebase-admin/package.json').version")"
+
+FROM node:24-slim AS run
+WORKDIR /app
+ENV NODE_ENV=production PORT=8080
+COPY --from=build /out ./
+USER node
+EXPOSE 8080
+CMD ["node", "server.cjs"]

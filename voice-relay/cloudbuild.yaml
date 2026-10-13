@@ -1,0 +1,5 @@
+# Builds the kibo-voice image from Dockerfile.voice (scripts/deploy-voice.sh passes _IMAGE).
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "-f", "Dockerfile.voice", "-t", "$_IMAGE", "."]
+images: ["$_IMAGE"]

@@ -32,6 +32,7 @@ KIBO is a public demo that must stay up for three weeks of judging, handles a (s
 
 ## Gemini Live tokens
 - `uses: 1`, short expiry, model/instructions/tools pinned with `liveConnectConstraints`, issued only to a valid `deviceToken` before `paying`, counted per session, per address and per day only when a token was created (a failed issue gives the counts back). (Check whether `expireTime` closes an already open connection.)
+- **Voice relay (`kibo-voice`, 12-phone-app:8):** the same checks and counts, run by the same `issueLiveToken`; the device token comes in the first WebSocket message (browsers cannot set WebSocket headers). Instructions and tools are built on the server and never sent to the browser; a client `setup` message is dropped, so the browser cannot change them. The relay ends the session at the same voice time as a token, closes both sides together, limits messages to 256 KB, logs only error names, never audio or transcripts, and holds no key (Vertex AI with the runtime service account).
 
 ## Abuse and cost
 - `max-instances=3`, per-IP rate limit (last `X-Forwarded-For` hop; IPv6 by /64 prefix), per-session, per-address-per-day and daily caps on voice and chat (so one address cannot spend everyone's day), a cap on open session streams per address (so one address cannot hold every Cloud Run request slot), input and output limits, Gemini per-minute quota cap. Details in `docs/ARCHITECTURE.md`.
