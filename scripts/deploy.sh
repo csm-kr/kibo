@@ -2,7 +2,8 @@
 # Deploys KIBO to Cloud Run from source (Cloud Build runs the Dockerfile). Run by a person, never by the app.
 # The region is explicit: the local gcloud default points elsewhere. GEMINI_API_KEY comes from Secret Manager
 # and serves voice (ephemeral tokens) and the text agent; with GEMINI_TEXT_BACKEND=auto the text agent falls back
-# to Vertex AI (as the runtime service account) when the key fails on billing, quota or server errors.
+# to Vertex AI (as the runtime service account) when the key fails on billing, quota or server errors, and with
+# VOICE_RELAY_URL set, voice falls back to the kibo-voice relay when the key cannot pay.
 # Flags are explained in docs/plan/OPERATIONS.md "Deploy".
 # A failed Cloud Build leaves the old revision serving, so /api/health alone looks fine: the script succeeds only
 # when /api/health reports a revision other than the one serving before. The last line is DEPLOYED or DEPLOY FAILED.
@@ -40,6 +41,21 @@ case "$SHORT_APP_URL" in
   *[!a-z0-9.-]*) fail "SHORT_APP_URL must be a bare host such as kibo-2026.web.app" ;;
 esac
 
+# The kibo-voice relay (scripts/deploy-voice.sh, deployed first): with it, voice falls back to Vertex AI Live when
+# the key's prepaid credits run out (ADR-012). Unset leaves voice on the key only.
+VOICE_RELAY_URL=${VOICE_RELAY_URL:-}
+if [ -n "$VOICE_RELAY_URL" ]; then
+  RELAY_HOST=${VOICE_RELAY_URL#wss://}
+  RELAY_HOST=${RELAY_HOST%/ws}
+  case "$VOICE_RELAY_URL" in
+    wss://*/ws) ;;
+    *) fail "VOICE_RELAY_URL must look like wss://kibo-voice-<number>.<region>.run.app/ws" ;;
+  esac
+  case "$RELAY_HOST" in
+    "" | *[!a-z0-9.-]*) fail "VOICE_RELAY_URL must look like wss://kibo-voice-<number>.<region>.run.app/ws" ;;
+  esac
+fi
+
 URL=$(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format 'value(status.url)' 2>/dev/null || true)
 BEFORE=""
 [ -n "$URL" ] && BEFORE=$(health_revision "$URL")
@@ -58,7 +74,7 @@ gcloud run deploy "$SERVICE" \
   --cpu 1 \
   --memory 1Gi \
   --set-secrets GEMINI_API_KEY=gemini-api-key:latest \
-  --set-env-vars STORE=firestore,GOOGLE_CLOUD_PROJECT=$PROJECT,GEMINI_TEXT_BACKEND=auto,GEMINI_TEXT_MODEL=gemini-3.8-flash,GEMINI_TEXT_THINKING=low,GEMINI_LIVE_MODEL=gemini-3.8-live,PUBLIC_ORIGIN=$PUBLIC_ORIGIN${SHORT_APP_URL:+,SHORT_APP_URL=$SHORT_APP_URL} ||
+  --set-env-vars STORE=firestore,GOOGLE_CLOUD_PROJECT=$PROJECT,GEMINI_TEXT_BACKEND=auto,GEMINI_TEXT_MODEL=gemini-3.8-flash,GEMINI_TEXT_THINKING=low,GEMINI_LIVE_MODEL=gemini-3.8-live,GEMINI_LIVE_BACKEND=auto,PUBLIC_ORIGIN=$PUBLIC_ORIGIN${SHORT_APP_URL:+,SHORT_APP_URL=$SHORT_APP_URL}${VOICE_RELAY_URL:+,VOICE_RELAY_URL=$VOICE_RELAY_URL} ||
   fail "gcloud run deploy failed (the old revision ${BEFORE:-none} is still serving)"
 
 URL=$(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format 'value(status.url)') ||

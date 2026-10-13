@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import pkg from "../../../../package.json";
+import { relayHealthzUrl, voiceRelayUrl } from "@/lib/agent/liveBackend";
 import { textModels } from "@/lib/agent/model";
 import { createDeepHealth } from "@/lib/health";
 import { clientIp, fail, ok } from "@/lib/http";
@@ -26,6 +27,11 @@ const deepHealth = createDeepHealth({
   text: textModels,
   // Ephemeral tokens exist only in v1alpha, as in src/lib/agent/live.ts.
   liveTokens: () => (tokenAi ??= new GoogleGenAI({ apiKey: apiKey(), httpOptions: { apiVersion: "v1alpha" } })).authTokens,
+  // The Vertex voice relay (kibo-voice), when VOICE_RELAY_URL is set.
+  liveRelay: () => {
+    const url = voiceRelayUrl();
+    return url ? async () => (await fetch(relayHealthzUrl(url), { cache: "no-store" })).ok : null;
+  },
   textModel: process.env.GEMINI_TEXT_MODEL ?? "gemini-3.8-flash",
   liveModel: process.env.GEMINI_LIVE_MODEL ?? "gemini-3.8-live",
   now: Date.now,

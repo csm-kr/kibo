@@ -1,0 +1,54 @@
+{
+  "about": "Voice order E2E on /demo through the kibo-voice relay to Vertex AI Live (relay mode of e2e/voice.live.spec.ts, `npm run test:e2e:live`): GEMINI_LIVE_BACKEND=vertex; the relay and a dev server run in one local process (scripts/e2e-relay-stack.ts), so the browser → relay hop is local, not Cloud Run; Vertex AI in VOICE_VERTEX_LOCATION or us-central1. Synthetic TTS voice (Gemini TTS, e2e/fixtures) through Chromium's fake microphone on a laptop, not a real phone. End of speech = the last voiced 40 ms mic frame sent to Live before the model's first output; the page sends the looping fixture once. (a) end of speech → first AI audio chunk; (b) end of speech → first 2 s highlight ring on the kiosk half. Medians over passing runs.",
+  "model": "gemini-3.8-live",
+  "firstRun": "2026-10-13T09:23:34.155Z",
+  "lastRun": "2026-10-13T09:24:02.744Z",
+  "summary": {
+    "runs": 2,
+    "passed": 2,
+    "aMedianMs": 2122,
+    "bMedianMs": 1148,
+    "byFixture": {
+      "hero-en": {
+        "runs": 1,
+        "passed": 1,
+        "aMedianMs": 2089,
+        "bMedianMs": 1212
+      },
+      "hero-ko": {
+        "runs": 1,
+        "passed": 1,
+        "aMedianMs": 2155,
+        "bMedianMs": 1084
+      }
+    }
+  },
+  "runs": [
+    {
+      "at": "2026-10-13T09:23:34.155Z",
+      "fixture": "hero-en",
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 2089,
+      "bMs": 1212,
+      "toolMs": 877,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ]
+    },
+    {
+      "at": "2026-10-13T09:24:02.744Z",
+      "fixture": "hero-ko",
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 2155,
+      "bMs": 1084,
+      "toolMs": 864,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ]
+    }
+  ]
+}

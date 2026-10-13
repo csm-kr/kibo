@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { createDeepHealth, type DeepHealthDeps } from "./health";
 
-const ALL_OK = { store: "ok", textModel: "ok", liveModel: "ok", textGenerate: "ok", keyGenerate: "ok", liveToken: "ok" };
+const ALL_OK = { store: "ok", textModel: "ok", liveModel: "ok", textGenerate: "ok", keyGenerate: "ok", liveToken: "ok", liveRelay: "off" };
 const ONE_TOKEN = { model: "text-model", contents: "Reply with OK", config: { maxOutputTokens: 1 } };
 
 function deps(over: Partial<DeepHealthDeps> = {}): DeepHealthDeps {
@@ -54,6 +54,30 @@ describe("deep health", () => {
     expect(log).toHaveBeenCalledWith("health keyGenerate:", "Error 402");
   });
 
+  it("no relay configured: liveRelay is off and does not change ok", async () => {
+    expect((await createDeepHealth(deps({ liveRelay: () => null }))()).checks.liveRelay).toBe("off");
+  });
+
+  it("a healthy relay keeps voice working, so a failing keyGenerate is ok; the key status stays in the body", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const reachable = vi.fn().mockResolvedValue(true);
+    const check = createDeepHealth(
+      deps({ api: () => ({ get: vi.fn().mockResolvedValue({}), generateContent: billing }), liveRelay: () => reachable }),
+    );
+    expect(await check()).toEqual({ ok: true, checks: { ...ALL_OK, keyGenerate: "fail", liveRelay: "ok" } });
+    expect(reachable).toHaveBeenCalledTimes(1);
+  });
+
+  it("a configured relay that is down fails, even with a working key; with the key down too, not ok", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const down = createDeepHealth(deps({ liveRelay: () => vi.fn().mockResolvedValue(false) }));
+    expect(await down()).toEqual({ ok: false, checks: { ...ALL_OK, liveRelay: "fail" } });
+    const both = createDeepHealth(
+      deps({ api: () => ({ get: vi.fn().mockResolvedValue({}), generateContent: billing }), liveRelay: () => () => Promise.reject(new TypeError("fetch failed")) }),
+    );
+    expect(await both()).toEqual({ ok: false, checks: { ...ALL_OK, keyGenerate: "fail", liveRelay: "fail" } });
+  });
+
   it("text backend billing failure fails textGenerate only", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     const check = createDeepHealth(deps({ text: () => ({ generateContent: billing }) }));
@@ -97,7 +121,7 @@ describe("deep health", () => {
     const check = createDeepHealth(deps({ api: noKey, liveTokens: noKey }));
     expect(await check()).toEqual({
       ok: false,
-      checks: { store: "ok", textModel: "fail", liveModel: "fail", textGenerate: "ok", keyGenerate: "fail", liveToken: "fail" },
+      checks: { store: "ok", textModel: "fail", liveModel: "fail", textGenerate: "ok", keyGenerate: "fail", liveToken: "fail", liveRelay: "off" },
     });
   });
 
@@ -114,7 +138,7 @@ describe("deep health", () => {
     );
     expect(await check()).toEqual({
       ok: false,
-      checks: { store: "ok", textModel: "fail", liveModel: "fail", textGenerate: "fail", keyGenerate: "fail", liveToken: "fail" },
+      checks: { store: "ok", textModel: "fail", liveModel: "fail", textGenerate: "fail", keyGenerate: "fail", liveToken: "fail", liveRelay: "off" },
     });
   });
 

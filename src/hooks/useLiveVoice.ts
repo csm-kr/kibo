@@ -1,6 +1,6 @@
 "use client";
 
-import type { FunctionCall, FunctionResponse, LiveServerMessage, Session as LiveSession } from "@google/genai";
+import type { FunctionCall, FunctionResponse, LiveServerMessage } from "@google/genai";
 import { useEffect, useState } from "react";
 import type { AgentAction } from "@/lib/agent/actions";
 import { ApiError, liveToken, sendCommand } from "@/lib/client/api";
@@ -8,14 +8,16 @@ import { errorCopy } from "@/lib/i18n/errors";
 import { pt } from "@/lib/i18n/phone";
 import { e2eFrame, e2eMarks, e2eOutput, frameRms } from "@/lib/voice/e2eMarks";
 import { base64ToFloat32, downsampleTo16k, int16ToBase64 } from "@/lib/voice/pcm";
+import { connectRelay, relayCloseOutcome, type LiveLink } from "@/lib/voice/relayLink";
 import { runToolCalls } from "@/lib/voice/toolRunner";
 import { initialTurns, noiseStep, raiseSeq, turnEvents, turnsReducer, type TurnEvent } from "@/lib/voice/turns";
 import type { KioskData, Locale } from "@/types/menu";
 import type { CartLine, Session, SessionStatus } from "@/types/session";
 
 // The phone's Gemini Live connection (ADR-003, docs/ARCHITECTURE.md "Voice"): audio goes straight to Gemini with a
-// one-use token; tool calls go to /api/command. Half-duplex, reconnect, then text. Audio, transcripts and tokens
-// are never logged.
+// one-use token, or through the Vertex relay when /api/live-token says so (ADR-012; the same Live messages, so one
+// handler serves both); tool calls go to /api/command. Half-duplex, reconnect, then text. Audio, transcripts and
+// tokens are never logged.
 
 export type VoiceState = "off" | "connecting" | "listening" | "thinking" | "speaking" | "reconnecting" | "error";
 
@@ -54,12 +56,14 @@ const MAX_RETRIES = 2;
 const RETRY_DELAY_MS = 1000;
 /** The SDK's connect waits for setupComplete and never settles if the socket closes first. */
 const SETUP_TIMEOUT_MS = 10_000;
+/** The relay checks the session and opens Vertex first, with its own 10 s limits; give it room to say why it failed. */
+const RELAY_SETUP_TIMEOUT_MS = 15_000;
 
 interface Run {
   ctx: AudioContext;
   stream: MediaStream | null;
   worklet: AudioWorkletNode | null;
-  live: LiveSession | null;
+  live: LiveLink | null;
   /** The current connection; callbacks of an older one see another id and do nothing. */
   liveSessionId: string;
   release: (() => void) | null;
@@ -169,8 +173,12 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
   }
 
   function failure(e: unknown): string {
-    if (e instanceof ApiError && e.code === "RATE_LIMITED") return pt("voiceBusy", o.locale);
-    if (e instanceof ApiError && e.code === "UPSTREAM") return errorCopy("UPSTREAM", o.locale);
+    return failureFor(e instanceof ApiError ? e.code : null);
+  }
+
+  function failureFor(code: string | null): string {
+    if (code === "RATE_LIMITED") return pt("voiceBusy", o.locale);
+    if (code === "UPSTREAM") return errorCopy("UPSTREAM", o.locale);
     return pt("voiceFailed", o.locale);
   }
 
@@ -298,30 +306,61 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     r.timer = setInterval(tick, 1000);
   }
 
-  /** Fetches a token and opens a connection. Token errors throw; a dropped socket goes to reconnect. */
+  /** Asks /api/live-token how to start and opens a connection. Token errors throw; a dropped socket goes to
+   *  reconnect, which asks again, so a key that works again sends the phone back to the direct path. */
   async function connect(r: Run) {
     const { sessionId, deviceToken, locale } = o;
     if (!sessionId || !deviceToken) throw new Error("no session");
     const t = await liveToken({ sessionId, token: deviceToken, locale });
     if (r.stopped) return;
-    // The countdown runs from the first token of this start; reconnects keep it.
-    if (r.deadline === 0) startClock(r, t.voiceSeconds);
-    const { GoogleGenAI } = await import("@google/genai");
-    if (r.stopped) return;
+    // The countdown runs from the first token of this start (the relay's arrives when it is ready); reconnects keep it.
+    if (t.mode === "direct" && r.deadline === 0) startClock(r, t.voiceSeconds);
     const id = crypto.randomUUID();
     r.liveSessionId = id;
+    const setupTimer = setTimeout(
+      () => {
+        if (r.liveSessionId === id && !r.live) void reconnect(r);
+      },
+      t.mode === "relay" ? RELAY_SETUP_TIMEOUT_MS : SETUP_TIMEOUT_MS,
+    );
+    const onmessage = (m: LiveServerMessage) => {
+      if (r.liveSessionId === id) onMessage(r, id, m);
+    };
+    const opened = (live: LiveLink) => {
+      clearTimeout(setupTimer);
+      if (r.liveSessionId === id) r.live = live;
+      else live.close();
+    };
+
+    if (t.mode === "relay") {
+      // The relay holds the instructions (with the current cart, marked applied) and tools; the device token goes
+      // in its first message.
+      void connectRelay(t.url, { sessionId, deviceToken, locale }, {
+        onready: (info) => {
+          if (r.liveSessionId === id && r.deadline === 0) startClock(r, info.voiceSeconds);
+        },
+        onmessage,
+        onclose: (code) => {
+          clearTimeout(setupTimer);
+          if (r.liveSessionId !== id) return;
+          const outcome = relayCloseOutcome(code);
+          if (outcome === "retry") return void reconnect(r);
+          end(r, "error", outcome === "timeUp" ? pt("voiceTimeUp", o.locale) : failureFor(outcome));
+        },
+      }).then(opened);
+      return;
+    }
+
+    const { GoogleGenAI } = await import("@google/genai");
+    // Stopped or replaced while the SDK loaded.
+    if (r.liveSessionId !== id) return clearTimeout(setupTimer);
     // Model, instructions (with the current cart, marked applied) and tools are pinned in the token.
     const ai = new GoogleGenAI({ apiKey: t.token, httpOptions: { apiVersion: "v1alpha" } });
-    const setupTimer = setTimeout(() => {
-      if (r.liveSessionId === id && !r.live) void reconnect(r);
-    }, SETUP_TIMEOUT_MS);
     ai.live
       .connect({
         model: t.model,
         callbacks: {
-          onmessage: (m) => {
-            if (r.liveSessionId === id) onMessage(r, id, m);
-          },
+          onmessage,
           onclose: () => {
             clearTimeout(setupTimer);
             if (r.liveSessionId === id) void reconnect(r);
@@ -330,11 +369,7 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
           onerror: () => {},
         },
       })
-      .then((live) => {
-        clearTimeout(setupTimer);
-        if (r.liveSessionId === id) r.live = live;
-        else live.close();
-      })
+      .then(opened)
       .catch(() => {
         clearTimeout(setupTimer);
         if (r.liveSessionId === id) void reconnect(r);

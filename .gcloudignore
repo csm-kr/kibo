@@ -2,6 +2,7 @@
 # The image needs package*.json, next.config.ts, tsconfig.json, src/, data/, public/ (and skills/ once it exists).
 node_modules
 .next
+.next-e2e-relay
 .git
 .env
 .env.*

@@ -12,6 +12,13 @@ vi.mock("@/lib/agent/live", async (orig) => ({
   ...(await orig<typeof import("@/lib/agent/live")>()),
   geminiTokenIssuer: () => ({ create }),
 }));
+// The key probe would call Gemini; each test says whether the key can generate.
+const keyUsable = vi.fn();
+vi.mock("@/lib/agent/liveBackend", async (orig) => ({
+  ...(await orig<typeof import("@/lib/agent/liveBackend")>()),
+  sharedKeyHealth: () => ({ usable: keyUsable, failed: () => {} }),
+}));
+const RELAY = "wss://kibo-voice.example.run.app/ws";
 
 const KEY = "AIza-test-key-never-sent";
 
@@ -19,7 +26,11 @@ beforeEach(() => {
   resetLimits();
   create.mockReset();
   create.mockResolvedValue({ name: "auth_tokens/abc" });
+  keyUsable.mockReset();
+  keyUsable.mockResolvedValue(true);
   vi.stubEnv("GEMINI_API_KEY", KEY);
+  vi.stubEnv("GEMINI_LIVE_BACKEND", "");
+  vi.stubEnv("VOICE_RELAY_URL", "");
 });
 afterEach(() => vi.unstubAllEnvs());
 
@@ -40,10 +51,42 @@ describe("POST /api/live-token", () => {
     expect(res.status).toBe(200);
     expect(text).not.toContain(KEY);
     const body = JSON.parse(text);
-    expect(body).toMatchObject({ ok: true, token: "auth_tokens/abc", model: "gemini-3.8-live", voiceSeconds: 180 });
+    expect(body).toMatchObject({ ok: true, mode: "direct", token: "auth_tokens/abc", model: "gemini-3.8-live", voiceSeconds: 180 });
     expect(typeof body.expiresAt).toBe("number");
     // The instructions travel inside the token, not to the browser.
     expect(text).not.toContain("menu_data");
+  });
+
+  it("GEMINI_LIVE_BACKEND=vertex: only the relay address; no token, instructions or key in the reply", async () => {
+    vi.stubEnv("GEMINI_LIVE_BACKEND", "vertex");
+    vi.stubEnv("VOICE_RELAY_URL", RELAY);
+    const s = await demo();
+    const res = await tokenRequest(s.sessionId, s.deviceToken);
+    const text = await res.text();
+    expect(res.status).toBe(200);
+    expect(JSON.parse(text)).toEqual({ ok: true, mode: "relay", url: RELAY });
+    expect(text).not.toContain(KEY);
+    expect(create).not.toHaveBeenCalled();
+    // Nothing counted here, so a demo session can still ask more than its 2 tokens of the relay's address.
+    for (let i = 0; i < 3; i++) expect((await tokenRequest(s.sessionId, s.deviceToken)).status).toBe(200);
+    expect((await read(await tokenRequest(s.sessionId))).status).toBe(401);
+  });
+
+  it("auto with the key's credits used up (402 from the probe) and a relay: the relay address", async () => {
+    vi.stubEnv("VOICE_RELAY_URL", RELAY);
+    keyUsable.mockResolvedValue(false);
+    const s = await demo();
+    expect((await read(await tokenRequest(s.sessionId, s.deviceToken))).body).toEqual({ ok: true, mode: "relay", url: RELAY });
+    keyUsable.mockResolvedValue(true);
+    expect((await read(await tokenRequest(s.sessionId, s.deviceToken))).body.mode).toBe("direct");
+  });
+
+  it("vertex without VOICE_RELAY_URL: 502 voice not available", async () => {
+    vi.stubEnv("GEMINI_LIVE_BACKEND", "vertex");
+    const s = await demo();
+    const { status, body } = await read(await tokenRequest(s.sessionId, s.deviceToken));
+    expect(status).toBe(502);
+    expect(body.error.code).toBe("UPSTREAM");
   });
 
   it("401 without a token, 403 with the kiosk token", async () => {

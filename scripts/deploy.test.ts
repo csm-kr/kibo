@@ -14,6 +14,8 @@ interface Run {
   newRevision?: string;
   /** SHORT_APP_URL in the deploying shell; absent means unset. */
   shortAppUrl?: string;
+  /** VOICE_RELAY_URL in the deploying shell; absent means unset. */
+  voiceRelayUrl?: string;
 }
 
 function run(opts: Run) {
@@ -43,6 +45,8 @@ esac`,
   const env: NodeJS.ProcessEnv = { ...process.env, PATH: `${bin}:${process.env.PATH}` };
   delete env.SHORT_APP_URL;
   if (opts.shortAppUrl !== undefined) env.SHORT_APP_URL = opts.shortAppUrl;
+  delete env.VOICE_RELAY_URL;
+  if (opts.voiceRelayUrl !== undefined) env.VOICE_RELAY_URL = opts.voiceRelayUrl;
   const out = spawnSync("sh", [join(dir, "scripts/deploy.sh")], { encoding: "utf8", env });
   const lines = out.stdout.trim().split("\n");
   return { code: out.status, last: lines.at(-1), calls: existsSync(log) ? readFileSync(log, "utf8") : "" };
@@ -63,6 +67,23 @@ describe("scripts/deploy.sh", { timeout: 30_000 }, () => {
     expect(r.calls).toContain("PUBLIC_ORIGIN=https://kibo-407514467119.asia-northeast3.run.app");
     // Unset in the deploying shell: the service gets no SHORT_APP_URL and the kiosk shows "<host>/app".
     expect(r.calls).not.toContain("SHORT_APP_URL");
+    // Voice falls back to the relay only when its address is given (ADR-012); the backend is always auto.
+    expect(r.calls).toContain("GEMINI_LIVE_BACKEND=auto");
+    expect(r.calls).not.toContain("VOICE_RELAY_URL");
+  });
+
+  it("passes VOICE_RELAY_URL through when it is set", () => {
+    const r = run({ newRevision: "kibo-00042-new", voiceRelayUrl: "wss://kibo-voice-407514467119.us-central1.run.app/ws" });
+    expect(r.last).toBe("DEPLOYED kibo-00042-new");
+    expect(r.calls).toContain(",VOICE_RELAY_URL=wss://kibo-voice-407514467119.us-central1.run.app/ws");
+  });
+
+  it("refuses a VOICE_RELAY_URL that is not wss://<host>/ws", () => {
+    for (const bad of ["https://kibo-voice.run.app/ws", "wss://kibo-voice.run.app/ws,STORE=memory", "wss://kibo-voice.run.app"]) {
+      const r = run({ newRevision: "kibo-00042-new", voiceRelayUrl: bad });
+      expect(r.last).toBe("DEPLOY FAILED: VOICE_RELAY_URL must look like wss://kibo-voice-<number>.<region>.run.app/ws");
+      expect(r.calls).not.toContain("gcloud run deploy");
+    }
   });
 
   it("passes SHORT_APP_URL through when it is set, next to the unchanged PUBLIC_ORIGIN", () => {

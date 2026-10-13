@@ -9,6 +9,8 @@ const eslintConfig = defineConfig([
   globalIgnores([
     // Default ignores of eslint-config-next:
     ".next/**",
+    // The voice relay E2E stack's dev build (scripts/e2e-relay-stack.ts).
+    ".next-e2e-relay/**",
     "out/**",
     "build/**",
     "next-env.d.ts",

@@ -337,6 +337,19 @@ describe("bumpSessionCounter", () => {
     expect(sec?.chatCount).toBe(2);
   });
 
+  it("checkOnly runs the same checks and answers allowed without counting (the voice relay counts)", async () => {
+    const { store, sessionId, claimToken, kioskToken } = await setup();
+    const { deviceToken } = await claimSession(store, { sessionId, claimToken }, T0);
+    const check = (bearer: string | null, limit = 1) =>
+      bumpSessionCounter(store, { sessionId, bearer, field: "liveTokenCount", limit, checkOnly: true }, T0 + 1);
+    expect((await check(deviceToken)).allowed).toBe(true);
+    expect((await check(deviceToken)).allowed).toBe(true);
+    expect((await check(deviceToken, 0)).allowed).toBe(false);
+    expect(await code(check(kioskToken))).toBe("FORBIDDEN");
+    const sec = await store.transact(sessionId, (_s, sec) => ({ value: sec }));
+    expect(sec?.liveTokenCount ?? 0).toBe(0);
+  });
+
   it("only the phone may use it; unknown NOT_FOUND, expired GONE", async () => {
     const { store, sessionId, claimToken, kioskToken } = await setup();
     const { deviceToken } = await claimSession(store, { sessionId, claimToken }, T0);

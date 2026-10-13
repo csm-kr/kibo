@@ -10,8 +10,34 @@ import { kioskRoot } from "./helpers";
 // mic plays a synthetic TTS sentence (e2e/fixtures, `npm run fixtures:voice`); no real person's voice. The page runs
 // with `?e2e=1`, so useLiveVoice keeps latency marks on window.__kiboVoiceTimings (src/lib/voice/e2eMarks.ts).
 // Every run, pass or fail, is added to evidence/voice-e2e.json: fixture, pass, timings, model. No transcript, no token.
+// Relay mode (ADR-012): the same orders on a second app (scripts/e2e-relay-stack.ts, port 3110) with
+// GEMINI_LIVE_BACKEND=vertex, so the phone's voice goes through the kibo-voice relay to Vertex AI Live; its runs go
+// to evidence/voice-e2e-relay.json.
 
-const EVIDENCE = join(process.cwd(), "evidence/voice-e2e.json");
+const ABOUT_TAIL =
+  "Synthetic TTS voice " +
+  "(Gemini TTS, e2e/fixtures) through Chromium's fake microphone on a laptop, not a real phone. End of speech = the last " +
+  "voiced 40 ms mic frame sent to Live before the model's first output; the page sends the looping fixture once. (a) end of speech → first AI audio chunk; " +
+  "(b) end of speech → first 2 s highlight ring on the kiosk half. Medians over passing runs.";
+
+const MODES = {
+  direct: {
+    evidence: join(process.cwd(), "evidence/voice-e2e.json"),
+    baseURL: undefined as string | undefined,
+    about: "Voice order E2E on /demo with real Gemini Live (e2e/voice.live.spec.ts, `npm run test:e2e:live`). " + ABOUT_TAIL,
+  },
+  relay: {
+    evidence: join(process.cwd(), "evidence/voice-e2e-relay.json"),
+    baseURL: "http://localhost:3110",
+    about:
+      "Voice order E2E on /demo through the kibo-voice relay to Vertex AI Live (relay mode of e2e/voice.live.spec.ts, " +
+      "`npm run test:e2e:live`): GEMINI_LIVE_BACKEND=vertex; the relay and a dev server run in one local process " +
+      "(scripts/e2e-relay-stack.ts), so the browser → relay hop is local, not Cloud Run; Vertex AI in VOICE_VERTEX_LOCATION " +
+      "or us-central1. " +
+      ABOUT_TAIL,
+  },
+};
+type Mode = keyof typeof MODES;
 const kiosk = getKiosk("malo");
 
 interface Run {
@@ -38,18 +64,15 @@ function median(values: number[]): number | null {
   return s.length % 2 ? s[mid] : Math.round((s[mid - 1] + s[mid]) / 2);
 }
 
-function record(run: Run) {
-  const old = existsSync(EVIDENCE) ? (JSON.parse(readFileSync(EVIDENCE, "utf8")) as { runs: Run[] }) : { runs: [] };
+function record(mode: Mode, run: Run) {
+  const { evidence, about } = MODES[mode];
+  const old = existsSync(evidence) ? (JSON.parse(readFileSync(evidence, "utf8")) as { runs: Run[] }) : { runs: [] };
   const runs = [...old.runs, run];
   const passed = runs.filter((r) => r.pass);
   const pick = (k: "aMs" | "bMs", rs: Run[]) => rs.flatMap((r) => (r[k] === null ? [] : [r[k]]));
   const fixtures = [...new Set(runs.map((r) => r.fixture))];
   const out = {
-    about:
-      "Voice order E2E on /demo with real Gemini Live (e2e/voice.live.spec.ts, `npm run test:e2e:live`). Synthetic TTS voice " +
-      "(Gemini TTS, e2e/fixtures) through Chromium's fake microphone on a laptop, not a real phone. End of speech = the last " +
-      "voiced 40 ms mic frame sent to Live before the model's first output; the page sends the looping fixture once. (a) end of speech → first AI audio chunk; " +
-      "(b) end of speech → first 2 s highlight ring on the kiosk half. Medians over passing runs.",
+    about,
     model: passed.find((r) => r.model)?.model ?? runs.find((r) => r.model)?.model ?? null,
     firstRun: runs[0]?.at ?? null,
     lastRun: run.at,
@@ -68,7 +91,7 @@ function record(run: Run) {
     },
     runs,
   };
-  writeFileSync(EVIDENCE, JSON.stringify(out, null, 2) + "\n");
+  writeFileSync(evidence, JSON.stringify(out, null, 2) + "\n");
 }
 
 /** The hero cart: two cheeseburger sets, drinks zero cola and cider, exactly one without pickles. */
@@ -95,7 +118,7 @@ async function startDemo(page: Page) {
 }
 
 /** A browser whose fake mic plays this fixture; launch flags cannot change inside one Playwright worker. */
-async function openPage(fixture: string, n: number, baseURL: string | undefined): Promise<{ page: Page; close(): Promise<void> }> {
+async function openPage(fixture: string, ip: string, baseURL: string | undefined): Promise<{ page: Page; close(): Promise<void> }> {
   const browser = await chromium.launch({
     args: [
       "--use-fake-ui-for-media-stream",
@@ -109,13 +132,20 @@ async function openPage(fixture: string, n: number, baseURL: string | undefined)
     baseURL,
     viewport: { width: 1440, height: 900 },
     // Its own address for the dev server's per-IP limit, like e2e/demo.spec.ts.
-    extraHTTPHeaders: { "X-Forwarded-For": `192.0.2.${30 + n}` },
+    extraHTTPHeaders: { "X-Forwarded-For": ip },
   });
   return { page: await context.newPage(), close: () => browser.close() };
 }
 
-for (const [i, fixture] of ["hero-en", "hero-ko"].entries()) {
-  test.describe(fixture, () => {
+const RUNS: { mode: Mode; fixture: string; ip: string }[] = [
+  { mode: "direct", fixture: "hero-en", ip: "192.0.2.30" },
+  { mode: "direct", fixture: "hero-ko", ip: "192.0.2.31" },
+  { mode: "relay", fixture: "hero-en", ip: "192.0.2.50" },
+  { mode: "relay", fixture: "hero-ko", ip: "192.0.2.51" },
+];
+
+for (const { mode, fixture, ip } of RUNS) {
+  test.describe(`${mode} ${fixture}`, () => {
     let close: (() => Promise<void>) | null = null;
 
     test.afterEach(async ({}, info) => {
@@ -123,23 +153,44 @@ for (const [i, fixture] of ["hero-en", "hero-ko"].entries()) {
       close = null;
       if (!current) return;
       current.pass = info.status === "passed";
-      record(current);
+      record(mode, current);
       current = null;
     });
 
-    test(`@live voice order from a synthetic voice (${fixture}) fills the hero cart on both halves`, async ({}, info) => {
+    const title =
+      mode === "direct"
+        ? `@live voice order from a synthetic voice (${fixture}) fills the hero cart on both halves`
+        : `@live voice order through the Vertex relay (${fixture}) fills the hero cart on both halves`;
+    test(title, async ({}, info) => {
       test.skip(process.env.E2E_LIVE !== "1", "calls real Gemini Live; run `npm run test:e2e:live`");
-      const opened = await openPage(fixture, i, info.project.use.baseURL);
+      const opened = await openPage(fixture, ip, MODES[mode].baseURL ?? info.project.use.baseURL);
       close = opened.close;
       const page = opened.page;
       const run: Run = { at: new Date().toISOString(), fixture, pass: false, model: null, aMs: null, bMs: null, toolMs: null, commands: [] };
       current = run;
 
       let cart: CartLine[] = [];
+      // How /api/live-token told the page to start, and whether any instructions reached the browser on either path.
+      const modes: string[] = [];
+      let leaked = false;
+      page.on("websocket", (ws) => {
+        ws.on("framereceived", ({ payload }) => {
+          const text = typeof payload === "string" ? payload : payload.toString();
+          if (text.includes("menu_data")) leaked = true;
+          // The relay's first message names the model it opened.
+          if (text.startsWith('{"relay"')) run.model ??= (JSON.parse(text) as { relay: { model: string } }).relay.model;
+        });
+      });
       page.on("response", async (res) => {
         if (res.request().method() !== "POST") return;
         try {
-          if (res.url().endsWith("/api/live-token")) run.model ??= ((await res.json()) as { model?: string }).model ?? null;
+          if (res.url().endsWith("/api/live-token")) {
+            const body = await res.text();
+            if (body.includes("menu_data")) leaked = true;
+            const json = JSON.parse(body) as { mode?: string; model?: string };
+            if (json.mode) modes.push(json.mode);
+            run.model ??= json.model ?? null;
+          }
           if (res.url().endsWith("/api/command")) {
             const json = (await res.json()) as { ok: boolean; cart?: CartLine[]; error?: { code: string } };
             if (json.ok && json.cart) cart = json.cart;
@@ -165,6 +216,11 @@ for (const [i, fixture] of ["hero-en", "hero-ko"].entries()) {
       await expect.poll(() => page.evaluate(() => (window as unknown as { __kiboHighlightAt?: number }).__kiboHighlightAt ?? null)).not.toBeNull();
       await mic.click();
       await expect(mic).toHaveAttribute("data-voice-state", "off");
+      expect(leaked, "instructions reached the browser").toBe(false);
+      expect(modes.length).toBeGreaterThan(0);
+      // GEMINI_LIVE_BACKEND=vertex always sends the phone to the relay; direct mode (auto) may also go there while
+      // the key cannot serve voice.
+      if (mode === "relay") expect(new Set(modes)).toEqual(new Set(["relay"]));
 
       const t = await page.evaluate(() => ({
         marks: window.__kiboVoiceTimings!,

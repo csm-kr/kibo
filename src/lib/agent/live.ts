@@ -39,23 +39,36 @@ export interface LiveTokenDeps {
 /** /demo gets 2 tokens and 3 min of voice; a phone gets more tokens because every reconnect needs one. */
 const SESSION_LIMIT = 6;
 const DEMO_SESSION_LIMIT = 2;
+export const liveTokenLimit = (demo: boolean) => (demo ? DEMO_SESSION_LIMIT : SESSION_LIMIT);
 const DAILY_LIMIT = 200;
 const VOICE_SECONDS = 600;
 const DEMO_VOICE_SECONDS = 180;
 /** The phone connects right after it gets the token. */
 const NEW_SESSION_MS = 60_000;
-const BUSY = "Voice is busy right now. Please type instead.";
+export const BUSY = "Voice is busy right now. Please type instead.";
+export const VOICE_UNAVAILABLE = "Voice is not available right now. Please type instead.";
 const LANGUAGE_CODES: Record<Locale, string> = { ko: "ko-KR", en: "en-US" };
 /** End of speech after 700 ms of silence: short answers ("네") sometimes waited 3.5–8.9 s with the default
  *  (spikes/voice-compare/RESULTS.md); not shorter, so slow speakers' pauses do not end their turn. */
 const SILENCE_MS = 700;
 
+/** The Gemini API key cannot serve voice (prepaid credits used up, HTTP 402, or no key). With
+ *  GEMINI_LIVE_BACKEND=auto the phone then goes to the Vertex relay (src/lib/agent/liveBackend.ts). */
+export class KeyUnavailableError extends CommandError {
+  constructor() {
+    super("UPSTREAM", VOICE_UNAVAILABLE);
+  }
+}
+
 function tokenError(e: unknown): CommandError {
   if (e instanceof ApiError && e.status === 429) return new CommandError("RATE_LIMITED", BUSY);
   // Status or name only: the upstream message can echo the request. HTTP 402: the key's prepaid credits are used up.
-  if (e instanceof ApiError && e.status === 402) console.error("gemini billing error (402)");
-  else console.error("live token error:", e instanceof ApiError ? `ApiError ${e.status}` : e instanceof Error ? e.name : typeof e);
-  return new CommandError("UPSTREAM", "Voice is not available right now. Please type instead.");
+  if (e instanceof ApiError && e.status === 402) {
+    console.error("gemini billing error (402)");
+    return new KeyUnavailableError();
+  }
+  console.error("live token error:", e instanceof ApiError ? `ApiError ${e.status}` : e instanceof Error ? e.name : typeof e);
+  return new CommandError("UPSTREAM", VOICE_UNAVAILABLE);
 }
 
 /** The Live session config the token pins; scripts/measure-cost.ts connects with the same one. */
@@ -78,10 +91,13 @@ export function liveConnectConfig(system: string, tools: object[], languageCode:
 export function geminiTokenIssuer(ai?: Pick<GoogleGenAI, "authTokens">): LiveTokenIssuer {
   return {
     async create({ model, system, tools, languageCode, expireTime, newSessionExpireTime }) {
+      // Without a key the SDK would still send a request; refuse before building the client.
+      if (!ai && !process.env.GEMINI_API_KEY) {
+        console.error("live token error: GEMINI_API_KEY is not set");
+        throw new KeyUnavailableError();
+      }
       let token;
       try {
-        // Without a key the SDK would still send a request; refuse before building the client.
-        if (!ai && !process.env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not set");
         // Ephemeral tokens exist only in v1alpha.
         ai ??= new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY, httpOptions: { apiVersion: "v1alpha" } });
         token = await ai.authTokens.create({
@@ -130,7 +146,7 @@ export async function issueLiveToken(
       sessionId: input.sessionId,
       bearer: input.bearer,
       field: "liveTokenCount",
-      limit: known.demo ? DEMO_SESSION_LIMIT : SESSION_LIMIT,
+      limit: liveTokenLimit(known.demo),
       states: BEFORE_PAYING,
     },
     now(),

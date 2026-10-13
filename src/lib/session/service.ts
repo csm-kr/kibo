@@ -383,6 +383,8 @@ export async function bumpSessionCounter(
     limit: number;
     /** States the counted thing is allowed in; another state is CONFLICT before anything is counted (I-150). */
     states?: SessionStatus[];
+    /** The same checks without counting: the voice relay counts the token itself (12-phone-app:9). */
+    checkOnly?: boolean;
   },
   now: number,
 ): Promise<{ allowed: boolean; session: Session }> {
@@ -398,6 +400,7 @@ export async function bumpSessionCounter(
     const count = sec[input.field] ?? 0;
     if (count >= input.limit)
       return { value: { ok: { allowed: false, session: s } } };
+    if (input.checkOnly) return { value: { ok: { allowed: true, session: s } } };
     return {
       secrets: { ...sec, [input.field]: count + 1 },
       value: { ok: { allowed: true, session: s } },

@@ -21,7 +21,10 @@ export function getStore(): SessionStore {
   if (kind === "memory" && process.env.NODE_ENV === "production" && process.env.ALLOW_MEMORY_STORE !== "1") {
     throw new Error("STORE=memory is refused in production; set ALLOW_MEMORY_STORE=1 to allow it on a single instance");
   }
-  // FirestoreStore loads firebase-admin on first use, so the memory branch never loads it.
-  store = kind === "firestore" ? new FirestoreStore() : new MemoryStore();
+  // FirestoreStore loads firebase-admin on first use, so the memory branch never loads it. The memory store sits on
+  // globalThis so a voice relay in the same process (scripts/e2e-relay-stack.ts) sees the dev server's sessions:
+  // Next.js bundles its own copy of this module.
+  const g = globalThis as { __kiboMemoryStore?: SessionStore };
+  store = kind === "firestore" ? new FirestoreStore() : (g.__kiboMemoryStore ??= new MemoryStore());
   return store;
 }

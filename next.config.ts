@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   // The dev "N" badge would show in QA screenshots and demo footage.
   devIndicators: false,
+  // A second dev server (the voice relay E2E stack, scripts/e2e-relay-stack.ts) needs its own folder: Next.js
+  // allows one dev server per folder (.next-e2e-relay, outside .next, which `next build` empties). Unset everywhere else.
+  ...(process.env.KIBO_DIST_DIR ? { distDir: process.env.KIBO_DIST_DIR } : {}),
   experimental: {
     // Playwright starts its dev servers one after another on the same .next/dev; reusing the compile cache there
     // made pages reload in a loop ("[Fast Refresh] rebuilding" on every connect). Off for those servers only.

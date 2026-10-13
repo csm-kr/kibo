@@ -14,12 +14,13 @@ describe("GET /api/health", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     vi.stubEnv("GEMINI_TEXT_BACKEND", "api");
     vi.stubEnv("GEMINI_API_KEY", "");
+    vi.stubEnv("VOICE_RELAY_URL", "");
     try {
       const { status, body } = await read(await GET(new Request(`${BASE}/api/health?deep=1`)));
       expect(status).toBe(503);
       expect(body).toEqual({
         ok: false,
-        checks: { store: "ok", textModel: "fail", liveModel: "fail", textGenerate: "fail", keyGenerate: "fail", liveToken: "fail" },
+        checks: { store: "ok", textModel: "fail", liveModel: "fail", textGenerate: "fail", keyGenerate: "fail", liveToken: "fail", liveRelay: "off" },
       });
     } finally {
       vi.unstubAllEnvs();

@@ -10,6 +10,8 @@ plan.md
 
 node_modules/
 .next/
+# the voice relay E2E stack's dev build (scripts/e2e-relay-stack.ts)
+.next-e2e-relay/
 out/
 # kibo-voice bundle (npm run voice:build)
 voice-relay/dist/

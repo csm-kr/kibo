@@ -7,6 +7,10 @@ import type { SessionStore } from "@/lib/store/types";
 // API key, which voice uses) fail when billing does. Results are cached so a busy uptime check or a
 // curious visitor costs at most six upstream calls a minute.
 
+// liveRelay (12-phone-app:9): the Vertex voice relay's /healthz when VOICE_RELAY_URL is set, else "off". While
+// it answers, voice works without the key (ADR-012), so a failing keyGenerate alone does not fail the check;
+// keyGenerate stays in the body so the key's state is still visible.
+
 export type CheckResult = "ok" | "fail";
 
 export interface DeepHealth {
@@ -18,6 +22,7 @@ export interface DeepHealth {
     textGenerate: CheckResult;
     keyGenerate: CheckResult;
     liveToken: CheckResult;
+    liveRelay: CheckResult | "off";
   };
 }
 
@@ -37,6 +42,8 @@ export interface DeepHealthDeps {
       config: { uses: number; expireTime: string; newSessionExpireTime: string; httpOptions: { apiVersion: string } };
     }): Promise<{ name?: string }>;
   };
+  /** The relay's reachability check, or null when no relay is configured. */
+  liveRelay?: () => (() => Promise<boolean>) | null;
   textModel: string;
   liveModel: string;
   now: () => number;
@@ -79,7 +86,8 @@ export function createDeepHealth(deps: DeepHealthDeps): () => Promise<DeepHealth
       return true;
     };
     const tokenExpiry = new Date(deps.now() + 60_000).toISOString();
-    const [store, textModel, liveModel, textGenerate, keyGenerate, liveToken] = await Promise.all([
+    const relay = deps.liveRelay?.() ?? null;
+    const [store, textModel, liveModel, textGenerate, keyGenerate, liveToken, liveRelay] = await Promise.all([
       run("store", timeoutMs, async () => (await deps.store().get(PROBE_ID)) === null),
       run("textModel", timeoutMs, lookup(deps.textModel)),
       run("liveModel", timeoutMs, lookup(deps.liveModel)),
@@ -92,9 +100,12 @@ export function createDeepHealth(deps: DeepHealthDeps): () => Promise<DeepHealth
         });
         return Boolean(token.name);
       }),
+      relay ? run("liveRelay", timeoutMs, relay) : Promise.resolve("off" as const),
     ]);
-    const checks = { store, textModel, liveModel, textGenerate, keyGenerate, liveToken };
-    return { ok: Object.values(checks).every((c) => c === "ok"), checks };
+    const checks = { store, textModel, liveModel, textGenerate, keyGenerate, liveToken, liveRelay };
+    const voice = keyGenerate === "ok" || liveRelay === "ok";
+    const rest = [store, textModel, liveModel, textGenerate, liveToken].every((c) => c === "ok");
+    return { ok: rest && voice && liveRelay !== "fail", checks };
   }
 
   return () => {

@@ -107,14 +107,12 @@ export function pair(code: string): Promise<{ sessionId: string; deviceToken: st
   return post("/api/session/pair", { code });
 }
 
-export interface LiveTokenReply {
-  token: string;
-  model: string;
-  expiresAt: number;
-  voiceSeconds: number;
-}
+/** A one-use Gemini Live token (ADR-003), or the Vertex relay's address when the key cannot serve voice (ADR-012). */
+export type LiveTokenReply =
+  | { mode: "direct"; token: string; model: string; expiresAt: number; voiceSeconds: number }
+  | { mode: "relay"; url: string };
 
-/** One-use Gemini Live token; model, instructions and tools are pinned in it (ADR-003). */
+/** How voice starts; model, instructions and tools are pinned in the token or held by the relay, never sent here. */
 export function liveToken(input: { sessionId: string; token: string; locale: Locale }): Promise<LiveTokenReply> {
   return post("/api/live-token", { sessionId: input.sessionId, locale: input.locale }, input.token);
 }
