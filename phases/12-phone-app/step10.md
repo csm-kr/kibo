@@ -21,6 +21,8 @@ Write phases/12-phone-app/qa/REPORT.md: one line per angle A–I with pass/fail 
 - Dock: the right button's label is only "On"/"Off"; an older user cannot tell what is on. Label it "Voice on"/"Voice off" (Korean "음성 켜짐"/"음성 꺼짐") within the 56px target.
 - Dock state labels: "Tap to stop" also shows while "Thinking…" and "Reconnecting…"; use a label that matches what a tap does in each state (or no action label while reconnecting).
 
+**Orchestrator decision on I-172 (10-13), do this first in this step:** kiosk pages (`/kiosk`, `/learned/*`, and the kiosk half of `/demo` own-phone mode) **never show the idle pause while the page is visible**: a kiosk waits on K1 with its QR and code for a phone, and a learned kiosk's bridge must replay as soon as a phone orders. Keep the 60 s hidden-tab close and the server's 15 min stream cap for them. The phone (`/assistant`) and the `/demo` judge view keep the 20 min idle pause. Update the `StreamControl` options and tests (a kiosk option that disables the idle pause), `e2e/stream-idle.spec.ts`, UX KX, OPERATIONS "Open streams and cost" (visible kiosk tabs stay active by design; close kiosk tabs after a demo), and close I-172 with this decision.
+
 ## Acceptance criteria
 ```bash
 npm run lint && npm run build && npm run test
