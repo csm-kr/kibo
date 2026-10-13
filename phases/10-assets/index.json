@@ -13,10 +13,7 @@
     {
       "step": 1,
       "name": "deck-assets",
-      "status": "error",
-      "started_at": "2026-10-13T12:03:04+0900",
-      "error_message": "[failed after 3 attempts] Step did not update status",
-      "failed_at": "2026-10-13T12:23:05+0900"
+      "status": "pending"
     },
     {
       "step": 2,
