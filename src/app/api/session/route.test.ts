@@ -39,6 +39,25 @@ describe("POST /api/session", () => {
     expect(await getStore().get(body.sessionId)).toMatchObject({ status: "idle", demo: true });
   });
 
+  it("returns the address to show beside the code; SHORT_APP_URL changes only that, never the claim URL", async () => {
+    const headers = { "x-forwarded-proto": "https", "x-forwarded-host": "kibo.example.app" };
+    const before = (await read(await POST(jsonRequest("/api/session", { kioskId: "malo" }, headers)))).body;
+    expect(before.pairUrl).toBe("kibo.example.app/app");
+    try {
+      process.env.SHORT_APP_URL = "kibo-2026.web.app";
+      const after = (await read(await POST(jsonRequest("/api/session", { kioskId: "malo" }, headers)))).body;
+      expect(after.pairUrl).toBe("kibo-2026.web.app");
+      const url = new URL(after.claimUrl);
+      expect(url.origin).toBe("https://kibo.example.app");
+      expect(url.pathname).toBe("/assistant");
+      expect(url.search).toBe(`?s=${after.sessionId}`);
+      // A demo session has no code, so nothing to show.
+      expect((await read(await POST(jsonRequest("/api/session", { kioskId: "malo", demo: true })))).body.pairUrl).toBeUndefined();
+    } finally {
+      delete process.env.SHORT_APP_URL;
+    }
+  });
+
   it("refuses bad bodies with BAD_REQUEST", async () => {
     for (const b of ["{nope", { kioskId: "nope" }, { kioskId: "malo", extra: 1 }, { kioskId: 3 }, { kioskId: "malo", pairPhone: true }]) {
       const { status, body } = await read(await POST(jsonRequest("/api/session", b)));

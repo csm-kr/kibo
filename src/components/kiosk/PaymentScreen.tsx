@@ -24,6 +24,7 @@ export function PaymentScreen(props: {
   session: Session;
   claimUrl: string | null;
   pairCode?: string | null;
+  pairUrl?: string | null;
   send(type: CommandType, args: object): Promise<CommandReply | null>;
   onClaimUrl?(claimUrl: string, pairCode?: string): void;
   /** /demo's card stand-in: each "tap" event inserts the card as if the button below were pressed. */
@@ -65,7 +66,7 @@ export function PaymentScreen(props: {
   return (
     <div className="relative flex min-h-0 flex-1 flex-col">
       <Header kiosk={kiosk} />
-      <KioskToolbar kiosk={kiosk} session={session} claimUrl={props.claimUrl} pairCode={props.pairCode} send={send} onClaimUrl={props.onClaimUrl} />
+      <KioskToolbar kiosk={kiosk} session={session} claimUrl={props.claimUrl} pairCode={props.pairCode} pairUrl={props.pairUrl} send={send} onClaimUrl={props.onClaimUrl} />
 
       <div className="flex min-h-0 flex-1 flex-col px-12 pt-12">
         {step === "method" && (

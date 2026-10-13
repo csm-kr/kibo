@@ -12,6 +12,8 @@ interface Run {
   deploy?: number;
   /** Revision /api/health reports after the deploy; absent keeps the old one. */
   newRevision?: string;
+  /** SHORT_APP_URL in the deploying shell; absent means unset. */
+  shortAppUrl?: string;
 }
 
 function run(opts: Run) {
@@ -38,10 +40,10 @@ esac`,
   );
   fake("curl", `printf '{"ok":true,"revision":"%s"}' "$(cat "${state}")"`);
   fake("sleep", "exit 0");
-  const out = spawnSync("sh", [join(dir, "scripts/deploy.sh")], {
-    encoding: "utf8",
-    env: { ...process.env, PATH: `${bin}:${process.env.PATH}` },
-  });
+  const env: NodeJS.ProcessEnv = { ...process.env, PATH: `${bin}:${process.env.PATH}` };
+  delete env.SHORT_APP_URL;
+  if (opts.shortAppUrl !== undefined) env.SHORT_APP_URL = opts.shortAppUrl;
+  const out = spawnSync("sh", [join(dir, "scripts/deploy.sh")], { encoding: "utf8", env });
   const lines = out.stdout.trim().split("\n");
   return { code: out.status, last: lines.at(-1), calls: existsSync(log) ? readFileSync(log, "utf8") : "" };
 }
@@ -57,6 +59,21 @@ describe("scripts/deploy.sh", { timeout: 30_000 }, () => {
     expect(r.calls).toContain("--region asia-northeast3");
     // QR links and the kiosk's "<host>/app" line use the deterministic service URL, built from the project number.
     expect(r.calls).toContain("PUBLIC_ORIGIN=https://kibo-407514467119.asia-northeast3.run.app");
+    // Unset in the deploying shell: the service gets no SHORT_APP_URL and the kiosk shows "<host>/app".
+    expect(r.calls).not.toContain("SHORT_APP_URL");
+  });
+
+  it("passes SHORT_APP_URL through when it is set, next to the unchanged PUBLIC_ORIGIN", () => {
+    const r = run({ newRevision: "kibo-00042-new", shortAppUrl: "kibo-2026.web.app" });
+    expect(r.last).toBe("DEPLOYED kibo-00042-new");
+    expect(r.calls).toContain("PUBLIC_ORIGIN=https://kibo-407514467119.asia-northeast3.run.app,SHORT_APP_URL=kibo-2026.web.app");
+  });
+
+  it("refuses a SHORT_APP_URL that could add other variables to the deploy", () => {
+    const r = run({ newRevision: "kibo-00042-new", shortAppUrl: "kibo-2026.web.app,STORE=memory" });
+    expect(r.last).toBe("DEPLOY FAILED: SHORT_APP_URL must be a bare host such as kibo-2026.web.app");
+    expect(r.code).toBe(1);
+    expect(r.calls).not.toContain("gcloud run deploy");
   });
 
   it("stops before uploading when the local build fails", () => {

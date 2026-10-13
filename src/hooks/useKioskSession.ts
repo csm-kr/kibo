@@ -14,15 +14,23 @@ interface Stored {
   claimUrl: string;
   /** The 6-digit code for /app; absent on records stored before pairing codes existed. */
   pairCode?: string;
+  /** The address shown beside the code; kept across a reissued QR, which does not change it. */
+  pairUrl?: string;
 }
 
 function parseStored(raw: string | null): Stored | null {
   try {
     const v: unknown = JSON.parse(raw ?? "null");
     if (!v || typeof v !== "object") return null;
-    const { sessionId, kioskToken, claimUrl, pairCode } = v as Record<string, unknown>;
+    const { sessionId, kioskToken, claimUrl, pairCode, pairUrl } = v as Record<string, unknown>;
     if (typeof sessionId !== "string" || typeof kioskToken !== "string" || typeof claimUrl !== "string") return null;
-    return { sessionId, kioskToken, claimUrl, ...(typeof pairCode === "string" ? { pairCode } : {}) };
+    return {
+      sessionId,
+      kioskToken,
+      claimUrl,
+      ...(typeof pairCode === "string" ? { pairCode } : {}),
+      ...(typeof pairUrl === "string" ? { pairUrl } : {}),
+    };
   } catch {
     return null;
   }
@@ -72,7 +80,7 @@ export function useKioskSession(kioskId: string) {
     clearTimeout(retryTimer.current);
     try {
       const r = await createSession(kioskId);
-      writeStored(key, { sessionId: r.sessionId, kioskToken: r.kioskToken, claimUrl: r.claimUrl, pairCode: r.pairCode });
+      writeStored(key, { sessionId: r.sessionId, kioskToken: r.kioskToken, claimUrl: r.claimUrl, pairCode: r.pairCode, pairUrl: r.pairUrl });
     } catch {
       // Rate limit or no connection: keep the attract screen up and try again shortly.
       retryTimer.current = setTimeout(() => retry.current(), RETRY_MS);
@@ -143,6 +151,7 @@ export function useKioskSession(kioskId: string) {
     kioskToken: stored?.kioskToken ?? null,
     claimUrl: stored?.claimUrl ?? null,
     pairCode: stored?.pairCode ?? null,
+    pairUrl: stored?.pairUrl ?? null,
     session,
     streamState: state,
     clockOffset,

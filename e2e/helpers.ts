@@ -12,6 +12,15 @@ export async function openScenarios(page: Page): Promise<void> {
 }
 
 /** The kiosk root; `data-screen` names the screen (attract, dine, menu, review, payment, done). */
+/** How many lines the element's text wraps to: one rect per line box for a range over its contents. */
+export function textLines(el: Locator): Promise<number> {
+  return el.evaluate((node) => {
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    return new Set([...range.getClientRects()].filter((r) => r.width > 0).map((r) => Math.round(r.top))).size;
+  });
+}
+
 export function kioskRoot(page: Page): Locator {
   return page.locator("[data-screen]").first();
 }

@@ -58,6 +58,7 @@ export function MenuScreen(props: {
   session: Session;
   claimUrl: string | null;
   pairCode?: string | null;
+  pairUrl?: string | null;
   /** Server time minus local time; lastChange.at is server time. */
   clockOffset: number;
   send(type: CommandType, args: object): Promise<CommandReply | null>;
@@ -144,7 +145,7 @@ export function MenuScreen(props: {
       <KioskToolbar
         kiosk={kiosk}
         session={session}
-        claimUrl={props.claimUrl} pairCode={props.pairCode}
+        claimUrl={props.claimUrl} pairCode={props.pairCode} pairUrl={props.pairUrl}
         send={send}
         onClaimUrl={props.onClaimUrl}
         status={flash?.status ?? null}

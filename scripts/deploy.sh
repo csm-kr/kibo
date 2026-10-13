@@ -33,6 +33,13 @@ PROJECT_NUMBER=$(gcloud projects describe "$PROJECT" --format 'value(projectNumb
 [ -n "$PROJECT_NUMBER" ] || fail "could not read the project number"
 PUBLIC_ORIGIN="https://$SERVICE-$PROJECT_NUMBER.$REGION.run.app"
 
+# Optional short host the kiosk shows instead of "<host>/app" (a redirect, see firebase.json); QR links keep
+# PUBLIC_ORIGIN. Set it in the deploying shell, e.g. SHORT_APP_URL=kibo-2026.web.app; unset leaves it off the service.
+SHORT_APP_URL=${SHORT_APP_URL:-}
+case "$SHORT_APP_URL" in
+  *[!a-z0-9.-]*) fail "SHORT_APP_URL must be a bare host such as kibo-2026.web.app" ;;
+esac
+
 URL=$(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format 'value(status.url)' 2>/dev/null || true)
 BEFORE=""
 [ -n "$URL" ] && BEFORE=$(health_revision "$URL")
@@ -51,7 +58,7 @@ gcloud run deploy "$SERVICE" \
   --cpu 1 \
   --memory 1Gi \
   --set-secrets GEMINI_API_KEY=gemini-api-key:latest \
-  --set-env-vars STORE=firestore,GOOGLE_CLOUD_PROJECT=$PROJECT,GEMINI_TEXT_BACKEND=auto,GEMINI_TEXT_MODEL=gemini-3.8-flash,GEMINI_TEXT_THINKING=low,GEMINI_LIVE_MODEL=gemini-3.8-live,PUBLIC_ORIGIN=$PUBLIC_ORIGIN ||
+  --set-env-vars STORE=firestore,GOOGLE_CLOUD_PROJECT=$PROJECT,GEMINI_TEXT_BACKEND=auto,GEMINI_TEXT_MODEL=gemini-3.8-flash,GEMINI_TEXT_THINKING=low,GEMINI_LIVE_MODEL=gemini-3.8-live,PUBLIC_ORIGIN=$PUBLIC_ORIGIN${SHORT_APP_URL:+,SHORT_APP_URL=$SHORT_APP_URL} ||
   fail "gcloud run deploy failed (the old revision ${BEFORE:-none} is still serving)"
 
 URL=$(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format 'value(status.url)') ||

@@ -33,6 +33,7 @@ export function KioskApp({ kiosk, demo }: { kiosk: KioskData; demo: boolean }) {
             kioskToken={ks.kioskToken}
             claimUrl={ks.claimUrl}
             pairCode={ks.pairCode}
+            pairUrl={ks.pairUrl}
             demo={demo}
             clockOffset={ks.clockOffset}
             onNewSession={() => void ks.newSession()}
@@ -43,7 +44,7 @@ export function KioskApp({ kiosk, demo }: { kiosk: KioskData; demo: boolean }) {
       </div>
       {landscape && (
         <div className="min-w-0 flex-1">
-          <PairingPanel kiosk={kiosk} session={ks.session} claimUrl={ks.claimUrl} pairCode={ks.pairCode} clockOffset={ks.clockOffset} />
+          <PairingPanel kiosk={kiosk} session={ks.session} claimUrl={ks.claimUrl} pairCode={ks.pairCode} pairUrl={ks.pairUrl} clockOffset={ks.clockOffset} />
         </div>
       )}
     </div>

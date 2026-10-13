@@ -44,7 +44,9 @@ export default defineConfig({
   webServer: {
     command: "npm run dev -- --port 3200",
     url: "http://localhost:3200/api/health",
-    env: { STORE: "memory", KIBO_DEV_CACHE: "off" },
+    // SHORT_APP_URL: the kiosk shows the short production host, as it will once deployed (12-phone-app:6). The E2E
+    // config leaves it unset, so `npm run test:e2e` covers the "<host>/app" fallback.
+    env: { STORE: "memory", KIBO_DEV_CACHE: "off", SHORT_APP_URL: "kibo-2026.web.app" },
     reuseExistingServer: false,
     timeout: 120_000,
   },

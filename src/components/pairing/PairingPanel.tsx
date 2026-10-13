@@ -20,6 +20,8 @@ export function PairingPanel(props: {
   session: Session | null;
   claimUrl: string | null;
   pairCode: string | null;
+  /** What to open beside the code, from the server (SHORT_APP_URL or <host>/app); else the claim URL's host. */
+  pairUrl?: string | null;
   clockOffset: number;
   /** /demo: the end card ([Try again], other places) once the order is done. */
   children?: ReactNode;
@@ -28,7 +30,7 @@ export function PairingPanel(props: {
   const now = useNow();
   const link = phoneLink(session, now, clockOffset);
   const src = useQrSrc(claimUrl);
-  const host = claimUrl ? new URL(claimUrl).host : null;
+  const address = props.pairUrl ?? (claimUrl ? `${new URL(claimUrl).host}/app` : null);
 
   return (
     <aside
@@ -64,7 +66,7 @@ export function PairingPanel(props: {
               <p className="text-xl/normal">
                 Scan with your phone camera, or open
                 {/* Its own line, so a host breaks only when it cannot fit (I-167). */}
-                <strong className="block break-all text-kibo">{host ? `${host}/app` : "the KIBO app"}</strong>
+                <strong data-panel-pair-url className="block break-all text-kibo">{address ?? "the KIBO app"}</strong>
                 and enter the code.
               </p>
               {pairCode && (

@@ -90,6 +90,29 @@ export function publicOrigin(req: Request): string {
   return `${proto}://${host}`;
 }
 
+const BARE_HOST = /^(?=.{1,253}$)[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+$/;
+let warnedShortHost: string | null = null;
+
+/** `SHORT_APP_URL`: a bare lowercase host (e.g. `kibo-2026.web.app`) that redirects to /app; anything else is ignored. */
+function shortAppHost(): string | null {
+  const raw = process.env.SHORT_APP_URL;
+  if (!raw) return null;
+  if (BARE_HOST.test(raw)) return raw;
+  if (warnedShortHost !== raw) {
+    warnedShortHost = raw;
+    console.warn("SHORT_APP_URL ignored: it must be a bare lowercase host, no scheme, port or path");
+  }
+  return null;
+}
+
+/**
+ * What the kiosk tells people to open beside the pairing code. Only shown: QR codes and claim URLs keep
+ * publicOrigin, so a short redirect host can change without a rebuild and without touching any link.
+ */
+export function pairUrl(req: Request): string {
+  return shortAppHost() ?? `${new URL(publicOrigin(req)).host}/app`;
+}
+
 /** The claim token goes in the fragment, which browsers never send to a server or in a Referer. */
 export function claimUrl(req: Request, sessionId: string, claimToken: string): string {
   return `${publicOrigin(req)}/assistant?s=${encodeURIComponent(sessionId)}#t=${claimToken}`;

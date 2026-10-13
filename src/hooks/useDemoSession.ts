@@ -16,6 +16,8 @@ interface DemoTokens {
   claimUrl: string;
   /** "Use my phone" mode only: the 6-digit code for /app. */
   pairCode: string | null;
+  /** "Use my phone" mode only: the address shown beside the code. */
+  pairUrl: string | null;
 }
 
 /**
@@ -49,6 +51,7 @@ export function useDemoSession(kioskId: string) {
           ...(r.deviceToken ? { deviceToken: r.deviceToken } : {}),
           claimUrl: r.claimUrl,
           pairCode: r.pairCode ?? null,
+          pairUrl: r.pairUrl ?? null,
         });
         lastActive.current = Date.now();
       } catch (e) {

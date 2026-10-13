@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CommandError } from "@/lib/commands/errors";
-import { bearer, clientIp, fail, ok, publicOrigin, readJson } from "./http";
+import { bearer, clientIp, fail, ok, pairUrl, publicOrigin, readJson } from "./http";
 
 function req(headers: Record<string, string> = {}, body?: string, url = "http://kibo.test/api/x"): Request {
   return new Request(url, { method: body === undefined ? "GET" : "POST", headers, body });
@@ -106,5 +106,46 @@ describe("publicOrigin", () => {
     } finally {
       delete process.env.PUBLIC_ORIGIN;
     }
+  });
+});
+
+describe("pairUrl", () => {
+  afterEach(() => {
+    delete process.env.SHORT_APP_URL;
+    delete process.env.PUBLIC_ORIGIN;
+  });
+
+  it("is <public host>/app without SHORT_APP_URL", () => {
+    expect(pairUrl(req({ host: "localhost:3000" }))).toBe("localhost:3000/app");
+    process.env.PUBLIC_ORIGIN = "https://kibo-1.asia-northeast3.run.app";
+    expect(pairUrl(req({ host: "internal:8080" }))).toBe("kibo-1.asia-northeast3.run.app/app");
+  });
+
+  it("is SHORT_APP_URL when it is a bare lowercase host", () => {
+    process.env.PUBLIC_ORIGIN = "https://kibo-1.asia-northeast3.run.app";
+    process.env.SHORT_APP_URL = "kibo-2026.web.app";
+    expect(pairUrl(req({ host: "localhost:3000" }))).toBe("kibo-2026.web.app");
+  });
+
+  it("ignores anything but a bare lowercase host, with one log line per value", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const bad = [
+      "https://kibo-2026.web.app",
+      "kibo-2026.web.app/app",
+      "Kibo-2026.web.app",
+      "kibo-2026.web.app:443",
+      "localhost",
+      " kibo-2026.web.app",
+      "-kibo.web.app",
+      "kibo..web.app",
+      "kibo_2026.web.app",
+      `${"a".repeat(64)}.web.app`,
+    ];
+    for (const value of bad) {
+      process.env.SHORT_APP_URL = value;
+      expect(pairUrl(req({ host: "localhost:3000" }))).toBe("localhost:3000/app");
+      expect(pairUrl(req({ host: "localhost:3000" }))).toBe("localhost:3000/app");
+    }
+    expect(warn).toHaveBeenCalledTimes(bad.length);
   });
 });

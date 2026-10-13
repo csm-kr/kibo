@@ -1,5 +1,5 @@
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
-import { claim, command, readClaim } from "../helpers";
+import { claim, command, readClaim, textLines } from "../helpers";
 import { PAIRING, qaState, type Findings } from "./checks";
 
 // UI QA of KIBO's pairing panel (12-phone-app:4): /kiosk on a landscape screen (a laptop as the kiosk) and /demo
@@ -30,8 +30,12 @@ for (const vp of [
     await page.setViewportSize(vp);
     await page.goto("/kiosk?k=malo");
     const panel = page.locator("[data-pairing-panel]");
-    const { sessionId, claimToken } = await readClaim(page);
+    const { url, sessionId, claimToken } = await readClaim(page);
     await expect(panel.locator("img[data-panel-qr]")).toBeVisible();
+    // SHORT_APP_URL is set on the QA server: the short host on one line (I-167); the claim URL keeps this server.
+    await expect(panel.locator("[data-panel-pair-url]")).toHaveText("kibo-2026.web.app");
+    expect(await textLines(panel.locator("[data-panel-pair-url]"))).toBe(1);
+    expect(new URL(url).origin).toBe("http://localhost:3200");
     await check(page, info, "kiosk-pairing-waiting");
 
     const { deviceToken } = await (await claim(request, sessionId, claimToken)).json();

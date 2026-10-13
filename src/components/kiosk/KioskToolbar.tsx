@@ -19,6 +19,7 @@ export function KioskToolbar(props: {
   session: Session;
   claimUrl: string | null;
   pairCode?: string | null;
+  pairUrl?: string | null;
   send(type: CommandType, args: object): Promise<CommandReply | null>;
   /** Absent in /demo, which hides [Connect another phone] (see KioskScreen). */
   onClaimUrl?(claimUrl: string, pairCode?: string): void;
@@ -62,7 +63,7 @@ export function KioskToolbar(props: {
           )}
         </div>
       </div>
-      {qrOpen && <QrSheet kiosk={kiosk} claimUrl={props.claimUrl} pairCode={props.pairCode} onClose={() => setQrOpen(false)} />}
+      {qrOpen && <QrSheet kiosk={kiosk} claimUrl={props.claimUrl} pairCode={props.pairCode} pairUrl={props.pairUrl} onClose={() => setQrOpen(false)} />}
     </div>
   );
 }
@@ -139,7 +140,7 @@ function SmallQrButton(props: { claimUrl: string | null; label: string; onOpen()
   );
 }
 
-function QrSheet(props: { kiosk: KioskData; claimUrl: string | null; pairCode?: string | null; onClose(): void }) {
+function QrSheet(props: { kiosk: KioskData; claimUrl: string | null; pairCode?: string | null; pairUrl?: string | null; onClose(): void }) {
   const { locale, domain } = props.kiosk;
   const src = useQrSrc(props.claimUrl);
   return (
@@ -164,7 +165,7 @@ function QrSheet(props: { kiosk: KioskData; claimUrl: string | null; pairCode?: 
           </p>
         )}
         <p className="k-text-40 text-[#4B463F]">{kt("qrSheetHint", locale, domain)}</p>
-        <PairCode kiosk={props.kiosk} claimUrl={props.claimUrl} pairCode={props.pairCode} className="w-full text-left" />
+        <PairCode kiosk={props.kiosk} claimUrl={props.claimUrl} pairCode={props.pairCode} pairUrl={props.pairUrl} className="w-full text-left" />
         <button
           type="button"
           onClick={props.onClose}

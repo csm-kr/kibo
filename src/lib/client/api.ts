@@ -27,6 +27,8 @@ export interface CreatedSession {
   deviceToken?: string;
   /** 6 digits the phone can type on /app; absent on /demo sessions unless `pairPhone`. */
   pairCode?: string;
+  /** With `pairCode`: the address to show beside it (SHORT_APP_URL, else "<host>/app"); never a link target. */
+  pairUrl?: string;
 }
 
 export interface CommandReply {

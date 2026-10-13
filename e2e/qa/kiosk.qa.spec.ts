@@ -1,5 +1,5 @@
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
-import { buttonWithText, claim, command, kioskRoot, readClaim } from "../helpers";
+import { buttonWithText, claim, command, kioskRoot, readClaim, textLines } from "../helpers";
 import { KIOSK, qaShot, qaState, type Findings } from "./checks";
 
 // UI QA of every kiosk screen (docs/UX.md screen map K1–K8, KX) on the 1080x1920 design canvas. States are
@@ -29,6 +29,12 @@ test("touch path: K1 to K8", async ({ page }, info) => {
   await readClaim(page);
   // The touch button is disabled until the session arrives through the stream.
   await expect(page.getByRole("button", { name: /화면을 눌러서 주문/ })).toBeEnabled();
+  // The QA server sets SHORT_APP_URL (playwright.qa.config.ts): the kiosk shows the short host on one line, while
+  // the QR still points at this server (12-phone-app:6, I-167).
+  const pairUrl = page.locator("[data-pair-url]");
+  await expect(pairUrl).toHaveText("kibo-2026.web.app");
+  expect(await textLines(pairUrl)).toBe(1);
+  expect(new URL((await page.locator("img[data-claim-url]").getAttribute("data-claim-url")) ?? "").origin).toBe("http://localhost:3200");
   await check(page, info, "K1-attract");
 
   // The scaled size /demo uses, for the record; sizes are measured on the full canvas only.
@@ -45,6 +51,7 @@ test("touch path: K1 to K8", async ({ page }, info) => {
   // The small QR's sheet, with the pairing code for /app under the QR (12-phone-app:3).
   await page.getByRole("button", { name: "휴대폰으로 말해서 주문" }).click();
   await expect(page.getByRole("dialog").locator("[data-pair-code]")).toBeVisible();
+  expect(await textLines(page.getByRole("dialog").locator("[data-pair-url]"))).toBe(1);
   await check(page, info, "KX-qr-sheet");
   await page.getByRole("dialog").getByRole("button", { name: "닫기" }).click();
 

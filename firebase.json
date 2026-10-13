@@ -1,0 +1,9 @@
+{
+  "hosting": {
+    "public": "hosting-public",
+    "redirects": [
+      { "source": "/", "destination": "https://kibo-407514467119.asia-northeast3.run.app/app", "type": 302 },
+      { "regex": "^/(?P<path>.+)$", "destination": "https://kibo-407514467119.asia-northeast3.run.app/:path", "type": 302 }
+    ]
+  }
+}

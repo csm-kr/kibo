@@ -47,7 +47,7 @@ What each persona goes through, where they could give up, and which moment must 
 | # | Kiosk | Phone | Heuristics |
 |---|---|---|---|
 | A1 | Attract screen with two large choices: "Order by talking (QR)" and "Order by touch" | — | 2, 6 |
-| A2 | "Connecting…" next to the QR; under it "Or open **<host>/app** and enter **123 456**" (the 6-digit pairing code) | Camera shows a link; tapping opens `/assistant`. No install. Or, without a camera app: open `<host>/app`, type the 6 digits, [Connect]; or [Scan a kiosk] on `/app` scans the QR inside the web app (`/app/scan`). All three end in `/assistant` | 1, 7 |
+| A2 | "Connecting…" next to the QR; under it "Or open **<host>/app** and enter **123 456**" (the 6-digit pairing code; with `SHORT_APP_URL` set, the short host such as **kibo-2026.web.app**, which redirects to `/app`) | Camera shows a link; tapping opens `/assistant`. No install. Or, without a camera app: open `<host>/app`, type the 6 digits, [Connect]; or [Scan a kiosk] on `/app` scans the QR inside the web app (`/app/scan`). All three end in `/assistant` | 1, 7 |
 | A3 | "Phone connected"; moves to dine option | **Mic hint screen:** "Tap **Allow** on the next screen" with a picture, then the browser prompt | 1, 10 |
 | A4 | Unchanged | "Eat here or take out?" with two large photo buttons; speaking works too | 6 |
 | A5 | — | **One large mic button.** "Listening…" with a waveform; stops automatically; shows what it heard | 1, 3 |

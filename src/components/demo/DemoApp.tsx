@@ -180,6 +180,7 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
                   kioskToken={tokens.kioskToken}
                   claimUrl={tokens.claimUrl}
                   pairCode={tokens.pairCode}
+                  pairUrl={tokens.pairUrl}
                   // No `demo` (the &demo=1 tap counter) and no onStartOver ([처음으로]): a new session would drop
                   // the judge's order (I-135, I-048). onClaimUrl ([Connect another phone]) only with the judge's own
                   // phone; with the phone half a new QR would void this page's own phone (I-066).
@@ -200,7 +201,7 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
           <section aria-labelledby="demo-phone-caption" className="flex h-full max-w-[720px] min-w-[400px] flex-1 flex-col gap-2">
             <Caption id="demo-phone-caption" text="Your own phone (KIBO)" />
             <div className="min-h-0 flex-1 overflow-hidden rounded-sheet shadow-card">
-              <PairingPanel kiosk={kiosk} session={session} claimUrl={tokens.claimUrl} pairCode={tokens.pairCode} clockOffset={demo.clockOffset}>
+              <PairingPanel kiosk={kiosk} session={session} claimUrl={tokens.claimUrl} pairCode={tokens.pairCode} pairUrl={tokens.pairUrl} clockOffset={demo.clockOffset}>
                 {ended ? (
                   endCard
                 ) : (

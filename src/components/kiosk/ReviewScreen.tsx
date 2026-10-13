@@ -24,6 +24,7 @@ export function ReviewScreen(props: {
   session: Session;
   claimUrl: string | null;
   pairCode?: string | null;
+  pairUrl?: string | null;
   send: Send;
   onClaimUrl?(claimUrl: string, pairCode?: string): void;
 }) {
@@ -43,7 +44,7 @@ export function ReviewScreen(props: {
   return (
     <div className="relative flex min-h-0 flex-1 flex-col">
       <Header kiosk={kiosk} />
-      <KioskToolbar kiosk={kiosk} session={session} claimUrl={props.claimUrl} pairCode={props.pairCode} send={props.send} onClaimUrl={props.onClaimUrl} />
+      <KioskToolbar kiosk={kiosk} session={session} claimUrl={props.claimUrl} pairCode={props.pairCode} pairUrl={props.pairUrl} send={props.send} onClaimUrl={props.onClaimUrl} />
       <h1 className="k-text-72 flex-none px-12 pt-12 pb-8 font-bold">{kt("reviewTitle", locale, domain)}</h1>
 
       <ul className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-12 pb-8">

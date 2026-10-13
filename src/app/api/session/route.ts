@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { claimUrl, clientIp, fail, ok, parseBody, readJson } from "@/lib/http";
+import { claimUrl, clientIp, fail, ok, pairUrl, parseBody, readJson } from "@/lib/http";
 import { checkIpLimit } from "@/lib/limits/ip";
 import { createSession } from "@/lib/session/service";
 import { getStore } from "@/lib/store";
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
       kioskToken: r.kioskToken,
       expiresAt: r.expiresAt,
       ...(r.deviceToken ? { deviceToken: r.deviceToken } : {}),
-      ...(r.pairCode ? { pairCode: r.pairCode } : {}),
+      ...(r.pairCode ? { pairCode: r.pairCode, pairUrl: pairUrl(req) } : {}),
     });
   } catch (e) {
     return fail(e);
