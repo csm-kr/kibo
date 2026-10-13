@@ -767,12 +767,30 @@
       }
     ]
   },
+  "costUsdPerOrder": {
+    "about": "Measured tokens of each completed order x the prices below, per run, then the median over runs (scripts/cost.ts, checked by scripts/cost.test.ts). Text: uncached prompt at flashInput, `cached` at flashCachedInput (implicit cache; no storage charge assumed), candidates + thoughts at flashOutput. Voice (the 3 runs in voice.runs; the stalled attempt is left out): per usage message, AUDIO input from promptByModality at liveAudioInput; the rest of `prompt` at liveTextInput, including the part promptByModality does not attribute (about 700-1,000 tokens per message; medianIfUnattributedIsAudio bills it as audio instead, the upper bound); AUDIO output from responseByModality at liveAudioOutput; the rest of candidates (tool calls) and thoughts at liveTextOutput (assumed: the page names no separate Live thinking rate). USD only, no exchange rate.",
+    "text": {
+      "runs": [0.06332, 0.064766, 0.065265],
+      "median": 0.064766
+    },
+    "voice": {
+      "runs": [0.088586, 0.074904, 0.099254],
+      "median": 0.088586,
+      "medianIfUnattributedIsAudio": 0.108528
+    }
+  },
   "prices": {
-    "textInputPerMTok": null,
-    "textOutputPerMTok": null,
-    "liveAudioInputPerMTok": null,
-    "liveTextInputPerMTok": null,
-    "liveAudioOutputPerMTok": null,
-    "note": "Fill from the official Gemini API pricing page on the day of the deck; thinking tokens are billed as output. Not read here (R-001)."
+    "source": "https://ai.google.dev/gemini-api/docs/pricing",
+    "readOn": "2026-10-13",
+    "tier": "Gemini API paid tier, USD per 1M tokens",
+    "validThrough": "2026-12-31 (the page says prices double from 2027-01-01)",
+    "flashInput": 0.75,
+    "flashCachedInput": 0.075,
+    "flashOutput": 3.75,
+    "liveTextInput": 0.75,
+    "liveAudioInput": 3,
+    "liveTextOutput": 4.5,
+    "liveAudioOutput": 12,
+    "note": "gemini-3.8-flash: input, context-cache input, output including thinking. gemini-3.8-live: input text and audio, output text and audio. Read from the page by the orchestrating session on 10-13 and copied here in 10-assets:1."
   }
 }

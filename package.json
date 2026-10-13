@@ -16,6 +16,7 @@
     "measure:cost": "tsx --env-file=.env scripts/measure-cost.ts",
     "fixtures:voice": "tsx --env-file=.env scripts/make-voice-fixtures.ts",
     "shots:landing": "tsx scripts/landing-shots.ts",
+    "shots:deck": "tsx --env-file=.env scripts/deck-shots.ts",
     "capture:footage": "tsx --env-file=.env scripts/capture-footage.ts"
   },
   "dependencies": {
@@ -37,6 +38,7 @@
     "axe-core": "^4.14.0",
     "eslint": "^9",
     "eslint-config-next": "16.4.0",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",
     "typescript": "^5",
