@@ -1,14 +1,14 @@
-# Orchestrator handoff (10-13 ~14:30 KST)
+# Orchestrator handoff (updated 10-13 ~20:10 KST)
 
 The orchestrating session ran `/harness` from 10-12 22:30. The user delegated all decisions ("don't ask, decide") except things only a person can do (payments, logins). Read this, then `phases/index.json`, then the latest `phases/<phase>/index.json` summaries.
 
 ## State
 | Phase | Status | Notes |
 |---|---|---|
-| 1-core … 10-assets | completed | merged into `main` up to 10-assets (`git branch -f main feat-10-assets`) |
-| 11-hardening | running (chain3) | step 2 prompt-cache in progress at handoff; then load-check, lighthouse, qa |
-| 12-phone-app | queued (chain4 waiter) | phone redesign (design spec → redesign), PWA `/app`, 6-digit pairing code + in-app QR scanner, laptop kiosk pairing panel, `/demo` "use my phone", two-device E2E, qa |
-| 13-blind-kiosks | queued (chain5 waiter, HARNESS_TIMEOUT=3600) | 4 blind kiosks already built and committed in `spikes/blind-kiosks/` with `PROTOCOL.md`; grader → baselines → learner gaps (dev set only) → finals with traces → `/learn` replay viewer → report → qa |
+| 1-core … 11-hardening | completed | `main` = 11-hardening (`cf25e9d`); production `kibo-00011-dgq` |
+| 12-phone-app | running (chain4), qa step last | phone redesign, PWA `/app`, 6-digit pairing code + in-app QR scanner, laptop kiosk pairing panel, `/demo` "use my phone", short address, stream idle (cost), **voice relay `kibo-voice` to Vertex AI Live (ADR-012)** |
+| 13-blind-kiosks | queued (chain5 waiter, HARNESS_TIMEOUT=3600) | learner dev runs use `PROVIDER=openai` (user decision 10-13); blind baselines/finals stay on Gemini (published numbers) |
+| 14-final | drafted, not in `phases/` yet | drafts in the orchestrator scratchpad `phase14-draft/`: judge-review, judge-fixes, numbers-final, shots-final, repo-ready, qa |
 
 Runner: `.harness-logs/chain.sh <phase…>` (retries a phase up to 3× after a network/DNS outage via `.harness-logs/reset_network_failure.py`). The chain and the two waiters are background tasks of the old session; **if they are gone, resume with**:
 ```
@@ -26,6 +26,14 @@ HARNESS_TIMEOUT=3600 HARNESS_MAX_TURNS=300 sh .harness-logs/chain.sh 13-blind-ki
 
 ## Decisions made by the orchestrator (all logged in docs)
 SSE instead of the Firebase client SDK (ADR-010); model ids (ADR-011); Playwright for automated UI QA; I-029 option A (AI confirm only after a phone-opened review); error copy localized on screens; airport fares changed away from real-operator numbers (I-122); fair touch measurement 24 taps (efficient path), 41-tap edit path as footnote; no option editing on kiosk lines (I-039); `[처음으로]` on standalone kiosk; text backend auto fallback.
+
+## Changes on 10-13 afternoon (orchestrator)
+- AI Studio prepaid credits are empty (HTTP 402, I-104); the user chose **not** to depend on them: voice falls back to the `kibo-voice` relay (Vertex AI Live `gemini-3.8-live`, us-central1 only, post-paid). Local `.env` has `GEMINI_TEXT_BACKEND=vertex` so harness runs never spend the key. Vertex text is slow under parallel load (I-157: up to 70 s per call with 5 parallel requests).
+- `kibo-voice` deployed once (`kibo-voice-00001-6kz`, `wss://kibo-voice-407514467119.asia-northeast3.run.app/ws`); `/healthz` is swallowed by Cloud Run (paths ending in `z` are reserved) and phase 12 qa renames it to `/health`.
+- Short address: Firebase added to `kibo-2026` (terms accepted by the user's request), Hosting site `kibo-2026.web.app` deployed through the Hosting REST API as redirects only (`/` → `<run.app>/app`, `^/(?P<path>.+)$` → same path). Re-deploy with the orchestrator's `hosting-redirect.sh` pattern or `firebase.json`.
+- Deploy after phase 12, in this order: `sh scripts/deploy-voice.sh`, then `SHORT_APP_URL=kibo-2026.web.app VOICE_RELAY_URL=wss://kibo-voice-407514467119.asia-northeast3.run.app/ws sh scripts/deploy.sh` (both from the clean worktree). Then check `/api/health?deep=1` (`liveRelay` ok) and `git branch -f main feat-12-phone-app`.
+- Cost (agent report 10-13): month to 10-12 net KRW 32,741 (gross 51,263); Cloud Run active time from open SSE streams was the growing cost (fixed by phase 12 stream-idle, timeout 900). A KRW 100,000 alert-only budget was added. Billing card: the backup Mastercard is fine (user).
+- The user wants GPT/Azure only for development; the product stays Gemini (hackathon rules).
 
 ## Open items for the next orchestrator
 - Watch phases 11–13; look at screenshots after every UI step; deploy after each phase (phase 12 especially: phone redesign).
