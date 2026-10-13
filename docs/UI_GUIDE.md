@@ -100,6 +100,8 @@ Every button has pressed (color, and a 0.98 shrink only without reduced motion),
 
 **Done (P6).** One white card: "Order number" (20px/600 muted), the number 120px Space Grotesk in KIBO blue with proportional figures and 0.04em tracking (the tabular "1" has a foot, and a 7 and a 1 touched), "We'll call your number at the counter."; [Done] (primary) under the card (on `/demo` the end card instead).
 
+**Home (P0, `/app`).** No app bar (there is no kiosk yet): the KIBO logo (40px), one 24px line, [Scan a kiosk] (primary, 88px, scan icon), [Continue my order] (secondary) only while this phone holds an open order, then two white cards: "How it works" (three numbered steps on `kibo-tint` circles) and "Settings": the language as two halves on a tint track (the chosen one white with a check mark), and full-width switch rows for AI voice and larger text (name left; "On"/"Off" in words and a 56×32 track right, `kibo` on, `field` off). Larger text sets the root font size to 115%, so every rem size grows and the browser's own text size still applies.
+
 **Motion.** Sheets open in 200ms ease-out (`kibo-sheet-in`; a plain fade with reduced motion); presses change color in 150ms; the listening pulse is unchanged. Nothing else moves.
 
 ## Motion

@@ -53,6 +53,7 @@ KIBO is a public demo that must stay up for three weeks of judging, handles a (s
 
 ## Reliability
 - Kiosk stores `{sessionId, kioskToken}` per kiosk in localStorage and resumes after a reload unless expired or paid.
+- The phone app's service worker (`public/sw.js`, scope `/app`) caches only a static offline page; it never caches or answers `/api`, session streams, `/assistant` or anything holding a token. `/app` keeps only the last order's session id, status and expiry for [Continue my order]; the device token stays under its own key, as before.
 - Phone heartbeat every 30 s; the kiosk shows "connection paused" after 60 s. Expiry is extended only when the user was active in the last 30 s; the kiosk corrects for server clock offset.
 - Live reconnect with a fresh token; GoAway handled; `/demo` falls back to text automatically.
 - Only one tab per phone holds a Live session (`navigator.locks`); [Try again] and `paid` close the Live session.

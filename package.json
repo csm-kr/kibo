@@ -16,6 +16,7 @@
     "measure:cost": "tsx --env-file=.env scripts/measure-cost.ts",
     "load:check": "tsx --env-file=.env scripts/load-check.ts",
     "lighthouse": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/lighthouse.ts",
+    "pwa:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/pwa-check.ts",
     "fixtures:voice": "tsx --env-file=.env scripts/make-voice-fixtures.ts",
     "shots:landing": "tsx scripts/landing-shots.ts",
     "shots:deck": "tsx --env-file=.env scripts/deck-shots.ts",

@@ -173,6 +173,19 @@ const PHONE_TEXT = {
   // Idle
   idleQuestion: { ko: "계속 주문하시겠어요?", en: "Still ordering?" },
   idleContinue: { ko: "계속하기", en: "Continue" },
+  // /app home (the installable phone app, P0)
+  appTagline: { ko: "KIBO QR이 있는 키오스크라면 말로 주문할 수 있어요.", en: "Talk to any kiosk that shows the KIBO QR." },
+  scanKiosk: { ko: "키오스크 QR 찍기", en: "Scan a kiosk" },
+  continueOrder: { ko: "하던 주문 이어서 하기", en: "Continue my order" },
+  howTitle: { ko: "이렇게 써요", en: "How it works" },
+  appStep1: { ko: "키오스크 화면의 QR을 찍어요.", en: "Scan the QR on the kiosk screen." },
+  appStep2: { ko: "휴대폰에 주문을 말해요.", en: "Tell your phone what you want." },
+  appStep3: { ko: "주문을 확인하고, 키오스크에서 결제해요.", en: "Check your order, then pay at the kiosk." },
+  settings: { ko: "설정", en: "Settings" },
+  language: { ko: "언어", en: "Language" },
+  largeText: { ko: "큰 글씨", en: "Larger text" },
+  settingOn: { ko: "켜짐", en: "On" },
+  settingOff: { ko: "꺼짐", en: "Off" },
 } satisfies Record<string, Record<Locale, string>>;
 
 export type PhoneTextKey = keyof typeof PHONE_TEXT;

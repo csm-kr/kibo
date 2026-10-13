@@ -99,6 +99,7 @@ Every screen and state that a QA pass must look at (`docs/UI_QA.md`). Ids are us
 | K7 | Kiosk payment method → card insert → approving | `paying` | K8 or K6 (edit) |
 | K8 | Kiosk receipt? → order number | `paid` | K1 after 10 s |
 | KX | Kiosk banners: staff called and connection paused (a strip at the top that pushes the screen down), AI highlight + status line (in the toolbar row for 2 s), idle warning | any | — |
+| P0 | Phone app home `/app` (the installed app's start page; optional, a QR link never needs it): [Scan a kiosk], [Continue my order] while this phone holds an open order, how it works, settings (language, AI voice, larger text) that `/assistant` reads | — | scanner (`/app/scan`), or P2–P5 by [Continue my order] |
 | P1 | Phone mic hint (or in-app browser warning) | `connected`, or `ordering` when scanned mid-order | P2, or P3 when the dine option is already set; text mode if denied |
 | P2 | Phone dine option (not on a kiosk without dine options, such as the ticket machine: P3 directly) | `connected` | P3 |
 | P3 | Phone talk: mic, transcript, last two messages, cart card, choices, [Undo] | `ordering` | P4 |

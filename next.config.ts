@@ -23,6 +23,14 @@ const nextConfig: NextConfig = {
           { key: "Permissions-Policy", value: "microphone=(self), camera=()" },
         ],
       },
+      {
+        // The service worker is always fetched fresh, so a fix reaches phones on their next visit.
+        source: "/sw.js",
+        headers: [
+          { key: "Content-Type", value: "application/javascript; charset=utf-8" },
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+        ],
+      },
     ];
   },
   turbopack: {

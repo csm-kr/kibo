@@ -66,6 +66,9 @@ interface Props {
   onActions?: (actions: AgentAction[]) => void;
   /** /demo only: one user turn went to the AI (typed, spoken, an example or a choice), for the D3 comparison card. */
   onUserTurn?: () => void;
+  /** /assistant: the AI voice setting kept on the phone (/app settings); /demo keeps its own, on by default. */
+  voiceOutput?: boolean;
+  onVoiceOutputChange?: (on: boolean) => void;
 }
 
 export type SayFn = (text: string) => Promise<SendResult>;
@@ -136,7 +139,9 @@ export function AssistantPanel(props: Props) {
     else focusPending.current = true;
   }
 
-  const [voiceOutput, setVoiceOutput] = useState(true);
+  const [ownVoiceOutput, setOwnVoiceOutput] = useState(true);
+  const voiceOutput = props.voiceOutput ?? ownVoiceOutput;
+  const setVoiceOutput = props.onVoiceOutputChange ?? setOwnVoiceOutput;
   /** One plain sentence in the dock: why voice stopped, or the noise suggestion. */
   const [voiceNote, setVoiceNote] = useState<string | null>(null);
   const voice = useLiveVoice({

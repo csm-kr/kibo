@@ -22,6 +22,10 @@ const grotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "KIBO",
   description: "Talk to your phone, and the kiosk orders for you.",
+  // Home screen on iOS (the manifest in src/app/manifest.ts covers the other browsers).
+  icons: { apple: "/icons/apple-touch-icon.png" },
+  appleWebApp: { capable: true, title: "KIBO", statusBarStyle: "default" },
+  other: { "apple-mobile-web-app-capable": "yes" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
