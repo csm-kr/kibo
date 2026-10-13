@@ -10,6 +10,9 @@ Shell: only `npm`, `npx`, `node`, `python3`, `ls`, `mkdir`, `git status|diff|add
 ## Task
 Show the touch-versus-talk difference to judges with honest numbers.
 
+### First: a fair touch measurement (decision 10-13, orchestrating session; REVIEW.md K9)
+`evidence/touch-hero.json` (41 taps) measures "change both fries to large" by clearing the cart and re-adding, which inflates the touch side (the prototype path was 19 taps). A judge would call that unfair. Add a second automated touch run, `e2e/kiosk-touch-efficient.spec.ts`, that builds the **same final hero cart** the way a touch user who knows the order would: choose fries L in the sheet while adding each set, no clear-all, upsell declined. Save it to `evidence/touch-hero-efficient.json` (same fields, note "automated, efficient path: options chosen while adding"). **The comparison card and any deck/landing number use the efficient path**; the 41-tap edit path stays only as a footnote ("changing an option after adding needs delete and re-add on this kiosk"). Update the TESTING ledger rows accordingly (R-001).
+
 ### D3 comparison card (MALO only)
 After `paid` on `/demo?k=malo`, the end card shows two columns:
 - **This order with KIBO:** the live counts of this session: sentences sent (typed or spoken), taps on the phone, taps on the kiosk half, and seconds from [Start] to the order number (measured in the browser for this session).
