@@ -64,7 +64,7 @@ export function useKioskSession(kioskId: string) {
   );
   const stored = useMemo(() => parseStored(raw), [raw]);
   const [clockOffset, setClockOffset] = useState(0);
-  const { session, state } = useSessionStream(stored?.sessionId ?? null);
+  const { session, state, paused, resume } = useSessionStream(stored?.sessionId ?? null);
 
   const creating = useRef(false);
   const retryTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -154,6 +154,8 @@ export function useKioskSession(kioskId: string) {
     pairUrl: stored?.pairUrl ?? null,
     session,
     streamState: state,
+    paused,
+    resume,
     clockOffset,
     newSession,
     setClaimUrl,

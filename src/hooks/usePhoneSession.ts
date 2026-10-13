@@ -56,7 +56,7 @@ export function usePhoneSession(sessionId: string | null, opts: { holdClaim?: bo
   const [retryTick, setRetryTick] = useState(0);
   const claiming = useRef(false);
   const lastActive = useRef(0);
-  const { session, state } = useSessionStream(deviceToken && sessionId ? sessionId : null);
+  const { session, state, paused, resume } = useSessionStream(deviceToken && sessionId ? sessionId : null);
 
   useEffect(() => {
     if (!key || !sessionId || claiming.current) return;
@@ -137,6 +137,8 @@ export function usePhoneSession(sessionId: string | null, opts: { holdClaim?: bo
     deviceToken,
     session,
     streamState: state,
+    paused,
+    resume,
     claimError: error,
     clockOffset,
     /** A claim is waiting for `holdClaim` to end. */

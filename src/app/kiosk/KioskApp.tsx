@@ -4,7 +4,9 @@ import { useSyncExternalStore } from "react";
 import { KioskCanvas } from "@/components/kiosk/KioskCanvas";
 import { KioskScreen } from "@/components/kiosk/KioskScreen";
 import { PairingPanel } from "@/components/pairing/PairingPanel";
+import { PausedLayer } from "@/components/PausedLayer";
 import { useKioskSession } from "@/hooks/useKioskSession";
+import { kt } from "@/lib/i18n/kiosk";
 import type { KioskData } from "@/types/menu";
 
 /** Wider than tall: a laptop standing in for the kiosk. */
@@ -47,6 +49,7 @@ export function KioskApp({ kiosk, demo }: { kiosk: KioskData; demo: boolean }) {
           <PairingPanel kiosk={kiosk} session={ks.session} claimUrl={ks.claimUrl} pairCode={ks.pairCode} pairUrl={ks.pairUrl} clockOffset={ks.clockOffset} />
         </div>
       )}
+      {ks.paused && <PausedLayer kiosk lines={[kt("streamPaused", "ko"), kt("streamPaused", "en")]} onResume={ks.resume} />}
     </div>
   );
 }

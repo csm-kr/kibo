@@ -193,6 +193,51 @@ describe("GET /api/session/[id]/events", () => {
     }
   });
 
+  // 12-phone-app:7: a stream held open for the whole Cloud Run timeout keeps an instance billed as active,
+  // so the server ends each stream after 15 min and EventSource reconnects if the screen is still in use.
+  it("ends the stream cleanly after 15 min, unsubscribes and frees its place", async () => {
+    vi.useFakeTimers({ toFake: ["setInterval", "clearInterval", "setTimeout", "clearTimeout"] });
+    try {
+      const s = await newSession();
+      const store = getStore();
+      const unsubscribe = vi.fn();
+      const original = store.subscribe.bind(store);
+      vi.spyOn(store, "subscribe").mockImplementation((id, onChange, onError) => {
+        const off = original(id, onChange, onError);
+        return () => {
+          unsubscribe();
+          off();
+        };
+      });
+      const ip = { headers: { "x-forwarded-for": "203.0.113.12" } };
+      const req = () =>
+        GET(new Request(`${BASE}/api/session/${s.sessionId}/events`, ip), { params: Promise.resolve({ id: s.sessionId }) });
+      // Fill this address's 10 places; the 15-minute end of the first must free one.
+      const first = events(await req());
+      for (let i = 0; i < 9; i++) expect((await req()).status).toBe(200);
+      expect((await req()).status).toBe(429);
+
+      await first.next();
+      vi.advanceTimersByTime(15 * 60_000 - 1);
+      // Only keepalives before the cap.
+      for (let i = 0; i < Math.floor((15 * 60_000 - 1) / 25_000); i++) expect(await first.next()).toBe(": keepalive");
+      expect(unsubscribe).not.toHaveBeenCalled();
+      vi.advanceTimersByTime(1);
+      // The 36th keepalive falls on the same millisecond; the last frame must be the end comment.
+      const tail: (string | null)[] = [];
+      for (let e = await first.next(); e !== null; e = await first.next()) tail.push(e);
+      expect(tail.at(-1)).toBe(": stream end");
+      // All ten were opened at the same (fake) moment, so all ten end together and free their places.
+      expect(unsubscribe).toHaveBeenCalledTimes(10);
+
+      const again = await req();
+      expect(again.status).toBe(200);
+      await again.body!.cancel();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("sends a keepalive comment every 25 s", async () => {
     vi.useFakeTimers({ toFake: ["setInterval", "clearInterval"] });
     try {

@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { PausedLayer } from "@/components/PausedLayer";
 import { useKioskSession } from "@/hooks/useKioskSession";
+import { kt } from "@/lib/i18n/kiosk";
 import { useQrSrc } from "@/hooks/useQrSrc";
 import { createBridge, type BridgeOutcome } from "@/lib/bridge/bridge";
 import { sendCommand } from "@/lib/client/api";
@@ -18,7 +20,13 @@ const PAGE_H = 1600;
 /** Standalone /learned/<kioskId>: owns its session like /kiosk; /demo passes its own to LearnedKioskHost. */
 export function LearnedKioskApp({ kiosk }: { kiosk: KioskData }) {
   const ks = useKioskSession(kiosk.kioskId);
-  return <LearnedKioskHost kiosk={kiosk} session={ks.session} kioskToken={ks.kioskToken} claimUrl={ks.claimUrl} />;
+  return (
+    <>
+      <LearnedKioskHost kiosk={kiosk} session={ks.session} kioskToken={ks.kioskToken} claimUrl={ks.claimUrl} />
+      {/* The bridge reads commands from the stream too, so a paused page replays nothing until tapped. */}
+      {ks.paused && <PausedLayer kiosk lines={[kt("streamPaused", "ko"), kt("streamPaused", "en")]} onResume={ks.resume} />}
+    </>
+  );
 }
 
 export function LearnedKioskHost(props: {

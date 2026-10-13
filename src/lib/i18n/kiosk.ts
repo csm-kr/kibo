@@ -109,6 +109,8 @@ export const KIOSK_TEXT = {
   },
   idleQuestion: { ko: "계속 주문하시겠어요?", en: "Still ordering?" },
   idleContinue: { ko: "계속하기", en: "Continue" },
+  // Shown with Korean first and English below, whatever the kiosk's language (12-phone-app:7).
+  streamPaused: { ko: "일시정지됨 · 화면을 누르면 계속합니다", en: "Paused · Tap to continue" },
 } satisfies Record<string, Record<Locale, string>>;
 
 export type KioskTextKey = keyof typeof KIOSK_TEXT;

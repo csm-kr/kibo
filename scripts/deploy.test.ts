@@ -57,6 +57,8 @@ describe("scripts/deploy.sh", { timeout: 30_000 }, () => {
     // The local build runs before anything is uploaded, and the deploy names the region.
     expect(r.calls.indexOf("npm run build")).toBeLessThan(r.calls.indexOf("gcloud run deploy"));
     expect(r.calls).toContain("--region asia-northeast3");
+    // Above the events route's 15 min cap, so the server ends each stream, not Cloud Run (12-phone-app:7).
+    expect(r.calls).toContain("--timeout 900");
     // QR links and the kiosk's "<host>/app" line use the deterministic service URL, built from the project number.
     expect(r.calls).toContain("PUBLIC_ORIGIN=https://kibo-407514467119.asia-northeast3.run.app");
     // Unset in the deploying shell: the service gets no SHORT_APP_URL and the kiosk shows "<host>/app".

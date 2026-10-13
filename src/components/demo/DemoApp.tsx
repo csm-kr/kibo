@@ -8,12 +8,14 @@ import { KioskCanvas } from "@/components/kiosk/KioskCanvas";
 import { KioskScreen } from "@/components/kiosk/KioskScreen";
 import { LearnedKioskHost } from "@/components/learned/LearnedKioskHost";
 import { PairingPanel } from "@/components/pairing/PairingPanel";
+import { PausedLayer } from "@/components/PausedLayer";
 import { useDemoSession } from "@/hooks/useDemoSession";
 import type { AgentAction } from "@/lib/agent/actions";
 import { examplesFor } from "@/lib/agent/examples";
 import { buildComparison, HERO_KIOSK } from "@/lib/demo/compare";
 import { EDIT_PATH_TAPS, HUMAN_RUNS, TOUCH_RUN } from "@/lib/demo/evidence";
 import { scenariosFor } from "@/lib/demo/scenarios";
+import { pt } from "@/lib/i18n/phone";
 import type { KioskData, Locale } from "@/types/menu";
 import { ActionStrip } from "./ActionStrip";
 import { CompareCard } from "./CompareCard";
@@ -267,6 +269,8 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
           aside={beside ? actionStrip : undefined}
         />
       </main>
+      {/* Outside the counted columns, so the tap that resumes is no kiosk or phone tap. A paid order keeps its end card. */}
+      {demo.paused && session?.status !== "paid" && <PausedLayer lines={[pt("streamPaused", locale)]} onResume={demo.resume} />}
     </>
   );
 }

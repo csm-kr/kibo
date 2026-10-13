@@ -3,9 +3,11 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { AssistantPanel } from "@/components/assistant/AssistantPanel";
 import { ServiceWorker } from "@/components/app/ServiceWorker";
+import { PausedLayer } from "@/components/PausedLayer";
 import { setPhoneSettings, usePhoneSettings } from "@/hooks/usePhoneSettings";
 import { usePhoneSession } from "@/hooks/usePhoneSession";
 import { examplesFor } from "@/lib/agent/examples";
+import { pt } from "@/lib/i18n/phone";
 import { isInAppBrowser } from "@/lib/phone/inApp";
 import { LAST_ORDER_KEY, lastOrderRecord } from "@/lib/phone/settings";
 import type { KioskData, Locale } from "@/types/menu";
@@ -49,6 +51,8 @@ export function AssistantApp({ sessionId, kiosks }: { sessionId: string | null; 
         clockOffset={ps.clockOffset}
         inApp={inApp ? { held: ps.claimHeld, onStay: () => setStayInApp(true) } : undefined}
       />
+      {/* After payment nothing more comes through the stream, so the order number stays in view, unpaused (J1). */}
+      {ps.paused && session?.status !== "paid" && <PausedLayer lines={[pt("streamPaused", settings.locale)]} onResume={ps.resume} />}
     </>
   );
 }

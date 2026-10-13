@@ -54,7 +54,7 @@ gcloud run deploy "$SERVICE" \
   --min-instances 1 \
   --max-instances 3 \
   --concurrency 80 \
-  --timeout 3600 \
+  --timeout 900 \
   --cpu 1 \
   --memory 1Gi \
   --set-secrets GEMINI_API_KEY=gemini-api-key:latest \

@@ -34,7 +34,7 @@ export function useDemoSession(kioskId: string) {
   const [clockOffset, setClockOffset] = useState(0);
   const busy = useRef(false);
   const lastActive = useRef(0);
-  const { session, state } = useSessionStream(tokens?.sessionId ?? null);
+  const { session, state, paused, resume } = useSessionStream(tokens?.sessionId ?? null);
 
   const start = useCallback(
     async (pairPhone = false) => {
@@ -102,6 +102,8 @@ export function useDemoSession(kioskId: string) {
     tokens,
     session,
     streamState: state,
+    paused,
+    resume,
     clockOffset,
     error,
     starting,

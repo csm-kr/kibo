@@ -18,6 +18,8 @@ const PHONE_TEXT = {
   reconnecting: { ko: "다시 연결하고 있어요…", en: "Reconnecting…" },
   // Connecting
   connecting: { ko: "키오스크에 연결하고 있어요…", en: "Connecting to the kiosk…" },
+  // The screen stopped reading the order after 20 min with nothing happening (12-phone-app:7).
+  streamPaused: { ko: "일시정지됨 · 화면을 누르면 계속합니다", en: "Paused · Tap to continue" },
   // Start
   startTitle: { ko: "휴대폰으로 말하면 키오스크가 주문해요", en: "Tell your phone, and the kiosk orders for you" },
   startLead: { ko: "키오스크를 배우지 않아도 돼요.", en: "You don't need to learn the kiosk." },

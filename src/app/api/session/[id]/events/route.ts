@@ -6,9 +6,12 @@ import { toPublicSession } from "@/lib/session/public";
 import { getStore } from "@/lib/store";
 
 const KEEPALIVE_MS = 25_000;
+// An open stream keeps a Cloud Run instance billed as active, so each one ends after 15 min. Must stay below
+// the Cloud Run request timeout (900 s, scripts/deploy.sh) so the server, not Cloud Run, ends it cleanly.
+const MAX_STREAM_MS = 15 * 60_000;
 
 // ADR-010: screens read the session only through this stream; the server holds the store listener.
-// EventSource reconnects on its own when Cloud Run ends the request at its timeout.
+// EventSource reconnects on its own when the stream ends, so a screen in use just reads the next snapshot.
 export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }) {
   // Outside the try: during the build Next.js stops prerendering by throwing on request access.
   const ip = clientIp(req);
@@ -37,12 +40,17 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
         if (!closed) controller.enqueue(encoder.encode(text));
       };
       const timer = setInterval(() => send(": keepalive\n\n"), KEEPALIVE_MS);
+      const cap = setTimeout(() => {
+        send(": stream end\n\n");
+        close();
+      }, MAX_STREAM_MS);
       close = () => {
         if (closed) return;
         closed = true;
         release();
         unsubscribe();
         clearInterval(timer);
+        clearTimeout(cap);
         req.signal.removeEventListener("abort", close);
         try {
           controller.close();

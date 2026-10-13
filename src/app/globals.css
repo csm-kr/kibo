@@ -64,6 +64,10 @@
     opacity: 1;
   }
 }
+/* A full-screen layer appears (the stream pause): a plain fade, no movement, so reduced motion needs nothing else. */
+@utility kibo-fade-in {
+  animation: kibo-fade-in 200ms ease-out;
+}
 @utility kibo-sheet-in {
   animation: kibo-sheet-in 200ms ease-out;
   @media (prefers-reduced-motion: reduce) {
