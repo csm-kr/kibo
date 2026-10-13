@@ -311,3 +311,62 @@ describe("geminiClient, GEMINI_TEXT_BACKEND=auto", () => {
     expect(t.apiGen).not.toHaveBeenCalled();
   });
 });
+
+describe("geminiClient with the prompt cache", () => {
+  /** A fake cache: a name per backend, or null where the backend refused one. */
+  function fakeCache(names: Partial<Record<"api" | "vertex", string | null>>) {
+    return { get: vi.fn(async (b: "api" | "vertex") => names[b] ?? null), drop: vi.fn() };
+  }
+
+  it("names the cache instead of sending the instructions and tools; contents and output limits stay", async () => {
+    const t = auto(async () => OK);
+    const cache = fakeCache({ api: "cachedContents/a1" });
+    await geminiClient({ ...t.deps, cache }).generate({ ...REQ, tools: [{ functionDeclarations: [] }] });
+    expect(cache.get).toHaveBeenCalledWith("api", "gemini-3.8-flash", "sys", [{ functionDeclarations: [] }]);
+    const sent = t.apiGen.mock.calls[0][0] as { contents: unknown; config: Record<string, unknown> };
+    expect(sent.contents).toBe(REQ.contents);
+    expect(sent.config.cachedContent).toBe("cachedContents/a1");
+    expect(sent.config).not.toHaveProperty("systemInstruction");
+    expect(sent.config).not.toHaveProperty("tools");
+    expect(sent.config.maxOutputTokens).toBe(1024);
+    expect(sent.config).toHaveProperty("thinkingConfig");
+  });
+
+  it("without a cache name the request is sent inline, as before", async () => {
+    const t = auto(async () => OK);
+    await geminiClient({ ...t.deps, cache: fakeCache({}) }).generate(REQ);
+    const sent = t.apiGen.mock.calls[0][0] as { config: Record<string, unknown> };
+    expect(sent.config.systemInstruction).toBe("sys");
+    expect(sent.config).not.toHaveProperty("cachedContent");
+  });
+
+  it("injected models without an injected cache never create one (tests stay off the network)", async () => {
+    const t = auto(async () => OK);
+    await t.client().generate(REQ);
+    expect((t.apiGen.mock.calls[0][0] as { config: Record<string, unknown> }).config.systemInstruction).toBe("sys");
+  });
+
+  it("a cache the backend no longer has (404) is dropped and the same call goes inline once", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const t = auto(async () => OK);
+    t.apiGen.mockRejectedValueOnce(apiError(404));
+    const cache = fakeCache({ api: "cachedContents/gone" });
+    const out = await geminiClient({ ...t.deps, cache }).generate(REQ);
+    expect(out.text).toBe("ok");
+    expect(cache.drop).toHaveBeenCalledWith("cachedContents/gone");
+    expect(t.apiGen).toHaveBeenCalledTimes(2);
+    expect((t.apiGen.mock.calls[1][0] as { config: Record<string, unknown> }).config.systemInstruction).toBe("sys");
+    expect(console.error).toHaveBeenCalledWith("gemini cache refused (404), sent inline");
+    expect(t.vertexGen).not.toHaveBeenCalled();
+  });
+
+  it("the fallback to Vertex uses Vertex's own cache, never the API key's cache name", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const t = auto(async () => Promise.reject(apiError(402)));
+    const cache = fakeCache({ api: "cachedContents/a1", vertex: "projects/p/locations/global/cachedContents/v1" });
+    const out = await geminiClient({ ...t.deps, cache }).generate(REQ);
+    expect(out.backend).toBe("vertex");
+    const sent = t.vertexGen.mock.calls[0] as unknown as [{ config: Record<string, unknown> }];
+    expect(sent[0].config.cachedContent).toBe("projects/p/locations/global/cachedContents/v1");
+  });
+});

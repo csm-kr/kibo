@@ -21,7 +21,10 @@
     {
       "step": 2,
       "name": "prompt-cache",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-13T13:51:33+0900",
+      "summary": "I-155 fixed: after a learned-kiosk command answers pending, the next call of the request waits for the bridge (runChat polls the store, the voice runner reads the latest streamed session; 200 ms polls up to 12 s, src/lib/agent/bridgeWait.ts), else the rest get the server's CONFLICT 'kiosk still working' without being sent. Explicit Gemini context cache for the text agent (src/lib/agent/cache.ts): chatInstructions splits a static system (rules+menu, same per kiosk/locale) from a <current_order> block prepended to the latest user message; one cache per backend/model/prompt hash, 60 min TTL, replaced 5 min before expiry, refused create -> inline + one log line + 10 min backoff, cached call 400/403/404 -> drop + inline once; Live unchanged (LiveConnectConfig has no cachedContent). Measured (evidence/prompt-cache.json): text hero order $0.0588 -> $0.0088 before storage (85% less; 77,048 of 79,593 prompt tokens cached; reorder alone $0.0556), storage price not on file (unverified, break-even $5.19/1M tok/h at 1 order/cache-hour); eval 44/44 before, 44/44 after (14/14 on API key, then key hit HTTP 402 -> I-104 reopened, voice down until credits topped up; 30/30 re-run on Vertex, cache works there too, refused for small Doughhouse prompt); no latency gain (same 18 requests: median 6.4->6.7 s, first command 2.6->3.9 s). Kept for cost. Docs: TESTING ledger, ARCHITECTURE limits, DECK_FACTS cost rows, ISSUE I-155/I-104. AC: lint, build, test 806 passed, eval:agent, measure:cost.",
+      "completed_at": "2026-10-13T14:30:00+0900"
     },
     {
       "step": 3,

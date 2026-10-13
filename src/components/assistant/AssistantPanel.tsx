@@ -151,6 +151,7 @@ export function AssistantPanel(props: Props) {
     voiceOutput,
     utterances,
     getCart: () => session?.cart ?? [],
+    getSession: () => session,
     onAction: props.onActions ? (action) => props.onActions?.([action]) : undefined,
   });
   const voiceOpen = voice.state === "listening" || voice.state === "thinking" || voice.state === "speaking";

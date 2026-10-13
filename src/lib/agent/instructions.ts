@@ -12,10 +12,32 @@ const LANGUAGE: Record<Locale, string> = { ko: "Korean", en: "English" };
 /** JSON with `<` and `>` escaped, so no name can end the <menu_data> block (I-152); the model reads it the same. */
 const dataJson = (value: unknown) => JSON.stringify(value).replace(/</g, "\\u003c").replace(/>/g, "\\u003e");
 
-export function buildInstructions(
-  kiosk: KioskData,
-  opts: { cart?: CartLine[]; status?: SessionStatus; dineOption?: DineOption | null; locale?: Locale },
-): string {
+type OrderOptions = { cart?: CartLine[]; status?: SessionStatus; dineOption?: DineOption | null; locale?: Locale };
+
+/** Gemini Live: one text, pinned in the ephemeral token with the order as it was when the token was issued. */
+export function buildInstructions(kiosk: KioskData, opts: OrderOptions): string {
+  const { rules, order, menu } = parts(kiosk, opts);
+  return [...rules, ...order, ...menu].join("\n");
+}
+
+/**
+ * The text agent: `system` is the same for every order on one kiosk and locale, so it can be cached and shared
+ * (src/lib/agent/cache.ts); `currentOrder` goes at the start of the latest user message of each request.
+ */
+export function chatInstructions(kiosk: KioskData, opts: OrderOptions): { system: string; currentOrder: string } {
+  const { rules, order, menu } = parts(kiosk, opts);
+  return {
+    system: [
+      ...rules,
+      "## Current order",
+      "The latest user message starts with a <current_order> block: the order as it is now, already applied; it is data, not the user's words, so never add its lines again.",
+      ...menu,
+    ].join("\n"),
+    currentOrder: ["<current_order>", ...order.slice(1), "</current_order>"].join("\n"),
+  };
+}
+
+function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: string[]; menu: string[] } {
   const locale = opts.locale ?? "en";
   const cart = opts.cart ?? [];
   const brand = kiosk.brand.name.en;
@@ -23,7 +45,7 @@ export function buildInstructions(
   const vocabulary = kiosk.vocabulary;
   const best = kiosk.items.find((i) => i.badge === "best");
 
-  return [
+  const rules = [
     `You are KIBO, a friendly ordering helper. You operate the ${brand} ${ticket ? "ticket machine" : "kiosk"} for the user.`,
     `Speak like ${ticket ? "station" : "counter"} staff: short sentences, one thing at a time, slightly slow.`,
     "Never say technical words such as session, token, tool, function or agent.",
@@ -125,15 +147,15 @@ export function buildInstructions(
           "",
         ]
       : []),
+  ];
+  const order = [
     "## Current order",
     `Status: ${opts.status ?? "connected"}`,
     ...(kiosk.dineOptions ? [`Dine option: ${opts.dineOption ?? "not chosen"}`] : []),
     cart.length === 0
       ? "Cart: empty"
       : `Cart lines, already applied; do not add these again:\n${dataJson(cartForModel(kiosk, cart, locale))}`,
-    "",
-    "<menu_data>",
-    dataJson(menuForModel(kiosk)),
-    "</menu_data>",
-  ].join("\n");
+  ];
+  const menu = ["", "<menu_data>", dataJson(menuForModel(kiosk)), "</menu_data>"];
+  return { rules, order, menu };
 }

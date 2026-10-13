@@ -1,0 +1,76 @@
+{
+  "about": "Explicit context caching for the text agent (11-hardening:2, src/lib/agent/cache.ts). The static part of the prompt (rules, menu, tools; chatInstructions in src/lib/agent/instructions.ts) is stored once per backend, model, kiosk and locale with a 60 min TTL; each request names it with cachedContent and sends the order (status, dine option, cart) in a <current_order> block at the start of the latest user message. Cost: `npm run measure:cost` (MALO hero order, 4 user turns, 3 text runs each, en, on the Gemini API key: GEMINI_TEXT_BACKEND=api from the local .env, I-125). Pass rate and latency: `npm run eval:agent`. Counts, timings and verdicts only. Run on a laptop, 10-13; one set of 3 runs per variant, so durations are noisy.",
+  "date": "2026-10-13",
+  "model": "gemini-3.8-flash, thinking low",
+  "variants": {
+    "before": "the code before this step (commit e2b6ad9): one system instruction per request with the current order before the menu, so its prefix changed with every cart change",
+    "reorderOnly": "this step's prompt split (static system, order in the user message) without the explicit cache (`npm run measure:cost -- --no-prompt-cache`); the implicit cache still applies",
+    "explicitCache": "this step as shipped: the static system and tools in an explicit cache"
+  },
+  "textHeroOrder": {
+    "before": {
+      "source": "measure:cost run of 2026-10-13T04:52Z (copy of evidence/cost-per-order.json at that time)",
+      "runs": 3,
+      "heroCart": "3/3",
+      "medianPerOrder": { "prompt": 79237, "cached": 7585, "candidates": 310, "thoughts": 0, "total": 79547 },
+      "uncachedPromptPerRun": [79135, 71652, 72271],
+      "usdPerRun": [0.060529, 0.05547, 0.058755],
+      "usdMedian": 0.058755,
+      "durationMsPerRun": [16857, 15897, 21989],
+      "durationMsMedian": 16857
+    },
+    "reorderOnly": {
+      "source": "measure:cost --no-prompt-cache run of 2026-10-13T05:05Z",
+      "runs": 3,
+      "heroCart": "3/3",
+      "medianPerOrder": { "prompt": 79561, "cached": 7639, "candidates": 297, "thoughts": 0, "total": 79847 },
+      "uncachedPromptPerRun": [71922, 61909, 72004],
+      "usdPerRun": [0.055587, 0.048118, 0.055708],
+      "usdMedian": 0.055587,
+      "durationMsPerRun": [16989, 14572, 17224],
+      "durationMsMedian": 16989,
+      "note": "The implicit cache served only the first call of each order (7,639 tokens), even with the static part first."
+    },
+    "explicitCache": {
+      "source": "measure:cost run of 2026-10-13T05:02Z, kept as evidence/cost-per-order.json",
+      "runs": 3,
+      "heroCart": "3/3",
+      "medianPerOrder": { "prompt": 79593, "cached": 77048, "candidates": 289, "thoughts": 0, "total": 79882 },
+      "cachedTokensPerCall": 9631,
+      "uncachedPromptPerRun": [2149, 2763, 2545],
+      "usdPerRun": [0.007718, 0.009111, 0.008771],
+      "usdMedian": 0.008771,
+      "durationMsPerRun": [17939, 27387, 18090],
+      "durationMsMedian": 18090,
+      "note": "Every call named the cache (9,631 of about 9,700-10,300 prompt tokens). Run 2 (27.4 s) made three model calls on turn 1 instead of two. USD excludes cache storage (below)."
+    },
+    "usdSavedPerOrderVsBefore": 0.049984,
+    "usdPricesUsed": "evidence/cost-per-order.json `prices` (gemini-3.8-flash input 0.75, cached input 0.075, output 3.75 USD per 1M tokens, read 10-13 from https://ai.google.dev/gemini-api/docs/pricing); scripts/cost.ts"
+  },
+  "cacheStorage": {
+    "pricePerMTokenHour": null,
+    "priceNote": "Not on file and not read in this step (the step's shell had no web access): unverified. A person copies the context-caching storage price for gemini-3.8-flash from https://ai.google.dev/gemini-api/docs/pricing into evidence/cost-per-order.json `prices`.",
+    "tokensPerCache": 9631,
+    "tokensPerCacheMeasuredFor": "MALO BURGER, en (cachedContentTokenCount of every call)",
+    "cacheHourUsd": "9631 / 1,000,000 x price = 0.009631 x price",
+    "breakEven": "One hero order saves 0.049984 USD of input, so one order per cache-hour covers a storage price up to 5.19 USD per 1M tokens per hour (0.049984 / 0.009631).",
+    "mostCachesAtOnce": "Per Cloud Run instance one cache per backend, kiosk and locale in use within the last 60 min: 3 kiosks x 2 locales = 6 on the API key (Vertex only during a fallback), x 3 instances (max-instances=3) = 18. A cache lives 60 min from creation and is not extended; the next request after that (or within its last 5 min) creates a new one, so an idle kiosk costs at most one cache-hour."
+  },
+  "evalPassRate": {
+    "before": { "file": "evals/results/2026-10-13T13-55.json", "backend": "api", "passed": "44/44", "latency": { "requests": 59, "totalMedianMs": 5572, "totalP90Ms": 7339, "firstToolMedianMs": 2429, "firstToolP90Ms": 4645 } },
+    "explicitCache": {
+      "passed": "44/44 (14/14 on the API key + 30/30 on Vertex AI)",
+      "onApiKey": { "file": "evals/results/2026-10-13T14-07.json", "passed": "14/44", "note": "The first 14 cases passed; then the API key's prepaid credits ran out (HTTP 402 on every call, I-104) and the other 30 cases got no model answer (UPSTREAM), so they are not failures of the change." },
+      "onVertex": { "file": "evals/results/2026-10-13T14-19.json", "passed": "30/30", "subset": "the 30 cases without a model answer above, GEMINI_TEXT_BACKEND=vertex", "note": "Vertex AI (location global) accepted the explicit cache for MALO and airport rail (no refusal logged); it refused one for the smaller Doughhouse prompt (HTTP 400, probably under its minimum size, unverified), and those two cases ran inline and passed." }
+    }
+  },
+  "latencySameCases": {
+    "about": "The 14 cases that passed on the API key in both runs (18 requests), before vs explicit cache; one run each.",
+    "before": { "requestMedianMs": 6447, "requestP90Ms": 8320, "firstCommandMedianMs": 2601, "firstCommandP90Ms": 4930 },
+    "explicitCache": { "requestMedianMs": 6681, "requestP90Ms": 10196, "firstCommandMedianMs": 3876, "firstCommandP90Ms": 5652 },
+    "verdict": "No latency gain measured: medians are within run-to-run noise or slower. The first request also waits for the cache to be created. The explicit cache is kept for cost only."
+  },
+  "voice": "Unchanged. Gemini Live cannot name a cache: in @google/genai 2.28 only GenerateContentConfig has `cachedContent`, LiveConnectConfig (and the ephemeral token's liveConnectConstraints) has none, so the Live instructions stay pinned in the token as before (buildInstructions output unchanged).",
+  "decision": "Kept: the eval pass rate did not drop (44/44 before and after) and the text agent's input cost per hero order fell from 0.0588 to 0.0088 USD before storage (85% less), which covers storage at any price up to 5.19 USD per 1M tokens per hour with one order per cache-hour. Latency did not improve.",
+  "exposure": "Cache names stay on the server: they are never in an API response, the session stream or a log line (logs carry the HTTP status only)."
+}

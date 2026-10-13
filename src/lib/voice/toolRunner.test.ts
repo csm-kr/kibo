@@ -1,7 +1,8 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getKiosk } from "@/lib/adapters/catalog";
 import { ApiError, type CommandReply } from "@/lib/client/api";
 import type { AgentAction } from "@/lib/agent/actions";
+import type { Session } from "@/types/session";
 import { runToolCalls, type ToolContext, type VoiceCommand } from "./toolRunner";
 
 const kiosk = getKiosk("malo");
@@ -181,5 +182,76 @@ describe("runToolCalls", () => {
       { tool: "unknown", args: {}, code: "BAD_REQUEST", ms: expect.any(Number) },
     ]);
     expect(JSON.stringify(actions)).not.toMatch(/live-uuid|free text|Please confirm/);
+  });
+});
+
+describe("runToolCalls on a learned kiosk (I-155)", () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  type View = Pick<Session, "pendingBridgeCommand" | "bridgeStatus">;
+  const PENDING = { ...REPLY, pending: true } as CommandReply;
+  const DINE_AND_ADD = [
+    { id: "d", name: "setDineOption", args: { option: "eat_in" } },
+    { id: "a", name: "addToCart", args: { itemId: "cheese_oven_spaghetti", variant: "single" } },
+  ];
+  const waiting = (commandId: string): View => ({
+    pendingBridgeCommand: { commandId, type: "setDineOption", args: { option: "eat_in" }, source: "voice", at: 1 },
+    bridgeStatus: null,
+  });
+
+  function learnedCtx(view: () => View) {
+    const sent: string[] = [];
+    const c = ctx({
+      kiosk: getKiosk("doughhouse"),
+      session: view,
+      send: async (cmd) => {
+        sent.push(cmd.commandId);
+        return PENDING;
+      },
+    });
+    return { c, sent };
+  }
+
+  it("waits until the session stream shows the replay done, then sends the next call", async () => {
+    let view: View = { pendingBridgeCommand: null, bridgeStatus: null };
+    const { c, sent } = learnedCtx(() => view);
+    const run = runToolCalls(DINE_AND_ADD, c);
+
+    // The stream has not caught up yet: an old snapshot without the pending change is not "done".
+    await vi.advanceTimersByTimeAsync(200);
+    expect(sent).toEqual(["live-uuid:d"]);
+    view = waiting("live-uuid:d");
+    await vi.advanceTimersByTimeAsync(400);
+    expect(sent).toEqual(["live-uuid:d"]);
+    view = { pendingBridgeCommand: null, bridgeStatus: { lastOk: true, at: 5 } };
+    await vi.advanceTimersByTimeAsync(200);
+    const out = await run;
+    expect(sent).toEqual(["live-uuid:d", "live-uuid:a"]);
+    expect(out.map((r) => (r.response as { ok: boolean }).ok)).toEqual([true, true]);
+  });
+
+  it("counts a new bridge report as done even when the stream never showed the pending change", async () => {
+    let view: View = { pendingBridgeCommand: null, bridgeStatus: { lastOk: true, at: 1 } };
+    const { c, sent } = learnedCtx(() => view);
+    const run = runToolCalls(DINE_AND_ADD, c);
+    await vi.advanceTimersByTimeAsync(400);
+    expect(sent).toHaveLength(1);
+    view = { pendingBridgeCommand: null, bridgeStatus: { lastOk: true, at: 9 } };
+    await vi.advanceTimersByTimeAsync(200);
+    await run;
+    expect(sent).toHaveLength(2);
+  });
+
+  it("after 12 s answers the remaining calls with the kiosk-busy result without sending them", async () => {
+    const { c, sent } = learnedCtx(() => waiting("live-uuid:d"));
+    const run = runToolCalls([...DINE_AND_ADD, { id: "r", name: "requestCheckout", args: {} }], c);
+    await vi.advanceTimersByTimeAsync(12_000);
+    const out = await run;
+    expect(sent).toEqual(["live-uuid:d"]);
+    expect(out.slice(1).map((r) => r.response)).toEqual([
+      { ok: false, code: "CONFLICT", message: "The kiosk is still working on your last request." },
+      { ok: false, code: "CONFLICT", message: "The kiosk is still working on your last request." },
+    ]);
   });
 });

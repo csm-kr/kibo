@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CommandError } from "@/lib/commands/errors";
 import { MemoryUsageStore, type UsageStore } from "@/lib/limits/usage";
-import { claimSession, createSession } from "@/lib/session/service";
+import { claimSession, createSession, runCommand } from "@/lib/session/service";
 import { MemoryStore } from "@/lib/store/memory";
 import { runChat, type ChatInput } from "./chat";
 import type { ModelClient, ModelTurn } from "./model";
@@ -88,10 +88,12 @@ describe("runChat", () => {
     expect(session?.lastChange?.source).toBe("text");
 
     expect(requests[0].system).toContain("<menu_data>");
+    // The order goes with the latest message, so the system text stays the same and can be cached (11-hardening:2).
+    expect(requests[0].system).not.toMatch(/Status: |Cart: /);
     expect(requests[0].contents).toEqual([
       { role: "user", parts: [{ text: "Hello" }] },
       { role: "model", parts: [{ text: "Hi! What would you like?" }] },
-      { role: "user", parts: [{ text: "Two cheeseburger sets" }] },
+      { role: "user", parts: [{ text: expect.stringMatching(/^<current_order>\nStatus: connected\n[\s\S]*Cart: empty\n<\/current_order>$/) }, { text: "Two cheeseburger sets" }] },
     ]);
     const [modelTurn, answers] = requests[1].contents.slice(-2);
     expect(modelTurn.parts).toEqual([
@@ -267,5 +269,89 @@ describe("runChat", () => {
     const printed = JSON.stringify(logs.flatMap((l) => l.mock.calls));
     expect(printed).not.toContain("peanut");
     expect(printed).toContain("addToCart");
+  });
+});
+
+describe("runChat on a learned kiosk (I-155)", () => {
+  const DINE_AND_ADD: Call[] = [
+    { name: "setDineOption", args: { option: "eat_in" } },
+    { name: "addToCart", args: { itemId: "cheese_oven_spaghetti", variant: "single" } },
+  ];
+
+  async function learned() {
+    const r = await createSession(store, { kioskId: "doughhouse", demo: true }, T0);
+    return { sessionId: r.sessionId, deviceToken: r.deviceToken!, kioskToken: r.kioskToken };
+  }
+
+  /** What the in-page bridge sends once it has replayed the pending change on the kiosk page. */
+  async function bridgeReports(s: { sessionId: string; kioskToken: string }) {
+    const session = (await store.get(s.sessionId))!;
+    const p = session.pendingBridgeCommand!;
+    const kioskTotal = p.type === "addToCart" ? session.total + 6900 : session.total;
+    const body = {
+      sessionId: s.sessionId,
+      commandId: `bridge-${++rid}`,
+      type: "bridgeReport",
+      args: { commandId: p.commandId, ok: true, kioskTotal, kioskLines: [] },
+      source: "touch",
+    };
+    await runCommand(store, { body, bearer: s.kioskToken }, now);
+  }
+
+  it("waits for the bridge to replay the dine option before sending the add of the same response", async () => {
+    const s = await learned();
+    const { model } = script(DINE_AND_ADD, "Adding it now.");
+    let sleeps = 0;
+    const sleep = async (ms: number) => {
+      now += ms;
+      if (++sleeps === 2) await bridgeReports(s);
+    };
+    const out = await runChat({ ...deps(model), sleep }, input(s, { message: "One cheese oven spaghetti to eat here" }));
+
+    expect(sleeps).toBe(2);
+    expect(out.actions.map((a) => [a.tool, a.code, a.pending])).toEqual([
+      ["setDineOption", "ok", true],
+      ["addToCart", "ok", true],
+    ]);
+    const session = (await store.get(s.sessionId))!;
+    expect(session.dineOption).toBe("eat_in");
+    expect(session.pendingBridgeCommand).toMatchObject({ type: "addToCart" });
+  });
+
+  it("answers the rest of the response with the kiosk-busy result when the bridge does not report within 12 s", async () => {
+    const s = await learned();
+    const { model, requests } = script(DINE_AND_ADD, "The kiosk is still busy.");
+    let sleeps = 0;
+    const sleep = async (ms: number) => {
+      now += ms;
+      sleeps++;
+    };
+    const req = input(s);
+    const out = await runChat({ ...deps(model), sleep }, req);
+
+    expect(now - T0).toBe(12_000);
+    expect(sleeps).toBe(60);
+    expect(out.actions.map((a) => [a.tool, a.code])).toEqual([
+      ["setDineOption", "ok"],
+      ["addToCart", "CONFLICT"],
+    ]);
+    const answers = requests[1].contents.at(-1)!.parts as { functionResponse: { response: Record<string, unknown> } }[];
+    expect(answers[1].functionResponse.response).toEqual({
+      ok: false,
+      code: "CONFLICT",
+      message: "The kiosk is still working on your last request.",
+    });
+    // The add was never sent: the server saw only the dine option.
+    const session = (await store.get(s.sessionId))!;
+    expect(session.recentCommandIds).toEqual([`${req.chatRequestId}:0`]);
+    expect(session.pendingBridgeCommand).toMatchObject({ type: "setDineOption" });
+  });
+
+  it("never waits on a direct kiosk", async () => {
+    const s = await demo();
+    const sleep = vi.fn();
+    const out = await runChat({ ...deps(script(HERO, "Added.").model), sleep }, input(s));
+    expect(out.cart).toHaveLength(2);
+    expect(sleep).not.toHaveBeenCalled();
   });
 });

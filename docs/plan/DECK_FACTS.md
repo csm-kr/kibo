@@ -76,11 +76,12 @@ Phone captures are 390×844 CSS px at 2×; kiosk captures are the 1080×1920 can
 ## 10 Cost
 | Fact | Source | Status |
 |---|---|---|
-| One hero order by text: median 90,393 Gemini tokens, **$0.0648** (3 runs, $0.0633–0.0653) | `evidence/cost-per-order.json` (`costUsdPerOrder.text`); TESTING ledger "Cost per session" | measured tokens × official price |
-| One hero order by voice: median 91,795 tokens (thoughts on top), **$0.0886** (3 completed runs, $0.0749–0.0993; $0.1085 if the unattributed prompt is billed as audio) | same, `costUsdPerOrder.voice` | measured tokens × official price; voice split assumed (see the ledger) |
+| One hero order by text: median 79,882 Gemini tokens, 77,048 of them read from the explicit prompt cache, **$0.0088** before cache storage (3 runs, $0.0077–0.0091) | `evidence/cost-per-order.json` (`costUsdPerOrder.text`); TESTING ledger "Cost per session" | measured tokens × official price; storage not included |
+| Prompt cache: text input cost per hero order **85% lower** ($0.0588 → $0.0088 the same day), same eval pass rate (44/44), **no latency gain**; storage price not on file, so say "before storage" | `evidence/prompt-cache.json`; TESTING ledger "Explicit prompt cache" | measured; storage price **unverified** |
+| One hero order by voice: median 78,979 tokens (thoughts on top), **$0.0766** (3 runs, $0.0744–0.0771; $0.0930 if the unattributed prompt is billed as audio); Live cannot use the prompt cache | same, `costUsdPerOrder.voice` | measured tokens × official price; voice split assumed (see the ledger) |
 | Prices: Gemini API paid tier, read 10-13 from https://ai.google.dev/gemini-api/docs/pricing, valid through 2026-12-31 (they double from 2027-01-01) | `evidence/cost-per-order.json` `prices` | official URL; re-read before submitting |
-| The prompt dominates: each call re-reads the instructions with the whole menu (about 9,600 tokens) | same, `text.runs[].calls` | measured |
-| Voice: 1 more attempt stalled on turn 1 (kept as a failure); hero cart exact in 2 of 3 completed runs | same, `voice.failedAttempts`; I-139 | measured |
+| The prompt dominates: each call re-reads the instructions with the whole menu (about 9,600 tokens); the text agent now reads them from the cache | same, `text.runs[].calls` | measured |
+| Voice: hero cart exact in 3 of 3 runs, no stalled attempt in the 11-hardening:2 run (an earlier run had 1 stall, I-139) | same, `voice.runs`, `voice.failedAttempts` | measured |
 
 USD only. Do not show KRW without an official exchange-rate source and date. No prices to customers (T&C).
 

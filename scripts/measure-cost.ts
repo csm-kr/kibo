@@ -52,6 +52,10 @@ const TURN_TIMEOUT_MS = 45_000;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+// `-- --no-prompt-cache`: the text agent without its explicit prompt cache, for the comparison in
+// evidence/prompt-cache.json (the implicit cache still applies).
+const PROMPT_CACHE = !process.argv.includes("--no-prompt-cache");
+
 function sum(us: TokenUsage[]): TokenUsage {
   return us.reduce((a, u) => ({
     prompt: a.prompt + u.prompt,
@@ -105,7 +109,7 @@ async function textRun() {
     const session = (await store.get(sessionId))!;
     const history = historyFor(chat.messages);
     chat = chatReducer(chat, { type: "send", text: message });
-    const inner = geminiClient();
+    const inner = geminiClient(PROMPT_CACHE ? {} : { cache: null });
     const model: ModelClient = {
       async generate(req) {
         const out = await inner.generate(req);
@@ -313,7 +317,9 @@ async function main() {
       "config the ephemeral token pins, connected from Node with the API key; turns 1-2 spoken by the synthetic TTS fixtures " +
       "hero-en.wav and fries-en.wav (e2e/fixtures), turns 3-4 typed into the same session; tokens from every usageMetadata " +
       "message (one per model generation, sent with its turnComplete), summed per order. Medians per field are taken " +
-      "separately, so they need not add up. `cached` is the part of `prompt` served from the implicit cache. Live's " +
+      "separately, so they need not add up. `cached` is the part of `prompt` served from a cache: the text agent's " +
+      "explicit prompt cache (src/lib/agent/cache.ts, since 11-hardening:2; its storage is not in these counts, see " +
+      "evidence/prompt-cache.json) or the implicit cache. Live's " +
       "totalTokenCount leaves out thoughtsTokenCount (seen in every message), so bill thoughts as output on top of it. " +
       "Memory store, dine option tapped first. Counts only: no utterances, replies or instructions.",
     date,
@@ -323,6 +329,7 @@ async function main() {
       model: process.env.GEMINI_TEXT_MODEL ?? "gemini-3.8-flash",
       backendSetting: textBackendSetting(),
       thinkingLevel: process.env.GEMINI_TEXT_THINKING ?? "low",
+      promptCache: PROMPT_CACHE ? "explicit" : "off",
       medianPerOrder: medians(text),
       runs: text,
     },

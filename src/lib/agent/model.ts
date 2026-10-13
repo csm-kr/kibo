@@ -8,6 +8,7 @@ import {
   type ToolListUnion,
 } from "@google/genai";
 import { CommandError } from "@/lib/commands/errors";
+import { createPromptCache, type PromptCache } from "./cache";
 
 // The text agent's model (ADR-011). Server only: GEMINI_API_KEY never leaves this module.
 // GEMINI_TEXT_BACKEND=auto (default): the Gemini API key first, because it was faster (I-105), and Vertex AI
@@ -111,7 +112,6 @@ function textGenAI(backend: TextBackend): GoogleGenAI {
 }
 
 type Models = Pick<GoogleGenAI["models"], "generateContent">;
-type GenerateParams = Parameters<Models["generateContent"]>[0];
 type GenerateResponse = Awaited<ReturnType<Models["generateContent"]>>;
 
 const OUTAGE_WINDOW_MS = 5 * 60_000;
@@ -159,29 +159,36 @@ function fallbackStatus(e: unknown): string | null {
   return e.status === 402 || e.status === 429 || e.status >= 500 ? String(e.status) : null;
 }
 
-/** One generateContent. With `pinned`, only that backend; otherwise auto may retry once on Vertex. */
+/** One generateContent through `call`. With `pinned`, only that backend; otherwise auto may retry once on Vertex. */
 async function generateOn(
   deps: TextDeps,
-  params: GenerateParams,
+  call: (backend: TextBackend) => Promise<GenerateResponse>,
   pinned?: TextBackend,
 ): Promise<{ res: GenerateResponse; backend: TextBackend }> {
   const auto = deps.backend === "auto" && pinned === undefined;
   const first = pinned ?? (deps.backend !== "auto" ? deps.backend : deps.circuit.open(deps.now()) ? "vertex" : "api");
   try {
-    return { res: await deps.models(first).generateContent(params), backend: first };
+    return { res: await call(first), backend: first };
   } catch (e) {
     const status = auto && first === "api" ? fallbackStatus(e) : null;
     if (status === null) throw e;
     if (status === "402") deps.circuit.billingFailure(deps.now());
     console.error(`gemini text fallback api->vertex (${status})`);
-    return { res: await deps.models("vertex").generateContent(params), backend: "vertex" };
+    return { res: await call("vertex"), backend: "vertex" };
   }
 }
 
 /** The text backend for one-off calls (the deep health check), with the same fallback as the agent. */
 export function textModels(): Models {
-  return { generateContent: async (params) => (await generateOn(defaultTextDeps(), params)).res };
+  const deps = defaultTextDeps();
+  return { generateContent: async (params) => (await generateOn(deps, (b) => deps.models(b).generateContent(params))).res };
 }
+
+// One prompt cache per instance for the production clients (src/lib/agent/cache.ts).
+const sharedCache = createPromptCache((b) => textGenAI(b).caches);
+
+/** A cached call the backend refuses with these is retried inline once: nothing ran, so the retry is safe. */
+const CACHE_REFUSED = [400, 403, 404];
 
 /** Upstream messages can hold request data, so callers only ever see these fixed ones. */
 function modelError(e: unknown): CommandError {
@@ -197,26 +204,40 @@ function modelError(e: unknown): CommandError {
  * or while the circuit is open); every later call stays there without fallback, because tools may already have
  * run, so a request never switches backends after a command was applied. `overrides` are for tests; production
  * builds the shared clients on first use, so a missing key is an UPSTREAM error.
+ * `system` and `tools` must be the same for every order on a kiosk and locale (chatInstructions): they go into a
+ * shared explicit cache when the backend allows one. Injected `models` get no cache unless one is injected too.
  */
-export function geminiClient(overrides: Partial<TextDeps> = {}): ModelClient {
+export function geminiClient(overrides: Partial<TextDeps> & { cache?: PromptCache | null } = {}): ModelClient {
   const model = process.env.GEMINI_TEXT_MODEL ?? "gemini-3.8-flash";
+  const cache = overrides.cache !== undefined ? overrides.cache : overrides.models ? null : sharedCache;
   let pinned: TextBackend | undefined;
   return {
     async generate({ system, contents, tools }) {
+      const deps = { ...defaultTextDeps(), ...overrides };
+      const config = {
+        maxOutputTokens: MAX_OUTPUT_TOKENS,
+        // Temperature stays the model default, as Google advises for Gemini 3.
+        thinkingConfig: { thinkingLevel: thinkingLevel() },
+      };
+      // Gemini 3 returns thought signatures with function calls; the caller sends `content` back unchanged.
+      const inline = { model, contents: contents as Content[], config: { systemInstruction: system, tools: tools as ToolListUnion, ...config } };
+      const call = async (backend: TextBackend) => {
+        const models = deps.models(backend);
+        const name = cache ? await cache.get(backend, model, system, tools) : null;
+        if (!name) return models.generateContent(inline);
+        try {
+          // A request that names a cache may not also set the instructions or tools.
+          return await models.generateContent({ model, contents: contents as Content[], config: { cachedContent: name, ...config } });
+        } catch (e) {
+          if (!(e instanceof ApiError) || !CACHE_REFUSED.includes(e.status)) throw e;
+          cache!.drop(name);
+          console.error(`gemini cache refused (${e.status}), sent inline`);
+          return models.generateContent(inline);
+        }
+      };
       let out;
       try {
-        out = await generateOn({ ...defaultTextDeps(), ...overrides }, {
-          model,
-          // Gemini 3 returns thought signatures with function calls; the caller sends `content` back unchanged.
-          contents: contents as Content[],
-          config: {
-            systemInstruction: system,
-            tools: tools as ToolListUnion,
-            maxOutputTokens: MAX_OUTPUT_TOKENS,
-            // Temperature stays the model default, as Google advises for Gemini 3.
-            thinkingConfig: { thinkingLevel: thinkingLevel() },
-          },
-        }, pinned);
+        out = await generateOn(deps, call, pinned);
       } catch (e) {
         throw modelError(e);
       }

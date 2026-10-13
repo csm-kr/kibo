@@ -7,7 +7,8 @@ import { bumpSessionCounter, runCommand } from "@/lib/session/service";
 import type { SessionStore } from "@/lib/store/types";
 import type { CartLine, SessionStatus } from "@/types/session";
 import { agentAction, type AgentAction } from "./actions";
-import { buildInstructions } from "./instructions";
+import { KIOSK_BUSY, waitForBridge } from "./bridgeWait";
+import { chatInstructions } from "./instructions";
 import { toolCallToCommand, toolResult } from "./mapping";
 import type { ModelClient, ModelTurn } from "./model";
 import { toolDeclarations } from "./tools";
@@ -33,6 +34,8 @@ export interface ChatDeps {
   model: ModelClient;
   usage: UsageStore;
   now: () => number;
+  /** Between checks of a learned kiosk's replay; tests move a fake clock. */
+  sleep?: (ms: number) => Promise<void>;
 }
 
 export interface ChatResponse {
@@ -70,7 +73,7 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
   }
 
   const kiosk = getKiosk(session.kioskId);
-  const system = buildInstructions(kiosk, {
+  const { system, currentOrder } = chatInstructions(kiosk, {
     cart: session.cart,
     status: session.status,
     dineOption: session.dineOption,
@@ -82,7 +85,7 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
   const toolNames = new Set(declarations.map((d) => d.name));
   const contents: ModelTurn[] = [
     ...input.history.map((h) => ({ role: h.role, parts: [{ text: h.text }] })),
-    { role: "user", parts: [{ text: input.message }] },
+    { role: "user", parts: [{ text: currentOrder }, { text: input.message }] },
   ];
 
   let n = 0;
@@ -109,6 +112,21 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
     }
   };
 
+  // Learned kiosks: after a change the bridge is still replaying, the next call waits for it (I-155); once a wait
+  // ran out, the rest of the request is answered as busy instead of being sent.
+  let replaying = false;
+  let kioskStuck = false;
+  const replayDone = async () => !(await store.get(input.sessionId))?.pendingBridgeCommand;
+  const run = async (name: string, args: unknown): Promise<Outcome> => {
+    if (replaying && (kioskStuck || !(await waitForBridge(replayDone, now, deps.sleep)))) {
+      kioskStuck = true;
+      return KIOSK_BUSY;
+    }
+    const outcome = await execute(name, args);
+    replaying = outcome.ok && outcome.response.pending === true;
+    return outcome;
+  };
+
   // The cart before each call, so a remove or update can name its line.
   let cart = session.cart;
   const actions: AgentAction[] = [];
@@ -122,7 +140,7 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
     const parts = [];
     for (const call of out.functionCalls) {
       const started = performance.now();
-      const outcome = await execute(call.name, call.args);
+      const outcome = await run(call.name, call.args);
       actions.push(agentAction(call.name, call.args, outcome, performance.now() - started, cart));
       if (outcome.ok) cart = outcome.response.cart;
       // Tool names and result codes only (SECURITY "Secrets and repo hygiene").

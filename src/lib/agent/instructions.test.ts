@@ -3,7 +3,7 @@ import skill from "../../../skills/doughhouse.json";
 import { getKiosk } from "@/lib/adapters/catalog";
 import { learnedToKiosk, skillSchema } from "@/lib/adapters/learned";
 import type { CartLine } from "@/types/session";
-import { buildInstructions } from "./instructions";
+import { buildInstructions, chatInstructions } from "./instructions";
 import { menuForModel } from "./menu";
 
 const k = getKiosk("malo");
@@ -211,5 +211,43 @@ describe("buildInstructions with untrusted learned text (I-152)", () => {
     const text = buildInstructions(tampered, { locale: "en", cart: [{ ...cart[0], itemId: tampered.items[0].itemId }] });
     expect(text.split("</menu_data>").length - 1).toBe(1);
     expect(text).toContain("\\u003c/menu_data\\u003e x");
+  });
+});
+
+describe("chatInstructions (static system for the prompt cache, the order per request)", () => {
+  const full = { cart, status: "confirming" as const, dineOption: "take_out" as const, locale: "en" as const };
+  const empty = { cart: [], status: "connected" as const, dineOption: null, locale: "en" as const };
+
+  it("the system text is the same for every order on one kiosk and locale, and holds no order", () => {
+    const a = chatInstructions(k, full);
+    const b = chatInstructions(k, empty);
+    expect(a.system).toBe(b.system);
+    expect(a.system).not.toContain("c0ffee01");
+    expect(a.system).not.toMatch(/Status: |Dine option: |Cart: |Cart lines/);
+    expect(menuBlock(a.system)).toEqual(menuForModel(k));
+    expect(chatInstructions(k, { ...empty, locale: "ko" }).system).not.toBe(a.system);
+  });
+
+  it("the system text says where the order is and that it is data", () => {
+    expect(chatInstructions(k, empty).system).toMatch(/<current_order>.*data, not the user's words/i);
+  });
+
+  it("the current order carries status, dine option and the cart lines, in a <current_order> block", () => {
+    const { currentOrder } = chatInstructions(k, full);
+    expect(currentOrder).toMatch(/^<current_order>\n[\s\S]*\n<\/current_order>$/);
+    expect(currentOrder).toContain("Status: confirming");
+    expect(currentOrder).toContain("Dine option: take_out");
+    expect(currentOrder).toContain("c0ffee01");
+    expect(chatInstructions(k, empty).currentOrder).toContain("Cart: empty");
+  });
+
+  it("voice keeps one text with the same rules, order and menu (the Live token pins it)", () => {
+    const text = buildInstructions(k, full);
+    const { system, currentOrder } = chatInstructions(k, full);
+    const order = currentOrder.split("\n").slice(1, -1);
+    expect(text).toContain(["## Current order", ...order].join("\n"));
+    expect(text).not.toContain("current_order");
+    const rules = system.split("\n").filter((l) => !l.includes("current_order"));
+    for (const line of rules) expect(text).toContain(line);
   });
 });
