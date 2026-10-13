@@ -48,7 +48,7 @@
       "status": "completed",
       "started_at": "2026-10-13T15:01:00+0900",
       "summary": "phases/11-hardening/qa/REPORT.md: scope = every screen (font loading in layout.tsx) plus / and D1 pictures, D2/D3 scenario guide paid line. AC: lint, build, test 806 passed/1 skipped (Firestore IT), test:e2e 19 passed/14 @live skipped, e2e_check 42/42, qa:ui 26 passed, 263 records, 0 H; T misses same kinds as 9-polish (I-140, I-042, I-075, I-043). test:e2e:live once: 12 text @live passed on Vertex (incl. all 9 Play-it-for-me scenarios), 2 voice hero orders failed only because the Gemini API key still answers HTTP 402 'prepayment credits are depleted' (status-only probe; I-104 note) -> orchestrator re-runs after a top-up. All AUDIT.md fixed items re-run by test name (I-148..I-153, I-156, I-100, I-155, audit probes); no it.skip left. R-001: README Lighthouse, DECK_FACTS cost and LOAD.md numbers match evidence files. Fixed: R-003 gap, paid guide state added to e2e/qa/demo.qa.spec.ts as D3-scenario-paid-guide (I-161); R-010, viewport loop reset the guide scroll and hid the 'Your turn' line on finished-guide screenshots, now scrolled into view (I-160). Restored evidence/touch-hero.json, bridge-replay.json (rewritten by test:e2e) and voice-e2e.json (2 runs that never reached Gemini) to committed values (I-099). Docs: ISSUE (I-104 note, I-160, I-161), UI_QA demo paragraph.",
-      "completed_at": "2026-10-13T15:35:00+0900"
+      "completed_at": "2026-10-13T15:22:39+0900"
     }
   ],
   "created_at": "2026-10-13T13:03:07+0900"
