@@ -225,6 +225,11 @@ export default function Home() {
               detail="example orders: 2 of 5 and 3 of 5 passed; the rest were refused before running"
               path="spikes/blind-kiosk/results/v3run1/grade.txt, spikes/blind-kiosk/results/holdout.log"
             />
+            <Fact
+              value="2 kiosks it had never seen: 56 of 56 items, 14 of 20 orders right"
+              detail="built by other AI agents; 3 orders refused safely, 3 went wrong (take-out orders 100원 short)"
+              path="spikes/blind-kiosks/RESULTS.md"
+            />
             <Link href="/demo?k=doughhouse" className={SECONDARY}>
               Try the learned pizza kiosk
             </Link>

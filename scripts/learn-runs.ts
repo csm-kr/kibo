@@ -23,11 +23,20 @@ interface RunSource {
 
 const RUNS: RunSource[] = [
   {
+    // Fresh hold-out (never seen before its run, added after the learner fixes) with unsafe = 0 and 10 correct of 10
+    // under grader v2, which opens the closed cart drawer (13-blind-kiosks:10, I-183).
+    runId: "themepark",
+    kioskId: "bk6-themepark",
+    dir: "spikes/blind-kiosks/results/bk6-themepark/final",
+    grade: "spikes/blind-kiosks/results/bk6-themepark/final/grade-v2.json",
+    notes: "spikes/blind-kiosks/results/bk6-themepark/final/notes.md",
+  },
+  {
     // Best blind final with unsafe = 0: 10 correct of 10 (bk3-ramen ties; this one has more options the total can confirm).
     runId: "airport-shop",
     kioskId: "bk4-airport-shop",
     dir: "spikes/blind-kiosks/results/bk4-airport-shop/final",
-    grade: "spikes/blind-kiosks/results/bk4-airport-shop/final/grade.json",
+    grade: "spikes/blind-kiosks/results/bk4-airport-shop/final/grade-v2.json",
     notes: "spikes/blind-kiosks/results/bk4-airport-shop/final/notes.md",
   },
   {
@@ -73,8 +82,13 @@ function gradeSummary(r: RunSource, skill: Json) {
   if (r.grade) {
     const g = read(r.grade) as {
       catalog: { items: { matched: number; key: number }; price: { correct: number; of: number } };
-      orders: { total: number; correct: number; safeRefusal: number; unsafe: number; linesChecked: number };
+      orders: {
+        total: number; correct: number; safeRefusal: number; unsafe: number; linesChecked: number;
+        results: { kioskTotal: number | null; skillPredicts: number | null }[];
+      };
     };
+    // Orders the kiosk ran where the skill's own total (what a phone would quote) differs from the kiosk's (I-197).
+    const skillTotalDiffers = g.orders.results.filter((x) => x.kioskTotal != null && x.skillPredicts != null && x.kioskTotal !== x.skillPredicts).length;
     return {
       itemsFound: g.catalog.items.matched,
       itemsOf: g.catalog.items.key,
@@ -86,6 +100,7 @@ function gradeSummary(r: RunSource, skill: Json) {
         unsafe: g.orders.unsafe,
         ruleViolationDetected: 0,
         linesChecked: g.orders.linesChecked,
+        skillTotalDiffers,
       },
       itemsSource: r.grade,
       ordersSource: r.grade,
@@ -105,7 +120,7 @@ function gradeSummary(r: RunSource, skill: Json) {
     itemsFound: found.length,
     itemsOf: reviewed.length,
     pricesCorrect: priced.length,
-    orders: { total: pass + failed, correct: pass, safeRefusal: 0, unsafe: failed, ruleViolationDetected: detected, linesChecked: null },
+    orders: { total: pass + failed, correct: pass, safeRefusal: 0, unsafe: failed, ruleViolationDetected: detected, linesChecked: null, skillTotalDiffers: null },
     itemsSource: `${r.dir}/skill.json, ${r.reviewedSkill}`,
     ordersSource: r.holdout,
   };

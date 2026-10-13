@@ -27,10 +27,11 @@
    "safeRefusal": 0,
    "unsafe": 0,
    "ruleViolationDetected": 0,
-   "linesChecked": 0
+   "linesChecked": 10,
+   "skillTotalDiffers": 0
   },
-  "itemsSource": "spikes/blind-kiosks/results/bk4-airport-shop/final/grade.json",
-  "ordersSource": "spikes/blind-kiosks/results/bk4-airport-shop/final/grade.json"
+  "itemsSource": "spikes/blind-kiosks/results/bk4-airport-shop/final/grade-v2.json",
+  "ordersSource": "spikes/blind-kiosks/results/bk4-airport-shop/final/grade-v2.json"
  },
  "skill": {
   "categories": [

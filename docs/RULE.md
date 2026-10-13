@@ -82,3 +82,8 @@ When an issue class in `docs/ISSUE.md` is seen for the **3rd time**, it becomes 
 - From: `unreadable-third-party-page` — I-096 (seen 10-13/6-learn:2, 10-13/10-assets:2), I-198 (10-14/13-blind-kiosks:9)
 - Why: learned and recorded kiosk screens cannot be restyled, and each time one was shown smaller (the `/demo` iframe, a deck picture, the `/learn` replay) its own text dropped to 4–8 px.
 - Check: on every QA screenshot or deck picture with a scaled kiosk page or recorded kiosk screenshot, the point it makes (what was tapped, what was added, what it learned) can be read from KIBO's text next to it at ≥ 16 px; if not, add a caption or log it with the screenshot name.
+
+### R-014 (proposed): Wherever a learned skill's order results are quoted, also say how often its own total differed from the kiosk's; passing self-tests do not prove the option groups they never used
+- From: `unexercised-option-group` — I-192 (seen 10-13/13-blind-kiosks:4), I-197 (10-14/13-blind-kiosks:8, 10-14/13-blind-kiosks:10)
+- Why: three skills passed the finish gate with 3 of 3 self-tests, then failed or mispriced orders whose option groups no self-test had used (Doughhouse toppings, bk6 discounts, bk1 and bk2 prices), and the order counts alone hid it.
+- Check: each blind-kiosk results table (`spikes/blind-kiosks/RESULTS.md`, `/learn` cards) shows the "skill total wrong" count from `skillPredicts` vs `kioskTotal` in `grade-v2.json`; a learner change to the gate on the dev set has a test with an option group the self-tests skip.

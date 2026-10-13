@@ -1,0 +1,271 @@
+{
+  "kioskId": "bk2-bakery",
+  "label": "baseline",
+  "grader": 2,
+  "gradedAt": "2026-10-13T22:37:34.973Z",
+  "skill": "no skill",
+  "files": {
+    "skill": "spikes/blind-kiosks/results/bk2-bakery/baseline/skill.json",
+    "key": "spikes/blind-kiosks/bk2-bakery/answer-key.json",
+    "app": "spikes/blind-kiosks/bk2-bakery/app/index.html"
+  },
+  "summary": "bk2-bakery/baseline: learning not finished, 10.3 min, 77 turns, 2007149 input tokens; no skill; items 0/40 (precision null), price 0/0, options exact 0/0 (openable 0/0); orders correct 0, safe refusal 0, unsafe 0, not learned 10 of 10 (cart lines read in 0)",
+  "learning": {
+    "provider": "gemini",
+    "model": "gemini-3.8-flash",
+    "cachedInputTokens": 0,
+    "finished": false,
+    "turns": 77,
+    "acts": 65,
+    "tests": 7,
+    "inputTokens": 2007149,
+    "outputTokens": 6357,
+    "minutes": "10.3"
+  },
+  "catalog": {
+    "items": {
+      "key": 40,
+      "skill": 0,
+      "matched": 0,
+      "recall": 0,
+      "precision": null,
+      "missing": [
+        "아메리카노",
+        "카페라떼",
+        "바닐라빈 라떼",
+        "카푸치노",
+        "카라멜 마키아토",
+        "카페모카",
+        "콜드브루",
+        "에스프레소",
+        "초코라떼",
+        "녹차라떼",
+        "고구마라떼",
+        "딸기라떼",
+        "레몬에이드",
+        "흑임자 라떼",
+        "캐모마일",
+        "페퍼민트",
+        "얼그레이",
+        "유자차",
+        "자몽차",
+        "로열 밀크티",
+        "소금빵",
+        "버터 크루아상",
+        "단팥빵",
+        "크림치즈 베이글",
+        "마늘 바게트",
+        "앙버터",
+        "소보로빵",
+        "우유식빵",
+        "딸기 생크림 케이크",
+        "초코 가나슈 케이크",
+        "뉴욕 치즈케이크",
+        "티라미수",
+        "당근 케이크",
+        "레몬 파운드",
+        "햄치즈 샌드위치",
+        "에그마요 샌드위치",
+        "치킨 클럽 샌드위치",
+        "베이컨 토마토 샌드위치",
+        "리코타 샐러드 샌드위치",
+        "크로크무슈"
+      ],
+      "extra": []
+    },
+    "price": {
+      "correct": 0,
+      "of": 0
+    },
+    "category": {
+      "correct": 0,
+      "of": 0
+    },
+    "soldOut": {
+      "correct": 0,
+      "of": 0
+    },
+    "options": {
+      "itemsExact": 0,
+      "items": 0,
+      "openableExact": 0,
+      "openable": 0,
+      "groups": 0,
+      "groupsFound": 0,
+      "groupLabelsExact": 0,
+      "groupRulesCorrect": 0,
+      "quantityGroups": 0,
+      "quantityRecognized": 0,
+      "conditionalGroups": 0,
+      "conditionalFound": 0
+    },
+    "perItem": [],
+    "perGroup": []
+  },
+  "orders": {
+    "total": 10,
+    "correct": 0,
+    "safeRefusal": 0,
+    "unsafe": 0,
+    "notLearned": 10,
+    "linesChecked": 0,
+    "results": [
+      {
+        "id": "h1",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 12200,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "카페라떼 › 적게",
+          "카페라떼 › 일반 우유",
+          "소금빵 › 그대로 주세요"
+        ],
+        "order": null
+      },
+      {
+        "id": "h2",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 13400,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "아메리카노 › HOT",
+          "아메리카노 › 바닐라 시럽",
+          "아메리카노 › 헤이즐넛 시럽",
+          "버터 크루아상 › 따뜻하게 데워 주세요"
+        ],
+        "order": null
+      },
+      {
+        "id": "h3",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 11300,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "콜드브루 › 많이",
+          "콜드브루 › 카라멜 시럽"
+        ],
+        "order": null
+      },
+      {
+        "id": "h4",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 13300,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "카페모카 › 보통"
+        ],
+        "order": null
+      },
+      {
+        "id": "h5",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 18100,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "자몽차 › 보통"
+        ],
+        "order": null
+      },
+      {
+        "id": "h6",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 18600,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "녹차라떼 › 보통",
+          "치킨 클럽 샌드위치 › 따뜻하게 데워 주세요"
+        ],
+        "order": null
+      },
+      {
+        "id": "h7",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 11800,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [],
+        "order": null
+      },
+      {
+        "id": "h8",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 14300,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "캐모마일 › ICED",
+          "캐모마일 › 적게",
+          "아메리카노 › ICED",
+          "아메리카노 › 보통",
+          "카라멜 마키아토 › 바닐라 시럽",
+          "카라멜 마키아토 › 일반 우유"
+        ],
+        "order": null
+      },
+      {
+        "id": "h9",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 23800,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "크로크무슈 › 그대로 주세요",
+          "레몬에이드 › 보통",
+          "로열 밀크티 › 보통",
+          "로열 밀크티 › 헤이즐넛 시럽",
+          "로열 밀크티 › 일반 우유"
+        ],
+        "order": null
+      },
+      {
+        "id": "h10",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 23300,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "바닐라빈 라떼 › 저지방 우유",
+          "초코라떼 › 보통",
+          "초코라떼 › 일반 우유"
+        ],
+        "order": null
+      }
+    ]
+  }
+}

@@ -36,7 +36,11 @@ export function RunFacts({ run }: { run: LearnRun }) {
             ? `Unseen orders; ${o.ruleViolationDetected} more order with a planted rule break was caught.`
             : o.linesChecked === 0
               ? "Unseen orders, judged by the kiosk's own total; the cart lines were not read."
-              : "Unseen orders."
+              : `Unseen orders, judged by the kiosk's own total and its cart lines (item names).${
+                  o.skillTotalDiffers
+                    ? ` In ${o.skillTotalDiffers} of them the skill's own total was wrong, so the phone would have shown another price than the kiosk.`
+                    : ""
+                }`
         }
         path={grade.ordersSource}
       />

@@ -1,0 +1,765 @@
+{
+  "kioskId": "bk5-restarea",
+  "label": "final",
+  "grader": 2,
+  "gradedAt": "2026-10-13T22:39:20.658Z",
+  "skill": "present",
+  "files": {
+    "skill": "spikes/blind-kiosks/results/bk5-restarea/final/skill.json",
+    "key": "spikes/blind-kiosks/bk5-restarea/answer-key.json",
+    "app": "spikes/blind-kiosks/bk5-restarea/app/index.html"
+  },
+  "summary": "bk5-restarea/final: learning finished, 13.5 min, 89 turns, 843596 input tokens; items 31/31 (precision 1), price 31/31, options exact 4/10 (openable 4/9); orders correct 4, safe refusal 3, unsafe 3 of 10 (cart lines read in 4)",
+  "learning": {
+    "provider": "gemini",
+    "model": "gemini-3.8-flash",
+    "cachedInputTokens": 556135,
+    "finished": true,
+    "turns": 89,
+    "acts": 116,
+    "tests": 4,
+    "inputTokens": 843596,
+    "outputTokens": 24362,
+    "minutes": "13.5"
+  },
+  "catalog": {
+    "items": {
+      "key": 31,
+      "skill": 31,
+      "matched": 31,
+      "recall": 1,
+      "precision": 1,
+      "missing": [],
+      "extra": []
+    },
+    "price": {
+      "correct": 31,
+      "of": 31
+    },
+    "category": {
+      "correct": 31,
+      "of": 31
+    },
+    "soldOut": {
+      "correct": 31,
+      "of": 31
+    },
+    "options": {
+      "itemsExact": 4,
+      "items": 10,
+      "openableExact": 4,
+      "openable": 9,
+      "groups": 15,
+      "groupsFound": 14,
+      "groupLabelsExact": 9,
+      "groupRulesCorrect": 14,
+      "quantityGroups": 0,
+      "quantityRecognized": 0,
+      "conditionalGroups": 0,
+      "conditionalFound": 0
+    },
+    "perItem": [
+      {
+        "name": "소고기국밥",
+        "skillName": "소고기국밥",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "김치찌개",
+        "skillName": "김치찌개",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "된장찌개",
+        "skillName": "된장찌개",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "제육덮밥",
+        "skillName": "제육덮밥",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "산채비빔밥",
+        "skillName": "산채비빔밥",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "왕돈까스",
+        "skillName": "왕돈까스",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "황태해장국",
+        "skillName": "황태해장국",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "소떡소떡",
+        "skillName": "소떡소떡",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "핫바",
+        "skillName": "핫바",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "떡볶이",
+        "skillName": "떡볶이",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "야채김밥",
+        "skillName": "야채김밥",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "참치김밥",
+        "skillName": "참치김밥",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "순대",
+        "skillName": "순대",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "꼬치어묵",
+        "skillName": "꼬치어묵",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "가락우동",
+        "skillName": "가락우동",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "곱빼기 1000"
+          ],
+          "extra": [
+            "곱배기 1000"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "얼큰우동",
+        "skillName": "얼큰우동",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "곱빼기 1000"
+          ],
+          "extra": [
+            "곱배기 1000"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "해물짬뽕",
+        "skillName": "해물짬뽕",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "곱빼기 1000"
+          ],
+          "extra": [
+            "곱배기 1000"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "비빔국수",
+        "skillName": "비빔국수",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "곱빼기 1000"
+          ],
+          "extra": [
+            "곱배기 1000"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "잔치국수",
+        "skillName": "잔치국수",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "곱빼기 1000"
+          ],
+          "extra": [
+            "곱배기 1000"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "라면",
+        "skillName": "라면",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "물냉면",
+        "skillName": "물냉면",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "곱빼기 1000"
+          ],
+          "extra": []
+        }
+      },
+      {
+        "name": "호두과자 (소)",
+        "skillName": "호두과자 (소)",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "호두과자 (대)",
+        "skillName": "호두과자 (대)",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "호두과자 선물상자",
+        "skillName": "호두과자 선물상자",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "알감자",
+        "skillName": "알감자",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "아메리카노",
+        "skillName": "아메리카노",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "식혜",
+        "skillName": "식혜",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "콜라",
+        "skillName": "콜라",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "생수",
+        "skillName": "생수",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "한상세트",
+        "skillName": "한상세트",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "면사랑세트",
+        "skillName": "면사랑세트",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      }
+    ],
+    "perGroup": [
+      {
+        "item": "가락우동",
+        "group": "size",
+        "found": true,
+        "skillGroup": "양 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "얼큰우동",
+        "group": "spice",
+        "found": true,
+        "skillGroup": "맵기 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "얼큰우동",
+        "group": "size",
+        "found": true,
+        "skillGroup": "양 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "해물짬뽕",
+        "group": "spice",
+        "found": true,
+        "skillGroup": "맵기 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "해물짬뽕",
+        "group": "size",
+        "found": true,
+        "skillGroup": "양 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "비빔국수",
+        "group": "spice",
+        "found": true,
+        "skillGroup": "맵기 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "비빔국수",
+        "group": "size",
+        "found": true,
+        "skillGroup": "양 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "잔치국수",
+        "group": "size",
+        "found": true,
+        "skillGroup": "양 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "라면",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "토핑 추가 (최대 2개)",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "물냉면",
+        "group": "size",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "아메리카노",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "한상세트",
+        "group": "setMealA",
+        "found": true,
+        "skillGroup": "식사 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "한상세트",
+        "group": "setDrink",
+        "found": true,
+        "skillGroup": "음료 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "면사랑세트",
+        "group": "setMealB",
+        "found": true,
+        "skillGroup": "식사 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "면사랑세트",
+        "group": "setDrink",
+        "found": true,
+        "skillGroup": "음료 선택",
+        "labelsExact": true,
+        "rules": true
+      }
+    ]
+  },
+  "orders": {
+    "total": 10,
+    "correct": 4,
+    "safeRefusal": 3,
+    "unsafe": 3,
+    "linesChecked": 4,
+    "results": [
+      {
+        "id": "h1",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 얼큰우동 › 곱빼기",
+        "linesChecked": null,
+        "cartSource": null,
+        "expectedTotal": 15000,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "얼큰우동 › 매운맛"
+        ],
+        "order": null
+      },
+      {
+        "id": "h2",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "expectedTotal": 7500,
+        "kioskTotal": 7500,
+        "skillPredicts": 7500,
+        "ms": 387,
+        "totalCannotSee": [],
+        "order": {
+          "dineOption": "매장에서 먹기",
+          "lines": [
+            {
+              "category": "분식",
+              "item": "소떡소떡",
+              "options": [],
+              "qty": 1
+            },
+            {
+              "category": "음료·간식",
+              "item": "아메리카노",
+              "options": [
+                "ICE"
+              ],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h3",
+        "outcome": "unsafe",
+        "reason": "kiosk total 11500, expected 11600",
+        "linesChecked": null,
+        "cartSource": "visible",
+        "expectedTotal": 11600,
+        "kioskTotal": 11500,
+        "skillPredicts": 11500,
+        "ms": 405,
+        "totalCannotSee": [],
+        "order": {
+          "dineOption": "포장하기",
+          "lines": [
+            {
+              "category": "세트",
+              "item": "한상세트",
+              "options": [
+                "왕돈까스",
+                "식혜"
+              ],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h4",
+        "outcome": "unsafe",
+        "reason": "kiosk total 18000, expected 18100",
+        "linesChecked": null,
+        "cartSource": "visible",
+        "expectedTotal": 18100,
+        "kioskTotal": 18000,
+        "skillPredicts": 18000,
+        "ms": 385,
+        "totalCannotSee": [],
+        "order": {
+          "dineOption": "포장하기",
+          "lines": [
+            {
+              "category": "음료·간식",
+              "item": "호두과자 선물상자",
+              "options": [],
+              "qty": 1
+            },
+            {
+              "category": "음료·간식",
+              "item": "호두과자 (소)",
+              "options": [],
+              "qty": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "h5",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "expectedTotal": 17000,
+        "kioskTotal": 17000,
+        "skillPredicts": 17000,
+        "ms": 374,
+        "totalCannotSee": [
+          "면사랑세트 › 콜라"
+        ],
+        "order": {
+          "dineOption": "매장에서 먹기",
+          "lines": [
+            {
+              "category": "세트",
+              "item": "면사랑세트",
+              "options": [
+                "라면",
+                "콜라"
+              ],
+              "qty": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "h6",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 비빔국수 › 곱빼기",
+        "linesChecked": null,
+        "cartSource": null,
+        "expectedTotal": 16500,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "해물짬뽕 › 순한맛",
+          "비빔국수 › 보통"
+        ],
+        "order": null
+      },
+      {
+        "id": "h7",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 가락우동 › 곱빼기",
+        "linesChecked": null,
+        "cartSource": null,
+        "expectedTotal": 12500,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "라면 › 계란",
+          "라면 › 치즈"
+        ],
+        "order": null
+      },
+      {
+        "id": "h8",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "expectedTotal": 23500,
+        "kioskTotal": 23500,
+        "skillPredicts": 23500,
+        "ms": 455,
+        "totalCannotSee": [],
+        "order": {
+          "dineOption": "매장에서 먹기",
+          "lines": [
+            {
+              "category": "한식",
+              "item": "소고기국밥",
+              "options": [],
+              "qty": 1
+            },
+            {
+              "category": "한식",
+              "item": "왕돈까스",
+              "options": [],
+              "qty": 1
+            },
+            {
+              "category": "음료·간식",
+              "item": "식혜",
+              "options": [],
+              "qty": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "h9",
+        "outcome": "unsafe",
+        "reason": "kiosk total 20500, expected 20600",
+        "linesChecked": null,
+        "cartSource": "visible",
+        "expectedTotal": 20600,
+        "kioskTotal": 20500,
+        "skillPredicts": 20500,
+        "ms": 547,
+        "totalCannotSee": [],
+        "order": {
+          "dineOption": "포장하기",
+          "lines": [
+            {
+              "category": "분식",
+              "item": "참치김밥",
+              "options": [],
+              "qty": 3
+            },
+            {
+              "category": "분식",
+              "item": "꼬치어묵",
+              "options": [],
+              "qty": 2
+            },
+            {
+              "category": "음료·간식",
+              "item": "생수",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h10",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "expectedTotal": 21500,
+        "kioskTotal": 21500,
+        "skillPredicts": 21500,
+        "ms": 642,
+        "totalCannotSee": [
+          "한상세트 › 김치찌개",
+          "얼큰우동 › 보통"
+        ],
+        "order": {
+          "dineOption": "매장에서 먹기",
+          "lines": [
+            {
+              "category": "세트",
+              "item": "한상세트",
+              "options": [
+                "김치찌개",
+                "아메리카노"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "면류",
+              "item": "얼큰우동",
+              "options": [
+                "보통"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "음료·간식",
+              "item": "알감자",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

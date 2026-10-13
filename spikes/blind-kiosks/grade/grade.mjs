@@ -1,19 +1,22 @@
 // AI-free grader for the blind kiosk test (spikes/blind-kiosks/PROTOCOL.md "Metrics").
-// Usage: node grade.mjs <kioskId> <skill.json> [--label <name>] [--key <answer-key.json>] [--app <index.html>] [--no-orders]
-// Prints grade JSON and writes it to spikes/blind-kiosks/results/<kioskId>/<label>/grade.json.
+// Usage: node grade.mjs <kioskId> <skill.json> [--label <name>] [--out <file name>] [--key <answer-key.json>] [--app <index.html>] [--no-orders]
+// Prints grade JSON and writes it to spikes/blind-kiosks/results/<kioskId>/<label>/<out> (default grade.json).
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { gradeCatalog, translateOrder, plannedSteps, forbiddenSteps, classify, totalCannotSee, notLearnedOrders } from './lib.mjs';
+import { gradeCatalog, translateOrder, plannedSteps, forbiddenSteps, classify, totalCannotSee, notLearnedOrders, keyItemNames } from './lib.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const BLIND_ROOT = path.resolve(HERE, '..');
+// 2: cart lines come from the kiosk's cart panel, opened if it is a closed drawer (run.mjs); 1: accessibility-tree list items.
+export const GRADER_VERSION = 2;
 const readJson = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
 
 async function gradeOrders(key, skill, appPath) {
   // The driver reads KIOSK_URL when it opens the kiosk.
   process.env.KIOSK_URL = pathToFileURL(appPath).href;
-  const { runOrder } = await import('../../kibo-learn/runner.mjs');
+  const { runAndReadCart } = await import('./run.mjs');
+  const names = key.items.flatMap(keyItemNames);
   const results = [];
   for (const h of key.holdoutOrders ?? []) {
     const translation = translateOrder(key, skill, h);
@@ -21,11 +24,12 @@ async function gradeOrders(key, skill, appPath) {
     let forbidden = [];
     if (translation.ok) {
       forbidden = forbiddenSteps(plannedSteps(skill, translation.order), skill.forbiddenLabels ?? []);
-      if (!forbidden.length) run = await runOrder(skill, translation.order);
+      if (!forbidden.length) run = await runAndReadCart(skill, translation.order, names);
     }
     const c = classify({ translation, forbidden, run, expectedTotal: h.expectedTotal });
     results.push({
       id: h.id, outcome: c.outcome, reason: c.reason ?? null, linesChecked: c.linesChecked ?? null,
+      cartSource: run?.cartSource ?? null,
       expectedTotal: h.expectedTotal, kioskTotal: run?.shownTotal ?? null, skillPredicts: run?.expectedTotal ?? null,
       ms: run?.ms ?? null, totalCannotSee: totalCannotSee(key, h), order: translation.order ?? null,
     });
@@ -58,16 +62,16 @@ export async function gradeKiosk({ kioskId, skillPath, label, keyPath, appPath, 
     orders ? `orders correct ${orders.correct}, safe refusal ${orders.safeRefusal}, unsafe ${orders.unsafe}${orders.notLearned ? `, not learned ${orders.notLearned}` : ''} of ${orders.total} (cart lines read in ${orders.linesChecked})` : 'orders not run',
   ].filter(Boolean).join(' ');
   return {
-    kioskId, label, gradedAt: new Date().toISOString(), skill: skill ? 'present' : 'no skill',
+    kioskId, label, grader: GRADER_VERSION, gradedAt: new Date().toISOString(), skill: skill ? 'present' : 'no skill',
     files: { skill: path.relative(process.cwd(), skillPath), key: path.relative(process.cwd(), keyPath), app: path.relative(process.cwd(), appPath) },
     summary, learning, catalog, orders,
   };
 }
 
-export function writeGrade(grade) {
+export function writeGrade(grade, out = 'grade.json') {
   const dir = path.join(BLIND_ROOT, 'results', grade.kioskId, grade.label);
   fs.mkdirSync(dir, { recursive: true });
-  const file = path.join(dir, 'grade.json');
+  const file = path.join(dir, out);
   fs.writeFileSync(file, JSON.stringify(grade, null, 2) + '\n');
   return file;
 }
@@ -76,10 +80,10 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const args = process.argv.slice(2);
   const flag = (name) => { const i = args.indexOf(name); return i >= 0 ? args.splice(i, 2)[1] : undefined; };
   const noOrders = args.includes('--no-orders');
-  const label = flag('--label'), keyArg = flag('--key'), appArg = flag('--app');
+  const label = flag('--label'), keyArg = flag('--key'), appArg = flag('--app'), out = flag('--out') ?? 'grade.json';
   const [kioskId, skillArg] = args.filter((a) => a !== '--no-orders');
-  if (!kioskId || !skillArg) {
-    console.error('usage: grade.mjs <kioskId> <skill.json> [--label <name>] [--key <answer-key.json>] [--app <index.html>] [--no-orders]');
+  if (!kioskId || !skillArg || out.includes('/')) {
+    console.error('usage: grade.mjs <kioskId> <skill.json> [--label <name>] [--out <file name>] [--key <answer-key.json>] [--app <index.html>] [--no-orders]');
     process.exit(2);
   }
   const skillPath = path.resolve(skillArg);
@@ -90,7 +94,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     appPath: path.resolve(appArg ?? path.join(BLIND_ROOT, kioskId, 'app', 'index.html')),
     runOrders: !noOrders,
   });
-  const file = writeGrade(grade);
+  const file = writeGrade(grade, out);
   console.log(JSON.stringify(grade, null, 2));
   console.error(grade.summary);
   console.error(`written: ${path.relative(process.cwd(), file)}`);

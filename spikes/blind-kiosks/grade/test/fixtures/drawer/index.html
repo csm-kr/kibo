@@ -1,0 +1,62 @@
+<!doctype html>
+<!-- Grader test kiosk (I-183): category tabs are list items, the cart is a closed drawer that slides in from the
+     right only after tapping 장바구니, and two items cost the same, so only the cart lines can tell them apart.
+     ?open=1 starts with the drawer open (a cart panel that is already on screen). -->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>테스트 기념품점</title>
+<style>
+  body { margin: 0; font-family: sans-serif; overflow: hidden; }
+  ul.tabs { display: flex; gap: 8px; list-style: none; padding: 8px; }
+  ul.tabs li, .tile, .bar button { cursor: pointer; }
+  .grid { display: flex; gap: 12px; padding: 8px; }
+  .tile { border: 1px solid #999; padding: 12px; }
+  .tile b { display: block; font-size: 20px; }
+  .bar { position: fixed; bottom: 0; left: 0; right: 0; display: flex; gap: 16px; padding: 12px; background: #eee; }
+  aside { position: fixed; top: 0; right: 0; width: 400px; height: 100%; background: #fff; border-left: 1px solid #999;
+          transform: translateX(100%); transition: transform 0.2s; }
+  aside.open { transform: translateX(0); }
+</style>
+</head>
+<body>
+<h1>테스트 기념품점</h1>
+<ul class="tabs"><li>기념품</li><li>간식</li></ul>
+<div class="grid">
+  <div class="tile" data-name="고래 키링" data-price="6000"><b>고래 키링</b><span>6,000원</span></div>
+  <div class="tile" data-name="바다 엽서" data-price="6000"><b>바다 엽서</b><span>6,000원</span></div>
+  <div class="tile" data-name="펭귄 머리띠" data-price="9000"><b>펭귄 머리띠</b><span>9,000원</span></div>
+</div>
+<div class="bar">
+  <button id="cartBtn">🛒 장바구니 <span id="count">0</span></button>
+  <span>합계 <span id="total">0원</span></span>
+  <button>주문하기</button>
+</div>
+<aside id="drawer">
+  <h2>장바구니</h2>
+  <button id="close">닫기</button>
+  <div id="lines"></div>
+  <div>합계 <span id="dtotal">0원</span></div>
+</aside>
+<script>
+  const cart = [];
+  const won = (n) => n.toLocaleString('ko-KR') + '원';
+  function render() {
+    const total = cart.reduce((a, l) => a + l.price * l.qty, 0);
+    document.getElementById('count').textContent = cart.reduce((a, l) => a + l.qty, 0);
+    document.getElementById('total').textContent = won(total);
+    document.getElementById('dtotal').textContent = won(total);
+    document.getElementById('lines').innerHTML = cart.map((l) => `<div>${l.name} ×${l.qty} ${won(l.price * l.qty)}</div>`).join('');
+  }
+  document.querySelectorAll('.tile').forEach((t) => t.addEventListener('click', () => {
+    const line = cart.find((l) => l.name === t.dataset.name);
+    if (line) line.qty += 1; else cart.push({ name: t.dataset.name, price: Number(t.dataset.price), qty: 1 });
+    render();
+  }));
+  document.getElementById('cartBtn').addEventListener('click', () => document.getElementById('drawer').classList.add('open'));
+  document.getElementById('close').addEventListener('click', () => document.getElementById('drawer').classList.remove('open'));
+  if (new URLSearchParams(location.search).get('open')) document.getElementById('drawer').classList.add('open');
+  render();
+</script>
+</body>
+</html>

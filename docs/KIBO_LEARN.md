@@ -56,12 +56,24 @@ Starts an order with the skill's own recipe, opens every category (following pag
 Regression test (`test_audit.mjs`, 4/4): complete skills pass; a skill missing three categories is rejected; a category disguised as a "control" is caught.
 
 ## Watching a run (`/learn`)
-Learning runs offline (a browser and Gemini, minutes per run), so the product shows replays of real recorded runs, never a live or made-up one. With `TRACE_DIR` the learner writes one screenshot and one JSON line per turn; `npm run learn:runs` (`scripts/learn-runs.ts`) copies them to `public/learn/<runId>/` unchanged except for the image format (WebP ≤ 60 KB, ≤ 5 MB per run). `/learn/<runId>` steps through every turn: the screenshot, the action in plain words, the counts the learner had written down, and milestones (first items, all categories, coverage audit, self-test, finish). Shown (13-blind-kiosks:9): the `bk4-airport-shop` final run (the best blind final with unsafe 0; `bk3-ramen` ties at 10/0/0) and the traced Doughhouse run of the improved learner (`spikes/blind-kiosks/results/dev/gemini-doughhouse-after/`). The airport shop is not a first sighting: the learner was improved from its baseline run's failure patterns (`spikes/blind-kiosks/PROTOCOL.md`), and its orders were judged by the kiosk total only (I-183); the page says both.
+Learning runs offline (a browser and Gemini, minutes per run), so the product shows replays of real recorded runs, never a live or made-up one. With `TRACE_DIR` the learner writes one screenshot and one JSON line per turn; `npm run learn:runs` (`scripts/learn-runs.ts`) copies them to `public/learn/<runId>/` unchanged except for the image format (WebP ≤ 60 KB, ≤ 5 MB per run). `/learn/<runId>` steps through every turn: the screenshot, the action in plain words, the counts the learner had written down, and milestones (first items, all categories, coverage audit, self-test, finish). Shown, in this order: the `bk6-themepark` final run (13-blind-kiosks:10: the fresh hold-out kiosk with unsafe 0 and 10 of 10 correct under grader v2, never seen before its run; its card also says the skill's own total was wrong in 4 of the 10, I-197), the `bk4-airport-shop` final run (13-blind-kiosks:9: the best final of the first four with unsafe 0; `bk3-ramen` ties at 10/0/0) and the traced Doughhouse run of the improved learner (`spikes/blind-kiosks/results/dev/gemini-doughhouse-after/`). The airport shop is not a first sighting: the learner was improved from its baseline run's failure patterns (`spikes/blind-kiosks/PROTOCOL.md`); the page says so. Both blind cards take their order numbers from `grade-v2.json`.
 
 ## Runtime
 Tool call → arguments validated against the skill catalog → the in-page bridge replays the recipe → the kiosk's own total **and** cart lines are checked → session updated. On mismatch: stop, re-read the kiosk cart, offer staff or touch. No self-healing at runtime.
 
 ## Results so far
+**Blind kiosk test (13-blind-kiosks, 10-13 to 10-14; full tables in `spikes/blind-kiosks/RESULTS.md`).** Six synthetic kiosks built by separate AI agents, 10 holdout orders each, graded without AI by `spikes/blind-kiosks/grade/` (grader v2: kiosk total plus the item names in the kiosk's cart, opening a closed cart drawer; options are not compared). Gemini 3.8 Flash, one run per kiosk and phase. Orders are correct / safe refusal / **unsafe**.
+
+| Kiosks | Learner | Finished | Items found | Orders | Cost | Evidence |
+|---|---|---|---|---|---|---|
+| bk1–bk4 (cinema, bakery, ramen, airport shop) | before the improvements (baseline) | 2 of 4 | 57/134 | 5 / 10 / **5** of 40, 20 not learned | $5.22 (cache not recorded) | `spikes/blind-kiosks/results/bk*/baseline/grade-v2.json`, `learn-stats.json` |
+| bk1–bk4 | after the improvements (final) | 4 of 4 | 134/134 | 31 / 4 / **5** of 40 | $1.49 | `spikes/blind-kiosks/results/bk*/final/grade-v2.json`, `learn-stats.json` |
+| bk5, bk6 (food court, theme park): **fresh hold-out**, added after the improvements, never seen | final | 2 of 2 | 56/56 | 14 / 3 / **3** of 20 | $0.84 | `spikes/blind-kiosks/results/bk{5-restarea,6-themepark}/final/grade-v2.json` |
+
+The final unsafe orders: 5 on the bakery, where the kiosk's own timeout modal blocked the replay (I-193; 4 remain after its fix in a labelled rerun, I-194), and 3 on the food court, the three take-out orders, 100원 below the answer key (I-195). In 7 of the 48 final orders that reached a kiosk total, the skill's own total (what the phone would quote) differed from the kiosk's (I-197). The first four kiosks are not a clean blind test of the final learner: it was improved from their baseline failure patterns, on the dev set only. Cost is tokens × the Gemini API price for `gemini-3.8-flash` (`evidence/cost-per-order.json`); the learner ran on Vertex AI, whose price was not read (unverified).
+
+Earlier runs:
+
 | Run | Model | Result |
 |---|---|---|
 | Doughhouse, run 3 (10-13, **with the finish gate and audit**) | Gemini 3.8 Flash | finished: 4.8 min, 63 turns, 482,553 input tokens; one self-test call of 3 orders 3/3; audit passed (0 missing, 0 unknown, 0 hidden); items, prices and options match the reviewed skill (the sold-out pizza has no options, it cannot be opened); unseen orders 4/4 + rule violation detected, 546–697 ms each (`results/run3/`) |
@@ -77,9 +89,12 @@ Only run 3 includes the ≥ 3 self-test finish gate and the coverage audit (`spi
 Evidence files are listed in `docs/TESTING.md`.
 
 ## Known gaps (next)
-13-blind-kiosks:4 added a way to express items 1–3 and checks for them (quantity groups, the lint, `appliesWhen`, `chooseOptions`), tested on synthetic fixtures and the dev set only; whether the learner uses them on unseen kiosks is unverified until the final blind runs (`spikes/blind-kiosks/RESULTS.md`).
+13-blind-kiosks:4 added a way to express items 1–3 and checks for them (quantity groups, the lint, `appliesWhen`, `chooseOptions`). On the blind finals (`spikes/blind-kiosks/RESULTS.md`) quantity groups were learned 18 of 20 on bk1–bk4 and 7 of 7 on bk6; conditional groups 16 of 19 on bk2 but 0 of 4 on bk1 and bk6.
 1. **Quantity options** (extra shot "− 1 +"): expressible as `"type": "quantity"`; the product cart cannot order a count on a learned kiosk yet (I-190).
 2. **Navigation recorded as options** ("Next" in multi-step sets): the skill lint rejects navigation words and bare symbols as option names; wizard steps go in a group's `after`.
 3. **Conditional groups** (ice amount appears only for iced drinks): recorded with `appliesWhen`; the audit only sees each item's first screen, so it cannot point out a missed conditional group.
-4. Scope: web and webview kiosks. Native apps via OS accessibility APIs are roadmap.
-5. Skills are tied to the driver's labelling rules; record the driver version and re-learn when it changes.
+4. **Interruptions in the middle of an order**: a kiosk's timeout modal that comes up between two steps stops the replay (I-194, the remaining bakery unsafe orders); a skill can only answer it at the start of a recipe.
+5. **Prices the skill predicts**: a discount per person recorded as one amount per line (bk6) and charges added only after the checkout button (bk5's take-out, I-195) make the skill's total differ from the kiosk's; the gate does not ask for self-tests that cover every option group (I-192, I-197).
+6. **Names typed by the learner**: an option named `곱배기` while the kiosk shows `곱빼기` blocks those orders (I-196); upsell acceptance is not recorded (bk1).
+7. Scope: web and webview kiosks. Native apps via OS accessibility APIs are roadmap.
+8. Skills are tied to the driver's labelling rules; record the driver version and re-learn when it changes.

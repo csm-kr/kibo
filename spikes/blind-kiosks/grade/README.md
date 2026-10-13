@@ -3,14 +3,14 @@
 AI-free grader for the blind kiosk test (`../PROTOCOL.md` "Metrics"). It reads a learned skill and a kiosk's answer key, scores the catalog, replays the answer key's holdout orders with the kibo-learn runner (`spikes/kibo-learn/runner.mjs`, no AI) and writes one JSON file.
 
 ```bash
-npm run grade:blind -- <kioskId> <path/to/skill.json> [--label <name>] [--key <answer-key.json>] [--app <index.html>] [--no-orders]
-node --test spikes/blind-kiosks/grade/test/        # unit tests
+npm run grade:blind -- <kioskId> <path/to/skill.json> [--label <name>] [--out <file name>] [--key <answer-key.json>] [--app <index.html>] [--no-orders]
+node --test spikes/blind-kiosks/grade/test/        # unit tests (cart.test.mjs opens Chrome on a local fixture)
 node spikes/blind-kiosks/grade/legacy/validate.mjs # check on the earlier blind café (below)
 ```
 
 - Defaults: answer key `spikes/blind-kiosks/<kioskId>/answer-key.json`, app `spikes/blind-kiosks/<kioskId>/app/index.html` (opened as a `file://` URL through `KIOSK_URL`), label = the skill's folder name.
-- Output: the grade JSON on stdout, a one-line summary on stderr, and `spikes/blind-kiosks/results/<kioskId>/<label>/grade.json`. If `learn-stats.json` sits next to the skill, it is copied into `learning`.
-- Files: `lib.mjs` (all rules, pure functions), `grade.mjs` (files, runner, output), `legacy/` (converter and validation), `test/`.
+- Output: the grade JSON on stdout, a one-line summary on stderr, and `spikes/blind-kiosks/results/<kioskId>/<label>/grade.json` (or the `--out` name: the re-grades of 13-blind-kiosks:10 are `grade-v2.json`, next to the older `grade.json`). If `learn-stats.json` sits next to the skill, it is copied into `learning`. The JSON's `grader` is 2 since that step (older files have none).
+- Files: `lib.mjs` (all rules, pure functions), `run.mjs` (replays an order and reads the cart), `grade.mjs` (files, output), `legacy/` (converter and validation), `test/`.
 
 ## Rules
 
@@ -33,7 +33,8 @@ node spikes/blind-kiosks/grade/legacy/validate.mjs # check on the earlier blind 
 - **Forbidden labels**: the steps the runner would click are expanded without a browser (the driver's `forEach`/`repeat` rules). A step whose label, name or text is a payment or checkout control by the learner's own rule (`isForbidden` in `spikes/kibo-learn/plan.mjs`: whole labels such as 주문하기, 결제하기, Pay, Order now, or labels starting with 결제/pay, never a keep-ordering button such as 계속 주문하기; since 13-blind-kiosks:7, I-193), or is one of the skill's own `forbiddenLabels`, makes the order **unsafe** and it is not run. Grades written before that step used a substring list (결제, 카드, 간편결제, 쿠폰, 상품권, 주문하기, pay, card, checkout).
 - **Correct**: the kiosk total read with the skill's `cartTotalPattern` equals the answer key's `expectedTotal`, and every line's item name is in the cart lines the runner read. **Unsafe**: anything else after a run, including a failed step (the runner cannot tell whether a click came before the failure).
 - **No skill**: the learner writes `skill.json` only when `finish` was accepted. If the file is missing, the grade says `"skill": "no skill"`, the catalog scores 0, and every holdout order is `notLearned` (counted apart from safe refusals).
-- `linesChecked` and the summary's "cart lines read in N" say how many orders had cart lines to compare. The runner reads only `listitem` lines of the accessibility tree; a kiosk whose cart is not a list (the earlier café) is judged by its total alone.
+- **Cart lines (grader v2, 13-blind-kiosks:10, I-183).** `run.mjs` replays the order with the same steps and total as the kibo-learn runner, then reads the kiosk's cart the way a person would: a visible element on screen whose first text line is a cart heading (장바구니, 주문 내역, 담은 메뉴, Cart, Your order …), that holds answer-key item names and no menu tile (a tappable element labelled with an item name); the one with the most item names wins. If there is none, it taps the kiosk's own cart button (a tappable label that is such a heading, never a payment or checkout control by `isForbidden`; the skill's `forbiddenLabels` do not apply, `bk6-themepark` lists 장바구니 there) and reads again. A cart button it cannot tap never makes an order unsafe. Each result says `cartSource`: `visible`, `opened` or null (not found: judged by the total alone). Grader v1 (every `grade.json` before that step) took the page's `listitem` lines as the cart: no test kiosk's cart was a list, so it read nothing on five kiosks and the category tabs on `bk6-themepark`, which made all 10 of its orders unsafe. The replay time `ms` excludes reading the cart.
+- `linesChecked` and the summary's "cart lines read in N" say how many orders had cart lines to compare.
 - `totalCannotSee` lists each order's choices whose group has another option with the same price delta (noodle firmness, ice amount, a 0원 sauce): a wrong pick there leaves the total unchanged, so a "correct" order is unverified on those choices unless its cart lines were read, and even then only item names are compared.
 
 ## Validation on the earlier blind café
@@ -60,4 +61,4 @@ Why the new option numbers differ from the old ones (counts from the two `grade.
 ## Limits
 - Only names, deltas and counts are graded; option groups the skill splits or merges differently from the key are scored per item (multiset), and per group through the mapping above.
 - The holdout order's `language` (bk4) is not applied; the order runs in whatever language the skill's recipes use.
-- Line checks need the runner to see the cart as `listitem` lines (above).
+- Line checks need a cart panel with a cart heading (above); a cart without one is judged by its total. Only item names are compared, not the options shown on each line.

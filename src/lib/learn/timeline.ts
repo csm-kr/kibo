@@ -40,7 +40,16 @@ export interface LearnRunData {
     itemsFound: number;
     itemsOf: number;
     pricesCorrect: number;
-    orders: { total: number; correct: number; safeRefusal: number; unsafe: number; ruleViolationDetected: number; linesChecked: number | null };
+    orders: {
+      total: number;
+      correct: number;
+      safeRefusal: number;
+      unsafe: number;
+      ruleViolationDetected: number;
+      linesChecked: number | null;
+      /** Orders whose kiosk total differs from the skill's own prediction (I-197); null without an answer key. */
+      skillTotalDiffers: number | null;
+    };
     itemsSource: string;
     ordersSource: string;
   };

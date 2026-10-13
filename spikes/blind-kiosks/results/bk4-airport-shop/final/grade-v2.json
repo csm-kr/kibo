@@ -1,0 +1,905 @@
+{
+  "kioskId": "bk4-airport-shop",
+  "label": "final",
+  "grader": 2,
+  "gradedAt": "2026-10-13T22:39:11.470Z",
+  "skill": "present",
+  "files": {
+    "skill": "spikes/blind-kiosks/results/bk4-airport-shop/final/skill.json",
+    "key": "spikes/blind-kiosks/bk4-airport-shop/answer-key.json",
+    "app": "spikes/blind-kiosks/bk4-airport-shop/app/index.html"
+  },
+  "summary": "bk4-airport-shop/final: learning finished, 8.1 min, 64 turns, 666077 input tokens; items 37/37 (precision 1), price 37/37, options exact 12/12 (openable 12/12); orders correct 10, safe refusal 0, unsafe 0 of 10 (cart lines read in 10)",
+  "learning": {
+    "provider": "gemini",
+    "model": "gemini-3.8-flash",
+    "cachedInputTokens": 394579,
+    "finished": true,
+    "turns": 64,
+    "acts": 64,
+    "tests": 1,
+    "inputTokens": 666077,
+    "outputTokens": 13569,
+    "minutes": "8.1"
+  },
+  "catalog": {
+    "items": {
+      "key": 37,
+      "skill": 37,
+      "matched": 37,
+      "recall": 1,
+      "precision": 1,
+      "missing": [],
+      "extra": []
+    },
+    "price": {
+      "correct": 37,
+      "of": 37
+    },
+    "category": {
+      "correct": 37,
+      "of": 37
+    },
+    "soldOut": {
+      "correct": 37,
+      "of": 37
+    },
+    "options": {
+      "itemsExact": 12,
+      "items": 12,
+      "openableExact": 12,
+      "openable": 12,
+      "groups": 17,
+      "groupsFound": 17,
+      "groupLabelsExact": 17,
+      "groupRulesCorrect": 17,
+      "quantityGroups": 2,
+      "quantityRecognized": 2,
+      "conditionalGroups": 0,
+      "conditionalFound": 0
+    },
+    "perItem": [
+      {
+        "name": "야채김밥",
+        "skillName": "야채김밥",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "참치김밥",
+        "skillName": "참치김밥",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "불고기김밥",
+        "skillName": "불고기김밥",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "아침 한정 계란김밥 세트",
+        "skillName": "아침 한정 계란김밥 세트",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "제육도시락",
+        "skillName": "제육도시락",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "치킨마요덮밥",
+        "skillName": "치킨마요덮밥",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "유부초밥 4입",
+        "skillName": "유부초밥 4입",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "햄치즈 샌드위치",
+        "skillName": "햄치즈 샌드위치",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "에그마요 샌드위치",
+        "skillName": "에그마요 샌드위치",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "치킨 랩",
+        "skillName": "치킨 랩",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "버터 크루아상",
+        "skillName": "버터 크루아상",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "블루베리 머핀",
+        "skillName": "블루베리 머핀",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "클래식 핫도그",
+        "skillName": "클래식 핫도그",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "아메리카노",
+        "skillName": "아메리카노",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "카페라떼",
+        "skillName": "카페라떼",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "생수 500ml",
+        "skillName": "생수 500ml",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "꿀바나나우유",
+        "skillName": "꿀바나나우유",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "제주감귤주스",
+        "skillName": "제주감귤주스",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "레몬 탄산수",
+        "skillName": "레몬 탄산수",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "활주로 라거 500ml",
+        "skillName": "활주로 라거 500ml",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "버터감자칩",
+        "skillName": "버터감자칩",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "초코 크런치바",
+        "skillName": "초코 크런치바",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "젤리 믹스",
+        "skillName": "젤리 믹스",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "견과류 한줌",
+        "skillName": "견과류 한줌",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "치킨텐더 4조각",
+        "skillName": "치킨텐더 4조각",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "구운 달걀 2입",
+        "skillName": "구운 달걀 2입",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "여행용 목베개",
+        "skillName": "여행용 목베개",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "멀티 여행 어댑터",
+        "skillName": "멀티 여행 어댑터",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "휴대용 보조배터리",
+        "skillName": "휴대용 보조배터리",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "일회용 마스크 5매",
+        "skillName": "일회용 마스크 5매",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "여행용 세면도구 키트",
+        "skillName": "여행용 세면도구 키트",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "수면 안대",
+        "skillName": "수면 안대",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "한복 곰 키링",
+        "skillName": "한복 곰 키링",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "전통 문양 손거울",
+        "skillName": "전통 문양 손거울",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "꿀약과 6입",
+        "skillName": "꿀약과 6입",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "서울 엽서 세트",
+        "skillName": "서울 엽서 세트",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "자개 책갈피",
+        "skillName": "자개 책갈피",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      }
+    ],
+    "perGroup": [
+      {
+        "item": "제육도시락",
+        "group": "heat",
+        "found": true,
+        "skillGroup": "데우기 여부",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "치킨마요덮밥",
+        "group": "heat",
+        "found": true,
+        "skillGroup": "데우기 여부",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "햄치즈 샌드위치",
+        "group": "heat",
+        "found": true,
+        "skillGroup": "데우기 여부",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "치킨 랩",
+        "group": "heat",
+        "found": true,
+        "skillGroup": "데우기 여부",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "치킨 랩",
+        "group": "sauce",
+        "found": true,
+        "skillGroup": "소스 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "클래식 핫도그",
+        "group": "sauce",
+        "found": true,
+        "skillGroup": "소스 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "아메리카노",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "아메리카노",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "아메리카노",
+        "group": "shot",
+        "found": true,
+        "skillGroup": "샷 추가",
+        "labelsExact": true,
+        "rules": true,
+        "quantity": true
+      },
+      {
+        "item": "카페라떼",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카페라떼",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카페라떼",
+        "group": "shot",
+        "found": true,
+        "skillGroup": "샷 추가",
+        "labelsExact": true,
+        "rules": true,
+        "quantity": true
+      },
+      {
+        "item": "치킨텐더 4조각",
+        "group": "sauce",
+        "found": true,
+        "skillGroup": "소스 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "여행용 목베개",
+        "group": "color",
+        "found": true,
+        "skillGroup": "색상",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "한복 곰 키링",
+        "group": "wrap",
+        "found": true,
+        "skillGroup": "선물 포장",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "전통 문양 손거울",
+        "group": "wrap",
+        "found": true,
+        "skillGroup": "선물 포장",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "자개 책갈피",
+        "group": "wrap",
+        "found": true,
+        "skillGroup": "선물 포장",
+        "labelsExact": true,
+        "rules": true
+      }
+    ]
+  },
+  "orders": {
+    "total": 10,
+    "correct": 10,
+    "safeRefusal": 0,
+    "unsafe": 0,
+    "linesChecked": 10,
+    "results": [
+      {
+        "id": "h1",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "expectedTotal": 8000,
+        "kioskTotal": 8000,
+        "skillPredicts": 8000,
+        "ms": 336,
+        "totalCannotSee": [],
+        "order": {
+          "dineOption": "화면을 터치하여 주문을 시작하세요",
+          "lines": [
+            {
+              "category": "김밥·도시락",
+              "item": "야채김밥",
+              "options": [],
+              "qty": 2
+            },
+            {
+              "category": "음료",
+              "item": "생수 500ml",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h2",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "expectedTotal": 5700,
+        "kioskTotal": 5700,
+        "skillPredicts": 5700,
+        "ms": 354,
+        "totalCannotSee": [],
+        "order": {
+          "dineOption": "화면을 터치하여 주문을 시작하세요",
+          "lines": [
+            {
+              "category": "음료",
+              "item": "꿀바나나우유",
+              "options": [],
+              "qty": 1
+            },
+            {
+              "category": "샌드위치·베이커리",
+              "item": "에그마요 샌드위치",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h3",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "expectedTotal": 11000,
+        "kioskTotal": 11000,
+        "skillPredicts": 11000,
+        "ms": 378,
+        "totalCannotSee": [],
+        "order": {
+          "dineOption": "화면을 터치하여 주문을 시작하세요",
+          "lines": [
+            {
+              "category": "음료",
+              "item": "활주로 라거 500ml",
+              "options": [],
+              "qty": 2
+            },
+            {
+              "category": "간식",
+              "item": "버터감자칩",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h4",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "expectedTotal": 13400,
+        "kioskTotal": 13400,
+        "skillPredicts": 13400,
+        "ms": 481,
+        "totalCannotSee": [
+          "제육도시락 › 데워 주세요",
+          "치킨마요덮밥 › 데우지 않음"
+        ],
+        "order": {
+          "dineOption": "화면을 터치하여 주문을 시작하세요",
+          "lines": [
+            {
+              "category": "김밥·도시락",
+              "item": "제육도시락",
+              "options": [
+                "데워 주세요"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "김밥·도시락",
+              "item": "치킨마요덮밥",
+              "options": [
+                "데우지 않음"
+              ],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h5",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "expectedTotal": 10900,
+        "kioskTotal": 10900,
+        "skillPredicts": 10900,
+        "ms": 659,
+        "totalCannotSee": [],
+        "order": {
+          "dineOption": "화면을 터치하여 주문을 시작하세요",
+          "lines": [
+            {
+              "category": "음료",
+              "item": "아메리카노",
+              "options": [
+                "ICE 차갑게",
+                "라지",
+                "에스프레소 샷",
+                "에스프레소 샷"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "음료",
+              "item": "카페라떼",
+              "options": [
+                "HOT 따뜻하게",
+                "레귤러"
+              ],
+              "qty": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "h6",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "expectedTotal": 16500,
+        "kioskTotal": 16500,
+        "skillPredicts": 16500,
+        "ms": 546,
+        "totalCannotSee": [
+          "치킨 랩 › 데워 주세요",
+          "치킨텐더 4조각 › 스위트칠리"
+        ],
+        "order": {
+          "dineOption": "화면을 터치하여 주문을 시작하세요",
+          "lines": [
+            {
+              "category": "샌드위치·베이커리",
+              "item": "치킨 랩",
+              "options": [
+                "데워 주세요",
+                "갈릭마요"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "간식",
+              "item": "치킨텐더 4조각",
+              "options": [
+                "스위트칠리"
+              ],
+              "qty": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "h7",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "expectedTotal": 25800,
+        "kioskTotal": 25800,
+        "skillPredicts": 25800,
+        "ms": 500,
+        "totalCannotSee": [
+          "여행용 목베개 › 네이비"
+        ],
+        "order": {
+          "dineOption": "화면을 터치하여 주문을 시작하세요",
+          "lines": [
+            {
+              "category": "여행용품",
+              "item": "여행용 목베개",
+              "options": [
+                "네이비"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "여행용품",
+              "item": "일회용 마스크 5매",
+              "options": [],
+              "qty": 2
+            },
+            {
+              "category": "음료",
+              "item": "제주감귤주스",
+              "options": [],
+              "qty": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "h8",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "expectedTotal": 35500,
+        "kioskTotal": 35500,
+        "skillPredicts": 35500,
+        "ms": 560,
+        "totalCannotSee": [],
+        "order": {
+          "dineOption": "화면을 터치하여 주문을 시작하세요",
+          "lines": [
+            {
+              "category": "기념품",
+              "item": "한복 곰 키링",
+              "options": [
+                "선물 포장"
+              ],
+              "qty": 2
+            },
+            {
+              "category": "기념품",
+              "item": "꿀약과 6입",
+              "options": [],
+              "qty": 1
+            },
+            {
+              "category": "기념품",
+              "item": "자개 책갈피",
+              "options": [
+                "포장 안 함"
+              ],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h9",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "expectedTotal": 8000,
+        "kioskTotal": 8000,
+        "skillPredicts": 8000,
+        "ms": 494,
+        "totalCannotSee": [],
+        "order": {
+          "dineOption": "화면을 터치하여 주문을 시작하세요",
+          "lines": [
+            {
+              "category": "김밥·도시락",
+              "item": "아침 한정 계란김밥 세트",
+              "options": [],
+              "qty": 1
+            },
+            {
+              "category": "음료",
+              "item": "아메리카노",
+              "options": [
+                "HOT 따뜻하게",
+                "레귤러"
+              ],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h10",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "expectedTotal": 43000,
+        "kioskTotal": 43000,
+        "skillPredicts": 43000,
+        "ms": 738,
+        "totalCannotSee": [
+          "클래식 핫도그 › 허니머스타드",
+          "햄치즈 샌드위치 › 데워 주세요"
+        ],
+        "order": {
+          "dineOption": "화면을 터치하여 주문을 시작하세요",
+          "lines": [
+            {
+              "category": "샌드위치·베이커리",
+              "item": "클래식 핫도그",
+              "options": [
+                "허니머스타드"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "샌드위치·베이커리",
+              "item": "햄치즈 샌드위치",
+              "options": [
+                "데워 주세요"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "음료",
+              "item": "활주로 라거 500ml",
+              "options": [],
+              "qty": 1
+            },
+            {
+              "category": "음료",
+              "item": "꿀바나나우유",
+              "options": [],
+              "qty": 3
+            },
+            {
+              "category": "여행용품",
+              "item": "휴대용 보조배터리",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

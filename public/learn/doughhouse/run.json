@@ -27,7 +27,8 @@
    "safeRefusal": 0,
    "unsafe": 0,
    "ruleViolationDetected": 1,
-   "linesChecked": null
+   "linesChecked": null,
+   "skillTotalDiffers": null
   },
   "itemsSource": "spikes/blind-kiosks/results/dev/gemini-doughhouse-after/skill.json, skills/doughhouse.json",
   "ordersSource": "spikes/blind-kiosks/results/dev/gemini-doughhouse-after/holdout.log"

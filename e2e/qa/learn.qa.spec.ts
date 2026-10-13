@@ -29,7 +29,16 @@ test("/learn index", async ({ page }, info) => {
   await page.goto("/learn");
   await expect(page.getByRole("heading", { name: "Watch KIBO learn a kiosk it has never seen." })).toBeVisible({ timeout: 60_000 });
   await check(page, info, "index-top");
-  await check(page, info, "index-cards", '[data-learn-run="airport-shop"]');
+  await check(page, info, "index-cards", '[data-learn-run="themepark"]');
+  await check(page, info, "index-cards-second", '[data-learn-run="airport-shop"]');
+});
+
+test("learn replay: the fresh theme park run's finish and learned skill", async ({ page }, info) => {
+  await page.goto("/learn/themepark");
+  await expect(page.locator("[data-learn-turn]")).toHaveText(/Turn 1 of 87/, { timeout: 60_000 });
+  await page.locator('[data-learn-milestone="finish"]').click();
+  await expect(page.locator("[data-learn-skill]")).toBeVisible();
+  await check(page, info, "replay-themepark-skill", "[data-learn-skill]");
 });
 
 test("learn replay: start, a stopped tap, the finish and the learned skill", async ({ page }, info) => {

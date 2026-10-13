@@ -12,11 +12,18 @@ test("/learn lists the recorded runs with their numbers", async ({ page }) => {
   await page.goto("/learn");
   await expect(page.getByRole("heading", { name: "Watch KIBO learn a kiosk it has never seen." })).toBeVisible({ timeout: 60_000 });
   const cards = page.locator("[data-learn-run]");
-  await expect(cards).toHaveCount(2);
+  await expect(cards).toHaveCount(3);
+  // The fresh hold-out kiosk comes first, with its wrong-total caveat next to the order numbers (I-197).
+  const fresh = cards.first();
+  await expect(fresh).toHaveAttribute("data-learn-run", "themepark");
+  await expect(fresh).toContainText("never seen before this run");
+  await expect(fresh).toContainText("10 correct, 0 refused, 0 unsafe, of 10");
+  await expect(fresh).toContainText("In 4 of them the skill's own total was wrong");
+  await expect(fresh).toContainText("spikes/blind-kiosks/results/bk6-themepark/final/grade-v2.json");
   const blind = page.locator('[data-learn-run="airport-shop"]');
   await expect(blind).toContainText("37 of 37 items found");
   await expect(blind).toContainText("10 correct, 0 refused, 0 unsafe, of 10");
-  await expect(blind).toContainText("spikes/blind-kiosks/results/bk4-airport-shop/final/grade.json");
+  await expect(blind).toContainText("spikes/blind-kiosks/results/bk4-airport-shop/final/grade-v2.json");
   await expect(page.locator('[data-learn-run="doughhouse"]')).toContainText("4 correct, 0 refused, 0 unsafe, of 4");
   await blind.getByRole("link", { name: "Watch this run" }).click();
   await expect(page).toHaveURL(/\/learn\/airport-shop$/);
@@ -46,6 +53,18 @@ test("the viewer steps through the trace, reaches the finish and hides the order
   const skill = page.locator("[data-learn-skill]");
   await expect(skill).toBeVisible();
   await expect(skill.getByRole("rowheader", { name: "야채김밥" })).toBeVisible();
+  await expect(skill.locator("[data-learn-order]")).toHaveCount(0);
+  await expect(skill.locator("[data-learn-no-order]")).toContainText("not in the live demo");
+});
+
+test("the theme park replay says it kept no notes and ends at its learned skill without an order button", async ({ page }) => {
+  await page.goto("/learn/themepark");
+  await expect(page.locator("[data-learn-turn]")).toHaveText(/Turn 1 of 87/, { timeout: 60_000 });
+  await expect(page.locator("[data-learn-no-notes]")).toBeVisible();
+  await expect(page.locator("[data-learn-count]")).toHaveCount(0);
+  await page.locator('[data-learn-milestone="finish"]').click();
+  const skill = page.locator("[data-learn-skill]");
+  await expect(skill.getByRole("rowheader", { name: "종일 자유이용권" })).toBeVisible();
   await expect(skill.locator("[data-learn-order]")).toHaveCount(0);
   await expect(skill.locator("[data-learn-no-order]")).toContainText("not in the live demo");
 });

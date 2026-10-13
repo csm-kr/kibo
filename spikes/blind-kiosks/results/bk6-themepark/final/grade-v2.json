@@ -1,0 +1,972 @@
+{
+  "kioskId": "bk6-themepark",
+  "label": "final",
+  "grader": 2,
+  "gradedAt": "2026-10-13T22:39:45.275Z",
+  "skill": "present",
+  "files": {
+    "skill": "spikes/blind-kiosks/results/bk6-themepark/final/skill.json",
+    "key": "spikes/blind-kiosks/bk6-themepark/answer-key.json",
+    "app": "spikes/blind-kiosks/bk6-themepark/app/index.html"
+  },
+  "summary": "bk6-themepark/final: learning finished, 12.7 min, 87 turns, 1284672 input tokens; items 25/25 (precision 1), price 18/25, options exact 10/18 (openable 14/17); orders correct 10, safe refusal 0, unsafe 0 of 10 (cart lines read in 10)",
+  "learning": {
+    "provider": "gemini",
+    "model": "gemini-3.8-flash",
+    "cachedInputTokens": 862085,
+    "finished": true,
+    "turns": 87,
+    "acts": 111,
+    "tests": 2,
+    "inputTokens": 1284672,
+    "outputTokens": 28615,
+    "minutes": "12.7"
+  },
+  "catalog": {
+    "items": {
+      "key": 25,
+      "skill": 25,
+      "matched": 25,
+      "recall": 1,
+      "precision": 1,
+      "missing": [],
+      "extra": []
+    },
+    "price": {
+      "correct": 18,
+      "of": 25
+    },
+    "category": {
+      "correct": 25,
+      "of": 25
+    },
+    "soldOut": {
+      "correct": 25,
+      "of": 25
+    },
+    "options": {
+      "itemsExact": 10,
+      "items": 18,
+      "openableExact": 14,
+      "openable": 17,
+      "groups": 22,
+      "groupsFound": 21,
+      "groupLabelsExact": 14,
+      "groupRulesCorrect": 14,
+      "quantityGroups": 7,
+      "quantityRecognized": 7,
+      "conditionalGroups": 4,
+      "conditionalFound": 0
+    },
+    "perItem": [
+      {
+        "name": "아쿠아리움 입장권",
+        "skillName": "아쿠아리움 입장권",
+        "price": false,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "대인 0",
+            "청소년 -4000",
+            "소인 -8000"
+          ],
+          "extra": [
+            "대인 29000",
+            "청소년 25000",
+            "소인 21000"
+          ],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "오션 스카이 전망대",
+        "skillName": "오션 스카이 전망대",
+        "price": false,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "대인 0",
+            "청소년 -2000",
+            "소인 -4000"
+          ],
+          "extra": [
+            "대인 12000",
+            "청소년 10000",
+            "소인 8000"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "아쿠아리움+전망대 패키지",
+        "skillName": "아쿠아리움+전망대 패키지",
+        "price": false,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "대인 0",
+            "청소년 -5000",
+            "소인 -10000"
+          ],
+          "extra": [
+            "대인 36000",
+            "청소년 31000",
+            "소인 26000"
+          ],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "4D 해저탐험 영상관",
+        "skillName": "4D 해저탐험 영상관",
+        "price": false,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "대인 0",
+            "청소년 0",
+            "소인 -2000"
+          ],
+          "extra": [
+            "대인 7000",
+            "청소년 6000",
+            "소인 5000"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "종일 자유이용권",
+        "skillName": "종일 자유이용권",
+        "price": false,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "대인 0",
+            "청소년 -7000",
+            "소인 -12000"
+          ],
+          "extra": [
+            "대인 59000",
+            "청소년 51000",
+            "소인 43000"
+          ],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "오후 자유이용권",
+        "skillName": "오후 자유이용권",
+        "price": false,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "대인 0",
+            "청소년 -6000",
+            "소인 -10000"
+          ],
+          "extra": [
+            "대인 47000",
+            "청소년 41000",
+            "소인 35000"
+          ],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "빅5 어트랙션 이용권",
+        "skillName": "빅5 어트랙션 이용권",
+        "price": false,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "대인 0",
+            "청소년 0",
+            "소인 -5000"
+          ],
+          "extra": [
+            "대인 35000",
+            "청소년 30000",
+            "소인 25000"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "별사탕 츄러스",
+        "skillName": "별사탕 츄러스",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "고래 꼬리 핫도그",
+        "skillName": "고래 꼬리 핫도그",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "치즈 소스 500",
+            "초코 소스 500",
+            "연유 드리즐 500",
+            "아이스크림 토핑 1000"
+          ],
+          "extra": []
+        }
+      },
+      {
+        "name": "소금빵 크로플",
+        "skillName": "소금빵 크로플",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "산호 팝콘",
+        "skillName": "산호 팝콘",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "해마 와플",
+        "skillName": "해마 와플",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "통감자 버터구이",
+        "skillName": "통감자 버터구이",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "블루 레모네이드",
+        "skillName": "블루 레모네이드",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "파도 자몽에이드",
+        "skillName": "파도 자몽에이드",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "아이스 아메리카노",
+        "skillName": "아이스 아메리카노",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "딸기 스무디",
+        "skillName": "딸기 스무디",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "핫초코",
+        "skillName": "핫초코",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "생수 500ml",
+        "skillName": "생수 500ml",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "아기 물범 인형",
+        "skillName": "아기 물범 인형",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "해파리 무드등",
+        "skillName": "해파리 무드등",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "고래 키링",
+        "skillName": "고래 키링",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "바다 엽서 세트",
+        "skillName": "바다 엽서 세트",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "펭귄 머리띠",
+        "skillName": "펭귄 머리띠",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "별바다 머그컵",
+        "skillName": "별바다 머그컵",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      }
+    ],
+    "perGroup": [
+      {
+        "item": "아쿠아리움 입장권",
+        "group": "discount",
+        "found": true,
+        "skillGroup": "할인 유형",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "아쿠아리움 입장권",
+        "group": "age_aquarium",
+        "found": true,
+        "skillGroup": "인원 선택",
+        "labelsExact": false,
+        "rules": false,
+        "quantity": true,
+        "conditional": false
+      },
+      {
+        "item": "오션 스카이 전망대",
+        "group": "age_skydeck",
+        "found": true,
+        "skillGroup": "인원 선택",
+        "labelsExact": false,
+        "rules": false,
+        "quantity": true
+      },
+      {
+        "item": "아쿠아리움+전망대 패키지",
+        "group": "discount",
+        "found": true,
+        "skillGroup": "할인 유형",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "아쿠아리움+전망대 패키지",
+        "group": "age_package",
+        "found": true,
+        "skillGroup": "인원 선택",
+        "labelsExact": false,
+        "rules": false,
+        "quantity": true,
+        "conditional": false
+      },
+      {
+        "item": "4D 해저탐험 영상관",
+        "group": "age_4d",
+        "found": true,
+        "skillGroup": "인원 선택",
+        "labelsExact": false,
+        "rules": false,
+        "quantity": true
+      },
+      {
+        "item": "종일 자유이용권",
+        "group": "discount",
+        "found": true,
+        "skillGroup": "할인 유형",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "종일 자유이용권",
+        "group": "age_fullday",
+        "found": true,
+        "skillGroup": "인원 선택",
+        "labelsExact": false,
+        "rules": false,
+        "quantity": true,
+        "conditional": false
+      },
+      {
+        "item": "오후 자유이용권",
+        "group": "discount",
+        "found": true,
+        "skillGroup": "할인 유형",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "오후 자유이용권",
+        "group": "age_afternoon",
+        "found": true,
+        "skillGroup": "인원 선택",
+        "labelsExact": false,
+        "rules": false,
+        "quantity": true,
+        "conditional": false
+      },
+      {
+        "item": "빅5 어트랙션 이용권",
+        "group": "age_big5",
+        "found": true,
+        "skillGroup": "인원 선택",
+        "labelsExact": false,
+        "rules": false,
+        "quantity": true
+      },
+      {
+        "item": "별사탕 츄러스",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "추가 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "고래 꼬리 핫도그",
+        "group": "topping",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "소금빵 크로플",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "추가 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "산호 팝콘",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "추가 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "해마 와플",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "추가 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "통감자 버터구이",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "추가 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "블루 레모네이드",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "파도 자몽에이드",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "아이스 아메리카노",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "딸기 스무디",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "핫초코",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      }
+    ]
+  },
+  "orders": {
+    "total": 10,
+    "correct": 10,
+    "safeRefusal": 0,
+    "unsafe": 0,
+    "linesChecked": 10,
+    "results": [
+      {
+        "id": "h1",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "opened",
+        "expectedTotal": 84500,
+        "kioskTotal": 84500,
+        "skillPredicts": 84500,
+        "ms": 1042,
+        "totalCannotSee": [],
+        "order": {
+          "lines": [
+            {
+              "category": "입장권",
+              "item": "아쿠아리움 입장권",
+              "options": [
+                "일반",
+                "대인",
+                "대인",
+                "소인"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "음료",
+              "item": "블루 레모네이드",
+              "options": [
+                "L 라지 +1,000원"
+              ],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h2",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "opened",
+        "expectedTotal": 91000,
+        "kioskTotal": 91000,
+        "skillPredicts": 100000,
+        "ms": 648,
+        "totalCannotSee": [],
+        "order": {
+          "lines": [
+            {
+              "category": "자유이용권",
+              "item": "종일 자유이용권",
+              "options": [
+                "장애인 우대",
+                "대인",
+                "청소년"
+              ],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h3",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "opened",
+        "expectedTotal": 65000,
+        "kioskTotal": 65000,
+        "skillPredicts": 73000,
+        "ms": 1058,
+        "totalCannotSee": [],
+        "order": {
+          "lines": [
+            {
+              "category": "입장권",
+              "item": "아쿠아리움+전망대 패키지",
+              "options": [
+                "경로 우대",
+                "대인",
+                "대인"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "음료",
+              "item": "핫초코",
+              "options": [
+                "R 레귤러"
+              ],
+              "qty": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "h4",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "opened",
+        "expectedTotal": 11500,
+        "kioskTotal": 11500,
+        "skillPredicts": 11500,
+        "ms": 973,
+        "totalCannotSee": [
+          "별사탕 츄러스 › 초코 소스"
+        ],
+        "order": {
+          "lines": [
+            {
+              "category": "간식",
+              "item": "별사탕 츄러스",
+              "options": [
+                "초코 소스"
+              ],
+              "qty": 2
+            },
+            {
+              "category": "음료",
+              "item": "생수 500ml",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h5",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "opened",
+        "expectedTotal": 21500,
+        "kioskTotal": 21500,
+        "skillPredicts": 21500,
+        "ms": 1019,
+        "totalCannotSee": [
+          "소금빵 크로플 › 연유 드리즐",
+          "산호 팝콘 › 치즈 소스"
+        ],
+        "order": {
+          "lines": [
+            {
+              "category": "간식",
+              "item": "소금빵 크로플",
+              "options": [
+                "연유 드리즐",
+                "아이스크림 토핑"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "간식",
+              "item": "산호 팝콘",
+              "options": [
+                "치즈 소스"
+              ],
+              "qty": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "h6",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "opened",
+        "expectedTotal": 42000,
+        "kioskTotal": 42000,
+        "skillPredicts": 42000,
+        "ms": 1028,
+        "totalCannotSee": [],
+        "order": {
+          "lines": [
+            {
+              "category": "입장권",
+              "item": "오션 스카이 전망대",
+              "options": [
+                "대인",
+                "청소년",
+                "청소년"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "입장권",
+              "item": "4D 해저탐험 영상관",
+              "options": [
+                "소인",
+                "소인"
+              ],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h7",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "opened",
+        "expectedTotal": 36000,
+        "kioskTotal": 36000,
+        "skillPredicts": 36000,
+        "ms": 477,
+        "totalCannotSee": [],
+        "order": {
+          "lines": [
+            {
+              "category": "기념품",
+              "item": "아기 물범 인형",
+              "options": [],
+              "qty": 1
+            },
+            {
+              "category": "기념품",
+              "item": "고래 키링",
+              "options": [],
+              "qty": 2
+            },
+            {
+              "category": "기념품",
+              "item": "펭귄 머리띠",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h8",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "opened",
+        "expectedTotal": 20500,
+        "kioskTotal": 20500,
+        "skillPredicts": 20500,
+        "ms": 1369,
+        "totalCannotSee": [],
+        "order": {
+          "lines": [
+            {
+              "category": "음료",
+              "item": "파도 자몽에이드",
+              "options": [
+                "L 라지 +1,000원"
+              ],
+              "qty": 2
+            },
+            {
+              "category": "음료",
+              "item": "아이스 아메리카노",
+              "options": [
+                "R 레귤러"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "음료",
+              "item": "블루 레모네이드",
+              "options": [
+                "R 레귤러"
+              ],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h9",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "opened",
+        "expectedTotal": 196000,
+        "kioskTotal": 196000,
+        "skillPredicts": 194000,
+        "ms": 1552,
+        "totalCannotSee": [
+          "해마 와플 › 치즈 소스",
+          "해마 와플 › 초코 소스"
+        ],
+        "order": {
+          "lines": [
+            {
+              "category": "자유이용권",
+              "item": "오후 자유이용권",
+              "options": [
+                "일반",
+                "대인",
+                "대인",
+                "청소년",
+                "소인"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "간식",
+              "item": "별사탕 츄러스",
+              "options": [],
+              "qty": 4
+            },
+            {
+              "category": "간식",
+              "item": "해마 와플",
+              "options": [
+                "치즈 소스",
+                "초코 소스"
+              ],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h10",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "opened",
+        "expectedTotal": 93500,
+        "kioskTotal": 93500,
+        "skillPredicts": 88500,
+        "ms": 1452,
+        "totalCannotSee": [
+          "빅5 어트랙션 이용권 › 대인",
+          "통감자 버터구이 › 치즈 소스"
+        ],
+        "order": {
+          "lines": [
+            {
+              "category": "자유이용권",
+              "item": "빅5 어트랙션 이용권",
+              "options": [
+                "대인",
+                "소인"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "입장권",
+              "item": "아쿠아리움 입장권",
+              "options": [
+                "장애인 우대",
+                "소인"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "간식",
+              "item": "통감자 버터구이",
+              "options": [
+                "치즈 소스"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "기념품",
+              "item": "별바다 머그컵",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

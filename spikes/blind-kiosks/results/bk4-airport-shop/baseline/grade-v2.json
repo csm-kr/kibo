@@ -1,0 +1,243 @@
+{
+  "kioskId": "bk4-airport-shop",
+  "label": "baseline",
+  "grader": 2,
+  "gradedAt": "2026-10-13T22:37:40.298Z",
+  "skill": "no skill",
+  "files": {
+    "skill": "spikes/blind-kiosks/results/bk4-airport-shop/baseline/skill.json",
+    "key": "spikes/blind-kiosks/bk4-airport-shop/answer-key.json",
+    "app": "spikes/blind-kiosks/bk4-airport-shop/app/index.html"
+  },
+  "summary": "bk4-airport-shop/baseline: learning not finished, 11.1 min, 113 turns, 2002024 input tokens; no skill; items 0/37 (precision null), price 0/0, options exact 0/0 (openable 0/0); orders correct 0, safe refusal 0, unsafe 0, not learned 10 of 10 (cart lines read in 0)",
+  "learning": {
+    "provider": "gemini",
+    "model": "gemini-3.8-flash",
+    "cachedInputTokens": 0,
+    "finished": false,
+    "turns": 113,
+    "acts": 80,
+    "tests": 1,
+    "inputTokens": 2002024,
+    "outputTokens": 9479,
+    "minutes": "11.1"
+  },
+  "catalog": {
+    "items": {
+      "key": 37,
+      "skill": 0,
+      "matched": 0,
+      "recall": 0,
+      "precision": null,
+      "missing": [
+        "야채김밥",
+        "참치김밥",
+        "불고기김밥",
+        "아침 한정 계란김밥 세트",
+        "제육도시락",
+        "치킨마요덮밥",
+        "유부초밥 4입",
+        "햄치즈 샌드위치",
+        "에그마요 샌드위치",
+        "치킨 랩",
+        "버터 크루아상",
+        "블루베리 머핀",
+        "클래식 핫도그",
+        "아메리카노",
+        "카페라떼",
+        "생수 500ml",
+        "꿀바나나우유",
+        "제주감귤주스",
+        "레몬 탄산수",
+        "활주로 라거 500ml",
+        "버터감자칩",
+        "초코 크런치바",
+        "젤리 믹스",
+        "견과류 한줌",
+        "치킨텐더 4조각",
+        "구운 달걀 2입",
+        "여행용 목베개",
+        "멀티 여행 어댑터",
+        "휴대용 보조배터리",
+        "일회용 마스크 5매",
+        "여행용 세면도구 키트",
+        "수면 안대",
+        "한복 곰 키링",
+        "전통 문양 손거울",
+        "꿀약과 6입",
+        "서울 엽서 세트",
+        "자개 책갈피"
+      ],
+      "extra": []
+    },
+    "price": {
+      "correct": 0,
+      "of": 0
+    },
+    "category": {
+      "correct": 0,
+      "of": 0
+    },
+    "soldOut": {
+      "correct": 0,
+      "of": 0
+    },
+    "options": {
+      "itemsExact": 0,
+      "items": 0,
+      "openableExact": 0,
+      "openable": 0,
+      "groups": 0,
+      "groupsFound": 0,
+      "groupLabelsExact": 0,
+      "groupRulesCorrect": 0,
+      "quantityGroups": 0,
+      "quantityRecognized": 0,
+      "conditionalGroups": 0,
+      "conditionalFound": 0
+    },
+    "perItem": [],
+    "perGroup": []
+  },
+  "orders": {
+    "total": 10,
+    "correct": 0,
+    "safeRefusal": 0,
+    "unsafe": 0,
+    "notLearned": 10,
+    "linesChecked": 0,
+    "results": [
+      {
+        "id": "h1",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 8000,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [],
+        "order": null
+      },
+      {
+        "id": "h2",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 5700,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [],
+        "order": null
+      },
+      {
+        "id": "h3",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 11000,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [],
+        "order": null
+      },
+      {
+        "id": "h4",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 13400,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "제육도시락 › 데워 주세요",
+          "치킨마요덮밥 › 데우지 않음"
+        ],
+        "order": null
+      },
+      {
+        "id": "h5",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 10900,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [],
+        "order": null
+      },
+      {
+        "id": "h6",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 16500,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "치킨 랩 › 데워 주세요",
+          "치킨텐더 4조각 › 스위트칠리"
+        ],
+        "order": null
+      },
+      {
+        "id": "h7",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 25800,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "여행용 목베개 › 네이비"
+        ],
+        "order": null
+      },
+      {
+        "id": "h8",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 35500,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [],
+        "order": null
+      },
+      {
+        "id": "h9",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 8000,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [],
+        "order": null
+      },
+      {
+        "id": "h10",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 43000,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "클래식 핫도그 › 허니머스타드",
+          "햄치즈 샌드위치 › 데워 주세요"
+        ],
+        "order": null
+      }
+    ]
+  }
+}

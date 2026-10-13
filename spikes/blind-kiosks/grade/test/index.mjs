@@ -4,3 +4,4 @@ import './translate.test.mjs';
 import './classify.test.mjs';
 import './catalog.test.mjs';
 import './noskill.test.mjs';
+import './cart.test.mjs';

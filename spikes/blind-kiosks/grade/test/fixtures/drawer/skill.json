@@ -1,0 +1,19 @@
+{
+  "kiosk": "테스트 기념품점",
+  "dineOptions": {},
+  "recipes": {
+    "startOrder": [],
+    "addToCart": [
+      { "op": "click", "label": "{item}" },
+      { "op": "repeat", "times": "{qtyMinus1}", "steps": [{ "op": "click", "label": "{item}" }] }
+    ],
+    "addWrongTile": [{ "op": "click", "label": "고래 키링" }]
+  },
+  "catalog": [
+    { "name": "고래 키링", "category": "기념품", "price": 6000, "soldOut": false, "optionGroups": [] },
+    { "name": "바다 엽서", "category": "기념품", "price": 6000, "soldOut": false, "recipe": "addWrongTile", "optionGroups": [] },
+    { "name": "펭귄 머리띠", "category": "기념품", "price": 9000, "soldOut": false, "optionGroups": [] }
+  ],
+  "forbiddenLabels": ["장바구니", "주문하기"],
+  "cartTotalPattern": "합계 ([0-9,]+)원"
+}

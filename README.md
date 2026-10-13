@@ -173,8 +173,10 @@ Measured rows from the evidence ledger in `docs/TESTING.md`. Each number comes f
 | Blind cafe kiosk, built by a separate agent (Gemini) | learning finished 2/3 runs (10.3 min, 15.1 min) | `spikes/blind-kiosk/results/v3run{1,2,3}/learn-stats.json` |
 | Blind cafe catalog accuracy (Gemini) | items 40/40; options 22/29 and 21/29 exact | `spikes/blind-kiosk/results/v3run{1,2}/grade.txt`, `grade_fair.txt` |
 | Blind cafe example orders (Gemini) | 2/5 and 3/5 passed; the rest refused before execution | `spikes/blind-kiosk/results/holdout.log` |
+| Blind kiosk test, fresh hold-out: 2 kiosks built by separate AI agents, never seen before their run (Gemini 3.8 Flash, finish gate and audit) | both learned (13.5, 12.7 min), items 56/56; 20 unseen orders without AI: 14 correct, 3 refused safely, **3 unsafe** (take-out orders 100원 short, I-195) | `spikes/blind-kiosks/RESULTS.md`, `spikes/blind-kiosks/results/bk{5-restarea,6-themepark}/final/grade-v2.json` |
+| Blind kiosk test, 4 test kiosks, learner before → after its improvements | finished 2 → 4 of 4; items 57 → 134 of 134; 40 unseen orders correct 5 → 31, **unsafe 5 → 5**. The learner was improved from these kiosks' baseline failures (dev set only), so the final is not a clean blind result | `spikes/blind-kiosks/RESULTS.md`, `spikes/blind-kiosks/results/bk*/{baseline,final}/grade-v2.json` |
 
-The KIBO Learn runs above predate the learner's finish gate (≥ 3 passing self-tests and a coverage audit); a Gemini re-run with both is planned. OpenAI runs in `spikes/` were development aids only and are not quoted (`spikes/README.md`).
+The pizza and café runs above predate the learner's finish gate (≥ 3 passing self-tests and a coverage audit); the blind kiosk test rows use both. All blind kiosks are synthetic web kiosks, one run each. OpenAI runs in `spikes/` were development aids only and are not quoted (`spikes/README.md`).
 
 ### Known limits
 - **KIBO Learn covers web and webview kiosks only**, and runs as offline experiments; in-app replay on a learned kiosk is not built yet. Native kiosk apps are roadmap.

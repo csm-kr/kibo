@@ -34,6 +34,8 @@ export function LearnPlayer({ run }: { run: LearnRun }) {
   const { data } = run;
   const { steps, milestones } = useMemo(() => buildTimeline(data), [data]);
   const last = steps.length - 1;
+  // A run that never used `record` (bk6) has all-zero counters; they would read as "found nothing".
+  const noNotes = steps.every((s) => s.known.items === 0 && s.known.optionGroups === 0 && s.known.categories === 0);
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState<(typeof SPEEDS)[number]>(1);
@@ -188,37 +190,46 @@ export function LearnPlayer({ run }: { run: LearnRun }) {
             <h2 id="learn-knows" className="text-xl font-bold">
               What KIBO knows
             </h2>
-            <dl className="grid grid-cols-3 gap-3">
-              {(
-                [
-                  ["Items", step.known.items],
-                  ["Option groups", step.known.optionGroups],
-                  ["Categories", step.known.categories],
-                ] as const
-              ).map(([label, value]) => (
-                <div key={label} className="flex flex-col">
-                  <dt className="order-2 text-base text-muted">{label}</dt>
-                  <dd className="font-display order-1 text-[32px] leading-tight font-bold tabular-nums" data-learn-count={label}>
-                    {value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-            <p className="text-base">
-              {step.latest ? (
-                <>
-                  <span className="font-semibold">Latest written down (turn {step.latest.n}):</span> {step.latest.names.join(", ")}
-                </>
-              ) : (
-                "Nothing written down yet."
-              )}
-            </p>
-            <p className="text-base text-muted">
-              What the learner had written down by this turn; the finished skill can hold more.{" "}
-              <code className="[overflow-wrap:anywhere]">
-                {data.sources.trace}/turn-{step.n}.json
-              </code>
-            </p>
+            {noNotes ? (
+              <p className="text-base" data-learn-no-notes>
+                This run wrote no notes along the way: it put what it found straight into the skill it tested, shown at
+                the last turn.
+              </p>
+            ) : (
+              <>
+                <dl className="grid grid-cols-3 gap-3">
+                  {(
+                    [
+                      ["Items", step.known.items],
+                      ["Option groups", step.known.optionGroups],
+                      ["Categories", step.known.categories],
+                    ] as const
+                  ).map(([label, value]) => (
+                    <div key={label} className="flex flex-col">
+                      <dt className="order-2 text-base text-muted">{label}</dt>
+                      <dd className="font-display order-1 text-[32px] leading-tight font-bold tabular-nums" data-learn-count={label}>
+                        {value}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+                <p className="text-base">
+                  {step.latest ? (
+                    <>
+                      <span className="font-semibold">Latest written down (turn {step.latest.n}):</span> {step.latest.names.join(", ")}
+                    </>
+                  ) : (
+                    "Nothing written down yet."
+                  )}
+                </p>
+                <p className="text-base text-muted">
+                  What the learner had written down by this turn; the finished skill can hold more.{" "}
+                  <code className="[overflow-wrap:anywhere]">
+                    {data.sources.trace}/turn-{step.n}.json
+                  </code>
+                </p>
+              </>
+            )}
           </section>
         </div>
       </section>
