@@ -52,7 +52,8 @@
     },
     {
       "dir": "11-hardening",
-      "status": "pending"
+      "status": "completed",
+      "completed_at": "2026-10-13T15:22:39+0900"
     },
     {
       "dir": "12-phone-app",
