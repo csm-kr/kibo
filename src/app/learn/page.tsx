@@ -20,14 +20,14 @@ export default function LearnIndex() {
           KIBO
         </Link>
         <header className="flex flex-col gap-4">
-          <h1 className="font-display text-[32px] leading-tight font-bold">Watch KIBO learn a kiosk it has never seen.</h1>
+          <h1 className="font-display text-[32px] leading-tight font-bold">Watch KIBO learn a kiosk from its screens alone.</h1>
           <p>
             Gemini explores the kiosk&apos;s screens once and writes a skill: the menu and how to tap each item. The skill
             must pass self-tests and a coverage audit, both without AI; after that, every order is replayed without AI.
           </p>
           <p className="text-base text-muted">
             Limits: web and webview kiosks only. All three kiosks are synthetic: two built by other AI agents for the
-            test, one by the KIBO team. One run per kiosk, Gemini on one day. These are replays of recorded runs, not
+            test, one by the KIBO team. One run per kiosk, Gemini 3.8 Flash on 10-13 and 10-14. These are replays of recorded runs, not
             live.
           </p>
         </header>

@@ -93,7 +93,9 @@
     {
       "step": 11,
       "name": "qa",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-14T07:51:59+0900",
+      "summary": "QA pass written to phases/13-blind-kiosks/qa/REPORT.md (angles A-I all pass, G and I after fixes, plus Fairness audit). Every number in RESULTS.md recomputed from learn-stats.json and grade-v2.json of all 11 runs (incl. cost at the cited Gemini price and skill-total-wrong 7 of 48): all match; KIBO_LEARN, TESTING, DECK_FACTS, README, landing Fact and /learn cards match. Fixes (R-001/R-014 only): /learn heading 'Watch KIBO learn a kiosk from its screens alone.' and limits 'Gemini 3.8 Flash on 10-13 and 10-14' (I-204; UX L1 and both learn specs updated); skill-total count added to landing Fact, README two rows, DECK_FACTS and TESTING four-kiosk rows (I-203); PROTOCOL/RESULTS cite learner commit a952d4e not 1dade19 and say bk5/bk6 were in the repo unopened during the I-193 fix (I-201); PROTOCOL notes the bk2 after-fix rerun started 06:20 before e84bd35 (06:39), uncommitted learner (I-202, open). Fairness: no learner diff references bk1-bk6 apps/keys/briefs; bk1-4 finals started 05:37/05:59 after a952d4e (05:35), bk5/bk6 06:40 after e84bd35. Brands: none in the six kiosks (only false positives bbq flavor, chococake, universal adapter). Also logged: I-035 Seen (stray .claude/worktrees gitlink in 1dade19), I-075 Seen (/learn auto margins), I-205 README says learned-kiosk replay not built (planned 14-final:9). AC: lint, build, test (954 passed), test:e2e (36 passed, 18 @live skipped; first run stopped on I-127 font flake), e2e_check 42/42, qa:ui 39 passed 0 H 205 T. Not committed: evidence/bridge-replay.json, evidence/touch-hero.json (I-099)."
     }
   ],
   "created_at": "2026-10-13T20:22:42+0900"

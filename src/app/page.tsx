@@ -227,7 +227,7 @@ export default function Home() {
             />
             <Fact
               value="2 kiosks it had never seen: 56 of 56 items, 14 of 20 orders right"
-              detail="built by other AI agents; 3 orders refused safely, 3 went wrong (take-out orders 100원 short)"
+              detail="built by other AI agents; 3 orders refused safely, 3 went wrong (take-out orders 100원 short); in 4 of the right ones the skill's own price differed from the kiosk's"
               path="spikes/blind-kiosks/RESULTS.md"
             />
             <Link href="/demo?k=doughhouse" className={SECONDARY}>

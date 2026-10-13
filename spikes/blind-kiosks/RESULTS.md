@@ -87,7 +87,7 @@ Baseline unsafe: the cart's `수량 더하기` matched 2–3 buttons (h4, h9); r
 Sums of the per-kiosk rows above. With the bk2 rerun in place of bk2's final, the final orders would read 32 / 4 / 4; that rerun was informed by bk2, so it is not the reported number.
 
 ## Fresh hold-out: bk5-restarea and bk6-themepark
-Built by separate AI agents and copied into the repo only after the learner improvements (commit `738d8f2`, after the learner commit `1dade19`); nobody working on the learner opened them before their run, and the learner was not changed after seeing them (`PROTOCOL.md` "Fresh test set"). One run each, no baseline, no rerun. **This is the cleanest "never seen" result.**
+Built by separate AI agents and copied into the repo only after the learner improvements (commit `738d8f2`, after the learner commit `a952d4e`); nobody working on the learner opened them before their run, and the learner was not changed after seeing them (`PROTOCOL.md` "Fresh test set"). One run each, no baseline, no rerun. **This is the cleanest "never seen" result.**
 
 | | bk5-restarea (highway food court) | bk6-themepark (theme park tickets and snacks) |
 |---|---|---|

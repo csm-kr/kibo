@@ -27,7 +27,7 @@ async function check(page: Page, info: Parameters<typeof qaState>[1], state: str
 
 test("/learn index", async ({ page }, info) => {
   await page.goto("/learn");
-  await expect(page.getByRole("heading", { name: "Watch KIBO learn a kiosk it has never seen." })).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByRole("heading", { name: "Watch KIBO learn a kiosk from its screens alone." })).toBeVisible({ timeout: 60_000 });
   await check(page, info, "index-top");
   await check(page, info, "index-cards", '[data-learn-run="themepark"]');
   await check(page, info, "index-cards-second", '[data-learn-run="airport-shop"]');

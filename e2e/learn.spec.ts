@@ -10,7 +10,7 @@ test.use({
 
 test("/learn lists the recorded runs with their numbers", async ({ page }) => {
   await page.goto("/learn");
-  await expect(page.getByRole("heading", { name: "Watch KIBO learn a kiosk it has never seen." })).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByRole("heading", { name: "Watch KIBO learn a kiosk from its screens alone." })).toBeVisible({ timeout: 60_000 });
   const cards = page.locator("[data-learn-run]");
   await expect(cards).toHaveCount(3);
   // The fresh hold-out kiosk comes first, with its wrong-total caveat next to the order numbers (I-197).
