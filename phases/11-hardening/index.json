@@ -1,0 +1,12 @@
+{
+  "project": "KIBO",
+  "phase": "11-hardening",
+  "steps": [
+    { "step": 0, "name": "security-audit", "status": "pending" },
+    { "step": 1, "name": "audit-fixes", "status": "pending" },
+    { "step": 2, "name": "prompt-cache", "status": "pending" },
+    { "step": 3, "name": "load-check", "status": "pending" },
+    { "step": 4, "name": "lighthouse", "status": "pending" },
+    { "step": 5, "name": "qa", "status": "pending" }
+  ]
+}

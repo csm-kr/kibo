@@ -47,6 +47,10 @@
     {
       "dir": "10-assets",
       "status": "pending"
+    },
+    {
+      "dir": "11-hardening",
+      "status": "pending"
     }
   ]
 }
