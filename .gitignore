@@ -21,6 +21,7 @@ scripts/test_execute.py
 
 # harness run outputs
 phases/**/qa/*.png
+phases/**/qa/lighthouse-*.html
 phases/**/*-output.json
 
 # from create-next-app

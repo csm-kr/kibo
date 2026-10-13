@@ -1,0 +1,418 @@
+{
+  "what": "Lighthouse on the local production build (standalone server.js as on Cloud Run, STORE=memory), not the deployed URL. Scores are the median of 3 loads per page; desktop uses Lighthouse's desktop config, mobile its default (simulated slow 4G, 4x CPU slowdown). Headless Chromium from Playwright on a laptop.",
+  "notes": "medianRunObservedLcpMs and medianRunTransfer of the before and after runs were read afterwards from the same runs' HTML reports (the script records them since). Changes between before and after: IBM Plex Sans KR preload off and its unused weight 500 dropped (src/app/layout.tsx); landing and /demo D1 pictures resized by next/image with sizes instead of unoptimized, landing hero fetchPriority high (src/app/page.tsx, src/components/demo/DemoIntro.tsx).",
+  "runs": [
+    {
+      "label": "before",
+      "date": "2026-10-13T05:44:43.016Z",
+      "lighthouseVersion": "13.5.0",
+      "browser": "HeadlessChrome/156.0.0.0",
+      "machine": {
+        "platform": "darwin",
+        "cpus": 8,
+        "cpuModel": "Apple M1",
+        "node": "v26.4.0"
+      },
+      "pages": [
+        {
+          "page": "home",
+          "path": "/",
+          "formFactor": "desktop",
+          "scores": {
+            "performance": 84,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "performanceRuns": [
+            82,
+            84,
+            84
+          ],
+          "medianRunMetrics": {
+            "fcp": "0.3 s",
+            "lcp": "2.9 s",
+            "tbt": "0 ms",
+            "cls": "0",
+            "si": "0.3 s"
+          },
+          "medianRunObservedLcpMs": 196,
+          "medianRunTransfer": {
+            "totalKb": 2188,
+            "requests": 212,
+            "fontRequests": 188,
+            "fontKb": 1642
+          },
+          "medianRunFailedAudits": {
+            "performance": [
+              "largest-contentful-paint: Largest Contentful Paint (2.9 s)"
+            ],
+            "accessibility": [],
+            "best-practices": [],
+            "seo": []
+          },
+          "runWarnings": []
+        },
+        {
+          "page": "home",
+          "path": "/",
+          "formFactor": "mobile",
+          "scores": {
+            "performance": 75,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "performanceRuns": [
+            75,
+            75,
+            75
+          ],
+          "medianRunMetrics": {
+            "fcp": "1.4 s",
+            "lcp": "15.4 s",
+            "tbt": "70 ms",
+            "cls": "0",
+            "si": "1.4 s"
+          },
+          "medianRunObservedLcpMs": 223,
+          "medianRunTransfer": {
+            "totalKb": 2110,
+            "requests": 209,
+            "fontRequests": 188,
+            "fontKb": 1642
+          },
+          "medianRunFailedAudits": {
+            "performance": [
+              "largest-contentful-paint: Largest Contentful Paint (15.4 s)"
+            ],
+            "accessibility": [],
+            "best-practices": [],
+            "seo": []
+          },
+          "runWarnings": []
+        },
+        {
+          "page": "demo",
+          "path": "/demo",
+          "formFactor": "desktop",
+          "scores": {
+            "performance": 82,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "performanceRuns": [
+            82,
+            83,
+            82
+          ],
+          "medianRunMetrics": {
+            "fcp": "0.3 s",
+            "lcp": "3.2 s",
+            "tbt": "0 ms",
+            "cls": "0",
+            "si": "0.3 s"
+          },
+          "medianRunObservedLcpMs": 339,
+          "medianRunTransfer": {
+            "totalKb": 2066,
+            "requests": 210,
+            "fontRequests": 188,
+            "fontKb": 1642
+          },
+          "medianRunFailedAudits": {
+            "performance": [
+              "largest-contentful-paint: Largest Contentful Paint (3.2 s)"
+            ],
+            "accessibility": [],
+            "best-practices": [],
+            "seo": []
+          },
+          "runWarnings": []
+        },
+        {
+          "page": "assistant",
+          "path": "/assistant?s=<session>#t=<claim>",
+          "formFactor": "mobile",
+          "scores": {
+            "performance": 67,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "performanceRuns": [
+            73,
+            61,
+            67
+          ],
+          "medianRunMetrics": {
+            "fcp": "1.4 s",
+            "lcp": "16.5 s",
+            "tbt": "350 ms",
+            "cls": "0.001",
+            "si": "1.4 s"
+          },
+          "medianRunObservedLcpMs": 849,
+          "medianRunTransfer": {
+            "totalKb": 2002,
+            "requests": 212,
+            "fontRequests": 194,
+            "fontKb": 1689
+          },
+          "medianRunFailedAudits": {
+            "performance": [
+              "largest-contentful-paint: Largest Contentful Paint (16.5 s)",
+              "total-blocking-time: Total Blocking Time (350 ms)"
+            ],
+            "accessibility": [],
+            "best-practices": [],
+            "seo": []
+          },
+          "runWarnings": []
+        },
+        {
+          "page": "kiosk",
+          "path": "/kiosk",
+          "formFactor": "desktop",
+          "scores": {
+            "performance": 81,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "performanceRuns": [
+            81,
+            81,
+            81
+          ],
+          "medianRunMetrics": {
+            "fcp": "0.4 s",
+            "lcp": "3.5 s",
+            "tbt": "0 ms",
+            "cls": "0",
+            "si": "0.9 s"
+          },
+          "medianRunObservedLcpMs": 2620,
+          "medianRunTransfer": {
+            "totalKb": 2034,
+            "requests": 214,
+            "fontRequests": 195,
+            "fontKb": 1697
+          },
+          "medianRunFailedAudits": {
+            "performance": [
+              "largest-contentful-paint: Largest Contentful Paint (3.5 s)"
+            ],
+            "accessibility": [],
+            "best-practices": [],
+            "seo": []
+          },
+          "runWarnings": []
+        }
+      ]
+    },
+    {
+      "label": "after",
+      "date": "2026-10-13T05:52:26.041Z",
+      "lighthouseVersion": "13.5.0",
+      "browser": "HeadlessChrome/156.0.0.0",
+      "machine": {
+        "platform": "darwin",
+        "cpus": 8,
+        "cpuModel": "Apple M1",
+        "node": "v26.4.0"
+      },
+      "pages": [
+        {
+          "page": "home",
+          "path": "/",
+          "formFactor": "desktop",
+          "scores": {
+            "performance": 100,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "performanceRuns": [
+            99,
+            100,
+            100
+          ],
+          "medianRunMetrics": {
+            "fcp": "0.3 s",
+            "lcp": "0.6 s",
+            "tbt": "0 ms",
+            "cls": "0",
+            "si": "0.3 s"
+          },
+          "medianRunObservedLcpMs": 87,
+          "medianRunTransfer": {
+            "totalKb": 425,
+            "requests": 27,
+            "fontRequests": 4,
+            "fontKb": 52
+          },
+          "medianRunFailedAudits": {
+            "performance": [],
+            "accessibility": [],
+            "best-practices": [],
+            "seo": []
+          },
+          "runWarnings": []
+        },
+        {
+          "page": "home",
+          "path": "/",
+          "formFactor": "mobile",
+          "scores": {
+            "performance": 98,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "performanceRuns": [
+            95,
+            98,
+            98
+          ],
+          "medianRunMetrics": {
+            "fcp": "1.2 s",
+            "lcp": "2.3 s",
+            "tbt": "60 ms",
+            "cls": "0",
+            "si": "1.2 s"
+          },
+          "medianRunObservedLcpMs": 75,
+          "medianRunTransfer": {
+            "totalKb": 386,
+            "requests": 24,
+            "fontRequests": 4,
+            "fontKb": 52
+          },
+          "medianRunFailedAudits": {
+            "performance": [],
+            "accessibility": [],
+            "best-practices": [],
+            "seo": []
+          },
+          "runWarnings": []
+        },
+        {
+          "page": "demo",
+          "path": "/demo",
+          "formFactor": "desktop",
+          "scores": {
+            "performance": 100,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "performanceRuns": [
+            100,
+            100,
+            100
+          ],
+          "medianRunMetrics": {
+            "fcp": "0.3 s",
+            "lcp": "0.7 s",
+            "tbt": "0 ms",
+            "cls": "0",
+            "si": "0.3 s"
+          },
+          "medianRunObservedLcpMs": 252,
+          "medianRunTransfer": {
+            "totalKb": 389,
+            "requests": 24,
+            "fontRequests": 3,
+            "fontKb": 44
+          },
+          "medianRunFailedAudits": {
+            "performance": [],
+            "accessibility": [],
+            "best-practices": [],
+            "seo": []
+          },
+          "runWarnings": []
+        },
+        {
+          "page": "assistant",
+          "path": "/assistant?s=<session>#t=<claim>",
+          "formFactor": "mobile",
+          "scores": {
+            "performance": 88,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "performanceRuns": [
+            88,
+            87,
+            88
+          ],
+          "medianRunMetrics": {
+            "fcp": "1.2 s",
+            "lcp": "3.7 s",
+            "tbt": "150 ms",
+            "cls": "0.016",
+            "si": "1.2 s"
+          },
+          "medianRunObservedLcpMs": 287,
+          "medianRunTransfer": {
+            "totalKb": 414,
+            "requests": 31,
+            "fontRequests": 14,
+            "fontKb": 129
+          },
+          "medianRunFailedAudits": {
+            "performance": [
+              "largest-contentful-paint: Largest Contentful Paint (3.7 s)"
+            ],
+            "accessibility": [],
+            "best-practices": [],
+            "seo": []
+          },
+          "runWarnings": []
+        },
+        {
+          "page": "kiosk",
+          "path": "/kiosk",
+          "formFactor": "desktop",
+          "scores": {
+            "performance": 99,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "performanceRuns": [
+            99,
+            99,
+            99
+          ],
+          "medianRunMetrics": {
+            "fcp": "0.6 s",
+            "lcp": "0.8 s",
+            "tbt": "0 ms",
+            "cls": "0",
+            "si": "0.6 s"
+          },
+          "medianRunObservedLcpMs": 416,
+          "medianRunTransfer": {
+            "totalKb": 462,
+            "requests": 35,
+            "fontRequests": 17,
+            "fontKb": 153
+          },
+          "medianRunFailedAudits": {
+            "performance": [],
+            "accessibility": [],
+            "best-practices": [],
+            "seo": []
+          },
+          "runWarnings": []
+        }
+      ]
+    }
+  ],
+  "script": "scripts/lighthouse.ts (npm run lighthouse -- --label <name>)"
+}

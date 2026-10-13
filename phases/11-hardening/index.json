@@ -37,7 +37,10 @@
     {
       "step": 4,
       "name": "lighthouse",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-13T14:39:56+0900",
+      "summary": "scripts/lighthouse.ts (npm run lighthouse -- --label <name>; plain node, not tsx, whose __name helper breaks Lighthouse's in-page code): local standalone production build with public/ and .next/static copied as the Dockerfile does, STORE=memory, Playwright's Chromium, Lighthouse 13.5.0 (devDependency), median of 3 loads; pages / desktop+mobile, /demo desktop, /assistant mobile (claimed from a fresh QR link), /kiosk desktop; evidence/lighthouse.json keeps before and after (scores, failed audits, observed LCP, transfer), HTML reports in phases/11-hardening/qa/ (git-ignored). Accessibility, Best Practices, SEO 100 on every page before and after. Performance before -> after: / desktop 84->100, / mobile 75->98, /demo 82->100, /assistant 67->88, /kiosk 81->99. Cause (I-158, fixed): next/font preloaded 187 IBM Plex Sans KR slices on every page (188-195 font files, ~1.6 MB of 2.0-2.2 MB); fix preload:false + drop unused weight 500 (src/app/layout.tsx) -> 3-17 font files, 0.39-0.46 MB per page, /kiosk observed LCP 2.6 s -> 0.42 s, Korean still in Plex. Landing and D1 pictures now resized by next/image with sizes (no unoptimized), hero fetchPriority high. Left open (I-159): /assistant renders its text after hydration (simulated LCP 3.8 s, observed 0.29 s), ~70 KB unused Next JS, 14 KB polyfills, 38 KB render-blocking font CSS. TESTING ledger and README evidence rows added. AC: lint, build, test 806 passed, test:e2e 19 passed/14 @live skipped, qa:ui 26 passed; evidence/touch-hero.json and bridge-replay.json rewritten by test:e2e were restored by hand (I-099).",
+      "completed_at": "2026-10-13T15:20:00+0900"
     },
     {
       "step": 5,

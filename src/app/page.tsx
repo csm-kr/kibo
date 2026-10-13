@@ -93,8 +93,9 @@ export default function Home() {
           alt="The live demo: on the left the Korean kiosk with two cheeseburger sets the AI just added, highlighted; on the right the phone with the same order and total."
           width={1280}
           height={1168}
-          unoptimized
+          sizes="(min-width: 1072px) 1024px, calc(100vw - 48px)"
           preload
+          fetchPriority="high"
           className="mx-auto h-auto w-full max-w-5xl rounded-[18px] border border-[#E2DACB]"
         />
         <p className={EVIDENCE}>
@@ -153,7 +154,7 @@ export default function Home() {
                 alt={`The top of the ${env.short} kiosk screen, in Korean`}
                 width={800}
                 height={600}
-                unoptimized
+                sizes="(min-width: 1024px) 33vw, 100vw"
                 className="h-auto w-full rounded-[12px] border border-[#E2DACB]"
               />
               <h3 className="font-bold text-[#15171C]">{env.place.en}</h3>
@@ -307,7 +308,7 @@ function Shot({ src, alt, width, height }: { src: string; alt: string; width: nu
       alt={alt}
       width={width}
       height={height}
-      unoptimized
+      sizes="384px"
       className="h-auto w-full max-w-sm rounded-[18px] border border-[#E2DACB]"
     />
   );

@@ -66,7 +66,7 @@ export function DemoIntro(props: { kioskId: string; starting: boolean; error: Sc
                           alt=""
                           width={800}
                           height={600}
-                          unoptimized
+                          sizes="320px"
                           className="aspect-[4/3] h-auto w-full rounded-[12px] border border-[#E2DACB] object-cover object-top"
                         />
                         {current && (
