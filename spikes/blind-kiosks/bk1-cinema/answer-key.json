@@ -1,0 +1,186 @@
+{
+  "kiosk": { "name": "별무리 시네마 스낵바", "nameEn": "Byeolmuri Cinema Snack Bar", "domain": "cinema snack bar (popcorn, drinks, combos, snacks)" },
+  "flow": [
+    "Attract screen: tap anywhere ('화면을 터치하여 주문을 시작하세요')",
+    "Pickup choice (replaces dine-in/takeout): '상영관 입장 전 수령' or '지금 바로 수령'",
+    "Menu: icon-only category tabs (aria-label only), 3x2 paged grid with ◀ / ▶ pager, cart panel with total and '주문하기'",
+    "Item options modal for items with option groups (chips, quantity stepper, '<price> 담기'); items without options are added straight to the cart on tap",
+    "Combo wizard (any combo card): 콤보 선택 → 팝콘 사이즈 → 팝콘 맛 (반반 → pick 2 flavors) → 음료 → 확인, with '취소/이전' and '다음/장바구니 담기'",
+    "Upsell popup after each combo is added: '바삭한 나쵸도 함께 드릴까요?' 네, 추가할게요 / 아니요",
+    "Order review: '주문 내역을 확인해 주세요', lines, pickup method, total; '이전' / '결제하기'",
+    "Payment method: '결제 수단을 선택해 주세요' (신용/체크카드, 간편결제, 모바일 관람권·쿠폰) with the final amount; flow stops here"
+  ],
+  "categories": [
+    { "label": "콤보", "itemCount": 4 },
+    { "label": "팝콘", "itemCount": 8 },
+    { "label": "음료", "itemCount": 8 },
+    { "label": "스낵", "itemCount": 5 },
+    { "label": "핫푸드", "itemCount": 4 },
+    { "label": "디저트", "itemCount": 3 }
+  ],
+  "optionGroups": {
+    "popcornSize": { "title": "사이즈", "type": "single", "required": true, "min": 1, "max": 1, "default": null, "appliesWhen": null,
+      "options": [ { "id": "S", "label": "S", "priceDelta": 0 }, { "id": "M", "label": "M", "priceDelta": 1000 }, { "id": "L", "label": "L", "priceDelta": 2000 } ] },
+    "halfFlavors": { "title": "반반 맛 선택", "type": "multi", "required": true, "min": 2, "max": 2, "default": null, "appliesWhen": "item is 반반 팝콘, or a combo with comboFlavor = half",
+      "options": [ { "id": "original", "label": "오리지널", "priceDelta": 0 }, { "id": "caramel", "label": "카라멜", "priceDelta": 0 }, { "id": "cheese", "label": "치즈", "priceDelta": 0 }, { "id": "onion", "label": "어니언", "priceDelta": 0 }, { "id": "garlic", "label": "갈릭버터", "priceDelta": 0 } ] },
+    "drinkSize": { "title": "사이즈", "type": "single", "required": true, "min": 1, "max": 1, "default": "R", "appliesWhen": null,
+      "options": [ { "id": "R", "label": "R", "priceDelta": 0 }, { "id": "L", "label": "L", "priceDelta": 500 } ] },
+    "coffeeTemp": { "title": "온도", "type": "single", "required": true, "min": 1, "max": 1, "default": null, "appliesWhen": null,
+      "options": [ { "id": "hot", "label": "HOT", "priceDelta": 0 }, { "id": "ice", "label": "ICE", "priceDelta": 0 } ] },
+    "nachoSauce": { "title": "소스", "type": "single", "required": true, "min": 1, "max": 1, "default": "cheese", "appliesWhen": null,
+      "options": [ { "id": "cheese", "label": "치즈 소스", "priceDelta": 0 }, { "id": "jalapeno", "label": "할라피뇨 치즈 소스", "priceDelta": 500 } ] },
+    "squidSeason": { "title": "시즈닝", "type": "single", "required": true, "min": 1, "max": 1, "default": "butter", "appliesWhen": null,
+      "options": [ { "id": "butter", "label": "기본 버터", "priceDelta": 0 }, { "id": "spicymayo", "label": "청양마요", "priceDelta": 500 } ] },
+    "hotdogTopping": { "title": "토핑 추가", "type": "multi", "required": false, "min": 0, "max": 3, "default": null, "appliesWhen": null,
+      "options": [ { "id": "cheese", "label": "치즈", "priceDelta": 500 }, { "id": "jalapeno", "label": "할라피뇨", "priceDelta": 500 }, { "id": "onion", "label": "크리스피 어니언", "priceDelta": 300 } ] },
+    "tenderDip": { "title": "디핑 소스", "type": "single", "required": true, "min": 1, "max": 1, "default": "honeymustard", "appliesWhen": null,
+      "options": [ { "id": "honeymustard", "label": "허니머스타드", "priceDelta": 0 }, { "id": "bbq", "label": "바비큐", "priceDelta": 0 }, { "id": "sweetchili", "label": "스위트칠리", "priceDelta": 300 } ] },
+    "slushFlavor": { "title": "맛", "type": "single", "required": true, "min": 1, "max": 1, "default": null, "appliesWhen": null,
+      "options": [ { "id": "bluelemon", "label": "블루 레몬", "priceDelta": 0 }, { "id": "strawberry", "label": "딸기", "priceDelta": 0 }, { "id": "greengrape", "label": "청포도", "priceDelta": 0 } ] },
+    "comboPopcornSize": { "title": "팝콘 사이즈", "type": "single", "required": true, "min": 1, "max": 1, "default": null, "appliesWhen": "combo wizard step 2",
+      "options": [ { "id": "M", "label": "M (기본)", "priceDelta": 0 }, { "id": "L", "label": "L 업그레이드", "priceDelta": 1000 } ] },
+    "comboFlavor": { "title": "팝콘 맛", "type": "single", "required": true, "min": 1, "max": 1, "default": null, "appliesWhen": "combo wizard step 3",
+      "options": [ { "id": "original", "label": "오리지널", "priceDelta": 0 }, { "id": "caramel", "label": "카라멜", "priceDelta": 500 }, { "id": "cheese", "label": "치즈", "priceDelta": 500 }, { "id": "onion", "label": "어니언", "priceDelta": 500 }, { "id": "garlic", "label": "갈릭버터", "priceDelta": 500 }, { "id": "half", "label": "반반", "priceDelta": 1000 } ] },
+    "comboDrink1": { "title": "음료 선택 (1잔)", "type": "single", "required": true, "min": 1, "max": 1, "default": null, "appliesWhen": "combo wizard step 4, combos with 1 drink (싱글 콤보)",
+      "options": [ { "id": "cola", "label": "콜라", "priceDelta": 0 }, { "id": "zero", "label": "제로콜라", "priceDelta": 0 }, { "id": "cider", "label": "사이다", "priceDelta": 0 }, { "id": "icetea", "label": "아이스티", "priceDelta": 500 }, { "id": "lemonade", "label": "레몬에이드", "priceDelta": 1000 } ] },
+    "comboDrinks2": { "title": "음료 선택 (2잔)", "type": "quantity", "required": true, "min": 2, "max": 2, "default": null, "appliesWhen": "combo wizard step 4, combos with 2 drinks (커플/스페셜/패밀리 콤보); total count must be exactly 2; priceDelta is per cup",
+      "options": [ { "id": "cola", "label": "콜라", "priceDelta": 0, "maxQty": 2 }, { "id": "zero", "label": "제로콜라", "priceDelta": 0, "maxQty": 2 }, { "id": "cider", "label": "사이다", "priceDelta": 0, "maxQty": 2 }, { "id": "icetea", "label": "아이스티", "priceDelta": 500, "maxQty": 2 }, { "id": "lemonade", "label": "레몬에이드", "priceDelta": 1000, "maxQty": 2 } ] }
+  },
+  "items": [
+    { "name": "싱글 콤보", "category": "콤보", "basePrice": 8500, "soldOut": false, "timeLimited": null, "optionGroups": ["comboPopcornSize", "comboFlavor", "halfFlavors", "comboDrink1"] },
+    { "name": "커플 콤보", "category": "콤보", "basePrice": 11500, "soldOut": false, "timeLimited": null, "optionGroups": ["comboPopcornSize", "comboFlavor", "halfFlavors", "comboDrinks2"] },
+    { "name": "스페셜 콤보", "category": "콤보", "basePrice": 15000, "soldOut": false, "timeLimited": null, "optionGroups": ["comboPopcornSize", "comboFlavor", "halfFlavors", "comboDrinks2"] },
+    { "name": "패밀리 콤보", "category": "콤보", "basePrice": 17500, "soldOut": true, "timeLimited": null, "optionGroups": ["comboPopcornSize", "comboFlavor", "halfFlavors", "comboDrinks2"] },
+
+    { "name": "오리지널 팝콘", "category": "팝콘", "basePrice": 5000, "soldOut": false, "timeLimited": null, "optionGroups": ["popcornSize"] },
+    { "name": "카라멜 팝콘", "category": "팝콘", "basePrice": 5500, "soldOut": false, "timeLimited": null, "optionGroups": ["popcornSize"] },
+    { "name": "치즈 팝콘", "category": "팝콘", "basePrice": 5500, "soldOut": false, "timeLimited": null, "optionGroups": ["popcornSize"] },
+    { "name": "어니언 팝콘", "category": "팝콘", "basePrice": 5500, "soldOut": false, "timeLimited": null, "optionGroups": ["popcornSize"] },
+    { "name": "갈릭버터 팝콘", "category": "팝콘", "basePrice": 6000, "soldOut": false, "timeLimited": null, "optionGroups": ["popcornSize"] },
+    { "name": "시나몬 버터 팝콘", "category": "팝콘", "basePrice": 6000, "soldOut": false, "timeLimited": null, "optionGroups": ["popcornSize"] },
+    { "name": "반반 팝콘", "category": "팝콘", "basePrice": 6000, "soldOut": false, "timeLimited": null, "optionGroups": ["popcornSize", "halfFlavors"] },
+    { "name": "트러플 팝콘", "category": "팝콘", "basePrice": 6500, "soldOut": true, "timeLimited": null, "optionGroups": ["popcornSize"] },
+
+    { "name": "콜라", "category": "음료", "basePrice": 2500, "soldOut": false, "timeLimited": null, "optionGroups": ["drinkSize"] },
+    { "name": "제로콜라", "category": "음료", "basePrice": 2500, "soldOut": false, "timeLimited": null, "optionGroups": ["drinkSize"] },
+    { "name": "사이다", "category": "음료", "basePrice": 2500, "soldOut": false, "timeLimited": null, "optionGroups": ["drinkSize"] },
+    { "name": "아이스티", "category": "음료", "basePrice": 3000, "soldOut": false, "timeLimited": null, "optionGroups": ["drinkSize"] },
+    { "name": "레몬에이드", "category": "음료", "basePrice": 3800, "soldOut": false, "timeLimited": null, "optionGroups": ["drinkSize"] },
+    { "name": "자몽에이드", "category": "음료", "basePrice": 3800, "soldOut": true, "timeLimited": null, "optionGroups": ["drinkSize"] },
+    { "name": "아메리카노", "category": "음료", "basePrice": 3500, "soldOut": false, "timeLimited": null, "optionGroups": ["coffeeTemp", "drinkSize"] },
+    { "name": "생수", "category": "음료", "basePrice": 1500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+
+    { "name": "나쵸", "category": "스낵", "basePrice": 4000, "soldOut": false, "timeLimited": null, "optionGroups": ["nachoSauce"] },
+    { "name": "프레첼", "category": "스낵", "basePrice": 3500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "버터구이 오징어", "category": "스낵", "basePrice": 5000, "soldOut": false, "timeLimited": null, "optionGroups": ["squidSeason"] },
+    { "name": "츄러스", "category": "스낵", "basePrice": 3000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "칠리 치즈 감자", "category": "스낵", "basePrice": 4500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+
+    { "name": "클래식 핫도그", "category": "핫푸드", "basePrice": 4500, "soldOut": false, "timeLimited": null, "optionGroups": ["hotdogTopping"] },
+    { "name": "칠리 핫도그", "category": "핫푸드", "basePrice": 5500, "soldOut": false, "timeLimited": null, "optionGroups": ["hotdogTopping"] },
+    { "name": "치즈볼 (5개)", "category": "핫푸드", "basePrice": 4000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "치킨 텐더", "category": "핫푸드", "basePrice": 5500, "soldOut": false, "timeLimited": null, "optionGroups": ["tenderDip"] },
+
+    { "name": "소프트 아이스크림", "category": "디저트", "basePrice": 2500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "슬러시", "category": "디저트", "basePrice": 3000, "soldOut": false, "timeLimited": null, "optionGroups": ["slushFlavor"] },
+    { "name": "초코칩 쿠키", "category": "디저트", "basePrice": 2000, "soldOut": false, "timeLimited": null, "optionGroups": [] }
+  ],
+  "promotions": [
+    { "rule": "Every time a combo is added to the cart (wizard '장바구니 담기'), a popup asks '바삭한 나쵸도 함께 드릴까요?' offering 나쵸 at 콤보 고객 특가 3,000원 (regular 4,000원)",
+      "effect": "'네, 추가할게요' adds a separate cart line '나쵸 [콤보 특가]' (치즈 소스, no options) at 3,000원; accepting again merges into the same line (qty+1). '아니요' adds nothing. The regular 나쵸 from the 스낵 tab stays 4,000원 and is a different line." }
+  ],
+  "holdoutOrders": [
+    { "id": "h1", "pickup": "상영관 입장 전 수령",
+      "lines": [
+        { "item": "싱글 콤보", "options": { "comboPopcornSize": ["L"], "comboFlavor": ["caramel"], "comboDrink1": ["cola"] }, "qty": 1 }
+      ],
+      "upsell": ["declined"],
+      "expectedTotal": 10000, "patterns": ["combo-wizard", "combo-size-upgrade", "upsell-declined", "pickup-choice"] },
+    { "id": "h2", "pickup": "지금 바로 수령",
+      "lines": [
+        { "item": "커플 콤보", "options": { "comboPopcornSize": ["M"], "comboFlavor": ["half"], "halfFlavors": ["caramel", "cheese"], "comboDrinks2": ["cola", "lemonade"] }, "qty": 1 },
+        { "item": "나쵸", "options": {}, "qty": 1, "upsell": true }
+      ],
+      "upsell": ["accepted"],
+      "expectedTotal": 16500, "patterns": ["combo-wizard", "half-and-half-exactly-2", "combo-drink-quantity", "upsell-accepted", "wizard-error"] },
+    { "id": "h3", "pickup": "상영관 입장 전 수령",
+      "lines": [
+        { "item": "반반 팝콘", "options": { "popcornSize": ["L"], "halfFlavors": ["original", "onion"] }, "qty": 1 },
+        { "item": "아메리카노", "options": { "coffeeTemp": ["ice"], "drinkSize": ["L"] }, "qty": 2 }
+      ],
+      "expectedTotal": 16000, "patterns": ["paged-grid-page-2", "half-and-half-exactly-2", "popcorn-size-required", "required-no-default", "quantity"] },
+    { "id": "h4", "pickup": "지금 바로 수령",
+      "lines": [
+        { "item": "치즈 팝콘", "options": { "popcornSize": ["M"] }, "qty": 2 },
+        { "item": "제로콜라", "options": { "drinkSize": ["R"] }, "qty": 2 }
+      ],
+      "expectedTotal": 18000, "patterns": ["popcorn-size-required", "default-option", "quantity", "icon-tabs"] },
+    { "id": "h5", "pickup": "상영관 입장 전 수령",
+      "lines": [
+        { "item": "스페셜 콤보", "options": { "comboPopcornSize": ["L"], "comboFlavor": ["garlic"], "comboDrinks2": ["cider", "cider"] }, "qty": 1 },
+        { "item": "나쵸", "options": {}, "qty": 1, "upsell": true },
+        { "item": "츄러스", "options": {}, "qty": 1 }
+      ],
+      "upsell": ["accepted"],
+      "expectedTotal": 22500, "patterns": ["combo-wizard", "combo-drink-quantity-same-drink", "upsell-accepted", "no-option-direct-add"] },
+    { "id": "h6", "pickup": "지금 바로 수령",
+      "lines": [
+        { "item": "클래식 핫도그", "options": { "hotdogTopping": ["cheese", "onion"] }, "qty": 1 },
+        { "item": "칠리 핫도그", "options": { "hotdogTopping": [] }, "qty": 1 },
+        { "item": "슬러시", "options": { "slushFlavor": ["strawberry"] }, "qty": 2 }
+      ],
+      "expectedTotal": 16800, "patterns": ["multi-select-optional", "required-no-default", "option-error", "quantity"] },
+    { "id": "h7", "pickup": "상영관 입장 전 수령",
+      "lines": [
+        { "item": "나쵸", "options": { "nachoSauce": ["jalapeno"] }, "qty": 1 },
+        { "item": "버터구이 오징어", "options": { "squidSeason": ["spicymayo"] }, "qty": 1 },
+        { "item": "레몬에이드", "options": { "drinkSize": ["L"] }, "qty": 1 }
+      ],
+      "expectedTotal": 14300, "patterns": ["regular-nacho-not-upsell", "change-default-option", "drink-size-upgrade"] },
+    { "id": "h8", "pickup": "지금 바로 수령",
+      "lines": [
+        { "item": "싱글 콤보", "options": { "comboPopcornSize": ["M"], "comboFlavor": ["half"], "halfFlavors": ["original", "garlic"], "comboDrink1": ["icetea"] }, "qty": 1 },
+        { "item": "커플 콤보", "options": { "comboPopcornSize": ["L"], "comboFlavor": ["original"], "comboDrinks2": ["cola", "cola"] }, "qty": 1 },
+        { "item": "나쵸", "options": {}, "qty": 2, "upsell": true }
+      ],
+      "upsell": ["accepted", "accepted"],
+      "expectedTotal": 28500, "patterns": ["two-combos", "half-and-half-exactly-2", "upsell-accepted-twice-merges", "combo-drink-delta"] },
+    { "id": "h9", "pickup": "상영관 입장 전 수령",
+      "lines": [
+        { "item": "오리지널 팝콘", "options": { "popcornSize": ["S"] }, "qty": 1 },
+        { "item": "시나몬 버터 팝콘", "options": { "popcornSize": ["L"] }, "qty": 1 },
+        { "item": "생수", "options": {}, "qty": 3 },
+        { "item": "치킨 텐더", "options": { "tenderDip": ["sweetchili"] }, "qty": 1 }
+      ],
+      "expectedTotal": 23300, "patterns": ["popcorn-size-required", "paged-grid-page-2", "no-option-direct-add", "cart-quantity"] },
+    { "id": "h10", "pickup": "지금 바로 수령",
+      "lines": [
+        { "item": "커플 콤보", "options": { "comboPopcornSize": ["M"], "comboFlavor": ["cheese"], "comboDrinks2": ["zero", "zero"] }, "qty": 1 },
+        { "item": "소프트 아이스크림", "options": {}, "qty": 2 },
+        { "item": "치즈볼 (5개)", "options": {}, "qty": 1 },
+        { "item": "프레첼", "options": {}, "qty": 1 }
+      ],
+      "upsell": ["declined"],
+      "expectedTotal": 24500, "patterns": ["combo-wizard", "upsell-declined", "no-option-direct-add", "mixed-categories"] }
+  ],
+  "quirks": [
+    "Category tabs are icon-only (inline SVG); the category name exists only in each tab's aria-label. No category heading is shown on the menu.",
+    "Grid shows 6 items per page (3x2). Pager arrows ◀ / ▶ are clickable divs with a '1 / 2' indicator; switching tabs resets to page 1. 팝콘 page 2: 반반 팝콘, 트러플 팝콘(품절). 음료 page 2: 아메리카노, 생수.",
+    "Sold out (dark '품절' overlay, tap shows error toast '품절된 메뉴입니다.'): 패밀리 콤보, 트러플 팝콘, 자몽에이드. 패밀리 콤보 is also disabled inside the wizard's step 1.",
+    "Standalone popcorn base price is the S size; size (S/M/L, +0/+1,000/+2,000) has no default and is required ('사이즈를 선택해 주세요.').",
+    "Drink size defaults to R. 아메리카노 also needs HOT/ICE with no default. 슬러시 flavor has no default. 나쵸 sauce, 오징어 seasoning and 텐더 dip have defaults.",
+    "Half-and-half: exactly 2 flavors. Picking a 3rd is blocked with '반반은 맛을 2가지까지만 고를 수 있어요.'; fewer than 2 gives '반반 팝콘은 맛을 정확히 2가지 선택해 주세요. (현재 N가지)' on 담기/다음. The chosen flavors never change the price (반반 팝콘 is 6,000원 base; combo 반반 is a flat +1,000원).",
+    "Combo wizard opens from any combo card with that combo preselected. Step 1's left button is '취소' (not '이전'); step 5's right button is '장바구니 담기'. Changing the combo on step 1 clears drink picks. The wizard shows a running '현재 금액'.",
+    "Combo popcorn is M by default price; L is +1,000원. Combo flavors other than 오리지널 are +500원. Combo drinks: 아이스티 +500원, 레몬에이드 +1,000원 per cup. 2-drink combos use −/+ counters that must total exactly 2 ('음료를 2잔 선택해 주세요.').",
+    "스페셜 콤보 includes a fixed 클래식 핫도그 without topping options.",
+    "Combos are always added with qty 1; the upsell popup appears after every combo add, before returning to the menu.",
+    "Items without option groups (생수, 프레첼, 츄러스, 칠리 치즈 감자, 치즈볼 (5개), 소프트 아이스크림, 초코칩 쿠키) are added to the cart immediately on tap (toast '<name> 1개를 담았습니다.'); each tap adds 1.",
+    "Identical lines (same item and same options) merge into one cart line with a higher qty. Max 9 per line.",
+    "Cart '−' at qty 1 does nothing; '✕' removes the line; '전체 삭제' asks for confirmation. '처음으로' asks for confirmation and clears the cart and pickup choice.",
+    "Menu card text merges in the DOM (e.g. '카라멜 팝콘5,500원'). The item modal's add button reads '<price> 담기' (e.g. '8,000원 담기'). The upsell '네, 추가할게요' is a div, '아니요' is a button.",
+    "Pickup choice has no effect on price; it is shown as a badge in the top bar and on the review screen.",
+    "No clock, timers or random behavior. Toasts stay until the next tap.",
+    "Payment screen ends the flow: picking a method only shows an instruction ('카드를 아래 투입구에 꽂아 주세요' etc.); no payment happens.",
+    "Holdout notation: quantity-group picks (comboDrinks2) list an option id once per cup; the upsell nacho is written as item '나쵸' with \"upsell\": true and costs 3,000원."
+  ]
+}

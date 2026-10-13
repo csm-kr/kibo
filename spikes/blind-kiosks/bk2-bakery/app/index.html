@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=540">
+<title>포근밀 베이커리카페 - 셀프 주문</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="kiosk">
+
+  <!-- 1. 대기 화면 -->
+  <section id="scr-attract" class="screen">
+    <div class="attract" id="attract-touch">
+      <div class="logo-mark">🥐</div>
+      <div class="brand-big">포근밀<br><small>BAKERY CAFE</small></div>
+      <p class="attract-copy">갓 구운 빵과 커피,<br>여기서 바로 주문하세요</p>
+      <p class="attract-notice" id="attract-notice" hidden></p>
+      <div class="touch-hint">화면을 터치해 주문을 시작하세요 👆</div>
+    </div>
+  </section>
+
+  <!-- 2. 식사 장소 선택 -->
+  <section id="scr-type" class="screen" hidden>
+    <header class="topbar">
+      <span class="tb-brand">포근밀 베이커리카페</span>
+      <div class="tb-home" data-act="home">처음으로</div>
+    </header>
+    <h1 class="type-title">어디에서 드시나요?</h1>
+    <div class="type-cards">
+      <div class="type-card" data-act="type" data-type="dine"><span class="tc-ico">🍽️</span>매장에서 먹어요</div>
+      <div class="type-card" data-act="type" data-type="take"><span class="tc-ico">🛍️</span>포장해 갈게요</div>
+    </div>
+  </section>
+
+  <!-- 3. 메뉴 + 장바구니 -->
+  <section id="scr-menu" class="screen" hidden>
+    <header class="topbar">
+      <span class="tb-brand">포근밀 베이커리카페</span>
+      <span class="tb-badge" id="type-badge"></span>
+      <div class="tb-home" data-act="home">처음으로</div>
+    </header>
+    <nav class="tabs" id="tabs"></nav>
+    <div class="grid" id="grid"></div>
+    <div class="cart" id="cart">
+      <div class="cart-head">
+        <span>장바구니</span>
+        <button type="button" class="cart-clear" data-act="clear">전체삭제</button>
+      </div>
+      <div class="cart-lines" id="cart-lines"></div>
+      <div class="cart-foot">
+        <div class="cart-sum">총 <b id="cart-count">0</b>개 <span class="cart-total" id="cart-total">0원</span></div>
+        <div class="btn-order" data-act="order">주문하기</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. 주문 확인 -->
+  <section id="scr-review" class="screen" hidden>
+    <header class="topbar">
+      <span class="tb-brand">포근밀 베이커리카페</span>
+      <div class="tb-home" data-act="home">처음으로</div>
+    </header>
+    <h1 class="page-title">주문 내역을 확인해 주세요</h1>
+    <div class="review-type" id="review-type"></div>
+    <div class="review-lines" id="review-lines"></div>
+    <div class="review-total">총 결제금액 <strong id="review-total">0원</strong></div>
+    <div class="review-btns">
+      <div class="btn ghost" data-act="back-menu">메뉴 추가하기</div>
+      <button type="button" class="btn primary" data-act="to-pay">결제하기</button>
+    </div>
+  </section>
+
+  <!-- 5. 결제 수단 -->
+  <section id="scr-pay" class="screen" hidden>
+    <header class="topbar">
+      <span class="tb-brand">포근밀 베이커리카페</span>
+      <div class="tb-home" data-act="home">처음으로</div>
+    </header>
+    <h1 class="page-title">결제 수단을 선택해 주세요</h1>
+    <div class="pay-amount">결제하실 금액<span id="pay-total">0원</span></div>
+    <div class="pay-methods">
+      <div class="pay-m" data-act="pay-method" data-m="card"><span>💳</span>신용·체크카드</div>
+      <div class="pay-m" data-act="pay-method" data-m="qr"><span>📱</span>QR 간편결제</div>
+      <div class="pay-m" data-act="pay-method" data-m="voucher"><span>🎟️</span>모바일 상품권</div>
+    </div>
+    <p class="pay-guide" id="pay-guide"></p>
+    <div class="review-btns">
+      <div class="btn ghost" data-act="back-review">이전</div>
+    </div>
+  </section>
+
+  <!-- 옵션 팝업 -->
+  <div class="overlay" id="opt-modal" hidden>
+    <div class="sheet">
+      <div class="opt-head">
+        <div class="opt-pic" id="opt-pic"></div>
+        <div>
+          <h2 id="opt-name"></h2>
+          <p id="opt-base"></p>
+        </div>
+      </div>
+      <div class="opt-body" id="opt-body"></div>
+      <div class="qty-row">
+        <span>수량</span>
+        <div class="stepper">
+          <button type="button" data-act="q-minus">−</button>
+          <span class="st-val" id="q-val">1</span>
+          <button type="button" data-act="q-plus">+</button>
+        </div>
+      </div>
+      <div class="err" id="opt-err" role="alert" hidden></div>
+      <div class="opt-foot">
+        <button type="button" class="btn ghost" data-act="opt-cancel">취소</button>
+        <button type="button" class="btn primary" data-act="opt-add"><span id="opt-total">0원</span> 담기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 알림 / 확인 팝업 -->
+  <div class="overlay" id="dialog" hidden>
+    <div class="dlg">
+      <p id="dlg-msg"></p>
+      <div class="dlg-btns">
+        <button type="button" class="btn ghost" id="dlg-cancel" data-act="dlg-cancel">취소</button>
+        <button type="button" class="btn primary" id="dlg-ok" data-act="dlg-ok">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 무입력 경고 -->
+  <div class="overlay idle-ov" id="idle" hidden>
+    <div class="idle-box">
+      <div class="idle-ico">⏰</div>
+      <h3>계속 주문하시겠어요?</h3>
+      <p><b id="idle-sec">30</b>초 후 처음 화면으로 돌아갑니다.</p>
+      <div class="idle-bar"><i id="idle-fill"></i></div>
+      <div class="idle-btns">
+        <div class="btn ghost" id="idle-home" data-act="idle-home">처음으로</div>
+        <button type="button" class="btn primary" id="idle-continue" data-act="idle-continue">계속 주문하기</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+</div>
+<script src="menu.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

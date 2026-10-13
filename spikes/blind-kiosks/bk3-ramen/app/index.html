@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>면구름 라멘 식권 발매기</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="kiosk">
+
+  <!-- 1. attract -->
+  <section id="scr-attract" class="screen active">
+    <div class="attract-tap" id="attract-tap">
+      <div class="logo-bowl">🍜</div>
+      <div class="brand">면구름 라멘</div>
+      <div class="brand-en">MYEONGUREUM RAMEN</div>
+      <div class="slogan">열두 시간 우린 진한 한 그릇</div>
+      <div class="touch">화면을 터치하여 주문을 시작하세요</div>
+      <div class="ticket-note">식권 발매기 · 주문 후 번호표를 받아 가세요</div>
+    </div>
+  </section>
+
+  <!-- 2. dine choice -->
+  <section id="scr-dine" class="screen">
+    <div class="dine-wrap">
+      <h1>식사 방법을 선택해 주세요</h1>
+      <div class="dine-btns">
+        <button class="dine-btn" data-dine="매장"><span class="ico">🥢</span><span class="big">매장에서 먹어요</span><small>매장 식사</small></button>
+        <button class="dine-btn" data-dine="포장"><span class="ico">🛍️</span><span class="big">가져갈게요</span><small>포장</small></button>
+      </div>
+      <div class="link-back" id="dine-back">처음으로</div>
+    </div>
+  </section>
+
+  <!-- 3. menu -->
+  <section id="scr-menu" class="screen">
+    <header class="top">
+      <div class="top-brand">🍜 면구름 라멘</div>
+      <div class="top-dine" id="menu-dine"></div>
+      <button class="top-home" id="btn-home">처음으로</button>
+    </header>
+    <div class="chips" id="chips"></div>
+    <div class="grid" id="grid"></div>
+    <aside class="cart">
+      <div class="cart-head">
+        <span class="cart-title">주문 내역</span><span class="cart-count" id="cart-count">0개</span>
+        <button class="clear" id="btn-clear">전체 취소</button>
+      </div>
+      <div class="cart-list" id="cart-list"></div>
+      <div class="cart-foot">
+        <div class="sum">합계<strong id="cart-total">0원</strong></div>
+        <button class="order" id="btn-order">주문하기</button>
+      </div>
+    </aside>
+  </section>
+
+  <!-- 4. review -->
+  <section id="scr-review" class="screen">
+    <header class="top"><div class="top-brand">주문 확인</div></header>
+    <div class="review-body">
+      <p class="review-q">주문 내역이 맞는지 확인해 주세요</p>
+      <div class="review-dine">식사 방법 <b id="review-dine"></b></div>
+      <div class="review-list" id="review-list"></div>
+      <div class="review-total">총 결제금액<strong id="review-total">0원</strong></div>
+    </div>
+    <div class="review-btns">
+      <button class="ghost" id="review-back">메뉴 추가/수정</button>
+      <button class="primary" id="review-ok">결제하기</button>
+    </div>
+  </section>
+
+  <!-- 5. payment method -->
+  <section id="scr-pay" class="screen">
+    <header class="top"><div class="top-brand">결제</div></header>
+    <div class="pay-body">
+      <div class="pay-amount">결제하실 금액<div class="pay-big" id="pay-total">0원</div></div>
+      <h2>결제 수단을 선택해 주세요</h2>
+      <div class="pay-methods">
+        <div class="pm" data-pm="card"><span class="ico">💳</span>신용·체크카드</div>
+        <div class="pm" data-pm="mobile"><span class="ico">📱</span>모바일 간편결제</div>
+        <div class="pm" data-pm="voucher"><span class="ico">🎫</span>모바일 식권/쿠폰</div>
+      </div>
+      <div class="pay-note" id="pay-note">결제 수단을 눌러 주세요.</div>
+      <button class="ghost" id="pay-back">이전</button>
+    </div>
+  </section>
+
+  <div id="modal-root"></div>
+  <div id="toast"></div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,1077 @@
+{
+  "kiosk": {
+    "name": "하늘곳간",
+    "nameEn": "SKY PANTRY",
+    "domain": "airport convenience store / grab-and-go (takeaway only, no dine choice)"
+  },
+  "flow": [
+    "Attract screen: logo, 한국어/English toggle (whole UI and item names switch), tap the 화면을 터치하여 주문을 시작하세요 panel to start. No dine-in/takeout choice (takeaway only).",
+    "Menu: header with fake clock (현재 시각 08:15) and 처음으로; 6 category tabs; item tiles. Simple items have + 담기 that turns into a − n + stepper on the tile; items with options have 옵션 선택 ›.",
+    "Option sheet (bottom popup) for items with option groups: single-choice chips, a quantity stepper for 샷 추가, item quantity, 취소 / \"<price> 담기\". Missing required option shows an inline error.",
+    "Age confirmation popup (만 19세 이상입니까? 예/아니요) before the age-restricted beer is first added; 아니요 shows an error popup.",
+    "Cart drawer slides in from the right when the orange 🛒 장바구니 button (count badge) is tapped: lines with −/+ and ✕, 1+1 free lines at 0원, 전체 삭제 (confirm popup), 합계, 주문하기.",
+    "Order review screen (주문 내역 확인): read-only lines, 총 n개, 총 결제금액, 이전 / 결제하기.",
+    "Payment method screen (결제 수단 선택): 결제 금액 and 신용·체크카드 / QR 간편결제 / 선불·교통카드. Choosing one only shows a demo notice; the flow stops here."
+  ],
+  "categories": [
+    {
+      "label": "김밥·도시락",
+      "labelEn": "Gimbap & Meals",
+      "itemCount": 7
+    },
+    {
+      "label": "샌드위치·베이커리",
+      "labelEn": "Sandwich & Bakery",
+      "itemCount": 6
+    },
+    {
+      "label": "음료",
+      "labelEn": "Drinks",
+      "itemCount": 7
+    },
+    {
+      "label": "간식",
+      "labelEn": "Snacks",
+      "itemCount": 6
+    },
+    {
+      "label": "여행용품",
+      "labelEn": "Travel Goods",
+      "itemCount": 6
+    },
+    {
+      "label": "기념품",
+      "labelEn": "Souvenirs",
+      "itemCount": 5
+    }
+  ],
+  "optionGroups": {
+    "heat": {
+      "title": "데우기 여부",
+      "titleEn": "Heating",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": null,
+      "appliesWhen": null,
+      "options": [
+        {
+          "id": "heat",
+          "label": "데워 주세요",
+          "labelEn": "Heat it",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "noheat",
+          "label": "데우지 않음",
+          "labelEn": "No heating",
+          "priceDelta": 0,
+          "maxQty": 1
+        }
+      ]
+    },
+    "sauce": {
+      "title": "소스 선택",
+      "titleEn": "Sauce",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": null,
+      "appliesWhen": null,
+      "options": [
+        {
+          "id": "honeymustard",
+          "label": "허니머스타드",
+          "labelEn": "Honey Mustard",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "sweetchili",
+          "label": "스위트칠리",
+          "labelEn": "Sweet Chili",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "garlicmayo",
+          "label": "갈릭마요",
+          "labelEn": "Garlic Mayo",
+          "priceDelta": 300,
+          "maxQty": 1
+        }
+      ]
+    },
+    "temp": {
+      "title": "온도",
+      "titleEn": "Temperature",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": null,
+      "appliesWhen": null,
+      "options": [
+        {
+          "id": "hot",
+          "label": "HOT 따뜻하게",
+          "labelEn": "HOT",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "ice",
+          "label": "ICE 차갑게",
+          "labelEn": "ICED",
+          "priceDelta": 300,
+          "maxQty": 1
+        }
+      ]
+    },
+    "size": {
+      "title": "사이즈",
+      "titleEn": "Size",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": "regular",
+      "appliesWhen": null,
+      "options": [
+        {
+          "id": "regular",
+          "label": "레귤러",
+          "labelEn": "Regular",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "large",
+          "label": "라지",
+          "labelEn": "Large",
+          "priceDelta": 700,
+          "maxQty": 1
+        }
+      ]
+    },
+    "shot": {
+      "title": "샷 추가",
+      "titleEn": "Extra shot",
+      "type": "quantity",
+      "required": false,
+      "min": 0,
+      "max": 2,
+      "default": null,
+      "appliesWhen": null,
+      "options": [
+        {
+          "id": "shot",
+          "label": "에스프레소 샷",
+          "labelEn": "Espresso shot",
+          "priceDelta": 500,
+          "maxQty": 2
+        }
+      ]
+    },
+    "color": {
+      "title": "색상",
+      "titleEn": "Color",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": null,
+      "appliesWhen": null,
+      "options": [
+        {
+          "id": "navy",
+          "label": "네이비",
+          "labelEn": "Navy",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "gray",
+          "label": "그레이",
+          "labelEn": "Gray",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "beige",
+          "label": "베이지",
+          "labelEn": "Beige",
+          "priceDelta": 0,
+          "maxQty": 1
+        }
+      ]
+    },
+    "wrap": {
+      "title": "선물 포장",
+      "titleEn": "Gift wrap",
+      "type": "single",
+      "required": false,
+      "min": 0,
+      "max": 1,
+      "default": "nowrap",
+      "appliesWhen": null,
+      "options": [
+        {
+          "id": "nowrap",
+          "label": "포장 안 함",
+          "labelEn": "No wrap",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "giftwrap",
+          "label": "선물 포장",
+          "labelEn": "Gift wrap",
+          "priceDelta": 1000,
+          "maxQty": 1
+        }
+      ]
+    }
+  },
+  "items": [
+    {
+      "name": "야채김밥",
+      "nameEn": "Veggie Gimbap",
+      "category": "김밥·도시락",
+      "categoryEn": "Gimbap & Meals",
+      "basePrice": 3500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "참치김밥",
+      "nameEn": "Tuna Gimbap",
+      "category": "김밥·도시락",
+      "categoryEn": "Gimbap & Meals",
+      "basePrice": 4200,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "불고기김밥",
+      "nameEn": "Bulgogi Gimbap",
+      "category": "김밥·도시락",
+      "categoryEn": "Gimbap & Meals",
+      "basePrice": 4500,
+      "soldOut": true,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "아침 한정 계란김밥 세트",
+      "nameEn": "Morning Egg Gimbap Set",
+      "category": "김밥·도시락",
+      "categoryEn": "Gimbap & Meals",
+      "basePrice": 5500,
+      "soldOut": false,
+      "timeLimited": {
+        "window": "06:00-11:00",
+        "fakeClock": "08:15",
+        "availableAtFakeClock": true
+      },
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "제육도시락",
+      "nameEn": "Spicy Pork Lunchbox",
+      "category": "김밥·도시락",
+      "categoryEn": "Gimbap & Meals",
+      "basePrice": 6900,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "heat"
+      ],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "치킨마요덮밥",
+      "nameEn": "Chicken Mayo Rice Bowl",
+      "category": "김밥·도시락",
+      "categoryEn": "Gimbap & Meals",
+      "basePrice": 6500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "heat"
+      ],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "유부초밥 4입",
+      "nameEn": "Tofu Pocket Rice (4 pcs)",
+      "category": "김밥·도시락",
+      "categoryEn": "Gimbap & Meals",
+      "basePrice": 4000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "햄치즈 샌드위치",
+      "nameEn": "Ham & Cheese Sandwich",
+      "category": "샌드위치·베이커리",
+      "categoryEn": "Sandwich & Bakery",
+      "basePrice": 4300,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "heat"
+      ],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "에그마요 샌드위치",
+      "nameEn": "Egg Mayo Sandwich",
+      "category": "샌드위치·베이커리",
+      "categoryEn": "Sandwich & Bakery",
+      "basePrice": 3900,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "치킨 랩",
+      "nameEn": "Chicken Wrap",
+      "category": "샌드위치·베이커리",
+      "categoryEn": "Sandwich & Bakery",
+      "basePrice": 5200,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "heat",
+        "sauce"
+      ],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "버터 크루아상",
+      "nameEn": "Butter Croissant",
+      "category": "샌드위치·베이커리",
+      "categoryEn": "Sandwich & Bakery",
+      "basePrice": 2800,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "블루베리 머핀",
+      "nameEn": "Blueberry Muffin",
+      "category": "샌드위치·베이커리",
+      "categoryEn": "Sandwich & Bakery",
+      "basePrice": 3200,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "클래식 핫도그",
+      "nameEn": "Classic Hot Dog",
+      "category": "샌드위치·베이커리",
+      "categoryEn": "Sandwich & Bakery",
+      "basePrice": 3800,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "sauce"
+      ],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "아메리카노",
+      "nameEn": "Americano",
+      "category": "음료",
+      "categoryEn": "Drinks",
+      "basePrice": 2500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "temp",
+        "size",
+        "shot"
+      ],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "카페라떼",
+      "nameEn": "Caffe Latte",
+      "category": "음료",
+      "categoryEn": "Drinks",
+      "basePrice": 3200,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "temp",
+        "size",
+        "shot"
+      ],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "생수 500ml",
+      "nameEn": "Still Water 500ml",
+      "category": "음료",
+      "categoryEn": "Drinks",
+      "basePrice": 1000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "꿀바나나우유",
+      "nameEn": "Honey Banana Milk",
+      "category": "음료",
+      "categoryEn": "Drinks",
+      "basePrice": 1800,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": "1+1"
+    },
+    {
+      "name": "제주감귤주스",
+      "nameEn": "Jeju Tangerine Juice",
+      "category": "음료",
+      "categoryEn": "Drinks",
+      "basePrice": 2400,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": "1+1"
+    },
+    {
+      "name": "레몬 탄산수",
+      "nameEn": "Lemon Sparkling Water",
+      "category": "음료",
+      "categoryEn": "Drinks",
+      "basePrice": 1600,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "활주로 라거 500ml",
+      "nameEn": "Runway Lager 500ml",
+      "category": "음료",
+      "categoryEn": "Drinks",
+      "basePrice": 4500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": true,
+      "promo": null
+    },
+    {
+      "name": "버터감자칩",
+      "nameEn": "Butter Potato Chips",
+      "category": "간식",
+      "categoryEn": "Snacks",
+      "basePrice": 2000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": "1+1"
+    },
+    {
+      "name": "초코 크런치바",
+      "nameEn": "Choco Crunch Bar",
+      "category": "간식",
+      "categoryEn": "Snacks",
+      "basePrice": 1500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "젤리 믹스",
+      "nameEn": "Gummy Mix",
+      "category": "간식",
+      "categoryEn": "Snacks",
+      "basePrice": 2200,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "견과류 한줌",
+      "nameEn": "Mixed Nuts Pack",
+      "category": "간식",
+      "categoryEn": "Snacks",
+      "basePrice": 2500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "치킨텐더 4조각",
+      "nameEn": "Chicken Tenders (4 pcs)",
+      "category": "간식",
+      "categoryEn": "Snacks",
+      "basePrice": 5500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "sauce"
+      ],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "구운 달걀 2입",
+      "nameEn": "Roasted Eggs (2 pcs)",
+      "category": "간식",
+      "categoryEn": "Snacks",
+      "basePrice": 2000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "여행용 목베개",
+      "nameEn": "Travel Neck Pillow",
+      "category": "여행용품",
+      "categoryEn": "Travel Goods",
+      "basePrice": 15000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "color"
+      ],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "멀티 여행 어댑터",
+      "nameEn": "Universal Travel Adapter",
+      "category": "여행용품",
+      "categoryEn": "Travel Goods",
+      "basePrice": 18000,
+      "soldOut": true,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "휴대용 보조배터리",
+      "nameEn": "Portable Power Bank",
+      "category": "여행용품",
+      "categoryEn": "Travel Goods",
+      "basePrice": 25000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "일회용 마스크 5매",
+      "nameEn": "Disposable Masks (5 pcs)",
+      "category": "여행용품",
+      "categoryEn": "Travel Goods",
+      "basePrice": 3000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "여행용 세면도구 키트",
+      "nameEn": "Travel Toiletry Kit",
+      "category": "여행용품",
+      "categoryEn": "Travel Goods",
+      "basePrice": 8500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "수면 안대",
+      "nameEn": "Sleep Eye Mask",
+      "category": "여행용품",
+      "categoryEn": "Travel Goods",
+      "basePrice": 6000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "한복 곰 키링",
+      "nameEn": "Hanbok Bear Keyring",
+      "category": "기념품",
+      "categoryEn": "Souvenirs",
+      "basePrice": 9000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "wrap"
+      ],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "전통 문양 손거울",
+      "nameEn": "Traditional Pattern Hand Mirror",
+      "category": "기념품",
+      "categoryEn": "Souvenirs",
+      "basePrice": 12000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "wrap"
+      ],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "꿀약과 6입",
+      "nameEn": "Honey Yakgwa (6 pcs)",
+      "category": "기념품",
+      "categoryEn": "Souvenirs",
+      "basePrice": 7500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "서울 엽서 세트",
+      "nameEn": "Seoul Postcard Set",
+      "category": "기념품",
+      "categoryEn": "Souvenirs",
+      "basePrice": 5000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "ageRestricted": false,
+      "promo": null
+    },
+    {
+      "name": "자개 책갈피",
+      "nameEn": "Mother-of-Pearl Bookmark",
+      "category": "기념품",
+      "categoryEn": "Souvenirs",
+      "basePrice": 8000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "wrap"
+      ],
+      "ageRestricted": false,
+      "promo": null
+    }
+  ],
+  "promotions": [
+    {
+      "rule": "1+1 on 꿀바나나우유 (Honey Banana Milk), 제주감귤주스 (Jeju Tangerine Juice), 버터감자칩 (Butter Potato Chips)",
+      "effect": "For every paid unit a free line \"<name> (1+1 증정)\" / \"<name> (1+1 free)\" with the same quantity at 0원 appears directly under the paid line. Only paid units count toward the total; the free line follows the paid quantity and cannot be edited."
+    }
+  ],
+  "holdoutOrders": [
+    {
+      "id": "h1",
+      "language": "ko",
+      "lines": [
+        {
+          "item": "야채김밥",
+          "itemEn": "Veggie Gimbap",
+          "options": {},
+          "qty": 2
+        },
+        {
+          "item": "생수 500ml",
+          "itemEn": "Still Water 500ml",
+          "options": {},
+          "qty": 1
+        }
+      ],
+      "expectedTotal": 8000,
+      "patterns": [
+        "simple items via tile stepper",
+        "qty > 1 on tile"
+      ]
+    },
+    {
+      "id": "h2",
+      "language": "ko",
+      "lines": [
+        {
+          "item": "꿀바나나우유",
+          "itemEn": "Honey Banana Milk",
+          "options": {},
+          "qty": 1
+        },
+        {
+          "item": "에그마요 샌드위치",
+          "itemEn": "Egg Mayo Sandwich",
+          "options": {},
+          "qty": 1
+        }
+      ],
+      "expectedTotal": 5700,
+      "patterns": [
+        "1+1 free line (0원) auto-added",
+        "two categories"
+      ]
+    },
+    {
+      "id": "h3",
+      "language": "ko",
+      "lines": [
+        {
+          "item": "활주로 라거 500ml",
+          "itemEn": "Runway Lager 500ml",
+          "options": {},
+          "qty": 2
+        },
+        {
+          "item": "버터감자칩",
+          "itemEn": "Butter Potato Chips",
+          "options": {},
+          "qty": 1
+        }
+      ],
+      "expectedTotal": 11000,
+      "patterns": [
+        "age-restricted item: answer 예 to 만 19세 이상입니까?",
+        "second unit via stepper does not ask again",
+        "1+1 free line"
+      ]
+    },
+    {
+      "id": "h4",
+      "language": "ko",
+      "lines": [
+        {
+          "item": "제육도시락",
+          "itemEn": "Spicy Pork Lunchbox",
+          "options": {
+            "heat": [
+              "heat"
+            ]
+          },
+          "qty": 1
+        },
+        {
+          "item": "치킨마요덮밥",
+          "itemEn": "Chicken Mayo Rice Bowl",
+          "options": {
+            "heat": [
+              "noheat"
+            ]
+          },
+          "qty": 1
+        }
+      ],
+      "expectedTotal": 13400,
+      "patterns": [
+        "required option sheet (데우기 여부)",
+        "no-default required group"
+      ]
+    },
+    {
+      "id": "h5",
+      "language": "ko",
+      "lines": [
+        {
+          "item": "아메리카노",
+          "itemEn": "Americano",
+          "options": {
+            "temp": [
+              "ice"
+            ],
+            "size": [
+              "large"
+            ],
+            "shot": [
+              "shot",
+              "shot"
+            ]
+          },
+          "qty": 1
+        },
+        {
+          "item": "카페라떼",
+          "itemEn": "Caffe Latte",
+          "options": {
+            "temp": [
+              "hot"
+            ],
+            "size": [
+              "regular"
+            ],
+            "shot": []
+          },
+          "qty": 2
+        }
+      ],
+      "expectedTotal": 10900,
+      "patterns": [
+        "option price deltas (ICE +300, 라지 +700)",
+        "quantity option group (샷 추가 x2)",
+        "default size kept",
+        "qty 2 inside the option sheet"
+      ]
+    },
+    {
+      "id": "h6",
+      "language": "ko",
+      "lines": [
+        {
+          "item": "치킨 랩",
+          "itemEn": "Chicken Wrap",
+          "options": {
+            "heat": [
+              "heat"
+            ],
+            "sauce": [
+              "garlicmayo"
+            ]
+          },
+          "qty": 1
+        },
+        {
+          "item": "치킨텐더 4조각",
+          "itemEn": "Chicken Tenders (4 pcs)",
+          "options": {
+            "sauce": [
+              "sweetchili"
+            ]
+          },
+          "qty": 2
+        }
+      ],
+      "expectedTotal": 16500,
+      "patterns": [
+        "two required groups on one item",
+        "paid sauce (+300)",
+        "sheet qty 2"
+      ]
+    },
+    {
+      "id": "h7",
+      "language": "en",
+      "lines": [
+        {
+          "item": "여행용 목베개",
+          "itemEn": "Travel Neck Pillow",
+          "options": {
+            "color": [
+              "navy"
+            ]
+          },
+          "qty": 1
+        },
+        {
+          "item": "일회용 마스크 5매",
+          "itemEn": "Disposable Masks (5 pcs)",
+          "options": {},
+          "qty": 2
+        },
+        {
+          "item": "제주감귤주스",
+          "itemEn": "Jeju Tangerine Juice",
+          "options": {},
+          "qty": 2
+        }
+      ],
+      "expectedTotal": 25800,
+      "patterns": [
+        "English UI",
+        "required color option",
+        "1+1 with qty 2 (free line x2)"
+      ]
+    },
+    {
+      "id": "h8",
+      "language": "ko",
+      "lines": [
+        {
+          "item": "한복 곰 키링",
+          "itemEn": "Hanbok Bear Keyring",
+          "options": {
+            "wrap": [
+              "giftwrap"
+            ]
+          },
+          "qty": 2
+        },
+        {
+          "item": "꿀약과 6입",
+          "itemEn": "Honey Yakgwa (6 pcs)",
+          "options": {},
+          "qty": 1
+        },
+        {
+          "item": "자개 책갈피",
+          "itemEn": "Mother-of-Pearl Bookmark",
+          "options": {
+            "wrap": [
+              "nowrap"
+            ]
+          },
+          "qty": 1
+        }
+      ],
+      "expectedTotal": 35500,
+      "patterns": [
+        "optional group with default (선물 포장 +1,000)",
+        "sheet qty 2 multiplies option delta"
+      ]
+    },
+    {
+      "id": "h9",
+      "language": "ko",
+      "lines": [
+        {
+          "item": "아침 한정 계란김밥 세트",
+          "itemEn": "Morning Egg Gimbap Set",
+          "options": {},
+          "qty": 1
+        },
+        {
+          "item": "아메리카노",
+          "itemEn": "Americano",
+          "options": {
+            "temp": [
+              "hot"
+            ],
+            "size": [
+              "regular"
+            ],
+            "shot": []
+          },
+          "qty": 1
+        }
+      ],
+      "expectedTotal": 8000,
+      "patterns": [
+        "time-limited item (06:00-11:00, fake clock 08:15)",
+        "coffee with defaults"
+      ]
+    },
+    {
+      "id": "h10",
+      "language": "en",
+      "lines": [
+        {
+          "item": "클래식 핫도그",
+          "itemEn": "Classic Hot Dog",
+          "options": {
+            "sauce": [
+              "honeymustard"
+            ]
+          },
+          "qty": 1
+        },
+        {
+          "item": "햄치즈 샌드위치",
+          "itemEn": "Ham & Cheese Sandwich",
+          "options": {
+            "heat": [
+              "heat"
+            ]
+          },
+          "qty": 1
+        },
+        {
+          "item": "활주로 라거 500ml",
+          "itemEn": "Runway Lager 500ml",
+          "options": {},
+          "qty": 1
+        },
+        {
+          "item": "꿀바나나우유",
+          "itemEn": "Honey Banana Milk",
+          "options": {},
+          "qty": 3
+        },
+        {
+          "item": "휴대용 보조배터리",
+          "itemEn": "Portable Power Bank",
+          "options": {},
+          "qty": 1
+        }
+      ],
+      "expectedTotal": 43000,
+      "patterns": [
+        "English UI",
+        "age confirm (Yes)",
+        "1+1 qty 3",
+        "mixed option and simple items across 5 categories"
+      ]
+    }
+  ],
+  "quirks": [
+    "Fixed fake clock 08:15 (shown in the menu header). 아침 한정 계란김밥 세트 is time-limited to 06:00-11:00 and is therefore orderable; outside the window it would show an error popup.",
+    "Sold out: 불고기김밥 and 멀티 여행 어댑터. Tiles are greyed with 품절 and no add button; tapping them shows a toast 품절된 상품입니다.",
+    "Tapping anywhere on a simple-item tile adds one (same as + 담기 / +). Tapping an option-item tile opens the option sheet.",
+    "The age popup appears only when 활주로 라거 500ml goes from 0 to 1 in the cart. Further + taps (tile or drawer) do not ask again; after removing it, adding asks again.",
+    "Cart badge and 총 n개 count free 1+1 units too (1 banana milk -> badge 2).",
+    "Option items with identical selections merge into one cart line; different selections become separate lines. Option-item tiles never show a stepper.",
+    "Defaults: 사이즈 = 레귤러, 선물 포장 = 포장 안 함, 샷 추가 = 0. 데우기 여부, 소스 선택, 온도, 색상 have no default; pressing 담기 without them shows 필수 옵션을 선택해 주세요: <group>.",
+    "In holdout orders a quantity group is written by repeating the option id (shot: [\"shot\",\"shot\"] = 2 extra shots); default selections are written out explicitly.",
+    "Max 10 per cart line; exceeding it shows an error popup. The sheet quantity stops at 10.",
+    "Prices use 원 in both languages (e.g. \"4,500원\" in English too).",
+    "The language can only be changed on the start screen. 처음으로 with a non-empty cart asks for confirmation, then empties the cart and resets the language to Korean.",
+    "DOM text merges: tile name and price (\"꿀바나나우유1,800원\"), cart button and badge (\"🛒 장바구니4\"), cart line name and option summary.",
+    "주문하기 with an empty cart shows an error popup 장바구니가 비어 있습니다. 상품을 담아 주세요.",
+    "The drawer closes with 닫기 ✕ or a tap on the dimmed area; the cart is kept.",
+    "The category tab bar scrolls sideways; in English at narrow widths the last tab (Souvenirs) is partly off-screen.",
+    "A toast 장바구니에 담았습니다. appears after adding from the option sheet; simple-item adds give no toast, only the tile stepper and badge change."
+  ]
+}

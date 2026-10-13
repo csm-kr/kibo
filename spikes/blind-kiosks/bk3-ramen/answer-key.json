@@ -1,0 +1,223 @@
+{
+  "kiosk": { "name": "면구름 라멘", "nameEn": "Myeongureum Ramen", "domain": "ramen shop meal-ticket machine (식권 발매기)" },
+  "flow": [
+    "Attract screen: tap anywhere ('화면을 터치하여 주문을 시작하세요')",
+    "Dine choice: 매장에서 먹어요 (매장) or 가져갈게요 (포장)",
+    "Menu: one grid of item cards, category filter chips above (전체 shows every item), cart list with +/− and 전체 취소 below, 주문하기 button",
+    "Item popup: ramen (면 익힘 required radio + per-topping quantity 0-3), rice bowl (밥 양 radio, 보통 preselected); sides and drinks are added directly with no popup",
+    "Set popup: 3 steps — 1) 라멘 선택 + 면 익힘, 2) 사이드 선택, 3) 음료 선택, then 담기",
+    "Order review (주문 확인): lines, dine mode, 총 결제금액; 메뉴 추가/수정 or 결제하기",
+    "Payment method screen: 신용·체크카드 / 모바일 간편결제 / 모바일 식권/쿠폰 (no real payment)"
+  ],
+  "categories": [
+    { "label": "라멘", "itemCount": 8 },
+    { "label": "덮밥", "itemCount": 4 },
+    { "label": "사이드", "itemCount": 6 },
+    { "label": "음료", "itemCount": 5 },
+    { "label": "세트", "itemCount": 2 }
+  ],
+  "optionGroups": {
+    "firmness": {
+      "title": "면 익힘 정도", "type": "single", "required": true, "min": 1, "max": 1, "default": null,
+      "appliesWhen": "every 라멘 item, and step 1 of every set",
+      "options": [
+        { "id": "firm", "label": "꼬들", "priceDelta": 0, "maxQty": 1 },
+        { "id": "normal", "label": "보통", "priceDelta": 0, "maxQty": 1 },
+        { "id": "soft", "label": "부드럽게", "priceDelta": 0, "maxQty": 1 }
+      ]
+    },
+    "toppings": {
+      "title": "토핑 추가", "type": "quantity", "required": false, "min": 0, "max": 18, "default": null,
+      "appliesWhen": "every 라멘 item ordered alone (not available inside sets)",
+      "options": [
+        { "id": "chashu", "label": "차슈", "priceDelta": 2000, "maxQty": 3 },
+        { "id": "egg", "label": "계란", "priceDelta": 1000, "maxQty": 3 },
+        { "id": "nori", "label": "김", "priceDelta": 500, "maxQty": 3 },
+        { "id": "sprouts", "label": "숙주", "priceDelta": 500, "maxQty": 3 },
+        { "id": "menma", "label": "멘마", "priceDelta": 1000, "maxQty": 3 },
+        { "id": "cornbutter", "label": "콘버터", "priceDelta": 1500, "maxQty": 3 }
+      ]
+    },
+    "rice_size": {
+      "title": "밥 양", "type": "single", "required": true, "min": 1, "max": 1, "default": "regular",
+      "appliesWhen": "every 덮밥 item",
+      "options": [
+        { "id": "regular", "label": "보통", "priceDelta": 0, "maxQty": 1 },
+        { "id": "large", "label": "곱빼기", "priceDelta": 1000, "maxQty": 1 }
+      ]
+    },
+    "set_ramen": {
+      "title": "라멘 선택 (세트 STEP 1)", "type": "single", "required": true, "min": 1, "max": 1, "default": null,
+      "appliesWhen": "both sets",
+      "options": [
+        { "id": "tonkotsu", "label": "돈코츠 라멘", "priceDelta": 0, "maxQty": 1 },
+        { "id": "shoyu", "label": "쇼유 라멘", "priceDelta": 0, "maxQty": 1 },
+        { "id": "shio", "label": "시오 라멘", "priceDelta": 0, "maxQty": 1 },
+        { "id": "miso", "label": "미소 라멘", "priceDelta": 0, "maxQty": 1 },
+        { "id": "spicy", "label": "매운 돈코츠 라멘", "priceDelta": 500, "maxQty": 1 },
+        { "id": "tantan", "label": "탄탄멘", "priceDelta": 1000, "maxQty": 1 },
+        { "id": "chashu", "label": "차슈 듬뿍 라멘", "priceDelta": 3000, "maxQty": 1 }
+      ]
+    },
+    "set_side_basic": {
+      "title": "사이드 선택 (세트 STEP 2)", "type": "single", "required": true, "min": 1, "max": 1, "default": null,
+      "appliesWhen": "라멘 기본 세트 only",
+      "options": [
+        { "id": "gyoza", "label": "교자 (5개)", "priceDelta": 0, "maxQty": 1 },
+        { "id": "edamame", "label": "에다마메", "priceDelta": 0, "maxQty": 1 },
+        { "id": "karaage", "label": "가라아게 (4조각)", "priceDelta": 1000, "maxQty": 1 }
+      ]
+    },
+    "set_side_hearty": {
+      "title": "사이드 선택 (세트 STEP 2)", "type": "single", "required": true, "min": 1, "max": 1, "default": null,
+      "appliesWhen": "라멘 든든 세트 only",
+      "options": [
+        { "id": "karaage", "label": "가라아게 (4조각)", "priceDelta": 0, "maxQty": 1 },
+        { "id": "minidon", "label": "미니 차슈덮밥", "priceDelta": 0, "maxQty": 1 }
+      ]
+    },
+    "set_drink": {
+      "title": "음료 선택 (세트 STEP 3)", "type": "single", "required": true, "min": 1, "max": 1, "default": null,
+      "appliesWhen": "both sets",
+      "options": [
+        { "id": "cola", "label": "콜라", "priceDelta": 0, "maxQty": 1 },
+        { "id": "cider", "label": "사이다", "priceDelta": 0, "maxQty": 1 },
+        { "id": "zero", "label": "제로 콜라", "priceDelta": 0, "maxQty": 1 },
+        { "id": "oolong", "label": "우롱차", "priceDelta": 500, "maxQty": 1 },
+        { "id": "yuja", "label": "유자 에이드", "priceDelta": 1500, "maxQty": 1 }
+      ]
+    }
+  },
+  "items": [
+    { "name": "돈코츠 라멘", "category": "라멘", "basePrice": 9500, "soldOut": false, "timeLimited": null, "optionGroups": ["firmness", "toppings"] },
+    { "name": "매운 돈코츠 라멘", "category": "라멘", "basePrice": 10000, "soldOut": false, "timeLimited": null, "optionGroups": ["firmness", "toppings"] },
+    { "name": "쇼유 라멘", "category": "라멘", "basePrice": 9000, "soldOut": false, "timeLimited": null, "optionGroups": ["firmness", "toppings"] },
+    { "name": "시오 라멘", "category": "라멘", "basePrice": 9000, "soldOut": false, "timeLimited": null, "optionGroups": ["firmness", "toppings"] },
+    { "name": "미소 라멘", "category": "라멘", "basePrice": 9500, "soldOut": false, "timeLimited": null, "optionGroups": ["firmness", "toppings"] },
+    { "name": "탄탄멘", "category": "라멘", "basePrice": 10500, "soldOut": false, "timeLimited": null, "optionGroups": ["firmness", "toppings"] },
+    { "name": "차슈 듬뿍 라멘", "category": "라멘", "basePrice": 12500, "soldOut": false, "timeLimited": null, "optionGroups": ["firmness", "toppings"] },
+    { "name": "츠케멘", "category": "라멘", "basePrice": 11000, "soldOut": true, "timeLimited": null, "optionGroups": ["firmness", "toppings"] },
+    { "name": "차슈 덮밥", "category": "덮밥", "basePrice": 8500, "soldOut": false, "timeLimited": null, "optionGroups": ["rice_size"] },
+    { "name": "규동", "category": "덮밥", "basePrice": 8000, "soldOut": false, "timeLimited": null, "optionGroups": ["rice_size"] },
+    { "name": "치킨 마요 덮밥", "category": "덮밥", "basePrice": 7500, "soldOut": false, "timeLimited": null, "optionGroups": ["rice_size"] },
+    { "name": "연어 덮밥", "category": "덮밥", "basePrice": 11000, "soldOut": false, "timeLimited": null, "optionGroups": ["rice_size"] },
+    { "name": "교자 (5개)", "category": "사이드", "basePrice": 4500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "가라아게 (4조각)", "category": "사이드", "basePrice": 5500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "타코야키 (6개)", "category": "사이드", "basePrice": 5000, "soldOut": true, "timeLimited": null, "optionGroups": [] },
+    { "name": "미니 차슈덮밥", "category": "사이드", "basePrice": 4000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "공기밥", "category": "사이드", "basePrice": 1000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "에다마메", "category": "사이드", "basePrice": 3000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "콜라", "category": "음료", "basePrice": 2000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "사이다", "category": "음료", "basePrice": 2000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "제로 콜라", "category": "음료", "basePrice": 2000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "우롱차", "category": "음료", "basePrice": 2500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "유자 에이드", "category": "음료", "basePrice": 3500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "라멘 기본 세트", "category": "세트", "basePrice": 13500, "soldOut": false, "timeLimited": null, "optionGroups": ["set_ramen", "firmness", "set_side_basic", "set_drink"] },
+    { "name": "라멘 든든 세트", "category": "세트", "basePrice": 15000, "soldOut": false, "timeLimited": null, "optionGroups": ["set_ramen", "firmness", "set_side_hearty", "set_drink"] }
+  ],
+  "promotions": [],
+  "holdoutOrders": [
+    {
+      "id": "h1", "dine": "매장",
+      "lines": [ { "item": "쇼유 라멘", "options": { "firmness": ["normal"] }, "qty": 1 } ],
+      "expectedTotal": 9000,
+      "patterns": ["required firmness radio", "no toppings"]
+    },
+    {
+      "id": "h2", "dine": "매장",
+      "lines": [ { "item": "돈코츠 라멘", "options": { "firmness": ["firm"], "toppings": ["chashu", "chashu", "egg"] }, "qty": 1 } ],
+      "expectedTotal": 14500,
+      "patterns": ["per-topping quantity (차슈 ×2)", "mixed toppings"]
+    },
+    {
+      "id": "h3", "dine": "매장",
+      "lines": [ { "item": "라멘 기본 세트", "options": { "set_ramen": ["tantan"], "firmness": ["soft"], "set_side_basic": ["karaage"], "set_drink": ["yuja"] }, "qty": 1 } ],
+      "expectedTotal": 17000,
+      "patterns": ["3-step set modal", "upcharge in every step"]
+    },
+    {
+      "id": "h4", "dine": "포장",
+      "lines": [
+        { "item": "교자 (5개)", "options": {}, "qty": 2 },
+        { "item": "콜라", "options": {}, "qty": 2 }
+      ],
+      "expectedTotal": 13000,
+      "patterns": ["takeout", "direct-add items with no popup", "quantity via cart + or repeat tap"]
+    },
+    {
+      "id": "h5", "dine": "매장",
+      "lines": [
+        { "item": "규동", "options": { "rice_size": ["large"] }, "qty": 1 },
+        { "item": "치킨 마요 덮밥", "options": { "rice_size": ["regular"] }, "qty": 1 }
+      ],
+      "expectedTotal": 16500,
+      "patterns": ["rice size radio with preselected default", "곱빼기 upcharge"]
+    },
+    {
+      "id": "h6", "dine": "포장",
+      "lines": [
+        { "item": "미소 라멘", "options": { "firmness": ["normal"], "toppings": ["nori", "nori", "nori"] }, "qty": 1 },
+        { "item": "라멘 든든 세트", "options": { "set_ramen": ["chashu"], "firmness": ["firm"], "set_side_hearty": ["minidon"], "set_drink": ["oolong"] }, "qty": 1 }
+      ],
+      "expectedTotal": 29500,
+      "patterns": ["takeout", "topping at max quantity 3", "hearty set with its own side list"]
+    },
+    {
+      "id": "h7", "dine": "매장",
+      "lines": [
+        { "item": "시오 라멘", "options": { "firmness": ["normal"] }, "qty": 1 },
+        { "item": "시오 라멘", "options": { "firmness": ["normal"], "toppings": ["sprouts", "sprouts", "sprouts"] }, "qty": 1 }
+      ],
+      "expectedTotal": 19500,
+      "patterns": ["same item with different options stays as two cart lines", "topping at max quantity 3"]
+    },
+    {
+      "id": "h8", "dine": "매장",
+      "lines": [
+        { "item": "매운 돈코츠 라멘", "options": { "firmness": ["firm"], "toppings": ["egg", "egg"] }, "qty": 2 },
+        { "item": "공기밥", "options": {}, "qty": 1 }
+      ],
+      "expectedTotal": 25000,
+      "patterns": ["cart + on a ramen line with toppings (unit price × qty)", "direct-add side"]
+    },
+    {
+      "id": "h9", "dine": "포장",
+      "lines": [
+        { "item": "차슈 덮밥", "options": { "rice_size": ["regular"] }, "qty": 1 },
+        { "item": "에다마메", "options": {}, "qty": 1 },
+        { "item": "사이다", "options": {}, "qty": 3 }
+      ],
+      "expectedTotal": 17500,
+      "patterns": ["takeout", "default option kept", "drink quantity 3"]
+    },
+    {
+      "id": "h10", "dine": "매장",
+      "lines": [
+        { "item": "차슈 듬뿍 라멘", "options": { "firmness": ["soft"], "toppings": ["chashu", "chashu", "chashu", "egg", "nori", "menma", "cornbutter"] }, "qty": 1 },
+        { "item": "라멘 기본 세트", "options": { "set_ramen": ["shoyu"], "firmness": ["normal"], "set_side_basic": ["gyoza"], "set_drink": ["zero"] }, "qty": 1 },
+        { "item": "연어 덮밥", "options": { "rice_size": ["large"] }, "qty": 1 },
+        { "item": "유자 에이드", "options": {}, "qty": 1 }
+      ],
+      "expectedTotal": 51500,
+      "patterns": ["large mixed order", "five different toppings, one at max 3", "set with no upcharge", "every category"]
+    }
+  ],
+  "quirks": [
+    "Category chips are a filter over one grid, not separate pages; 전체 lists all 25 items in category order (라멘, 덮밥, 사이드, 음료, 세트).",
+    "Sides and drinks have no popup: one tap adds 1 to the cart and a short toast appears. Tapping again adds 1 more to the same line.",
+    "면 익힘 has no default. Pressing 담기 without it shows a native alert '면 익힘 정도를 선택해 주세요.' (also in set STEP 1).",
+    "Each topping has its own −/+ stepper (0-3). Pressing + at 3 shows a native alert; there is no overall topping limit.",
+    "In quantity option groups in this key, an option id is listed once per unit (['chashu','chashu'] = 차슈 ×2). Topping prices are per unit and are multiplied by the cart line quantity.",
+    "밥 양 defaults to 보통 (preselected); 곱빼기 is +1,000원.",
+    "Set prices are a bundle price; upcharges (+500/+1,000/+1,500/+3,000원) are shown on each choice card. Toppings cannot be added to set ramen. 츠케멘 is not offered in sets.",
+    "The two sets have different side lists: 기본 세트 (교자/에다마메 free, 가라아게 +1,000원), 든든 세트 (가라아게/미니 차슈덮밥, both free).",
+    "Adding an identical configuration again merges into the existing cart line (qty +1); a different firmness or topping count makes a new line.",
+    "Cart − at quantity 1 removes the line with no confirmation. Max 9 per line (native alert beyond that).",
+    "전체 취소 opens an in-page confirmation popup (아니요 / 모두 취소); with an empty cart it shows a native alert instead.",
+    "주문하기 with an empty cart shows a native alert '메뉴를 먼저 선택해 주세요.'",
+    "Sold-out cards (츠케멘, 타코야키) are greyed with a 품절 stamp; tapping one shows a native alert.",
+    "처음으로 in the menu header clears the cart (asks first if the cart is not empty).",
+    "Dine choice (매장/포장) does not change any price.",
+    "Card text merges in the DOM (e.g. '🍜돈코츠 라멘진한 돼지뼈 육수9,500원')."
+  ]
+}

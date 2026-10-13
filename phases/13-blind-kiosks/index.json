@@ -1,0 +1,51 @@
+{
+  "project": "KIBO",
+  "phase": "13-blind-kiosks",
+  "steps": [
+    {
+      "step": 0,
+      "name": "grader",
+      "status": "pending"
+    },
+    {
+      "step": 1,
+      "name": "baseline-a",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "name": "baseline-b",
+      "status": "pending"
+    },
+    {
+      "step": 3,
+      "name": "learner-gaps",
+      "status": "pending"
+    },
+    {
+      "step": 4,
+      "name": "final-a",
+      "status": "pending"
+    },
+    {
+      "step": 5,
+      "name": "final-b",
+      "status": "pending"
+    },
+    {
+      "step": 6,
+      "name": "learn-viewer",
+      "status": "pending"
+    },
+    {
+      "step": 7,
+      "name": "report",
+      "status": "pending"
+    },
+    {
+      "step": 8,
+      "name": "qa",
+      "status": "pending"
+    }
+  ]
+}

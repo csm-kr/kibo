@@ -1,0 +1,41 @@
+{
+  "project": "KIBO",
+  "phase": "12-phone-app",
+  "steps": [
+    {
+      "step": 0,
+      "name": "phone-design",
+      "status": "pending"
+    },
+    {
+      "step": 1,
+      "name": "phone-redesign",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "name": "pwa-shell",
+      "status": "pending"
+    },
+    {
+      "step": 3,
+      "name": "pairing",
+      "status": "pending"
+    },
+    {
+      "step": 4,
+      "name": "kiosk-pairing",
+      "status": "pending"
+    },
+    {
+      "step": 5,
+      "name": "two-device-e2e",
+      "status": "pending"
+    },
+    {
+      "step": 6,
+      "name": "qa",
+      "status": "pending"
+    }
+  ]
+}

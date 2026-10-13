@@ -1,0 +1,1121 @@
+{
+  "kiosk": {
+    "name": "포근밀 베이커리카페",
+    "nameEn": "Pogeunmil Bakery Cafe",
+    "domain": "bakery cafe (coffee, non-coffee, tea, bread, cake, sandwich)"
+  },
+  "flow": [
+    "Attract screen: tap anywhere ('화면을 터치해 주문을 시작하세요')",
+    "Dine-in / take-out choice: '매장에서 먹어요' or '포장해 갈게요' (prices do not change)",
+    "Menu screen: 6 category tabs, 3-column item grid, cart panel at the bottom (per-line − qty + and ✕, '전체삭제', '총 N개 total', '주문하기')",
+    "Item option popup (only for items that have option groups): option groups, '수량' stepper, '취소' / '<line price> 담기'. Items without option groups go straight into the cart on tap",
+    "Order review '주문 내역을 확인해 주세요': lines, dine-in/take-out, '총 결제금액'; '결제하기' opens the confirmation '총 N원을 결제할까요?' ('다시 확인' / '결제하기')",
+    "Payment-method screen '결제 수단을 선택해 주세요': '결제하실 금액' and 3 methods (신용·체크카드, QR 간편결제, 모바일 상품권); picking one only shows a guide line. End of flow"
+  ],
+  "categories": [
+    {
+      "label": "커피",
+      "itemCount": 8
+    },
+    {
+      "label": "논커피",
+      "itemCount": 6
+    },
+    {
+      "label": "티",
+      "itemCount": 6
+    },
+    {
+      "label": "빵",
+      "itemCount": 8
+    },
+    {
+      "label": "케이크",
+      "itemCount": 6
+    },
+    {
+      "label": "샌드위치",
+      "itemCount": 6
+    }
+  ],
+  "optionGroups": {
+    "temp": {
+      "title": "온도 선택",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": null,
+      "appliesWhen": null,
+      "options": [
+        {
+          "id": "hot",
+          "label": "HOT",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "iced",
+          "label": "ICED",
+          "priceDelta": 0,
+          "maxQty": 1
+        }
+      ]
+    },
+    "tempUp": {
+      "title": "온도 선택",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": null,
+      "appliesWhen": null,
+      "options": [
+        {
+          "id": "hot",
+          "label": "HOT",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "iced",
+          "label": "ICED",
+          "priceDelta": 500,
+          "maxQty": 1
+        }
+      ]
+    },
+    "tempIced": {
+      "title": "온도 선택",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": "iced",
+      "appliesWhen": null,
+      "options": [
+        {
+          "id": "iced",
+          "label": "ICED ONLY",
+          "priceDelta": 0,
+          "maxQty": 1
+        }
+      ]
+    },
+    "ice": {
+      "title": "얼음 양",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": "regular",
+      "appliesWhen": "temperature option (temp / tempUp / tempIced) is \"iced\"",
+      "options": [
+        {
+          "id": "less",
+          "label": "적게",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "regular",
+          "label": "보통",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "more",
+          "label": "많이",
+          "priceDelta": 0,
+          "maxQty": 1
+        }
+      ]
+    },
+    "shot": {
+      "title": "샷 추가",
+      "type": "quantity",
+      "required": false,
+      "min": 0,
+      "max": 3,
+      "default": null,
+      "appliesWhen": null,
+      "options": [
+        {
+          "id": "shot",
+          "label": "에스프레소 샷",
+          "priceDelta": 500,
+          "maxQty": 3
+        }
+      ]
+    },
+    "syrup": {
+      "title": "시럽 추가",
+      "type": "multi",
+      "required": false,
+      "min": 0,
+      "max": 2,
+      "default": null,
+      "appliesWhen": null,
+      "options": [
+        {
+          "id": "vanilla",
+          "label": "바닐라 시럽",
+          "priceDelta": 500,
+          "maxQty": 1
+        },
+        {
+          "id": "hazelnut",
+          "label": "헤이즐넛 시럽",
+          "priceDelta": 500,
+          "maxQty": 1
+        },
+        {
+          "id": "caramel",
+          "label": "카라멜 시럽",
+          "priceDelta": 500,
+          "maxQty": 1
+        },
+        {
+          "id": "brownsugar",
+          "label": "흑당 시럽",
+          "priceDelta": 700,
+          "maxQty": 1
+        }
+      ]
+    },
+    "milk": {
+      "title": "우유 선택",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": "regular",
+      "appliesWhen": null,
+      "options": [
+        {
+          "id": "regular",
+          "label": "일반 우유",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "lowfat",
+          "label": "저지방 우유",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "oat",
+          "label": "오트 밀크",
+          "priceDelta": 600,
+          "maxQty": 1
+        },
+        {
+          "id": "soy",
+          "label": "두유",
+          "priceDelta": 500,
+          "maxQty": 1
+        }
+      ]
+    },
+    "warm": {
+      "title": "데우기",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": "none",
+      "appliesWhen": null,
+      "options": [
+        {
+          "id": "none",
+          "label": "그대로 주세요",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "warm",
+          "label": "따뜻하게 데워 주세요",
+          "priceDelta": 0,
+          "maxQty": 1
+        }
+      ]
+    }
+  },
+  "items": [
+    {
+      "name": "아메리카노",
+      "category": "커피",
+      "basePrice": 3800,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "temp",
+        "ice",
+        "shot",
+        "syrup"
+      ]
+    },
+    {
+      "name": "카페라떼",
+      "category": "커피",
+      "basePrice": 4300,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "tempUp",
+        "ice",
+        "shot",
+        "syrup",
+        "milk"
+      ]
+    },
+    {
+      "name": "바닐라빈 라떼",
+      "category": "커피",
+      "basePrice": 4800,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "tempUp",
+        "ice",
+        "shot",
+        "milk"
+      ]
+    },
+    {
+      "name": "카푸치노",
+      "category": "커피",
+      "basePrice": 4300,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "temp",
+        "ice",
+        "shot",
+        "syrup",
+        "milk"
+      ]
+    },
+    {
+      "name": "카라멜 마키아토",
+      "category": "커피",
+      "basePrice": 5000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "tempUp",
+        "ice",
+        "shot",
+        "syrup",
+        "milk"
+      ]
+    },
+    {
+      "name": "카페모카",
+      "category": "커피",
+      "basePrice": 4900,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "tempUp",
+        "ice",
+        "shot",
+        "syrup",
+        "milk"
+      ]
+    },
+    {
+      "name": "콜드브루",
+      "category": "커피",
+      "basePrice": 4500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "tempIced",
+        "ice",
+        "syrup"
+      ]
+    },
+    {
+      "name": "에스프레소",
+      "category": "커피",
+      "basePrice": 3000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "shot"
+      ]
+    },
+    {
+      "name": "초코라떼",
+      "category": "논커피",
+      "basePrice": 4500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "tempUp",
+        "ice",
+        "milk"
+      ]
+    },
+    {
+      "name": "녹차라떼",
+      "category": "논커피",
+      "basePrice": 4700,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "tempUp",
+        "ice",
+        "milk"
+      ]
+    },
+    {
+      "name": "고구마라떼",
+      "category": "논커피",
+      "basePrice": 4800,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "temp",
+        "ice",
+        "milk"
+      ]
+    },
+    {
+      "name": "딸기라떼",
+      "category": "논커피",
+      "basePrice": 5300,
+      "soldOut": true,
+      "timeLimited": null,
+      "optionGroups": [
+        "tempIced",
+        "ice",
+        "milk"
+      ]
+    },
+    {
+      "name": "레몬에이드",
+      "category": "논커피",
+      "basePrice": 4800,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "tempIced",
+        "ice"
+      ]
+    },
+    {
+      "name": "흑임자 라떼",
+      "category": "논커피",
+      "basePrice": 5000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "tempUp",
+        "ice",
+        "milk"
+      ]
+    },
+    {
+      "name": "캐모마일",
+      "category": "티",
+      "basePrice": 3800,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "temp",
+        "ice"
+      ]
+    },
+    {
+      "name": "페퍼민트",
+      "category": "티",
+      "basePrice": 3800,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "temp",
+        "ice"
+      ]
+    },
+    {
+      "name": "얼그레이",
+      "category": "티",
+      "basePrice": 4000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "temp",
+        "ice",
+        "syrup"
+      ]
+    },
+    {
+      "name": "유자차",
+      "category": "티",
+      "basePrice": 4500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "tempUp",
+        "ice"
+      ]
+    },
+    {
+      "name": "자몽차",
+      "category": "티",
+      "basePrice": 4700,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "tempUp",
+        "ice"
+      ]
+    },
+    {
+      "name": "로열 밀크티",
+      "category": "티",
+      "basePrice": 5000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "tempUp",
+        "ice",
+        "syrup",
+        "milk"
+      ]
+    },
+    {
+      "name": "소금빵",
+      "category": "빵",
+      "basePrice": 3200,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "warm"
+      ]
+    },
+    {
+      "name": "버터 크루아상",
+      "category": "빵",
+      "basePrice": 3800,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "warm"
+      ]
+    },
+    {
+      "name": "단팥빵",
+      "category": "빵",
+      "basePrice": 2800,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "크림치즈 베이글",
+      "category": "빵",
+      "basePrice": 4200,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "warm"
+      ]
+    },
+    {
+      "name": "마늘 바게트",
+      "category": "빵",
+      "basePrice": 4500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "앙버터",
+      "category": "빵",
+      "basePrice": 4300,
+      "soldOut": true,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "소보로빵",
+      "category": "빵",
+      "basePrice": 2600,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "우유식빵",
+      "category": "빵",
+      "basePrice": 6500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "딸기 생크림 케이크",
+      "category": "케이크",
+      "basePrice": 6500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "초코 가나슈 케이크",
+      "category": "케이크",
+      "basePrice": 6800,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "뉴욕 치즈케이크",
+      "category": "케이크",
+      "basePrice": 6300,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "티라미수",
+      "category": "케이크",
+      "basePrice": 6900,
+      "soldOut": true,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "당근 케이크",
+      "category": "케이크",
+      "basePrice": 6200,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "레몬 파운드",
+      "category": "케이크",
+      "basePrice": 3900,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "햄치즈 샌드위치",
+      "category": "샌드위치",
+      "basePrice": 6300,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "warm"
+      ]
+    },
+    {
+      "name": "에그마요 샌드위치",
+      "category": "샌드위치",
+      "basePrice": 5800,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "치킨 클럽 샌드위치",
+      "category": "샌드위치",
+      "basePrice": 7200,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "warm"
+      ]
+    },
+    {
+      "name": "베이컨 토마토 샌드위치",
+      "category": "샌드위치",
+      "basePrice": 6900,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "warm"
+      ]
+    },
+    {
+      "name": "리코타 샐러드 샌드위치",
+      "category": "샌드위치",
+      "basePrice": 6800,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "크로크무슈",
+      "category": "샌드위치",
+      "basePrice": 6500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "warm"
+      ]
+    }
+  ],
+  "promotions": [],
+  "holdoutOrders": [
+    {
+      "id": "h1",
+      "lines": [
+        {
+          "item": "카페라떼",
+          "options": {
+            "tempUp": [
+              "iced"
+            ],
+            "ice": [
+              "less"
+            ],
+            "shot": [
+              "shot",
+              "shot"
+            ],
+            "syrup": [],
+            "milk": [
+              "regular"
+            ]
+          },
+          "qty": 1
+        },
+        {
+          "item": "소금빵",
+          "options": {
+            "warm": [
+              "none"
+            ]
+          },
+          "qty": 2
+        }
+      ],
+      "expectedTotal": 12200,
+      "patterns": [
+        "dine-in",
+        "hot-iced-required",
+        "iced-surcharge",
+        "conditional-ice-amount",
+        "shot-quantity-stepper",
+        "qty-in-popup",
+        "multi-line",
+        "idle-warning"
+      ]
+    },
+    {
+      "id": "h2",
+      "lines": [
+        {
+          "item": "아메리카노",
+          "options": {
+            "temp": [
+              "hot"
+            ],
+            "shot": [],
+            "syrup": [
+              "vanilla",
+              "hazelnut"
+            ]
+          },
+          "qty": 2
+        },
+        {
+          "item": "버터 크루아상",
+          "options": {
+            "warm": [
+              "warm"
+            ]
+          },
+          "qty": 1
+        }
+      ],
+      "expectedTotal": 13400,
+      "patterns": [
+        "take-out",
+        "hot-iced-required",
+        "syrup-multi",
+        "syrup-max-2-error",
+        "cart-qty-change",
+        "warm-option",
+        "idle-warning"
+      ]
+    },
+    {
+      "id": "h3",
+      "lines": [
+        {
+          "item": "콜드브루",
+          "options": {
+            "tempIced": [
+              "iced"
+            ],
+            "ice": [
+              "more"
+            ],
+            "syrup": [
+              "caramel"
+            ]
+          },
+          "qty": 1
+        },
+        {
+          "item": "뉴욕 치즈케이크",
+          "options": {},
+          "qty": 1
+        }
+      ],
+      "expectedTotal": 11300,
+      "patterns": [
+        "dine-in",
+        "iced-only-item",
+        "conditional-ice-amount",
+        "syrup-multi",
+        "direct-add-no-popup"
+      ]
+    },
+    {
+      "id": "h4",
+      "lines": [
+        {
+          "item": "카페모카",
+          "options": {
+            "tempUp": [
+              "iced"
+            ],
+            "ice": [
+              "regular"
+            ],
+            "shot": [
+              "shot",
+              "shot",
+              "shot"
+            ],
+            "syrup": [],
+            "milk": [
+              "oat"
+            ]
+          },
+          "qty": 1
+        },
+        {
+          "item": "에그마요 샌드위치",
+          "options": {},
+          "qty": 1
+        }
+      ],
+      "expectedTotal": 13300,
+      "patterns": [
+        "dine-in",
+        "iced-surcharge",
+        "conditional-ice-amount",
+        "shot-max-3-error",
+        "milk-upcharge",
+        "direct-add-no-popup",
+        "idle-warning"
+      ]
+    },
+    {
+      "id": "h5",
+      "lines": [
+        {
+          "item": "유자차",
+          "options": {
+            "tempUp": [
+              "hot"
+            ]
+          },
+          "qty": 1
+        },
+        {
+          "item": "자몽차",
+          "options": {
+            "tempUp": [
+              "iced"
+            ],
+            "ice": [
+              "regular"
+            ]
+          },
+          "qty": 1
+        },
+        {
+          "item": "단팥빵",
+          "options": {},
+          "qty": 3
+        }
+      ],
+      "expectedTotal": 18100,
+      "patterns": [
+        "take-out",
+        "hot-iced-required",
+        "iced-surcharge",
+        "direct-add-repeat-taps",
+        "sold-out-neighbor (앙버터)",
+        "multi-line",
+        "idle-warning"
+      ]
+    },
+    {
+      "id": "h6",
+      "lines": [
+        {
+          "item": "녹차라떼",
+          "options": {
+            "tempUp": [
+              "iced"
+            ],
+            "ice": [
+              "regular"
+            ],
+            "milk": [
+              "soy"
+            ]
+          },
+          "qty": 2
+        },
+        {
+          "item": "치킨 클럽 샌드위치",
+          "options": {
+            "warm": [
+              "warm"
+            ]
+          },
+          "qty": 1
+        }
+      ],
+      "expectedTotal": 18600,
+      "patterns": [
+        "dine-in",
+        "iced-surcharge",
+        "milk-upcharge",
+        "qty-in-popup",
+        "warm-option",
+        "sold-out-neighbor (딸기라떼)",
+        "idle-warning"
+      ]
+    },
+    {
+      "id": "h7",
+      "lines": [
+        {
+          "item": "에스프레소",
+          "options": {
+            "shot": [
+              "shot",
+              "shot"
+            ]
+          },
+          "qty": 1
+        },
+        {
+          "item": "레몬 파운드",
+          "options": {},
+          "qty": 2
+        }
+      ],
+      "expectedTotal": 11800,
+      "patterns": [
+        "take-out",
+        "hot-only-item",
+        "shot-quantity-stepper",
+        "direct-add-repeat-taps"
+      ]
+    },
+    {
+      "id": "h8",
+      "lines": [
+        {
+          "item": "캐모마일",
+          "options": {
+            "temp": [
+              "iced"
+            ],
+            "ice": [
+              "less"
+            ]
+          },
+          "qty": 1
+        },
+        {
+          "item": "아메리카노",
+          "options": {
+            "temp": [
+              "iced"
+            ],
+            "ice": [
+              "regular"
+            ],
+            "shot": [
+              "shot"
+            ],
+            "syrup": []
+          },
+          "qty": 1
+        },
+        {
+          "item": "카라멜 마키아토",
+          "options": {
+            "tempUp": [
+              "hot"
+            ],
+            "shot": [],
+            "syrup": [
+              "vanilla",
+              "brownsugar"
+            ],
+            "milk": [
+              "regular"
+            ]
+          },
+          "qty": 1
+        }
+      ],
+      "expectedTotal": 14300,
+      "patterns": [
+        "dine-in",
+        "iced-no-surcharge",
+        "conditional-ice-amount",
+        "shot-quantity-stepper",
+        "syrup-multi (mixed prices)",
+        "multi-line",
+        "idle-warning"
+      ]
+    },
+    {
+      "id": "h9",
+      "lines": [
+        {
+          "item": "크로크무슈",
+          "options": {
+            "warm": [
+              "none"
+            ]
+          },
+          "qty": 2
+        },
+        {
+          "item": "레몬에이드",
+          "options": {
+            "tempIced": [
+              "iced"
+            ],
+            "ice": [
+              "regular"
+            ]
+          },
+          "qty": 1
+        },
+        {
+          "item": "로열 밀크티",
+          "options": {
+            "tempUp": [
+              "iced"
+            ],
+            "ice": [
+              "regular"
+            ],
+            "syrup": [
+              "hazelnut"
+            ],
+            "milk": [
+              "regular"
+            ]
+          },
+          "qty": 1
+        }
+      ],
+      "expectedTotal": 23800,
+      "patterns": [
+        "take-out",
+        "iced-only-item",
+        "iced-surcharge",
+        "syrup-multi",
+        "qty-in-popup",
+        "multi-line",
+        "idle-warning"
+      ]
+    },
+    {
+      "id": "h10",
+      "lines": [
+        {
+          "item": "바닐라빈 라떼",
+          "options": {
+            "tempUp": [
+              "hot"
+            ],
+            "shot": [
+              "shot"
+            ],
+            "milk": [
+              "lowfat"
+            ]
+          },
+          "qty": 1
+        },
+        {
+          "item": "초코라떼",
+          "options": {
+            "tempUp": [
+              "iced"
+            ],
+            "ice": [
+              "regular"
+            ],
+            "milk": [
+              "regular"
+            ]
+          },
+          "qty": 1
+        },
+        {
+          "item": "우유식빵",
+          "options": {},
+          "qty": 1
+        },
+        {
+          "item": "딸기 생크림 케이크",
+          "options": {},
+          "qty": 1
+        }
+      ],
+      "expectedTotal": 23300,
+      "patterns": [
+        "dine-in",
+        "hot-iced-required",
+        "iced-surcharge",
+        "shot-quantity-stepper",
+        "milk-free-change",
+        "direct-add-no-popup",
+        "four-lines",
+        "idle-warning"
+      ]
+    }
+  ],
+  "quirks": [
+    "Menu cards show the HOT/base price. The ICED +500원 surcharge appears only inside the option popup, and only for drinks using group tempUp (카페라떼, 바닐라빈 라떼, 카라멜 마키아토, 카페모카, 초코라떼, 녹차라떼, 흑임자 라떼, 유자차, 자몽차, 로열 밀크티). Drinks using group temp (아메리카노, 카푸치노, 고구마라떼, 캐모마일, 페퍼민트, 얼그레이) have no surcharge.",
+    "HOT/ICED has no default. Tapping '담기' without it shows the error '온도(HOT/ICED)를 선택해 주세요.'",
+    "'얼음 양' (적게/보통/많이, default 보통) appears only after ICED is selected. Switching back to HOT hides it; selecting ICED again resets it to 보통.",
+    "ICE ONLY items (콜드브루, 레몬에이드, 딸기라떼) have ICED pre-selected as the only temperature choice, so '얼음 양' is visible immediately.",
+    "에스프레소 is HOT ONLY: it has no temperature group, only '샷 추가'.",
+    "'샷 추가' is a − 0 + stepper (+500원 per shot, max 3). Pressing + at 3 shows '샷 추가는 최대 3회까지 가능해요.' The popup also has a separate '수량' stepper for the line quantity.",
+    "Syrups are multi-select, max 2. A third tap shows '시럽은 최대 2개까지 선택할 수 있어요.' and is not selected; tapping a selected syrup deselects it. 흑당 시럽 is +700원, the others +500원.",
+    "'우유 선택' and '데우기' are pre-selected (일반 우유 / 그대로 주세요). 오트 밀크 +600원, 두유 +500원, 저지방 우유 free.",
+    "Items without option groups (단팥빵, 마늘 바게트, 소보로빵, 우유식빵, every cake, 에그마요 샌드위치, 리코타 샐러드 샌드위치) are added to the cart immediately on tap with a toast; every further tap adds 1 more.",
+    "Adding the same item with the same options merges into the existing cart line (quantities add up). Max 9 per line.",
+    "In the cart, − is disabled at quantity 1 (it never deletes); ✕ deletes the line immediately without confirmation; '전체삭제' asks '장바구니를 모두 비울까요?'.",
+    "Sold out: 딸기라떼, 앙버터, 티라미수. Cards are greyed with a '품절' stamp; tapping shows a popup and nothing is added.",
+    "Inactivity warning uses a fixed fake timer, not real time: right after the 12th counted tap of an order (the attract-screen tap and taps inside the warning are not counted; taps on empty areas are counted), the modal '계속 주문하시겠어요?' opens once per order on top of whatever is showing, with '30초'. It never counts down by itself. Each tap on the dark backdrop outside the box costs 10 fake seconds; at 0 the order is discarded and the attract screen shows '입력이 없어 주문이 취소되었습니다.' '계속 주문하기' keeps everything; the modal's '처음으로' discards the order without asking.",
+    "The header '처음으로' asks '주문을 취소하고 처음 화면으로 돌아갈까요?' before discarding.",
+    "'결제하기' appears twice in a row: the review screen button and the confirmation button.",
+    "Text merges in the DOM: a menu card's text is like '☕아메리카노3,800원', an option chip 'ICED+500원', the add button '5,800원 담기'.",
+    "Category tabs, menu cards, option chips, '주문하기', '처음으로', '메뉴 추가하기', '이전' and payment methods are clickable divs; steppers, ✕, '전체삭제', '담기', '취소', '결제하기' and dialog buttons are real buttons."
+  ]
+}

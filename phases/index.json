@@ -53,6 +53,14 @@
     {
       "dir": "11-hardening",
       "status": "pending"
+    },
+    {
+      "dir": "12-phone-app",
+      "status": "pending"
+    },
+    {
+      "dir": "13-blind-kiosks",
+      "status": "pending"
     }
   ]
 }
