@@ -11,6 +11,8 @@ First, one reliability fix found by the orchestrating session on 10-13: a Cloud 
 
 Also fix two items logged by phase 10: I-144 (the scenario guide's "Your turn" line stays after payment: hide or replace it once the session is `paid`, with a test) and I-143 (the `kiosk-touch` footage clip records the 41-tap edit path while the deck cites the 24-tap efficient path: make `scripts/capture-footage.ts` record the efficient path from `e2e/kiosk-touch-efficient.spec.ts`, re-record only that clip, and note it in `docs/plan/FOOTAGE.md`).
 
+Also from phase 10's QA: I-100 (on the learned Doughhouse kiosk the AI offers to pay, but learned sessions end at `confirming` and the user pays on the kiosk itself: make the learned-kiosk instructions say so plainly and add a grounded-reply eval case for it) and I-147 (`scripts/capture-footage.ts` takes the hero still 03 before menu images load: wait for visible images, as the QA spec does).
+
 Then fix every P0 and P1 in AUDIT.md, then the P2s that are cheap. For each: turn its skipped test on (or write one), see it fail, fix, see it pass; mark the ISSUE row fixed with how. Keep docs in step with every contract you touch (R-002). Findings that need a product decision: leave open with a note and, if P0, set this step blocked with the issue id.
 
 ## Acceptance criteria
