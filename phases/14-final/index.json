@@ -1,0 +1,61 @@
+{
+  "project": "KIBO",
+  "phase": "14-final",
+  "steps": [
+    {
+      "step": 0,
+      "name": "kiosk-english",
+      "status": "pending"
+    },
+    {
+      "step": 1,
+      "name": "flow-polish",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "name": "kiosk-polish",
+      "status": "pending"
+    },
+    {
+      "step": 3,
+      "name": "learn-visible",
+      "status": "pending"
+    },
+    {
+      "step": 4,
+      "name": "any-language",
+      "status": "pending"
+    },
+    {
+      "step": 5,
+      "name": "fast-feel",
+      "status": "pending"
+    },
+    {
+      "step": 6,
+      "name": "impact-content",
+      "status": "pending"
+    },
+    {
+      "step": 7,
+      "name": "numbers-final",
+      "status": "pending"
+    },
+    {
+      "step": 8,
+      "name": "shots-final",
+      "status": "pending"
+    },
+    {
+      "step": 9,
+      "name": "repo-ready",
+      "status": "pending"
+    },
+    {
+      "step": 10,
+      "name": "qa",
+      "status": "pending"
+    }
+  ]
+}

@@ -1,43 +1,48 @@
-# Orchestrator handoff (updated 10-13 ~20:10 KST)
+# Orchestrator handoff (updated 10-14 ~07:40 KST)
 
-The orchestrating session ran `/harness` from 10-12 22:30. The user delegated all decisions ("don't ask, decide") except things only a person can do (payments, logins). Read this, then `phases/index.json`, then the latest `phases/<phase>/index.json` summaries.
+The orchestrating session has run `/harness` since 10-12 22:30. The user delegated all decisions ("don't ask, decide") except things only a person can do (payments, logins, publishing). Reply to the user in Korean, short, conclusion first; numbers only with their evidence file (R-001).
 
 ## State
 | Phase | Status | Notes |
 |---|---|---|
-| 1-core … 12-phone-app | completed | `main` = 12-phone-app (`c72f7e4`); production `kibo-00012-zm8` + relay `kibo-voice-00002-xfv` (deployed 10-13 20:30 with SHORT_APP_URL and VOICE_RELAY_URL; deep health ok, liveRelay ok; production voice smoke through the relay: ready 3.4 s, first audio 0.8 s after the turn) |
-| (12 contents) | — | phone redesign, PWA `/app`, 6-digit pairing code + in-app QR scanner, laptop kiosk pairing panel, `/demo` "use my phone", short address, stream idle (cost), **voice relay `kibo-voice` to Vertex AI Live (ADR-012)** |
-| 13-blind-kiosks | running since 20:22 (chain5, HARNESS_TIMEOUT=3600) | learner dev runs use `PROVIDER=openai` (user decision 10-13); blind baselines/finals stay on Gemini (published numbers) |
-| 14-final | drafted, not in `phases/` yet | drafts in the orchestrator scratchpad `phase14-draft/`: judge-review, judge-fixes, numbers-final, shots-final, repo-ready, qa |
+| 1-core … 12-phone-app | completed, deployed | `main` = 12-phone-app (`c72f7e4`) |
+| hotfix `hotfix/stream-limits` (`65b118c`, off `c72f7e4`) | **deployed** (`kibo-00013-d5g`), **not merged** | per-address limits 10→40 streams, 60→240 api/min; stream retry with "Busy right now. Reconnecting…"; worktree `.claude/worktrees/agent-af2b661da01baf837`. Merge into the phase 14 base before phase 14 runs (expect a `docs/ISSUE.md` conflict: it added I-189 while phase 13 also used I-18x/I-19x → renumber the hotfix row) |
+| 13-blind-kiosks | running (chain5, HARNESS_TIMEOUT=3600), at step 10 `report`, then 11 `qa` | 12 steps after orchestrator inserts: grader, baseline-a, crash-fix, baseline-b, learner-gaps, final-a, final-b, forbidden-fix, final-fresh, learn-viewer, report (+ grader drawer-cart fix, re-grade into `grade-v2.json`, `/learn` run choice), qa |
+| 14-final | **written, not started**: `phases/14-final/` (11 steps) | not yet in `phases/index.json`; start after phase 13 is deployed and the hotfix is merged |
 
-Runner: `.harness-logs/chain.sh <phase…>` (retries a phase up to 3× after a network/DNS outage via `.harness-logs/reset_network_failure.py`). The chain and the two waiters are background tasks of the old session; **if they are gone, resume with**:
-```
-HARNESS_TIMEOUT=2700 HARNESS_MAX_TURNS=300 sh .harness-logs/chain.sh 11-hardening 12-phone-app > .harness-logs/chainX.log 2>&1
-HARNESS_TIMEOUT=3600 HARNESS_MAX_TURNS=300 sh .harness-logs/chain.sh 13-blind-kiosks > .harness-logs/chainY.log 2>&1
-```
-`execute.py` resumes at the first pending step; a step in `error` needs `status: pending` and its `error_message` removed first.
+Production: `https://kibo-407514467119.asia-northeast3.run.app` (`kibo-00013-d5g`), voice relay `kibo-voice-00002-xfv` (`wss://kibo-voice-407514467119.asia-northeast3.run.app/ws`), short address `https://kibo-2026.web.app` (Firebase Hosting redirect; `firebase.json`; REST deploy script `videos/orchestrator/hosting-redirect.sh`). Deep health all ok after the AI Studio top-up.
 
-## Production
-- URL: https://kibo-407514467119.asia-northeast3.run.app (`/`, `/demo`, `/kiosk`, `/assistant`, `/learned/doughhouse`, `/mic-test`). Serving `kibo-00010-zpv` = phase 11 step 1 (security fixes). Deep health `/api/health?deep=1` all ok.
-- Deploy only from a clean worktree, never from the live harness tree: `/private/tmp/claude-501/-Users-sungmincho-mac-Desktop-sm-apps-kibo/<session>/scratchpad/deploy` (`git checkout -q -- . && git checkout -q --detach <commit>`, real `node_modules` via `npm ci`, **not a symlink**: Turbopack refuses it), then `sh scripts/deploy.sh`; trust only its last line `DEPLOYED <rev>` / `DEPLOY FAILED`.
-- GCP set up by the orchestrator: Firestore (asia-northeast3, TTL on `sessions`, `sessionSecrets`, `pairCodes` `expiresAt`), deny-all rules, Secret Manager `gemini-api-key`, runtime SA `kibo-runtime` (datastore.user, secret accessor, aiplatform.user), uptime check `kibo-deep-health` + email alert, Speech API enabled.
-- Text agent `GEMINI_TEXT_BACKEND=auto` (API key first, Vertex fallback); voice `gemini-3.8-live` needs the AI Studio prepaid credits (ran out once on 10-13, I-104; the user topped up).
-- `.env` (never print): GEMINI_API_KEY, OPENAI_API_KEY (offline only), MS_SPEECH_KEY/ENDPOINT (offline comparison only), GEMINI_TEXT_BACKEND=api (local).
+## Phase 13 results so far (`spikes/blind-kiosks/results/`)
+- Baseline (end-of-phase-12 learner + crash fixes): 2/4 learned, items 57/134, orders 5 correct / 10 refused / 5 unsafe of 40 (`BASELINE.md`).
+- Final (after step 4, patterns from the 4 test kiosks): bk1 6/4/0, bk2 5/0/5, bk3 10/0/0, bk4 10/0/0 → 31/4/5 of 40, items 134/134, 8–13 min and 0.44–0.98M input tokens each, 40–62% cached (`*/final/`).
+- bk2 rerun after the I-193 fix (labelled "informed by bk2", shown next to final): 6/0/4; the other 4 come from a mid-line "계속 주문하시겠어요?" modal (I-194, open).
+- Fresh hold-outs (built by separate agents, added after the learner fixes): bk5-restarea 4/3/3 (items 31/31); bk6-themepark graded 0/0/10 unsafe **but the kiosk total matched in 10/10**: the grader read category tabs as cart lines because the cart is a closed drawer (I-183 P1) → step 10 fixes the grader only and re-grades (`grade-v2.json`).
+- Learning cost (orchestrator arithmetic: learn-stats × official prices in `evidence/cost-per-order.json`): finals $0.25–0.53 each; becomes `evidence/learn-cost.json` in phase 14 step 7.
 
-## Decisions made by the orchestrator (all logged in docs)
-SSE instead of the Firebase client SDK (ADR-010); model ids (ADR-011); Playwright for automated UI QA; I-029 option A (AI confirm only after a phone-opened review); error copy localized on screens; airport fares changed away from real-operator numbers (I-122); fair touch measurement 24 taps (efficient path), 41-tap edit path as footnote; no option editing on kiosk lines (I-039); `[처음으로]` on standalone kiosk; text backend auto fallback.
+## Next steps, in order
+1. Watch phase 13 to the end (`pgrep -fl chain.sh`; `.harness-logs/chain5.log`, `.harness-logs/13-blind-kiosks.log`; summaries in `phases/13-blind-kiosks/index.json`). After a Mac sleep the chain resumes by itself; a step killed at the 60 min limit retries (steps carry "if this is a retry" guidance).
+2. Deploy phase 13 from the clean worktree (below), check `/learn` and deep health, `git branch -f main feat-13-blind-kiosks`.
+3. Merge `hotfix/stream-limits` (resolve `docs/ISSUE.md`), run `npm run test`, commit.
+4. Add `{"dir": "14-final", "status": "pending"}` to `phases/index.json`, then in the background `HARNESS_TIMEOUT=3600 HARNESS_MAX_TURNS=300 sh .harness-logs/chain.sh 14-final > .harness-logs/chain6.log 2>&1`. Phase 14 reads `docs/plan/judges/*` and `docs/plan/SOURCES.md` (already in the repo). Watch each step, look at screenshots after UI steps.
+5. After phase 14: deploy (`sh scripts/deploy-voice.sh` only if `voice-relay/` changed; then `SHORT_APP_URL=kibo-2026.web.app VOICE_RELAY_URL=wss://kibo-voice-407514467119.asia-northeast3.run.app/ws sh scripts/deploy.sh`), check, `main` → phase 14.
+6. Deliverables: video v2 per `videos/submission-v2/PLAN.md` (rev. 2; `.claude/skills/motion-demo-video/`; capture from the live URL, headed Chromium for Live audio); deck final pass per `videos/deck-v2/NOTES.md` TODOs; a second judge round (3 fresh judge agents on the deployed build); code freeze 10-16 12:00; submission 10-17.
 
-## Changes on 10-13 afternoon (orchestrator)
-- AI Studio prepaid credits are empty (HTTP 402, I-104); the user chose **not** to depend on them: voice falls back to the `kibo-voice` relay (Vertex AI Live `gemini-3.8-live`, us-central1 only, post-paid). Local `.env` has `GEMINI_TEXT_BACKEND=vertex` so harness runs never spend the key. Vertex text is slow under parallel load (I-157: up to 70 s per call with 5 parallel requests).
-- `kibo-voice` deployed once (`kibo-voice-00001-6kz`, `wss://kibo-voice-407514467119.asia-northeast3.run.app/ws`); `/healthz` is swallowed by Cloud Run (paths ending in `z` are reserved) and phase 12 qa renames it to `/health`.
-- Short address: Firebase added to `kibo-2026` (terms accepted by the user's request), Hosting site `kibo-2026.web.app` deployed through the Hosting REST API as redirects only (`/` → `<run.app>/app`, `^/(?P<path>.+)$` → same path). Re-deploy with the orchestrator's `hosting-redirect.sh` pattern or `firebase.json`.
-- Deploy after phase 12, in this order: `sh scripts/deploy-voice.sh`, then `SHORT_APP_URL=kibo-2026.web.app VOICE_RELAY_URL=wss://kibo-voice-407514467119.asia-northeast3.run.app/ws sh scripts/deploy.sh` (both from the clean worktree). Then check `/api/health?deep=1` (`liveRelay` ok) and `git branch -f main feat-12-phone-app`.
-- Cost (agent report 10-13): month to 10-12 net KRW 32,741 (gross 51,263); Cloud Run active time from open SSE streams was the growing cost (fixed by phase 12 stream-idle, timeout 900). A KRW 100,000 alert-only budget was added. Billing card: the backup Mastercard is fine (user).
-- The user wants GPT/Azure only for development; the product stays Gemini (hackathon rules).
+## Deploy procedure (never from the live harness tree)
+Clean worktree `/private/tmp/claude-501/-Users-sungmincho-mac-Desktop-sm-apps-kibo/5e4077f3-a03e-418a-bb20-c3c1f77daf49/scratchpad/deploy` (if /tmp was cleared: `git worktree add <new dir> <commit>`). `git checkout -q -- . && git checkout -q --detach <commit>`, `npm ci` (real node_modules, never a symlink), then the deploy line above; trust only the last line `DEPLOYED <rev>` / `DEPLOY FAILED`. `--set-env-vars` replaces all env vars, so always pass `SHORT_APP_URL` and `VOICE_RELAY_URL`.
 
-## Open items for the next orchestrator
-- Watch phases 11–13; look at screenshots after every UI step; deploy after each phase (phase 12 especially: phone redesign).
-- Cost: a background agent was checking GCP spend (the user saw > KRW 50,000); see its report or redo: budget alert, Artifact Registry cleanup, min-instance/CPU settings, deep-health generation frequency.
-- Azure: Developer support plan already cancelled (expires 11-11); refund ticket 2610120060001183 open. Azure resource `kibo-voice-compare` (East US) exists only for the offline voice comparison; delete it when no longer needed (ask the user).
-- Real-phone checks (iOS Safari, KakaoTalk/NAVER in-app) are still undone: `/mic-test` exists for the teammate.
-- Video: footage in `videos/footage/2026-10-13/` (real screens); real-phone voice footage needs a person.
+## User decisions and constraints (10-13/14)
+- Product AI stays Gemini (contest rules); GPT/Azure only for development. Learner dev runs used `PROVIDER=openai`; published learning runs use Gemini.
+- Local `.env` has `GEMINI_TEXT_BACKEND=vertex` so harness runs never spend the AI Studio prepaid key (topped up KRW 100,000 on 10-14, auto top-up off). Voice falls back to the Vertex relay when the key fails (ADR-012).
+- Budgets: "KIBO monthly 50k KRW" raised to KRW 100,000 (alert only) + "KIBO monthly 100k KRW alerts"; Artifact Registry keeps the last 5 images, deletes older than 7 days. Backup Mastercard is fine (user).
+- Video feedback: remove crackle (done in v1.1); kiosk quality must improve (pizza unfinished, burger too); stop emphasizing Korean only (any language via Gemini; Gemini Live lists 99 languages, claim only what we tested); tall kiosk with one QR; keep the architecture chapter; align numbers like "3 vs 24".
+- Caching is on (text agent explicit cache; learner block pruning for the implicit cache).
+- The Mac sleeps on low battery (23:32–05:32 on 10-13/14 cost 6 h): `caffeinate -ims -t 172800` runs; keep it on power.
+
+## Key documents
+- Judge reviews and Q&A matrix: `docs/plan/judges/` (tech 7.4, impact 6.25, UX 7.9 of 10).
+- Sourced facts: `docs/plan/SOURCES.md` (English); Korean research notes `videos/orchestrator/SOURCES-research-ko.md`.
+- Expert reviews: `videos/deck-v1/EXPERT_REVIEW.md` (deck 6/10), `videos/submission-v1/EXPERT_REVIEW.md` (video 6/10).
+- Deliverables: deck v2 `videos/deck-v2/kibo-deck-v2.pdf` (+ NOTES.md TODOs); video v1.1 `videos/submission-v1/out/kibo-submission-v1.1.mp4` (`video-*.mp4` there are silent intermediates); video v2 plan `videos/submission-v2/PLAN.md`; phase 14 drafts backup `videos/orchestrator/phase14-draft-backup/`.
+
+## Waiting on people
+Real phone shot (3 s, by 10-16 morning; video plan §3); real-user test (5 people 60+, 3 non-Korean readers); the official Hack2skill deck template; team roles on the deck (assumed: Sungmin Cho product and engineering, Ye Seul Ahn research and user testing); approval to create the public GitHub repo; YouTube upload and the submission form.

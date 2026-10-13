@@ -1,0 +1,33 @@
+# Step 7: numbers-final
+
+## Read first
+- `CLAUDE.md` and `docs/*.md` are in your prompt. TESTING "Measurements" and "Evidence ledger", RULE R-001.
+- `docs/plan/judges/JUDGE_QA.md` row A7 and `docs/plan/judges/tech/REPORT.md` "Numbers drift"; `docs/plan/DECK_FACTS.md`, `docs/plan/SUBMISSION.md` ("Solution description", `scripts/submission.test.ts`), `README.md`, `src/app/page.tsx`, `src/lib/demo/evidence.ts`, `spikes/blind-kiosks/RESULTS.md`, `evidence/*.json`, `evals/results/*`.
+
+Shell: only `npm`, `npx`, `node`, `python3`, `ls`, `mkdir`, `git status|diff|add|commit|log`.
+
+## Why
+Judges found the same claim with different numbers (eval 32/32 vs 42/42 vs 44/44; voice 6/6 and 1,084 ms vs 8/8 and 974 ms; bridge 68–528 vs 62–551 ms) and a failed voice run left out of the evidence (I-115). One source of truth, all attempts counted.
+
+## Task
+1. `docs/plan/NUMBERS.md`: every published number (landing, `/demo`, `/learn`, README, DECK_FACTS, SUBMISSION, video script): claim, value, evidence file, date, run conditions, and every place it appears (find them with grep). One value per claim: the newest full run; stitched or partial runs are not headline numbers.
+2. Voice: report "N attempted / M passed / K upstream failures" from the evidence files, including failed runs (restore I-115's failure in the record if it was removed; explain in one line).
+3. Re-measure once on the final code: `npm run eval:agent` (Vertex locally; say so), `npm run measure:cost` (text and voice; voice through the relay if the key path is unavailable, and add Vertex AI Live prices with URL and date). Production typed latency: a small script that sends 6 typed hero turns to the deployed `/api/chat` (one session, sequential) and records per-request ms → `evidence/prod-latency.json` (cost: 6 messages).
+4. **Voice fixtures bug (found by the video agent, 10-14):** `scripts/make-voice-fixtures.ts` writes the Gemini TTS response's 44-byte WAV header and ~140 ms of trailing bytes into `e2e/fixtures/*.wav` as audio and upsamples 24→48 kHz by linear interpolation, so every voice E2E sentence starts with a 1 ms click and ends with a full-scale noise burst. Fix the generator (strip the header, trim to the speech, proper resampling or keep 24 kHz with the right header), regenerate the fixtures, add a test that the fixtures have no flat-top runs or impulses at the edges, then re-run `npm run test:e2e:live` once and record the voice numbers anew (both paths), marking earlier voice evidence as "fixtures with a click and noise tail".
+5. **Learning cost evidence:** `scripts/learn-cost.ts` reads every `spikes/blind-kiosks/results/*/{baseline,final,final-after-fix}/learn-stats.json` and the Doughhouse run 3 stats, multiplies input (uncached), cached input and output tokens by the official prices in `evidence/cost-per-order.json` (`flashInput`, `flashCachedInput`, `flashOutput`), and writes `evidence/learn-cost.json` (per run: tokens, minutes, finished, USD; note that the learner ran on Vertex AI and that thinking tokens are not recorded if that is the case). Test the arithmetic. The deck and video quote learning cost only from this file.
+6. Fix every place that disagrees with NUMBERS.md; update the SUBMISSION description (≤ 1,024 chars, test passes).
+
+## Acceptance criteria
+```bash
+npm run lint
+npm run build
+npm run test
+```
+
+## Verify
+1. NUMBERS.md lists every number shown on `/`, `/demo`, `/learn` and in README with an evidence path that exists; no surface disagrees.
+2. Update this step in `phases/14-final/index.json`.
+
+## Do not
+- Do not rerun a measurement to get a better number.
+- Break existing tests.
