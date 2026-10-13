@@ -14,6 +14,8 @@ Log everything else in docs/ISSUE.md following its "How to use".
 If an H failure is out of scope or needs a decision: log it and set this step "blocked" with the issue id.
 Write phases/11-hardening/qa/REPORT.md: one line per angle A–I with pass/fail and issue ids, and the audit items verified.
 
+**Gemini API key credits (10-13):** the key's AI Studio prepaid credits ran out at about 14:07 KST (HTTP 402 "prepayment credits are depleted", I-104); the text agent runs on Vertex AI locally (`.env` `GEMINI_TEXT_BACKEND=vertex`), but Gemini Live needs the key. If `npm run test:e2e:live` fails **only** with HTTP 402 / credits depleted, record that in the summary and in I-104 and treat it as not a failure of this step (the orchestrator re-runs it after a top-up); do not retry it in a loop.
+
 ## Acceptance criteria
 ```bash
 npm run lint && npm run build && npm run test

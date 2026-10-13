@@ -12,6 +12,8 @@ Prove the full two-device flow in real browsers.
 2. `@live` (skipped unless `E2E_LIVE=1`): the same with B's fake microphone playing `hero-ko.wav`: the kiosk in A fills with the hero lines by voice. Run `npm run test:e2e:live` once and record the result in the summary.
 3. `docs/plan/OPERATIONS.md` and `README.md`: a short "Two-device demo" checklist for the team (laptop on `/kiosk` full screen, phone opens the camera or the KIBO app, allow camera and mic, talk), including what to do in KakaoTalk/NAVER browsers.
 
+**Gemini API key credits (10-13):** the key's AI Studio prepaid credits ran out at about 14:07 KST (HTTP 402 "prepayment credits are depleted", I-104); the text agent runs on Vertex AI locally (`.env` `GEMINI_TEXT_BACKEND=vertex`), but Gemini Live needs the key. If `npm run test:e2e:live` fails **only** with HTTP 402 / credits depleted, record that in the summary and in I-104 and treat it as not a failure of this step (the orchestrator re-runs it after a top-up); do not retry it in a loop.
+
 ## Acceptance criteria
 ```bash
 npm run lint

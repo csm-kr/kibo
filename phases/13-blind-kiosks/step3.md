@@ -16,7 +16,7 @@ For each failure pattern in BASELINE.md, in order of how many kiosks it affected
 1. Make a minimal fixture that shows it, and an AI-free regression test (runner/audit level, `node --test` or the existing test scripts) that fails today.
 2. Fix it in the learner's tools, prompt, skill format or runner (examples: a `quantity` option type with `{ op: "repeat" }` on a stepper; a lint that rejects navigation words like 다음/이전/확인 and bare symbols as option names; conditional groups recorded with `appliesWhen`; pager following in snapshots; `aria-label`-only controls as labels; dismissing native alerts with their text in the snapshot). Keep the finish gate (≥ 3 self-tests + coverage audit) and add checks if a pattern needs one.
 3. Keep the product bridge in step: if the skill format changes, update `src/lib/adapters/learned.ts`, `skills/doughhouse.json` stays valid, and `src/lib/bridge/*` replays the new ops, with unit tests.
-4. Re-run the learner on the dev set (Doughhouse and Gureum once each, Gemini, 2M cap) to show no regression; save under `spikes/blind-kiosks/results/dev/`.
+4. Re-run the learner on the dev set (Doughhouse and Gureum once each, **`PROVIDER=openai`** with its default model, 2M cap) to show no regression; save under `spikes/blind-kiosks/results/dev/`. The user decided on 10-13 to save Gemini spend on development work: every learner run in this step (iterations and these re-runs) uses `PROVIDER=openai`, which CLAUDE.md allows for learner experiments. Compare with the earlier OpenAI dev runs (`spikes/kibo-learn/results/openai/`, `spikes/blind-kiosk/results/blind-sol2/`), not with the Gemini runs. These results are dev-only and never published. The blind baselines and finals (steps 1, 2, 4, 5) stay on Gemini because they are the published numbers.
 Record every change in `spikes/kibo-learn/CHANGES.md` with the pattern it addresses.
 
 ### Learning trace (for the `/learn` viewer in step 6)
@@ -33,7 +33,7 @@ plus the learner regression tests you added (list the commands in the summary).
 
 ## Verify
 1. Run the AC commands and the new regression tests.
-2. The dev-set re-runs exist and did not get worse than their previous results (Doughhouse run3, Gureum v3 runs); if one did, say so plainly.
+2. The dev-set re-runs exist and did not get worse than the earlier OpenAI dev runs (`spikes/kibo-learn/results/openai/`, `spikes/blind-kiosk/results/blind-sol2/`); if one did, say so plainly.
 3. Update this step in `phases/13-blind-kiosks/index.json` (completed + summary / error / blocked).
 
 ## Do not
