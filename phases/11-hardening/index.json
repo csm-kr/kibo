@@ -29,7 +29,10 @@
     {
       "step": 3,
       "name": "load-check",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-13T14:29:48+0900",
+      "summary": "scripts/load-check.ts (npm run load:check, tsx --env-file=.env): starts the local standalone production server (node .next/standalone/server.js as on Cloud Run; next start warns with output: standalone) on a free 127.0.0.1 port with STORE=memory ALLOW_MEMORY_STORE=1 GEMINI_TEXT_BACKEND=auto, memory/handle probe via NODE_OPTIONS --import scripts/load-probe.mjs, never a deployed URL; each simulated /demo user = 13 requests (demo session, 2 held SSE streams, 2 pings, setDineOption, hero adds, updateCart fries L, requestCheckout, confirmCheckout button, cardAction stand-in); `-- --no-chat` dry run. Results (evidence/load-check.json, phases/11-hardening/LOAD.md): own addresses 5/10/20 users all paid, command p50 <=12 ms p90 <=24 ms, SSE event 0-1 ms after response (memory store), RSS peak <=130 MB, open handles back to idle 2 after each scenario (no leak), closed streams release their per-IP places. 5 real /api/chat in parallel: all 2 hero lines but 25.4-39.8 s each (key 402 -> Vertex fallback; new I-157 P1, slow-text-agent 3rd -> R-011 proposed). Shared address: 5 users -> 1/5 paid, 4 refused at confirm/pay by 60 req/min; 20 users -> 10 sessions/min first, then 10 streams, then 60/min; all polite JSON 429, health 200 (I-154 updated). Recommendation: keep concurrency 80/max 3; raise per-IP limit for token-bearing requests (not changed, needs real /demo voice request rate); fix I-033; top up key and re-run. No limits changed, no product code changed.",
+      "completed_at": "2026-10-13T14:41:00+0900"
     },
     {
       "step": 4,

@@ -67,3 +67,8 @@ When an issue class in `docs/ISSUE.md` is seen for the **3rd time**, it becomes 
 - From: `qa-screenshot-artifact` — I-121 (seen 10-13/7-environments:6, 10-13/9-polish:6), I-138 (10-13/9-polish:0)
 - Why: QA screenshots feed the deck and the video, and leftovers from the previous check (focus rings, scrolled containers, images not yet loaded) made them show states no user would see, such as a highlighted tile scrolled out of view.
 - Check: a new check in `e2e/qa/checks.ts` restores what it changes (as `focus` restores scroll and `textSpacing` removes its style); after `npm run qa:ui`, the second and third viewport of a state show the same scroll position as the first (`demo-D3-done-*`, `kiosk-KX-staff-1080x1920.png`).
+
+### R-011 (proposed): Measure the text agent's latency on the backend production uses, with parallel users, before claiming or deploying a change to its path
+- From: `slow-text-agent` — I-059 (seen 10-13/3-assistant:2), I-105 (10-13/7-environments:0), I-157 (10-13/11-hardening:3)
+- Why: each time the text agent was measured in a new setting (first real call, Vertex AI, five users at once) it was several times slower than the last number on file, and judges type on `/demo` when voice is down.
+- Check: a step that changes the text agent's backend, model, instructions or cache cites per-request median and p90 from `npm run eval:agent` next to the previous run in the TESTING ledger, and before a deploy for judging `npm run load:check` reports the 5 parallel chat latencies in `evidence/load-check.json`; a value over 10 s gets an issue row.

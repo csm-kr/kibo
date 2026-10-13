@@ -1,0 +1,467 @@
+{
+  "what": "Load check of the local production build (standalone server.js as on Cloud Run, STORE=memory, single process): N concurrent /demo users through the HTTP API",
+  "date": "2026-10-13T05:36:49.511Z",
+  "script": "scripts/load-check.ts (npm run load:check)",
+  "target": "http://127.0.0.1:<free port>, never the deployed service",
+  "machine": {
+    "platform": "darwin",
+    "cpus": 8,
+    "cpuModel": "Apple M1",
+    "memoryGb": 8,
+    "node": "v26.4.0"
+  },
+  "flowPerUser": [
+    "POST /api/session (demo)",
+    "2 × GET /api/session/{id}/events (kiosk and phone streams, held until every user of the scenario is done)",
+    "2 × POST /api/ping",
+    "setDineOption (button)",
+    "N = 5: 1 × POST /api/chat with the hero sentence (real Gemini, GEMINI_TEXT_BACKEND=auto); else 2 × addToCart",
+    "updateCart per line with a side (fries L)",
+    "requestCheckout, confirmCheckout (button), cardAction (kiosk, the /demo stand-in)"
+  ],
+  "notModelled": "Cloud Run's concurrency 80 per instance and max-instances 3: the local server has no request cap, so held streams never queue here. Firestore latency (memory store). The phone's 30 s ping cadence and EventSource reconnects.",
+  "serverIdle": {
+    "rssMb": 102.6,
+    "openHandles": 2
+  },
+  "scenarios": [
+    {
+      "name": "5 users, own addresses, 1 real /api/chat each",
+      "users": 5,
+      "addresses": 5,
+      "chatPerUser": 1,
+      "elapsedMs": 40016,
+      "paid": 5,
+      "fullSuccess": 5,
+      "successRate": 1,
+      "streamsOpened": 10,
+      "stoppedAt": {},
+      "requests": 60,
+      "commandLatencyMs": {
+        "n": 30,
+        "p50": 5,
+        "p90": 19,
+        "max": 78
+      },
+      "sseEventDelayMs": {
+        "n": 60,
+        "p50": 0,
+        "p90": 0,
+        "max": 1,
+        "missed": 0
+      },
+      "chat": {
+        "latencyMs": [
+          25387,
+          31212,
+          33253,
+          36813,
+          39836
+        ],
+        "outcomes": [
+          "ok, 2 lines",
+          "ok, 2 lines",
+          "ok, 2 lines",
+          "ok, 2 lines",
+          "ok, 2 lines"
+        ]
+      },
+      "responses": {
+        "/api/session": {
+          "200": 5
+        },
+        "/api/session/{id}/events": {
+          "200": 10
+        },
+        "/api/ping": {
+          "200": 10
+        },
+        "/api/command": {
+          "200": 30
+        },
+        "/api/chat": {
+          "200": 5
+        }
+      },
+      "firstFailure": null,
+      "distinctFailures": [],
+      "allPolite": true,
+      "impolite": 0,
+      "healthAfter": 200,
+      "server": {
+        "rssMb": {
+          "before": 102.6,
+          "peak": 129.8,
+          "streamsOpen": 53,
+          "after": 57.4
+        },
+        "heapUsedMb": {
+          "before": 29.6,
+          "peak": 49.9,
+          "streamsOpen": 40.1,
+          "after": 40.7
+        },
+        "openHandles": {
+          "before": 2,
+          "streamsOpen": 25,
+          "peak": 32,
+          "after": 2
+        },
+        "handlesByTypeStreamsOpen": {
+          "PipeWrap": 1,
+          "TCPServerWrap": 1,
+          "TCPSocketWrap": 13,
+          "Timeout": 10
+        },
+        "handlesByTypeAfter": {
+          "PipeWrap": 1,
+          "TCPServerWrap": 1
+        }
+      }
+    },
+    {
+      "name": "10 users, own addresses",
+      "users": 10,
+      "addresses": 10,
+      "chatPerUser": 0,
+      "elapsedMs": 178,
+      "paid": 10,
+      "fullSuccess": 10,
+      "successRate": 1,
+      "streamsOpened": 20,
+      "stoppedAt": {},
+      "requests": 130,
+      "commandLatencyMs": {
+        "n": 80,
+        "p50": 10,
+        "p90": 22,
+        "max": 28
+      },
+      "sseEventDelayMs": {
+        "n": 160,
+        "p50": 0,
+        "p90": 0,
+        "max": 1,
+        "missed": 0
+      },
+      "responses": {
+        "/api/session": {
+          "200": 10
+        },
+        "/api/session/{id}/events": {
+          "200": 20
+        },
+        "/api/ping": {
+          "200": 20
+        },
+        "/api/command": {
+          "200": 80
+        }
+      },
+      "firstFailure": null,
+      "distinctFailures": [],
+      "allPolite": true,
+      "impolite": 0,
+      "healthAfter": 200,
+      "server": {
+        "rssMb": {
+          "before": 57.4,
+          "peak": 83.5,
+          "streamsOpen": 83.5,
+          "after": 54.7
+        },
+        "heapUsedMb": {
+          "before": 40.7,
+          "peak": 45.8,
+          "streamsOpen": 45,
+          "after": 45.8
+        },
+        "openHandles": {
+          "before": 2,
+          "streamsOpen": 57,
+          "peak": 57,
+          "after": 2
+        },
+        "handlesByTypeStreamsOpen": {
+          "PipeWrap": 1,
+          "TCPServerWrap": 1,
+          "TCPSocketWrap": 35,
+          "Timeout": 20
+        },
+        "handlesByTypeAfter": {
+          "PipeWrap": 1,
+          "TCPServerWrap": 1
+        }
+      }
+    },
+    {
+      "name": "20 users, own addresses",
+      "users": 20,
+      "addresses": 20,
+      "chatPerUser": 0,
+      "elapsedMs": 428,
+      "paid": 20,
+      "fullSuccess": 20,
+      "successRate": 1,
+      "streamsOpened": 40,
+      "stoppedAt": {},
+      "requests": 260,
+      "commandLatencyMs": {
+        "n": 160,
+        "p50": 12,
+        "p90": 24,
+        "max": 173
+      },
+      "sseEventDelayMs": {
+        "n": 320,
+        "p50": 0,
+        "p90": 0,
+        "max": 1,
+        "missed": 0
+      },
+      "responses": {
+        "/api/session": {
+          "200": 20
+        },
+        "/api/session/{id}/events": {
+          "200": 40
+        },
+        "/api/ping": {
+          "200": 40
+        },
+        "/api/command": {
+          "200": 160
+        }
+      },
+      "firstFailure": null,
+      "distinctFailures": [],
+      "allPolite": true,
+      "impolite": 0,
+      "healthAfter": 200,
+      "server": {
+        "rssMb": {
+          "before": 54.7,
+          "peak": 109.4,
+          "streamsOpen": 109.3,
+          "after": 109.4
+        },
+        "heapUsedMb": {
+          "before": 45.8,
+          "peak": 54.9,
+          "streamsOpen": 47.8,
+          "after": 49.1
+        },
+        "openHandles": {
+          "before": 2,
+          "streamsOpen": 104,
+          "peak": 104,
+          "after": 2
+        },
+        "handlesByTypeStreamsOpen": {
+          "PipeWrap": 1,
+          "TCPServerWrap": 1,
+          "TCPSocketWrap": 62,
+          "Timeout": 40
+        },
+        "handlesByTypeAfter": {
+          "PipeWrap": 1,
+          "TCPServerWrap": 1
+        }
+      }
+    },
+    {
+      "name": "5 users, one shared address",
+      "users": 5,
+      "addresses": 1,
+      "chatPerUser": 0,
+      "elapsedMs": 251,
+      "paid": 1,
+      "fullSuccess": 1,
+      "successRate": 0.2,
+      "streamsOpened": 10,
+      "stoppedAt": {
+        "confirmCheckout": 1,
+        "cardAction": 3
+      },
+      "requests": 64,
+      "commandLatencyMs": {
+        "n": 35,
+        "p50": 21,
+        "p90": 57,
+        "max": 71
+      },
+      "sseEventDelayMs": {
+        "n": 70,
+        "p50": 0,
+        "p90": 1,
+        "max": 3,
+        "missed": 0
+      },
+      "responses": {
+        "/api/session": {
+          "200": 5
+        },
+        "/api/session/{id}/events": {
+          "200": 10
+        },
+        "/api/ping": {
+          "200": 10
+        },
+        "/api/command": {
+          "200": 35,
+          "429 RATE_LIMITED": 4
+        }
+      },
+      "firstFailure": {
+        "route": "/api/command",
+        "status": 429,
+        "code": "RATE_LIMITED",
+        "message": "Too many requests. Please wait a moment.",
+        "atMs": 201
+      },
+      "distinctFailures": [
+        "/api/command 429 RATE_LIMITED: Too many requests. Please wait a moment."
+      ],
+      "allPolite": true,
+      "impolite": 0,
+      "healthAfter": 200,
+      "server": {
+        "rssMb": {
+          "before": 95,
+          "peak": 117.4,
+          "streamsOpen": 106.4,
+          "after": 32.2
+        },
+        "heapUsedMb": {
+          "before": 52.3,
+          "peak": 57.6,
+          "streamsOpen": 48.4,
+          "after": 48.8
+        },
+        "openHandles": {
+          "before": 13,
+          "streamsOpen": 28,
+          "peak": 28,
+          "after": 2
+        },
+        "handlesByTypeStreamsOpen": {
+          "PipeWrap": 1,
+          "TCPServerWrap": 1,
+          "TCPSocketWrap": 16,
+          "Timeout": 10
+        },
+        "handlesByTypeAfter": {
+          "PipeWrap": 1,
+          "TCPServerWrap": 1
+        }
+      }
+    },
+    {
+      "name": "20 users, one shared address",
+      "users": 20,
+      "addresses": 1,
+      "chatPerUser": 0,
+      "elapsedMs": 93,
+      "paid": 0,
+      "fullSuccess": 0,
+      "successRate": 0,
+      "streamsOpened": 10,
+      "stoppedAt": {
+        "updateCart": 2,
+        "addToCart": 3,
+        "ping": 5,
+        "createSession": 10
+      },
+      "requests": 71,
+      "commandLatencyMs": {
+        "n": 10,
+        "p50": 6,
+        "p90": 8,
+        "max": 12
+      },
+      "sseEventDelayMs": {
+        "n": 10,
+        "p50": 0,
+        "p90": 0,
+        "max": 0,
+        "missed": 0
+      },
+      "responses": {
+        "/api/session": {
+          "200": 10,
+          "429 RATE_LIMITED": 10
+        },
+        "/api/session/{id}/events": {
+          "200": 10,
+          "429 RATE_LIMITED": 10
+        },
+        "/api/ping": {
+          "200": 11,
+          "429 RATE_LIMITED": 5
+        },
+        "/api/command": {
+          "200": 10,
+          "429 RATE_LIMITED": 5
+        }
+      },
+      "firstFailure": {
+        "route": "/api/session",
+        "status": 429,
+        "code": "RATE_LIMITED",
+        "message": "Too many requests. Please wait a moment.",
+        "atMs": 1
+      },
+      "distinctFailures": [
+        "/api/session 429 RATE_LIMITED: Too many requests. Please wait a moment.",
+        "/api/session/{id}/events 429 RATE_LIMITED: Too many open screens. Please close one and try again.",
+        "/api/session/{id}/events 429 RATE_LIMITED: Too many requests. Please wait a moment.",
+        "/api/ping 429 RATE_LIMITED: Too many requests. Please wait a moment.",
+        "/api/command 429 RATE_LIMITED: Too many requests. Please wait a moment."
+      ],
+      "allPolite": true,
+      "impolite": 0,
+      "healthAfter": 200,
+      "server": {
+        "rssMb": {
+          "before": 32.2,
+          "peak": 100.2,
+          "streamsOpen": 100.2,
+          "after": 33.2
+        },
+        "heapUsedMb": {
+          "before": 48.8,
+          "peak": 53.6,
+          "streamsOpen": 37.8,
+          "after": 38.3
+        },
+        "openHandles": {
+          "before": 2,
+          "streamsOpen": 44,
+          "peak": 44,
+          "after": 2
+        },
+        "handlesByTypeStreamsOpen": {
+          "PipeWrap": 1,
+          "TCPServerWrap": 1,
+          "TCPSocketWrap": 32,
+          "Timeout": 10
+        },
+        "handlesByTypeAfter": {
+          "PipeWrap": 1,
+          "TCPServerWrap": 1
+        }
+      }
+    }
+  ],
+  "streamRelease": {
+    "ip": "198.51.100.31",
+    "opened": 10,
+    "eleventhStatus": 429,
+    "eleventhMessage": "Too many open screens. Please close one and try again."
+  },
+  "serverStderr": [
+    "gemini cache unavailable on api (402)",
+    "gemini text fallback api->vertex (402)"
+  ],
+  "serverExitedDuringRun": false
+}

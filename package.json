@@ -14,6 +14,7 @@
     "qa:ui": "playwright test -c playwright.qa.config.ts",
     "eval:agent": "tsx --env-file=.env scripts/eval-agent.ts",
     "measure:cost": "tsx --env-file=.env scripts/measure-cost.ts",
+    "load:check": "tsx --env-file=.env scripts/load-check.ts",
     "fixtures:voice": "tsx --env-file=.env scripts/make-voice-fixtures.ts",
     "shots:landing": "tsx scripts/landing-shots.ts",
     "shots:deck": "tsx --env-file=.env scripts/deck-shots.ts",
