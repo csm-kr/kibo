@@ -9,6 +9,11 @@ const PHONE_TEXT = {
   langKo: { ko: "한국어", en: "한국어" },
   langEn: { ko: "English", en: "English" },
   callStaff: { ko: "직원 호출", en: "Call staff" },
+  // Phone design app bar (docs/UI_GUIDE.md "Phone design"): short visible labels; the full name is the accessible one
+  staffShort: { ko: "직원", en: "Staff" },
+  connected: { ko: "연결됨", en: "Connected" },
+  // Short enough for one line beside the brand at 360px; the banner keeps the full sentence.
+  barReconnecting: { ko: "연결 중…", en: "Reconnecting…" },
   staffCalled: { ko: "직원을 불렀어요. 잠시만 기다려 주세요.", en: "Staff is on the way. Please wait a moment." },
   reconnecting: { ko: "다시 연결하고 있어요…", en: "Reconnecting…" },
   // Connecting
@@ -48,6 +53,7 @@ const PHONE_TEXT = {
   pickMore: { ko: "더 고를게요", en: "Pick more" },
   sayYes: { ko: "\"네\"라고 말해도 돼요.", en: "You can also say yes." },
   typeButton: { ko: "글자 입력", en: "Type" },
+  closeTyping: { ko: "닫기", en: "Close" },
   // Learned kiosk (KIBO Learn): the kiosk page is driven by the bridge, and the user pays on the kiosk itself
   bridgePending: { ko: "키오스크에 입력하고 있어요…", en: "The kiosk is entering it…" },
   bridgeSlow: { ko: "키오스크 화면을 확인해 주세요.", en: "Please check the kiosk screen." },
@@ -192,6 +198,11 @@ export function playStep(waiting: boolean, step: number, total: number, locale: 
 export function phonePrice(n: number, locale: Locale): string {
   const digits = n.toLocaleString("en-US");
   return locale === "ko" ? `${digits}원` : `${digits} won`;
+}
+
+/** "2 items" after the cart title: the sum of quantities, so two of one line count as two. */
+export function itemCount(n: number, locale: Locale): string {
+  return locale === "ko" ? `${n}개` : `${n} ${n === 1 ? "item" : "items"}`;
 }
 
 /** "× 2" next to a cart line. */

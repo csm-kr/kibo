@@ -20,6 +20,57 @@
   --font-display: var(--font-grotesk), var(--font-plex-kr), sans-serif;
 }
 
+/* Phone tokens (docs/UI_GUIDE.md "Phone design"); the kiosk uses its own --k-* variables, untouched by these.
+   Spacing stays on Tailwind's 4px steps, used only at 4, 8, 12, 16, 24, 32, 48, 64. */
+@theme {
+  --color-ink: #15171c;
+  --color-muted: #4b463f;
+  --color-cream: #fbf7ef;
+  --color-kibo-pressed: #2735a8;
+  /* KIBO blue at about 8% on white: secondary buttons, suggestions, AI-free tints. Blue text on it is 6.2:1. */
+  --color-kibo-tint: #eef0fd;
+  --color-kibo-tint-pressed: #dde1fa;
+  /* Deeper tint for the user's own bubble, so it differs from suggestions. */
+  --color-kibo-bubble: #dfe3fb;
+  --color-kibo-deep: #1f2a8a;
+  /* Text field edge: 4.5:1 on white, so the field is visible without a heavy outline (WCAG 1.4.11). */
+  --color-field: #7d766b;
+  --color-staff-tint: #fff1cc;
+  --color-staff-tint-pressed: #fbe3a6;
+  --color-staff-ink: #7a2e0e;
+  --color-online: #1e7f4f;
+  --radius-tile: 18px;
+  --radius-sheet: 26px;
+  --shadow-card: 0 1px 2px rgb(21 23 28 / 0.06), 0 4px 16px rgb(21 23 28 / 0.06);
+  --shadow-dock: 0 -1px 2px rgb(21 23 28 / 0.04), 0 -8px 24px rgb(21 23 28 / 0.06);
+}
+
+/* Phone sheet open (docs/UI_GUIDE.md "Phone design", Motion): 200ms ease-out; a plain fade with reduced motion. */
+@keyframes kibo-sheet-in {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+@keyframes kibo-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@utility kibo-sheet-in {
+  animation: kibo-sheet-in 200ms ease-out;
+  @media (prefers-reduced-motion: reduce) {
+    animation: kibo-fade-in 200ms ease-out;
+  }
+}
+
 /* Kiosk text in 1080x1920 canvas px (docs/UI_GUIDE.md "Canvas"); nothing below 40px.
    --k-fs is 1.15 in large-text mode. */
 @utility k-text-40 {

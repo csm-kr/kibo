@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getKiosk } from "@/lib/adapters/catalog";
-import { learnedPayHint, payMethodHint, pt } from "./phone";
+import { itemCount, learnedPayHint, payMethodHint, pt } from "./phone";
 
 const checkout = getKiosk("doughhouse").learned!.checkout;
 
@@ -46,5 +46,14 @@ describe("learned kiosk copy", () => {
     expect(pt("bridgeSlow", "en")).toBe("Please check the kiosk screen.");
     expect(pt("bridgeMismatch", "en")).toBe("The kiosk did not take that change. Please check the kiosk screen. Staff is on the way.");
     for (const key of ["bridgePending", "bridgeSlow", "bridgeMismatch"] as const) expect(pt(key, "ko")).not.toBe("");
+  });
+});
+
+describe("cart item count (phone design)", () => {
+  it("says item or items in English and 개 in Korean", () => {
+    expect(itemCount(1, "en")).toBe("1 item");
+    expect(itemCount(2, "en")).toBe("2 items");
+    expect(itemCount(0, "en")).toBe("0 items");
+    expect(itemCount(3, "ko")).toBe("3개");
   });
 });
