@@ -5,9 +5,9 @@ The orchestrating session ran `/harness` from 10-12 22:30. The user delegated al
 ## State
 | Phase | Status | Notes |
 |---|---|---|
-| 1-core … 11-hardening | completed | `main` = 11-hardening (`cf25e9d`); production `kibo-00011-dgq` |
-| 12-phone-app | running (chain4), qa step last | phone redesign, PWA `/app`, 6-digit pairing code + in-app QR scanner, laptop kiosk pairing panel, `/demo` "use my phone", short address, stream idle (cost), **voice relay `kibo-voice` to Vertex AI Live (ADR-012)** |
-| 13-blind-kiosks | queued (chain5 waiter, HARNESS_TIMEOUT=3600) | learner dev runs use `PROVIDER=openai` (user decision 10-13); blind baselines/finals stay on Gemini (published numbers) |
+| 1-core … 12-phone-app | completed | `main` = 12-phone-app (`c72f7e4`); production `kibo-00012-zm8` + relay `kibo-voice-00002-xfv` (deployed 10-13 20:30 with SHORT_APP_URL and VOICE_RELAY_URL; deep health ok, liveRelay ok; production voice smoke through the relay: ready 3.4 s, first audio 0.8 s after the turn) |
+| (12 contents) | — | phone redesign, PWA `/app`, 6-digit pairing code + in-app QR scanner, laptop kiosk pairing panel, `/demo` "use my phone", short address, stream idle (cost), **voice relay `kibo-voice` to Vertex AI Live (ADR-012)** |
+| 13-blind-kiosks | running since 20:22 (chain5, HARNESS_TIMEOUT=3600) | learner dev runs use `PROVIDER=openai` (user decision 10-13); blind baselines/finals stay on Gemini (published numbers) |
 | 14-final | drafted, not in `phases/` yet | drafts in the orchestrator scratchpad `phase14-draft/`: judge-review, judge-fixes, numbers-final, shots-final, repo-ready, qa |
 
 Runner: `.harness-logs/chain.sh <phase…>` (retries a phase up to 3× after a network/DNS outage via `.harness-logs/reset_network_failure.py`). The chain and the two waiters are background tasks of the old session; **if they are gone, resume with**:
