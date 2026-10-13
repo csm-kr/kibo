@@ -1,0 +1,64 @@
+bk6-themepark self-check (Playwright, headless Chromium, 720x1280, app/index.html via file://)
+Run from a directory whose node_modules has playwright: node selfcheck/<script>.mjs
+
+== Hand-written holdout scripts (h2, h4, h9) ==
+--- h2.mjs
+  [ok] attract switched to English
+  [ok] discount required error
+  [ok] adult price after discount
+  [ok] sheet total
+  [ok] membership popup shown
+  [ok] membership popup closed
+  [ok] review line text
+  [ok] review total equals payment total — 91000 vs 91000
+  [ok] practice notice shown
+  page errors: none
+h2: expected 91000 / kiosk 91000 => MATCH
+h2: PASS
+exit=0
+--- h4.mjs
+  [ok] sold-out popup
+  [ok] sheet total 10,000원
+  [ok] promo toast
+  [ok] membership popup shown
+  [ok] delete confirmation
+  [ok] 3 lines left (churros, water, free churros) — ["⭐별사탕 츄러스+초코 소스−2+10,000원삭제","💧생수 500ml−1+1,500원삭제","⭐별사탕 츄러스2+1 증정×10원증정"]
+  [ok] free line present
+  [ok] no 고래 키링
+  [ok] review total equals payment total — 11500 vs 11500
+  page errors: none
+h4: expected 11500 / kiosk 11500 => MATCH
+h4: PASS
+exit=0
+--- h9.mjs
+  [ok] discount required error
+  [ok] zero persons error
+  [ok] senior disables youth plus
+  [ok] ticket sheet total 172,000원
+  [ok] membership popup shown
+  [ok] membership info
+  [ok] churros qty 4
+  [ok] promo toast says 2 free
+  [ok] max-2 error
+  [ok] only 2 selected
+  [ok] free line ×2 at 0원 — ⭐별사탕 츄러스2+1 증정×20원증정
+  [ok] ticket line text
+  [ok] review total equals payment total — 196000 vs 196000
+  page errors: none
+h9: expected 196000 / kiosk 196000 => MATCH
+h9: PASS
+exit=0
+
+== Extra: all 10 holdouts driven from answer-key.json (all-holdouts.mjs) ==
+h1 (ko): expected 84500 / kiosk 84500 => MATCH
+h2 (en): expected 91000 / kiosk 91000 => MATCH
+h3 (ko): expected 65000 / kiosk 65000 => MATCH
+h4 (ko): expected 11500 / kiosk 11500 => MATCH
+h5 (ko): expected 21500 / kiosk 21500 => MATCH
+h6 (en): expected 42000 / kiosk 42000 => MATCH
+h7 (ko): expected 36000 / kiosk 36000 => MATCH
+h8 (en): expected 20500 / kiosk 20500 => MATCH
+h9 (ko): expected 196000 / kiosk 196000 => MATCH
+h10 (ko): expected 93500 / kiosk 93500 => MATCH
+all 10 holdouts match
+exit=0

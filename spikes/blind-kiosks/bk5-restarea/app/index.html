@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=720, initial-scale=1">
+<title>달빛고개 휴게소 푸드코트 무인주문기</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="kiosk">
+
+  <!-- 1. attract -->
+  <section id="screen-attract" class="screen active">
+    <div class="attract-inner">
+      <div class="moon"></div>
+      <div class="road"><i></i><i></i><i></i></div>
+      <div class="attract-brand">달빛고개<span>휴게소 푸드코트</span></div>
+      <div class="attract-sub">한식 · 분식 · 면류 · 음료·간식 · 세트<br>여러 코너 메뉴를 한 번에 주문하세요</div>
+      <div class="attract-touch">주문하시려면 화면을 터치해 주세요</div>
+      <div class="attract-foot">상행선 · 무인주문기 3호기</div>
+    </div>
+  </section>
+
+  <!-- 2. dine-in / takeout -->
+  <section id="screen-mode" class="screen">
+    <div class="topbar"><div class="tb-brand">달빛고개 푸드코트</div><button type="button" class="tb-home" data-home>처음으로</button></div>
+    <div class="mode-wrap">
+      <h1 class="mode-title">식사 장소를 선택해 주세요</h1>
+      <div class="mode-btns">
+        <button type="button" class="mode-btn" data-mode="dine"><span class="mi">🍽️</span><b>매장에서 먹기</b><small>푸드코트 좌석에서 드세요</small></button>
+        <button type="button" class="mode-btn" data-mode="takeout"><span class="mi">🛍️</span><b>포장하기</b><small>차에서 드실 분은 포장을 선택하세요</small></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. menu -->
+  <section id="screen-menu" class="screen">
+    <div class="topbar"><div class="tb-brand">달빛고개 푸드코트</div><div class="tb-mode" id="mode-badge">매장</div><button type="button" class="tb-home" data-home>처음으로</button></div>
+    <div class="tabs" id="tabs"></div>
+    <div class="caption" id="counter-caption"></div>
+    <div class="grid" id="grid"></div>
+    <div class="cart">
+      <div class="cart-head"><span>장바구니</span><button type="button" class="cart-clear" id="cart-clear">전체삭제</button></div>
+      <div class="cart-lines" id="cart-lines"></div>
+      <div class="cart-foot">
+        <div class="cart-sum">총<span id="cart-count">0</span>개<strong id="cart-total">0원</strong></div>
+        <div class="order-btn" id="btn-order">주문하기</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. order review -->
+  <section id="screen-review" class="screen">
+    <div class="topbar"><div class="tb-brand">달빛고개 푸드코트</div><button type="button" class="tb-home" data-home>처음으로</button></div>
+    <h1 class="rv-title">주문 내역을 확인해 주세요</h1>
+    <div class="rv-modeline">식사 방법 : <b id="rv-mode"></b></div>
+    <div class="rv-lines" id="rv-lines"></div>
+    <div id="rv-bag"></div>
+    <div class="rv-totals">
+      <div class="rv-row"><span>주문 금액</span><span id="rv-sub">0원</span></div>
+      <div class="rv-row hidden" id="rv-bag-row"><span>봉투</span><span id="rv-bag-amt">0원</span></div>
+      <div class="rv-row total"><span>총 결제금액</span><strong id="rv-total">0원</strong></div>
+    </div>
+    <div class="rv-actions">
+      <button type="button" class="btn ghost big" id="rv-back">메뉴 더 담기</button>
+      <button type="button" class="btn primary big" id="btn-pay">결제하기</button>
+    </div>
+  </section>
+
+  <!-- 5. payment method -->
+  <section id="screen-pay" class="screen">
+    <div class="topbar"><div class="tb-brand">달빛고개 푸드코트</div><button type="button" class="tb-home" data-home>처음으로</button></div>
+    <h1 class="pay-title">결제 수단을 선택해 주세요</h1>
+    <div class="pay-amount">결제하실 금액<strong id="pay-total">0원</strong></div>
+    <div class="pay-methods" id="pay-methods">
+      <button type="button" class="pm" data-pm="card"><span class="pm-i">💳</span><b>신용·체크카드</b></button>
+      <div class="pm" data-pm="qr"><span class="pm-i">📱</span><b>간편결제</b><small>QR · 바코드</small></div>
+      <button type="button" class="pm" data-pm="transit"><span class="pm-i">🚌</span><b>교통카드</b></button>
+    </div>
+    <div class="pay-guide hidden" id="pay-guide"></div>
+    <div class="pay-actions"><button type="button" class="btn ghost big" id="pay-back">이전</button></div>
+  </section>
+
+  <div id="overlay" class="overlay hidden"></div>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,872 @@
+{
+  "kiosk": {
+    "name": "달빛고개 휴게소 푸드코트",
+    "nameEn": "Dalbit Pass Rest Area Food Court",
+    "domain": "highway rest-area food court (one kiosk for several counters)"
+  },
+  "flow": [
+    "Attract screen: tap anywhere ('주문하시려면 화면을 터치해 주세요')",
+    "Dining choice '식사 장소를 선택해 주세요': '매장에서 먹기' (dine-in) or '포장하기' (takeout)",
+    "Menu: tabs 추천 / 한식 / 분식 / 면류 / 음료·간식 / 세트 (추천 selected first), 3-column tile grid, cart panel at the bottom with total and '주문하기'",
+    "Item detail sheet (popup): option groups, '− 1 +' quantity stepper, '장바구니 담기' / '취소'. Set items open a 2-step modal instead (1 식사 or 면 선택 -> 2 음료 선택) with 취소/다음 then 이전/장바구니 담기",
+    "Order review '주문 내역을 확인해 주세요': lines grouped by pickup counter; takeout shows a '봉투 +100원' toggle; '메뉴 더 담기' or '결제하기'",
+    "'주문 확인' confirmation modal (식사 방법, 주문 수량, 봉투, 총 결제금액) with 취소 / 확인",
+    "Payment-method screen '결제 수단을 선택해 주세요' showing '결제하실 금액' and 신용·체크카드 / 간편결제 / 교통카드; choosing one only shows an instruction (flow ends here)"
+  ],
+  "categories": [
+    {
+      "label": "추천",
+      "itemCount": 6
+    },
+    {
+      "label": "한식",
+      "itemCount": 7
+    },
+    {
+      "label": "분식",
+      "itemCount": 7
+    },
+    {
+      "label": "면류",
+      "itemCount": 7
+    },
+    {
+      "label": "음료·간식",
+      "itemCount": 8
+    },
+    {
+      "label": "세트",
+      "itemCount": 2
+    }
+  ],
+  "optionGroups": {
+    "spice": {
+      "title": "맵기 선택",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": null,
+      "appliesWhen": null,
+      "options": [
+        {
+          "id": "mild",
+          "label": "순한맛",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "regular",
+          "label": "보통",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "spicy",
+          "label": "매운맛",
+          "priceDelta": 0,
+          "maxQty": 1
+        }
+      ]
+    },
+    "size": {
+      "title": "양 선택",
+      "type": "multi",
+      "required": false,
+      "min": 0,
+      "max": 1,
+      "default": null,
+      "appliesWhen": null,
+      "options": [
+        {
+          "id": "large",
+          "label": "곱빼기",
+          "priceDelta": 1000,
+          "maxQty": 1
+        }
+      ]
+    },
+    "topping": {
+      "title": "토핑 추가 (최대 2개)",
+      "type": "multi",
+      "required": false,
+      "min": 0,
+      "max": 2,
+      "default": null,
+      "appliesWhen": null,
+      "options": [
+        {
+          "id": "egg",
+          "label": "계란",
+          "priceDelta": 500,
+          "maxQty": 1
+        },
+        {
+          "id": "cheese",
+          "label": "치즈",
+          "priceDelta": 500,
+          "maxQty": 1
+        },
+        {
+          "id": "tteok",
+          "label": "떡",
+          "priceDelta": 500,
+          "maxQty": 1
+        }
+      ]
+    },
+    "temp": {
+      "title": "온도",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": "hot",
+      "appliesWhen": null,
+      "options": [
+        {
+          "id": "hot",
+          "label": "HOT",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "iced",
+          "label": "ICE",
+          "priceDelta": 500,
+          "maxQty": 1
+        }
+      ]
+    },
+    "setMealA": {
+      "title": "식사 선택",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": null,
+      "appliesWhen": "step 1 of the 한상세트 set modal",
+      "options": [
+        {
+          "id": "kimchi-stew",
+          "label": "김치찌개",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "jeyuk-bowl",
+          "label": "제육덮밥",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "beef-soup",
+          "label": "소고기국밥",
+          "priceDelta": 500,
+          "maxQty": 1
+        },
+        {
+          "id": "pork-cutlet",
+          "label": "왕돈까스",
+          "priceDelta": 1000,
+          "maxQty": 1
+        }
+      ]
+    },
+    "setMealB": {
+      "title": "면 선택",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": null,
+      "appliesWhen": "step 1 of the 면사랑세트 set modal",
+      "options": [
+        {
+          "id": "udon",
+          "label": "가락우동",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "janchi-guksu",
+          "label": "잔치국수",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "ramyeon",
+          "label": "라면",
+          "priceDelta": 500,
+          "maxQty": 1
+        }
+      ]
+    },
+    "setDrink": {
+      "title": "음료 선택",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": "cola",
+      "appliesWhen": "step 2 of either set modal (한상세트, 면사랑세트)",
+      "options": [
+        {
+          "id": "cola",
+          "label": "콜라",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "cider",
+          "label": "사이다",
+          "priceDelta": 0,
+          "maxQty": 1
+        },
+        {
+          "id": "sikhye",
+          "label": "식혜",
+          "priceDelta": 500,
+          "maxQty": 1
+        },
+        {
+          "id": "americano",
+          "label": "아메리카노",
+          "priceDelta": 1000,
+          "maxQty": 1
+        }
+      ]
+    },
+    "bag": {
+      "title": "봉투",
+      "type": "multi",
+      "required": false,
+      "min": 0,
+      "max": 1,
+      "default": null,
+      "appliesWhen": "takeout (포장) orders only; order-level toggle on the review screen, one bag per order",
+      "options": [
+        {
+          "id": "bag",
+          "label": "봉투",
+          "priceDelta": 100,
+          "maxQty": 1
+        }
+      ]
+    }
+  },
+  "items": [
+    {
+      "name": "소고기국밥",
+      "category": "한식",
+      "basePrice": 9000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "alsoIn": [
+        "추천"
+      ]
+    },
+    {
+      "name": "김치찌개",
+      "category": "한식",
+      "basePrice": 8000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "된장찌개",
+      "category": "한식",
+      "basePrice": 8000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "제육덮밥",
+      "category": "한식",
+      "basePrice": 8500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "산채비빔밥",
+      "category": "한식",
+      "basePrice": 8500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "왕돈까스",
+      "category": "한식",
+      "basePrice": 9500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "alsoIn": [
+        "추천"
+      ]
+    },
+    {
+      "name": "황태해장국",
+      "category": "한식",
+      "basePrice": 9000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "소떡소떡",
+      "category": "분식",
+      "basePrice": 4000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "alsoIn": [
+        "추천"
+      ]
+    },
+    {
+      "name": "핫바",
+      "category": "분식",
+      "basePrice": 3500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "떡볶이",
+      "category": "분식",
+      "basePrice": 4500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "야채김밥",
+      "category": "분식",
+      "basePrice": 3500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "참치김밥",
+      "category": "분식",
+      "basePrice": 4500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "순대",
+      "category": "분식",
+      "basePrice": 5000,
+      "soldOut": true,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "꼬치어묵",
+      "category": "분식",
+      "basePrice": 3000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "가락우동",
+      "category": "면류",
+      "basePrice": 6000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "size"
+      ]
+    },
+    {
+      "name": "얼큰우동",
+      "category": "면류",
+      "basePrice": 6500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "spice",
+        "size"
+      ],
+      "alsoIn": [
+        "추천"
+      ]
+    },
+    {
+      "name": "해물짬뽕",
+      "category": "면류",
+      "basePrice": 8500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "spice",
+        "size"
+      ]
+    },
+    {
+      "name": "비빔국수",
+      "category": "면류",
+      "basePrice": 7000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "spice",
+        "size"
+      ]
+    },
+    {
+      "name": "잔치국수",
+      "category": "면류",
+      "basePrice": 6000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "size"
+      ]
+    },
+    {
+      "name": "라면",
+      "category": "면류",
+      "basePrice": 4500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "topping"
+      ]
+    },
+    {
+      "name": "물냉면",
+      "category": "면류",
+      "basePrice": 8000,
+      "soldOut": true,
+      "timeLimited": null,
+      "optionGroups": [
+        "size"
+      ]
+    },
+    {
+      "name": "호두과자 (소)",
+      "category": "음료·간식",
+      "basePrice": 3000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "alsoIn": [
+        "추천"
+      ]
+    },
+    {
+      "name": "호두과자 (대)",
+      "category": "음료·간식",
+      "basePrice": 5000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "호두과자 선물상자",
+      "category": "음료·간식",
+      "basePrice": 12000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [],
+      "takeoutOnly": true
+    },
+    {
+      "name": "알감자",
+      "category": "음료·간식",
+      "basePrice": 4000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "아메리카노",
+      "category": "음료·간식",
+      "basePrice": 3000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "temp"
+      ]
+    },
+    {
+      "name": "식혜",
+      "category": "음료·간식",
+      "basePrice": 2500,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "콜라",
+      "category": "음료·간식",
+      "basePrice": 2000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "생수",
+      "category": "음료·간식",
+      "basePrice": 1000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": []
+    },
+    {
+      "name": "한상세트",
+      "category": "세트",
+      "basePrice": 10000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "setMealA",
+        "setDrink"
+      ],
+      "alsoIn": [
+        "추천"
+      ],
+      "setMeal": true
+    },
+    {
+      "name": "면사랑세트",
+      "category": "세트",
+      "basePrice": 8000,
+      "soldOut": false,
+      "timeLimited": null,
+      "optionGroups": [
+        "setMealB",
+        "setDrink"
+      ],
+      "setMeal": true
+    }
+  ],
+  "promotions": [],
+  "holdoutOrders": [
+    {
+      "id": "h1",
+      "mode": "dineIn",
+      "lines": [
+        {
+          "item": "얼큰우동",
+          "options": {
+            "spice": [
+              "spicy"
+            ],
+            "size": [
+              "large"
+            ]
+          },
+          "qty": 2
+        }
+      ],
+      "orderOptions": {},
+      "expectedTotal": 15000,
+      "patterns": [
+        "required single choice (맵기)",
+        "optional 곱빼기 +1,000원",
+        "quantity stepper on detail sheet"
+      ]
+    },
+    {
+      "id": "h2",
+      "mode": "dineIn",
+      "lines": [
+        {
+          "item": "소떡소떡",
+          "options": {},
+          "qty": 1
+        },
+        {
+          "item": "아메리카노",
+          "options": {
+            "temp": [
+              "iced"
+            ]
+          },
+          "qty": 1
+        }
+      ],
+      "orderOptions": {},
+      "expectedTotal": 7500,
+      "patterns": [
+        "추천 tab cross-listed item",
+        "required single choice with a preselected default (HOT -> ICE +500원)"
+      ]
+    },
+    {
+      "id": "h3",
+      "mode": "takeout",
+      "lines": [
+        {
+          "item": "한상세트",
+          "options": {
+            "setMealA": [
+              "pork-cutlet"
+            ],
+            "setDrink": [
+              "sikhye"
+            ]
+          },
+          "qty": 1
+        }
+      ],
+      "orderOptions": {
+        "bag": [
+          "bag"
+        ]
+      },
+      "expectedTotal": 11600,
+      "patterns": [
+        "set meal 2-step modal (이전/다음)",
+        "surcharges inside a set",
+        "takeout bag +100원"
+      ]
+    },
+    {
+      "id": "h4",
+      "mode": "takeout",
+      "lines": [
+        {
+          "item": "호두과자 선물상자",
+          "options": {},
+          "qty": 1
+        },
+        {
+          "item": "호두과자 (소)",
+          "options": {},
+          "qty": 2
+        }
+      ],
+      "orderOptions": {
+        "bag": [
+          "bag"
+        ]
+      },
+      "expectedTotal": 18100,
+      "patterns": [
+        "takeout-only item",
+        "similar item names",
+        "quantity stepper",
+        "takeout bag +100원"
+      ]
+    },
+    {
+      "id": "h5",
+      "mode": "dineIn",
+      "lines": [
+        {
+          "item": "면사랑세트",
+          "options": {
+            "setMealB": [
+              "ramyeon"
+            ],
+            "setDrink": [
+              "cola"
+            ]
+          },
+          "qty": 2
+        }
+      ],
+      "orderOptions": {},
+      "expectedTotal": 17000,
+      "patterns": [
+        "set meal 2-step modal",
+        "default drink kept",
+        "quantity stepper on the set modal last step"
+      ]
+    },
+    {
+      "id": "h6",
+      "mode": "dineIn",
+      "lines": [
+        {
+          "item": "해물짬뽕",
+          "options": {
+            "spice": [
+              "mild"
+            ]
+          },
+          "qty": 1
+        },
+        {
+          "item": "비빔국수",
+          "options": {
+            "spice": [
+              "regular"
+            ],
+            "size": [
+              "large"
+            ]
+          },
+          "qty": 1
+        }
+      ],
+      "orderOptions": {},
+      "expectedTotal": 16500,
+      "patterns": [
+        "required single choice (맵기) on two noodle items",
+        "optional 곱빼기 on one line only"
+      ]
+    },
+    {
+      "id": "h7",
+      "mode": "takeout",
+      "lines": [
+        {
+          "item": "라면",
+          "options": {
+            "topping": [
+              "egg",
+              "cheese"
+            ]
+          },
+          "qty": 1
+        },
+        {
+          "item": "가락우동",
+          "options": {
+            "size": [
+              "large"
+            ]
+          },
+          "qty": 1
+        }
+      ],
+      "orderOptions": {},
+      "expectedTotal": 12500,
+      "patterns": [
+        "multi-select toppings (max 2)",
+        "optional 곱빼기",
+        "takeout without a bag"
+      ]
+    },
+    {
+      "id": "h8",
+      "mode": "dineIn",
+      "lines": [
+        {
+          "item": "소고기국밥",
+          "options": {},
+          "qty": 1
+        },
+        {
+          "item": "왕돈까스",
+          "options": {},
+          "qty": 1
+        },
+        {
+          "item": "식혜",
+          "options": {},
+          "qty": 2
+        }
+      ],
+      "orderOptions": {},
+      "expectedTotal": 23500,
+      "patterns": [
+        "standalone items that are also set components (no set surcharge)",
+        "multiple counters in one order",
+        "quantity stepper"
+      ]
+    },
+    {
+      "id": "h9",
+      "mode": "takeout",
+      "lines": [
+        {
+          "item": "참치김밥",
+          "options": {},
+          "qty": 3
+        },
+        {
+          "item": "꼬치어묵",
+          "options": {},
+          "qty": 2
+        },
+        {
+          "item": "생수",
+          "options": {},
+          "qty": 1
+        }
+      ],
+      "orderOptions": {
+        "bag": [
+          "bag"
+        ]
+      },
+      "expectedTotal": 20600,
+      "patterns": [
+        "quantity stepper above 2",
+        "takeout bag +100원 once per order"
+      ]
+    },
+    {
+      "id": "h10",
+      "mode": "dineIn",
+      "lines": [
+        {
+          "item": "한상세트",
+          "options": {
+            "setMealA": [
+              "kimchi-stew"
+            ],
+            "setDrink": [
+              "americano"
+            ]
+          },
+          "qty": 1
+        },
+        {
+          "item": "얼큰우동",
+          "options": {
+            "spice": [
+              "regular"
+            ]
+          },
+          "qty": 1
+        },
+        {
+          "item": "알감자",
+          "options": {},
+          "qty": 1
+        }
+      ],
+      "orderOptions": {},
+      "expectedTotal": 21500,
+      "patterns": [
+        "set meal with drink surcharge",
+        "required 맵기 without 곱빼기",
+        "mixed counters"
+      ]
+    }
+  ],
+  "quirks": [
+    "The 추천 tab is selected when the menu opens. Its 6 tiles are the same products as in their home counters (not duplicates); a counter label sits in front of the name in the DOM (text reads like '면류얼큰우동6,500원'), and adding the same item with the same options from either tab merges into one cart line.",
+    "In their home counters the recommended items carry a 'BEST' ribbon merged into the name text ('BEST얼큰우동').",
+    "Set tiles show the base price with a trailing '~' ('10,000원~'); the set price is base + meal surcharge + drink surcharge.",
+    "맵기 has no default; pressing '장바구니 담기' without it shows the inline red error '맵기를 선택해 주세요.' and nothing is added. All three spice levels cost the same.",
+    "곱빼기 is a native checkbox inside a label ('곱빼기 (+1,000원)'); 아메리카노 온도 is preselected HOT, ICE is +500원.",
+    "라면 has toppings (계란/치즈/떡, +500원 each, max 2; a third tap shows '토핑은 최대 2개까지 선택할 수 있습니다.') and no 곱빼기. 물냉면 also has 곱빼기 but is sold out.",
+    "Set modal: meal has no default ('다음' without a choice shows '식사 메뉴를 선택해 주세요.' or '면 메뉴를 선택해 주세요.'), the drink is preselected 콜라, the quantity stepper appears only on the last step, and '이전' keeps earlier choices. Noodles inside a set have no 맵기/곱빼기/토핑 options.",
+    "Set components reuse standalone names at different prices: 소고기국밥 +500원 and 왕돈까스 +1,000원 inside 한상세트, 라면 +500원 inside 면사랑세트, 아메리카노 +1,000원 and 식혜 +500원 as set drinks; 사이다 exists only as a set drink.",
+    "Sold out: 순대 (분식) and 물냉면 (면류) show a grey '품절' stamp; tapping opens a '품절 안내' modal.",
+    "호두과자 선물상자 is 포장전용: in a dine-in order its tile is dimmed and tapping opens a '포장 전용 메뉴' modal; in a takeout order it opens normally. The mode cannot be changed without going back to '처음으로'.",
+    "Similar names: 호두과자 (소) / 호두과자 (대) / 호두과자 선물상자; 가락우동 / 얼큰우동; 야채김밥 / 참치김밥; 김치찌개 / 된장찌개.",
+    "The bag toggle appears only for takeout, is off by default and adds 100원 once per order regardless of item count. The cart panel total excludes the bag; review, confirm and payment totals include it.",
+    "The cart shows quantities as '2개', the review screen as 'x2'; the review regroups lines by pickup counter (1번 한식 ... 5번 세트), not in the order they were added.",
+    "Each cart line is capped at 9; a merge that would exceed 9 shows a '수량 초과' modal and nothing is added. Cart lines have only a ✕ delete (no stepper); '전체삭제' asks for confirmation.",
+    "'주문하기' with an empty cart shows an '알림' modal ('선택하신 메뉴가 없습니다.'). '처음으로' with items asks for confirmation and clears the order.",
+    "Clickable divs (no button role): tabs, menu tiles, spice/topping chips, set cards, the '주문하기' bar, the bag toggle and the '간편결제' tile. Real buttons: mode choice, steppers, HOT/ICE, modal actions, '결제하기', '신용·체크카드', '교통카드'.",
+    "Tapping outside a popup does nothing; popups close only via their buttons."
+  ]
+}

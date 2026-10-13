@@ -1,0 +1,334 @@
+{
+  "kiosk": {
+    "name": "별바다 파크 매표·간식 키오스크",
+    "nameEn": "Starsea Park Ticket & Snack Kiosk",
+    "domain": "theme park / aquarium ticket and snack kiosk (테마파크 매표·간식 키오스크)"
+  },
+  "flow": [
+    "Attract screen: brand, '화면을 터치하여 주문을 시작하세요', language toggle 한국어 / English (the only place to change language); tap anywhere else to start",
+    "Menu: header with 처음으로, 2+1 banner, category tabs (입장권, 자유이용권, 간식, 음료, 기념품), item card grid, bottom bar (장바구니 count, 합계, 주문하기)",
+    "Item option sheet (bottom sheet): tickets = 할인 유형 (some tickets) + 대인/청소년/소인 '− 0 +' steppers; snacks = 추가 선택 (max 2) + 수량; drinks = 사이즈 R/L + 수량 (생수 = 수량 only); 취소 / 담기. 기념품 have no sheet: one tap adds 1 to the cart",
+    "Membership popup '회원이신가요?' after the first successful add (once per session): 회원 적립하기 (shows an info message, then 확인) or 비회원으로 계속",
+    "Cart drawer sliding in from the right (open by tapping 장바구니 in the bottom bar): lines with − / + (not for tickets or the free line), 삭제 with confirmation, 전체 삭제, 합계, 주문하기",
+    "Order review '주문 내역을 확인해 주세요': all lines, 상품 N건, 총 결제 금액; 이전 / 결제하기",
+    "Payment method screen '결제 수단을 선택해 주세요': 결제하실 금액 and 신용/체크카드, 간편결제 (QR·바코드), 모바일 상품권; choosing one asks for confirmation and then shows a practice notice (end; no real payment)"
+  ],
+  "categories": [
+    { "label": "입장권", "itemCount": 4 },
+    { "label": "자유이용권", "itemCount": 3 },
+    { "label": "간식", "itemCount": 6 },
+    { "label": "음료", "itemCount": 6 },
+    { "label": "기념품", "itemCount": 6 }
+  ],
+  "optionGroups": {
+    "discount": {
+      "title": "할인 유형",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": null,
+      "appliesWhen": "only on 아쿠아리움 입장권, 아쿠아리움+전망대 패키지, 종일 자유이용권, 오후 자유이용권. priceDelta is per person and applies to every person on the line. 경로 우대 allows 대인 only (청소년/소인 steppers are disabled and reset to 0). Adding without a choice shows '할인 유형을 선택해 주세요.'",
+      "options": [
+        { "id": "general", "label": "일반", "priceDelta": 0, "maxQty": 1 },
+        { "id": "disabled", "label": "장애인 우대", "priceDelta": -10000, "maxQty": 1 },
+        { "id": "senior", "label": "경로 우대", "priceDelta": -8000, "maxQty": 1 }
+      ]
+    },
+    "age_aquarium": {
+      "title": "인원 선택 (아쿠아리움 입장권)",
+      "type": "quantity",
+      "required": true,
+      "min": 1,
+      "max": 27,
+      "default": null,
+      "appliesWhen": "아쿠아리움 입장권 only; per-person price = basePrice + priceDelta (+ discount delta)",
+      "options": [
+        { "id": "adult", "label": "대인", "priceDelta": 0, "maxQty": 9 },
+        { "id": "youth", "label": "청소년", "priceDelta": -4000, "maxQty": 9 },
+        { "id": "child", "label": "소인", "priceDelta": -8000, "maxQty": 9 }
+      ]
+    },
+    "age_skydeck": {
+      "title": "인원 선택 (오션 스카이 전망대)",
+      "type": "quantity",
+      "required": true,
+      "min": 1,
+      "max": 27,
+      "default": null,
+      "appliesWhen": "오션 스카이 전망대 only; per-person price = basePrice + priceDelta",
+      "options": [
+        { "id": "adult", "label": "대인", "priceDelta": 0, "maxQty": 9 },
+        { "id": "youth", "label": "청소년", "priceDelta": -2000, "maxQty": 9 },
+        { "id": "child", "label": "소인", "priceDelta": -4000, "maxQty": 9 }
+      ]
+    },
+    "age_package": {
+      "title": "인원 선택 (아쿠아리움+전망대 패키지)",
+      "type": "quantity",
+      "required": true,
+      "min": 1,
+      "max": 27,
+      "default": null,
+      "appliesWhen": "아쿠아리움+전망대 패키지 only; per-person price = basePrice + priceDelta (+ discount delta)",
+      "options": [
+        { "id": "adult", "label": "대인", "priceDelta": 0, "maxQty": 9 },
+        { "id": "youth", "label": "청소년", "priceDelta": -5000, "maxQty": 9 },
+        { "id": "child", "label": "소인", "priceDelta": -10000, "maxQty": 9 }
+      ]
+    },
+    "age_4d": {
+      "title": "인원 선택 (4D 해저탐험 영상관)",
+      "type": "quantity",
+      "required": true,
+      "min": 1,
+      "max": 27,
+      "default": null,
+      "appliesWhen": "4D 해저탐험 영상관 only; per-person price = basePrice + priceDelta",
+      "options": [
+        { "id": "adult", "label": "대인", "priceDelta": 0, "maxQty": 9 },
+        { "id": "youth", "label": "청소년", "priceDelta": 0, "maxQty": 9 },
+        { "id": "child", "label": "소인", "priceDelta": -2000, "maxQty": 9 }
+      ]
+    },
+    "age_fullday": {
+      "title": "인원 선택 (종일 자유이용권)",
+      "type": "quantity",
+      "required": true,
+      "min": 1,
+      "max": 27,
+      "default": null,
+      "appliesWhen": "종일 자유이용권 only; per-person price = basePrice + priceDelta (+ discount delta)",
+      "options": [
+        { "id": "adult", "label": "대인", "priceDelta": 0, "maxQty": 9 },
+        { "id": "youth", "label": "청소년", "priceDelta": -7000, "maxQty": 9 },
+        { "id": "child", "label": "소인", "priceDelta": -12000, "maxQty": 9 }
+      ]
+    },
+    "age_afternoon": {
+      "title": "인원 선택 (오후 자유이용권)",
+      "type": "quantity",
+      "required": true,
+      "min": 1,
+      "max": 27,
+      "default": null,
+      "appliesWhen": "오후 자유이용권 only; per-person price = basePrice + priceDelta (+ discount delta)",
+      "options": [
+        { "id": "adult", "label": "대인", "priceDelta": 0, "maxQty": 9 },
+        { "id": "youth", "label": "청소년", "priceDelta": -6000, "maxQty": 9 },
+        { "id": "child", "label": "소인", "priceDelta": -10000, "maxQty": 9 }
+      ]
+    },
+    "age_big5": {
+      "title": "인원 선택 (빅5 어트랙션 이용권)",
+      "type": "quantity",
+      "required": true,
+      "min": 1,
+      "max": 27,
+      "default": null,
+      "appliesWhen": "빅5 어트랙션 이용권 only; per-person price = basePrice + priceDelta",
+      "options": [
+        { "id": "adult", "label": "대인", "priceDelta": 0, "maxQty": 9 },
+        { "id": "youth", "label": "청소년", "priceDelta": 0, "maxQty": 9 },
+        { "id": "child", "label": "소인", "priceDelta": -5000, "maxQty": 9 }
+      ]
+    },
+    "topping": {
+      "title": "추가 선택 (최대 2개)",
+      "type": "multi",
+      "required": false,
+      "min": 0,
+      "max": 2,
+      "default": null,
+      "appliesWhen": "all 간식 items; picking a 3rd shows '추가 선택은 최대 2개까지 가능합니다.' and is not selected",
+      "options": [
+        { "id": "cheese", "label": "치즈 소스", "priceDelta": 500, "maxQty": 1 },
+        { "id": "choco", "label": "초코 소스", "priceDelta": 500, "maxQty": 1 },
+        { "id": "condensed", "label": "연유 드리즐", "priceDelta": 500, "maxQty": 1 },
+        { "id": "icecream", "label": "아이스크림 토핑", "priceDelta": 1000, "maxQty": 1 }
+      ]
+    },
+    "size": {
+      "title": "사이즈",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": "R",
+      "appliesWhen": "all 음료 except 생수 500ml; R is preselected",
+      "options": [
+        { "id": "R", "label": "R 레귤러", "priceDelta": 0, "maxQty": 1 },
+        { "id": "L", "label": "L 라지", "priceDelta": 1000, "maxQty": 1 }
+      ]
+    }
+  },
+  "items": [
+    { "name": "아쿠아리움 입장권", "nameEn": "Aquarium Admission", "category": "입장권", "basePrice": 29000, "soldOut": false, "timeLimited": null, "optionGroups": ["discount", "age_aquarium"] },
+    { "name": "오션 스카이 전망대", "nameEn": "Ocean Sky Deck", "category": "입장권", "basePrice": 12000, "soldOut": false, "timeLimited": null, "optionGroups": ["age_skydeck"] },
+    { "name": "아쿠아리움+전망대 패키지", "nameEn": "Aquarium + Sky Deck Package", "category": "입장권", "basePrice": 36000, "soldOut": false, "timeLimited": null, "optionGroups": ["discount", "age_package"] },
+    { "name": "4D 해저탐험 영상관", "nameEn": "4D Deep Sea Theater", "category": "입장권", "basePrice": 7000, "soldOut": false, "timeLimited": null, "optionGroups": ["age_4d"] },
+    { "name": "종일 자유이용권", "nameEn": "Full-Day Ride Pass", "category": "자유이용권", "basePrice": 59000, "soldOut": false, "timeLimited": null, "optionGroups": ["discount", "age_fullday"] },
+    { "name": "오후 자유이용권", "nameEn": "Afternoon Ride Pass", "category": "자유이용권", "basePrice": 47000, "soldOut": false, "timeLimited": null, "optionGroups": ["discount", "age_afternoon"] },
+    { "name": "빅5 어트랙션 이용권", "nameEn": "Big 5 Ride Ticket", "category": "자유이용권", "basePrice": 35000, "soldOut": false, "timeLimited": null, "optionGroups": ["age_big5"] },
+    { "name": "별사탕 츄러스", "nameEn": "Star Candy Churros", "category": "간식", "basePrice": 4500, "soldOut": false, "timeLimited": null, "optionGroups": ["topping"] },
+    { "name": "고래 꼬리 핫도그", "nameEn": "Whale Tail Corn Dog", "category": "간식", "basePrice": 5500, "soldOut": true, "timeLimited": null, "optionGroups": ["topping"] },
+    { "name": "소금빵 크로플", "nameEn": "Salt Butter Croffle", "category": "간식", "basePrice": 6000, "soldOut": false, "timeLimited": null, "optionGroups": ["topping"] },
+    { "name": "산호 팝콘", "nameEn": "Coral Popcorn", "category": "간식", "basePrice": 6500, "soldOut": false, "timeLimited": null, "optionGroups": ["topping"] },
+    { "name": "해마 와플", "nameEn": "Seahorse Waffle", "category": "간식", "basePrice": 5000, "soldOut": false, "timeLimited": null, "optionGroups": ["topping"] },
+    { "name": "통감자 버터구이", "nameEn": "Buttered Whole Potato", "category": "간식", "basePrice": 5000, "soldOut": false, "timeLimited": null, "optionGroups": ["topping"] },
+    { "name": "블루 레모네이드", "nameEn": "Blue Lemonade", "category": "음료", "basePrice": 4500, "soldOut": false, "timeLimited": null, "optionGroups": ["size"] },
+    { "name": "파도 자몽에이드", "nameEn": "Wave Grapefruit Ade", "category": "음료", "basePrice": 5000, "soldOut": false, "timeLimited": null, "optionGroups": ["size"] },
+    { "name": "아이스 아메리카노", "nameEn": "Iced Americano", "category": "음료", "basePrice": 4000, "soldOut": false, "timeLimited": null, "optionGroups": ["size"] },
+    { "name": "딸기 스무디", "nameEn": "Strawberry Smoothie", "category": "음료", "basePrice": 5500, "soldOut": false, "timeLimited": null, "optionGroups": ["size"] },
+    { "name": "핫초코", "nameEn": "Hot Chocolate", "category": "음료", "basePrice": 4500, "soldOut": false, "timeLimited": null, "optionGroups": ["size"] },
+    { "name": "생수 500ml", "nameEn": "Bottled Water 500ml", "category": "음료", "basePrice": 1500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "아기 물범 인형", "nameEn": "Baby Seal Plush", "category": "기념품", "basePrice": 15000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "해파리 무드등", "nameEn": "Jellyfish Mood Lamp", "category": "기념품", "basePrice": 22000, "soldOut": true, "timeLimited": null, "optionGroups": [] },
+    { "name": "고래 키링", "nameEn": "Whale Keyring", "category": "기념품", "basePrice": 6000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "바다 엽서 세트", "nameEn": "Sea Postcard Set", "category": "기념품", "basePrice": 4000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "펭귄 머리띠", "nameEn": "Penguin Headband", "category": "기념품", "basePrice": 9000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "별바다 머그컵", "nameEn": "Starsea Mug", "category": "기념품", "basePrice": 12000, "soldOut": false, "timeLimited": null, "optionGroups": [] }
+  ],
+  "promotions": [
+    {
+      "rule": "별사탕 츄러스 2+1: for every 2 paid 별사탕 츄러스 in the cart (summed across all its lines, any 추가 선택), 1 more is free. Free count = floor(paid qty / 2).",
+      "effect": "The kiosk adds or updates one separate line '별사탕 츄러스' with option text '2+1 증정', qty = free count, price 0원, no add-ons, placed at the end of the cart. It has no − / + or 삭제; it changes or disappears when the paid churros change. The total is unchanged by the free line."
+    }
+  ],
+  "holdoutOrders": [
+    {
+      "id": "h1",
+      "language": "ko",
+      "lines": [
+        { "item": "아쿠아리움 입장권", "options": { "discount": ["general"], "age_aquarium": ["adult", "adult", "child"] }, "qty": 1 },
+        { "item": "블루 레모네이드", "options": { "size": ["L"] }, "qty": 1 }
+      ],
+      "expectedTotal": 84500,
+      "patterns": ["ticket-age-steppers", "discount-required (일반)", "drink-size", "membership-popup", "cart-drawer", "order-review", "payment-method"]
+    },
+    {
+      "id": "h2",
+      "language": "en",
+      "lines": [
+        { "item": "종일 자유이용권", "options": { "discount": ["disabled"], "age_fullday": ["adult", "youth"] }, "qty": 1 }
+      ],
+      "expectedTotal": 91000,
+      "patterns": ["lang-en", "ticket-age-steppers", "discount-required (장애인 우대, per-person delta)", "membership-popup", "payment-method"]
+    },
+    {
+      "id": "h3",
+      "language": "ko",
+      "lines": [
+        { "item": "아쿠아리움+전망대 패키지", "options": { "discount": ["senior"], "age_package": ["adult", "adult"] }, "qty": 1 },
+        { "item": "핫초코", "options": { "size": ["R"] }, "qty": 2 }
+      ],
+      "expectedTotal": 65000,
+      "patterns": ["discount-required (경로 우대, adult only)", "ticket-age-steppers", "drink-size (default R)", "qty-stepper"]
+    },
+    {
+      "id": "h4",
+      "language": "ko",
+      "lines": [
+        { "item": "별사탕 츄러스", "options": { "topping": ["choco"] }, "qty": 2 },
+        { "item": "생수 500ml", "options": {}, "qty": 1 }
+      ],
+      "autoLines": [
+        { "item": "별사탕 츄러스", "options": {}, "qty": 1, "price": 0, "label": "2+1 증정" }
+      ],
+      "expectedTotal": 11500,
+      "patterns": ["promo-2plus1 (free line auto-added)", "snack-addon", "drink-without-size", "membership-popup"]
+    },
+    {
+      "id": "h5",
+      "language": "ko",
+      "lines": [
+        { "item": "소금빵 크로플", "options": { "topping": ["condensed", "icecream"] }, "qty": 1 },
+        { "item": "산호 팝콘", "options": { "topping": ["cheese"] }, "qty": 2 }
+      ],
+      "expectedTotal": 21500,
+      "patterns": ["snack-addons-max2", "snack-addon +1,000원", "qty-stepper"]
+    },
+    {
+      "id": "h6",
+      "language": "en",
+      "lines": [
+        { "item": "오션 스카이 전망대", "options": { "age_skydeck": ["adult", "youth", "youth"] }, "qty": 1 },
+        { "item": "4D 해저탐험 영상관", "options": { "age_4d": ["child", "child"] }, "qty": 1 }
+      ],
+      "expectedTotal": 42000,
+      "patterns": ["lang-en", "ticket-age-steppers", "ticket-without-discount", "two ticket lines"]
+    },
+    {
+      "id": "h7",
+      "language": "ko",
+      "lines": [
+        { "item": "아기 물범 인형", "options": {}, "qty": 1 },
+        { "item": "고래 키링", "options": {}, "qty": 2 },
+        { "item": "펭귄 머리띠", "options": {}, "qty": 1 }
+      ],
+      "requestedButSoldOut": ["해파리 무드등"],
+      "expectedTotal": 36000,
+      "patterns": ["quick-add souvenirs (tap adds 1, repeat tap merges)", "sold-out (해파리 무드등 is asked for but cannot be added; skip it)", "membership-popup"]
+    },
+    {
+      "id": "h8",
+      "language": "en",
+      "lines": [
+        { "item": "파도 자몽에이드", "options": { "size": ["L"] }, "qty": 2 },
+        { "item": "아이스 아메리카노", "options": { "size": ["R"] }, "qty": 1 },
+        { "item": "블루 레모네이드", "options": { "size": ["R"] }, "qty": 1 }
+      ],
+      "expectedTotal": 20500,
+      "patterns": ["lang-en", "drink-size", "qty-stepper"]
+    },
+    {
+      "id": "h9",
+      "language": "ko",
+      "lines": [
+        { "item": "오후 자유이용권", "options": { "discount": ["general"], "age_afternoon": ["adult", "adult", "youth", "child"] }, "qty": 1 },
+        { "item": "별사탕 츄러스", "options": {}, "qty": 4 },
+        { "item": "해마 와플", "options": { "topping": ["cheese", "choco"] }, "qty": 1 }
+      ],
+      "autoLines": [
+        { "item": "별사탕 츄러스", "options": {}, "qty": 2, "price": 0, "label": "2+1 증정" }
+      ],
+      "expectedTotal": 196000,
+      "patterns": ["ticket-age-steppers (all three ages)", "discount-required (일반)", "promo-2plus1 (2 free)", "snack-addons-max2", "mixed categories"]
+    },
+    {
+      "id": "h10",
+      "language": "ko",
+      "lines": [
+        { "item": "빅5 어트랙션 이용권", "options": { "age_big5": ["adult", "child"] }, "qty": 1 },
+        { "item": "아쿠아리움 입장권", "options": { "discount": ["disabled"], "age_aquarium": ["child"] }, "qty": 1 },
+        { "item": "통감자 버터구이", "options": { "topping": ["cheese"] }, "qty": 1 },
+        { "item": "별바다 머그컵", "options": {}, "qty": 1 }
+      ],
+      "requestedButSoldOut": ["고래 꼬리 핫도그"],
+      "expectedTotal": 93500,
+      "patterns": ["ticket-without-discount", "discount-required (장애인 우대 on a child)", "snack-addon", "quick-add souvenir", "sold-out (고래 꼬리 핫도그 is asked for but cannot be added; skip it)"]
+    }
+  ],
+  "quirks": [
+    "Notation: for 'quantity' option groups (age_*), each option id appears once per person, e.g. [\"adult\",\"adult\",\"child\"] = 대인 2, 소인 1. A ticket sheet becomes ONE cart line (qty 1) whose price is the sum over persons of (basePrice + age priceDelta + discount priceDelta).",
+    "Extra holdout fields: 'language' = which language to pick on the attract screen; 'autoLines' = lines the kiosk adds by itself (2+1 free line, 0원); 'requestedButSoldOut' = items a customer asks for that are sold out and must be left out (expectedTotal excludes them).",
+    "Language can be changed only on the attract screen. 처음으로 (after a confirmation when the cart is not empty) clears the cart and resets the language to 한국어.",
+    "Prices are shown as '4,500원' in English mode too. English labels: Adult/Youth/Child, Standard/Disability/Senior (65+), R Regular/L Large.",
+    "Ticket cards show only the 대인 price, e.g. '대인 29,000원'. The sheet shows each age's per-person price, updated after a discount type is picked (e.g. 장애인 우대 → 대인 19,000원).",
+    "Discount tickets: steppers work before a discount type is chosen, but 담기 shows '할인 유형을 선택해 주세요.' Choosing 경로 우대 disables 청소년/소인 and resets them to 0 with a red notice. 담기 with 0 persons shows '인원을 1명 이상 선택해 주세요.' Max 9 per age.",
+    "Ticket lines cannot change quantity in the cart drawer (shows 'N명'); delete and re-add instead.",
+    "기념품 have no option sheet: one tap adds 1 and shows a toast '장바구니에 담았습니다.'; tapping again raises that line's qty.",
+    "Adding the same non-ticket item with the same options merges into the existing line (qty adds up). Different add-ons or sizes make separate lines.",
+    "Drinks: R is preselected; L is +1,000원. 생수 500ml has no size, only 수량.",
+    "Snack add-ons are optional checkbox-like tiles (divs); a 3rd pick shows '추가 선택은 최대 2개까지 가능합니다.' and is ignored.",
+    "The 2+1 free churros line appears at the end of the cart with a '증정' badge, 0원, no 삭제; adding churros that create a free one shows a toast about the free item instead of '장바구니에 담았습니다.'.",
+    "The banner text '별사탕 츄러스 2+1 행사 중!' also contains the item name, so a plain text match on '별사탕 츄러스' can hit the banner instead of the card.",
+    "Sold-out cards (고래 꼬리 핫도그, 해파리 무드등) are greyed with a '품절' overlay; tapping them opens an error popup '품절된 상품입니다. 다른 상품을 선택해 주세요.' with 확인.",
+    "The membership popup '회원이신가요?' appears once, right after the first successful add, and blocks the screen. '비회원으로 계속' is an underlined text link (a div), '회원 적립하기' is a button that shows an info popup needing 확인. Neither changes prices.",
+    "The cart drawer opens only from the 장바구니 area in the bottom bar (left side); 주문하기 in the bottom bar goes straight to the review screen. Tapping the dark backdrop or ✕ closes the drawer.",
+    "Deleting a line asks '선택한 상품을 장바구니에서 삭제할까요?' (취소 / 삭제). 전체 삭제 and 처음으로 also confirm. 주문하기 with an empty cart shows an error popup.",
+    "The bottom-bar badge counts persons for ticket lines and qty for other lines (the free line counts too); the review screen shows '상품 N건' = number of lines.",
+    "DOM text merges: a card's text reads like '2+1⭐별사탕 츄러스4,500원' or '품절' + name; the cart bar reads '장바구니3'; a line name and its options read '아쿠아리움 입장권장애인 우대 / 대인 1명 · 소인 1명'.",
+    "Toasts stay until the next tap (no timers). The payment screen shows the final amount in '결제하실 금액'; choosing a method asks '…(으)로 결제를 진행할까요?' and then only shows '연습용 키오스크입니다. 실제 결제는 진행되지 않습니다.'"
+  ]
+}

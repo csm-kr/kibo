@@ -1,0 +1,19 @@
+== answer-key arithmetic (all holdouts) ==
+h1   recomputed  15,000원 expected  15,000원 PASS
+h2   recomputed   7,500원 expected   7,500원 PASS
+h3   recomputed  11,600원 expected  11,600원 PASS
+h4   recomputed  18,100원 expected  18,100원 PASS
+h5   recomputed  17,000원 expected  17,000원 PASS
+h6   recomputed  16,500원 expected  16,500원 PASS
+h7   recomputed  12,500원 expected  12,500원 PASS
+h8   recomputed  23,500원 expected  23,500원 PASS
+h9   recomputed  20,600원 expected  20,600원 PASS
+h10  recomputed  21,500원 expected  21,500원 PASS
+
+== UI orders (Playwright, chromium, blind-fresh/bk5-restarea/app/index.html) ==
+h1   kiosk  15,000원 expected  15,000원 PASS
+h3   kiosk  11,600원 expected  11,600원 PASS
+h4   kiosk  18,100원 expected  18,100원 PASS
+page errors / network requests: none
+
+OVERALL: PASS
