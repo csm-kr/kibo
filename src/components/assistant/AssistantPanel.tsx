@@ -60,6 +60,8 @@ interface Props {
   onSay?: (say: SayFn | null) => void;
   /** /demo only: what the AI did (typed or spoken), for the "What the AI did" strip. The phone never shows it. */
   onActions?: (actions: AgentAction[]) => void;
+  /** /demo only: one user turn went to the AI (typed, spoken, an example or a choice), for the D3 comparison card. */
+  onUserTurn?: () => void;
 }
 
 export type SayFn = (text: string) => Promise<SendResult>;
@@ -80,6 +82,7 @@ export function AssistantPanel(props: Props) {
     locale,
     nextSeq: () => ++utterances.current,
     onActions: props.onActions,
+    onSend: props.onUserTurn,
   });
   const now = useNow();
 
@@ -135,7 +138,10 @@ export function AssistantPanel(props: Props) {
     locale,
     status: session?.status ?? null,
     getCartVersion: () => session?.cartVersion ?? 0,
-    onUserText: (text) => chat.voice("user", text),
+    onUserText: (text) => {
+      chat.voice("user", text);
+      props.onUserTurn?.();
+    },
     onAiText: (text) => chat.voice("model", text),
     onFallback: (reason) => {
       setVoiceNote(reason);
@@ -182,6 +188,7 @@ export function AssistantPanel(props: Props) {
   async function speak(text: string): Promise<SendResult> {
     if (voiceOpen && voice.sendText(text)) {
       chat.voice("user", text);
+      props.onUserTurn?.();
       return "ok";
     }
     if (limited) return "limit";

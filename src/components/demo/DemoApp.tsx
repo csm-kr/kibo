@@ -9,9 +9,12 @@ import { LearnedKioskHost } from "@/components/learned/LearnedKioskHost";
 import { useDemoSession } from "@/hooks/useDemoSession";
 import type { AgentAction } from "@/lib/agent/actions";
 import { examplesFor } from "@/lib/agent/examples";
+import { buildComparison, HERO_KIOSK } from "@/lib/demo/compare";
+import { EDIT_PATH_TAPS, HUMAN_RUNS, TOUCH_RUN } from "@/lib/demo/evidence";
 import { scenariosFor } from "@/lib/demo/scenarios";
 import type { KioskData, Locale } from "@/types/menu";
 import { ActionStrip } from "./ActionStrip";
+import { CompareCard } from "./CompareCard";
 import { DemoEndCard } from "./DemoEndCard";
 import { DemoIntro } from "./DemoIntro";
 import { environmentOf } from "./environments";
@@ -27,6 +30,21 @@ const DEMO_CHAT_LIMIT = 30;
 const MAX_ACTIONS = 50;
 /** The judge laptop (docs/UI_QA.md 1440×900) and wider: room for a third column. */
 const WIDE = "(min-width: 1440px)";
+
+/**
+ * This demo order's own counts for the D3 comparison card (docs/PRD.md "Demo scenario" step 8), from [Start] or
+ * [Try again] to `paid`. Measured in this browser and never stored; `forId` binds them to the session they started.
+ */
+interface Run {
+  forId: string | null;
+  /** The session open when this order was started ([Try again]); the counts bind to the next one. */
+  after: string | null;
+  startAt: number;
+  sentences: number;
+  phoneTaps: number;
+  kioskTaps: number;
+}
+type Counted = "sentences" | "phoneTaps" | "kioskTaps";
 
 function subscribeWide(cb: () => void) {
   const mq = window.matchMedia(WIDE);
@@ -52,12 +70,49 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
   // From 1440px wide the scenario column opens beside the phone and holds "What the AI did" (I-132, I-084).
   const wide = useSyncExternalStore(subscribeWide, () => window.matchMedia(WIDE).matches, () => false);
 
+  const [run, setRun] = useState<Run | null>(null);
+  /** Every new demo order goes through here, so its counts start at zero. */
+  function startOrder() {
+    setRun({ forId: null, after: demo.tokens?.sessionId ?? null, startAt: Date.now(), sentences: 0, phoneTaps: 0, kioskTaps: 0 });
+    void demo.start();
+  }
+  // Counting stops at `paid`, so the end card's own buttons never add to it.
+  const count = (key: Counted) => {
+    if (demo.session?.status === "paid") return;
+    setRun((r) => (r && r.forId !== null ? { ...r, [key]: r[key] + 1 } : r));
+  };
+  const countTap = (key: Counted) => (e: { target: EventTarget }) => {
+    if (e.target instanceof Element && e.target.closest("button:not(:disabled)")) count(key);
+  };
+
   if (!demo.tokens) {
-    return <DemoIntro kioskId={kiosk.kioskId} starting={demo.starting} error={demo.error} onStart={() => void demo.start()} />;
+    return <DemoIntro kioskId={kiosk.kioskId} starting={demo.starting} error={demo.error} onStart={startOrder} />;
   }
 
   const { tokens, session } = demo;
-  const tryAgain = () => void demo.start();
+  const tryAgain = startOrder;
+  if (run && run.forId === null && run.after !== tokens.sessionId) setRun({ ...run, forId: tokens.sessionId });
+  const thisRun = run?.forId === tokens.sessionId ? run : null;
+  // The end is the server's paidAt in this browser's clock, so the seconds never grow while the card shows.
+  const compare =
+    kiosk.kioskId === HERO_KIOSK && session?.status === "paid" && session.paidAt !== null && thisRun ? (
+      <CompareCard
+        kiosk={kiosk}
+        locale={locale}
+        comparison={buildComparison({
+          live: {
+            sentences: thisRun.sentences,
+            phoneTaps: thisRun.phoneTaps,
+            kioskTaps: thisRun.kioskTaps,
+            seconds: Math.max(0, Math.round((session.paidAt - demo.clockOffset - thisRun.startAt) / 1000)),
+          },
+          cart: session.cart,
+          automated: TOUCH_RUN,
+          human: HUMAN_RUNS,
+          editPathTaps: EDIT_PATH_TAPS,
+        })}
+      />
+    ) : undefined;
   const beside = wide && scenariosFor(kiosk.kioskId).length > 0;
   const actionStrip = (
     <ActionStrip
@@ -85,7 +140,7 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
           className={`flex h-full flex-none flex-col gap-2 ${learned ? "w-[calc((100dvh-72px)*27/40)]" : "w-[calc((100dvh-72px)*9/16)]"}`}
         >
           <Caption id="demo-kiosk-caption" text={environmentOf(kiosk.kioskId).caption} />
-          <div className="min-h-0 flex-1 overflow-hidden rounded-[18px]">
+          <div className="min-h-0 flex-1 overflow-hidden rounded-[18px]" onPointerDownCapture={countTap("kioskTaps")}>
             {learned ? (
               // Keyed by session: [Try again] reloads the kiosk page, so the new order never starts on the old cart.
               <LearnedKioskHost
@@ -125,7 +180,10 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
         >
           <Caption id="demo-phone-caption" text="Your phone (KIBO)" />
           {/* 480px: the phone header at 200% text needs about 450 (WCAG 1.4.4), so the action strip under it gives way first. */}
-          <div className="min-h-[480px] flex-1 overflow-hidden rounded-[26px] border-2 border-[#15171C]">
+          <div
+            className="min-h-[480px] flex-1 overflow-hidden rounded-[26px] border-2 border-[#15171C]"
+            onPointerDownCapture={countTap("phoneTaps")}
+          >
             <AssistantPanel
               key={tokens.sessionId}
               kiosk={kiosk}
@@ -141,9 +199,17 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
               chatLimit={DEMO_CHAT_LIMIT}
               onTryAgain={tryAgain}
               endCard={
-                <DemoEndCard kioskId={kiosk.kioskId} locale={locale} learned={learned} onTryAgain={tryAgain} onIntro={demo.stop} />
+                <DemoEndCard
+                  kioskId={kiosk.kioskId}
+                  locale={locale}
+                  learned={learned}
+                  compare={compare}
+                  onTryAgain={tryAgain}
+                  onIntro={demo.stop}
+                />
               }
               onSay={onSay}
+              onUserTurn={() => count("sentences")}
               onActions={(list) =>
                 setActions((prev) => ({
                   sessionId: tokens.sessionId,

@@ -161,7 +161,7 @@ Measured rows from the evidence ledger in `docs/TESTING.md`. Each number comes f
 |---|---|---|
 | Agent evaluation (text agent, `/api/chat` path) | 32/32 cases passed, `gemini-3.8-flash`, Korean and English, cases written by the KIBO team (not an external benchmark); per request median 5.1 s; until the first command is applied median 2.3 s | `evals/results/2026-10-13T02-54.md` |
 | Voice hero order on `/demo` (Gemini Live) | 6/6 runs passed; end of speech → kiosk highlight median 1,084 ms; end of speech → first AI audio median 2,070 ms (target ≤ 2 s, missed). Synthetic TTS voice on a laptop, not a real phone | `evidence/voice-e2e.json` |
-| Touch hero order on `/kiosk` | 41 taps (automated Playwright run, taps only, not a human timing) | `evidence/touch-hero.json` |
+| Touch hero order on `/kiosk` | 24 taps, options picked while adding (automated Playwright run, taps only, not a human timing). Changing an option after adding needs delete and re-add on this kiosk: 41 taps (`evidence/touch-hero.json`) | `evidence/touch-hero-efficient.json` |
 | KIBO Learn on a pizza kiosk (Gemini 3.8 Flash) | learned in 5.5 min, 72 turns, 635,725 input tokens | `spikes/kibo-learn/results/stats.run2.json` |
 | Replay of unseen pizza orders, no AI | 4/4 passed at 0.7–5.2 s each, plus 1 rule violation detected | `spikes/kibo-learn/results/holdout.run2.log` |
 | Blind cafe kiosk, built by a separate agent (Gemini) | learning finished 2/3 runs (10.3 min, 15.1 min) | `spikes/blind-kiosk/results/v3run{1,2,3}/learn-stats.json` |

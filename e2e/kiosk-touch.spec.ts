@@ -1,39 +1,13 @@
 import { mkdirSync, writeFileSync } from "node:fs";
-import { expect, test, type Page } from "@playwright/test";
-import { buttonWithText, kioskRoot } from "./helpers";
+import { expect, test } from "@playwright/test";
+import { addCheeseburgerSet, kioskRoot } from "./helpers";
 
 // The hero order by touch (docs/PRD.md "Demo scenario" step 2) on the 1080x1920 canvas, with the demo counter.
 // The kiosk cannot change an option on a line already in the cart (real kiosks cannot either), so "both fries
-// to large" is done the way a touch user would: clear the cart and add both sets again with large fries.
+// to large" is done the way a touch user would: clear the cart and add both sets again with large fries. This is the
+// edit path; the /demo comparison uses e2e/kiosk-touch-efficient.spec.ts, which picks large fries while adding.
 
 test.use({ viewport: { width: 1080, height: 1920 } });
-
-interface SetOrder {
-  side: "감자튀김 M" | "감자튀김 L";
-  drink: string;
-  noPickles?: boolean;
-}
-
-/** Cheeseburger → set → side → drink → ingredients → 담기, all inside the K4 sheet. */
-async function addCheeseburgerSet(page: Page, order: SetOrder) {
-  await buttonWithText(page, "치즈버거").click();
-  const sheet = page.getByRole("dialog", { name: "치즈버거" });
-  await expect(sheet).toBeVisible();
-  await buttonWithText(sheet, "세트").click();
-  await sheet.getByRole("button", { name: "다음", exact: true }).click();
-
-  const fries = buttonWithText(sheet, order.side);
-  if ((await fries.getAttribute("aria-pressed")) !== "true") await fries.click();
-  await expect(fries).toHaveAttribute("aria-pressed", "true");
-  await sheet.getByRole("button", { name: "다음", exact: true }).click();
-
-  await buttonWithText(sheet, order.drink).click();
-  await sheet.getByRole("button", { name: "다음", exact: true }).click();
-
-  if (order.noPickles) await buttonWithText(sheet, "피클 빼기").click();
-  await sheet.getByRole("button", { name: "담기", exact: true }).click();
-  await expect(sheet).toBeHidden();
-}
 
 test("hero order by touch reaches an order number with the server's total", async ({ page }) => {
   await page.goto("/kiosk?k=malo&demo=1");

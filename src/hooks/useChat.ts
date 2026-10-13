@@ -24,6 +24,8 @@ export function useChat(opts: {
   nextSeq?: () => number;
   /** /demo: what the AI did for each answered message. */
   onActions?: (actions: AgentAction[]) => void;
+  /** /demo: a message went to the agent, for the comparison card's count. */
+  onSend?: () => void;
 }) {
   const [state, dispatch] = useReducer(chatReducer, initialChat);
   // When the current request started, for the "Working…" line after 1 s.
@@ -36,6 +38,7 @@ export function useChat(opts: {
     const history = historyFor(state.messages);
     const utteranceSeq = opts.nextSeq ? opts.nextSeq() : state.utteranceSeq + 1;
     dispatch({ type: "send", text: message });
+    opts.onSend?.();
     setSentAt(Date.now());
     try {
       const r = await chat({

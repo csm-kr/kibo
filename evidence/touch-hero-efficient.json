@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-13T01:19:08.574Z",
+  "taps": 24,
+  "seconds": 3,
+  "total": 14800,
+  "cart": [
+    {
+      "itemId": "cheese_burger",
+      "variant": "set",
+      "qty": 1,
+      "selections": {
+        "side": [
+          "fries_l"
+        ],
+        "drink": [
+          "zero_cola"
+        ],
+        "ingredients": [
+          "no_pickles"
+        ]
+      }
+    },
+    {
+      "itemId": "cheese_burger",
+      "variant": "set",
+      "qty": 1,
+      "selections": {
+        "side": [
+          "fries_l"
+        ],
+        "drink": [
+          "cider"
+        ]
+      }
+    }
+  ],
+  "note": "automated, efficient path: options chosen while adding; automated Playwright run on /kiosk, not a human timing"
+}

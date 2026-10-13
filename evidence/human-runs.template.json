@@ -1,0 +1,13 @@
+{
+  "about": "Human touch and talk runs of the hero order (scripts/measure-touch.md). Copy to evidence/human-runs.json and replace the example rows; the /demo comparison card shows the touch medians from that file. Zeros are refused, so this template is never read as data.",
+  "touch": [
+    { "date": "2026-10-16", "person": "A", "taps": 0, "seconds": 0 },
+    { "date": "2026-10-16", "person": "B", "taps": 0, "seconds": 0 },
+    { "date": "2026-10-16", "person": "C", "taps": 0, "seconds": 0 }
+  ],
+  "voice": [
+    { "date": "2026-10-16", "person": "A", "utterances": 0, "phoneTaps": 0, "kioskTaps": 0, "seconds": 0 },
+    { "date": "2026-10-16", "person": "B", "utterances": 0, "phoneTaps": 0, "kioskTaps": 0, "seconds": 0 },
+    { "date": "2026-10-16", "person": "C", "utterances": 0, "phoneTaps": 0, "kioskTaps": 0, "seconds": 0 }
+  ]
+}

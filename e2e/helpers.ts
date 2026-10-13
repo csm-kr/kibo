@@ -72,3 +72,30 @@ export async function storedKioskSession(page: Page, kioskId = "malo") {
   const raw = await page.evaluate((key) => localStorage.getItem(key), `kibo.kiosk.${kioskId}`);
   return JSON.parse(raw ?? "null") as { sessionId: string; kioskToken: string; claimUrl: string };
 }
+
+export interface SetOrder {
+  side: "감자튀김 M" | "감자튀김 L";
+  drink: string;
+  noPickles?: boolean;
+}
+
+/** Cheeseburger → set → side → drink → ingredients → 담기, all inside the K4 sheet. */
+export async function addCheeseburgerSet(page: Page, order: SetOrder) {
+  await buttonWithText(page, "치즈버거").click();
+  const sheet = page.getByRole("dialog", { name: "치즈버거" });
+  await expect(sheet).toBeVisible();
+  await buttonWithText(sheet, "세트").click();
+  await sheet.getByRole("button", { name: "다음", exact: true }).click();
+
+  const fries = buttonWithText(sheet, order.side);
+  if ((await fries.getAttribute("aria-pressed")) !== "true") await fries.click();
+  await expect(fries).toHaveAttribute("aria-pressed", "true");
+  await sheet.getByRole("button", { name: "다음", exact: true }).click();
+
+  await buttonWithText(sheet, order.drink).click();
+  await sheet.getByRole("button", { name: "다음", exact: true }).click();
+
+  if (order.noPickles) await buttonWithText(sheet, "피클 빼기").click();
+  await sheet.getByRole("button", { name: "담기", exact: true }).click();
+  await expect(sheet).toBeHidden();
+}
