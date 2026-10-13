@@ -253,7 +253,16 @@ test.describe(() => {
     await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "confirm");
     // R-009: the guide column must not push the total and [Yes, pay now] off screen.
     await check(page, info, "D2-scenario-finished", payInView(page));
-    await check(page, info, "D2-scenario-finished-guide", undefined, VIEWPORTS, DEMO_GUIDE);
+    // The viewport loop re-lays out the guide and loses its scroll; a user who stayed at one size still has the
+    // "Your turn" line in view (it scrolled there when the last step ticked), so show that (I-160, R-010).
+    const yourTurn = guide.locator("[data-scenario-your-turn]");
+    await check(page, info, "D2-scenario-finished-guide", () => yourTurn.scrollIntoViewIfNeeded(), VIEWPORTS, DEMO_GUIDE);
+
+    // After payment the "Your turn" line points on (I-144, added in 11-hardening:1; R-003).
+    await page.getByRole("button", { name: "Yes, pay now" }).click();
+    await page.getByRole("button", { name: "Insert the card at the kiosk" }).click();
+    await expect(yourTurn).toHaveText("Paid. Choose another scenario to try more.");
+    await check(page, info, "D3-scenario-paid-guide", () => yourTurn.scrollIntoViewIfNeeded(), VIEWPORTS, DEMO_GUIDE);
   });
 });
 
