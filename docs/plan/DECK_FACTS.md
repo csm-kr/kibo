@@ -90,7 +90,7 @@ Real `/demo` at 1920×1080 (2×) after the first sentence of a scenario, sent to
 | Picture | Shows | Status |
 |---|---|---|
 | `docs/assets/deck/snapshot-demo-malo-1920x1080.png` | Burger kiosk, phone and scenario guide after the hero sentence | measured (capture) |
-| `docs/assets/deck/snapshot-demo-airport_rail-1920x1080.png` | Airport rail ticket machine after "Two adult tickets to City Center" | **do not use yet**: the AI's reply offers window or aisle seats, which the data does not have (2 of 2 captures, I-072); re-take after the fix |
+| `docs/assets/deck/snapshot-demo-airport_rail-1920x1080.png` | Airport rail ticket machine after "Two adult tickets to City Center" | usable: the AI's reply offers a window or aisle seat, which is the express ticket's optional `seat` group in `data/kiosks/airport_rail.json` (an earlier note here was a false positive, I-072) |
 | `docs/assets/deck/snapshot-demo-doughhouse-1920x1080.png` | Learned pizza kiosk, the bridge entered the line | measured (capture) |
 | `docs/assets/deck/snapshot-demo-malo-guide-and-ai-actions.png` | Scenario guide and "What the AI did" close up | measured (capture) |
 
