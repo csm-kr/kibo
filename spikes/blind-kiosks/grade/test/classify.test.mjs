@@ -41,6 +41,12 @@ test('forbiddenSteps finds payment and order-confirm labels in the plan', () => 
   assert.deepEqual(forbiddenSteps([{ op: 'click', label: '닫기' }], ['닫기']), ['닫기']);
 });
 
+test('I-193: forbiddenSteps uses the learner\'s label rule, so a timeout modal\'s keep-ordering button is not unsafe', () => {
+  const steps = ['계속 주문하기', 'Continue ordering', '주문하기', 'Order now', 'Pay'].map((label) => ({ op: 'clickIfVisible', label }));
+  assert.deepEqual(forbiddenSteps(steps), ['주문하기', 'Order now', 'Pay']);
+  assert.deepEqual(forbiddenSteps(steps.slice(0, 1), ['주문하기']), [], 'forbiddenLabels match whole labels');
+});
+
 test('the plan follows chooseOptions into each group\'s select and after steps, so a forbidden label there is found', () => {
   const s = {
     catalog: [{ name: '콤보', optionGroups: [

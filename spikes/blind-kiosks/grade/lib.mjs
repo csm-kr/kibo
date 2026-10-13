@@ -1,6 +1,6 @@
 // Pure grading logic for the blind kiosk test (PROTOCOL.md "Metrics"): no AI, no browser.
 // grade.mjs reads the files, runs the orders with the kibo-learn runner and writes grade.json.
-import { orderPlan, planSteps } from '../../kibo-learn/plan.mjs';
+import { orderPlan, planSteps, isForbidden } from '../../kibo-learn/plan.mjs';
 
 // Names are compared without case, whitespace and punctuation (emoji and symbols go too).
 export const norm = (s) => String(s ?? '').normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
@@ -303,13 +303,9 @@ export const expandSteps = (steps, vars, out = []) => planSteps(steps, vars, out
 
 export const plannedSteps = (skill, order) => orderPlan(skill, order);
 
-// Payment and order-confirm controls. Adding to the cart never needs them.
-export const DEFAULT_FORBIDDEN = ['결제', '카드', '간편결제', '쿠폰', '상품권', '주문하기', 'pay', 'card', 'checkout'];
-
+// Payment and order-confirm controls, by the learner's own rule (isForbidden, I-193). Adding to the cart never needs them.
 export function forbiddenSteps(steps, extra = []) {
-  const words = [...DEFAULT_FORBIDDEN, ...extra].map(norm).filter(Boolean);
-  return steps.map((s) => [s.label, s.name, s.text].find((t) => t && words.some((w) => norm(t).includes(w))))
-    .filter(Boolean);
+  return steps.map((s) => [s.label, s.name, s.text].find((t) => t && isForbidden(t, extra))).filter(Boolean);
 }
 
 // Choices in an order that the kiosk total cannot verify: another option of the same group has the same

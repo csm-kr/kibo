@@ -12,11 +12,14 @@ import { openKiosk, snapshot, act, compactTree } from './driver.mjs';
 import { runOrder } from './runner.mjs';
 import { audit } from './audit.mjs';
 import { lintSkill } from './lint.mjs';
-import { orderPlan } from './plan.mjs';
+import { orderPlan, isForbidden } from './plan.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (f) => path.join(here, 'fixtures/patterns', f);
-const useKiosk = (f) => { process.env.KIOSK_URL = pathToFileURL(fixture(f)).href; };
+const useKiosk = (f) => {
+  const [file, query] = f.split('?');
+  process.env.KIOSK_URL = pathToFileURL(fixture(file)).href + (query ? `?${query}` : '');
+};
 const skillOf = (f) => JSON.parse(fs.readFileSync(fixture(f), 'utf8'));
 const line = (item, options, qty = 1) => ({ category: '메뉴', item, options, qty });
 
@@ -133,6 +136,64 @@ test('pattern 3: the audit treats forbiddenLabels as known and never clicks them
   const r = await audit(skillOf('stepper.skill.json'));
   assert.deepEqual(r.unknownLabels, []);
   assert.ok(r.ok, JSON.stringify(r));
+});
+
+test('I-193: a keep-ordering button is not a payment control; checkout and payment labels still are', () => {
+  for (const ok of ['계속 주문하기', ' « 계속 주문하기 » ', '계속\n주문하기', '더 담기', '취소', '이전', '처음으로', '장바구니', '머핀',
+    'Continue ordering', 'Back', 'Cancel', 'Add more']) {
+    assert.equal(isForbidden(ok), false, ok);
+  }
+  for (const bad of ['주문하기', '주문 하기', '주문하기 12,500원', '주문하기\n총 2개', '바로 주문하기', '결제', '결제하기', '결제 수단 선택',
+    '카드결제', '간편결제', '주문완료', '구매하기', '💳 신용/체크카드', '쿠폰', 'Pay', 'Pay now', 'Payment', 'Checkout',
+    'Place order', 'Order now', 'Continue to payment', 'Back to checkout']) {
+    assert.equal(isForbidden(bad), true, bad);
+  }
+  // A skill's forbiddenLabels match whole labels: listing 주문하기 does not take 계속 주문하기 with it.
+  assert.equal(isForbidden('닫기', ['닫기']), true);
+  assert.equal(isForbidden('계속 주문하기', ['주문하기']), false);
+});
+
+test('I-193: the driver taps 계속 주문하기 and Continue ordering on a timeout modal, and still refuses 주문하기 and Order now', async () => {
+  await onPage('modal.html', [{ op: 'click', label: '시작하기' }, { op: 'click', label: '머핀' }], async ({ page }) => {
+    assert.ok(await page.isVisible('#modal'));
+    await act(page, { op: 'click', label: '계속 주문하기' });
+    assert.ok(await page.isHidden('#modal'), 'the modal closed');
+    await assert.rejects(act(page, { op: 'click', label: '주문하기' }), /payment or checkout/);
+    assert.ok(await page.isVisible('#menu'), 'still on the menu');
+  });
+  await onPage('modal.html?lang=en', [{ op: 'click', label: 'Start' }, { op: 'click', label: 'Muffin' }], async ({ page }) => {
+    await act(page, { op: 'click', label: 'Continue ordering' });
+    assert.ok(await page.isHidden('#modal'), 'the modal closed');
+    await assert.rejects(act(page, { op: 'click', label: 'Order now' }), /payment or checkout/);
+    await assert.rejects(act(page, { op: 'click', role: 'button', name: 'Order now' }), /payment or checkout/);
+    assert.ok(await page.isVisible('#menu'), 'still on the menu');
+  });
+});
+
+test('I-193: the runner replays an order through the timeout modal, and still refuses a plan with Order now', async () => {
+  useKiosk('modal.html');
+  const r = await runOrder(skillOf('modal.skill.json'), { lines: [line('머핀', [], 2), line('스콘', [])] });
+  assert.equal(r.error, undefined);
+  assert.equal(r.shownTotal, 2 * 2500 + 3000);
+  assert.ok(r.ok);
+  useKiosk('modal.html?lang=en');
+  const en = skillOf('modal.en.skill.json');
+  assert.ok((await runOrder(en, { lines: [line('Scone', [])] })).ok);
+  en.recipes.addToCart.push({ op: 'click', label: 'Order now' });
+  const refused = await runOrder(en, { lines: [line('Scone', [])] });
+  assert.match(refused.error, /refused before any click: the plan clicks a forbidden label: Order now/);
+});
+
+test('I-193: the audit counts Order now as a checkout control without forbiddenLabels, and the lint accepts 계속 주문하기', async () => {
+  useKiosk('modal.html?lang=en');
+  const r = await audit(skillOf('modal.en.skill.json'));
+  assert.deepEqual(r.unknownLabels, []);
+  assert.ok(r.ok, JSON.stringify(r));
+  const skill = skillOf('modal.skill.json');
+  skill.recipes.startOrder.push({ op: 'clickIfVisible', label: '계속 주문하기' });
+  assert.deepEqual(lintSkill(skill), []);
+  skill.recipes.startOrder.push({ op: 'click', label: 'Order now' });
+  assert.match(lintSkill(skill).join('\n'), /payment or checkout control \(Order now\)/);
 });
 
 test('option groups: the audit opens each item and lists choices on its screen that its option groups lack', async () => {

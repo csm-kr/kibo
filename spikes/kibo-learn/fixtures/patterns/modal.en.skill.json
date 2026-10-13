@@ -1,0 +1,21 @@
+{
+  "kiosk": "Mock Bakery",
+  "categories": [],
+  "uiLabels": ["Continue ordering"],
+  "dineOptions": {},
+  "catalog": [
+    { "name": "Muffin", "category": "Menu", "price": 2500, "soldOut": false, "optionGroups": [] },
+    { "name": "Scone", "category": "Menu", "price": 3000, "soldOut": false, "optionGroups": [] }
+  ],
+  "recipes": {
+    "startOrder": [{ "op": "click", "label": "Start" }],
+    "addToCart": [
+      { "op": "repeat", "times": "{qty}", "steps": [
+        { "op": "click", "label": "{item}" },
+        { "op": "clickIfVisible", "label": "Continue ordering" }
+      ] }
+    ]
+  },
+  "cartTotalPattern": "Total ([\\d,]+)원",
+  "notes": ["No forbiddenLabels on purpose: the word rule alone must keep Order now and Pay out."]
+}

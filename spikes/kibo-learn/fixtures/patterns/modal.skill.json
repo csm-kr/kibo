@@ -1,0 +1,22 @@
+{
+  "kiosk": "모의 빵집",
+  "categories": [],
+  "uiLabels": ["계속 주문하기"],
+  "forbiddenLabels": ["주문하기"],
+  "dineOptions": {},
+  "catalog": [
+    { "name": "머핀", "category": "메뉴", "price": 2500, "soldOut": false, "optionGroups": [] },
+    { "name": "스콘", "category": "메뉴", "price": 3000, "soldOut": false, "optionGroups": [] }
+  ],
+  "recipes": {
+    "startOrder": [{ "op": "click", "label": "시작하기" }],
+    "addToCart": [
+      { "op": "repeat", "times": "{qty}", "steps": [
+        { "op": "click", "label": "{item}" },
+        { "op": "clickIfVisible", "label": "계속 주문하기" }
+      ] }
+    ]
+  },
+  "cartTotalPattern": "합계 ([\\d,]+)원",
+  "notes": ["Every add opens the 계속 주문하시겠어요? modal; 계속 주문하기 closes it. 주문하기 is the checkout button."]
+}

@@ -1,0 +1,65 @@
+<!doctype html>
+<!-- Synthetic fixture for learner regression tests (spikes/kibo-learn/patterns.test.mjs), written from I-193: after
+     each add, an inactivity modal covers the screen and its only button keeps the order going ("계속 주문하기",
+     "Continue ordering"), while the cart's checkout button ("주문하기", "Order now") leads to payment ("결제하기", "Pay").
+     ?lang=en shows the English variant. -->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>패턴: 시간 초과 안내</title>
+<style>
+  body { font-family: sans-serif; margin: 0; padding: 8px; }
+  .tile { cursor: pointer; border: 1px solid #999; padding: 12px; margin: 6px; display: inline-block; }
+  .hidden { display: none; }
+  #modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; }
+  #modal.hidden { display: none; }
+  #modal .box { background: #fff; padding: 24px; }
+</style>
+</head>
+<body>
+<section id="home"><h1 id="brand"></h1><button id="start"></button></section>
+<section id="menu" class="hidden">
+  <div class="tile" data-item="0"><div class="name"></div><div>2,500원</div></div>
+  <div class="tile" data-item="1"><div class="name"></div><div>3,000원</div></div>
+</section>
+<section id="cart"><ul id="lines"></ul><div id="total"></div><button id="checkout"></button></section>
+<section id="pay" class="hidden"><h2 id="pay-title"></h2><button id="pay-btn"></button></section>
+<div id="modal" class="hidden" role="dialog" aria-modal="true">
+  <div class="box"><p id="modal-q"></p><p id="modal-note"></p><button id="keep"></button></div>
+</div>
+<script>
+  const T = {
+    ko: { brand: '모의 빵집', start: '시작하기', items: ['머핀', '스콘'], total: '합계', checkout: '주문하기',
+      q: '계속 주문하시겠어요?', note: '30초 후 처음 화면으로 돌아갑니다', keep: '계속 주문하기', payTitle: '결제', pay: '결제하기' },
+    en: { brand: 'Mock Bakery', start: 'Start', items: ['Muffin', 'Scone'], total: 'Total', checkout: 'Order now',
+      q: 'Still ordering?', note: 'Returning to the start in 30 seconds', keep: 'Continue ordering', payTitle: 'Payment', pay: 'Pay' },
+  }[new URLSearchParams(location.search).get('lang') === 'en' ? 'en' : 'ko'];
+  const $ = (s) => document.querySelector(s);
+  const show = (id, on) => $('#' + id).classList.toggle('hidden', !on);
+  const won = (n) => n.toLocaleString('en-US') + '원';
+  const PRICES = [2500, 3000];
+  const lines = [];
+  $('#brand').textContent = T.brand;
+  $('#start').textContent = T.start;
+  $('#checkout').textContent = T.checkout;
+  $('#modal-q').textContent = T.q;
+  $('#modal-note').textContent = T.note;
+  $('#keep').textContent = T.keep;
+  $('#pay-title').textContent = T.payTitle;
+  $('#pay-btn').textContent = T.pay;
+  document.querySelectorAll('.tile').forEach((t) => {
+    t.querySelector('.name').textContent = T.items[t.dataset.item];
+    // Every add brings the modal up: the next tap anywhere else lands on its backdrop.
+    t.onclick = () => { lines.push(Number(t.dataset.item)); render(); show('modal', true); };
+  });
+  $('#start').onclick = () => { show('home', false); show('menu', true); };
+  $('#keep').onclick = () => show('modal', false);
+  $('#checkout').onclick = () => { show('menu', false); show('pay', true); };
+  function render() {
+    $('#lines').innerHTML = lines.map((i) => `<li>${T.items[i]} ${won(PRICES[i])}</li>`).join('');
+    $('#total').textContent = `${T.total} ${won(lines.reduce((a, i) => a + PRICES[i], 0))}`;
+  }
+  render();
+</script>
+</body>
+</html>

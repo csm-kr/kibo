@@ -148,7 +148,7 @@ async function locate(page, step) {
 const describe = (s) => [s.label, s.name, s.text].find(Boolean);
 
 // One primitive step. Ops: click, check, clickIfVisible. Target by label (preferred), role+name, or text, optionally
-// narrowed by "within". A payment or checkout control is never clicked (FORBIDDEN_WORDS plus opts.forbidden).
+// narrowed by "within". A payment or checkout control is never clicked (isForbidden in plan.mjs, plus opts.forbidden).
 export async function act(page, step, opts = {}) {
   const refuse = (what) => new Error(`Refused: ${JSON.stringify(what)} is a payment or checkout control; a skill never needs it (list it in forbiddenLabels)`);
   if (describe(step) && isForbidden(describe(step), opts.forbidden)) throw refuse(describe(step));

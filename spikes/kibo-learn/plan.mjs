@@ -4,13 +4,33 @@
 const fill = (v, vars) => (typeof v === 'string' ? v.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? `{${k}}`)) : v);
 export const fillStep = (s, vars) => Object.fromEntries(Object.entries(s).map(([k, v]) => [k, Array.isArray(v) ? v : fill(v, vars)]));
 
-// Payment and order-confirm controls. Learning, testing and replaying an order never need them.
-export const FORBIDDEN_WORDS = ['결제', '카드', '간편결제', '쿠폰', '상품권', '주문하기', 'pay', 'card', 'checkout'];
 // The same normalization as the blind-kiosk grader (spikes/blind-kiosks/grade/lib.mjs).
 const norm = (s) => String(s ?? '').normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+// Prices and counts are not part of a control's name ("주문하기 12,500원", "주문하기 (3)").
+const bare = (s) => norm(String(s ?? '').replace(/\d[\d,.]*\s*(원|won|개)?/gi, ''));
+
+// Payment and order-confirm controls. Learning, testing and replaying an order never need them. A label is one
+// when, bare, it is such an action, starts with a payment word, or ends with an order or pay verb. Matching whole
+// labels, not substrings (I-193): "계속 주문하기" on a timeout modal keeps the order going and must be tappable.
+const PAY_EXACT = ['주문', '주문하기', '주문완료', '결제', '결제하기', '카드', '카드결제', '간편결제', '신용카드', '체크카드', '신용체크카드',
+  '쿠폰', '상품권', '구매하기', 'order', 'ordernow', 'placeorder', 'submitorder', 'confirmorder', 'completeorder', 'pay', 'paynow',
+  'payment', 'checkout', 'card', 'creditcard', 'buynow'];
+const PAY_START = ['결제', 'pay', 'checkout'];
+const PAY_END = ['주문하기', '결제하기', '구매하기', '주문완료', '결제', 'checkout', 'ordernow', 'placeorder', 'paynow', 'payment'];
+// A keep-ordering word frees a label from the order words, but not from the payment ones ("Continue to payment").
+const KEEP_ORDERING = ['계속', '더담기', '취소', '이전', 'continue', 'back', 'cancel'];
+const PAYMENT = ['결제', '카드', 'pay', 'card', 'checkout'];
+const isPayAction = (t) => !!t && (PAY_EXACT.includes(t) || PAY_START.some((w) => t.startsWith(w)) || PAY_END.some((w) => t.endsWith(w)));
+
+// text may hold several lines (a control's label and its inner text); extra is the skill's forbiddenLabels, matched
+// as whole labels. The one rule for the driver, runner, audit, lint and the blind-kiosk grader.
 export const isForbidden = (text, extra = []) => {
-  const t = norm(text ?? '');
-  return !!t && [...FORBIDDEN_WORDS, ...extra].map(norm).filter(Boolean).some((w) => t.includes(w));
+  const lines = String(text ?? '').split('\n').filter((l) => norm(l));
+  const own = (extra ?? []).map(norm).filter(Boolean);
+  if (lines.some((l) => own.includes(norm(l)) || own.includes(bare(l)))) return true;
+  const all = bare(lines.join(' '));
+  if (KEEP_ORDERING.some((w) => all.includes(w))) return PAYMENT.some((w) => all.includes(w));
+  return lines.some((l) => isPayAction(bare(l)));
 };
 
 // Splits an order line's option names over the item's groups, in the skill's group order. A name repeated n times
