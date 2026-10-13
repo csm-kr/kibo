@@ -559,7 +559,16 @@ export function AssistantPanel(props: Props) {
 }
 
 function Scroll({ children }: { children: ReactNode }) {
-  return <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-6">{children}</div>;
+  // Focusable: while a message is on its way every control inside is disabled, and a keyboard must still scroll it
+  // (WCAG 2.1.1). The ring sits inside, because the phone frame clips anything outside.
+  return (
+    <div
+      tabIndex={0}
+      className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-6 focus-visible:outline-[3px] focus-visible:-outline-offset-[3px] focus-visible:outline-[#15171C]"
+    >
+      {children}
+    </div>
+  );
 }
 
 function Footer({ children }: { children: ReactNode }) {

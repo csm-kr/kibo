@@ -1,6 +1,6 @@
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
 import { command, kioskRoot } from "../helpers";
-import { HERO_ACTIONS } from "../recordedActions";
+import { HERO_ACTIONS, RAIL_ACTIONS } from "../recordedActions";
 import { DEMO, DEMO_GUIDE, qaState, type Findings } from "./checks";
 
 // UI QA of /demo (docs/UX.md screen map D1–D3) at the judge viewports in docs/UI_QA.md. The checks measure the
@@ -212,6 +212,137 @@ test.describe(() => {
 
     await strip.getByRole("button", { name: /What the AI did/ }).click();
     await check(page, info, "D2-actions-collapsed", undefined, [VIEWPORTS[1]]);
+  });
+});
+
+/** Opens /demo?k=<kioskId>, starts, opens the guide and chooses a scenario; returns the scenario's own session. */
+async function chooseScenario(page: Page, kioskId: string, scenarioId: string) {
+  await page.goto(`/demo?k=${kioskId}`);
+  await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible({ timeout: 60_000 });
+  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", /^(dine|talk)$/);
+  const guide = page.locator("[data-scenario-guide]");
+  await guide.getByRole("button", { name: "Scenarios", exact: true }).click();
+  const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
+  await page.locator(`[data-scenario="${scenarioId}"]`).click();
+  const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
+  await expect(guide.locator("[data-scenario-step]").first()).toBeVisible();
+  return { s, guide };
+}
+
+test.describe(() => {
+  // Its own address: two sessions per scenario (R-005).
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.32" } });
+
+  test("D2 scenario finished at the confirm card, guide and strip side by side", async ({ page, request }, info) => {
+    const { s, guide } = await chooseScenario(page, "malo", "sunja-lunch");
+    let seq = 0;
+    const ai = (type: string, args: object) =>
+      command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "text", utteranceSeq: ++seq });
+    await ai("setDineOption", { option: "eat_in" });
+    for (const drink of ["zero_cola", "cider"]) {
+      await ai("addToCart", { itemId: "cheese_burger", variant: "set", qty: 1, selections: { drink: [drink], side: ["fries_l"] } });
+    }
+    await ai("requestCheckout", {});
+    await expect(guide.locator("[data-scenario-your-turn]")).toBeVisible();
+    await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "confirm");
+    // R-009: the guide column must not push the total and [Yes, pay now] off screen.
+    await expect(page.getByRole("button", { name: "Yes, pay now" })).toBeInViewport();
+    await check(page, info, "D2-scenario-finished");
+    await check(page, info, "D2-scenario-finished-guide", undefined, VIEWPORTS, DEMO_GUIDE);
+  });
+});
+
+test.describe(() => {
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.33" } });
+
+  test("D2 Play it for me: sending, stopped, failed", async ({ page, request }, info) => {
+    const { s, guide } = await chooseScenario(page, "malo", "halal");
+    await command(request, s.deviceToken, { sessionId: s.sessionId, type: "setDineOption", args: { option: "eat_in" }, source: "button" });
+    const play = guide.getByRole("button", { name: "Play it for me" });
+
+    // Sending: /api/chat held open (no model), so the guide shows the step it is on and [Stop].
+    let release: () => void = () => {};
+    const held = new Promise<void>((r) => (release = r));
+    await page.route("**/api/chat", async (route) => {
+      await held;
+      await route.fulfill({ json: { ok: true, reply: "OK.", status: "ordering", cart: [], total: 0, cartVersion: 0, actions: [] } });
+    });
+    await play.click();
+    await expect(guide.getByText("Step 1 of 1: sending it to the AI…")).toBeVisible();
+    await check(page, info, "D2-play-sending-guide", undefined, [VIEWPORTS[0]], DEMO_GUIDE);
+
+    await guide.getByRole("button", { name: "Stop", exact: true }).click();
+    await expect(guide.getByText("Stopped. You can carry on yourself.")).toBeVisible();
+    release();
+    await check(page, info, "D2-play-stopped-guide", undefined, [VIEWPORTS[0]], DEMO_GUIDE);
+
+    // Failed: the agent answers but the step's check never holds within 20 s.
+    await page.unroute("**/api/chat");
+    await page.route("**/api/chat", (route) =>
+      route.fulfill({ json: { ok: true, reply: "OK.", status: "ordering", cart: [], total: 0, cartVersion: 0, actions: [] } }),
+    );
+    await play.click();
+    await expect(guide.getByText("This step didn't go as expected. You can type it yourself or try again.")).toBeVisible({ timeout: 30_000 });
+    await check(page, info, "D2-play-failed-guide", undefined, [VIEWPORTS[0], VIEWPORTS[1]], DEMO_GUIDE);
+    await check(page, info, "D2-play-failed", undefined, [VIEWPORTS[0]]);
+  });
+});
+
+test.describe(() => {
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.34" } });
+
+  test("D2 scenario guide on the airport rail ticket machine: list, finished, strip", async ({ page, request }, info) => {
+    const { s, guide } = await chooseScenario(page, "airport_rail", "mei-tickets");
+    await page.route("**/api/chat", async (route) => {
+      await command(request, s.deviceToken, {
+        sessionId: s.sessionId,
+        type: "addToCart",
+        args: { itemId: "express_city_center", variant: "single", qty: 2, selections: { passenger: ["adult"] } },
+        source: "text",
+        utteranceSeq: 1,
+      });
+      await route.fulfill({ json: { ok: true, reply: "Added.", status: "ordering", cart: [], total: 0, cartVersion: 1, actions: RAIL_ACTIONS } });
+    });
+    await guide.locator('[data-scenario-step="0"]').getByRole("button").click();
+    await expect(guide.locator('[data-scenario-step][data-done="true"]')).toHaveCount(1);
+    await expect(page.locator("[data-action-strip]").getByRole("listitem")).toHaveCount(RAIL_ACTIONS.length);
+    await check(page, info, "D2-rail-scenario-half", undefined, VIEWPORTS);
+    await check(page, info, "D2-rail-scenario-half-guide", undefined, VIEWPORTS, DEMO_GUIDE);
+
+    let seq = 1;
+    const ai = (type: string, args: object) =>
+      command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "text", utteranceSeq: ++seq });
+    await ai("addToCart", { itemId: "express_city_center", variant: "single", qty: 1, selections: { passenger: ["child"] } });
+    await ai("requestCheckout", {});
+    await expect(guide.locator("[data-scenario-your-turn]")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Yes, pay now" })).toBeInViewport();
+    await check(page, info, "D2-rail-scenario-finished", undefined, VIEWPORTS);
+
+    await guide.getByRole("button", { name: "All scenarios" }).click();
+    await check(page, info, "D2-rail-scenarios-list-guide", undefined, [VIEWPORTS[0]], DEMO_GUIDE);
+  });
+});
+
+test.describe(() => {
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.35" } });
+
+  test("D2 scenario guide on the learned pizza kiosk: finished at the review", async ({ page, request }, info) => {
+    const judge = [VIEWPORTS[0]];
+    const { s, guide } = await chooseScenario(page, "doughhouse", "learned-pizza");
+    await check(page, info, "D2-learned-scenario-start", undefined, judge, DEMO_GUIDE);
+    const widget = page.locator("[data-learned-widget]");
+    let seq = 0;
+    const ai = (type: string, args: object = {}) =>
+      command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "voice", utteranceSeq: ++seq });
+    await ai("setDineOption", { option: "eat_in" });
+    await expect(widget).toHaveAttribute("data-bridge-ok", "true");
+    await ai("addToCart", { itemId: "pepperoni", qty: 1, selections: { size: ["large"], dough: ["thin"], toppings: ["bacon"] } });
+    await expect(guide.locator('[data-scenario-step][data-done="true"]')).toHaveCount(1);
+    await ai("requestCheckout");
+    await expect(guide.locator("[data-scenario-your-turn]")).toContainText("finish and pay on the kiosk itself");
+    await check(page, info, "D2-learned-scenario-finished", undefined, judge);
+    await check(page, info, "D2-learned-scenario-finished-guide", undefined, judge, DEMO_GUIDE);
   });
 });
 

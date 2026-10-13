@@ -105,3 +105,45 @@ test("@live Play it for me: Sunja's lunch reaches the confirm card with two sets
   await page.waitForTimeout(3_000);
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "confirm");
 });
+
+// Every other scenario played once through real Gemini (phase 8 QA): the player reaches the end of the checklist and
+// the order never gets past the review by itself.
+const PLAYED = [
+  { kioskId: "malo", id: "not-sure", dine: true },
+  { kioskId: "malo", id: "sold-out", dine: true },
+  { kioskId: "malo", id: "halal", dine: true },
+  { kioskId: "malo", id: "ai-cannot-pay", dine: true },
+  { kioskId: "malo", id: "undo", dine: true },
+  { kioskId: "airport_rail", id: "mei-tickets", dine: false },
+  { kioskId: "airport_rail", id: "which-platform", dine: false },
+  { kioskId: "doughhouse", id: "learned-pizza", dine: true },
+];
+
+PLAYED.forEach((p, i) => {
+  test.describe(() => {
+    // Each its own address: every test opens two sessions and several chat requests (R-005).
+    test.use({ extraHTTPHeaders: { "X-Forwarded-For": `192.0.2.${60 + i}` } });
+
+    test(`@live Play it for me: ${p.kioskId} ${p.id} reaches the end of its checklist`, async ({ page }) => {
+      test.skip(process.env.E2E_LIVE !== "1", "calls real Gemini; run `npm run test:e2e:live`");
+      test.setTimeout(240_000);
+      await page.goto(`/demo?k=${p.kioskId}`);
+      await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible({ timeout: 60_000 });
+      await newSession(page, () => page.getByRole("button", { name: "Start", exact: true }).click());
+      await guide(page).getByRole("button", { name: "Scenarios", exact: true }).click();
+      await newSession(page, () => page.locator(`[data-scenario="${p.id}"]`).click());
+      if (p.dine) await phoneScreen(page).getByRole("button", { name: "Eat here" }).click();
+
+      const play = guide(page).getByRole("button", { name: "Play it for me" });
+      await expect(play).toBeEnabled();
+      await play.click();
+      const yourTurn = guide(page).locator("[data-scenario-your-turn]");
+      const failed = guide(page).getByText(/didn't go as expected|Demo limit reached/);
+      await expect(yourTurn.or(failed)).toBeVisible({ timeout: 200_000 });
+      await expect(yourTurn, "the player failed a step").toBeVisible();
+      // Nothing in a scenario pays: the phone is never on the card or order-number screen.
+      await page.waitForTimeout(2_000);
+      await expect(phoneScreen(page)).not.toHaveAttribute("data-phone-screen", /^(pay|done)$/);
+    });
+  });
+});

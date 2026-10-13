@@ -13,6 +13,11 @@ export const HERO_ACTIONS: AgentAction[] = [
   { tool: "addToCart", args: { itemId: "cheese_burger", variant: "set", qty: 1, selections: { drink: ["cider"] } }, code: "ok", ms: 164 },
 ];
 
+/** Step 1 of "Mei's tickets" on the airport rail ticket machine: two adult express tickets. */
+export const RAIL_ACTIONS: AgentAction[] = [
+  { tool: "addToCart", args: { itemId: "express_city_center", variant: "single", qty: 2, selections: { passenger: ["adult"] } }, code: "ok", ms: 171 },
+];
+
 /** A refusal of each kind the strip words differently. */
 export const MIXED_ACTIONS: AgentAction[] = [
   { tool: "addToCart", args: { itemId: "cheese_burger", variant: "set" }, code: "NEEDS_CHOICE", ms: 41 },
