@@ -1,0 +1,116 @@
+#1 act {"label":"화면을 터치하여 주문을 시작하세요","op":"click"}
+#2 record 
+#3 act {"label":"야채김밥","op":"click"}
+#4 act {"label":"야채김밥","op":"click"}
+#5 act {"label":"제육도시락","op":"click"}
+#6 act {"op":"click","label":"데워 주세요"}
+#7 act {"name":"담기","role":"button","op":"click"}
+#8 act {"op":"click","role":"button","name":"원 담기"}
+#9 act {"op":"click","label":"주문하기"}
+#10 act {"label":"이전","op":"click"}
+#11 act {"op":"click","label":"닫기 ✕"}
+#12 reload 
+#13 act {"label":"화면을 터치하여 주문을 시작하세요","op":"click"}
+#14 act {"label":"제육도시락","op":"click"}
+#15 act {"label":"취소","op":"click"}
+#16 act {"label":"치킨마요덮밥","op":"click"}
+#17 act {"label":"취소","op":"click"}
+#18 record 
+#19 record 
+#20 record 
+#21 record 
+#22 record 
+#23 record 
+#24 record 
+#25 act {"label":"샌드위치·베이커리","op":"click"}
+#26 act {"label":"햄치즈 샌드위치","op":"click"}
+#27 act {"op":"click","label":"취소"}
+#28 act {"op":"click","label":"치킨 랩"}
+#29 act {"op":"click","label":"취소"}
+#30 act {"label":"클래식 핫도그","op":"click"}
+#31 act {"label":"취소","op":"click"}
+#32 record 
+#33 record 
+#34 record 
+#35 record 
+#36 record 
+#37 record 
+#38 act {"label":"음료","op":"click"}
+#39 act {"op":"click","label":"아메리카노"}
+#40 act {"role":"button","op":"click","exact":true,"name":"+"}
+#41 act {"text":"에스프레소 샷","op":"click"}
+#42 act {"role":"button","op":"click","name":"샷"}
+#43 act {"op":"click","label":"+"}
+#44 act {"text":"+","op":"click"}
+#45 act {"op":"click","name":"에스프레소","role":"button"}
+#46 act {"op":"click","label":"HOT 따뜻하게"}
+#47 act {"label":"레귤러","op":"click"}
+#48 act {"op":"click","role":"button","name":"원 담기"}
+#49 act {"label":"+","op":"click"}
+#50 act {"label":"생수 500ml","op":"click"}
+#51 act {"op":"click","label":"생수 500ml"}
+#52 act {"op":"click","label":"아메리카노"}
+#53 act {"op":"click","name":"추가","role":"button"}
+#54 act {"name":"수량","op":"click","role":"button"}
+#55 act {"op":"click","label":"취소"}
+#56 act {"op":"click","label":"전체 삭제"}
+#57 act {"op":"click","label":"예"}
+#58 act {"op":"click","label":"아메리카노"}
+#59 records 
+#60 act {"name":"+500원","op":"click","role":"button"}
+#61 act {"op":"click","label":"취소"}
+#62 act {"op":"click","label":"김밥·도시락"}
+#63 act {"label":"제육도시락","op":"click"}
+#64 act {"label":"취소","op":"click"}
+#65 act {"label":"음료","op":"click"}
+#66 act {"label":"카페라떼","op":"click"}
+#67 act {"label":"취소","op":"click"}
+#68 act {"label":"활주로 라거 500ml","op":"click"}
+#69 act {"label":"예","op":"click"}
+#70 act {"label":"전체 삭제","op":"click"}
+#71 act {"op":"click","label":"예"}
+#72 record 
+#73 record 
+#74 record 
+#75 record 
+#76 record 
+#77 record 
+#78 record 
+#79 record 
+#80 act {"op":"click","label":"간식"}
+#81 records 
+#82 act {"label":"김밥·도시락","op":"click"}
+#83 act {"label":"야채김밥","op":"click"}
+#84 act {"label":"야채김밥","op":"click"}
+#85 act {"label":"제육도시락","op":"click"}
+#86 reload 
+#87 act {"label":"화면을 터치하여 주문을 시작하세요","op":"click"}
+#88 act {"label":"제육도시락","op":"click"}
+#89 act {"label":"+","op":"click"}
+#90 act {"op":"click","role":"button","name":"원 담기"}
+#91 act {"op":"click","label":"데워 주세요"}
+#92 act {"name":"원 담기","op":"click","role":"button"}
+#93 act {"op":"click","label":"닫기 ✕"}
+#94 testSkill 
+  test #1: PASS PASS PASS
+#95 audit 
+  audit #1: GAPS missing=17 unknown=0 hidden=0
+#96 act {"op":"click","label":"간식"}
+#97 act {"label":"치킨텐더 4조각","op":"click"}
+#98 act {"label":"취소","op":"click"}
+#99 act {"label":"여행용품","op":"click"}
+#100 act {"op":"click","label":"여행용 목베개"}
+#101 act {"label":"취소","op":"click"}
+#102 act {"label":"기념품","op":"click"}
+#103 act {"label":"한복 곰 키링","op":"click"}
+#104 act {"op":"click","label":"취소"}
+#105 act {"label":"전통 문양 손거울","op":"click"}
+#106 act {"op":"click","label":"취소"}
+#107 act {"op":"click","label":"자개 책갈피"}
+#108 act {"label":"취소","op":"click"}
+#109 record 
+#110 record 
+#111 record 
+#112 record 
+#113 record 
+{"provider":"gemini","model":"gemini-3.8-flash","cachedInputTokens":0,"finished":false,"turns":113,"acts":80,"tests":1,"inputTokens":2002024,"outputTokens":9479,"minutes":"11.1"}

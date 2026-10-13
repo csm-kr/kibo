@@ -5,8 +5,12 @@
 import fs from 'node:fs';
 
 const LOG = process.env.FAKE_VERTEX_LOG;
-// FAKE_VERTEX_FAIL="<status>@<request number>": answer that request once with that status.
-const [failStatus, failAt] = (process.env.FAKE_VERTEX_FAIL ?? '').split('@').map(Number);
+// FAKE_VERTEX_FAIL="<status>@<request number>": answer that request once with that status
+// ("throw@<n>": the request fails like a dropped network connection).
+const [failSpec, failAtSpec] = (process.env.FAKE_VERTEX_FAIL ?? '').split('@');
+const failStatus = Number(failSpec), failAt = Number(failAtSpec);
+// FAKE_VERTEX_CALLS='{"<request number>": {"name": "...", "args": {...}}}': call that tool instead of record().
+const CALLS = JSON.parse(process.env.FAKE_VERTEX_CALLS || '{}');
 let n = 0;
 
 const json = (status, body) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
@@ -18,6 +22,7 @@ globalThis.fetch = async (_url, init) => {
   const kinds = (last.parts ?? []).map((p) => (p.functionResponse ? 'functionResponse' : p.text !== undefined ? 'text' : 'other'));
   const text = (last.parts ?? []).map((p) => p.text ?? JSON.stringify(p.functionResponse?.response ?? '')).join(' ');
   fs.appendFileSync(LOG, JSON.stringify({ n, role: last.role, kinds, nudge: /Stop exploring/.test(text) }) + '\n');
+  if (n === failAt && failSpec === 'throw') throw new TypeError('fetch failed');
   if (n === failAt) return failStatus === 400 ? json(400, { error: { code: 400, message: 'Bad request.' } })
     : new Response('<html>Service Unavailable</html>', { status: failStatus });
   const textAfterResponse = kinds.lastIndexOf('text') > kinds.indexOf('functionResponse') && kinds.includes('functionResponse');
@@ -25,7 +30,7 @@ globalThis.fetch = async (_url, init) => {
     return json(400, { error: { code: 400, message: 'Requests ending with a model turn are not supported.', status: 'INVALID_ARGUMENT' } });
   }
   return json(200, {
-    candidates: [{ content: { role: 'model', parts: [{ functionCall: { name: 'record', args: { kind: 'flow', data: `fact ${n}` } } }] } }],
+    candidates: [{ content: { role: 'model', parts: [{ functionCall: CALLS[n] ?? { name: 'record', args: { kind: 'flow', data: `fact ${n}` } } }] } }],
     usageMetadata: { promptTokenCount: 10, candidatesTokenCount: 1 },
   });
 };

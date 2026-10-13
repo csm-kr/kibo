@@ -49,7 +49,7 @@ The four new kiosks are the **held-out test set**. They are learned twice: once 
 - Cost from the token counts and the official price (evidence file of the day).
 
 ## Runs and reporting
-- Baseline: the learner as it was at the end of phase 12 plus the I-185 crash fix only (`spikes/kibo-learn/CHANGES.md`), one run per kiosk, token cap 2M input. The first baselines of `bk1-cinema` and `bk2-bakery` (unchanged learner, each crashed twice with Vertex HTTP 400 at the "Stop exploring" nudge) are kept in `results/<kioskId>/baseline-crashed/` as evidence; they measured the crash, not learning.
+- Baseline: the learner as it was at the end of phase 12 plus the I-185 crash fix and, for `bk3-ramen` and `bk4-airport-shop`, the I-187 exit fix (the process always exits; exploration unchanged) only (`spikes/kibo-learn/CHANGES.md`), one run per kiosk, each with a 30 min wall-clock kill in the spawn wrapper, token cap 2M input. The first baselines of `bk1-cinema` and `bk2-bakery` (unchanged learner, each crashed twice with Vertex HTTP 400 at the "Stop exploring" nudge) are kept in `results/<kioskId>/baseline-crashed/` as evidence; they measured the crash, not learning.
 - Improvements: only on the dev set (above), with regression tests.
 - Final: improved learner, one run per kiosk, same cap. No reruns to "get a better number"; a crash is rerun once and reported.
 - `spikes/blind-kiosks/RESULTS.md`: a table per kiosk (baseline vs final) and the totals; links to every log; limits stated plainly. Numbers go to `docs/TESTING.md` and `docs/KIBO_LEARN.md` only from these files (R-001).

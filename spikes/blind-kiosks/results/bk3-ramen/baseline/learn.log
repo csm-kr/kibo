@@ -1,0 +1,107 @@
+#1 snapshot 
+#2 act {"op":"click","label":"면구름 라멘"}
+#3 record 
+#4 act {"op":"click","label":"매장에서 먹어요"}
+#5 act {"op":"click","label":"라멘"}
+#6 act {"op":"click","label":"돈코츠 라멘"}
+#7 act {"op":"click","label":"취소"}
+#8 act {"op":"click","label":"돈코츠 라멘"}
+#9 act {"op":"click","role":"button","name":"차슈"}
+#10 act {"op":"click","text":"차슈"}
+#11 act {"op":"click","text":"차슈 +2,000원"}
+#12 act {"label":"꼬들","op":"click"}
+#13 act {"label":"+","op":"click"}
+#14 act {"name":"+","role":"button","op":"click"}
+#15 act {"op":"click","text":"+"}
+#16 act {"op":"click","name":"차슈"}
+#17 act {"text":"차슈","exact":true,"op":"click"}
+#18 act {"op":"click","exact":true,"text":"+"}
+#19 act {"text":"2,000원","op":"click","exact":true}
+#20 act {"name":"차슈","op":"click","role":"spinbutton"}
+#21 act {"name":"+","role":"foo","op":"click"}
+#22 act {"op":"click","label":"취소"}
+#23 act {"label":"매운 돈코츠 라멘","op":"click"}
+#24 act {"op":"click","label":"담기"}
+#25 act {"label":"취소","op":"click"}
+#26 act {"op":"click","label":"덮밥"}
+#27 act {"label":"차슈 덮밥","op":"click"}
+#28 act {"op":"click","label":"취소"}
+#29 act {"op":"click","label":"규동"}
+#30 act {"op":"click","label":"취소"}
+#31 act {"label":"사이드","op":"click"}
+#32 act {"op":"click","label":"교자 (5개)"}
+#33 act {"op":"click","label":"전체 취소"}
+#34 act {"op":"click","label":"모두 취소"}
+#35 act {"label":"음료","op":"click"}
+#36 act {"op":"click","label":"콜라"}
+#37 act {"op":"click","label":"전체 취소"}
+#38 act {"op":"click","label":"모두 취소"}
+#39 act {"op":"click","label":"세트"}
+#40 act {"op":"click","label":"라멘 기본 세트"}
+#41 act {"label":"돈코츠 라멘","op":"click"}
+#42 act {"op":"click","label":"보통"}
+#43 act {"label":"다음","op":"click"}
+#44 act {"op":"click","label":"교자 (5개)"}
+#45 act {"label":"다음","op":"click"}
+#46 act {"label":"담기","op":"click"}
+#47 act {"label":"콜라","op":"click"}
+#48 act {"label":"담기","op":"click"}
+#49 act {"op":"click","label":"주문하기"}
+#50 act {"label":"결제하기","op":"click"}
+#51 reload 
+#52 act {"label":"면구름 라멘","op":"click"}
+#53 act {"label":"매장에서 먹어요","op":"click"}
+#54 act {"label":"돈코츠 라멘","op":"click"}
+#55 act {"op":"click","role":"button","name":"추가"}
+#56 act {"op":"click","role":"button","name":"더하기"}
+#57 act {"role":"button","name":"취소","op":"click"}
+#58 act {"op":"click","label":"취소"}
+#59 act {"label":"라멘","op":"click"}
+#60 act {"op":"click","label":"쇼유 라멘"}
+#61 act {"label":"취소","op":"click"}
+#62 act {"op":"click","label":"덮밥"}
+#63 act {"label":"치킨 마요 덮밥","op":"click"}
+#64 act {"op":"click","label":"취소"}
+#65 act {"label":"연어 덮밥","op":"click"}
+#66 act {"op":"click","label":"취소"}
+#67 act {"op":"click","label":"사이드"}
+#68 act {"label":"가라아게 (4조각)","op":"click"}
+#69 act {"op":"click","label":"미니 차슈덮밥"}
+#70 act {"label":"전체 취소","op":"click"}
+#71 act {"op":"click","label":"모두 취소"}
+#72 act {"label":"음료","op":"click"}
+#73 act {"label":"세트","op":"click"}
+#74 act {"op":"click","label":"라멘 든든 세트"}
+#75 act {"op":"click","label":"돈코츠 라멘"}
+#76 act {"label":"보통","op":"click"}
+#77 act {"label":"다음","op":"click"}
+#78 act {"label":"이전","op":"click"}
+#79 act {"label":"취소","op":"click"}
+#80 act {"label":"음료","op":"click"}
+#81 act {"label":"콜라","op":"click"}
+#82 records 
+#83 testSkill 
+  test #1: FAIL FAIL FAIL
+#84 testSkill 
+  test #2: PASS
+#85 testSkill 
+  test #3: FAIL
+#86 testSkill 
+  test #4: FAIL
+#87 act {"label":"콜라","op":"click"}
+#88 act {"label":"수량 더하기","op":"click"}
+#89 testSkill 
+  test #5: PASS
+#90 testSkill 
+  test #6: PASS
+#91 testSkill 
+  test #7: PASS
+#92 audit 
+  audit #1: OK missing=0 unknown=0 hidden=0
+#93 testSkill 
+  test #8: PASS PASS PASS
+#94 audit 
+  audit #2: OK missing=0 unknown=0 hidden=0
+#95 finish 
+  finish audit: OK
+{"provider":"gemini","model":"gemini-3.8-flash","cachedInputTokens":0,"finished":true,"turns":95,"acts":80,"tests":8,"inputTokens":1582965,"outputTokens":20044,"minutes":"20.6"}

@@ -130,28 +130,36 @@ async function generate(body) {
   }
 }
 
-if (PROVIDER === 'openai') await openaiLoop();
-else while (!finalSkill && stats.turns < MAX_TURNS && stats.inTok < MAX_INPUT_TOKENS) {
-  stats.turns++;
-  pruneOldTrees();
-  const data = await generate(JSON.stringify({ systemInstruction: { parts: [{ text: SYSTEM }] }, contents, tools }));
-  if (!data.candidates) { console.error(JSON.stringify(data).slice(0, 500)); break; }
-  stats.inTok += data.usageMetadata?.promptTokenCount ?? 0; stats.outTok += data.usageMetadata?.candidatesTokenCount ?? 0;
-  const msg = data.candidates[0].content;
-  contents.push(msg); // keep thought signatures intact
-  const calls = (msg.parts ?? []).filter((p) => p.functionCall);
-  if (!calls.length) { contents.push({ role: 'user', parts: [{ text: 'Continue. Use the tools; call finish when the skill passes tests.' }] }); continue; }
-  const responses = [];
-  // Weak models keep exploring; after 60 turns without a test, push them to write the skill from their records.
-  const nudge = stats.turns - lastTestTurn > 60 && stats.turns % 20 === 0;
-  for (const { functionCall: fc } of calls) {
-    console.log(`#${stats.turns} ${fc.name} ${fc.name === 'act' ? JSON.stringify(fc.args.step) : ''}`);
-    responses.push({ functionResponse: { name: fc.name, response: await call(fc.name, fc.args ?? {}) } });
+// Every way out (finish, turn or token cap, API error, crash) ends below: the browser is closed,
+// learn-stats.json is written and the process exits, so a run can never hang a harness step.
+let crash = null;
+try {
+  if (PROVIDER === 'openai') await openaiLoop();
+  else while (!finalSkill && stats.turns < MAX_TURNS && stats.inTok < MAX_INPUT_TOKENS) {
+    stats.turns++;
+    pruneOldTrees();
+    const data = await generate(JSON.stringify({ systemInstruction: { parts: [{ text: SYSTEM }] }, contents, tools }));
+    if (!data.candidates) { console.error(JSON.stringify(data).slice(0, 500)); break; }
+    stats.inTok += data.usageMetadata?.promptTokenCount ?? 0; stats.outTok += data.usageMetadata?.candidatesTokenCount ?? 0;
+    const msg = data.candidates[0].content;
+    contents.push(msg); // keep thought signatures intact
+    const calls = (msg.parts ?? []).filter((p) => p.functionCall);
+    if (!calls.length) { contents.push({ role: 'user', parts: [{ text: 'Continue. Use the tools; call finish when the skill passes tests.' }] }); continue; }
+    const responses = [];
+    // Weak models keep exploring; after 60 turns without a test, push them to write the skill from their records.
+    const nudge = stats.turns - lastTestTurn > 60 && stats.turns % 20 === 0;
+    for (const { functionCall: fc } of calls) {
+      console.log(`#${stats.turns} ${fc.name} ${fc.name === 'act' ? JSON.stringify(fc.args.step) : ''}`);
+      responses.push({ functionResponse: { name: fc.name, response: await call(fc.name, fc.args ?? {}) } });
+    }
+    // The nudge goes before the function responses: Vertex refuses a turn whose text part follows them
+    // with "Requests ending with a model turn are not supported." (checked 10-13, I-185).
+    if (nudge) responses.unshift({ text: 'Stop exploring. Call records(), write the skill JSON from it, and call testSkill now.' });
+    contents.push({ role: 'user', parts: responses });
   }
-  // The nudge goes before the function responses: Vertex refuses a turn whose text part follows them
-  // with "Requests ending with a model turn are not supported." (checked 10-13, I-185).
-  if (nudge) responses.unshift({ text: 'Stop exploring. Call records(), write the skill JSON from it, and call testSkill now.' });
-  contents.push({ role: 'user', parts: responses });
+} catch (e) {
+  crash = e;
+  console.error(`learner crashed: ${e.message.split('\n')[0]}`);
 }
 async function openaiLoop() {
   // Responses API: reasoning models can call tools here. Output items (reasoning + calls) go back in as input.
@@ -185,8 +193,11 @@ async function openaiLoop() {
   }
 }
 
-await browser.close();
-const summary = { provider: PROVIDER, model: MODEL, cachedInputTokens: stats.cached ?? 0, finished: !!finalSkill, turns: stats.turns, acts: stats.acts, tests: stats.tests, inputTokens: stats.inTok, outputTokens: stats.outTok, minutes: ((Date.now() - stats.t0) / 60000).toFixed(1) };
+await browser.close().catch(() => {});
+const summary = { provider: PROVIDER, model: MODEL, cachedInputTokens: stats.cached ?? 0, finished: !!finalSkill, turns: stats.turns, acts: stats.acts, tests: stats.tests, inputTokens: stats.inTok, outputTokens: stats.outTok, minutes: ((Date.now() - stats.t0) / 60000).toFixed(1), ...(crash ? { error: crash.message.split('\n')[0] } : {}) };
 console.log(JSON.stringify(summary));
 if (finalSkill) fs.writeFileSync('skill.json', JSON.stringify(finalSkill, null, 2));
 fs.writeFileSync('learn-stats.json', JSON.stringify(summary, null, 2));
+// Exit explicitly: an audit whose start recipe fails leaves a browser open (audit.mjs freshMenu),
+// and its connection would keep Node alive after this line. Playwright kills it on exit.
+process.exit(crash ? 1 : 0);

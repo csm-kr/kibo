@@ -29,7 +29,10 @@
     {
       "step": 3,
       "name": "baseline-b",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-13T21:32:14+0900",
+      "completed_at": "2026-10-13T22:40:00+0900",
+      "summary": "Exit fix first (I-187): learner.mjs runs its loop in try; every way out closes the browser, writes learn-stats.json (error field after a crash) and calls process.exit (0, or 1 after a crash), because an audit whose start recipe fails left a browser open (audit.mjs freshMenu, unchanged, left for step 4); 3 new AI-free tests in spikes/kibo-learn/learner.test.mjs (fake_vertex.mjs gained FAKE_VERTEX_CALLS and throw@n), 6/6 pass; CHANGES.md, PROTOCOL.md updated. Spawn wrapper (outside the repo) kills after 30 min; never reached. Baselines (gemini-3.8-flash, 2M cap): bk3-ramen FINISHED, 95 turns, 20.6 min, 1,582,965 input tokens; items 25/25, price 25/25, groups found 11/28, items exact 4/14, quantity 0/8; orders 2 correct / 6 safe refusal / 2 unsafe. bk4-airport-shop: first run stopped at turn 127 on Vertex 401 (expired token, I-188, kept in baseline/crash1/); the one rerun hit the 2M cap at turn 113 (11.1 min, 1 test 3/3, audit missing 17) -> no skill, items 0/37, 10 not learned. spikes/blind-kiosks/results/BASELINE.md: table of all four (2 of 4 finished, items 57/134, orders 5 correct / 10 safe refusal / 5 unsafe of 40, 20 not learned) and 9 failure patterns with kiosks and turns for step 4: (1) quantity steppers in option sheets 4/4, (2) token budget (9.8-26.1k input tokens per turn, cached 0; one record per turn, open-and-cancel per item) bk2/bk4 over cap, (3) exploration taps checkout/payment, no forbiddenLabels while learning 3/4, (4) single-order testSkill calls the gate ignores 3/4, (5) ambiguous cart '수량 더하기' at replay = all 5 unsafe orders, (6) set/combo wizards recorded without steps 2/4, (7) audit gaps after tests with no budget left 2/4, (8) toggles labels cannot reach (bk2 HOT), (9) conditional groups bk1 0/4. ISSUE: I-187 (exit fix, audit leak open), I-188 (401, rerun result). AC: lint, build, test (930 passed) green."
     },
     {
       "step": 4,
