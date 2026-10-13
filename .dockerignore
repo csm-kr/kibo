@@ -16,7 +16,6 @@ scripts
 docs
 phases
 evals
-evidence
 e2e
 qa-output
 test-results
@@ -25,3 +24,4 @@ playwright*.config.ts
 vitest.config.ts
 *.tsbuildinfo
 *.mp4
+# evidence/*.json is bundled into the /demo compare card at build time (src/lib/demo/evidence.ts)
