@@ -30,8 +30,17 @@ describe("POST /api/session", () => {
     expect(new URL(body.claimUrl).origin).toBe("http://kibo.test");
   });
 
+  it("a pairable demo session (judge's own phone) returns a pairing code and no device token", async () => {
+    const { status, body } = await read(await POST(jsonRequest("/api/session", { kioskId: "malo", demo: true, pairPhone: true })));
+    expect(status).toBe(200);
+    expect(body.deviceToken).toBeUndefined();
+    expect(body.pairCode).toMatch(/^\d{6}$/);
+    expect(new URL(body.claimUrl).hash).toMatch(/^#t=/);
+    expect(await getStore().get(body.sessionId)).toMatchObject({ status: "idle", demo: true });
+  });
+
   it("refuses bad bodies with BAD_REQUEST", async () => {
-    for (const b of ["{nope", { kioskId: "nope" }, { kioskId: "malo", extra: 1 }, { kioskId: 3 }]) {
+    for (const b of ["{nope", { kioskId: "nope" }, { kioskId: "malo", extra: 1 }, { kioskId: 3 }, { kioskId: "malo", pairPhone: true }]) {
       const { status, body } = await read(await POST(jsonRequest("/api/session", b)));
       expect(status).toBe(400);
       expect(body).toMatchObject({ ok: false, error: { code: "BAD_REQUEST", message: expect.any(String) } });

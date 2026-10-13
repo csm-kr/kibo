@@ -24,7 +24,7 @@ export interface CreateResult {
   claimToken: string;
   kioskToken: string;
   deviceToken?: string;
-  /** 6 digits for `/app`; absent on /demo sessions, which are claimed from the start. */
+  /** 6 digits for `/app`; absent on /demo sessions claimed from the start (all but `pairPhone`). */
   pairCode?: string;
   expiresAt: number;
 }
@@ -117,27 +117,34 @@ function expire(s: Session): { session?: Session; value: { gone: true } } {
 
 export async function createSession(
   store: SessionStore,
-  input: { kioskId: string; demo?: boolean },
+  input: { kioskId: string; demo?: boolean; pairPhone?: boolean },
   now: number,
 ): Promise<CreateResult> {
   if (!isKioskId(input.kioskId))
     throw new CommandError("BAD_REQUEST", "This kiosk is not available.");
+  if (input.pairPhone && input.demo !== true)
+    throw new CommandError(
+      "BAD_REQUEST",
+      "Only a demo order can wait for a phone this way.",
+    );
   const demo = input.demo === true;
+  // /demo "Use my phone": still a demo session (demo limits), but a real phone claims it by QR or code.
+  const preClaimed = demo && input.pairPhone !== true;
   const sessionId = newSessionId();
   const claimToken = newToken();
   const kioskToken = newToken();
-  const deviceToken = demo ? newToken() : undefined;
+  const deviceToken = preClaimed ? newToken() : undefined;
 
   let session = newSession({ sessionId, kioskId: input.kioskId, demo, now });
   // /demo holds both tokens on one page, so the phone half is connected from the start.
-  if (demo)
+  if (preClaimed)
     session = { ...session, status: "connected", phoneConnectedAt: now };
-  const pairCode = demo
+  const pairCode = preClaimed
     ? undefined
     : await reservePairCode(store, sessionId, now);
   await store.create(session, {
     claimTokenHash: hashToken(claimToken),
-    claimed: demo,
+    claimed: preClaimed,
     deviceTokenHash: deviceToken ? hashToken(deviceToken) : null,
     kioskTokenHash: hashToken(kioskToken),
     ...(pairCode ? { pairCode } : {}),

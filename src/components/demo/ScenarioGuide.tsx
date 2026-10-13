@@ -32,8 +32,11 @@ interface Props {
   session: Session | null;
   sessionId: string;
   locale: Locale;
-  /** The phone half's send: the same path as typing. */
-  send: SayFn;
+  /**
+   * The phone half's send: the same path as typing. Absent in "Use my phone" mode, where the judge talks to their own
+   * phone: the sentences stay as text to say, and nothing here sends or plays.
+   */
+  send?: SayFn;
   starting: boolean;
   startFailed: boolean;
   /** A fresh demo order, the same as [Try again]. */
@@ -52,6 +55,11 @@ export function ScenarioGuide(props: Props) {
   const scenario = scenarios.find((s) => s.id === chosen?.id);
 
   function choose(s: Scenario) {
+    // With the judge's own phone a fresh order would need a new scan, so the checklist follows the current one.
+    if (!props.send) {
+      setChosen({ id: s.id, from: "" });
+      return;
+    }
     // The session it was chosen in is left behind; the checklist waits for the fresh one.
     setChosen({ id: s.id, from: props.sessionId });
     props.onFresh();
@@ -61,7 +69,7 @@ export function ScenarioGuide(props: Props) {
   if (!scenario || !chosen) {
     body = (
       <>
-        <p className="text-base text-muted">{pt("scenariosLead", locale)}</p>
+        <p className="text-base text-muted">{pt(props.send ? "scenariosLead" : "scenariosLeadOwnPhone", locale)}</p>
         <ul className="flex flex-col gap-3">
           {scenarios.map((s) => (
             <li key={s.id}>
@@ -167,6 +175,7 @@ function Checklist(props: Props & { scenario: Scenario }) {
   const dineFirst = props.kiosk.dineOptions !== undefined && live !== null && live.dineOption === null;
 
   function start() {
+    if (!send) return;
     player.current = playScenario(scenario, locale, done, {
       send,
       session: () => latest.current,
@@ -186,6 +195,7 @@ function Checklist(props: Props & { scenario: Scenario }) {
     <>
       {!finished && dineFirst && <p className="rounded-tile bg-staff-tint px-4 py-3 text-base font-semibold text-staff-ink">{pt("scenarioDineFirst", locale)}</p>}
       {!finished &&
+        send &&
         (playing ? (
           <button type="button" onClick={() => player.current?.stop()} className={SECONDARY}>
             {pt("stopPlaying", locale)}
@@ -198,7 +208,7 @@ function Checklist(props: Props & { scenario: Scenario }) {
       <p role="status" className="text-base font-semibold text-[#33302B] empty:hidden">
         {status}
       </p>
-      {!finished && <p className="text-base text-muted">{pt("scenarioSayHint", locale)}</p>}
+      {!finished && <p className="text-base text-muted">{pt(send ? "scenarioSayHint" : "scenarioOwnPhoneHint", locale)}</p>}
       <ol className="flex flex-col gap-4">
         {scenario.steps.map((step, i) => {
           const ticked = i < done;
@@ -213,14 +223,20 @@ function Checklist(props: Props & { scenario: Scenario }) {
                 {ticked ? <Check size={20} strokeWidth={2.5} /> : i + 1}
               </span>
               <div className="flex min-w-0 flex-1 flex-col gap-2">
-                <button
-                  type="button"
-                  disabled={playing || !sendable}
-                  onClick={() => void send(step.say[locale])}
-                  className={SAY_CHIP}
-                >
-                  {step.say[locale]}
-                </button>
+                {send ? (
+                  <button
+                    type="button"
+                    disabled={playing || !sendable}
+                    onClick={() => void send(step.say[locale])}
+                    className={SAY_CHIP}
+                  >
+                    {step.say[locale]}
+                  </button>
+                ) : (
+                  <p data-scenario-say className="rounded-tile bg-white px-4 py-2 text-base text-ink shadow-card">
+                    “{step.say[locale]}”
+                  </p>
+                )}
                 <p className="text-base text-muted">{step.watch[locale]}</p>
                 {ticked && <p className="text-base font-bold text-kibo-deep">{pt("stepDoneLabel", locale)}</p>}
               </div>

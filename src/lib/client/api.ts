@@ -25,7 +25,7 @@ export interface CreatedSession {
   kioskToken: string;
   expiresAt: number;
   deviceToken?: string;
-  /** 6 digits the phone can type on /app; absent on /demo sessions. */
+  /** 6 digits the phone can type on /app; absent on /demo sessions unless `pairPhone`. */
   pairCode?: string;
 }
 
@@ -72,8 +72,9 @@ async function post<T>(path: string, body: object, token?: string): Promise<T> {
   throw new ApiError(code as ScreenErrorCode, message, json.error?.detail);
 }
 
-export function createSession(kioskId: string, demo?: boolean): Promise<CreatedSession> {
-  return post("/api/session", demo ? { kioskId, demo } : { kioskId });
+/** `pairPhone` (with `demo`): /demo "Use my phone", a demo session the judge's own phone claims. */
+export function createSession(kioskId: string, demo?: boolean, pairPhone?: boolean): Promise<CreatedSession> {
+  return post("/api/session", demo ? { kioskId, demo, ...(pairPhone ? { pairPhone } : {}) } : { kioskId });
 }
 
 export function sendCommand(input: {

@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { FOCUS, PRIMARY } from "@/components/assistant/styles";
+import { Smartphone } from "lucide-react";
+import { FOCUS, PRIMARY, SECONDARY } from "@/components/assistant/styles";
 import { errorCopy, type ScreenErrorCode } from "@/lib/i18n/errors";
 import { DEMO_ENVIRONMENTS, demoHref } from "./environments";
 
@@ -16,7 +17,14 @@ const STEPS = [
   "Confirm, then pay on the kiosk.",
 ];
 
-export function DemoIntro(props: { kioskId: string; starting: boolean; error: ScreenErrorCode | null; onStart(): void }) {
+export function DemoIntro(props: {
+  kioskId: string;
+  starting: boolean;
+  error: ScreenErrorCode | null;
+  onStart(): void;
+  /** "Use my phone instead": the kiosk and a pairing panel; the judge's own phone claims the order. */
+  onStartPhone(): void;
+}) {
   return (
     <main data-demo="intro" className="flex h-dvh w-full overflow-y-auto bg-[#FBF7EF] px-6 py-8 text-[#15171C]">
       <div data-demo-check className="m-auto grid w-full max-w-6xl items-start gap-12 lg:grid-cols-[2fr_3fr]">
@@ -88,11 +96,20 @@ export function DemoIntro(props: { kioskId: string; starting: boolean; error: Sc
             </ul>
           </nav>
           <div className="flex flex-col gap-2">
-            {/* As wide as the card row above it, so it reads as the row's action (I-123). */}
-            <button type="button" disabled={props.starting} onClick={props.onStart} className={PRIMARY}>
-              {props.starting ? "Starting…" : "Start"}
-            </button>
-            <p className="text-base text-[#4B463F]">Works in English and Korean. No microphone? Type instead.</p>
+            {/* Together as wide as the card row above it, so they read as the row's actions (I-123). */}
+            <div className="grid gap-3 sm:grid-cols-2">
+              <button type="button" disabled={props.starting} onClick={props.onStart} className={PRIMARY}>
+                {props.starting ? "Starting…" : "Start"}
+              </button>
+              <button type="button" data-demo-own-phone disabled={props.starting} onClick={props.onStartPhone} className={SECONDARY}>
+                <Smartphone size={24} strokeWidth={2} aria-hidden />
+                Use my phone instead
+              </button>
+            </div>
+            <p className="text-base text-[#4B463F]">
+              Works in English and Korean. No microphone? Type instead. With your own phone, scan the kiosk&apos;s QR and
+              talk to it.
+            </p>
           </div>
           {props.error && (
             <p role="alert" className="rounded-[18px] border-2 border-[#7A2E0E] bg-[#FFF1CC] px-4 py-3 text-xl text-[#7A2E0E]">

@@ -106,6 +106,8 @@ Every button has pressed (color, and a 0.98 shrink only without reduced motion),
 
 **Kiosk pairing line (K1, QR sheet).** Under the QR, a white 32px-radius panel: "또는 휴대폰에서 이 주소를 열고", the host and `/app` bold in the kiosk's dark primary (breaks anywhere when long), "이 번호를 넣으세요", and on the right "연결 번호" over the code in 72px Space Grotesk as "123 456" (screen readers hear the digits one by one). Kiosk canvas sizes, all ≥ 40px.
 
+**Pairing panel (landscape `/kiosk`, `/demo` "Use my phone instead").** KIBO's surface beside the kiosk canvas, not the store's, so it follows this phone design in CSS px (not canvas px), English, every text ≥ 18px: a cream column with content at most 768px wide; the KIBO mark and "Order by talking" (32px Space Grotesk); a status pill ("Waiting for a phone" with a hollow dot, "Phone connected at 16:52" with the `online` dot, "Connection paused" in `staff-tint`); while waiting, a white card with the QR (320px) and, beside it when there is room, the `<host>/app` line in KIBO blue on its own line and the code in 64px Space Grotesk, then three numbered steps on `kibo-tint` circles; once connected, a white card with the order line (32px bold) and who made the last change (18px muted). The kiosk canvas itself is unchanged.
+
 **Motion.** Sheets open in 200ms ease-out (`kibo-sheet-in`; a plain fade with reduced motion); presses change color in 150ms; the listening pulse is unchanged. Nothing else moves.
 
 ## Motion

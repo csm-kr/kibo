@@ -156,6 +156,15 @@ describe("issueLiveToken", () => {
     expect(issued).toHaveLength(8);
   });
 
+  it("a judge's own phone on a pairable demo session keeps the demo limits: 3 min, 2 tokens", async () => {
+    const r = await createSession(store, { kioskId: "malo", demo: true, pairPhone: true }, T0);
+    const { deviceToken } = await claimSession(store, { sessionId: r.sessionId, claimToken: r.claimToken }, T0);
+    const s = { sessionId: r.sessionId };
+    expect((await issue(s, deviceToken)).voiceSeconds).toBe(180);
+    await issue(s, deviceToken);
+    expect((await errorOf(issue(s, deviceToken))).code).toBe("RATE_LIMITED");
+  });
+
   it("I-150: a token the issuer failed to create gives back the session, address and daily counts", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     for (let i = 0; i < 199; i++) await usage.bump("2026-10-13", "voiceSessions", 200);

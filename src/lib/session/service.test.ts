@@ -66,6 +66,32 @@ describe("createSession", () => {
     expect(res.cart).toHaveLength(1);
     expect(await code(claimSession(store, { sessionId: r.sessionId, claimToken: r.claimToken }, T0 + 2))).toBe("CONFLICT");
   });
+
+  it("a pairable demo session waits for a real phone: no device token, a QR and a code, still a demo", async () => {
+    const store = new MemoryStore();
+    const r = await createSession(store, { kioskId: "malo", demo: true, pairPhone: true }, T0);
+    expect(r.deviceToken).toBeUndefined();
+    expect(r.pairCode).toMatch(/^\d{6}$/);
+    expect(await store.get(r.sessionId)).toMatchObject({ status: "idle", demo: true, phoneConnectedAt: null });
+    const sec = await store.transact(r.sessionId, (_s, sec) => ({ value: sec }));
+    expect(sec).toMatchObject({ claimed: false, deviceTokenHash: null, pairCode: r.pairCode });
+    // The judge's phone claims it like any kiosk QR; the session stays a demo one, so the demo limits apply.
+    const { deviceToken, session } = await claimSession(store, { sessionId: r.sessionId, claimToken: r.claimToken }, T0 + 1);
+    expect(session).toMatchObject({ status: "connected", demo: true });
+    const res = await runCommand(store, { body: body(r.sessionId, "addToCart", SET_ORDER, { source: "voice" }), bearer: deviceToken }, T0 + 2);
+    expect(res.cart).toHaveLength(1);
+  });
+
+  it("a pairable demo session pairs with its code too", async () => {
+    const store = new MemoryStore();
+    const r = await createSession(store, { kioskId: "malo", demo: true, pairPhone: true }, T0);
+    const p = await pairSession(store, { code: r.pairCode! }, T0 + 1);
+    expect(p).toMatchObject({ sessionId: r.sessionId, session: { status: "connected", demo: true } });
+  });
+
+  it("pairPhone without demo is BAD_REQUEST", async () => {
+    expect(await code(createSession(new MemoryStore(), { kioskId: "malo", pairPhone: true }, T0))).toBe("BAD_REQUEST");
+  });
 });
 
 describe("claimSession", () => {

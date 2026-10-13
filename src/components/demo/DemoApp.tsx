@@ -1,11 +1,13 @@
 "use client";
 
+import { ArrowLeft } from "lucide-react";
 import { useCallback, useRef, useState, useSyncExternalStore } from "react";
 import { AssistantPanel, type SayFn } from "@/components/assistant/AssistantPanel";
-import { SECONDARY } from "@/components/phone/ui";
+import { ICON, QUIET, SECONDARY } from "@/components/phone/ui";
 import { KioskCanvas } from "@/components/kiosk/KioskCanvas";
 import { KioskScreen } from "@/components/kiosk/KioskScreen";
 import { LearnedKioskHost } from "@/components/learned/LearnedKioskHost";
+import { PairingPanel } from "@/components/pairing/PairingPanel";
 import { useDemoSession } from "@/hooks/useDemoSession";
 import type { AgentAction } from "@/lib/agent/actions";
 import { examplesFor } from "@/lib/agent/examples";
@@ -22,7 +24,8 @@ import { ScenarioGuide } from "./ScenarioGuide";
 
 // /demo (docs/UX.md Flow C, screen map D1–D3): the real KioskScreen (or a learned kiosk page with the bridge) and
 // AssistantPanel on one real session. Nothing is recorded or simulated beyond the card reader, and the stand-in goes
-// through the kiosk's own path.
+// through the kiosk's own path. "Use my phone instead" swaps the phone half for KIBO's pairing panel: the judge's own
+// phone claims the same demo session (demo limits) by QR or code.
 
 /** The server's per-order chat limit for demo sessions (docs/ARCHITECTURE.md "Limits and cost"). */
 const DEMO_CHAT_LIMIT = 30;
@@ -71,10 +74,10 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
   const wide = useSyncExternalStore(subscribeWide, () => window.matchMedia(WIDE).matches, () => false);
 
   const [run, setRun] = useState<Run | null>(null);
-  /** Every new demo order goes through here, so its counts start at zero. */
-  function startOrder() {
+  /** Every new demo order goes through here, so its counts start at zero. `ownPhone`: "Use my phone instead". */
+  function startOrder(ownPhone: boolean) {
     setRun({ forId: null, after: demo.tokens?.sessionId ?? null, startAt: Date.now(), sentences: 0, phoneTaps: 0, kioskTaps: 0 });
-    void demo.start();
+    void demo.start(ownPhone);
   }
   // Counting stops at `paid`, so the end card's own buttons never add to it.
   const count = (key: Counted) => {
@@ -86,16 +89,27 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
   };
 
   if (!demo.tokens) {
-    return <DemoIntro kioskId={kiosk.kioskId} starting={demo.starting} error={demo.error} onStart={startOrder} />;
+    return (
+      <DemoIntro
+        kioskId={kiosk.kioskId}
+        starting={demo.starting}
+        error={demo.error}
+        onStart={() => startOrder(false)}
+        onStartPhone={() => startOrder(true)}
+      />
+    );
   }
 
   const { tokens, session } = demo;
-  const tryAgain = startOrder;
+  // "Use my phone instead": the page is only the kiosk; the judge's own phone holds the device token.
+  const ownPhone = tokens.deviceToken === undefined;
+  const tryAgain = () => startOrder(ownPhone);
   if (run && run.forId === null && run.after !== tokens.sessionId) setRun({ ...run, forId: tokens.sessionId });
   const thisRun = run?.forId === tokens.sessionId ? run : null;
   // The end is the server's paidAt in this browser's clock, so the seconds never grow while the card shows.
+  // Not with the judge's own phone: its messages and taps happen on that phone, so this page cannot count them.
   const compare =
-    kiosk.kioskId === HERO_KIOSK && session?.status === "paid" && session.paidAt !== null && thisRun ? (
+    !ownPhone && kiosk.kioskId === HERO_KIOSK && session?.status === "paid" && session.paidAt !== null && thisRun ? (
       <CompareCard
         kiosk={kiosk}
         locale={locale}
@@ -113,7 +127,7 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
         })}
       />
     ) : undefined;
-  const beside = wide && scenariosFor(kiosk.kioskId).length > 0;
+  const beside = !ownPhone && wide && scenariosFor(kiosk.kioskId).length > 0;
   const actionStrip = (
     <ActionStrip
       // Moving between the columns remounts it, so it opens or folds for where it now is.
@@ -125,6 +139,12 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
       beside={beside}
     />
   );
+  const endCard = (
+    <DemoEndCard kioskId={kiosk.kioskId} locale={locale} learned={learned} compare={compare} onTryAgain={tryAgain} onIntro={demo.stop} />
+  );
+  // Own phone: the pairing panel shows the end card when the phone half would (paid, ended, a learned kiosk's review).
+  const ended =
+    session !== null && (session.status === "paid" || session.status === "expired" || (learned && session.status === "confirming"));
 
   return (
     <>
@@ -132,6 +152,7 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
       <main
         data-demo="split"
         data-demo-kiosk={kiosk.kioskId}
+        data-demo-own-phone={ownPhone || undefined}
         className="flex h-dvh w-full justify-center gap-6 overflow-hidden bg-[#F3EEE4] p-4 text-[#15171C] max-[899px]:hidden"
       >
         {/* 72px = page padding 32 + caption 32 + gap 8, so the canvas (9:16, or the learned page's 1080:1600) fills the height. */}
@@ -158,9 +179,11 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
                   session={session}
                   kioskToken={tokens.kioskToken}
                   claimUrl={tokens.claimUrl}
-                  // No `demo` (the &demo=1 tap counter), no onClaimUrl ([Connect another phone]) and no onStartOver
-                  // ([처음으로]): nobody taps the kiosk here, and a new QR or session would void this page's own phone
-                  // (I-135, I-066, I-048).
+                  pairCode={tokens.pairCode}
+                  // No `demo` (the &demo=1 tap counter) and no onStartOver ([처음으로]): a new session would drop
+                  // the judge's order (I-135, I-048). onClaimUrl ([Connect another phone]) only with the judge's own
+                  // phone; with the phone half a new QR would void this page's own phone (I-066).
+                  onClaimUrl={ownPhone ? demo.setClaimUrl : undefined}
                   clockOffset={demo.clockOffset}
                   // A send found the session gone or expired: start over. A paid order stays for the end card.
                   onNewSession={() => {
@@ -173,59 +196,69 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
             )}
           </div>
         </section>
-        <section
-          data-demo-check
-          aria-labelledby="demo-phone-caption"
-          className="flex h-full w-[clamp(400px,32vw,480px)] flex-none flex-col gap-2"
-        >
-          <Caption id="demo-phone-caption" text="Your phone (KIBO)" />
-          {/* 480px: the phone header at 200% text needs about 450 (WCAG 1.4.4), so the action strip under it gives way first. */}
-          <div
-            className="min-h-[480px] flex-1 overflow-hidden rounded-sheet shadow-card"
-            onPointerDownCapture={countTap("phoneTaps")}
+        {ownPhone ? (
+          <section aria-labelledby="demo-phone-caption" className="flex h-full max-w-[720px] min-w-[400px] flex-1 flex-col gap-2">
+            <Caption id="demo-phone-caption" text="Your own phone (KIBO)" />
+            <div className="min-h-0 flex-1 overflow-hidden rounded-sheet shadow-card">
+              <PairingPanel kiosk={kiosk} session={session} claimUrl={tokens.claimUrl} pairCode={tokens.pairCode} clockOffset={demo.clockOffset}>
+                {ended ? (
+                  endCard
+                ) : (
+                  <button type="button" onClick={demo.stop} className={`${QUIET} self-start`}>
+                    <ArrowLeft {...ICON} />
+                    Back to the start
+                  </button>
+                )}
+              </PairingPanel>
+            </div>
+          </section>
+        ) : (
+          <section
+            data-demo-check
+            aria-labelledby="demo-phone-caption"
+            className="flex h-full w-[clamp(400px,32vw,480px)] flex-none flex-col gap-2"
           >
-            <AssistantPanel
-              key={tokens.sessionId}
-              kiosk={kiosk}
-              session={session}
-              deviceToken={tokens.deviceToken}
-              locale={locale}
-              onLocaleChange={setLocale}
-              mode="demo"
-              examples={examplesFor(kiosk.kioskId, locale, "demo")}
-              onCardStandIn={() => cardTap.dispatchEvent(new Event("tap"))}
-              streamState={demo.streamState}
-              clockOffset={demo.clockOffset}
-              chatLimit={DEMO_CHAT_LIMIT}
-              onTryAgain={tryAgain}
-              endCard={
-                <DemoEndCard
-                  kioskId={kiosk.kioskId}
-                  locale={locale}
-                  learned={learned}
-                  compare={compare}
-                  onTryAgain={tryAgain}
-                  onIntro={demo.stop}
-                />
-              }
-              onSay={onSay}
-              onUserTurn={() => count("sentences")}
-              onActions={(list) =>
-                setActions((prev) => ({
-                  sessionId: tokens.sessionId,
-                  list: [...(prev.sessionId === tokens.sessionId ? prev.list : []), ...list].slice(-MAX_ACTIONS),
-                }))
-              }
-            />
-          </div>
-          {!beside && actionStrip}
-        </section>
+            <Caption id="demo-phone-caption" text="Your phone (KIBO)" />
+            {/* 480px: the phone header at 200% text needs about 450 (WCAG 1.4.4), so the action strip under it gives way first. */}
+            <div
+              className="min-h-[480px] flex-1 overflow-hidden rounded-sheet shadow-card"
+              onPointerDownCapture={countTap("phoneTaps")}
+            >
+              <AssistantPanel
+                key={tokens.sessionId}
+                kiosk={kiosk}
+                session={session}
+                deviceToken={tokens.deviceToken ?? null}
+                locale={locale}
+                onLocaleChange={setLocale}
+                mode="demo"
+                examples={examplesFor(kiosk.kioskId, locale, "demo")}
+                onCardStandIn={() => cardTap.dispatchEvent(new Event("tap"))}
+                streamState={demo.streamState}
+                clockOffset={demo.clockOffset}
+                chatLimit={DEMO_CHAT_LIMIT}
+                onTryAgain={tryAgain}
+                endCard={endCard}
+                onSay={onSay}
+                onUserTurn={() => count("sentences")}
+                onActions={(list) =>
+                  setActions((prev) => ({
+                    sessionId: tokens.sessionId,
+                    list: [...(prev.sessionId === tokens.sessionId ? prev.list : []), ...list].slice(-MAX_ACTIONS),
+                  }))
+                }
+              />
+            </div>
+            {!beside && actionStrip}
+          </section>
+        )}
         <ScenarioGuide
           kiosk={kiosk}
           session={session}
           sessionId={tokens.sessionId}
           locale={locale}
-          send={send}
+          // The judge's own phone: the sentences are to say there, so nothing here sends or plays.
+          send={ownPhone ? undefined : send}
           starting={demo.starting}
           startFailed={demo.error !== null}
           onFresh={tryAgain}

@@ -67,10 +67,10 @@ export async function warmPhone(browser: Browser, request: APIRequestContext) {
   await page.close();
 }
 
-/** The standalone kiosk keeps {sessionId, kioskToken, claimUrl} in localStorage (useKioskSession). */
+/** The standalone kiosk keeps {sessionId, kioskToken, claimUrl, pairCode} in localStorage (useKioskSession). */
 export async function storedKioskSession(page: Page, kioskId = "malo") {
   const raw = await page.evaluate((key) => localStorage.getItem(key), `kibo.kiosk.${kioskId}`);
-  return JSON.parse(raw ?? "null") as { sessionId: string; kioskToken: string; claimUrl: string };
+  return JSON.parse(raw ?? "null") as { sessionId: string; kioskToken: string; claimUrl: string; pairCode?: string };
 }
 
 export interface SetOrder {
