@@ -60,6 +60,17 @@ describe("turnsReducer (utteranceSeq)", () => {
     expect(s.seq).toBe(2);
   });
 
+  // I-151: a late chunk of the checkout sentence stays "heard" after the response completes, so the next model output,
+  // with no new speech at all, gets a new seq and an AI confirmCheckout in it passes the server's fresh-utterance rule.
+  it.skip("I-151: a late chunk of the sentence that opened the review is not a new utterance after the response completes", () => {
+    let s = feed(initialTurns(), heard("That's all,"), call("requestCheckout"));
+    expect(s.seq).toBe(1);
+    s = feed(s, heard(" I'll pay."), said("Please check the card."), done);
+    // Nothing more from the user; the model speaks again on its own.
+    s = feed(s, call("confirmCheckout"));
+    expect(s.seq).toBe(1);
+  });
+
   it("counts speech after an interrupted response for the response that follows", () => {
     const s = feed(initialTurns(), heard("two burgers"), audio, { serverContent: { interrupted: true } }, heard("no, one"), audio);
     expect(s.seq).toBe(2);

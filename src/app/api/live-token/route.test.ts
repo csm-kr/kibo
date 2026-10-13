@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CommandError } from "@/lib/commands/errors";
 import { resetLimits } from "@/lib/limits/ip";
 import { POST as command } from "../command/route";
+import { POST as claimRoute } from "../session/claim/route";
 import { POST as createSession } from "../session/route";
 import { auth, commandBody, HERO_LINE, jsonRequest, read } from "../testing";
 import { POST } from "./route";
@@ -99,6 +100,57 @@ describe("POST /api/live-token", () => {
       error: { code: "RATE_LIMITED", message: "Voice is busy right now. Please type instead." },
     });
     expect(text).not.toContain(KEY);
+  });
+
+  // I-150: the per-session and daily counters are spent before the issuer answers, so an upstream blip costs a token.
+  it.skip("I-150: a token the issuer failed to create does not count against the session", async () => {
+    const s = await demo();
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    create.mockRejectedValueOnce(new CommandError("UPSTREAM", "Voice is not available right now. Please type instead."));
+    expect((await tokenRequest(s.sessionId, s.deviceToken)).status).toBe(502);
+    expect((await tokenRequest(s.sessionId, s.deviceToken)).status).toBe(200);
+    // A demo session has 2 tokens; the failed one must not have used one up.
+    expect((await tokenRequest(s.sessionId, s.deviceToken)).status).toBe(200);
+  });
+
+  // I-148: the daily voice budget (200 tokens a day, shared by everyone) is the only cap above one session, and new
+  // sessions are free, so one address within its own per-IP limits spends the whole day's budget in minutes.
+  it.skip("I-148: one address staying inside its per-IP limits for 10 minutes leaves voice for everyone else", async () => {
+    const t0 = Date.now();
+    let now = t0;
+    vi.spyOn(Date, "now").mockImplementation(() => now);
+    const from = (ip: string) => ({ "x-forwarded-for": ip });
+    let issued = 0;
+    let lastMinute = -1;
+    for (let minute = 0; minute < 10; minute++) {
+      now = t0 + minute * 61_000;
+      // Each session: create (api + session), claim, then up to 6 tokens; stop at the first refusal this minute.
+      for (let k = 0; k < 10; k++) {
+        const created = await createSession(jsonRequest("/api/session", { kioskId: "malo" }, from("203.0.113.9")));
+        if (created.status !== 200) break;
+        const { sessionId, claimUrl } = (await created.json()) as { sessionId: string; claimUrl: string };
+        const claimToken = new URL(claimUrl).hash.slice("#t=".length);
+        const claimed = await claimRoute(jsonRequest("/api/session/claim", { sessionId, claimToken }, from("203.0.113.9")));
+        if (claimed.status !== 200) break;
+        const { deviceToken } = (await claimed.json()) as { deviceToken: string };
+        let limited = false;
+        for (let t = 0; t < 6; t++) {
+          const res = await POST(jsonRequest("/api/live-token", { sessionId, locale: "en" }, { ...auth(deviceToken), ...from("203.0.113.9") }));
+          if (res.status !== 200) {
+            limited = true;
+            break;
+          }
+          issued++;
+          lastMinute = minute;
+        }
+        if (limited) break;
+      }
+    }
+    // A judge on another address right after.
+    const judge = (await read(await createSession(jsonRequest("/api/session", { kioskId: "malo", demo: true }, from("198.51.100.7"))))).body;
+    const res = await read(await POST(jsonRequest("/api/live-token", { sessionId: judge.sessionId, locale: "en" }, { ...auth(judge.deviceToken), ...from("198.51.100.7") })));
+    vi.restoreAllMocks();
+    expect(res.status, `the judge's token request after one address got ${issued} tokens, the last in minute ${lastMinute + 1}`).toBe(200);
   });
 
   it("400 for a bad body or session id", async () => {

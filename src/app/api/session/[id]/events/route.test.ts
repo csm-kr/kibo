@@ -141,6 +141,28 @@ describe("GET /api/session/[id]/events", () => {
     expect(unsubscribe).toHaveBeenCalledTimes(1);
   });
 
+  // I-149: each stream holds one Cloud Run request (concurrency 80 x max 3 instances = 240) for up to the 3600 s
+  // request timeout, and the only cap is the per-IP 60 requests a minute, so one address can hold every slot.
+  it.skip("I-149: one address cannot hold more than a few streams open at once", async () => {
+    const t0 = Date.now();
+    let now = t0;
+    vi.spyOn(Date, "now").mockImplementation(() => now);
+    const s = await newSession();
+    const open: Response[] = [];
+    for (let minute = 0; minute < 4; minute++) {
+      now = t0 + minute * 61_000;
+      for (let k = 0; k < 60; k++) {
+        const res = await GET(new Request(`${BASE}/api/session/${s.sessionId}/events`, { headers: { "x-forwarded-for": "203.0.113.9" } }), {
+          params: Promise.resolve({ id: s.sessionId }),
+        });
+        if (res.status === 200) open.push(res);
+      }
+    }
+    const held = open.length;
+    await Promise.all(open.map((r) => r.body!.cancel()));
+    expect(held, `streams one address held open at the same time`).toBeLessThanOrEqual(10);
+  });
+
   it("sends a keepalive comment every 25 s", async () => {
     vi.useFakeTimers({ toFake: ["setInterval", "clearInterval"] });
     try {
