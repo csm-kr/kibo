@@ -39,6 +39,7 @@ export function KioskApp({ kiosk, demo }: { kiosk: KioskData; demo: boolean }) {
             onNewSession={() => void ks.newSession()}
             onClaimUrl={ks.setClaimUrl}
             onStartOver={() => void ks.newSession()}
+            retrying={ks.streamState === "retrying"}
           />
         </KioskCanvas>
       </div>

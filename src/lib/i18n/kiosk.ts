@@ -107,6 +107,8 @@ export const KIOSK_TEXT = {
     ko: "휴대폰 연결이 잠시 끊겼어요. 화면을 눌러 계속할 수 있어요.",
     en: "The phone connection paused. You can keep going by touch.",
   },
+  // The server refused the screen's session stream (too many screens on one network); it reconnects by itself (I-033).
+  streamRetrying: { ko: "잠시 후 다시 연결합니다…", en: "Busy right now. Reconnecting…" },
   idleQuestion: { ko: "계속 주문하시겠어요?", en: "Still ordering?" },
   idleContinue: { ko: "계속하기", en: "Continue" },
   // Shown with Korean first and English below, whatever the kiosk's language (12-phone-app:7).

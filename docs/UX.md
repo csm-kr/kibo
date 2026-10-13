@@ -85,6 +85,7 @@ Pressing "Order by touch" runs the familiar kiosk flow (dine option → category
 | **Noise** | After two failures: "Try typing or choosing a button" | — | 9, 7 |
 | **Learned kiosk replay fails** | "Please check the kiosk screen" + [Call staff] | Shows its own real cart; the session keeps its last verified cart and calls staff | 9 |
 | **Change of mind at payment** | — | **[Edit order]** returns to review | 3 |
+| **Server busy** (the screen's stream refused, e.g. too many screens on one network; I-033) | "Busy right now. Reconnecting…" in place of "Connecting to the kiosk…", or as a pill above the dock with the order kept; reconnects by itself after 3 s, 6 s, 12 s, … up to 30 s | A strip at the top: "잠시 후 다시 연결합니다…"; reconnects the same way | 1, 9 |
 
 ## Screen map
 Every screen and state that a QA pass must look at (`docs/UI_QA.md`). Ids are used in QA findings.
@@ -99,7 +100,7 @@ Every screen and state that a QA pass must look at (`docs/UI_QA.md`). Ids are us
 | K6 | Kiosk order review | `confirming` | K7 or K3 |
 | K7 | Kiosk payment method → card insert → approving | `paying` | K8 or K6 (edit) |
 | K8 | Kiosk receipt? → order number | `paid` | K1 after 10 s |
-| KX | Kiosk banners: staff called and connection paused (a strip at the top that pushes the screen down), AI highlight + status line (in the toolbar row for 2 s), idle warning. A visible kiosk never pauses (I-172): it waits on K1 with its QR and code for a phone, and a learned kiosk's bridge must replay as soon as a phone orders; only a tab hidden for 60 s closes its stream, and it reopens when visible | any | — |
+| KX | Kiosk banners: staff called, connection paused and server busy ("잠시 후 다시 연결합니다…") (a strip at the top that pushes the screen down), AI highlight + status line (in the toolbar row for 2 s), idle warning. A visible kiosk never pauses (I-172): it waits on K1 with its QR and code for a phone, and a learned kiosk's bridge must replay as soon as a phone orders; only a tab hidden for 60 s closes its stream, and it reopens when visible | any | — |
 | P0 | Phone app home `/app` (the installed app's start page; optional, a QR link never needs it): [Continue my order] while this phone holds an open order, the 6-digit code field with [Connect] (wrong code: "That code doesn't match a kiosk. Check the number on the kiosk screen."), [Scan a kiosk], how it works, settings (language, AI voice, larger text) that `/assistant` reads; in an in-app browser a note to open Safari or Chrome | — | P1 by [Connect], the scanner, or P2–P5 by [Continue my order] |
 | P0-scan | Phone QR scanner `/app/scan`: camera hint with [Turn on the camera] (nothing starts before the tap), scanning (camera with a framing square, "Point at the QR on the kiosk", light toggle when the camera has one), "This QR is not a KIBO kiosk." for any other code, and without a camera "Open your camera app and scan the QR there, or paste the link below" with a link field | — | P1 (`/assistant`, the claim runs there), or `/app` by [Back] |
 | P1 | Phone mic hint (or in-app browser warning) | `connected`, or `ordering` when scanned mid-order | P2, or P3 when the dine option is already set; text mode if denied |
@@ -109,7 +110,7 @@ Every screen and state that a QA pass must look at (`docs/UI_QA.md`). Ids are us
 | P5 | Phone "insert your card into the kiosk" | `paying` | P6 |
 | P6 | Phone order number, kept until the user closes it | `paid` | P7 |
 | P7 | Phone session ended / someone else is using this kiosk | `expired` / other | — |
-| PX | Phone overlays: idle warning, staff called, reconnecting, "Please check the kiosk screen" (learned kiosk), "Paused · Tap to continue" after 20 min with no change and no input (not after payment, so the order number stays in view; also on `/demo` D2) | any | — |
+| PX | Phone overlays: idle warning, staff called, reconnecting, "Busy right now. Reconnecting…" (server busy, also on `/demo` D2), "Please check the kiosk screen" (learned kiosk), "Paused · Tap to continue" after 20 min with no change and no input (not after payment, so the order number stays in view; also on `/demo` D2) | any | — |
 | D1 | `/demo` intro with 3-step guide and three place cards (burger shop, airport rail, pizza shop); [Start] and [Use my phone instead] | — | D2 |
 | D2 | `/demo` split: kiosk left, assistant right, example sentences, card stand-in, optional scenario guide on the right (open from 1440px wide) with "What the AI did" at its bottom (under the phone below 1440px). Own-phone state ([Use my phone instead]): the pairing panel instead of the assistant, waiting (QR, code, steps) then connected (phone status, read-only order line); guide sentences as text; no "What the AI did" | all (own phone: `idle` until claimed) | D3 |
 | D3 | `/demo` end: Touch vs talk card (MALO only), [Try again], Try another place (the two other places), link to `/kiosk?k=<kioskId>`; learned kiosk: at the review, [Try again], Try another place | `paid` (learned: `confirming`) | D1 |

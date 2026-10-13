@@ -24,7 +24,7 @@ export default defineConfig({
   testDir: "e2e",
   // The UI QA specs have their own config (npm run qa:ui).
   testIgnore: "qa/**",
-  // One worker: every test shares the dev server's per-IP limit (60 API requests a minute).
+  // One worker: every test shares the dev server's per-IP limit (240 API requests a minute).
   workers: 1,
   retries: process.env.CI ? 1 : 0,
   timeout: 120_000,

@@ -13,7 +13,7 @@ const GARLIC_DIP = 500;
 
 test.use({
   viewport: { width: 1440, height: 900 },
-  // Its own address for the dev server's per-IP limit (60 a minute), which the other specs already use up (I-068).
+  // Its own address for the dev server's per-IP limit (240 a minute), which the other specs already use up (I-068).
   extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.20" },
 });
 

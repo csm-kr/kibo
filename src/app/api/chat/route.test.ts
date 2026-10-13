@@ -46,7 +46,7 @@ describe("POST /api/chat", () => {
     try {
       let s = await session("203.0.113.9");
       for (let i = 0; i < 300; i++) {
-        // A demo session has 30 messages; the per-IP window 60 requests a minute.
+        // A demo session has 30 messages; the per-IP window 240 requests a minute.
         if (i > 0 && i % 25 === 0) {
           now += 61_000;
           s = await session("203.0.113.9");

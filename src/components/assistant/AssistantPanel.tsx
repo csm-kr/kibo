@@ -236,6 +236,8 @@ export function AssistantPanel(props: Props) {
   const staffVisible = session !== null && notice !== "mismatch" && staffBannerVisible(session, now, clockOffset);
   const idle = session ? idleWarning(session, now, clockOffset) : { show: false, secondsLeft: 0 };
   const reconnecting = session !== null && props.streamState !== undefined && props.streamState !== "open";
+  // The server refused the stream (too many screens on one network) and it reconnects after a wait (I-033).
+  const retrying = props.streamState === "retrying";
   const ended = screen === "ended" || screen === "taken";
 
   const bridgeLine = notice && (
@@ -277,6 +279,7 @@ export function AssistantPanel(props: Props) {
       inputElement={inputElement}
       status={
         <>
+          {retrying && <StatusChip text={pt("streamRetrying", locale)} tone="warn" />}
           {working && <StatusChip text={pt("working", locale)} />}
           {secondsLeft !== null && (
             <p role="timer" className="rounded-full bg-staff-tint px-3 py-1 text-base font-semibold text-staff-ink">
@@ -295,7 +298,7 @@ export function AssistantPanel(props: Props) {
       body = (
         <Scroll>
           <p role="status" className="py-12 text-center text-xl text-muted">
-            {pt("connecting", locale)}
+            {pt(retrying ? "streamRetrying" : "connecting", locale)}
           </p>
         </Scroll>
       );

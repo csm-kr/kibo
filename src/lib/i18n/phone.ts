@@ -18,6 +18,8 @@ const PHONE_TEXT = {
   reconnecting: { ko: "다시 연결하고 있어요…", en: "Reconnecting…" },
   // Connecting
   connecting: { ko: "키오스크에 연결하고 있어요…", en: "Connecting to the kiosk…" },
+  // The server refused the session stream (too many screens on one network); it reconnects by itself (I-033).
+  streamRetrying: { ko: "지금은 붐벼요. 잠시 후 다시 연결할게요…", en: "Busy right now. Reconnecting…" },
   // The screen stopped reading the order after 20 min with nothing happening (12-phone-app:7).
   streamPaused: { ko: "일시정지됨 · 화면을 누르면 계속합니다", en: "Paused · Tap to continue" },
   // Start

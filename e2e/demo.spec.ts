@@ -6,7 +6,7 @@ import { buttonWithText, command, kioskRoot } from "./helpers";
 
 test.use({
   viewport: { width: 1440, height: 900 },
-  // Its own address for the dev server's per-IP limit (60 a minute), which the other specs already use up.
+  // Its own address for the dev server's per-IP limit (240 a minute), which the other specs already use up.
   // Next.js keeps a client's X-Forwarded-For, and the server keys on its last value.
   extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.10" },
 });

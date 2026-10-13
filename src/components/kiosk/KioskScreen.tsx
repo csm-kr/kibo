@@ -54,6 +54,8 @@ interface Props {
   cardTap?: EventTarget;
   /** /demo only: K8 keeps the order number instead of counting back to K1; the demo's end card moves on. */
   keepOrderNumber?: boolean;
+  /** The server refused this screen's session stream and it reconnects after a wait (I-033). */
+  retrying?: boolean;
 }
 
 export function KioskScreen(props: Props) {
@@ -134,6 +136,17 @@ export function KioskScreen(props: Props) {
       data-demo={demo || undefined}
       onPointerDownCapture={countTap}
     >
+      {props.retrying && (
+        // Like the KX strips: in the flow at the top, so it pushes the screen down and covers nothing (R-006). One
+        // short line, kept low so K1 still fits the canvas with WCAG 1.4.12 text spacing.
+        <div
+          role="status"
+          data-stream-retrying
+          className="k-text-40 flex-none border-b-4 border-[#7A2E0E] bg-[#FFF1CC] px-12 py-3 text-[#7A2E0E]"
+        >
+          {kt("streamRetrying", locale)}
+        </div>
+      )}
       {session && <KioskBanners kiosk={kiosk} session={session} kioskToken={kioskToken} clockOffset={clockOffset} />}
       {screen === "attract" ? (
         <Attract

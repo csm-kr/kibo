@@ -6,10 +6,12 @@ import { CommandError } from "@/lib/commands/errors";
 
 const WINDOW_MS = 60_000;
 /**
+ * `api`: every API request (pings, stream opens, commands, chat). 240, not 60: judges may share one office address
+ * during judging, and one `/demo` order alone is about 13 requests (I-154, `phases/11-hardening/LOAD.md`).
  * `pair`: 6-digit codes on `/api/session/pair`. With 10 tries a minute (30 across 3 instances) and a few live codes
  * out of 1,000,000, one address needs about 10,000 minutes on average to hit any live code.
  */
-const LIMITS = { api: 60, session: 10, pair: 10 } as const;
+const LIMITS = { api: 240, session: 10, pair: 10 } as const;
 /** Above this many tracked keys, finished windows are dropped so memory stays bounded. */
 const SWEEP_AT = 10_000;
 
@@ -77,9 +79,10 @@ export function giveBackDailyBudget(ip: string, kind: keyof typeof DAILY, now = 
 
 /**
  * Open event streams per address (I-149). Each stream holds one Cloud Run request (80 per instance, 3 instances) for up
- * to the request timeout, so one address could otherwise hold every slot. A screen needs one stream; /demo two.
+ * to the request timeout, so one address could otherwise hold every slot. A screen needs one stream; /demo two. 40,
+ * not 10: judges behind one office network hit 10 on 10-13 (I-154); 40 stays far below the 240 slots.
  */
-const MAX_STREAMS = 10;
+const MAX_STREAMS = 40;
 const streams = new Map<string, number>();
 
 /** Counts one open stream for the address and returns the function that releases it; RATE_LIMITED over the cap. */
