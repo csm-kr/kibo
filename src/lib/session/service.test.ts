@@ -4,7 +4,7 @@ import { SESSION_TTL_MS } from "@/lib/commands/session";
 import { MemoryStore } from "@/lib/store/memory";
 import { hashToken } from "@/lib/tokens";
 import type { Session } from "@/types/session";
-import { bumpSessionCounter, claimSession, createSession, ping, runCommand } from "./service";
+import { bumpSessionCounter, claimSession, createSession, PAIR_CODE_TTL_MS, pairSession, ping, reservePairCode, runCommand } from "./service";
 
 /** 2026-10-12 14:00 KST */
 const T0 = Date.UTC(2026, 9, 12, 5, 0);
@@ -367,5 +367,98 @@ describe("learned kiosk commands", () => {
   it("cardAction on a learned kiosk → CONFLICT", async () => {
     const { store, sessionId, kioskToken } = await learned();
     expect(await code(runCommand(store, { body: body(sessionId, "cardAction"), bearer: kioskToken }, T0 + 1))).toBe("CONFLICT");
+  });
+});
+
+describe("pairing code", () => {
+  const WRONG = "That code doesn't match a kiosk. Check the number on the kiosk screen.";
+
+  it("a kiosk session gets a 6-digit code that points at it; only sessionSecrets and pairCodes hold it", async () => {
+    const { store, sessionId, pairCode } = await setup();
+    expect(pairCode).toMatch(/^\d{6}$/);
+    expect(await store.getPairCode(pairCode!)).toEqual({ sessionId, expiresAt: T0 + PAIR_CODE_TTL_MS });
+    expect(JSON.stringify(await store.get(sessionId))).not.toContain(pairCode);
+    const sec = await store.transact(sessionId, (_s, sec) => ({ value: sec }));
+    expect(sec?.pairCode).toBe(pairCode);
+  });
+
+  it("a demo session (already claimed) gets no code", async () => {
+    const store = new MemoryStore();
+    const r = await createSession(store, { kioskId: "malo", demo: true }, T0);
+    expect(r.pairCode).toBeUndefined();
+    expect(store.pairCodeCount()).toBe(0);
+  });
+
+  it("pairs like a claim, then the code is gone: a second use is NOT_FOUND", async () => {
+    const { store, sessionId, pairCode } = await setup();
+    const r = await pairSession(store, { code: pairCode! }, T0 + 1000);
+    expect(r.sessionId).toBe(sessionId);
+    expect(r.deviceToken).toMatch(/^[A-Za-z0-9_-]{43}$/);
+    expect(r.session).toMatchObject({ status: "connected", phoneConnectedAt: T0 + 1000 });
+    expect(await store.getPairCode(pairCode!)).toBeNull();
+    const res = await runCommand(store, { body: body(sessionId, "callStaff", { reasonCode: "stuck" }, { source: "button" }), bearer: r.deviceToken }, T0 + 2000);
+    expect(res.ok).toBe(true);
+    const err = await pairSession(store, { code: pairCode! }, T0 + 3000).catch((e) => e);
+    expect(err).toBeInstanceOf(CommandError);
+    expect(err.code).toBe("NOT_FOUND");
+    expect(err.message).toBe(WRONG);
+  });
+
+  it("a wrong code is NOT_FOUND with plain words", async () => {
+    const { store, pairCode } = await setup();
+    const wrong = pairCode === "000000" ? "000001" : "000000";
+    const err = await pairSession(store, { code: wrong }, T0).catch((e) => e);
+    expect(err.code).toBe("NOT_FOUND");
+    expect(err.message).toBe(WRONG);
+  });
+
+  it("after a QR claim the code is CONFLICT; an expired session is GONE", async () => {
+    const a = await setup();
+    await claimSession(a.store, { sessionId: a.sessionId, claimToken: a.claimToken }, T0 + 1);
+    const err = await pairSession(a.store, { code: a.pairCode! }, T0 + 2).catch((e) => e);
+    expect(err.code).toBe("CONFLICT");
+    expect(err.message).toBe("Someone else is using this kiosk.");
+    const b = await setup();
+    expect(await code(pairSession(b.store, { code: b.pairCode! }, T0 + SESSION_TTL_MS + 1))).toBe("GONE");
+  });
+
+  it("a code past its own expiry is NOT_FOUND even while the session lives", async () => {
+    const { store, sessionId, pairCode } = await setup();
+    // A long touch order keeps the session alive past the code's hour.
+    await store.transact(sessionId, (s) => ({ session: { ...s!, expiresAt: T0 + 2 * PAIR_CODE_TTL_MS }, value: null }));
+    expect(await code(pairSession(store, { code: pairCode! }, T0 + PAIR_CODE_TTL_MS + 1))).toBe("NOT_FOUND");
+  });
+
+  it("reissueClaim rotates the code too: the old one is NOT_FOUND, the new one pairs", async () => {
+    const { store, sessionId, kioskToken, pairCode } = await setup();
+    const first = await pairSession(store, { code: pairCode! }, T0);
+    const r = await runCommand(store, { body: body(sessionId, "reissueClaim"), bearer: kioskToken }, T0 + 1);
+    const next = r.result?.pairCode;
+    expect(next).toMatch(/^\d{6}$/);
+    expect(next).not.toBe(pairCode);
+    expect(store.pairCodeCount()).toBe(1);
+    expect(await code(pairSession(store, { code: pairCode! }, T0 + 2))).toBe("NOT_FOUND");
+    const again = await pairSession(store, { code: next! }, T0 + 3);
+    expect(again.deviceToken).not.toBe(first.deviceToken);
+    // The rotated code is never kept in a stored result.
+    const sec = await store.transact(sessionId, (_s, sec) => ({ value: sec }));
+    expect(JSON.stringify(sec?.recentResults)).not.toContain(next!);
+  });
+
+  it("a refused reissueClaim keeps the old code and leaves no new one behind", async () => {
+    const { store, sessionId, kioskToken, pairCode } = await setup();
+    await store.transact(sessionId, (s) => ({ session: { ...s!, status: "paying" }, value: null }));
+    expect(await code(runCommand(store, { body: body(sessionId, "reissueClaim"), bearer: kioskToken }, T0 + 1))).toBe("CONFLICT");
+    expect(store.pairCodeCount()).toBe(1);
+    expect((await store.getPairCode(pairCode!))?.sessionId).toBe(sessionId);
+  });
+
+  it("reservePairCode draws again when a live code is taken, and gives up after a few tries", async () => {
+    const store = new MemoryStore();
+    await store.reservePairCode("111111", { sessionId: "other", expiresAt: T0 + 60_000 }, T0);
+    const draws = ["111111", "222222"];
+    expect(await reservePairCode(store, "mine", T0, () => draws.shift()!)).toBe("222222");
+    expect((await store.getPairCode("222222"))?.sessionId).toBe("mine");
+    await expect(reservePairCode(store, "mine", T0, () => "111111")).rejects.toThrow();
   });
 });

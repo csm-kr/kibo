@@ -50,6 +50,13 @@ test("/app home: first visit, then Korean with larger text and an order to conti
   await expect(page.getByRole("link", { name: "Scan a kiosk" })).toBeVisible({ timeout: 60_000 });
   await check(page, info, "P0-home");
 
+  // A code no kiosk shows: the error under the field.
+  await page.getByLabel("Enter the 6-digit code shown on the kiosk").fill("000000");
+  await page.getByRole("button", { name: "Connect" }).click();
+  await expect(page.locator("#pair-error")).toBeVisible();
+  await check(page, info, "P0-home-pair-error");
+  await page.getByLabel("Enter the 6-digit code shown on the kiosk").fill("");
+
   const res = await request.post("/api/session", { data: { kioskId: "malo" } });
   const { sessionId, claimUrl } = (await res.json()) as { sessionId: string; claimUrl: string };
   await page.goto(claimUrl);

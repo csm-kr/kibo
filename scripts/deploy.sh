@@ -28,6 +28,11 @@ health_revision() {
 # The same build Cloud Build will run; a broken build stops here, before anything is uploaded.
 npm run build || fail "local npm run build failed"
 
+# QR links and the kiosk's "<host>/app" line use the deterministic service URL, so every kiosk shows the same host.
+PROJECT_NUMBER=$(gcloud projects describe "$PROJECT" --format 'value(projectNumber)') || fail "could not read the project number"
+[ -n "$PROJECT_NUMBER" ] || fail "could not read the project number"
+PUBLIC_ORIGIN="https://$SERVICE-$PROJECT_NUMBER.$REGION.run.app"
+
 URL=$(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format 'value(status.url)' 2>/dev/null || true)
 BEFORE=""
 [ -n "$URL" ] && BEFORE=$(health_revision "$URL")
@@ -46,7 +51,7 @@ gcloud run deploy "$SERVICE" \
   --cpu 1 \
   --memory 1Gi \
   --set-secrets GEMINI_API_KEY=gemini-api-key:latest \
-  --set-env-vars STORE=firestore,GOOGLE_CLOUD_PROJECT=$PROJECT,GEMINI_TEXT_BACKEND=auto,GEMINI_TEXT_MODEL=gemini-3.8-flash,GEMINI_TEXT_THINKING=low,GEMINI_LIVE_MODEL=gemini-3.8-live ||
+  --set-env-vars STORE=firestore,GOOGLE_CLOUD_PROJECT=$PROJECT,GEMINI_TEXT_BACKEND=auto,GEMINI_TEXT_MODEL=gemini-3.8-flash,GEMINI_TEXT_THINKING=low,GEMINI_LIVE_MODEL=gemini-3.8-live,PUBLIC_ORIGIN=$PUBLIC_ORIGIN ||
   fail "gcloud run deploy failed (the old revision ${BEFORE:-none} is still serving)"
 
 URL=$(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format 'value(status.url)') ||

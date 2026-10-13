@@ -114,6 +114,19 @@ describe("MemoryStore", () => {
     expect(seen).toEqual([0]);
   });
 
+  it("pair codes: a live code cannot be reserved twice, an expired one can; delete only removes its own session's code", async () => {
+    const store = new MemoryStore();
+    expect(await store.reservePairCode("123456", { sessionId: "s1", expiresAt: T0 + 10 }, T0)).toBe(true);
+    expect(await store.reservePairCode("123456", { sessionId: "s2", expiresAt: T0 + 20 }, T0 + 5)).toBe(false);
+    expect(await store.getPairCode("123456")).toEqual({ sessionId: "s1", expiresAt: T0 + 10 });
+    expect(await store.reservePairCode("123456", { sessionId: "s2", expiresAt: T0 + 20 }, T0 + 10)).toBe(true);
+    await store.deletePairCode("123456", "s1");
+    expect((await store.getPairCode("123456"))?.sessionId).toBe("s2");
+    await store.deletePairCode("123456", "s2");
+    expect(await store.getPairCode("123456")).toBeNull();
+    expect(store.pairCodeCount()).toBe(0);
+  });
+
   it("subscribe on a missing session sends null", async () => {
     const store = new MemoryStore();
     const seen: unknown[] = [];

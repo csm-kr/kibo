@@ -5,7 +5,11 @@ import { CommandError } from "@/lib/commands/errors";
 // effective limit is up to 3x these values (ARCHITECTURE "Limits and cost").
 
 const WINDOW_MS = 60_000;
-const LIMITS = { api: 60, session: 10 } as const;
+/**
+ * `pair`: 6-digit codes on `/api/session/pair`. With 10 tries a minute (30 across 3 instances) and a few live codes
+ * out of 1,000,000, one address needs about 10,000 minutes on average to hit any live code.
+ */
+const LIMITS = { api: 60, session: 10, pair: 10 } as const;
 /** Above this many tracked keys, finished windows are dropped so memory stays bounded. */
 const SWEEP_AT = 10_000;
 

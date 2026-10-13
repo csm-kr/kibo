@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     if (claimToken) {
       // reissueClaim: runCommand accepted the body, so sessionId is a valid string.
       const { sessionId } = body as { sessionId: string };
-      return ok({ ...res, claimUrl: claimUrl(req, sessionId, claimToken) });
+      return ok({ ...res, claimUrl: claimUrl(req, sessionId, claimToken), pairCode: res.result?.pairCode });
     }
     return ok(res);
   } catch (e) {

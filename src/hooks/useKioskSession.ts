@@ -12,15 +12,17 @@ interface Stored {
   sessionId: string;
   kioskToken: string;
   claimUrl: string;
+  /** The 6-digit code for /app; absent on records stored before pairing codes existed. */
+  pairCode?: string;
 }
 
 function parseStored(raw: string | null): Stored | null {
   try {
     const v: unknown = JSON.parse(raw ?? "null");
     if (!v || typeof v !== "object") return null;
-    const { sessionId, kioskToken, claimUrl } = v as Record<string, unknown>;
+    const { sessionId, kioskToken, claimUrl, pairCode } = v as Record<string, unknown>;
     if (typeof sessionId !== "string" || typeof kioskToken !== "string" || typeof claimUrl !== "string") return null;
-    return { sessionId, kioskToken, claimUrl };
+    return { sessionId, kioskToken, claimUrl, ...(typeof pairCode === "string" ? { pairCode } : {}) };
   } catch {
     return null;
   }
@@ -42,7 +44,7 @@ function writeStored(key: string, s: Stored) {
 }
 
 /**
- * Session for the standalone /kiosk. Resumes {sessionId, kioskToken, claimUrl} from localStorage after a
+ * Session for the standalone /kiosk. Resumes {sessionId, kioskToken, claimUrl, pairCode} from localStorage after a
  * reload unless the session is gone, expired or paid (docs/SECURITY.md "Reliability"); otherwise creates one.
  */
 export function useKioskSession(kioskId: string) {
@@ -70,7 +72,7 @@ export function useKioskSession(kioskId: string) {
     clearTimeout(retryTimer.current);
     try {
       const r = await createSession(kioskId);
-      writeStored(key, { sessionId: r.sessionId, kioskToken: r.kioskToken, claimUrl: r.claimUrl });
+      writeStored(key, { sessionId: r.sessionId, kioskToken: r.kioskToken, claimUrl: r.claimUrl, pairCode: r.pairCode });
     } catch {
       // Rate limit or no connection: keep the attract screen up and try again shortly.
       retryTimer.current = setTimeout(() => retry.current(), RETRY_MS);
@@ -130,8 +132,8 @@ export function useKioskSession(kioskId: string) {
   }, [stored]);
 
   const setClaimUrl = useCallback(
-    (claimUrl: string) => {
-      if (stored) writeStored(key, { ...stored, claimUrl });
+    (claimUrl: string, pairCode?: string) => {
+      if (stored) writeStored(key, { ...stored, claimUrl, pairCode });
     },
     [stored, key],
   );
@@ -140,6 +142,7 @@ export function useKioskSession(kioskId: string) {
     sessionId: stored?.sessionId ?? null,
     kioskToken: stored?.kioskToken ?? null,
     claimUrl: stored?.claimUrl ?? null,
+    pairCode: stored?.pairCode ?? null,
     session,
     streamState: state,
     clockOffset,

@@ -31,6 +31,7 @@ function run(opts: Run) {
   fake(
     "gcloud",
     `case "$*" in
+  *"projects describe"*) echo "407514467119" ;;
   *describe*) echo "https://kibo.example" ;;
   *deploy*) [ ${opts.deploy ?? 0} -eq 0 ] || exit 1; ${opts.newRevision ? `echo "${opts.newRevision}" > "${state}"` : ":"} ;;
 esac`,
@@ -54,6 +55,8 @@ describe("scripts/deploy.sh", { timeout: 30_000 }, () => {
     // The local build runs before anything is uploaded, and the deploy names the region.
     expect(r.calls.indexOf("npm run build")).toBeLessThan(r.calls.indexOf("gcloud run deploy"));
     expect(r.calls).toContain("--region asia-northeast3");
+    // QR links and the kiosk's "<host>/app" line use the deterministic service URL, built from the project number.
+    expect(r.calls).toContain("PUBLIC_ORIGIN=https://kibo-407514467119.asia-northeast3.run.app");
   });
 
   it("stops before uploading when the local build fails", () => {

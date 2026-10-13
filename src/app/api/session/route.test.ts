@@ -19,12 +19,14 @@ describe("POST /api/session", () => {
     expect(url.pathname).toBe("/assistant");
     expect(url.search).toBe(`?s=${body.sessionId}`);
     expect(url.hash).toMatch(/^#t=[A-Za-z0-9_-]{43}$/);
+    expect(body.pairCode).toMatch(/^\d{6}$/);
     expect((await getStore().get(body.sessionId))?.status).toBe("idle");
   });
 
-  it("a demo session also returns a device token", async () => {
+  it("a demo session also returns a device token, and no pairing code", async () => {
     const { body } = await read(await POST(jsonRequest("/api/session", { kioskId: "malo", demo: true })));
     expect(body.deviceToken).toMatch(/^[A-Za-z0-9_-]{43}$/);
+    expect(body.pairCode).toBeUndefined();
     expect(new URL(body.claimUrl).origin).toBe("http://kibo.test");
   });
 

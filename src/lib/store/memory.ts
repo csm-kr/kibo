@@ -1,5 +1,5 @@
 import type { Session } from "@/types/session";
-import type { SessionSecrets, SessionStore, TransactResult } from "./types";
+import type { PairCodeEntry, SessionSecrets, SessionStore, TransactResult } from "./types";
 
 // Single-process store for unit tests and local E2E (STORE=memory). Not for Cloud Run with more than one instance.
 
@@ -10,6 +10,28 @@ export class MemoryStore implements SessionStore {
   private secrets = new Map<string, SessionSecrets>();
   private queues = new Map<string, Promise<unknown>>();
   private listeners = new Map<string, Set<Listener>>();
+  private pairCodes = new Map<string, PairCodeEntry>();
+
+  async reservePairCode(code: string, entry: PairCodeEntry, now: number): Promise<boolean> {
+    const held = this.pairCodes.get(code);
+    if (held && held.expiresAt > now) return false;
+    this.pairCodes.set(code, { ...entry });
+    return true;
+  }
+
+  async getPairCode(code: string): Promise<PairCodeEntry | null> {
+    const entry = this.pairCodes.get(code);
+    return entry ? { ...entry } : null;
+  }
+
+  async deletePairCode(code: string, sessionId: string): Promise<void> {
+    if (this.pairCodes.get(code)?.sessionId === sessionId) this.pairCodes.delete(code);
+  }
+
+  /** Tests only: how many pairing codes are stored. */
+  pairCodeCount(): number {
+    return this.pairCodes.size;
+  }
 
   async create(session: Session, secrets: SessionSecrets): Promise<void> {
     if (this.sessions.has(session.sessionId)) throw new Error("Session already exists");

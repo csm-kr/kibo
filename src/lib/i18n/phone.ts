@@ -178,7 +178,7 @@ const PHONE_TEXT = {
   scanKiosk: { ko: "키오스크 QR 찍기", en: "Scan a kiosk" },
   continueOrder: { ko: "하던 주문 이어서 하기", en: "Continue my order" },
   howTitle: { ko: "이렇게 써요", en: "How it works" },
-  appStep1: { ko: "키오스크 화면의 QR을 찍어요.", en: "Scan the QR on the kiosk screen." },
+  appStep1: { ko: "키오스크 화면의 번호를 넣거나 QR을 찍어요.", en: "Enter the code on the kiosk screen, or scan its QR." },
   appStep2: { ko: "휴대폰에 주문을 말해요.", en: "Tell your phone what you want." },
   appStep3: { ko: "주문을 확인하고, 키오스크에서 결제해요.", en: "Check your order, then pay at the kiosk." },
   settings: { ko: "설정", en: "Settings" },
@@ -186,6 +186,35 @@ const PHONE_TEXT = {
   largeText: { ko: "큰 글씨", en: "Larger text" },
   settingOn: { ko: "켜짐", en: "On" },
   settingOff: { ko: "꺼짐", en: "Off" },
+  // /app pairing code (12-phone-app:3), the short way in: the kiosk shows "<host>/app" and 6 digits
+  pairLabel: { ko: "키오스크 화면에 있는 6자리 번호를 넣으세요", en: "Enter the 6-digit code shown on the kiosk" },
+  pairConnect: { ko: "연결하기", en: "Connect" },
+  pairDigits: { ko: "6자리를 모두 넣어 주세요.", en: "Please enter all 6 digits." },
+  pairWrong: {
+    ko: "번호가 맞는 키오스크가 없어요. 키오스크 화면의 번호를 확인해 주세요.",
+    en: "That code doesn't match a kiosk. Check the number on the kiosk screen.",
+  },
+  pairOrScan: { ko: "또는 QR로 연결해요", en: "Or connect with the QR" },
+  inAppCamera: { ko: "이 앱에서는 마이크와 카메라가 잘 안 될 때가 많아요.", en: "Microphones and cameras often don't work in this app." },
+  // /app/scan, the in-app QR scanner
+  scanTitle: { ko: "키오스크 QR 찍기", en: "Scan the kiosk QR" },
+  camHintTitle: { ko: "카메라로 키오스크의 QR을 찍어요", en: "Use the camera to scan the kiosk QR" },
+  camPicTitle: { ko: "카메라 사용", en: "Use your camera" },
+  camTurnOn: { ko: "카메라 켜기", en: "Turn on the camera" },
+  camStarting: { ko: "카메라를 켜고 있어요…", en: "Starting the camera…" },
+  scanPoint: { ko: "키오스크의 QR을 네모 안에 맞춰 주세요", en: "Point at the QR on the kiosk" },
+  scanFound: { ko: "찾았어요. 연결하고 있어요…", en: "Found it. Connecting…" },
+  scanForeign: { ko: "KIBO 키오스크 QR이 아니에요.", en: "This QR is not a KIBO kiosk." },
+  torchOn: { ko: "불 켜기", en: "Light on" },
+  torchOff: { ko: "불 끄기", en: "Light off" },
+  camUnavailable: { ko: "카메라를 쓸 수 없어요.", en: "The camera isn't available." },
+  camOpenApp: {
+    ko: "휴대폰 카메라 앱으로 키오스크의 QR을 찍어 주세요. 링크를 아래에 붙여 넣어도 돼요.",
+    en: "Open your camera app and scan the QR there, or paste the link below.",
+  },
+  pasteLabel: { ko: "키오스크 링크", en: "Kiosk link" },
+  pasteOpen: { ko: "열기", en: "Open" },
+  backHome: { ko: "처음으로", en: "Back" },
 } satisfies Record<string, Record<Locale, string>>;
 
 export type PhoneTextKey = keyof typeof PHONE_TEXT;

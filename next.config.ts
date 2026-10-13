@@ -24,6 +24,11 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        // The in-app QR scanner is the only page that may use the camera. Later entries win for the same header.
+        source: "/app/scan",
+        headers: [{ key: "Permissions-Policy", value: "microphone=(self), camera=(self)" }],
+      },
+      {
         // The service worker is always fetched fresh, so a fix reaches phones on their next visit.
         source: "/sw.js",
         headers: [

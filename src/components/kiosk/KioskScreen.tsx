@@ -15,6 +15,7 @@ import { DemoCounter } from "./DemoCounter";
 import { DoneScreen } from "./DoneScreen";
 import { KioskBanners } from "./KioskBanners";
 import { MenuScreen } from "./MenuScreen";
+import { PairCode } from "./PairCode";
 import { PaymentScreen } from "./PaymentScreen";
 import { ReviewScreen } from "./ReviewScreen";
 import { StartOver } from "./StartOver";
@@ -29,6 +30,8 @@ interface Props {
   session: Session | null;
   kioskToken: string | null;
   claimUrl: string | null;
+  /** The 6-digit code for /app shown under the QR; /demo sessions have none. */
+  pairCode?: string | null;
   /** `/kiosk?…&demo=1` only: the tap counter for the touch-vs-voice measurement. /demo leaves it off (I-135). */
   demo?: boolean;
   /** Server time minus local time, from ping; session times are server time. */
@@ -39,7 +42,7 @@ interface Props {
    * [Connect another phone] issued a new QR; the owner stores it. /demo leaves it out, which hides the button:
    * a new QR would void the demo's own phone (I-066).
    */
-  onClaimUrl?(claimUrl: string): void;
+  onClaimUrl?(claimUrl: string, pairCode?: string): void;
   /**
    * Standalone /kiosk only: [처음으로] on K2 and K3 ends the touch order with a new session (I-048). /demo leaves it
    * out, so the judge's session is never dropped.
@@ -133,7 +136,7 @@ export function KioskScreen(props: Props) {
       {screen === "attract" ? (
         <Attract
           kiosk={kiosk}
-          claimUrl={claimUrl}
+          claimUrl={claimUrl} pairCode={props.pairCode}
           canStart={Boolean(session && kioskToken)}
           large={large}
           onLocale={(l: Locale) => setLang({ forId: sessionId, locale: l })}
@@ -144,19 +147,19 @@ export function KioskScreen(props: Props) {
         <MenuScreen
           kiosk={kiosk}
           session={session}
-          claimUrl={claimUrl}
+          claimUrl={claimUrl} pairCode={props.pairCode}
           clockOffset={clockOffset}
           send={send}
           onClaimUrl={onClaimUrl}
           startOver={startOver}
         />
       ) : screen === "review" && session ? (
-        <ReviewScreen kiosk={kiosk} session={session} claimUrl={claimUrl} send={send} onClaimUrl={onClaimUrl} />
+        <ReviewScreen kiosk={kiosk} session={session} claimUrl={claimUrl} pairCode={props.pairCode} send={send} onClaimUrl={onClaimUrl} />
       ) : screen === "payment" && session ? (
         <PaymentScreen
           kiosk={kiosk}
           session={session}
-          claimUrl={claimUrl}
+          claimUrl={claimUrl} pairCode={props.pairCode}
           send={send}
           onClaimUrl={onClaimUrl}
           cardTap={props.cardTap}
@@ -174,7 +177,7 @@ export function KioskScreen(props: Props) {
         <>
           <Header kiosk={kiosk} />
           {/* The small QR on K2 too: a touch order can switch to the phone from every screen (Flow B, I-048). */}
-          {session && <KioskToolbar kiosk={kiosk} session={session} claimUrl={claimUrl} send={send} onClaimUrl={onClaimUrl} />}
+          {session && <KioskToolbar kiosk={kiosk} session={session} claimUrl={claimUrl} pairCode={props.pairCode} send={send} onClaimUrl={onClaimUrl} />}
           <Dine
             kiosk={kiosk}
             phoneConnected={session?.phoneConnectedAt != null}
@@ -246,6 +249,7 @@ export function Header({ kiosk, children }: { kiosk: KioskData; children?: React
 function Attract(props: {
   kiosk: KioskData;
   claimUrl: string | null;
+  pairCode?: string | null;
   canStart: boolean;
   large: boolean;
   onLocale(locale: Locale): void;
@@ -294,6 +298,7 @@ function Attract(props: {
           <span className="k-text-40 text-(--k-primary-tint)">{kt("touchHint", locale)}</span>
         </button>
       </div>
+      <PairCode kiosk={kiosk} claimUrl={claimUrl} pairCode={props.pairCode} className="mx-12 mt-8 flex-none" />
       <div className="flex flex-none flex-wrap items-center justify-between gap-4 px-12 py-10">
         {kiosk.locales.length > 1 ? (
           <div role="group" aria-label={kt("language", locale)} className="flex gap-4">

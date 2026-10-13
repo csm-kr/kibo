@@ -25,6 +25,8 @@ export interface CreatedSession {
   kioskToken: string;
   expiresAt: number;
   deviceToken?: string;
+  /** 6 digits the phone can type on /app; absent on /demo sessions. */
+  pairCode?: string;
 }
 
 export interface CommandReply {
@@ -35,6 +37,8 @@ export interface CommandReply {
   result?: CommandResult;
   duplicate?: boolean;
   claimUrl?: string;
+  /** reissueClaim: the new pairing code that replaces the old one. */
+  pairCode?: string;
 }
 
 export interface PingReply {
@@ -93,6 +97,11 @@ export function ping(input: { sessionId: string; token: string; active: boolean 
 
 export function claim(input: { sessionId: string; claimToken: string }): Promise<{ deviceToken: string; status: SessionStatus }> {
   return post("/api/session/claim", input);
+}
+
+/** /app's code field: the kiosk's 6-digit code instead of a QR claim token. */
+export function pair(code: string): Promise<{ sessionId: string; deviceToken: string; status: SessionStatus }> {
+  return post("/api/session/pair", { code });
 }
 
 export interface LiveTokenReply {

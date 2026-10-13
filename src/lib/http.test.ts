@@ -96,4 +96,15 @@ describe("publicOrigin", () => {
   it("ignores a forwarded proto other than http or https", () => {
     expect(publicOrigin(req({ "x-forwarded-proto": "javascript", "x-forwarded-host": "kibo.example.app" }))).toBe("http://kibo.example.app");
   });
+
+  it("uses PUBLIC_ORIGIN when it is set to an http(s) origin, so every kiosk shows one short host", () => {
+    try {
+      process.env.PUBLIC_ORIGIN = "https://kibo-1.asia-northeast3.run.app";
+      expect(publicOrigin(req({ host: "kibo-abc-du.a.run.app" }))).toBe("https://kibo-1.asia-northeast3.run.app");
+      process.env.PUBLIC_ORIGIN = "not a url";
+      expect(publicOrigin(req({ host: "localhost:3000" }))).toBe("http://localhost:3000");
+    } finally {
+      delete process.env.PUBLIC_ORIGIN;
+    }
+  });
 });

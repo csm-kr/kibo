@@ -8,6 +8,7 @@ import { kt } from "@/lib/i18n/kiosk";
 import type { KioskData } from "@/types/menu";
 import type { Session } from "@/types/session";
 import { ModalLayer } from "./ModalLayer";
+import { PairCode } from "./PairCode";
 import { FOCUS, SCRIM } from "./styles";
 
 // The row under the header on K2, K3, K6 and K7: dine chip, and the small QR or "phone connected" (Flow B).
@@ -17,9 +18,10 @@ export function KioskToolbar(props: {
   kiosk: KioskData;
   session: Session;
   claimUrl: string | null;
+  pairCode?: string | null;
   send(type: CommandType, args: object): Promise<CommandReply | null>;
   /** Absent in /demo, which hides [Connect another phone] (see KioskScreen). */
-  onClaimUrl?(claimUrl: string): void;
+  onClaimUrl?(claimUrl: string, pairCode?: string): void;
   /** K3's 2 s "AI가 담았어요: …" line; it takes this row instead of covering the tiles (I-045). */
   status?: string | null;
 }) {
@@ -31,7 +33,7 @@ export function KioskToolbar(props: {
   async function connectOtherPhone() {
     const reply = await props.send("reissueClaim", {});
     if (reply?.claimUrl) {
-      onClaimUrl?.(reply.claimUrl);
+      onClaimUrl?.(reply.claimUrl, reply.pairCode);
       setQrOpen(true);
     }
   }
@@ -60,7 +62,7 @@ export function KioskToolbar(props: {
           )}
         </div>
       </div>
-      {qrOpen && <QrSheet kiosk={kiosk} claimUrl={props.claimUrl} onClose={() => setQrOpen(false)} />}
+      {qrOpen && <QrSheet kiosk={kiosk} claimUrl={props.claimUrl} pairCode={props.pairCode} onClose={() => setQrOpen(false)} />}
     </div>
   );
 }
@@ -137,7 +139,7 @@ function SmallQrButton(props: { claimUrl: string | null; label: string; onOpen()
   );
 }
 
-function QrSheet(props: { kiosk: KioskData; claimUrl: string | null; onClose(): void }) {
+function QrSheet(props: { kiosk: KioskData; claimUrl: string | null; pairCode?: string | null; onClose(): void }) {
   const { locale, domain } = props.kiosk;
   const src = useQrSrc(props.claimUrl);
   return (
@@ -162,6 +164,7 @@ function QrSheet(props: { kiosk: KioskData; claimUrl: string | null; onClose(): 
           </p>
         )}
         <p className="k-text-40 text-[#4B463F]">{kt("qrSheetHint", locale, domain)}</p>
+        <PairCode kiosk={props.kiosk} claimUrl={props.claimUrl} pairCode={props.pairCode} className="w-full text-left" />
         <button
           type="button"
           onClick={props.onClose}

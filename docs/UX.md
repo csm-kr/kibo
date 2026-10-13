@@ -47,7 +47,7 @@ What each persona goes through, where they could give up, and which moment must 
 | # | Kiosk | Phone | Heuristics |
 |---|---|---|---|
 | A1 | Attract screen with two large choices: "Order by talking (QR)" and "Order by touch" | — | 2, 6 |
-| A2 | "Connecting…" next to the QR | Camera shows a link; tapping opens `/assistant`. No install | 1 |
+| A2 | "Connecting…" next to the QR; under it "Or open **<host>/app** and enter **123 456**" (the 6-digit pairing code) | Camera shows a link; tapping opens `/assistant`. No install. Or, without a camera app: open `<host>/app`, type the 6 digits, [Connect]; or [Scan a kiosk] on `/app` scans the QR inside the web app (`/app/scan`). All three end in `/assistant` | 1, 7 |
 | A3 | "Phone connected"; moves to dine option | **Mic hint screen:** "Tap **Allow** on the next screen" with a picture, then the browser prompt | 1, 10 |
 | A4 | Unchanged | "Eat here or take out?" with two large photo buttons; speaking works too | 6 |
 | A5 | — | **One large mic button.** "Listening…" with a waveform; stops automatically; shows what it heard | 1, 3 |
@@ -99,7 +99,8 @@ Every screen and state that a QA pass must look at (`docs/UI_QA.md`). Ids are us
 | K7 | Kiosk payment method → card insert → approving | `paying` | K8 or K6 (edit) |
 | K8 | Kiosk receipt? → order number | `paid` | K1 after 10 s |
 | KX | Kiosk banners: staff called and connection paused (a strip at the top that pushes the screen down), AI highlight + status line (in the toolbar row for 2 s), idle warning | any | — |
-| P0 | Phone app home `/app` (the installed app's start page; optional, a QR link never needs it): [Scan a kiosk], [Continue my order] while this phone holds an open order, how it works, settings (language, AI voice, larger text) that `/assistant` reads | — | scanner (`/app/scan`), or P2–P5 by [Continue my order] |
+| P0 | Phone app home `/app` (the installed app's start page; optional, a QR link never needs it): [Continue my order] while this phone holds an open order, the 6-digit code field with [Connect] (wrong code: "That code doesn't match a kiosk. Check the number on the kiosk screen."), [Scan a kiosk], how it works, settings (language, AI voice, larger text) that `/assistant` reads; in an in-app browser a note to open Safari or Chrome | — | P1 by [Connect], the scanner, or P2–P5 by [Continue my order] |
+| P0-scan | Phone QR scanner `/app/scan`: camera hint with [Turn on the camera] (nothing starts before the tap), scanning (camera with a framing square, "Point at the QR on the kiosk", light toggle when the camera has one), "This QR is not a KIBO kiosk." for any other code, and without a camera "Open your camera app and scan the QR there, or paste the link below" with a link field | — | P1 (`/assistant`, the claim runs there), or `/app` by [Back] |
 | P1 | Phone mic hint (or in-app browser warning) | `connected`, or `ordering` when scanned mid-order | P2, or P3 when the dine option is already set; text mode if denied |
 | P2 | Phone dine option (not on a kiosk without dine options, such as the ticket machine: P3 directly) | `connected` | P3 |
 | P3 | Phone talk: mic, transcript, last two messages, cart card, choices, [Undo] | `ordering` | P4 |
@@ -133,7 +134,7 @@ Every screen and state that a QA pass must look at (`docs/UI_QA.md`). Ids are us
 - **Screen readers:** every control labelled; cart changes announced with `aria-live` when AI voice is off (suppressed while the AI speaks, to avoid overlap).
 - **Voice replies:** short, one thing at a time, slightly slow; can be turned off. Half-duplex (mic paused while the AI speaks) to avoid self-interruption.
 - **Language:** phone UI and AI voice support Korean and English, follow the browser language (anything else falls back to English) and can be changed; the kiosk starts in its default language (Korean) and its K1 language row switches the kiosk to English for one order.
-- **In-app browsers** (KakaoTalk, Naver, Instagram, Facebook, LINE) have unreliable microphones: detect and suggest opening in Safari/Chrome. P1 shows [Copy link] before the phone claims the QR, so the copied link still connects in the other browser; [Order here by typing] claims in the app and a banner stays.
+- **In-app browsers** (KakaoTalk, Naver, Instagram, Facebook, LINE) have unreliable microphones: detect and suggest opening in Safari/Chrome. P1 shows [Copy link] before the phone claims the QR, so the copied link still connects in the other browser; [Order here by typing] claims in the app and a banner stays. `/app` and `/app/scan` show the same advice (cameras often fail there too).
 
 ## Copy
 - Polite, short sentences, one piece of information per sentence.

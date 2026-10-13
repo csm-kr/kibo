@@ -1,9 +1,9 @@
 import type { DocumentData, Firestore } from "firebase-admin/firestore";
 import type { CartLine, Session } from "@/types/session";
-import type { SessionSecrets, SessionStore, TransactResult } from "./types";
+import type { PairCodeEntry, SessionSecrets, SessionStore, TransactResult } from "./types";
 
 // Production store (STORE=firestore). firebase-admin is imported on first use only, so tests and
-// STORE=memory never load it. Collections: `sessions` (public) and `sessionSecrets` (server only).
+// STORE=memory never load it. Collections: `sessions` (public), `sessionSecrets` and `pairCodes` (server only).
 
 type FirestoreModule = typeof import("firebase-admin/firestore");
 
@@ -65,6 +65,35 @@ export class FirestoreStore implements SessionStore {
     batch.create(db.collection("sessions").doc(session.sessionId), sessionToDoc(fs, session));
     batch.create(db.collection("sessionSecrets").doc(session.sessionId), secretsToDoc(fs, secrets));
     await batch.commit();
+  }
+
+  async reservePairCode(code: string, entry: PairCodeEntry, now: number): Promise<boolean> {
+    const { db, fs } = await this.load();
+    const ref = db.collection("pairCodes").doc(code);
+    return db.runTransaction(async (tx) => {
+      const snap = await tx.get(ref);
+      // TTL deletes up to a day late, so an expired entry may still be there and is simply replaced.
+      if (snap.exists && (snap.data()!.expiresAt.toMillis() as number) > now) return false;
+      tx.set(ref, { sessionId: entry.sessionId, expiresAt: fs.Timestamp.fromMillis(entry.expiresAt) });
+      return true;
+    });
+  }
+
+  async getPairCode(code: string): Promise<PairCodeEntry | null> {
+    const { db } = await this.load();
+    const snap = await db.collection("pairCodes").doc(code).get();
+    if (!snap.exists) return null;
+    const d = snap.data()!;
+    return { sessionId: d.sessionId as string, expiresAt: d.expiresAt.toMillis() as number };
+  }
+
+  async deletePairCode(code: string, sessionId: string): Promise<void> {
+    const { db } = await this.load();
+    const ref = db.collection("pairCodes").doc(code);
+    await db.runTransaction(async (tx) => {
+      const snap = await tx.get(ref);
+      if (snap.exists && snap.data()!.sessionId === sessionId) tx.delete(ref);
+    });
   }
 
   async get(sessionId: string): Promise<Session | null> {

@@ -20,6 +20,7 @@ export async function POST(req: Request) {
       kioskToken: r.kioskToken,
       expiresAt: r.expiresAt,
       ...(r.deviceToken ? { deviceToken: r.deviceToken } : {}),
+      ...(r.pairCode ? { pairCode: r.pairCode } : {}),
     });
   } catch (e) {
     return fail(e);

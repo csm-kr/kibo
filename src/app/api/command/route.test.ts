@@ -114,6 +114,7 @@ describe("POST /api/command", () => {
     const url = new URL(body.claimUrl);
     expect(`${url.origin}${url.pathname}${url.search}`).toBe(`https://kibo.example.app/assistant?s=${s.sessionId}`);
     expect(url.hash).toMatch(/^#t=[A-Za-z0-9_-]{43}$/);
+    expect(body.pairCode).toMatch(/^\d{6}$/);
     // The old phone's token stops working.
     const old = await POST(jsonRequest("/api/command", commandBody(s.sessionId, "undoLastChange"), auth(s.deviceToken)));
     expect(old.status).toBe(401);

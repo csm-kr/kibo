@@ -12,6 +12,11 @@ export interface SessionSecrets {
    * `reissueClaim` is stored with an empty result: the claim token itself is never kept. Absent until the first one.
    */
   recentResults?: { commandId: string; result: CommandResult }[];
+  /**
+   * The kiosk's current 6-digit pairing code (`pairCodes/{code}`), null once used, absent on /demo sessions.
+   * Kept in plain digits: a hash of a 6-digit code would protect nothing, and rotation must delete the old entry.
+   */
+  pairCode?: string | null;
   /** Per-session limits (ARCHITECTURE "Limits and cost"); absent until the first bump. */
   chatCount?: number;
   liveTokenCount?: number;
@@ -26,7 +31,18 @@ export interface TransactResult<T> {
   value: T;
 }
 
+/** Server only: `pairCodes/{code}`, deleted by TTL on `expiresAt` (epoch ms here). */
+export interface PairCodeEntry {
+  sessionId: string;
+  expiresAt: number;
+}
+
 export interface SessionStore {
+  /** Writes the entry unless a live one (expiresAt > now) holds the code; false when taken. */
+  reservePairCode(code: string, entry: PairCodeEntry, now: number): Promise<boolean>;
+  getPairCode(code: string): Promise<PairCodeEntry | null>;
+  /** Deletes the entry only while it still points at sessionId, so a reused code is never removed by its old session. */
+  deletePairCode(code: string, sessionId: string): Promise<void>;
   create(session: Session, secrets: SessionSecrets): Promise<void>;
   get(sessionId: string): Promise<Session | null>;
   /**

@@ -66,7 +66,21 @@ export function clientIp(req: Request): string {
   return hops[hops.length - 1].trim() || "local";
 }
 
+/** `PUBLIC_ORIGIN` (set by scripts/deploy.sh to the deterministic Cloud Run URL) when it is a valid http(s) origin. */
+function configuredOrigin(): string | null {
+  const raw = process.env.PUBLIC_ORIGIN;
+  if (!raw) return null;
+  try {
+    const u = new URL(raw);
+    return u.protocol === "https:" || u.protocol === "http:" ? u.origin : null;
+  } catch {
+    return null;
+  }
+}
+
 export function publicOrigin(req: Request): string {
+  const configured = configuredOrigin();
+  if (configured) return configured;
   const url = new URL(req.url);
   const first = (name: string) => req.headers.get(name)?.split(",")[0].trim() || null;
   const host = first("x-forwarded-host") ?? first("host");

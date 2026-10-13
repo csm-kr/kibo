@@ -1,12 +1,16 @@
 "use client";
 
-import { Check, ScanLine } from "lucide-react";
+import { Check, Link2, ScanLine } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSyncExternalStore } from "react";
+import { useRouter } from "next/navigation";
+import { useState, useSyncExternalStore, type FormEvent } from "react";
+import { InAppNote } from "@/components/app/InAppNote";
 import { ServiceWorker } from "@/components/app/ServiceWorker";
 import { CARD, FOCUS, ICON, PRESS, PRIMARY, SECONDARY } from "@/components/phone/ui";
 import { setPhoneSettings, usePhoneSettings } from "@/hooks/usePhoneSettings";
+import { ApiError, pair } from "@/lib/client/api";
+import { errorCopy } from "@/lib/i18n/errors";
 import { pt } from "@/lib/i18n/phone";
 import { LAST_ORDER_KEY, resumeHref } from "@/lib/phone/settings";
 import type { Locale } from "@/types/menu";
@@ -34,16 +38,22 @@ export function AppHome() {
           <h1 className="text-2xl leading-tight font-bold">{pt("appTagline", locale)}</h1>
         </div>
 
-        <div className="flex flex-col gap-3">
-          <Link href="/app/scan" className={`${PRIMARY} min-h-22`}>
+        <InAppNote locale={locale} />
+
+        {resume && (
+          <Link href={resume} className={SECONDARY}>
+            {pt("continueOrder", locale)}
+          </Link>
+        )}
+
+        <PairForm locale={locale} />
+
+        <div className="flex flex-col gap-2">
+          <p className="text-base font-semibold text-muted">{pt("pairOrScan", locale)}</p>
+          <Link href="/app/scan" className={SECONDARY}>
             <ScanLine {...ICON} />
             {pt("scanKiosk", locale)}
           </Link>
-          {resume && (
-            <Link href={resume} className={SECONDARY}>
-              {pt("continueOrder", locale)}
-            </Link>
-          )}
         </div>
 
         <section aria-labelledby="how" className={`${CARD} flex flex-col gap-3`}>
@@ -75,6 +85,67 @@ export function AppHome() {
         </section>
       </div>
     </main>
+  );
+}
+
+/**
+ * The primary way in (12-phone-app:3): the kiosk shows "<host>/app" and 6 digits. Success stores the device token
+ * where a QR claim stores it, then /assistant continues with the microphone hint and talking.
+ */
+function PairForm({ locale }: { locale: Locale }) {
+  const router = useRouter();
+  const [code, setCode] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    if (code.length !== 6) return setError(pt("pairDigits", locale));
+    setBusy(true);
+    setError(null);
+    try {
+      const r = await pair(code);
+      localStorage.setItem(`kibo.phone.${r.sessionId}`, r.deviceToken);
+      router.push(`/assistant?s=${encodeURIComponent(r.sessionId)}`);
+    } catch (err) {
+      const c = err instanceof ApiError ? err.code : "INTERNAL";
+      setError(c === "NOT_FOUND" ? pt("pairWrong", locale) : c === "CONFLICT" ? pt("takenTitle", locale) : errorCopy(c, locale));
+      setBusy(false);
+    }
+  }
+
+  return (
+    <form onSubmit={submit} noValidate className={`${CARD} flex flex-col gap-3`}>
+      <label htmlFor="pair-code" className="text-xl font-semibold">
+        {pt("pairLabel", locale)}
+      </label>
+      <input
+        id="pair-code"
+        name="code"
+        inputMode="numeric"
+        autoComplete="one-time-code"
+        pattern="[0-9]*"
+        placeholder="000000"
+        value={code}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? "pair-error" : undefined}
+        // Digits only, at most 6: "123 456" pasted from a message still works.
+        onChange={(e) => {
+          setCode(e.target.value.replace(/\D/g, "").slice(0, 6));
+          setError(null);
+        }}
+        className={`min-h-18 w-full rounded-tile border border-field bg-white px-4 text-center font-[family-name:var(--font-grotesk)] text-[2rem] font-bold tracking-[0.3em] tabular-nums placeholder:text-muted/40 ${FOCUS}`}
+      />
+      {error && (
+        <p id="pair-error" role="alert" className="text-xl text-staff-ink">
+          {error}
+        </p>
+      )}
+      <button type="submit" disabled={busy} className={`${PRIMARY} min-h-22`}>
+        <Link2 {...ICON} />
+        {pt("pairConnect", locale)}
+      </button>
+    </form>
   );
 }
 

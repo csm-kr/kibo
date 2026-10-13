@@ -6,6 +6,10 @@ import type { KioskDomain, Locale, Variant } from "@/types/menu";
 export const KIOSK_TEXT = {
   talkTitle: { ko: "휴대폰으로 말해서 주문 (QR)", en: "Order by talking (QR)" },
   talkHint: { ko: "휴대폰 카메라로 찍으세요", en: "Scan with your phone camera" },
+  // Under the QR: the pairing code for /app (12-phone-app:3), "Or open <host>/app and enter 123 456".
+  pairOpen: { ko: "또는 휴대폰에서 이 주소를 열고", en: "Or open this on your phone" },
+  pairEnter: { ko: "이 번호를 넣으세요", en: "and enter this code" },
+  pairCodeLabel: { ko: "연결 번호", en: "Code" },
   qrAlt: { ko: "휴대폰으로 주문하는 QR 코드", en: "QR code to order with your phone" },
   qrLoading: { ko: "QR을 준비하고 있어요", en: "Getting the QR ready" },
   touchTitle: { ko: "화면을 눌러서 주문", en: "Order by touch" },

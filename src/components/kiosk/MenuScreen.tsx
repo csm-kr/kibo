@@ -57,10 +57,11 @@ export function MenuScreen(props: {
   kiosk: KioskData;
   session: Session;
   claimUrl: string | null;
+  pairCode?: string | null;
   /** Server time minus local time; lastChange.at is server time. */
   clockOffset: number;
   send(type: CommandType, args: object): Promise<CommandReply | null>;
-  onClaimUrl?(claimUrl: string): void;
+  onClaimUrl?(claimUrl: string, pairCode?: string): void;
   /** Standalone /kiosk: [처음으로], bottom left of the cart bar. */
   startOver?: ReactNode;
 }) {
@@ -143,7 +144,7 @@ export function MenuScreen(props: {
       <KioskToolbar
         kiosk={kiosk}
         session={session}
-        claimUrl={props.claimUrl}
+        claimUrl={props.claimUrl} pairCode={props.pairCode}
         send={send}
         onClaimUrl={props.onClaimUrl}
         status={flash?.status ?? null}

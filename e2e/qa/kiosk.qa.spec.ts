@@ -42,6 +42,12 @@ test("touch path: K1 to K8", async ({ page }, info) => {
   await expect(root).toHaveAttribute("data-screen", "dine");
   await check(page, info, "K2-dine");
 
+  // The small QR's sheet, with the pairing code for /app under the QR (12-phone-app:3).
+  await page.getByRole("button", { name: "휴대폰으로 말해서 주문" }).click();
+  await expect(page.getByRole("dialog").locator("[data-pair-code]")).toBeVisible();
+  await check(page, info, "KX-qr-sheet");
+  await page.getByRole("dialog").getByRole("button", { name: "닫기" }).click();
+
   await page.getByRole("button", { name: "매장에서 먹기" }).click();
   await expect(root).toHaveAttribute("data-screen", "menu");
   // The burger category holds the sold-out shrimp burger.
