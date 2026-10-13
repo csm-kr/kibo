@@ -2,8 +2,23 @@
   "project": "KIBO",
   "phase": "10-assets",
   "steps": [
-    { "step": 0, "name": "footage-capture", "status": "pending" },
-    { "step": 1, "name": "deck-assets", "status": "pending" },
-    { "step": 2, "name": "qa", "status": "pending" }
-  ]
+    {
+      "step": 0,
+      "name": "footage-capture",
+      "status": "completed",
+      "started_at": "2026-10-13T11:37:21+0900",
+      "summary": "scripts/capture-footage.ts (npm run capture:footage, FOOTAGE_URL for the deployed app) records 6 clips of the real app into videos/footage/<date>/ (git-ignored): demo-hero, kiosk-touch, kiosk-mirror, phone, demo-airport, demo-pizza as .webm at CSS size plus PNGs at each key moment and manifest.json (steps in ms, model ids); waits on the session's SSE stream; typed orders hit real Gemini via /api/chat; 6/6 ok on 10-13. docs/plan/FOOTAGE.md for the editor. Logged I-143 (touch clip is the 41-tap edit path, deck cites 24) and I-144 (stale 'Your turn' line after payment). Real-phone voice footage still needs a person."
+    },
+    {
+      "step": 1,
+      "name": "deck-assets",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "name": "qa",
+      "status": "pending"
+    }
+  ],
+  "created_at": "2026-10-13T11:37:21+0900"
 }
