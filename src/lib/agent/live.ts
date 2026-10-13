@@ -79,6 +79,8 @@ export function geminiTokenIssuer(ai?: Pick<GoogleGenAI, "authTokens">): LiveTok
     async create({ model, system, tools, languageCode, expireTime, newSessionExpireTime }) {
       let token;
       try {
+        // Without a key the SDK would still send a request; refuse before building the client.
+        if (!ai && !process.env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not set");
         // Ephemeral tokens exist only in v1alpha.
         ai ??= new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY, httpOptions: { apiVersion: "v1alpha" } });
         token = await ai.authTokens.create({

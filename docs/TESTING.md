@@ -29,7 +29,7 @@ Report pass rate per type and per kiosk. Each case names its `kioskId` (default 
 ## End to end
 - `npm run test:e2e`: Playwright against the dev server with the in-memory store, no model calls. `npm run test:e2e:live` runs only the `@live` tests (`/demo` typed order to real Gemini, "Play it for me" for each of the 9 `/demo` scenarios in `e2e/demo-scenarios.spec.ts` (all 9 played through on 10-13, 8-scenarios:4; one run, no saved log), and `e2e/voice.live.spec.ts`: the hero order spoken to Gemini Live by a synthetic TTS voice through Chromium's fake microphone; needs `GEMINI_API_KEY` in `.env`). The voice fixtures in `e2e/fixtures/` come from `npm run fixtures:voice` (Gemini TTS); no real person's voice.
 - Real phones (iOS Safari, Android Chrome) from QR scan to order number; three consecutive passes the day before recording.
-- iOS checks: mic permission persistence across visits, silent switch, volume, AI voice feeding back into the mic, KakaoTalk/Naver in-app browsers.
+- iOS checks: mic permission persistence across visits, silent switch, volume, AI voice feeding back into the mic, KakaoTalk/Naver in-app browsers. Start with `/mic-test` (not linked, noindex): browser and in-app detection, the mic through the voice worklet with a level meter and sample rates, a 24 kHz tone through the AI voice's playback path, a reload check, and a one-line result to paste in the team chat. It sends nothing to the server and keeps no audio (`e2e/mic-test.spec.ts` checks both with Chromium's fake microphone).
 - Live reconnect (network switch, screen lock).
 
 ## Measurements

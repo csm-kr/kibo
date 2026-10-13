@@ -134,6 +134,8 @@ Until then the `qa` step checks the angles from code and the prototype and says 
 
 **Polish (10-13, 9-polish:2):** the kiosk spec adds K3 with the [처음으로] question (`K3-start-over-ask`); P4 asserts the whole [Yes, pay now] and the total in view at all four phone sizes (`toBeInViewport({ ratio: 1 })`, I-134) and adds `P4-confirm-typing`; the `/demo` confirm states assert the whole button at the three judge sizes. Screenshots wait for on-screen images, and the focus check blurs its last control (I-138, I-121).
 
+**Mic test (10-13, 9-polish:5):** `e2e/qa/mic-test.qa.spec.ts` checks `/mic-test` before and after the microphone and speaker tests at the four phone sizes with the reflow check, by the phone numbers.
+
 **Learned kiosk (10-13, 6-learn:2):** `e2e/qa/learned.qa.spec.ts` checks `/learned/doughhouse` (QR, then an item the bridge entered) at 1440×900, 1280×720 and 1920×1080. Profile `LEARNED` measures only KIBO's widget (`[data-learned-widget]`); the learned kiosk page in the iframe is third-party and unchanged, so it is judged on the screenshots. Since 6-learn:3, `e2e/qa/learned-phone.qa.spec.ts` checks the phone on a learned kiosk at the four phone sizes (P2 and P3 "The kiosk is entering it…" at 390 and 320 wide, P3 "Please check the kiosk screen" after 15 s, P3 mismatch, P4 without a pay button; the test sends the bridge's reports itself), and `e2e/qa/demo.qa.spec.ts` checks D1, D2 and D3 with `/demo?k=doughhouse` at 1440×900.
 
 **What the script checks:**
