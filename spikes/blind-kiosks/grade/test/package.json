@@ -1,0 +1,5 @@
+{
+  "private": true,
+  "description": "Lets `node --test spikes/blind-kiosks/grade/test/` load the folder: Node resolves a directory through main.",
+  "main": "index.mjs"
+}
