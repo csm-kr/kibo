@@ -16,6 +16,11 @@ Log everything else in docs/ISSUE.md following its "How to use".
 If an H failure is out of scope or needs a decision: log it and set this step "blocked" with the issue id.
 Write phases/12-phone-app/qa/REPORT.md: one line per angle A–I with pass/fail and issue ids.
 
+**Orchestrator findings from the step 0 preview (10-13, `phases/12-phone-app/qa/designphone-design-*-390x844.png`); check each on the real screens and fix if still present:**
+- P6 order number: with `tabular-nums` in Space Grotesk at 7.5rem the digit "1" renders as the footed tabular glyph and reads like a "J" or a cut-off shape (`179` in `designphone-design-done-390x844.png`). Use proportional figures for this single large number and confirm with numbers that contain 1 and 7 (e.g. 117, 171).
+- Dock: the right button's label is only "On"/"Off"; an older user cannot tell what is on. Label it "Voice on"/"Voice off" (Korean "음성 켜짐"/"음성 꺼짐") within the 56px target.
+- Dock state labels: "Tap to stop" also shows while "Thinking…" and "Reconnecting…"; use a label that matches what a tap does in each state (or no action label while reconnecting).
+
 ## Acceptance criteria
 ```bash
 npm run lint && npm run build && npm run test
