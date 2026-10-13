@@ -1,37 +1,32 @@
-# Step 7: learn-viewer
+# Step 7: final-fresh
 
 ## Read first
-- `CLAUDE.md` and `docs/*.md` are in your prompt. KIBO_LEARN (all), PRD "KIBO Learn", UX "Flow C" and USER_JOURNEY J3 (a cold judge), UI_GUIDE (KIBO surfaces: the phone design tokens and the landing style), UI_QA; RULE R-001.
-- The traces: `spikes/blind-kiosks/results/<kioskId>/final/trace/` (steps 5–6) and their `grade.json`; step 4's trace format in `spikes/kibo-learn/CHANGES.md`.
-- Code: `src/app/page.tsx` (landing), `src/app/demo/*`, `src/components/demo/*` (place cards), `src/components/learned/*`.
+- `spikes/blind-kiosks/PROTOCOL.md`, `phases/13-blind-kiosks/step5.md` (the final run procedure) and the summaries of steps 4–6 in `phases/13-blind-kiosks/index.json`; `spikes/kibo-learn/CHANGES.md`.
 
 Shell: only `npm`, `npx`, `node`, `python3`, `ls`, `mkdir`, `git status|diff|add|commit|log`.
 
 ## Why
-The user (10-13): "the learning part has to be visible too: the part where it sees a kiosk for the first time." Learning runs offline (Playwright + Gemini, minutes and cost per run), so the product shows a **faithful replay of a real recorded run**, never a mock.
+An independent judge review (10-13) pointed out that the learner improvements in step 4 were driven by failure patterns seen on the four test kiosks (`BASELINE.md`), so their final runs are not a clean "never seen" result. To answer that, the orchestrator had two **more** kiosks built by independent agents from short briefs, kept outside the repo while the learner was being changed, and copied them into `spikes/blind-kiosks/bk5-restarea/` (highway rest-area food court) and `spikes/blind-kiosks/bk6-themepark/` (theme park ticket and snack kiosk) only after step 4 was committed. Nobody working on the learner has seen them. They are the **fresh test set**.
 
 ## Task
-1. **Pick runs:** the final trace of the blind kiosk with the best orders result and **unsafe = 0** (if none has unsafe = 0, pick the best and show its unsafe count plainly), plus Doughhouse (record a fresh traced Doughhouse run with the improved learner if no trace exists; one run, Gemini, 2M cap). Copy each trace to `public/learn/<runId>/` with screenshots re-encoded to WebP ≤ 60 KB each (a `node` script using an existing dependency or Playwright to re-encode), and a `run.json` that merges the header, the turns, the final grade summary (catalog recall, orders correct / safe refusal / unsafe) and the source file paths. Keep each run ≤ 5 MB.
-2. **`/learn`** (index): "Watch KIBO learn a kiosk it has never seen." One sentence on how (Gemini explores the screens once, writes a skill, must pass self-tests and a coverage audit, then orders replay without AI), the honest limits in one line (web kiosks; synthetic kiosks built by other AI agents for the test), and a card per run (kiosk name, minutes, turns, items found, orders result with unsafe count).
-3. **`/learn/[runId]`** (viewer): a timeline player: the kiosk screenshot large on the left; on the right the current action in plain words ("Tapped 콤보 → opened 3-step combo builder"), a running "What KIBO knows" panel (categories, items, option groups counters with the latest additions), and milestones on the timeline (first item recorded, all categories visited, self-test 3/3 passed, coverage audit ok, finish). Controls: play/pause, speed 1×/4×/16×, step back/forward, jump to milestone; keyboard accessible; reduced motion → no auto-advance animation, manual stepping only. At the end: the learned skill summary (the catalog table from the skill) and **[Order on this kiosk]** linking to `/demo?k=<kioskId>` when the kiosk is in the product (Doughhouse always; a blind kiosk only if step 8 adds it — otherwise hide the button and say why). Every number links to its file path in small text (R-001).
-4. Links: landing ("Watch KIBO learn a new kiosk" in the "Works with kiosks that exist" section), `/demo` Doughhouse place card ("How KIBO learned this kiosk"), and D3's end card for learned kiosks.
-5. Tests: unit tests for the trace → timeline transform (milestones, counters); E2E: `/learn` lists the runs, the viewer steps forward and reaches the finish milestone, the order button routes correctly; QA: `/learn` and the viewer at 1440×900, 1280×720 and 390×844 (the viewer stacks vertically on phones).
+1. Record in `PROTOCOL.md` a "Fresh test set" section: the two kiosks, who built them (independent agents, briefs in each `BRIEF.md`), when they entered the repo (the commit that added them, after the step 4 learner commit), and the rule that the learner is not changed after seeing them.
+2. Run the final procedure (step 5's: improved learner, `PROVIDER=gemini`, default model, 2M cap, one run per kiosk, a 30-min kill in the spawn wrapper, results under `spikes/blind-kiosks/results/<kioskId>/final/` with `TRACE_DIR=.../final/trace`) on `bk5-restarea` and `bk6-themepark`, **in parallel**. No baseline run is needed for these (they measure the final learner on unseen kiosks); grade both.
+3. Write `notes.md` per kiosk like the other finals.
+
+**Time limit:** a step session is killed after 60 min and retried. If this is a retry after a timeout: do not start a new run for a kiosk whose `final/learn.log` already exists; if its `learner.mjs` is still running (`ps`), wait for it (kill only after 30 min), then grade.
 
 ## Acceptance criteria
 ```bash
 npm run lint
 npm run build
 npm run test
-npm run test:e2e
-npm run qa:ui
 ```
 
 ## Verify
-1. Run the AC commands; fix H failures on the new pages.
-2. Check: the replay shows only what the trace recorded (no invented steps), no prompts or model reasoning text, no secrets; the sizes stay within the limits.
-3. Update this step in `phases/13-blind-kiosks/index.json` (completed + summary / error / blocked).
+1. Both fresh kiosks have `final/` with logs, stats, grade, notes and the trace.
+2. No learner, driver, runner, audit or grader file changed in this step (`git diff --stat` shows only results, PROTOCOL.md and this phase's files).
+3. Update this step in `phases/13-blind-kiosks/index.json` (completed + summary with each kiosk's item recall and orders correct / safe refusal / unsafe / not learned, minutes, tokens / error / blocked).
 
 ## Do not
-- Do not fake or edit the trace to look better; skip boring turns only with a visible "skipped N similar steps" marker.
-- Do not run the learner from the product (no browser on Cloud Run, cost).
-- Break existing tests.
+- Do not change the learner, driver, runner, audit or grader in this step, because these kiosks exist to measure the learner as it was before anyone saw them.
+- Do not rerun to get a better number.
