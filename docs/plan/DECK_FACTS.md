@@ -91,10 +91,12 @@ Real `/demo` at 1920×1080 (2×) after the first sentence of a scenario, sent to
 |---|---|---|
 | `docs/assets/deck/snapshot-demo-malo-1920x1080.png` | Burger kiosk, phone and scenario guide after the hero sentence | measured (capture) |
 | `docs/assets/deck/snapshot-demo-airport_rail-1920x1080.png` | Airport rail ticket machine after "Two adult tickets to City Center" | usable: the AI's reply offers a window or aisle seat, which is the express ticket's optional `seat` group in `data/kiosks/airport_rail.json` (an earlier note here was a false positive, I-072) |
-| `docs/assets/deck/snapshot-demo-doughhouse-1920x1080.png` | Learned pizza kiosk, the bridge entered the line | measured (capture) |
+| `docs/assets/deck/snapshot-demo-doughhouse-1920x1080.png` | Learned pizza kiosk, the bridge entered the line | measured (capture); the learned page itself is unchanged third-party text drawn at about 0.5×, unreadable at slide size (I-096): let the phone and "What the AI did" carry the slide, or add a caption |
 | `docs/assets/deck/snapshot-demo-malo-guide-and-ai-actions.png` | Scenario guide and "What the AI did" close up | measured (capture) |
 
-The model's reply text differs per capture. Read it before using a picture: a reply that offers something not in the kiosk data (seats, popularity) must not go on a slide (I-072).
+The model's reply text differs per capture. Read it before using a picture: a reply that offers something not in the kiosk data (popularity or taste words, a choice the item has no option group for) must not go on a slide (I-072).
+
+The "What the AI did" rows show `0 ms` and `1 ms`: the captures run on the in-memory store on a laptop, so that is the command alone, not production latency. Do not quote them; cut or caption them "local test" (I-145). Latency numbers come only from slot 12.
 
 ## 12 Benchmarks
 Blind KIBO Learn first (`docs/plan/SUBMISSION.md`).

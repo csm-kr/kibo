@@ -25,6 +25,7 @@ Typed messages go at about 12 characters a second, and each kiosk change is held
 - **No voice.** Every clip is typed. The hero shot (0:35–1:25) needs a person speaking to a real phone (iOS Safari or Android Chrome) on the deployed app; **record that by hand**, with no notifications and no personal data on screen.
 - Check `manifest.json`: a clip with `"ok": false` failed twice (its `errors` say where) and has no video.
 - The AI's replies are not scripted, so wording differs between runs; read the screenshots before picking a take.
+- **Take of 10-13, checked in 10-assets:2** (`phases/10-assets/qa/REPORT.md`). Skip: `demo-hero--03-dine` (menu photos not loaded yet, I-147), `demo-airport--06` to `--08` (the guide still says "Your turn: tap Yes, pay now" after paying, I-144), `demo-pizza--02` (still connecting), `demo-pizza--05`/`--06` (the AI asks "Would you like to pay now?" on a kiosk where the user pays at the kiosk, I-100). Care: `phone--03` and `--05` cut a line at the scroll edge; the learned pizza page is unreadable without a zoom (I-096). Each clip has its own order number (hero 290, touch 414, mirror 731, phone 746), so do not cut two clips together as one order.
 
 ## Re-record
 ```bash

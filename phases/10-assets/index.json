@@ -21,7 +21,9 @@
     {
       "step": 2,
       "name": "qa",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-13T12:57:40+0900",
+      "summary": "QA of the deck pictures, footage stills (fresh-eyes agent) and SUBMISSION/DECK_FACTS/FOOTAGE docs; no product screen changed (A-F n/a). phases/10-assets/qa/REPORT.md. Every DECK_FACTS number checked against its source; description 998/1,024. Fixed in DECK_FACTS slot 11: do not quote the 0/1 ms 'What the AI did' timings (memory store, I-145), seats example removed, pizza page unreadable (I-096). Logged I-146 (no deck picture of the pay step; use footage stills), I-147 (footage hero 03 shot before images loaded); I-100 now seen in the pizza footage (AI offers to pay on a learned kiosk). FOOTAGE.md lists stills of the 10-13 take to skip. AC: lint, build, test 747/748 (1 skipped), e2e_check 42/42."
     }
   ],
   "created_at": "2026-10-13T11:37:21+0900"
