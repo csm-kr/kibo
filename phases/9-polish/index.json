@@ -16,7 +16,7 @@
       "status": "completed",
       "started_at": "2026-10-13T09:29:21+0900",
       "summary": "I-122 decided: airport_rail fares shifted (express 39 min / adult 10,500, return 20,000; all-stop 11-64 min / 1,600-5,200, all x10 and >= 0) with tests and comments updated; landing/D1 captures still show old numbers until step 2 recaptures. Fixed: K4/I-119 tiles show tilePrice (default options = adult fare, no 'from'), K4 discount groups show full fares; K1/I-045 AI status takes the toolbar row for 2 s (row controls invisible), staff/paused banners are an in-flow strip at the top (screen roots flex-1); K2+K3/I-135,I-113,I-066 /demo passes no `demo` and no onClaimUrl, so no tap counter and no [Connect another phone] (KioskScreen.demo now = &demo=1 only; useDemoSession.setClaimUrl removed); K5/I-048 partial: K2 has KioskToolbar (small QR) and larger dine photos, [처음으로] still needs a decision; K6/I-101 /demo learned widget is a strip under the page (LearnedKioskHost strip), I-096 page text unchanged; K7/I-109 K4 option names keep bracketed ranges unbroken (KeepRange), rail '교통카드·/이용권' break accepted; K8/I-120 K4 variant buttons capitalized; K10/I-041 k-text-40/48 line height 1.5, I-042 only K2 pt-16, 40px spacing left open. Not done: K9/I-039 (user decision). Docs: ARCHITECTURE, SECURITY, UX screen map. Lint, build, 701 unit, e2e 13 passed (15 @live/skip), qa:ui 25 passed 0 H; evidence/*.json restored after e2e (I-099).",
-      "completed_at": "2026-10-13T09:52:00+0900"
+      "completed_at": "2026-10-13T09:49:35+0900"
     },
     {
       "step": 2,
