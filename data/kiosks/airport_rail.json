@@ -32,7 +32,7 @@
     {
       "itemId": "express_city_center",
       "name": { "ko": "직통열차 시티센터", "en": "Express to City Center" },
-      "subtitle": { "ko": "직통 · 43분", "en": "Non-stop · 43 min" },
+      "subtitle": { "ko": "직통 · 39분", "en": "Non-stop · 39 min" },
       "category": "express",
       "image": "/kiosks/airport_rail/express.svg",
       "kcal": null,
@@ -40,7 +40,7 @@
       "allergens": [],
       "soldOut": false,
       "availableHours": null,
-      "variants": [{ "variant": "single", "price": 11000 }],
+      "variants": [{ "variant": "single", "price": 10500 }],
       "optionGroups": [
         {
           "groupId": "passenger",
@@ -52,9 +52,9 @@
           "defaultOptionIds": ["adult"],
           "options": [
             { "optionId": "adult", "name": { "ko": "어른", "en": "Adult" }, "priceDelta": 0, "soldOut": false },
-            { "optionId": "teen", "name": { "ko": "청소년 (13–18세)", "en": "Teen (13–18)" }, "priceDelta": -2200, "soldOut": false },
-            { "optionId": "child", "name": { "ko": "어린이 (6–12세)", "en": "Child (6–12)" }, "priceDelta": -5500, "soldOut": false },
-            { "optionId": "senior", "name": { "ko": "경로 (65세 이상)", "en": "Senior (65+)" }, "priceDelta": -3300, "soldOut": false }
+            { "optionId": "teen", "name": { "ko": "청소년 (13–18세)", "en": "Teen (13–18)" }, "priceDelta": -2100, "soldOut": false },
+            { "optionId": "child", "name": { "ko": "어린이 (6–12세)", "en": "Child (6–12)" }, "priceDelta": -5250, "soldOut": false },
+            { "optionId": "senior", "name": { "ko": "경로 (65세 이상)", "en": "Senior (65+)" }, "priceDelta": -3150, "soldOut": false }
           ]
         },
         {
@@ -75,7 +75,7 @@
     {
       "itemId": "express_city_center_return",
       "name": { "ko": "직통열차 시티센터 왕복", "en": "Express to City Center, return" },
-      "subtitle": { "ko": "직통 · 편도 43분", "en": "Non-stop · 43 min each way" },
+      "subtitle": { "ko": "직통 · 편도 39분", "en": "Non-stop · 39 min each way" },
       "category": "express",
       "image": "/kiosks/airport_rail/express.svg",
       "kcal": null,
@@ -83,7 +83,7 @@
       "allergens": [],
       "soldOut": false,
       "availableHours": null,
-      "variants": [{ "variant": "single", "price": 21000 }],
+      "variants": [{ "variant": "single", "price": 20000 }],
       "optionGroups": [
         {
           "groupId": "passenger",
@@ -95,9 +95,9 @@
           "defaultOptionIds": ["adult"],
           "options": [
             { "optionId": "adult", "name": { "ko": "어른", "en": "Adult" }, "priceDelta": 0, "soldOut": false },
-            { "optionId": "teen", "name": { "ko": "청소년 (13–18세)", "en": "Teen (13–18)" }, "priceDelta": -4200, "soldOut": false },
-            { "optionId": "child", "name": { "ko": "어린이 (6–12세)", "en": "Child (6–12)" }, "priceDelta": -10500, "soldOut": false },
-            { "optionId": "senior", "name": { "ko": "경로 (65세 이상)", "en": "Senior (65+)" }, "priceDelta": -6300, "soldOut": false }
+            { "optionId": "teen", "name": { "ko": "청소년 (13–18세)", "en": "Teen (13–18)" }, "priceDelta": -4000, "soldOut": false },
+            { "optionId": "child", "name": { "ko": "어린이 (6–12세)", "en": "Child (6–12)" }, "priceDelta": -10000, "soldOut": false },
+            { "optionId": "senior", "name": { "ko": "경로 (65세 이상)", "en": "Senior (65+)" }, "priceDelta": -6000, "soldOut": false }
           ]
         },
         {
@@ -118,7 +118,7 @@
     {
       "itemId": "all_stop_harbor_gate",
       "name": { "ko": "일반열차 하버게이트", "en": "All-stop to Harbor Gate" },
-      "subtitle": { "ko": "2개 역 · 9분", "en": "2 stops · 9 min" },
+      "subtitle": { "ko": "3개 역 · 11분", "en": "3 stops · 11 min" },
       "category": "all_stop",
       "image": "/kiosks/airport_rail/train.svg",
       "kcal": null,
@@ -126,7 +126,7 @@
       "allergens": [],
       "soldOut": false,
       "availableHours": null,
-      "variants": [{ "variant": "single", "price": 1450 }],
+      "variants": [{ "variant": "single", "price": 1600 }],
       "optionGroups": [
         {
           "groupId": "passenger",
@@ -138,9 +138,9 @@
           "defaultOptionIds": ["adult"],
           "options": [
             { "optionId": "adult", "name": { "ko": "어른", "en": "Adult" }, "priceDelta": 0, "soldOut": false },
-            { "optionId": "teen", "name": { "ko": "청소년 (13–18세)", "en": "Teen (13–18)" }, "priceDelta": -290, "soldOut": false },
-            { "optionId": "child", "name": { "ko": "어린이 (6–12세)", "en": "Child (6–12)" }, "priceDelta": -730, "soldOut": false },
-            { "optionId": "senior", "name": { "ko": "경로 (65세 이상)", "en": "Senior (65+)" }, "priceDelta": -440, "soldOut": false }
+            { "optionId": "teen", "name": { "ko": "청소년 (13–18세)", "en": "Teen (13–18)" }, "priceDelta": -320, "soldOut": false },
+            { "optionId": "child", "name": { "ko": "어린이 (6–12세)", "en": "Child (6–12)" }, "priceDelta": -800, "soldOut": false },
+            { "optionId": "senior", "name": { "ko": "경로 (65세 이상)", "en": "Senior (65+)" }, "priceDelta": -480, "soldOut": false }
           ]
         }
       ]
@@ -148,7 +148,7 @@
     {
       "itemId": "all_stop_expo_park",
       "name": { "ko": "일반열차 엑스포파크", "en": "All-stop to Expo Park" },
-      "subtitle": { "ko": "4개 역 · 18분", "en": "4 stops · 18 min" },
+      "subtitle": { "ko": "5개 역 · 21분", "en": "5 stops · 21 min" },
       "category": "all_stop",
       "image": "/kiosks/airport_rail/train.svg",
       "kcal": null,
@@ -156,7 +156,7 @@
       "allergens": [],
       "soldOut": false,
       "availableHours": null,
-      "variants": [{ "variant": "single", "price": 2050 }],
+      "variants": [{ "variant": "single", "price": 2300 }],
       "optionGroups": [
         {
           "groupId": "passenger",
@@ -168,9 +168,9 @@
           "defaultOptionIds": ["adult"],
           "options": [
             { "optionId": "adult", "name": { "ko": "어른", "en": "Adult" }, "priceDelta": 0, "soldOut": false },
-            { "optionId": "teen", "name": { "ko": "청소년 (13–18세)", "en": "Teen (13–18)" }, "priceDelta": -410, "soldOut": false },
-            { "optionId": "child", "name": { "ko": "어린이 (6–12세)", "en": "Child (6–12)" }, "priceDelta": -1030, "soldOut": false },
-            { "optionId": "senior", "name": { "ko": "경로 (65세 이상)", "en": "Senior (65+)" }, "priceDelta": -620, "soldOut": false }
+            { "optionId": "teen", "name": { "ko": "청소년 (13–18세)", "en": "Teen (13–18)" }, "priceDelta": -460, "soldOut": false },
+            { "optionId": "child", "name": { "ko": "어린이 (6–12세)", "en": "Child (6–12)" }, "priceDelta": -1150, "soldOut": false },
+            { "optionId": "senior", "name": { "ko": "경로 (65세 이상)", "en": "Senior (65+)" }, "priceDelta": -690, "soldOut": false }
           ]
         }
       ]
@@ -178,7 +178,7 @@
     {
       "itemId": "all_stop_riverside",
       "name": { "ko": "일반열차 리버사이드", "en": "All-stop to Riverside" },
-      "subtitle": { "ko": "7개 역 · 33분", "en": "7 stops · 33 min" },
+      "subtitle": { "ko": "8개 역 · 36분", "en": "8 stops · 36 min" },
       "category": "all_stop",
       "image": "/kiosks/airport_rail/train.svg",
       "kcal": null,
@@ -186,7 +186,7 @@
       "allergens": [],
       "soldOut": false,
       "availableHours": null,
-      "variants": [{ "variant": "single", "price": 3150 }],
+      "variants": [{ "variant": "single", "price": 3400 }],
       "optionGroups": [
         {
           "groupId": "passenger",
@@ -198,9 +198,9 @@
           "defaultOptionIds": ["adult"],
           "options": [
             { "optionId": "adult", "name": { "ko": "어른", "en": "Adult" }, "priceDelta": 0, "soldOut": false },
-            { "optionId": "teen", "name": { "ko": "청소년 (13–18세)", "en": "Teen (13–18)" }, "priceDelta": -630, "soldOut": false },
-            { "optionId": "child", "name": { "ko": "어린이 (6–12세)", "en": "Child (6–12)" }, "priceDelta": -1580, "soldOut": false },
-            { "optionId": "senior", "name": { "ko": "경로 (65세 이상)", "en": "Senior (65+)" }, "priceDelta": -950, "soldOut": false }
+            { "optionId": "teen", "name": { "ko": "청소년 (13–18세)", "en": "Teen (13–18)" }, "priceDelta": -680, "soldOut": false },
+            { "optionId": "child", "name": { "ko": "어린이 (6–12세)", "en": "Child (6–12)" }, "priceDelta": -1700, "soldOut": false },
+            { "optionId": "senior", "name": { "ko": "경로 (65세 이상)", "en": "Senior (65+)" }, "priceDelta": -1020, "soldOut": false }
           ]
         }
       ]
@@ -208,7 +208,7 @@
     {
       "itemId": "all_stop_old_town",
       "name": { "ko": "일반열차 올드타운", "en": "All-stop to Old Town" },
-      "subtitle": { "ko": "10개 역 · 49분", "en": "10 stops · 49 min" },
+      "subtitle": { "ko": "11개 역 · 52분", "en": "11 stops · 52 min" },
       "category": "all_stop",
       "image": "/kiosks/airport_rail/train.svg",
       "kcal": null,
@@ -216,7 +216,7 @@
       "allergens": [],
       "soldOut": false,
       "availableHours": null,
-      "variants": [{ "variant": "single", "price": 4150 }],
+      "variants": [{ "variant": "single", "price": 4400 }],
       "optionGroups": [
         {
           "groupId": "passenger",
@@ -228,9 +228,9 @@
           "defaultOptionIds": ["adult"],
           "options": [
             { "optionId": "adult", "name": { "ko": "어른", "en": "Adult" }, "priceDelta": 0, "soldOut": false },
-            { "optionId": "teen", "name": { "ko": "청소년 (13–18세)", "en": "Teen (13–18)" }, "priceDelta": -830, "soldOut": false },
-            { "optionId": "child", "name": { "ko": "어린이 (6–12세)", "en": "Child (6–12)" }, "priceDelta": -2080, "soldOut": false },
-            { "optionId": "senior", "name": { "ko": "경로 (65세 이상)", "en": "Senior (65+)" }, "priceDelta": -1250, "soldOut": false }
+            { "optionId": "teen", "name": { "ko": "청소년 (13–18세)", "en": "Teen (13–18)" }, "priceDelta": -880, "soldOut": false },
+            { "optionId": "child", "name": { "ko": "어린이 (6–12세)", "en": "Child (6–12)" }, "priceDelta": -2200, "soldOut": false },
+            { "optionId": "senior", "name": { "ko": "경로 (65세 이상)", "en": "Senior (65+)" }, "priceDelta": -1320, "soldOut": false }
           ]
         }
       ]
@@ -238,7 +238,7 @@
     {
       "itemId": "all_stop_city_center",
       "name": { "ko": "일반열차 시티센터", "en": "All-stop to City Center" },
-      "subtitle": { "ko": "12개 역 · 59분", "en": "12 stops · 59 min" },
+      "subtitle": { "ko": "14개 역 · 64분", "en": "14 stops · 64 min" },
       "category": "all_stop",
       "image": "/kiosks/airport_rail/train.svg",
       "kcal": null,
@@ -246,7 +246,7 @@
       "allergens": [],
       "soldOut": false,
       "availableHours": null,
-      "variants": [{ "variant": "single", "price": 4750 }],
+      "variants": [{ "variant": "single", "price": 5200 }],
       "optionGroups": [
         {
           "groupId": "passenger",
@@ -258,9 +258,9 @@
           "defaultOptionIds": ["adult"],
           "options": [
             { "optionId": "adult", "name": { "ko": "어른", "en": "Adult" }, "priceDelta": 0, "soldOut": false },
-            { "optionId": "teen", "name": { "ko": "청소년 (13–18세)", "en": "Teen (13–18)" }, "priceDelta": -950, "soldOut": false },
-            { "optionId": "child", "name": { "ko": "어린이 (6–12세)", "en": "Child (6–12)" }, "priceDelta": -2380, "soldOut": false },
-            { "optionId": "senior", "name": { "ko": "경로 (65세 이상)", "en": "Senior (65+)" }, "priceDelta": -1430, "soldOut": false }
+            { "optionId": "teen", "name": { "ko": "청소년 (13–18세)", "en": "Teen (13–18)" }, "priceDelta": -1040, "soldOut": false },
+            { "optionId": "child", "name": { "ko": "어린이 (6–12세)", "en": "Child (6–12)" }, "priceDelta": -2600, "soldOut": false },
+            { "optionId": "senior", "name": { "ko": "경로 (65세 이상)", "en": "Senior (65+)" }, "priceDelta": -1560, "soldOut": false }
           ]
         }
       ]

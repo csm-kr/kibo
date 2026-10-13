@@ -210,7 +210,7 @@ test.describe("other kiosk data", () => {
     const sheet = page.getByRole("dialog", { name: "Cheeseburger" });
     await expect(sheet.getByText("Make it a set?")).toBeVisible();
     await check(page, info, "K4-variant-en");
-    await buttonWithText(sheet, "set").click();
+    await buttonWithText(sheet, "Set").click();
     await sheet.getByRole("button", { name: "Next", exact: true }).click();
     await sheet.getByRole("button", { name: "Next", exact: true }).click();
     await check(page, info, "K4-drink-empty-en");

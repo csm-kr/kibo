@@ -10,7 +10,7 @@ import type { Session } from "@/types/session";
 import { ModalLayer } from "./ModalLayer";
 import { FOCUS, SCRIM } from "./styles";
 
-// The row under the header on K3, K6, K7 and K8: dine chip, and the small QR or "phone connected" (Flow B).
+// The row under the header on K2, K3, K6 and K7: dine chip, and the small QR or "phone connected" (Flow B).
 // The QR sheet is absolute, so it covers the nearest positioned screen root. Canvas px.
 
 export function KioskToolbar(props: {
@@ -18,24 +18,65 @@ export function KioskToolbar(props: {
   session: Session;
   claimUrl: string | null;
   send(type: CommandType, args: object): Promise<CommandReply | null>;
-  onClaimUrl(claimUrl: string): void;
+  /** Absent in /demo, which hides [Connect another phone] (see KioskScreen). */
+  onClaimUrl?(claimUrl: string): void;
+  /** K3's 2 s "AI가 담았어요: …" line; it takes this row instead of covering the tiles (I-045). */
+  status?: string | null;
 }) {
-  const { kiosk, session } = props;
-  const { locale, domain } = kiosk;
+  const { kiosk, session, onClaimUrl } = props;
   const [qrOpen, setQrOpen] = useState(false);
   // The server refuses a new QR once payment has started.
-  const canReissue = session.status !== "paying" && session.status !== "paid";
+  const canReissue = onClaimUrl !== undefined && session.status !== "paying" && session.status !== "paid";
 
   async function connectOtherPhone() {
     const reply = await props.send("reissueClaim", {});
     if (reply?.claimUrl) {
-      props.onClaimUrl(reply.claimUrl);
+      onClaimUrl?.(reply.claimUrl);
       setQrOpen(true);
     }
   }
 
+  const status = props.status ?? null;
   return (
-    <div className="flex h-28 flex-none items-center justify-between gap-6 bg-(--k-panel) px-12">
+    <div className="flex h-28 flex-none items-center bg-(--k-panel) px-12">
+      {/* Positioned here, not on the row: the QR sheet must cover the screen root, not this row. */}
+      <div className="relative flex h-full min-w-0 flex-1 items-center">
+        {/* While the status shows, the row's own controls are hidden (not focusable) rather than covered. */}
+        <div className={`flex min-w-0 flex-1 items-center justify-between gap-6 ${status ? "invisible" : ""}`}>
+          <ToolbarItems
+            kiosk={kiosk}
+            session={session}
+            claimUrl={props.claimUrl}
+            canReissue={canReissue}
+            onConnect={connectOtherPhone}
+            onQr={() => setQrOpen(true)}
+          />
+        </div>
+        <div aria-live="polite" className="pointer-events-none absolute inset-0 flex items-center">
+          {status && (
+            <p className="k-text-40 w-full truncate rounded-full bg-(--k-primary-dark) px-10 py-3 text-center font-bold text-white">
+              {status}
+            </p>
+          )}
+        </div>
+      </div>
+      {qrOpen && <QrSheet kiosk={kiosk} claimUrl={props.claimUrl} onClose={() => setQrOpen(false)} />}
+    </div>
+  );
+}
+
+function ToolbarItems(props: {
+  kiosk: KioskData;
+  session: Session;
+  claimUrl: string | null;
+  canReissue: boolean;
+  onConnect(): Promise<void>;
+  onQr(): void;
+}) {
+  const { kiosk, session, canReissue } = props;
+  const { locale, domain } = kiosk;
+  return (
+    <>
       {session.dineOption ? (
         <span className="k-text-40 rounded-full bg-(--k-primary) px-8 py-2 font-bold text-white">
           {kt(session.dineOption === "eat_in" ? "dineChip" : "takeOutChip", locale)}
@@ -52,7 +93,7 @@ export function KioskToolbar(props: {
           {canReissue && (
             <button
               type="button"
-              onClick={() => void connectOtherPhone()}
+              onClick={() => void props.onConnect()}
               className={`k-text-40 min-h-22 rounded-full border-4 border-[#1E1B18] bg-white px-8 font-bold ${FOCUS}`}
             >
               {kt("connectOtherPhone", locale)}
@@ -60,10 +101,9 @@ export function KioskToolbar(props: {
           )}
         </div>
       ) : (
-        <SmallQrButton claimUrl={props.claimUrl} label={kt("openQr", locale, domain)} onOpen={() => setQrOpen(true)} />
+        <SmallQrButton claimUrl={props.claimUrl} label={kt("openQr", locale, domain)} onOpen={props.onQr} />
       )}
-      {qrOpen && <QrSheet kiosk={kiosk} claimUrl={props.claimUrl} onClose={() => setQrOpen(false)} />}
-    </div>
+    </>
   );
 }
 

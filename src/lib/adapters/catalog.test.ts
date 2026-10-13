@@ -148,7 +148,7 @@ describe("kioskSchema (domain model)", () => {
     };
     t.items[0].kcal = null;
     t.items[0].allergens = [];
-    t.items[0].subtitle = { ko: "직통 · 43분", en: "Non-stop · 43 min" };
+    t.items[0].subtitle = { ko: "직통 · 39분", en: "Non-stop · 39 min" };
     const groups = t.items[0].optionGroups as { options: { priceDelta: number }[] }[];
     groups[0].options[0].priceDelta = -1000;
     return t;
@@ -371,15 +371,15 @@ describe("airport_rail.json", () => {
     }
   });
 
-  it("has the express at 11,000 with an optional seat group, and all-stop fares from 1,450 to 4,750", () => {
+  it("has the express at 10,500 with an optional seat group, and all-stop fares from 1,600 to 5,200", () => {
     const express = findItem(rail, "express_city_center")!;
-    expect(express.variants).toEqual([{ variant: "single", price: 11000 }]);
+    expect(express.variants).toEqual([{ variant: "single", price: 10500 }]);
     expect(express.badge).toBe("best");
     expect(express.optionGroups.find((g) => g.groupId === "seat")).toMatchObject({ required: false, min: 0, max: 1 });
     for (const t of rail.items.filter((i) => i.category === "all_stop")) {
       const price = t.variants[0].price;
-      expect(price, t.itemId).toBeGreaterThanOrEqual(1450);
-      expect(price, t.itemId).toBeLessThanOrEqual(4750);
+      expect(price, t.itemId).toBeGreaterThanOrEqual(1600);
+      expect(price, t.itemId).toBeLessThanOrEqual(5200);
     }
   });
 

@@ -150,7 +150,7 @@ describe("buildInstructions", () => {
 
     it("gives the model each ticket's subtitle (travel time, stops) from the data", () => {
       expect(menuBlock(t)).toEqual(menuForModel(rail));
-      expect(t).toContain("Non-stop · 43 min");
+      expect(t).toContain("Non-stop · 39 min");
     });
   });
 

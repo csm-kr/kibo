@@ -13,7 +13,7 @@ KIBO is a public demo that must stay up for three weeks of judging, handles a (s
 - Per-actor command table: card action and touch commands require `kioskToken`; AI tools and phone buttons require `deviceToken`. `/demo` receives both.
 - Secrets (`claimTokenHash`, `deviceTokenHash`, `kioskTokenHash`) live in `sessionSecrets/{id}`, which clients cannot read.
 - The claim token travels in the URL fragment (`#t=`) and is removed after claiming; `Referrer-Policy: no-referrer`.
-- A kiosk can issue a fresh QR ([Connect another phone]) to release a session held by a lost phone.
+- A kiosk can issue a fresh QR ([Connect another phone]) to release a session held by a lost phone. `/demo` hides the button, because the page's own phone half holds that session.
 
 ## Firestore rules
 - Clients have no Firestore access at all: every read and write is denied (ADR-010). Screens read the session through the SSE route `GET /api/session/{id}/events`, which sends only the public session document, never `sessionSecrets`.

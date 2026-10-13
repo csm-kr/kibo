@@ -12,25 +12,17 @@ export function formatWon(n: number, locale: Locale): string {
   return locale === "ko" ? `${digits}원` : `₩${digits}`;
 }
 
-/** "5,500원부터" / "from ₩5,500": the lowest price an option allows (a child fare). */
-export function formatFrom(n: number, locale: Locale): string {
-  return locale === "ko" ? `${formatWon(n, locale)}부터` : `from ${formatWon(n, locale)}`;
-}
-
 /**
- * The cheapest unit price of the first variant (the one a tile shows): each group's `min` cheapest options,
- * plus any further discounts up to `max`. Equal to the variant price when no option is negative.
+ * The price a tile shows: the first variant with its default options, which is what the sheet preselects
+ * (a fare shows the adult price, as ticket machines do, I-119).
  */
-export function lowestPrice(item: MenuItem): number {
+export function tilePrice(item: MenuItem): number {
   const { variant, price } = item.variants[0];
-  let lowest = price;
+  let total = price;
   for (const g of groupsFor(item, variant)) {
-    const deltas = g.options.filter((o) => !o.soldOut).map((o) => o.priceDelta).sort((a, b) => a - b);
-    deltas.slice(0, g.max).forEach((d, i) => {
-      if (i < g.min || d < 0) lowest += d;
-    });
+    for (const id of g.defaultOptionIds) total += findOption(g, id)?.priceDelta ?? 0;
   }
-  return lowest;
+  return total;
 }
 
 /** "치즈버거 세트" and "감자튀김 M · 제로콜라 · 피클 빼기": groups in menu order, options in menu order. */

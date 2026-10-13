@@ -57,7 +57,14 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
         <div className="min-h-0 flex-1 overflow-hidden rounded-[18px]">
           {learned ? (
             // Keyed by session: [Try again] reloads the kiosk page, so the new order never starts on the old cart.
-            <LearnedKioskHost key={tokens.sessionId} kiosk={kiosk} session={session} kioskToken={tokens.kioskToken} claimUrl={tokens.claimUrl} />
+            <LearnedKioskHost
+              key={tokens.sessionId}
+              kiosk={kiosk}
+              session={session}
+              kioskToken={tokens.kioskToken}
+              claimUrl={tokens.claimUrl}
+              strip
+            />
           ) : (
             <KioskCanvas theme={kiosk.theme} locale={kiosk.locale}>
               <KioskScreen
@@ -65,13 +72,13 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
                 session={session}
                 kioskToken={tokens.kioskToken}
                 claimUrl={tokens.claimUrl}
-                demo
+                // No `demo` (the &demo=1 tap counter) and no onClaimUrl ([Connect another phone]): nobody taps the
+                // kiosk here, and a new QR would void this page's own phone (I-135, I-066).
                 clockOffset={demo.clockOffset}
                 // A send found the session gone or expired: start over. A paid order stays for the end card.
                 onNewSession={() => {
                   if (session?.status !== "paid") tryAgain();
                 }}
-                onClaimUrl={demo.setClaimUrl}
                 cardTap={cardTap}
                 keepOrderNumber
               />

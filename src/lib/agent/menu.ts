@@ -10,7 +10,7 @@ export function menuForModel(k: KioskData) {
     items: k.items.map((i) => ({
       itemId: i.itemId,
       name: i.name,
-      // Ticket subtitles hold travel time and stops ("Non-stop · 43 min"), which the model may quote.
+      // Ticket subtitles hold travel time and stops ("Non-stop · 39 min"), which the model may quote.
       ...(i.subtitle ? { subtitle: i.subtitle } : {}),
       category: i.category,
       variants: i.variants,

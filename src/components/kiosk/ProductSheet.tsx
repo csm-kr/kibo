@@ -45,6 +45,9 @@ export function ProductSheet(props: {
   const chosen = group ? (draft.selections[group.groupId] ?? []) : [];
   const canGoOn = step.kind === "variant" ? draft.variant !== null : group ? chosen.length >= group.min : true;
   const price = sheetPrice(kiosk, draft);
+  // A group with discounts (passenger fares) shows each option's full price, so the adult fare is visible too (I-119).
+  const basePrice = item.variants.find((v) => v.variant === (draft.variant ?? item.variants[0].variant))?.price ?? 0;
+  const fullPrices = group?.options.some((o) => o.priceDelta < 0) ?? false;
 
   function pickVariant(variant: Variant) {
     setDraft((d) => ({ ...d, variant }));
@@ -108,7 +111,7 @@ export function ProductSheet(props: {
                   <Choice
                     key={v.variant}
                     selected={draft.variant === v.variant}
-                    name={variantWord(v.variant, locale)}
+                    name={capitalized(variantWord(v.variant, locale))}
                     sub={formatWon(v.price, locale)}
                     locale={locale}
                     onPick={() => pickVariant(v.variant)}
@@ -141,7 +144,7 @@ export function ProductSheet(props: {
                       soldOut={o.soldOut}
                       image={o.image}
                       name={o.name[locale]}
-                      sub={signedDelta(o.priceDelta, locale)}
+                      sub={fullPrices ? formatWon(basePrice + o.priceDelta, locale) : signedDelta(o.priceDelta, locale)}
                       locale={locale}
                       onPick={() => toggleOption(o)}
                     />
@@ -205,10 +208,20 @@ export function ProductSheet(props: {
   );
 }
 
-/** "+500원" for a surcharge, "−5,500원" for a discount (a child fare), nothing when the price stays. */
+/** "+500원" for a surcharge, nothing when the price stays. */
 function signedDelta(delta: number, locale: Locale): string | undefined {
   if (delta === 0) return undefined;
   return `${delta > 0 ? "+" : "−"}${formatWon(Math.abs(delta), locale)}`;
+}
+
+/** "Set" on the K4 button; line titles keep the lowercase word ("Cheeseburger set", I-120). Korean is unchanged. */
+function capitalized(word: string): string {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
+/** "어린이 (6–12세)": the bracketed range never breaks inside, `break-keep` allows a break after the dash (I-109). */
+function KeepRange({ name }: { name: string }) {
+  return name.split(/(\([^)]*\))/).map((part, i) => (i % 2 === 1 ? <span key={i} className="whitespace-nowrap">{part}</span> : part));
 }
 
 function Choice(props: {
@@ -237,7 +250,9 @@ function Choice(props: {
           <KioskImage src={image} sizes="300px" />
         </span>
       )}
-      <span className="k-text-40 block px-6 pt-4 font-bold">{props.name}</span>
+      <span className="k-text-40 block px-6 pt-4 font-bold">
+        <KeepRange name={props.name} />
+      </span>
       {props.sub && <span className="k-text-40 block px-6 text-(--k-primary-dark)">{props.sub}</span>}
       {props.soldOut && (
         <span className="k-text-40 mx-6 mt-2 self-start rounded-full bg-[#FFF1CC] px-4 font-bold text-[#7A2E0E]">

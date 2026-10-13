@@ -18,6 +18,7 @@ import { MenuScreen } from "./MenuScreen";
 import { PaymentScreen } from "./PaymentScreen";
 import { ReviewScreen } from "./ReviewScreen";
 import { KioskImage } from "./KioskImage";
+import { KioskToolbar } from "./KioskToolbar";
 import { FOCUS } from "./styles";
 
 // All sizes are 1080x1920 canvas px (docs/UI_GUIDE.md). Text uses the k-text-* utilities (>= 40px).
@@ -27,13 +28,17 @@ interface Props {
   session: Session | null;
   kioskToken: string | null;
   claimUrl: string | null;
-  demo: boolean;
+  /** `/kiosk?…&demo=1` only: the tap counter for the touch-vs-voice measurement. /demo leaves it off (I-135). */
+  demo?: boolean;
   /** Server time minus local time, from ping; session times are server time. */
   clockOffset: number;
   /** Called when the session has ended or vanished; the owner decides how to get a new one. */
   onNewSession(): void;
-  /** [Connect another phone] issued a new QR; the owner stores it. */
-  onClaimUrl(claimUrl: string): void;
+  /**
+   * [Connect another phone] issued a new QR; the owner stores it. /demo leaves it out, which hides the button:
+   * a new QR would void the demo's own phone (I-066).
+   */
+  onClaimUrl?(claimUrl: string): void;
   /** /demo only: a "tap" event inserts the card on K7, the same path as the kiosk's own button (Flow C4). */
   cardTap?: EventTarget;
   /** /demo only: K8 keeps the order number instead of counting back to K1; the demo's end card moves on. */
@@ -41,7 +46,7 @@ interface Props {
 }
 
 export function KioskScreen(props: Props) {
-  const { session, kioskToken, claimUrl, demo, clockOffset, onNewSession, onClaimUrl } = props;
+  const { session, kioskToken, claimUrl, demo = false, clockOffset, onNewSession, onClaimUrl } = props;
   const sessionId = session?.sessionId ?? null;
   // The language row on K1 picks the screen language for this order; a new session starts in the kiosk's default.
   const [lang, setLang] = useState<{ forId: string | null; locale: Locale }>({ forId: null, locale: props.kiosk.locale });
@@ -114,6 +119,7 @@ export function KioskScreen(props: Props) {
       data-demo={demo || undefined}
       onPointerDownCapture={countTap}
     >
+      {session && <KioskBanners kiosk={kiosk} session={session} kioskToken={kioskToken} clockOffset={clockOffset} />}
       {screen === "attract" ? (
         <Attract
           kiosk={kiosk}
@@ -156,6 +162,8 @@ export function KioskScreen(props: Props) {
       ) : (
         <>
           <Header kiosk={kiosk} />
+          {/* The small QR on K2 too: a touch order can switch to the phone from every screen (Flow B, I-048). */}
+          {session && <KioskToolbar kiosk={kiosk} session={session} claimUrl={claimUrl} send={send} onClaimUrl={onClaimUrl} />}
           <Dine
             kiosk={kiosk}
             phoneConnected={session?.phoneConnectedAt != null}
@@ -163,7 +171,6 @@ export function KioskScreen(props: Props) {
           />
         </>
       )}
-      {session && <KioskBanners kiosk={kiosk} session={session} kioskToken={kioskToken} clockOffset={clockOffset} />}
       {demo && (
         <DemoCounter
           // DoneScreen, a sibling, is keyed by the bare session id.
@@ -315,7 +322,7 @@ function Dine({ kiosk, phoneConnected, onPick }: { kiosk: KioskData; phoneConnec
   const dine = kiosk.dineOptions;
   if (!dine) return null;
   return (
-    <div className="flex flex-1 flex-col gap-16 px-12 pt-24">
+    <div className="flex flex-1 flex-col gap-16 px-12 pt-16">
       <h1 className="k-text-72 text-center font-bold">{kt("dineQuestion", locale)}</h1>
       <div className="grid grid-cols-2 gap-10">
         {options.map((o) => (
@@ -325,7 +332,7 @@ function Dine({ kiosk, phoneConnected, onPick }: { kiosk: KioskData; phoneConnec
             onClick={() => onPick(o)}
             className={`overflow-hidden rounded-[32px] border-[6px] border-[#1E1B18] bg-white active:bg-(--k-primary-tint) ${FOCUS}`}
           >
-            <span className="relative block h-140">
+            <span className="relative block h-160">
               <Image src={dine[o].image} alt="" fill sizes="480px" className="object-cover" />
             </span>
             <span className="k-text-56 block px-6 py-10 font-bold">{dine[o].name[locale]}</span>

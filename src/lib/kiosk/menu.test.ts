@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { getKiosk } from "@/lib/adapters/catalog";
 import type { MenuItem } from "@/types/menu";
 import type { CartLine } from "@/types/session";
-import { formatFrom, formatWon, lineLabel, lowestPrice, sheetPrice, sheetSteps } from "./menu";
+import { formatWon, lineLabel, sheetPrice, sheetSteps, tilePrice } from "./menu";
 
 const k = getKiosk("malo");
 const rail = getKiosk("airport_rail");
@@ -27,27 +27,26 @@ describe("formatWon", () => {
   });
 });
 
-describe("formatFrom", () => {
-  it("marks the price as the lowest one", () => {
-    expect(formatFrom(5500, "ko")).toBe("5,500원부터");
-    expect(formatFrom(5500, "en")).toBe("from ₩5,500");
-  });
-});
-
-describe("lowestPrice", () => {
-  it("the cheapest fare a passenger option allows", () => {
-    // Express 11,000 with child -5,500; Harbor Gate 1,450 with child -730 (data/kiosks/airport_rail.json).
-    expect(lowestPrice(railItem("express_city_center"))).toBe(5500);
-    expect(lowestPrice(railItem("all_stop_harbor_gate"))).toBe(720);
+describe("tilePrice", () => {
+  it("a fare shows the default passenger (adult), not the cheapest one (I-119)", () => {
+    // Express adult 10,500, child 5,250; Harbor Gate adult 1,600 (data/kiosks/airport_rail.json).
+    expect(tilePrice(railItem("express_city_center"))).toBe(10500);
+    expect(tilePrice(railItem("all_stop_harbor_gate"))).toBe(1600);
   });
 
-  it("a required group with only surcharges keeps the base price", () => {
-    expect(lowestPrice(railItem("transit_card"))).toBe(4000);
-    expect(lowestPrice(railItem("day_pass"))).toBe(15000);
+  it("adds the default options' price deltas", () => {
+    const fare = structuredClone(railItem("express_city_center"));
+    fare.optionGroups[0].defaultOptionIds = ["child"];
+    expect(tilePrice(fare)).toBe(5250);
   });
 
-  it("MALO items keep their first variant's price (no discounts)", () => {
-    for (const i of k.items) expect(lowestPrice(i), i.itemId).toBe(i.variants[0].price);
+  it("a required group without a default keeps the base price", () => {
+    expect(tilePrice(railItem("transit_card"))).toBe(4000);
+    expect(tilePrice(railItem("day_pass"))).toBe(15000);
+  });
+
+  it("MALO items keep their first variant's price", () => {
+    for (const i of k.items) expect(tilePrice(i), i.itemId).toBe(i.variants[0].price);
   });
 });
 

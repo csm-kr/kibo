@@ -28,7 +28,7 @@ export interface OptionGroup {
 export interface MenuItem {
   itemId: string;
   name: LocalizedName;
-  /** One short line under the name, e.g. "Non-stop · 43 min". */
+  /** One short line under the name, e.g. "Non-stop · 39 min". */
   subtitle?: LocalizedName;
   category: string;
   image: string;

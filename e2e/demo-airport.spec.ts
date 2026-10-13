@@ -50,7 +50,7 @@ test("airport rail on /demo: tickets on both halves, confirm, card stand-in, ref
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "menu");
   const canvas = page.locator("[data-kiosk-canvas]");
   await expect(buttonWithText(canvas, "직통열차 시티센터")).toHaveClass(/k-ring/);
-  await expect(canvas.getByText("22,000원").first()).toBeVisible();
+  await expect(canvas.getByText("21,000원").first()).toBeVisible();
 
   await ai("requestCheckout");
   await expect(page.getByRole("heading", { name: "Please check your order" })).toBeVisible();
@@ -86,6 +86,6 @@ test("@live typing a ticket order reaches real Gemini and two adult express tick
   await page.getByRole("button", { name: "Send" }).click();
   const cart = page.getByRole("region", { name: "Your order" });
   await expect(cart.getByText("Express to City Center", { exact: true })).toBeVisible({ timeout: 90_000 });
-  // 2 x 11,000 adult fare (data/kiosks/airport_rail.json): the kiosk's own total.
-  await expect(page.locator("[data-kiosk-canvas]").getByText("22,000원").first()).toBeVisible();
+  // 2 x 10,500 adult fare (data/kiosks/airport_rail.json): the kiosk's own total.
+  await expect(page.locator("[data-kiosk-canvas]").getByText("21,000원").first()).toBeVisible();
 });

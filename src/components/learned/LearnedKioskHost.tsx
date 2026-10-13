@@ -26,6 +26,11 @@ export function LearnedKioskHost(props: {
   session: Session | null;
   kioskToken: string | null;
   claimUrl: string | null;
+  /**
+   * /demo: the column has no letterbox, so the widget becomes a strip under the page instead of a card over its
+   * tiles (I-101, R-006).
+   */
+  strip?: boolean;
 }) {
   const { kiosk, session, kioskToken } = props;
   const outer = useRef<HTMLDivElement>(null);
@@ -67,23 +72,27 @@ export function LearnedKioskHost(props: {
     });
   }, [doc, session, kioskToken, kiosk]);
 
+  const widget = <KiboWidget kiosk={kiosk} session={session} claimUrl={props.claimUrl} outcome={outcome} strip={props.strip ?? false} />;
   return (
-    <div ref={outer} className="relative h-full w-full overflow-hidden bg-[#141210]">
-      <iframe
-        ref={attach}
-        src={kiosk.learned?.page}
-        title={kiosk.brand.name.ko}
-        data-learned-kiosk
-        onLoad={(e) => setDoc(e.currentTarget.contentDocument)}
-        style={{
-          width: PAGE_W,
-          height: PAGE_H,
-          transform: `translate(-50%, -50%) scale(${scale})`,
-          visibility: scale ? "visible" : "hidden",
-        }}
-        className="absolute top-1/2 left-1/2 origin-center border-0 bg-white"
-      />
-      <KiboWidget kiosk={kiosk} session={session} claimUrl={props.claimUrl} outcome={outcome} />
+    <div className="flex h-full w-full flex-col">
+      <div ref={outer} className="relative min-h-0 w-full flex-1 overflow-hidden bg-[#141210]">
+        <iframe
+          ref={attach}
+          src={kiosk.learned?.page}
+          title={kiosk.brand.name.ko}
+          data-learned-kiosk
+          onLoad={(e) => setDoc(e.currentTarget.contentDocument)}
+          style={{
+            width: PAGE_W,
+            height: PAGE_H,
+            transform: `translate(-50%, -50%) scale(${scale})`,
+            visibility: scale ? "visible" : "hidden",
+          }}
+          className="absolute top-1/2 left-1/2 origin-center border-0 bg-white"
+        />
+        {!props.strip && widget}
+      </div>
+      {props.strip && widget}
     </div>
   );
 }
@@ -99,8 +108,14 @@ function status(kiosk: KioskData, s: Session): { ko: string; en: string } | null
   return { ko: "키오스크에 반영했어요", en: "Done on the kiosk" };
 }
 
-/** KIBO's own corner card, outside the kiosk page: QR, phone state, and what the bridge is doing. */
-function KiboWidget(props: { kiosk: KioskData; session: Session | null; claimUrl: string | null; outcome: BridgeOutcome | null }) {
+/** KIBO's own card, outside the kiosk page: QR, phone state, and what the bridge is doing. A corner card, or a strip. */
+function KiboWidget(props: {
+  kiosk: KioskData;
+  session: Session | null;
+  claimUrl: string | null;
+  outcome: BridgeOutcome | null;
+  strip: boolean;
+}) {
   const { session, outcome } = props;
   const connected = session?.phoneConnectedAt != null;
   const src = useQrSrc(connected ? null : props.claimUrl);
@@ -115,7 +130,11 @@ function KiboWidget(props: { kiosk: KioskData; session: Session | null; claimUrl
       data-replay-ok={outcome ? String(outcome.ok) : ""}
       data-replay-ms={outcome?.ms ?? ""}
       aria-label="KIBO"
-      className="absolute top-4 right-4 flex w-72 flex-col gap-3 rounded-[18px] bg-white p-4 text-[#15171C] shadow-lg"
+      className={
+        props.strip
+          ? "grid flex-none grid-cols-[auto_1fr_1fr] items-start gap-4 bg-white p-4 text-[#15171C]"
+          : "absolute top-4 right-4 flex w-72 flex-col gap-3 rounded-[18px] bg-white p-4 text-[#15171C] shadow-lg"
+      }
     >
       <p className="text-base font-bold text-[#3446D4]">KIBO</p>
       {connected ? (

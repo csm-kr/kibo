@@ -72,8 +72,6 @@ export function useDemoSession(kioskId: string) {
     };
   }, [tokens]);
 
-  const setClaimUrl = useCallback((claimUrl: string) => setTokens((t) => (t ? { ...t, claimUrl } : t)), []);
-
   return {
     tokens,
     session,
@@ -84,6 +82,5 @@ export function useDemoSession(kioskId: string) {
     start,
     /** Back to the intro; the old session just expires. */
     stop: () => setTokens(null),
-    setClaimUrl,
   };
 }

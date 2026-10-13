@@ -42,13 +42,13 @@ test("airport rail: two express adults and one all-stop child reach a reference 
   await page.getByRole("button", { name: "구매하기", exact: true }).click();
   const reply = await (await checkout).json();
   expect(reply.ok).toBe(true);
-  // 2 x express 11,000 + Harbor Gate 1,450 with the child fare -730 (data/kiosks/airport_rail.json).
-  expect(reply.total).toBe(22720);
+  // 2 x express 10,500 + Harbor Gate 1,600 with the child fare -800 (data/kiosks/airport_rail.json).
+  expect(reply.total).toBe(21800);
 
   await expect(root).toHaveAttribute("data-screen", "review");
   await expect(page.getByRole("heading", { name: "구매 내역을 확인해 주세요" })).toBeVisible();
   await expect(page.locator('[data-screen="review"] ul > li')).toHaveCount(2);
-  await expect(page.getByText("22,720원", { exact: true })).toBeVisible();
+  await expect(page.getByText("21,800원", { exact: true })).toBeVisible();
   await expect(page.getByText("식사 장소")).toHaveCount(0);
 
   await page.getByRole("button", { name: "결제하기" }).click();
@@ -76,7 +76,7 @@ test("MALO in English: K1 language button, then a cheeseburger set to an English
   await buttonWithText(page, "Cheeseburger").click();
   const sheet = page.getByRole("dialog", { name: "Cheeseburger" });
   await expect(sheet.getByText("Make it a set?")).toBeVisible();
-  await buttonWithText(sheet, "set").click();
+  await buttonWithText(sheet, "Set").click();
   await sheet.getByRole("button", { name: "Next", exact: true }).click();
   await sheet.getByRole("button", { name: "Next", exact: true }).click();
   await buttonWithText(sheet, "Zero cola").click();

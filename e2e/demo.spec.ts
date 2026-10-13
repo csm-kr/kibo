@@ -42,7 +42,8 @@ test("judge path: intro, order on both halves, confirm, card stand-in, order num
   // The demo's phone is connected from the start, so both halves ask for the dine option.
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "dine");
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "dine");
-  await expect(page.locator("[data-demo-counter]")).toBeVisible();
+  // The tap counter is for the `/kiosk?…&demo=1` measurement only; nobody taps this kiosk (I-135).
+  await expect(page.locator("[data-demo-counter]")).toHaveCount(0);
 
   const ai = (type: string, args: object, utteranceSeq: number) =>
     command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "voice", utteranceSeq });
@@ -53,6 +54,8 @@ test("judge path: intro, order on both halves, confirm, card stand-in, order num
   await expect(cart.getByText("Cheeseburger set", { exact: true })).toBeVisible();
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "menu");
   await expect(buttonWithText(page.locator("[data-kiosk-canvas]"), "치즈버거")).toHaveClass(/k-ring/);
+  // [Connect another phone] would void this page's own phone (I-066).
+  await expect(page.getByRole("button", { name: "다른 휴대폰 연결" })).toHaveCount(0);
 
   await ai("requestCheckout", {}, 2);
   await expect(page.getByRole("heading", { name: "Please check your order" })).toBeVisible();

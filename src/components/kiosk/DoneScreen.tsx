@@ -41,7 +41,7 @@ export function DoneScreen(props: {
   }, [keepNumber, numberAt, left, onNewSession]);
 
   return (
-    <div className="relative flex h-full flex-col">
+    <div className="relative flex min-h-0 flex-1 flex-col">
       <Header kiosk={kiosk} />
       {!showNumber ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-16 px-12">

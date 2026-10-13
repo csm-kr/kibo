@@ -5,7 +5,7 @@ import type { CommandReply } from "@/lib/client/api";
 import { findItem, isAvailableNow } from "@/lib/adapters/catalog";
 import type { CommandType } from "@/lib/commands/schemas";
 import { kt, type KioskTextKey } from "@/lib/i18n/kiosk";
-import { formatFrom, formatWon, lineLabel, lowestPrice } from "@/lib/kiosk/menu";
+import { formatWon, lineLabel, tilePrice } from "@/lib/kiosk/menu";
 import type { KioskData, MenuItem } from "@/types/menu";
 import type { CartLine, ChangeKind, LineInput, Session } from "@/types/session";
 import { CartBar } from "./CartBar";
@@ -60,7 +60,7 @@ export function MenuScreen(props: {
   /** Server time minus local time; lastChange.at is server time. */
   clockOffset: number;
   send(type: CommandType, args: object): Promise<CommandReply | null>;
-  onClaimUrl(claimUrl: string): void;
+  onClaimUrl?(claimUrl: string): void;
 }) {
   const { kiosk, session, send } = props;
   const { locale, domain } = kiosk;
@@ -136,9 +136,16 @@ export function MenuScreen(props: {
   const items = kiosk.items.filter((i) => i.category === category);
 
   return (
-    <div className="relative flex h-full flex-col" onPointerDownCapture={onTouch}>
+    <div className="relative flex min-h-0 flex-1 flex-col" onPointerDownCapture={onTouch}>
       <Header kiosk={kiosk} />
-      <KioskToolbar kiosk={kiosk} session={session} claimUrl={props.claimUrl} send={send} onClaimUrl={props.onClaimUrl} />
+      <KioskToolbar
+        kiosk={kiosk}
+        session={session}
+        claimUrl={props.claimUrl}
+        send={send}
+        onClaimUrl={props.onClaimUrl}
+        status={flash?.status ?? null}
+      />
 
       <div className="relative flex min-h-0 flex-1">
         <nav aria-label={kt("categories", locale, domain)} className="flex w-65 flex-none flex-col gap-2 overflow-y-auto bg-(--k-panel) py-4">
@@ -179,14 +186,6 @@ export function MenuScreen(props: {
               );
             })}
           </div>
-        </div>
-
-        <div aria-live="polite" className="pointer-events-none absolute inset-x-12 top-6 z-10 flex justify-center">
-          {flash?.status && (
-            <p className="k-text-48 rounded-full bg-(--k-primary-dark) px-12 py-4 font-bold text-white shadow-[0_8px_24px_rgba(30,27,24,0.25)]">
-              {flash.status}
-            </p>
-          )}
         </div>
       </div>
 
@@ -242,9 +241,6 @@ function ProductTile(props: { kiosk: KioskData; item: MenuItem; available: boole
   const { item } = props;
   const { locale, domain } = props.kiosk;
   const blocked = item.soldOut ? kt("soldOut", locale, domain) : !props.available ? kt("notNow", locale) : null;
-  const price = item.variants[0].price;
-  // A fare with cheaper passenger options shows its lowest price, marked "from".
-  const lowest = lowestPrice(item);
   return (
     <button
       type="button"
@@ -274,9 +270,7 @@ function ProductTile(props: { kiosk: KioskData; item: MenuItem; available: boole
       <span className="flex flex-col px-6 pt-4 pb-6">
         <span className="k-text-40 font-bold">{item.name[locale]}</span>
         {item.subtitle && <span className="k-text-40 text-[#4B463F]">{item.subtitle[locale]}</span>}
-        <span className="k-text-40 font-bold text-(--k-primary)">
-          {lowest < price ? formatFrom(lowest, locale) : formatWon(price, locale)}
-        </span>
+        <span className="k-text-40 font-bold text-(--k-primary)">{formatWon(tilePrice(item), locale)}</span>
         {item.kcal !== null && (
           <span className="k-text-40 text-[#4B463F]">
             {item.kcal} {kt("kcal", locale)}

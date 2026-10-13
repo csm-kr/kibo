@@ -10,7 +10,8 @@ import { ModalLayer } from "./ModalLayer";
 import { FOCUS } from "./styles";
 
 // KX banners on every screen (docs/UX.md "Exception flows"). Fixed copy only: the session holds a reason code,
-// never model text. Placed below the header and toolbar (256px) so they never hide the QR or the staff state.
+// never model text. The strips are in the flow at the top of the kiosk and push the screen down, so they never
+// cover a tile, the category rail or the QR (I-045, R-006); the idle warning is a modal above everything.
 
 const STAFF_TEXT: Record<StaffReason, KioskTextKey> = {
   unknown_info: "staffCalled",
@@ -35,20 +36,22 @@ export function KioskBanners(props: { kiosk: KioskData; session: Session; kioskT
 
   return (
     <>
-      <div className="pointer-events-none absolute inset-x-12 top-64 z-30 flex flex-col gap-6">
-        {staff && (
-          <p role="status" className="k-text-48 flex items-center gap-8 rounded-[32px] border-4 border-[#7A2E0E] bg-[#FFF1CC] p-10 font-bold text-[#7A2E0E]">
-            <BellIcon />
-            {kt(STAFF_TEXT[staff.reasonCode], locale)}
-          </p>
-        )}
-        {paused && (
-          <p role="status" className="k-text-40 flex items-center gap-8 rounded-[32px] border-4 border-[#7A2E0E] bg-[#FFF1CC] p-10 text-[#7A2E0E]">
-            <PhoneOffIcon />
-            {kt("phonePaused", locale)}
-          </p>
-        )}
-      </div>
+      {(staff || paused) && (
+        <div className="flex flex-none flex-col border-b-4 border-[#7A2E0E] bg-[#FFF1CC] text-[#7A2E0E]">
+          {staff && (
+            <p role="status" className="k-text-48 flex items-center gap-8 px-12 py-8 font-bold">
+              <BellIcon />
+              {kt(STAFF_TEXT[staff.reasonCode], locale)}
+            </p>
+          )}
+          {paused && (
+            <p role="status" className="k-text-40 flex items-center gap-8 px-12 py-8">
+              <PhoneOffIcon />
+              {kt("phonePaused", locale)}
+            </p>
+          )}
+        </div>
+      )}
       {idle.show && (
         // Above sheets (SCRIM is z-20): the warning must win over whatever is open.
         <ModalLayer className="absolute inset-0 z-30 flex items-center justify-center bg-[#1E1B18]/60 p-12">

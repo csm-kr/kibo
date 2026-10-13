@@ -379,9 +379,9 @@ describe("airport rail tickets", () => {
       selections: { passenger: ["child"] },
     }, AFTERNOON, next).cart;
     expect(cart).toHaveLength(2);
-    expect(cart[0]).toMatchObject({ variant: "single", qty: 2, selections: { passenger: ["adult"] }, unitPrice: 11000 });
-    expect(cart[1]).toMatchObject({ qty: 1, selections: { passenger: ["child"] }, unitPrice: 5500 });
-    expect(cartTotal(cart)).toBe(27500);
+    expect(cart[0]).toMatchObject({ variant: "single", qty: 2, selections: { passenger: ["adult"] }, unitPrice: 10500 });
+    expect(cart[1]).toMatchObject({ qty: 1, selections: { passenger: ["child"] }, unitPrice: 5250 });
+    expect(cartTotal(cart)).toBe(26250);
   });
 
   it("sells a transit card with a 10,000 won top-up for 14,000 won", () => {

@@ -91,14 +91,14 @@ Every screen and state that a QA pass must look at (`docs/UI_QA.md`). Ids are us
 | Id | Screen | Session status | Next |
 |---|---|---|---|
 | K1 | Kiosk attract (talk QR, touch, large text) | `idle` | K2 or phone P1 |
-| K2 | Kiosk dine-in / take-out | `connected` / `ordering` | K3 |
+| K2 | Kiosk dine-in / take-out, small QR in the toolbar row | `connected` / `ordering` | K3 |
 | K3 | Kiosk menu: category rail, photo grid, cart bar, small QR | `ordering` | K4, K5, K6 |
 | K4 | Kiosk product sheet: set → side → drink → ingredients | `ordering` | K3 |
 | K5 | Kiosk upsell pop-up (once per order) | `ordering` | K3 |
 | K6 | Kiosk order review | `confirming` | K7 or K3 |
 | K7 | Kiosk payment method → card insert → approving | `paying` | K8 or K6 (edit) |
 | K8 | Kiosk receipt? → order number | `paid` | K1 after 10 s |
-| KX | Kiosk banners: staff called, AI highlight + status line, connection paused, idle warning | any | — |
+| KX | Kiosk banners: staff called and connection paused (a strip at the top that pushes the screen down), AI highlight + status line (in the toolbar row for 2 s), idle warning | any | — |
 | P1 | Phone mic hint (or in-app browser warning) | `connected`, or `ordering` when scanned mid-order | P2, or P3 when the dine option is already set; text mode if denied |
 | P2 | Phone dine option (not on a kiosk without dine options, such as the ticket machine: P3 directly) | `connected` | P3 |
 | P3 | Phone talk: mic, transcript, last two messages, cart card, choices, [Undo] | `ordering` | P4 |
