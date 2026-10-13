@@ -72,3 +72,8 @@ When an issue class in `docs/ISSUE.md` is seen for the **3rd time**, it becomes 
 - From: `slow-text-agent` — I-059 (seen 10-13/3-assistant:2), I-105 (10-13/7-environments:0), I-157 (10-13/11-hardening:3)
 - Why: each time the text agent was measured in a new setting (first real call, Vertex AI, five users at once) it was several times slower than the last number on file, and judges type on `/demo` when voice is down.
 - Check: a step that changes the text agent's backend, model, instructions or cache cites per-request median and p90 from `npm run eval:agent` next to the previous run in the TESTING ledger, and before a deploy for judging `npm run load:check` reports the 5 parallel chat latencies in `evidence/load-check.json`; a value over 10 s gets an issue row.
+
+### R-012 (proposed): Commit a step with explicit paths, and check what is staged before committing
+- From: `broad-git-add` — I-035 (seen 10-12/2-kiosk:2, 10-13/2-kiosk:5, 10-14/13-blind-kiosks:6)
+- Why: other sessions edit and stage planning files while a step runs, so `git add -A` or a bare `git commit` puts their work into the step's commit.
+- Check: before the step commit, `git diff --cached --name-only` lists only the step's files; commit with `git commit <paths> -m …` so files staged by others stay out.
