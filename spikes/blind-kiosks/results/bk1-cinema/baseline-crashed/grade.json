@@ -1,0 +1,250 @@
+{
+  "kioskId": "bk1-cinema",
+  "label": "baseline",
+  "gradedAt": "2026-10-13T11:44:37.277Z",
+  "skill": "no skill",
+  "files": {
+    "skill": "spikes/blind-kiosks/results/bk1-cinema/baseline/skill.json",
+    "key": "spikes/blind-kiosks/bk1-cinema/answer-key.json",
+    "app": "spikes/blind-kiosks/bk1-cinema/app/index.html"
+  },
+  "summary": "bk1-cinema/baseline: learning not finished, 3.0 min, 81 turns, 495133 input tokens; no skill; items 0/32 (precision null), price 0/0, options exact 0/0 (openable 0/0); orders correct 0, safe refusal 0, unsafe 0, not learned 10 of 10 (cart lines read in 0)",
+  "learning": {
+    "provider": "gemini",
+    "model": "gemini-3.8-flash",
+    "cachedInputTokens": 0,
+    "finished": false,
+    "turns": 81,
+    "acts": 59,
+    "tests": 0,
+    "inputTokens": 495133,
+    "outputTokens": 3249,
+    "minutes": "3.0"
+  },
+  "catalog": {
+    "items": {
+      "key": 32,
+      "skill": 0,
+      "matched": 0,
+      "recall": 0,
+      "precision": null,
+      "missing": [
+        "싱글 콤보",
+        "커플 콤보",
+        "스페셜 콤보",
+        "패밀리 콤보",
+        "오리지널 팝콘",
+        "카라멜 팝콘",
+        "치즈 팝콘",
+        "어니언 팝콘",
+        "갈릭버터 팝콘",
+        "시나몬 버터 팝콘",
+        "반반 팝콘",
+        "트러플 팝콘",
+        "콜라",
+        "제로콜라",
+        "사이다",
+        "아이스티",
+        "레몬에이드",
+        "자몽에이드",
+        "아메리카노",
+        "생수",
+        "나쵸",
+        "프레첼",
+        "버터구이 오징어",
+        "츄러스",
+        "칠리 치즈 감자",
+        "클래식 핫도그",
+        "칠리 핫도그",
+        "치즈볼 (5개)",
+        "치킨 텐더",
+        "소프트 아이스크림",
+        "슬러시",
+        "초코칩 쿠키"
+      ],
+      "extra": []
+    },
+    "price": {
+      "correct": 0,
+      "of": 0
+    },
+    "category": {
+      "correct": 0,
+      "of": 0
+    },
+    "soldOut": {
+      "correct": 0,
+      "of": 0
+    },
+    "options": {
+      "itemsExact": 0,
+      "items": 0,
+      "openableExact": 0,
+      "openable": 0,
+      "groups": 0,
+      "groupsFound": 0,
+      "groupLabelsExact": 0,
+      "groupRulesCorrect": 0,
+      "quantityGroups": 0,
+      "quantityRecognized": 0,
+      "conditionalGroups": 0,
+      "conditionalFound": 0
+    },
+    "perItem": [],
+    "perGroup": []
+  },
+  "orders": {
+    "total": 10,
+    "correct": 0,
+    "safeRefusal": 0,
+    "unsafe": 0,
+    "notLearned": 10,
+    "linesChecked": 0,
+    "results": [
+      {
+        "id": "h1",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 10000,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "싱글 콤보 › 카라멜",
+          "싱글 콤보 › 콜라"
+        ],
+        "order": null
+      },
+      {
+        "id": "h2",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 16500,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "커플 콤보 › 카라멜",
+          "커플 콤보 › 치즈",
+          "커플 콤보 › 콜라"
+        ],
+        "order": null
+      },
+      {
+        "id": "h3",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 16000,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "반반 팝콘 › 오리지널",
+          "반반 팝콘 › 어니언",
+          "아메리카노 › ICE"
+        ],
+        "order": null
+      },
+      {
+        "id": "h4",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 18000,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [],
+        "order": null
+      },
+      {
+        "id": "h5",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 22500,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "스페셜 콤보 › 갈릭버터",
+          "스페셜 콤보 › 사이다"
+        ],
+        "order": null
+      },
+      {
+        "id": "h6",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 16800,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "클래식 핫도그 › 치즈",
+          "슬러시 › 딸기"
+        ],
+        "order": null
+      },
+      {
+        "id": "h7",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 14300,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [],
+        "order": null
+      },
+      {
+        "id": "h8",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 28500,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "싱글 콤보 › 오리지널",
+          "싱글 콤보 › 갈릭버터",
+          "커플 콤보 › 콜라"
+        ],
+        "order": null
+      },
+      {
+        "id": "h9",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 23300,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [],
+        "order": null
+      },
+      {
+        "id": "h10",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 24500,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "커플 콤보 › 치즈",
+          "커플 콤보 › 제로콜라"
+        ],
+        "order": null
+      }
+    ]
+  }
+}

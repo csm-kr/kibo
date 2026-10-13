@@ -117,13 +117,24 @@ function pruneOldTrees(keep = 4) {
   }
 }
 
+// One retry after a short wait on rate limits and server errors; a 400 is our own request and is not retried.
+async function generate(body) {
+  for (let attempt = 1; ; attempt++) {
+    const res = await fetch(URL, { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body });
+    if (attempt === 1 && [429, 500, 503].includes(res.status)) {
+      console.error(`HTTP ${res.status}, retrying once in 5 s`);
+      await new Promise((r) => setTimeout(r, 5000));
+      continue;
+    }
+    return res.json().catch(() => ({ error: { code: res.status } }));
+  }
+}
+
 if (PROVIDER === 'openai') await openaiLoop();
 else while (!finalSkill && stats.turns < MAX_TURNS && stats.inTok < MAX_INPUT_TOKENS) {
   stats.turns++;
   pruneOldTrees();
-  const res = await fetch(URL, { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ systemInstruction: { parts: [{ text: SYSTEM }] }, contents, tools }) });
-  const data = await res.json();
+  const data = await generate(JSON.stringify({ systemInstruction: { parts: [{ text: SYSTEM }] }, contents, tools }));
   if (!data.candidates) { console.error(JSON.stringify(data).slice(0, 500)); break; }
   stats.inTok += data.usageMetadata?.promptTokenCount ?? 0; stats.outTok += data.usageMetadata?.candidatesTokenCount ?? 0;
   const msg = data.candidates[0].content;
@@ -137,7 +148,9 @@ else while (!finalSkill && stats.turns < MAX_TURNS && stats.inTok < MAX_INPUT_TO
     console.log(`#${stats.turns} ${fc.name} ${fc.name === 'act' ? JSON.stringify(fc.args.step) : ''}`);
     responses.push({ functionResponse: { name: fc.name, response: await call(fc.name, fc.args ?? {}) } });
   }
-  if (nudge) responses.push({ text: 'Stop exploring. Call records(), write the skill JSON from it, and call testSkill now.' });
+  // The nudge goes before the function responses: Vertex refuses a turn whose text part follows them
+  // with "Requests ending with a model turn are not supported." (checked 10-13, I-185).
+  if (nudge) responses.unshift({ text: 'Stop exploring. Call records(), write the skill JSON from it, and call testSkill now.' });
   contents.push({ role: 'user', parts: responses });
 }
 async function openaiLoop() {

@@ -1,0 +1,1138 @@
+{
+  "kiosk": "별무리 시네마",
+  "categories": [
+    "콤보",
+    "팝콘",
+    "음료",
+    "스낵",
+    "핫푸드",
+    "디저트"
+  ],
+  "uiLabels": [
+    "처음으로",
+    "전체 삭제",
+    "주문하기",
+    "◀",
+    "▶",
+    "수량 빼기",
+    "수량 더하기",
+    "✕",
+    "취소",
+    "확인",
+    "아니요",
+    "네, 추가할게요",
+    "다음",
+    "이전",
+    "장바구니 담기",
+    "품절"
+  ],
+  "dineOptions": {
+    "eat_in": "상영관 입장 전 수령",
+    "take_out": "지금 바로 수령"
+  },
+  "catalog": [
+    {
+      "name": "싱글 콤보",
+      "category": "콤보",
+      "price": 8500,
+      "soldOut": false,
+      "recipe": "singleCombo",
+      "optionGroups": [
+        {
+          "name": "팝콘 사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "M (기본)",
+              "priceDelta": 0
+            },
+            {
+              "name": "L 업그레이드",
+              "priceDelta": 1000
+            }
+          ]
+        },
+        {
+          "name": "팝콘 맛",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "오리지널",
+              "priceDelta": 0
+            },
+            {
+              "name": "카라멜",
+              "priceDelta": 500
+            },
+            {
+              "name": "치즈",
+              "priceDelta": 500
+            },
+            {
+              "name": "어니언",
+              "priceDelta": 500
+            },
+            {
+              "name": "갈릭버터",
+              "priceDelta": 500
+            },
+            {
+              "name": "반반",
+              "priceDelta": 1000
+            }
+          ]
+        },
+        {
+          "name": "음료",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "콜라",
+              "priceDelta": 0
+            },
+            {
+              "name": "제로콜라",
+              "priceDelta": 0
+            },
+            {
+              "name": "사이다",
+              "priceDelta": 0
+            },
+            {
+              "name": "아이스티",
+              "priceDelta": 500
+            },
+            {
+              "name": "레몬에이드",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "커플 콤보",
+      "category": "콤보",
+      "price": 11500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "팝콘 사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "M (기본)",
+              "priceDelta": 0
+            },
+            {
+              "name": "L 업그레이드",
+              "priceDelta": 1000
+            }
+          ]
+        },
+        {
+          "name": "팝콘 맛",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "오리지널",
+              "priceDelta": 0
+            },
+            {
+              "name": "카라멜",
+              "priceDelta": 500
+            },
+            {
+              "name": "치즈",
+              "priceDelta": 500
+            },
+            {
+              "name": "어니언",
+              "priceDelta": 500
+            },
+            {
+              "name": "갈릭버터",
+              "priceDelta": 500
+            },
+            {
+              "name": "반반",
+              "priceDelta": 1000
+            }
+          ]
+        },
+        {
+          "name": "음료 선택 (2잔)",
+          "required": true,
+          "min": 2,
+          "max": 2,
+          "options": [
+            {
+              "name": "콜라 더하기",
+              "priceDelta": 0
+            },
+            {
+              "name": "제로콜라 더하기",
+              "priceDelta": 0
+            },
+            {
+              "name": "사이다 더하기",
+              "priceDelta": 0
+            },
+            {
+              "name": "아이스티 더하기",
+              "priceDelta": 500
+            },
+            {
+              "name": "레몬에이드 더하기",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "스페셜 콤보",
+      "category": "콤보",
+      "price": 15000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "팝콘 사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "M (기본)",
+              "priceDelta": 0
+            },
+            {
+              "name": "L 업그레이드",
+              "priceDelta": 1000
+            }
+          ]
+        },
+        {
+          "name": "팝콘 맛",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "오리지널",
+              "priceDelta": 0
+            },
+            {
+              "name": "카라멜",
+              "priceDelta": 500
+            },
+            {
+              "name": "치즈",
+              "priceDelta": 500
+            },
+            {
+              "name": "어니언",
+              "priceDelta": 500
+            },
+            {
+              "name": "갈릭버터",
+              "priceDelta": 500
+            },
+            {
+              "name": "반반",
+              "priceDelta": 1000
+            }
+          ]
+        },
+        {
+          "name": "음료 선택 (2잔)",
+          "required": true,
+          "min": 2,
+          "max": 2,
+          "options": [
+            {
+              "name": "콜라 더하기",
+              "priceDelta": 0
+            },
+            {
+              "name": "제로콜라 더하기",
+              "priceDelta": 0
+            },
+            {
+              "name": "사이다 더하기",
+              "priceDelta": 0
+            },
+            {
+              "name": "아이스티 더하기",
+              "priceDelta": 500
+            },
+            {
+              "name": "레몬에이드 더하기",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "패밀리 콤보",
+      "category": "콤보",
+      "price": 17500,
+      "soldOut": true,
+      "optionGroups": []
+    },
+    {
+      "name": "오리지널 팝콘",
+      "category": "팝콘",
+      "price": 5000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "S",
+              "priceDelta": 0
+            },
+            {
+              "name": "M",
+              "priceDelta": 1000
+            },
+            {
+              "name": "L",
+              "priceDelta": 2000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "카라멜 팝콘",
+      "category": "팝콘",
+      "price": 5500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "S",
+              "priceDelta": 0
+            },
+            {
+              "name": "M",
+              "priceDelta": 1000
+            },
+            {
+              "name": "L",
+              "priceDelta": 2000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "치즈 팝콘",
+      "category": "팝콘",
+      "price": 5500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "S",
+              "priceDelta": 0
+            },
+            {
+              "name": "M",
+              "priceDelta": 1000
+            },
+            {
+              "name": "L",
+              "priceDelta": 2000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "어니언 팝콘",
+      "category": "팝콘",
+      "price": 5500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "S",
+              "priceDelta": 0
+            },
+            {
+              "name": "M",
+              "priceDelta": 1000
+            },
+            {
+              "name": "L",
+              "priceDelta": 2000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "갈릭버터 팝콘",
+      "category": "팝콘",
+      "price": 6000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "S",
+              "priceDelta": 0
+            },
+            {
+              "name": "M",
+              "priceDelta": 1000
+            },
+            {
+              "name": "L",
+              "priceDelta": 2000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "시나몬 버터 팝콘",
+      "category": "팝콘",
+      "price": 6000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "S",
+              "priceDelta": 0
+            },
+            {
+              "name": "M",
+              "priceDelta": 1000
+            },
+            {
+              "name": "L",
+              "priceDelta": 2000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "반반 팝콘",
+      "category": "팝콘",
+      "price": 6000,
+      "soldOut": false,
+      "recipe": "page2AddToCart",
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "S",
+              "priceDelta": 0
+            },
+            {
+              "name": "M",
+              "priceDelta": 1000
+            },
+            {
+              "name": "L",
+              "priceDelta": 2000
+            }
+          ]
+        },
+        {
+          "name": "반반 맛 선택",
+          "required": true,
+          "min": 2,
+          "max": 2,
+          "options": [
+            {
+              "name": "오리지널",
+              "priceDelta": 0
+            },
+            {
+              "name": "카라멜",
+              "priceDelta": 0
+            },
+            {
+              "name": "치즈",
+              "priceDelta": 0
+            },
+            {
+              "name": "어니언",
+              "priceDelta": 0
+            },
+            {
+              "name": "갈릭버터",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "트러플 팝콘",
+      "category": "팝콘",
+      "price": 6500,
+      "soldOut": true,
+      "recipe": "page2AddToCart",
+      "optionGroups": []
+    },
+    {
+      "name": "콜라",
+      "category": "음료",
+      "price": 2500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "R",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "제로콜라",
+      "category": "음료",
+      "price": 2500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "R",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "사이다",
+      "category": "음료",
+      "price": 2500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "R",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "아이스티",
+      "category": "음료",
+      "price": 3000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "R",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "레몬에이드",
+      "category": "음료",
+      "price": 3800,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "R",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "자몽에이드",
+      "category": "음료",
+      "price": 3800,
+      "soldOut": true,
+      "optionGroups": []
+    },
+    {
+      "name": "아메리카노",
+      "category": "음료",
+      "price": 3500,
+      "soldOut": false,
+      "recipe": "page2AddToCart",
+      "optionGroups": [
+        {
+          "name": "온도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            },
+            {
+              "name": "ICE",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "R",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "생수",
+      "category": "음료",
+      "price": 1500,
+      "soldOut": false,
+      "recipe": "page2DirectAddToCart",
+      "optionGroups": []
+    },
+    {
+      "name": "나쵸",
+      "category": "스낵",
+      "price": 4000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "소스",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "치즈 소스",
+              "priceDelta": 0
+            },
+            {
+              "name": "할라피뇨 치즈 소스",
+              "priceDelta": 500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "프레첼",
+      "category": "스낵",
+      "price": 3500,
+      "soldOut": false,
+      "recipe": "directAddToCart",
+      "optionGroups": []
+    },
+    {
+      "name": "버터구이 오징어",
+      "category": "스낵",
+      "price": 5000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "시즈닝",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "기본 버터",
+              "priceDelta": 0
+            },
+            {
+              "name": "청양마요",
+              "priceDelta": 500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "츄러스",
+      "category": "스낵",
+      "price": 3000,
+      "soldOut": false,
+      "recipe": "directAddToCart",
+      "optionGroups": []
+    },
+    {
+      "name": "칠리 치즈 감자",
+      "category": "스낵",
+      "price": 4500,
+      "soldOut": false,
+      "recipe": "directAddToCart",
+      "optionGroups": []
+    },
+    {
+      "name": "클래식 핫도그",
+      "category": "핫푸드",
+      "price": 4500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "토핑 추가",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "options": [
+            {
+              "name": "치즈",
+              "priceDelta": 500
+            },
+            {
+              "name": "할라피뇨",
+              "priceDelta": 500
+            },
+            {
+              "name": "크리스피 어니언",
+              "priceDelta": 300
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "칠리 핫도그",
+      "category": "핫푸드",
+      "price": 5500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "토핑 추가",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "options": [
+            {
+              "name": "치즈",
+              "priceDelta": 500
+            },
+            {
+              "name": "할라피뇨",
+              "priceDelta": 500
+            },
+            {
+              "name": "크리스피 어니언",
+              "priceDelta": 300
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "치즈볼 (5개)",
+      "category": "핫푸드",
+      "price": 4000,
+      "soldOut": false,
+      "recipe": "directAddToCart",
+      "optionGroups": []
+    },
+    {
+      "name": "치킨 텐더",
+      "category": "핫푸드",
+      "price": 5500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "디핑 소스",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "허니머스타드",
+              "priceDelta": 0
+            },
+            {
+              "name": "바비큐",
+              "priceDelta": 0
+            },
+            {
+              "name": "스위트칠리",
+              "priceDelta": 300
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "소프트 아이스크림",
+      "category": "디저트",
+      "price": 2500,
+      "soldOut": false,
+      "recipe": "directAddToCart",
+      "optionGroups": []
+    },
+    {
+      "name": "슬러시",
+      "category": "디저트",
+      "price": 3000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "맛",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "블루 레몬",
+              "priceDelta": 0
+            },
+            {
+              "name": "딸기",
+              "priceDelta": 0
+            },
+            {
+              "name": "청포도",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "초코칩 쿠키",
+      "category": "디저트",
+      "price": 2000,
+      "soldOut": false,
+      "recipe": "directAddToCart",
+      "optionGroups": []
+    }
+  ],
+  "recipes": {
+    "startOrder": [
+      {
+        "op": "click",
+        "label": "별무리 시네마"
+      },
+      {
+        "op": "click",
+        "label": "{dineOption}"
+      }
+    ],
+    "addToCart": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "forEach",
+        "over": "options",
+        "as": "option",
+        "steps": [
+          {
+            "op": "click",
+            "label": "{option}"
+          }
+        ]
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "role": "button",
+            "name": "수량 더하기"
+          }
+        ]
+      },
+      {
+        "op": "click",
+        "role": "button",
+        "name": "담기"
+      },
+      {
+        "op": "clickIfVisible",
+        "label": "아니요"
+      }
+    ],
+    "page2AddToCart": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "▶"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "forEach",
+        "over": "options",
+        "as": "option",
+        "steps": [
+          {
+            "op": "click",
+            "label": "{option}"
+          }
+        ]
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "role": "button",
+            "name": "수량 더하기"
+          }
+        ]
+      },
+      {
+        "op": "click",
+        "role": "button",
+        "name": "담기"
+      },
+      {
+        "op": "clickIfVisible",
+        "label": "아니요"
+      }
+    ],
+    "directAddToCart": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "label": "{item}"
+          }
+        ]
+      }
+    ],
+    "page2DirectAddToCart": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "▶"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "label": "{item}"
+          }
+        ]
+      }
+    ],
+    "singleCombo": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "click",
+        "label": "다음"
+      },
+      {
+        "op": "forEach",
+        "over": "options",
+        "as": "option",
+        "steps": [
+          {
+            "op": "clickIfVisible",
+            "label": "{option}"
+          }
+        ]
+      },
+      {
+        "op": "click",
+        "label": "다음"
+      },
+      {
+        "op": "forEach",
+        "over": "options",
+        "as": "option",
+        "steps": [
+          {
+            "op": "clickIfVisible",
+            "label": "{option}"
+          }
+        ]
+      },
+      {
+        "op": "click",
+        "label": "다음"
+      },
+      {
+        "op": "forEach",
+        "over": "options",
+        "as": "option",
+        "steps": [
+          {
+            "op": "clickIfVisible",
+            "label": "{option}"
+          }
+        ]
+      },
+      {
+        "op": "click",
+        "label": "다음"
+      },
+      {
+        "op": "click",
+        "label": "장바구니 담기"
+      },
+      {
+        "op": "clickIfVisible",
+        "label": "아니요"
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "role": "button",
+            "name": "수량 더하기"
+          }
+        ]
+      }
+    ]
+  },
+  "cartTotalPattern": "총 결제금액 ([\\d,]+)원",
+  "notes": [
+    "싱글 콤보 담기 후 나쵸 제안 팝업 표시됨 (아니요 클릭으로 닫기)",
+    "옵션이 없는 품목은 클릭 시 즉시 장바구니에 담김",
+    "팝콘 및 음료 탭은 2페이지 구성으로 우측 화살표로 이동"
+  ]
+}

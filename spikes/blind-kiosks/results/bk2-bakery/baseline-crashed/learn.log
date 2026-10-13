@@ -1,0 +1,105 @@
+#1 act {"label":"포근밀","op":"click"}
+#2 record 
+#3 act {"op":"click","label":"매장에서 먹어요"}
+#4 act {"label":"아메리카노","op":"click"}
+#5 snapshot 
+#6 act {"op":"click","label":"HOT"}
+#7 act {"op":"click","label":"에스프레소 샷"}
+#8 act {"label":"+","op":"click"}
+#9 act {"name":"+","op":"click","role":"button"}
+#10 act {"text":"에스프레소 샷 +500원","op":"click"}
+#11 act {"op":"click","name":"샷","role":"button"}
+#12 audit 
+#13 audit 
+  audit #2: GAPS missing=40 unknown=3 hidden=0
+#14 reload 
+#15 act {"op":"click","label":"포근밀"}
+#16 act {"label":"매장에서 먹어요","op":"click"}
+#17 act {"op":"click","label":"빵"}
+#18 act {"label":"소금빵","op":"click"}
+#19 act {"label":"+","op":"click"}
+#20 act {"label":"취소","op":"click"}
+#21 act {"op":"click","label":"커피"}
+#22 act {"op":"click","label":"아메리카노"}
+#23 act {"text":"+","op":"click"}
+#24 act {"text":"+","op":"click","exact":true}
+#25 act {"role":"button","op":"click","name":"수량"}
+#26 act {"op":"click","label":"HOT"}
+#27 act {"label":"담기","op":"click"}
+#28 act {"label":"+","op":"click"}
+#29 testSkill 
+  test #1: FAIL
+#30 testSkill 
+  test #2: PASS
+#31 reload 
+#32 act {"op":"click","label":"포근밀"}
+#33 act {"label":"매장에서 먹어요","op":"click"}
+#34 act {"op":"click","label":"아메리카노"}
+#35 act {"op":"click","label":"취소"}
+#36 act {"op":"click","label":"아메리카노"}
+#37 act {"role":"button","op":"click","name":"증가"}
+#38 act {"label":"취소","op":"click"}
+#39 act {"label":"카페라떼","op":"click"}
+#40 act {"label":"담기","op":"click"}
+#41 act {"op":"click","label":"HOT"}
+#42 act {"op":"click","label":"담기"}
+#43 act {"op":"click","label":"전체삭제"}
+#44 act {"label":"비우기","op":"click"}
+#45 record 
+#46 record 
+#47 act {"op":"click","label":"바닐라빈 라떼"}
+#48 act {"op":"click","label":"계속 주문하기"}
+#49 record 
+#50 record 
+#51 act {"label":"취소","op":"click"}
+#52 act {"label":"카푸치노","op":"click"}
+#53 record 
+#54 act {"op":"click","label":"취소"}
+#55 act {"op":"click","label":"카라멜 마키아토"}
+#56 record 
+#57 act {"label":"취소","op":"click"}
+#58 act {"label":"카페모카","op":"click"}
+#59 record 
+#60 act {"op":"click","label":"취소"}
+#61 act {"label":"콜드브루","op":"click"}
+#62 act {"op":"click","label":"담기"}
+#63 act {"label":"✕","op":"click"}
+#64 record 
+#65 act {"label":"에스프레소","op":"click"}
+#66 record 
+#67 act {"label":"취소","op":"click"}
+#68 act {"op":"click","label":"논커피"}
+#69 act {"label":"초코라떼","op":"click"}
+#70 record 
+#71 act {"label":"취소","op":"click"}
+#72 act {"label":"녹차라떼","op":"click"}
+#73 record 
+#74 act {"op":"click","label":"취소"}
+#75 act {"op":"click","label":"고구마라떼"}
+#76 record 
+#77 record 
+#78 act {"op":"click","label":"취소"}
+#79 act {"op":"click","label":"레몬에이드"}
+#80 record 
+#81 act {"op":"click","label":"취소"}
+#82 act {"label":"흑임자 라떼","op":"click"}
+#83 record 
+#84 act {"op":"click","label":"취소"}
+#85 act {"label":"티","op":"click"}
+#86 act {"op":"click","label":"캐모마일"}
+#87 record 
+#88 act {"op":"click","label":"취소"}
+#89 act {"op":"click","label":"페퍼민트"}
+#90 record 
+#91 act {"label":"취소","op":"click"}
+#92 act {"label":"얼그레이","op":"click"}
+#93 record 
+#94 act {"label":"취소","op":"click"}
+#95 act {"op":"click","label":"유자차"}
+#96 record 
+#97 act {"label":"취소","op":"click"}
+#98 act {"label":"자몽차","op":"click"}
+#99 record 
+#100 act {"label":"취소","op":"click"}
+{"error":{"code":400,"message":"Requests ending with a model turn are not supported.","status":"INVALID_ARGUMENT"}}
+{"provider":"gemini","model":"gemini-3.8-flash","cachedInputTokens":0,"finished":false,"turns":101,"acts":72,"tests":2,"inputTokens":1581998,"outputTokens":5615,"minutes":"7.5"}

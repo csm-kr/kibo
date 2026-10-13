@@ -1,28 +1,30 @@
-# bk1-cinema, baseline (current learner, unchanged)
+# bk1-cinema, baseline (phase-12 learner + I-185 crash fix only)
 
-Learner `spikes/kibo-learn/learner.mjs`, `PROVIDER=gemini` (`gemini-3.8-flash`), `MAX_INPUT_TOKENS=2000000`, 10-13. Written from the logs and `grade.json` only (the answer key and brief were not read).
+Learner `spikes/kibo-learn/learner.mjs` with only the I-185 fix (`spikes/kibo-learn/CHANGES.md`), `PROVIDER=gemini` (`gemini-3.8-flash`), `MAX_INPUT_TOKENS=2000000`, 10-13, one run. Written from the log, the learned `skill.json` and `grade.json` only (the answer key, brief and app source were not read). The first two runs, which crashed at the nudge, are in `../baseline-crashed/`.
 
 ## Outcome
-**No skill.** Both runs stopped at turn 81 with HTTP 400 from Vertex AI, `"Requests ending with a model turn are not supported."`, and the learner's loop ends on any API error without retry. Neither run had called `testSkill`, `audit` or `finish`.
+**Finished through the gate**: 109 turns, 102 acts, 7.4 min, 1,068,732 input / 22,840 output tokens (`learn-stats.json`). The nudge fired at turn 80 without a crash, and the model wrote its first skill at turn 82.
 
-| Run | Files | Turns | Acts | `record` calls | Input / output tokens | Minutes |
-|---|---|---|---|---|---|---|
-| 1 (crash) | `crash1/learn.log`, `crash1/learn-stats.json` | 81 | 68 | 12 | 514,964 / 2,577 | 2.8 |
-| 2 (the one allowed rerun, PROTOCOL "Runs") | `learn.log`, `learn-stats.json` | 81 | 59 | 21 | 495,133 / 3,249 | 3.0 |
+| testSkill | Result |
+|---|---|
+| #1 (turn 82) | FAIL FAIL FAIL |
+| #2 (turn 83) | PASS (one order, does not count for the gate) |
+| #3 (turn 107) | PASS PASS PASS |
+| audit #1 (turn 108) | OK, missing 0, unknown 0, hidden 0 |
+| finish (turn 109) | accepted |
 
-Grade (`grade.json`): items 0/32, every one of the 10 holdout orders `notLearned` (no skill to replay).
-
-## Why it stopped (cause unverified)
-Both runs failed on the request of turn 81, the first request after turn 80. Turn 80 is where the learner's "stop exploring" nudge first fires (`stats.turns - lastTestTurn > 60 && stats.turns % 20 === 0`, with no test yet `lastTestTurn` is 0): it appends a text part to the same user turn as the function responses. The same turn number in two runs that took different paths points to that nudge, not to the model's output; this was not checked against the API. Logged as I-185.
+Grade (`grade.json`):
+- **Catalog:** items 32/32 (precision 1), price 32/32, category 32/32, sold out 32/32.
+- **Options:** items exact 19/25 (openable 20/22); groups found 30/39, rules correct 30; quantity groups recognized 0/3; conditional groups found 0/4.
+- **Orders:** correct 3 (h1, h7, h9; 569–739 ms), safe refusal 4 (h2, h5, h8, h10), **unsafe 3** (h3, h4, h6), not learned 0. Cart lines read in 0 of 10, so the 3 correct orders are judged by the total only (I-183).
 
 ## What it did well
-- Started an order on its own: tapped the attract screen (`별무리 시네마`), then the pickup choice (`지금 바로 수령`).
-- Found the six category tabs (콤보, 팝콘, 음료, 스낵, 핫푸드, 디저트) and used the pager arrows (`▶`, `◀`) to reach tiles on the second page.
-- Walked the combo wizard with `다음` / `이전` (size `M (기본)`, flavor, drink), tried the half-and-half (`반반`) flavor pick, and in run 1 reached the post-combo popup and declined it (`아니요`).
-- Closed item sheets with `✕` or `취소` and cleared the cart (`전체 삭제` → `확인`) between items, so exploration did not pile up lines.
+- Every item, price, category and sold-out mark, including the second page of two tabs (it wrote `page2AddToCart` and `page2DirectAddToCart` recipes with the `▶` arrow).
+- Separate recipes for items that go straight into the cart on a tap (`directAddToCart`, qty by tapping the tile again) and for the single-combo wizard (`singleCombo`: `다음` between steps, then `장바구니 담기`, then closes the upsell with `clickIfVisible 아니요`).
+- Both pickup choices mapped (`지금 바로 수령`, `상영관 입장 전 수령`).
 
 ## Where it failed
-- Spent all 80 turns exploring one item at a time and never wrote a skill, so the nudge was its first push to test; in both runs that push is where it crashed.
-- The half-and-half pick needed three tries (`label` "오리지널", then `exact`, then `text` "오리지널 카라멜 +500원"), a sign that two tappable labels started with the same flavor name.
-- Run 2 clicked `주문하기` (the checkout button) once while exploring, then went back with `이전`; harmless during learning, but it is a label the grader forbids in recipes.
-- Records hold the findings only in memory; with no `finish`, nothing of the 12 and 21 recorded items survives the run (the log prints `record` without its data).
+- **Unsafe (h3, h4, h6):** the qty step clicks role button `수량 더하기`, which matched 2–3 buttons on the screen (Playwright strict mode), so the replay stopped after clicks had already been made. The skill never says which line's or which sheet's `+` to use.
+- **Safe refusals (h2, h5, h8, h10):** the 커플 and 스페셜 combos record the two-drink pick as "콜라 더하기"-style option names (the steppers' button text) and use the common `addToCart` recipe, not the wizard; orders naming a plain drink cannot be expressed. 패밀리 콤보 has no option groups at all.
+- Quantity options (0/3) and conditional groups (0/4) were not modelled, as the known gaps in `docs/KIBO_LEARN.md` predicted.
+- `주문하기` (checkout) is listed in `uiLabels`; no recipe clicks it.
