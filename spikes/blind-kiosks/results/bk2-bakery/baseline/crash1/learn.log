@@ -1,0 +1,82 @@
+#1 act {"op":"click","label":"포근밀"}
+#2 record 
+#3 act {"op":"click","label":"매장에서 먹어요"}
+#4 act {"label":"아메리카노","op":"click"}
+#5 snapshot 
+#6 act {"op":"click","label":"HOT"}
+#7 act {"op":"click","label":"바닐라 시럽"}
+#8 act {"text":"에스프레소 샷","op":"click"}
+#9 act {"op":"click","label":"+"}
+#10 act {"op":"click","label":"취소"}
+#11 act {"label":"빵","op":"click"}
+#12 act {"op":"click","label":"소금빵"}
+#13 act {"label":"+","op":"click"}
+#14 act {"label":"그대로 주세요","op":"click"}
+#15 act {"label":"담기","op":"click"}
+#16 act {"op":"click","label":"전체삭제"}
+#17 act {"op":"click","label":"계속 주문하기"}
+#18 act {"label":"비우기","op":"click"}
+#19 act {"label":"소금빵","op":"click"}
+#20 record 
+#21 act {"label":"취소","op":"취소"}
+#22 act {"label":"버터 크루아상","op":"click"}
+#23 record 
+#24 act {"label":"취소","op":"click"}
+#25 act {"label":"단팥빵","op":"click"}
+#26 act {"label":"✕","op":"click"}
+#27 record 
+#28 act {"label":"크림치즈 베이글","op":"click"}
+#29 record 
+#30 act {"op":"click","label":"취소"}
+#31 act {"label":"마늘 바게트","op":"click"}
+#32 act {"op":"click","label":"✕"}
+#33 record 
+#34 record 
+#35 act {"label":"소보로빵","op":"click"}
+#36 act {"label":"✕","op":"click"}
+#37 record 
+#38 act {"op":"click","label":"우유식빵"}
+#39 act {"label":"✕","op":"click"}
+#40 record 
+#41 act {"op":"click","label":"케이크"}
+#42 act {"label":"딸기 생크림 케이크","op":"click"}
+#43 act {"label":"✕","op":"click"}
+#44 record 
+#45 act {"op":"click","label":"초코 가나슈 케이크"}
+#46 act {"label":"✕","op":"click"}
+#47 record 
+#48 act {"op":"click","label":"뉴욕 치즈케이크"}
+#49 act {"op":"click","label":"✕"}
+#50 record 
+#51 record 
+#52 act {"op":"click","label":"당근 케이크"}
+#53 act {"label":"✕","op":"click"}
+#54 record 
+#55 act {"op":"click","label":"레몬 파운드"}
+#56 act {"label":"✕","op":"click"}
+#57 record 
+#58 act {"label":"샌드위치","op":"click"}
+#59 act {"op":"click","label":"햄치즈 샌드위치"}
+#60 record 
+#61 act {"label":"취소","op":"click"}
+#62 act {"op":"click","label":"에그마요 샌드위치"}
+#63 act {"op":"click","label":"✕"}
+#64 record 
+#65 act {"label":"치킨 클럽 샌드위치","op":"click"}
+#66 record 
+#67 act {"label":"취소","op":"click"}
+#68 act {"label":"베이컨 토마토 샌드위치","op":"click"}
+#69 record 
+#70 act {"op":"click","label":"취소"}
+#71 act {"label":"리코타 샐러드 샌드위치","op":"click"}
+#72 act {"op":"click","label":"✕"}
+#73 record 
+#74 act {"op":"click","label":"크로크무슈"}
+#75 record 
+#76 act {"op":"click","label":"취소"}
+#77 act {"op":"click","label":"티"}
+#78 act {"op":"click","label":"캐모마일"}
+#79 record 
+#80 act {"op":"click","label":"취소"}
+{"error":{"code":400,"message":"Requests ending with a model turn are not supported.","status":"INVALID_ARGUMENT"}}
+{"provider":"gemini","model":"gemini-3.8-flash","cachedInputTokens":0,"finished":false,"turns":81,"acts":57,"tests":0,"inputTokens":496584,"outputTokens":2861,"minutes":"4.5"}

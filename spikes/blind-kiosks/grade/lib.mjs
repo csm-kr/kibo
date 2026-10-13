@@ -368,3 +368,14 @@ export function classify({ translation, forbidden = [], run, expectedTotal }) {
   if (missing.length) return { outcome: 'unsafe', reason: `the kiosk cart lacks ${missing.map((m) => m[0]).join(', ')}`, linesChecked: true };
   return { outcome: 'correct', linesChecked: true };
 }
+
+// A run that wrote no skill (crash, token cap, never passed the gate): nothing to replay, so every
+// holdout order is "not learned", kept apart from a safe refusal by a skill that exists.
+export function notLearnedOrders(key) {
+  const results = (key.holdoutOrders ?? []).map((h) => ({
+    id: h.id, outcome: 'notLearned', reason: 'no skill', linesChecked: null,
+    expectedTotal: h.expectedTotal, kioskTotal: null, skillPredicts: null, ms: null,
+    totalCannotSee: totalCannotSee(key, h), order: null,
+  }));
+  return { total: results.length, correct: 0, safeRefusal: 0, unsafe: 0, notLearned: results.length, linesChecked: 0, results };
+}

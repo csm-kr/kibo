@@ -1,0 +1,82 @@
+#1 act {"label":"별무리 시네마","op":"click"}
+#2 record 
+#3 act {"op":"click","label":"지금 바로 수령"}
+#4 act {"op":"click","label":"싱글 콤보"}
+#5 act {"label":"다음","op":"click"}
+#6 act {"label":"다음","op":"click"}
+#7 act {"op":"click","label":"M (기본)"}
+#8 act {"label":"다음","op":"click"}
+#9 act {"op":"click","label":"오리지널"}
+#10 act {"label":"다음","op":"click"}
+#11 act {"label":"콜라","op":"click"}
+#12 act {"op":"click","label":"다음"}
+#13 act {"label":"장바구니 담기","op":"click"}
+#14 act {"op":"click","label":"아니요"}
+#15 act {"op":"click","label":"팝콘"}
+#16 act {"op":"click","label":"전체 삭제"}
+#17 act {"label":"확인","op":"click"}
+#18 act {"label":"오리지널 팝콘","op":"click"}
+#19 act {"name":"담기","role":"button","op":"click"}
+#20 act {"label":"S","op":"click"}
+#21 act {"op":"click","label":"취소"}
+#22 act {"op":"click","label":"▶"}
+#23 act {"op":"click","label":"콤보"}
+#24 act {"label":"커플 콤보","op":"click"}
+#25 act {"label":"다음","op":"click"}
+#26 act {"op":"click","label":"M (기본)"}
+#27 act {"op":"click","label":"다음"}
+#28 act {"op":"click","label":"오리지널"}
+#29 act {"label":"다음","op":"click"}
+#30 act {"label":"✕","op":"click"}
+#31 act {"op":"click","label":"스페셜 콤보"}
+#32 act {"op":"click","label":"✕"}
+#33 act {"op":"click","label":"팝콘"}
+#34 act {"op":"click","label":"▶"}
+#35 act {"label":"음료","op":"click"}
+#36 act {"op":"click","label":"▶"}
+#37 act {"op":"click","label":"스낵"}
+#38 act {"op":"click","label":"핫푸드"}
+#39 act {"label":"디저트","op":"click"}
+#40 act {"op":"click","label":"소프트 아이스크림"}
+#41 record 
+#42 act {"op":"click","label":"전체 삭제"}
+#43 act {"label":"확인","op":"click"}
+#44 act {"label":"슬러시","op":"click"}
+#45 record 
+#46 act {"label":"취소","op":"click"}
+#47 act {"op":"click","label":"초코칩 쿠키"}
+#48 record 
+#49 act {"label":"전체 삭제","op":"click"}
+#50 act {"label":"확인","op":"click"}
+#51 act {"label":"핫푸드","op":"click"}
+#52 act {"label":"클래식 핫도그","op":"click"}
+#53 record 
+#54 act {"op":"click","label":"취소"}
+#55 act {"op":"click","label":"칠리 핫도그"}
+#56 record 
+#57 act {"op":"click","label":"취소"}
+#58 act {"op":"click","label":"치즈볼 (5개)"}
+#59 record 
+#60 act {"op":"click","label":"전체 삭제"}
+#61 act {"op":"click","label":"확인"}
+#62 act {"op":"click","label":"치킨 텐더"}
+#63 record 
+#64 act {"label":"취소","op":"click"}
+#65 act {"op":"click","label":"스낵"}
+#66 act {"op":"click","label":"나쵸"}
+#67 record 
+#68 act {"op":"click","label":"취소"}
+#69 act {"label":"프레첼","op":"click"}
+#70 record 
+#71 act {"label":"전체 삭제","op":"click"}
+#72 act {"label":"확인","op":"click"}
+#73 act {"op":"click","label":"버터구이 오징어"}
+#74 record 
+#75 act {"label":"취소","op":"click"}
+#76 act {"label":"츄러스","op":"click"}
+#77 record 
+#78 act {"op":"click","label":"전체 삭제"}
+#79 act {"label":"확인","op":"click"}
+#80 act {"label":"칠리 치즈 감자","op":"click"}
+{"error":{"code":400,"message":"Requests ending with a model turn are not supported.","status":"INVALID_ARGUMENT"}}
+{"provider":"gemini","model":"gemini-3.8-flash","cachedInputTokens":0,"finished":false,"turns":81,"acts":68,"tests":0,"inputTokens":514964,"outputTokens":2577,"minutes":"2.8"}

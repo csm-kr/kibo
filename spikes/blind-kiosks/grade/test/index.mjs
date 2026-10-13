@@ -3,3 +3,4 @@ import './normalize.test.mjs';
 import './translate.test.mjs';
 import './classify.test.mjs';
 import './catalog.test.mjs';
+import './noskill.test.mjs';

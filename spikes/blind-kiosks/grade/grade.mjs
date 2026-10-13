@@ -4,7 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { gradeCatalog, translateOrder, plannedSteps, forbiddenSteps, classify, totalCannotSee } from './lib.mjs';
+import { gradeCatalog, translateOrder, plannedSteps, forbiddenSteps, classify, totalCannotSee, notLearnedOrders } from './lib.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const BLIND_ROOT = path.resolve(HERE, '..');
@@ -42,21 +42,23 @@ async function gradeOrders(key, skill, appPath) {
 
 export async function gradeKiosk({ kioskId, skillPath, label, keyPath, appPath, runOrders = true }) {
   const key = readJson(keyPath);
-  const skill = readJson(skillPath);
+  // The learner writes skill.json only when finish was accepted; without it the run is graded as "no skill".
+  const skill = fs.existsSync(skillPath) ? readJson(skillPath) : null;
   const statsPath = path.join(path.dirname(skillPath), 'learn-stats.json');
   const learning = fs.existsSync(statsPath) ? readJson(statsPath) : null;
-  const catalog = gradeCatalog(key, skill);
-  const orders = runOrders ? await gradeOrders(key, skill, appPath) : null;
+  const catalog = gradeCatalog(key, skill ?? {});
+  const orders = !runOrders ? null : skill ? await gradeOrders(key, skill, appPath) : notLearnedOrders(key);
   const c = catalog;
   const summary = [
     `${kioskId}/${label}:`,
     learning ? `learning ${learning.finished ? 'finished' : 'not finished'}, ${learning.minutes} min, ${learning.turns} turns, ${learning.inputTokens} input tokens;` : 'no learn-stats.json;',
+    skill ? '' : 'no skill;',
     `items ${c.items.matched}/${c.items.key} (precision ${c.items.precision}), price ${c.price.correct}/${c.price.of},`,
     `options exact ${c.options.itemsExact}/${c.options.items} (openable ${c.options.openableExact}/${c.options.openable});`,
-    orders ? `orders correct ${orders.correct}, safe refusal ${orders.safeRefusal}, unsafe ${orders.unsafe} of ${orders.total} (cart lines read in ${orders.linesChecked})` : 'orders not run',
-  ].join(' ');
+    orders ? `orders correct ${orders.correct}, safe refusal ${orders.safeRefusal}, unsafe ${orders.unsafe}${orders.notLearned ? `, not learned ${orders.notLearned}` : ''} of ${orders.total} (cart lines read in ${orders.linesChecked})` : 'orders not run',
+  ].filter(Boolean).join(' ');
   return {
-    kioskId, label, gradedAt: new Date().toISOString(),
+    kioskId, label, gradedAt: new Date().toISOString(), skill: skill ? 'present' : 'no skill',
     files: { skill: path.relative(process.cwd(), skillPath), key: path.relative(process.cwd(), keyPath), app: path.relative(process.cwd(), appPath) },
     summary, learning, catalog, orders,
   };
