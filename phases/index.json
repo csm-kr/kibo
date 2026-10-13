@@ -42,7 +42,8 @@
     },
     {
       "dir": "9-polish",
-      "status": "pending"
+      "status": "completed",
+      "completed_at": "2026-10-13T11:37:20+0900"
     },
     {
       "dir": "10-assets",
