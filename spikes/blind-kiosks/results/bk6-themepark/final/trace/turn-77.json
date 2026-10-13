@@ -1,0 +1,21 @@
+{
+  "n": 77,
+  "at": "2026-10-13T21:46:45.905Z",
+  "tool": "audit",
+  "args": {},
+  "resultSummary": "audit: 24 missing, 0 unknown, 0 hidden",
+  "calls": [
+    {
+      "tool": "audit",
+      "args": {},
+      "resultSummary": "audit: 24 missing, 0 unknown, 0 hidden"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 21713,
+  "outputTokens": 448
+}

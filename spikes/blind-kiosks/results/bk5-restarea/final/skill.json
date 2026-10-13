@@ -1,0 +1,609 @@
+{
+  "kiosk": "달빛고개 휴게소",
+  "categories": [
+    "추천",
+    "한식",
+    "분식",
+    "면류",
+    "음료·간식",
+    "세트"
+  ],
+  "uiLabels": [
+    "처음으로",
+    "전체삭제",
+    "취소",
+    "확인",
+    "장바구니 담기",
+    "수량 빼기",
+    "수량 더하기",
+    "다음",
+    "이전",
+    "삭제",
+    "품절"
+  ],
+  "forbiddenLabels": [
+    "주문하기"
+  ],
+  "dineOptions": {
+    "eat_in": "매장에서 먹기",
+    "take_out": "포장하기"
+  },
+  "cartTotalPattern": "총\\s*\\d+개[\\s\\S]*?([\\d,]+)원",
+  "recipes": {
+    "startOrder": [
+      {
+        "op": "click",
+        "label": "달빛고개"
+      },
+      {
+        "op": "click",
+        "label": "{dineOption}"
+      }
+    ],
+    "addToCart": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "chooseOptions",
+        "steps": [
+          {
+            "op": "click",
+            "label": "{option}"
+          }
+        ]
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "label": "수량 더하기"
+          }
+        ]
+      },
+      {
+        "op": "click",
+        "label": "장바구니 담기"
+      }
+    ]
+  },
+  "catalog": [
+    {
+      "name": "소고기국밥",
+      "category": "한식",
+      "price": 9000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "김치찌개",
+      "category": "한식",
+      "price": 8000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "된장찌개",
+      "category": "한식",
+      "price": 8000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "제육덮밥",
+      "category": "한식",
+      "price": 8500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "산채비빔밥",
+      "category": "한식",
+      "price": 8500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "왕돈까스",
+      "category": "한식",
+      "price": 9500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "황태해장국",
+      "category": "한식",
+      "price": 9000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "소떡소떡",
+      "category": "분식",
+      "price": 4000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "핫바",
+      "category": "분식",
+      "price": 3500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "떡볶이",
+      "category": "분식",
+      "price": 4500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "야채김밥",
+      "category": "분식",
+      "price": 3500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "참치김밥",
+      "category": "분식",
+      "price": 4500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "순대",
+      "category": "분식",
+      "price": 5000,
+      "soldOut": true,
+      "optionGroups": []
+    },
+    {
+      "name": "꼬치어묵",
+      "category": "분식",
+      "price": 3000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "가락우동",
+      "category": "면류",
+      "price": 6000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "양 선택",
+          "required": false,
+          "min": 0,
+          "max": 1,
+          "type": "single",
+          "select": [
+            {
+              "op": "click",
+              "label": "곱빼기"
+            }
+          ],
+          "options": [
+            {
+              "name": "곱배기",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "얼큰우동",
+      "category": "면류",
+      "price": 6500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "맵기 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "순한맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "매운맛",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "양 선택",
+          "required": false,
+          "min": 0,
+          "max": 1,
+          "type": "single",
+          "select": [
+            {
+              "op": "click",
+              "label": "곱빼기"
+            }
+          ],
+          "options": [
+            {
+              "name": "곱배기",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "해물짬뽕",
+      "category": "면류",
+      "price": 8500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "맵기 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "순한맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "매운맛",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "양 선택",
+          "required": false,
+          "min": 0,
+          "max": 1,
+          "type": "single",
+          "select": [
+            {
+              "op": "click",
+              "label": "곱빼기"
+            }
+          ],
+          "options": [
+            {
+              "name": "곱배기",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "비빔국수",
+      "category": "면류",
+      "price": 7000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "맵기 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "순한맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "매운맛",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "양 선택",
+          "required": false,
+          "min": 0,
+          "max": 1,
+          "type": "single",
+          "select": [
+            {
+              "op": "click",
+              "label": "곱빼기"
+            }
+          ],
+          "options": [
+            {
+              "name": "곱배기",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "잔치국수",
+      "category": "면류",
+      "price": 6000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "양 선택",
+          "required": false,
+          "min": 0,
+          "max": 1,
+          "type": "single",
+          "select": [
+            {
+              "op": "click",
+              "label": "곱빼기"
+            }
+          ],
+          "options": [
+            {
+              "name": "곱배기",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "라면",
+      "category": "면류",
+      "price": 4500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "토핑 추가 (최대 2개)",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "multi",
+          "options": [
+            {
+              "name": "계란",
+              "priceDelta": 500
+            },
+            {
+              "name": "치즈",
+              "priceDelta": 500
+            },
+            {
+              "name": "떡",
+              "priceDelta": 500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "물냉면",
+      "category": "면류",
+      "price": 8000,
+      "soldOut": true,
+      "optionGroups": []
+    },
+    {
+      "name": "호두과자 (소)",
+      "category": "음료·간식",
+      "price": 3000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "호두과자 (대)",
+      "category": "음료·간식",
+      "price": 5000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "호두과자 선물상자",
+      "category": "음료·간식",
+      "price": 12000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "알감자",
+      "category": "음료·간식",
+      "price": 4000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "아메리카노",
+      "category": "음료·간식",
+      "price": 3000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "온도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            },
+            {
+              "name": "ICE",
+              "priceDelta": 500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "식혜",
+      "category": "음료·간식",
+      "price": 2500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "콜라",
+      "category": "음료·간식",
+      "price": 2000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "생수",
+      "category": "음료·간식",
+      "price": 1000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "한상세트",
+      "category": "세트",
+      "price": 10000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "식사 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "after": [
+            {
+              "op": "click",
+              "label": "다음"
+            }
+          ],
+          "options": [
+            {
+              "name": "김치찌개",
+              "priceDelta": 0
+            },
+            {
+              "name": "제육덮밥",
+              "priceDelta": 0
+            },
+            {
+              "name": "소고기국밥",
+              "priceDelta": 500
+            },
+            {
+              "name": "왕돈까스",
+              "priceDelta": 1000
+            }
+          ]
+        },
+        {
+          "name": "음료 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "콜라",
+              "priceDelta": 0
+            },
+            {
+              "name": "사이다",
+              "priceDelta": 0
+            },
+            {
+              "name": "식혜",
+              "priceDelta": 500
+            },
+            {
+              "name": "아메리카노",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "면사랑세트",
+      "category": "세트",
+      "price": 8000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "식사 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "after": [
+            {
+              "op": "click",
+              "label": "다음"
+            }
+          ],
+          "options": [
+            {
+              "name": "가락우동",
+              "priceDelta": 0
+            },
+            {
+              "name": "잔치국수",
+              "priceDelta": 0
+            },
+            {
+              "name": "라면",
+              "priceDelta": 500
+            }
+          ]
+        },
+        {
+          "name": "음료 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "콜라",
+              "priceDelta": 0
+            },
+            {
+              "name": "사이다",
+              "priceDelta": 0
+            },
+            {
+              "name": "식혜",
+              "priceDelta": 500
+            },
+            {
+              "name": "아메리카노",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

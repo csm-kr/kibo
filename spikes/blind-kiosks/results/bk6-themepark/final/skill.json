@@ -1,0 +1,832 @@
+{
+  "kiosk": "별바다 파크",
+  "categories": [
+    "입장권",
+    "자유이용권",
+    "간식",
+    "음료",
+    "기념품"
+  ],
+  "uiLabels": [
+    "처음으로",
+    "취소",
+    "담기",
+    "비회원으로 계속"
+  ],
+  "forbiddenLabels": [
+    "주문하기",
+    "장바구니"
+  ],
+  "dineOptions": {},
+  "catalog": [
+    {
+      "name": "아쿠아리움 입장권",
+      "category": "입장권",
+      "price": 0,
+      "soldOut": false,
+      "recipe": "addTicket",
+      "optionGroups": [
+        {
+          "name": "할인 유형",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "일반",
+              "priceDelta": 0
+            },
+            {
+              "name": "장애인 우대",
+              "priceDelta": -10000
+            },
+            {
+              "name": "경로 우대",
+              "priceDelta": -8000
+            }
+          ]
+        },
+        {
+          "name": "인원 선택",
+          "required": true,
+          "min": 1,
+          "max": 9,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "{option}"
+            }
+          ],
+          "options": [
+            {
+              "name": "대인",
+              "priceDelta": 29000,
+              "maxQty": 9
+            },
+            {
+              "name": "청소년",
+              "priceDelta": 25000,
+              "maxQty": 9
+            },
+            {
+              "name": "소인",
+              "priceDelta": 21000,
+              "maxQty": 9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "오션 스카이 전망대",
+      "category": "입장권",
+      "price": 0,
+      "soldOut": false,
+      "recipe": "addTicket",
+      "optionGroups": [
+        {
+          "name": "인원 선택",
+          "required": true,
+          "min": 1,
+          "max": 9,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "{option}"
+            }
+          ],
+          "options": [
+            {
+              "name": "대인",
+              "priceDelta": 12000,
+              "maxQty": 9
+            },
+            {
+              "name": "청소년",
+              "priceDelta": 10000,
+              "maxQty": 9
+            },
+            {
+              "name": "소인",
+              "priceDelta": 8000,
+              "maxQty": 9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "아쿠아리움+전망대 패키지",
+      "category": "입장권",
+      "price": 0,
+      "soldOut": false,
+      "recipe": "addTicket",
+      "optionGroups": [
+        {
+          "name": "할인 유형",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "일반",
+              "priceDelta": 0
+            },
+            {
+              "name": "장애인 우대",
+              "priceDelta": -10000
+            },
+            {
+              "name": "경로 우대",
+              "priceDelta": -8000
+            }
+          ]
+        },
+        {
+          "name": "인원 선택",
+          "required": true,
+          "min": 1,
+          "max": 9,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "{option}"
+            }
+          ],
+          "options": [
+            {
+              "name": "대인",
+              "priceDelta": 36000,
+              "maxQty": 9
+            },
+            {
+              "name": "청소년",
+              "priceDelta": 31000,
+              "maxQty": 9
+            },
+            {
+              "name": "소인",
+              "priceDelta": 26000,
+              "maxQty": 9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4D 해저탐험 영상관",
+      "category": "입장권",
+      "price": 0,
+      "soldOut": false,
+      "recipe": "addTicket",
+      "optionGroups": [
+        {
+          "name": "인원 선택",
+          "required": true,
+          "min": 1,
+          "max": 9,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "{option}"
+            }
+          ],
+          "options": [
+            {
+              "name": "대인",
+              "priceDelta": 7000,
+              "maxQty": 9
+            },
+            {
+              "name": "청소년",
+              "priceDelta": 6000,
+              "maxQty": 9
+            },
+            {
+              "name": "소인",
+              "priceDelta": 5000,
+              "maxQty": 9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "종일 자유이용권",
+      "category": "자유이용권",
+      "price": 0,
+      "soldOut": false,
+      "recipe": "addTicket",
+      "optionGroups": [
+        {
+          "name": "할인 유형",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "일반",
+              "priceDelta": 0
+            },
+            {
+              "name": "장애인 우대",
+              "priceDelta": -10000
+            },
+            {
+              "name": "경로 우대",
+              "priceDelta": -8000
+            }
+          ]
+        },
+        {
+          "name": "인원 선택",
+          "required": true,
+          "min": 1,
+          "max": 9,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "{option}"
+            }
+          ],
+          "options": [
+            {
+              "name": "대인",
+              "priceDelta": 59000,
+              "maxQty": 9
+            },
+            {
+              "name": "청소년",
+              "priceDelta": 51000,
+              "maxQty": 9
+            },
+            {
+              "name": "소인",
+              "priceDelta": 43000,
+              "maxQty": 9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "오후 자유이용권",
+      "category": "자유이용권",
+      "price": 0,
+      "soldOut": false,
+      "recipe": "addTicket",
+      "optionGroups": [
+        {
+          "name": "할인 유형",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "일반",
+              "priceDelta": 0
+            },
+            {
+              "name": "장애인 우대",
+              "priceDelta": -10000
+            },
+            {
+              "name": "경로 우대",
+              "priceDelta": -8000
+            }
+          ]
+        },
+        {
+          "name": "인원 선택",
+          "required": true,
+          "min": 1,
+          "max": 9,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "{option}"
+            }
+          ],
+          "options": [
+            {
+              "name": "대인",
+              "priceDelta": 47000,
+              "maxQty": 9
+            },
+            {
+              "name": "청소년",
+              "priceDelta": 41000,
+              "maxQty": 9
+            },
+            {
+              "name": "소인",
+              "priceDelta": 35000,
+              "maxQty": 9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "빅5 어트랙션 이용권",
+      "category": "자유이용권",
+      "price": 0,
+      "soldOut": false,
+      "recipe": "addTicket",
+      "optionGroups": [
+        {
+          "name": "인원 선택",
+          "required": true,
+          "min": 1,
+          "max": 9,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "{option}"
+            }
+          ],
+          "options": [
+            {
+              "name": "대인",
+              "priceDelta": 35000,
+              "maxQty": 9
+            },
+            {
+              "name": "청소년",
+              "priceDelta": 30000,
+              "maxQty": 9
+            },
+            {
+              "name": "소인",
+              "priceDelta": 25000,
+              "maxQty": 9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "별사탕 츄러스",
+      "category": "간식",
+      "price": 4500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "추가 선택",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "multi",
+          "options": [
+            {
+              "name": "치즈 소스",
+              "priceDelta": 500
+            },
+            {
+              "name": "초코 소스",
+              "priceDelta": 500
+            },
+            {
+              "name": "연유 드리즐",
+              "priceDelta": 500
+            },
+            {
+              "name": "아이스크림 토핑",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "고래 꼬리 핫도그",
+      "category": "간식",
+      "price": 5500,
+      "soldOut": true
+    },
+    {
+      "name": "소금빵 크로플",
+      "category": "간식",
+      "price": 6000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "추가 선택",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "multi",
+          "options": [
+            {
+              "name": "치즈 소스",
+              "priceDelta": 500
+            },
+            {
+              "name": "초코 소스",
+              "priceDelta": 500
+            },
+            {
+              "name": "연유 드리즐",
+              "priceDelta": 500
+            },
+            {
+              "name": "아이스크림 토핑",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "산호 팝콘",
+      "category": "간식",
+      "price": 6500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "추가 선택",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "multi",
+          "options": [
+            {
+              "name": "치즈 소스",
+              "priceDelta": 500
+            },
+            {
+              "name": "초코 소스",
+              "priceDelta": 500
+            },
+            {
+              "name": "연유 드리즐",
+              "priceDelta": 500
+            },
+            {
+              "name": "아이스크림 토핑",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "해마 와플",
+      "category": "간식",
+      "price": 5000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "추가 선택",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "multi",
+          "options": [
+            {
+              "name": "치즈 소스",
+              "priceDelta": 500
+            },
+            {
+              "name": "초코 소스",
+              "priceDelta": 500
+            },
+            {
+              "name": "연유 드리즐",
+              "priceDelta": 500
+            },
+            {
+              "name": "아이스크림 토핑",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "통감자 버터구이",
+      "category": "간식",
+      "price": 5000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "추가 선택",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "multi",
+          "options": [
+            {
+              "name": "치즈 소스",
+              "priceDelta": 500
+            },
+            {
+              "name": "초코 소스",
+              "priceDelta": 500
+            },
+            {
+              "name": "연유 드리즐",
+              "priceDelta": 500
+            },
+            {
+              "name": "아이스크림 토핑",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "블루 레모네이드",
+      "category": "음료",
+      "price": 4500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "R 레귤러",
+              "priceDelta": 0
+            },
+            {
+              "name": "L 라지 +1,000원",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "파도 자몽에이드",
+      "category": "음료",
+      "price": 5000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "R 레귤러",
+              "priceDelta": 0
+            },
+            {
+              "name": "L 라지 +1,000원",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "아이스 아메리카노",
+      "category": "음료",
+      "price": 4000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "R 레귤러",
+              "priceDelta": 0
+            },
+            {
+              "name": "L 라지 +1,000원",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "딸기 스무디",
+      "category": "음료",
+      "price": 5500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "R 레귤러",
+              "priceDelta": 0
+            },
+            {
+              "name": "L 라지 +1,000원",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "핫초코",
+      "category": "음료",
+      "price": 4500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "R 레귤러",
+              "priceDelta": 0
+            },
+            {
+              "name": "L 라지 +1,000원",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "생수 500ml",
+      "category": "음료",
+      "price": 1500,
+      "soldOut": false
+    },
+    {
+      "name": "아기 물범 인형",
+      "category": "기념품",
+      "price": 15000,
+      "soldOut": false,
+      "recipe": "addDirectItem"
+    },
+    {
+      "name": "해파리 무드등",
+      "category": "기념품",
+      "price": 22000,
+      "soldOut": true
+    },
+    {
+      "name": "고래 키링",
+      "category": "기념품",
+      "price": 6000,
+      "soldOut": false,
+      "recipe": "addDirectItem"
+    },
+    {
+      "name": "바다 엽서 세트",
+      "category": "기념품",
+      "price": 4000,
+      "soldOut": false,
+      "recipe": "addDirectItem"
+    },
+    {
+      "name": "펭귄 머리띠",
+      "category": "기념품",
+      "price": 9000,
+      "soldOut": false,
+      "recipe": "addDirectItem"
+    },
+    {
+      "name": "별바다 머그컵",
+      "category": "기념품",
+      "price": 12000,
+      "soldOut": false,
+      "recipe": "addDirectItem"
+    }
+  ],
+  "recipes": {
+    "startOrder": [
+      {
+        "op": "click",
+        "label": "별바다 파크"
+      }
+    ],
+    "addToCart": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "chooseOptions",
+        "steps": [
+          {
+            "op": "click",
+            "label": "{option}"
+          }
+        ]
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "label": "+"
+          }
+        ]
+      },
+      {
+        "op": "click",
+        "label": "담기"
+      },
+      {
+        "op": "clickIfVisible",
+        "label": "비회원으로 계속"
+      }
+    ],
+    "addTicket": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "chooseOptions",
+        "steps": [
+          {
+            "op": "click",
+            "label": "{option}"
+          }
+        ]
+      },
+      {
+        "op": "click",
+        "label": "담기"
+      },
+      {
+        "op": "clickIfVisible",
+        "label": "비회원으로 계속"
+      }
+    ],
+    "addDirectItem": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "clickIfVisible",
+        "label": "비회원으로 계속"
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "label": "{item}"
+          }
+        ]
+      }
+    ]
+  },
+  "cartTotalPattern": "strong:\\s*([0-9,]+)원",
+  "notes": [
+    "첫 상품 담기 시 멤버십 팝업 표시(비회원으로 계속 클릭)",
+    "티켓은 인원 선택 시 수량 설정",
+    "기념품은 모달 없이 바로 담김"
+  ]
+}

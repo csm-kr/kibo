@@ -1,0 +1,18 @@
+{
+  "kioskId": "bk6-themepark",
+  "provider": "gemini",
+  "model": "gemini-3.8-flash",
+  "startedAt": "2026-10-13T21:40:03.352Z",
+  "endedAt": "2026-10-13T21:52:45.269Z",
+  "gate": {
+    "tests": 2,
+    "testsPassedForFinish": true,
+    "audits": 7,
+    "auditOk": true,
+    "finished": true
+  },
+  "turns": 87,
+  "inputTokens": 1284672,
+  "cachedInputTokens": 862085,
+  "outputTokens": 28615
+}

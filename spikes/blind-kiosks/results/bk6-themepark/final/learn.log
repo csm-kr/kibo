@@ -1,0 +1,98 @@
+#1 snapshot 
+#2 act {"op":"click","label":"별바다 파크"}
+#3 record 
+#4 act {"op":"click","label":"아쿠아리움 입장권"}
+#5 act {"label":"일반","op":"click"}
+#6 act {"op":"click","label":"+","within":"대인"}
+#7 act {"label":"취소","op":"click"}
+#8 audit 
+  audit #1: GAPS missing=25 unknown=0 hidden=1 itemsMissingOptions=0
+#9 audit 
+  audit #2: GAPS missing=24 unknown=0 hidden=1 itemsMissingOptions=0
+#10 act {"op":"click","label":"아쿠아리움 입장권"}
+#11 act {"label":"장애인 우대","op":"click"}
+#12 act {"label":"취소","op":"click"}
+#13 act {"label":"장바구니","op":"click"}
+#14 act {"label":"✕","op":"click"}
+#15 reload 
+#16 act {"op":"click","label":"별바다 파크"}
+#17 act {"label":"아쿠아리움 입장권","op":"click"}
+#18 act {"label":"+","op":"click","within":"대인"}
+#19 act {"label":"장애인 우대","op":"click"}
+#20 act {"within":"대인","op":"click","label":"−"}
+#21 act {"label":"담기","op":"click"}
+#22 reload 
+#23 act [{"label":"별바다 파크","op":"click"},{"op":"click","label":"아쿠아리움 입장권"}]
+#24 act {"label":"+","op":"click","within":"대인"}
+#25 act {"op":"click","label":"담기"}
+#26 act [{"label":"일반","op":"click"},{"op":"click","label":"담기"}]
+#27 act {"label":"비회원으로 계속","op":"click"}
+#28 act {"op":"click","label":"장바구니"}
+#29 act {"op":"click","label":"✕"}
+#30 act {"role":"button","name":"✕","op":"click"}
+#31 act {"op":"click","label":"간식"}
+#32 act {"op":"click","label":"소금빵 크로플"}
+#33 act {"op":"click","label":"취소"}
+#34 act {"op":"click","label":"별사탕 츄러스"}
+#35 act [{"label":"+","op":"click"},{"op":"click","label":"담기"}]
+#36 reload 
+#37 act [{"label":"별바다 파크","op":"click"},{"label":"간식","op":"click"},{"label":"소금빵 크로플","op":"click"},{"label":"담기","op":"click"}]
+#38 act {"label":"비회원으로 계속","op":"click"}
+#39 record 
+#40 act {"op":"click","label":"입장권"}
+#41 act {"op":"click","label":"오션 스카이 전망대"}
+#42 act {"op":"click","label":"취소"}
+#43 act {"op":"click","label":"아쿠아리움+전망대 패키지"}
+#44 act [{"label":"취소","op":"click"},{"label":"4D 해저탐험 영상관","op":"click"}]
+#45 act [{"op":"click","label":"취소"},{"label":"자유이용권","op":"click"}]
+#46 act {"op":"click","label":"종일 자유이용권"}
+#47 act [{"op":"click","label":"취소"},{"label":"오후 자유이용권","op":"click"}]
+#48 act [{"op":"click","label":"취소"},{"op":"click","label":"빅5 어트랙션 이용권"}]
+#49 act [{"label":"취소","op":"click"},{"op":"click","label":"간식"}]
+#50 act {"op":"click","label":"별사탕 츄러스"}
+#51 act [{"op":"click","label":"취소"},{"label":"산호 팝콘","op":"click"}]
+#52 act [{"label":"취소","op":"click"},{"op":"click","label":"해마 와플"}]
+#53 act [{"label":"취소","op":"click"},{"op":"click","label":"통감자 버터구이"}]
+#54 act [{"op":"click","label":"취소"},{"label":"음료","op":"click"}]
+#55 act {"op":"click","label":"블루 레모네이드"}
+#56 act [{"label":"취소","op":"click"},{"op":"click","label":"파도 자몽에이드"}]
+#57 act [{"label":"취소","op":"click"},{"op":"click","label":"아이스 아메리카노"}]
+#58 act [{"label":"취소","op":"click"},{"label":"딸기 스무디","op":"click"}]
+#59 act [{"op":"click","label":"취소"},{"label":"핫초코","op":"click"}]
+#60 act [{"label":"취소","op":"click"},{"op":"click","label":"생수 500ml"}]
+#61 act [{"op":"click","label":"취소"},{"label":"기념품","op":"click"}]
+#62 act {"op":"click","label":"아기 물범 인형"}
+#63 act {"op":"click","label":"고래 키링"}
+#64 act {"label":"장바구니","op":"click"}
+#65 act {"op":"click","label":"✕"}
+#66 act {"op":"click","label":"고래 키링"}
+#67 reload 
+#68 act [{"op":"click","label":"별바다 파크"},{"label":"오션 스카이 전망대","op":"click"}]
+#69 audit 
+  audit #3: GAPS missing=24 unknown=0 hidden=1 itemsMissingOptions=0
+#70 testSkill 
+  test #1: FAIL lint=3
+#71 snapshot 
+#72 act {"op":"click","within":"소인","label":"+"}
+#73 act [{"op":"click","label":"+","within":"소인"},{"op":"click","label":"+","within":"소인"},{"op":"click","label":"+","within":"소인"},{"within":"소인","label":"+","op":"click"},{"within":"소인","label":"+","op":"click"},{"within":"소인","label":"+","op":"click"},{"label":"+","within":"소인","op":"click"},{"op":"click","within":"소인","label":"+"},{"op":"click","label":"+","within":"소인"},{"within":"소인","label":"+","op":"click"}]
+#74 act {"op":"click","label":"취소"}
+#75 act [{"op":"click","label":"간식"},{"op":"click","label":"소금빵 크로플"}]
+#76 act [{"op":"click","label":"취소"},{"label":"입장권","op":"click"},{"label":"아쿠아리움 입장권","op":"click"}]
+#77 audit 
+  audit #4: GAPS missing=24 unknown=0 hidden=0 itemsMissingOptions=0
+#78 audit 
+  audit #5: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=0
+#79 reload 
+#80 act [{"label":"별바다 파크","op":"click"},{"label":"음료","op":"click"},{"op":"click","label":"아이스 아메리카노"}]
+#81 act [{"op":"click","label":"취소"},{"label":"핫초코","op":"click"}]
+#82 act [{"op":"click","label":"취소"},{"label":"생수 500ml","op":"click"}]
+#83 act [{"op":"click","label":"취소"},{"label":"간식","op":"click"},{"op":"click","label":"별사탕 츄러스"},{"label":"+","op":"click"},{"op":"click","label":"담기"},{"label":"비회원으로 계속","op":"click"}]
+#84 audit 
+  audit #6: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=0
+#85 testSkill 
+  test #2: PASS PASS PASS
+#86 audit 
+  audit #7: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=0
+#87 finish 
+  finish audit: OK
+{"provider":"gemini","model":"gemini-3.8-flash","cachedInputTokens":862085,"finished":true,"turns":87,"acts":111,"tests":2,"inputTokens":1284672,"outputTokens":28615,"minutes":"12.7"}

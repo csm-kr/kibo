@@ -42,6 +42,19 @@ The four new kiosks are the **held-out test set**. They are learned twice: once 
 }
 ```
 
+## Fresh test set (`bk5-restarea`, `bk6-themepark`)
+An independent review on 10-13 pointed out that the step-4 learner changes were driven by failure patterns seen on `bk1`–`bk4` (`results/BASELINE.md`), so their final runs are not a clean "never seen" result. Two more kiosks answer that:
+
+| Id | Domain | Built by |
+|---|---|---|
+| `bk5-restarea` | Highway rest-area food court | an independent agent, from a short brief (`bk5-restarea/BRIEF.md`) |
+| `bk6-themepark` | Theme park ticket and snack kiosk | an independent agent, from a short brief (`bk6-themepark/BRIEF.md`) |
+
+- Both were built under the "Builder rules" above and kept outside the repo while the learner was changed. The orchestrator copied them in after the step-4 learner commit (`1dade19`, 10-14 05:36 KST); they entered the repo in `738d8f2` (10-14 05:58 KST, committed together with the step 5 results).
+- Nobody working on the learner opened their apps, answer keys or briefs before their final run (13-blind-kiosks:8).
+- **The learner is not changed after seeing them.** They are learned once with the learner as it stands after the I-193 fix (13-blind-kiosks:7), one run each, same 2M cap and 30 min kill; no baseline run (they measure the final learner on unseen kiosks), no rerun except once after a crash. Any learner change prompted by their results is reported separately and never re-measured on them.
+- Results: `results/<kioskId>/final/` (log, stats, skill, grade, notes, trace). 10-14: both finished through the gate (items 31/31 and 25/25). `bk5-restarea` orders 4 correct / 3 safe refusal / 3 unsafe (the 3 take-out orders, 100원 short, I-195); `bk6-themepark` 0 / 0 / 10 unsafe as graded, while the kiosk total equals the answer key in 10 of 10: the runner read the category tabs as cart lines (I-183). Read both `notes.md` before quoting either number.
+
 ## Metrics (grader, no AI)
 - **Learning:** finished through the gate (≥ 3 self-tests + coverage audit), minutes, turns, input/output tokens.
 - **Catalog:** item recall and precision by name; price accuracy; category accuracy; sold-out accuracy; option groups per item exact (labels + deltas), min/max/required correct, conditional groups captured.

@@ -1,0 +1,37 @@
+{
+  "n": 20,
+  "at": "2026-10-13T21:41:55.763Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "−",
+        "within": "대인"
+      }
+    ]
+  },
+  "resultSummary": "tapped −",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "−",
+            "within": "대인"
+          }
+        ]
+      },
+      "resultSummary": "tapped −"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 9629,
+  "outputTokens": 29
+}
