@@ -373,6 +373,16 @@ async function screenshot(page: Page, info: TestInfo, p: Profile, state: string)
   await page.evaluate(() =>
     Promise.all([...document.images].filter((img) => img.complete && img.naturalWidth > 0).map((img) => img.decode().catch(() => {}))),
   );
+  // A phone sheet still rising (200ms) came out half faded: let those finish. Not the kiosk's 2 s highlight, which
+  // the AI-change states are meant to catch.
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((a) => a instanceof CSSAnimation && (a.animationName === "kibo-sheet-in" || a.animationName === "kibo-fade-in"))
+        .map((a) => a.finished.catch(() => {})),
+    ),
+  );
   const shot =`${out}/${p.route.replace(/\W/g, "") || "home"}-${state}-${viewport}.png`;
   await page.screenshot({ path: shot });
   return { out, viewport, shot };

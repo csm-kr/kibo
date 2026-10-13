@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { SayFn } from "@/components/assistant/AssistantPanel";
-import { CHIP, FOCUS, PRIMARY, SECONDARY, SMALL } from "@/components/assistant/styles";
+import { Check, ChevronDown, ChevronUp, List } from "lucide-react";
+import { FOCUS, PRESS, PRIMARY, SECONDARY } from "@/components/phone/ui";
 import { canSend, playScenario, type PlayerState } from "@/lib/demo/player";
 import { scenarioProgress, scenariosFor, type Scenario } from "@/lib/demo/scenarios";
 import { playStep, pt, type PhoneTextKey } from "@/lib/i18n/phone";
@@ -12,7 +13,11 @@ import type { Session } from "@/types/session";
 // D2 scenario guide (docs/UX.md Flow C): an optional column, open by default from 1440px wide, that lists what to try on this kiosk.
 // Choosing one starts a fresh order; each step's sentence is a chip that sends it as the user's message, and the check
 // mark ticks from the live session. [Play it for me] sends the same sentences through the same path, one per step, and
-// stops at the confirm card: nothing here confirms or pays.
+// stops at the confirm card: nothing here confirms or pays. Surfaces follow the phone design (docs/UI_GUIDE.md "Phone
+// design"): a cream column with white cards and soft shadows, tinted tags and sentence chips, no dark outlines.
+
+/** A sentence to send: the phone's "Try saying" look at the guide's 16px. */
+const SAY_CHIP = `min-h-14 rounded-tile bg-kibo-tint px-4 py-2 text-left text-base text-kibo-deep active:bg-kibo-tint-pressed disabled:opacity-60 ${PRESS} ${FOCUS}`;
 
 const TAG_TEXT: Record<Scenario["tags"][number], PhoneTextKey> = {
   ordering: "tagOrdering",
@@ -56,7 +61,7 @@ export function ScenarioGuide(props: Props) {
   if (!scenario || !chosen) {
     body = (
       <>
-        <p className="text-base text-[#4B463F]">{pt("scenariosLead", locale)}</p>
+        <p className="text-base text-muted">{pt("scenariosLead", locale)}</p>
         <ul className="flex flex-col gap-3">
           {scenarios.map((s) => (
             <li key={s.id}>
@@ -64,14 +69,14 @@ export function ScenarioGuide(props: Props) {
                 type="button"
                 data-scenario={s.id}
                 onClick={() => choose(s)}
-                className={`flex w-full flex-col items-start gap-2 rounded-[18px] border-2 border-[#15171C] bg-white p-4 text-left active:bg-[#F3EEE4] ${FOCUS}`}
+                className={`flex w-full flex-col items-start gap-2 rounded-tile bg-white p-4 text-left shadow-card active:bg-kibo-tint ${PRESS} ${FOCUS}`}
               >
                 <span className="text-xl font-bold">{s.title[locale]}</span>
-                <span className="text-base font-bold text-[#33302B]">{s.persona[locale]}</span>
-                <span className="text-base text-[#4B463F]">{s.goal[locale]}</span>
+                <span className="text-base font-semibold text-[#33302B]">{s.persona[locale]}</span>
+                <span className="text-base text-muted">{s.goal[locale]}</span>
                 <span className="flex flex-wrap gap-2">
                   {s.tags.map((t) => (
-                    <span key={t} className="rounded-full border border-[#4B463F] px-2 text-base text-[#33302B]">
+                    <span key={t} className="rounded-full bg-kibo-tint px-2 text-base text-kibo-deep">
                       {pt(TAG_TEXT[t], locale)}
                     </span>
                   ))}
@@ -90,9 +95,9 @@ export function ScenarioGuide(props: Props) {
           {pt("allScenarios", locale)}
         </button>
         <h3 className="text-xl font-bold">{scenario.title[locale]}</h3>
-        <p className="text-base text-[#4B463F]">{scenario.goal[locale]}</p>
+        <p className="text-base text-muted">{scenario.goal[locale]}</p>
         {stale ? (
-          <p role="status" className="text-base font-bold text-[#33302B]">
+          <p role="status" className="text-base font-semibold text-[#33302B]">
             {pt(props.starting || !props.startFailed ? "scenarioStarting" : "scenarioStartFailed", locale)}
           </p>
         ) : (
@@ -111,14 +116,18 @@ export function ScenarioGuide(props: Props) {
         aria-expanded={open}
         aria-controls="demo-scenario-guide"
         onClick={() => setOpen(!open)}
-        className={`${SMALL} self-end`}
+        className={`flex min-h-14 min-w-14 items-center justify-center gap-2 self-end rounded-full bg-white px-4 text-base font-semibold text-ink shadow-card active:bg-kibo-tint ${PRESS} ${FOCUS}`}
       >
-        <ListIcon />
+        <List size={20} strokeWidth={2} aria-hidden />
         {pt("scenarios", locale)}
-        <Chevron open={open} />
+        {open ? <ChevronUp size={20} strokeWidth={2} aria-hidden /> : <ChevronDown size={20} strokeWidth={2} aria-hidden />}
       </button>
       {open && (
-        <div id="demo-scenario-guide" lang={locale} className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto rounded-[26px] border border-[#E2DACB] bg-white p-4 text-[#15171C]">
+        <div
+          id="demo-scenario-guide"
+          lang={locale}
+          className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto rounded-sheet bg-cream p-4 text-ink shadow-card"
+        >
           {body}
         </div>
       )}
@@ -175,7 +184,7 @@ function Checklist(props: Props & { scenario: Scenario }) {
 
   return (
     <>
-      {!finished && dineFirst && <p className="rounded-[18px] bg-[#FFF1CC] px-4 py-3 text-base font-bold text-[#7A2E0E]">{pt("scenarioDineFirst", locale)}</p>}
+      {!finished && dineFirst && <p className="rounded-tile bg-staff-tint px-4 py-3 text-base font-semibold text-staff-ink">{pt("scenarioDineFirst", locale)}</p>}
       {!finished &&
         (playing ? (
           <button type="button" onClick={() => player.current?.stop()} className={SECONDARY}>
@@ -186,10 +195,10 @@ function Checklist(props: Props & { scenario: Scenario }) {
             {pt("playForMe", locale)}
           </button>
         ))}
-      <p role="status" className="text-base font-bold text-[#33302B] empty:hidden">
+      <p role="status" className="text-base font-semibold text-[#33302B] empty:hidden">
         {status}
       </p>
-      {!finished && <p className="text-base text-[#4B463F]">{pt("scenarioSayHint", locale)}</p>}
+      {!finished && <p className="text-base text-muted">{pt("scenarioSayHint", locale)}</p>}
       <ol className="flex flex-col gap-4">
         {scenario.steps.map((step, i) => {
           const ticked = i < done;
@@ -198,29 +207,29 @@ function Checklist(props: Props & { scenario: Scenario }) {
               <span
                 aria-hidden
                 className={`flex size-8 flex-none items-center justify-center rounded-full text-base font-bold ${
-                  ticked ? "bg-[#3446D4] text-white" : "border-2 border-[#4B463F] text-[#33302B]"
+                  ticked ? "bg-kibo text-white" : "bg-white text-kibo-deep shadow-card"
                 }`}
               >
-                {ticked ? <CheckIcon /> : i + 1}
+                {ticked ? <Check size={20} strokeWidth={2.5} /> : i + 1}
               </span>
               <div className="flex min-w-0 flex-1 flex-col gap-2">
                 <button
                   type="button"
                   disabled={playing || !sendable}
                   onClick={() => void send(step.say[locale])}
-                  className={CHIP}
+                  className={SAY_CHIP}
                 >
                   {step.say[locale]}
                 </button>
-                <p className="text-base text-[#4B463F]">{step.watch[locale]}</p>
-                {ticked && <p className="text-base font-bold text-[#1F2A8A]">{pt("stepDoneLabel", locale)}</p>}
+                <p className="text-base text-muted">{step.watch[locale]}</p>
+                {ticked && <p className="text-base font-bold text-kibo-deep">{pt("stepDoneLabel", locale)}</p>}
               </div>
             </li>
           );
         })}
       </ol>
       {finished && (
-        <p ref={yourTurn} data-scenario-your-turn className="rounded-[18px] bg-[#EEF0FD] px-4 py-3 text-xl">
+        <p ref={yourTurn} data-scenario-your-turn className="rounded-tile bg-kibo-tint px-4 py-3 text-xl text-kibo-deep">
           {/* After payment the "tap Yes, pay now" step is done, so the line points on instead (I-144). */}
           {live?.status === "paid" ? (
             pt("scenarioPaid", locale)
@@ -236,29 +245,5 @@ function Checklist(props: Props & { scenario: Scenario }) {
         </p>
       )}
     </>
-  );
-}
-
-function ListIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-none">
-      <path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01" />
-    </svg>
-  );
-}
-
-function Chevron({ open }: { open: boolean }) {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-none">
-      <path d={open ? "m6 15 6-6 6 6" : "m6 9 6 6 6-6"} />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m5 12.5 4.5 4.5L19 7.5" />
-    </svg>
   );
 }

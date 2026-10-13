@@ -157,10 +157,12 @@ const PHONE_TEXT = {
   micListening: { ko: "듣고 있어요…", en: "Listening…" },
   micThinking: { ko: "생각하고 있어요…", en: "Thinking…" },
   micSpeaking: { ko: "말하고 있어요…", en: "Speaking…" },
-  micStop: { ko: "누르면 멈춰요", en: "Tap to stop" },
+  // Under the mic: what a tap does in that state (a tap while voice runs ends it; while it connects, cancels it).
+  micEnd: { ko: "누르면 음성을 끝내요", en: "Tap to end voice" },
+  micCancel: { ko: "누르면 취소해요", en: "Tap to cancel" },
   aiVoice: { ko: "AI 목소리", en: "AI voice" },
-  on: { ko: "켜짐", en: "On" },
-  off: { ko: "꺼짐", en: "Off" },
+  voiceOn: { ko: "음성 켜짐", en: "Voice on" },
+  voiceOff: { ko: "음성 꺼짐", en: "Voice off" },
   voiceNoise: { ko: "잘 안 들리면 글자로 입력하거나 버튼을 눌러 주세요.", en: "Having trouble? Try typing or tapping a button." },
   // Voice, when it gives way to text
   voiceBusy: { ko: "지금은 음성 주문이 붐벼요. 글자로 입력해 주세요.", en: "Voice is busy right now. Please type instead." },

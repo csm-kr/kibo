@@ -2,7 +2,7 @@
 
 import { useCallback, useRef, useState, useSyncExternalStore } from "react";
 import { AssistantPanel, type SayFn } from "@/components/assistant/AssistantPanel";
-import { SECONDARY } from "@/components/assistant/styles";
+import { SECONDARY } from "@/components/phone/ui";
 import { KioskCanvas } from "@/components/kiosk/KioskCanvas";
 import { KioskScreen } from "@/components/kiosk/KioskScreen";
 import { LearnedKioskHost } from "@/components/learned/LearnedKioskHost";
@@ -181,7 +181,7 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
           <Caption id="demo-phone-caption" text="Your phone (KIBO)" />
           {/* 480px: the phone header at 200% text needs about 450 (WCAG 1.4.4), so the action strip under it gives way first. */}
           <div
-            className="min-h-[480px] flex-1 overflow-hidden rounded-[26px] border-2 border-[#15171C]"
+            className="min-h-[480px] flex-1 overflow-hidden rounded-sheet shadow-card"
             onPointerDownCapture={countTap("phoneTaps")}
           >
             <AssistantPanel

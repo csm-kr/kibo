@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { CARD } from "@/components/assistant/styles";
+import { CARD } from "@/components/phone/ui";
 import { HERO_CART, type Comparison } from "@/lib/demo/compare";
 import { lineLabel } from "@/lib/kiosk/menu";
 import type { KioskData, Locale } from "@/types/menu";

@@ -7,9 +7,10 @@ import { choiceLabel, choiceQuestion } from "@/lib/agent/choices";
 import type { ChoiceRef } from "@/lib/commands/errors";
 import type { KioskData, Locale } from "@/types/menu";
 import type { Session } from "@/types/session";
-import { CHIP } from "./styles";
+import { FOCUS, PRESS } from "./ui";
 
-// Choice buttons from session.pendingChoice (heuristic 6). The question and labels come from fixed templates and
+// Choice buttons from session.pendingChoice (heuristic 6), in the phone design: white cards with a photo, so they read
+// as answers, apart from the tinted "Try saying" suggestions. The question and labels come from fixed templates and
 // menu data, never from model text.
 
 function choicePhoto(k: KioskData, c: ChoiceRef): string | undefined {
@@ -26,7 +27,7 @@ function choicePhoto(k: KioskData, c: ChoiceRef): string | undefined {
   return undefined;
 }
 
-export function ChoiceButtons(props: {
+export function Choices(props: {
   kiosk: KioskData;
   pending: NonNullable<Session["pendingChoice"]>;
   locale: Locale;
@@ -52,10 +53,10 @@ export function ChoiceButtons(props: {
             type="button"
             disabled={props.disabled}
             onClick={() => props.onPick(choice, label)}
-            className={`${CHIP} flex items-center gap-3 font-bold`}
+            className={`flex min-h-15 items-center gap-3 rounded-tile bg-white px-3 py-2 text-left shadow-card active:bg-kibo-tint disabled:opacity-60 ${PRESS} ${FOCUS}`}
           >
-            {photo && <Image src={photo} alt="" width={48} height={48} className="size-12 flex-none rounded-[12px] object-cover" />}
-            <span className="text-xl">{label}</span>
+            {photo && <Image src={photo} alt="" width={48} height={48} className="size-12 flex-none rounded-[12px] bg-cream object-cover" />}
+            <span className="text-xl font-semibold">{label}</span>
           </button>
         ))}
       </div>

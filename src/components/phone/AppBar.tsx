@@ -14,7 +14,8 @@ export type Connection = "connected" | "reconnecting";
 export function AppBar(props: {
   brand: string;
   locale: Locale;
-  connection: Connection;
+  /** Left out before there is an order to be connected to, and after it ended. */
+  connection?: Connection;
   onLocaleChange(next: Locale): void;
   /** Left out once the order has ended (P7). */
   onStaff?: () => void;
@@ -30,10 +31,12 @@ export function AppBar(props: {
         <Image src="/kibo-mark.svg" alt="KIBO" width={32} height={32} unoptimized className="size-8 max-w-none flex-none" />
         <div className="flex min-w-0 flex-col">
           <span className="text-base leading-normal font-bold [overflow-wrap:anywhere]">{props.brand}</span>
-          <span role="status" className="flex items-center gap-2 text-base leading-normal text-muted">
-            <span aria-hidden className={`size-2 flex-none rounded-full ${online ? "bg-online" : "bg-staff-ink"}`} />
-            {pt(online ? "connected" : "barReconnecting", locale)}
-          </span>
+          {props.connection && (
+            <span role="status" className="flex items-center gap-2 text-base leading-normal text-muted">
+              <span aria-hidden className={`size-2 flex-none rounded-full ${online ? "bg-online" : "bg-staff-ink"}`} />
+              {pt(online ? "connected" : "barReconnecting", locale)}
+            </span>
+          )}
         </div>
       </div>
       {/* Named in the other language, so a reader of either can find it. The full name is shown, not "EN": a short

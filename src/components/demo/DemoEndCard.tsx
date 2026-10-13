@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { CARD, FOCUS, PRIMARY, SECONDARY } from "@/components/assistant/styles";
+import { CARD, FOCUS, PRIMARY, SECONDARY } from "@/components/phone/ui";
 import { pt } from "@/lib/i18n/phone";
 import type { Locale } from "@/types/menu";
 import { DEMO_ENVIRONMENTS, demoHref } from "./environments";
@@ -51,14 +51,14 @@ export function DemoEndCard(props: {
           {pt("tryAgain", locale)}
         </button>
         {others}
-        <p className="text-base text-[#4B463F]">{pt("twoDeviceHint", locale)}</p>
+        <p className="text-base text-muted">{pt("twoDeviceHint", locale)}</p>
         <Link href={`/kiosk?k=${props.kioskId}`} className={SECONDARY}>
           {pt("twoDeviceOpen", locale)}
         </Link>
         <button
           type="button"
           onClick={props.onIntro}
-          className={`min-h-14 rounded-[18px] text-base font-bold text-[#3446D4] underline underline-offset-4 ${FOCUS}`}
+          className={`min-h-14 rounded-tile text-base font-semibold text-kibo underline underline-offset-4 ${FOCUS}`}
         >
           {pt("backToIntro", locale)}
         </button>

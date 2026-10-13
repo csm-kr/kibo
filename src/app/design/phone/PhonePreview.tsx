@@ -3,6 +3,7 @@
 import { useId, useState, type ReactNode } from "react";
 import { AppBar } from "@/components/phone/AppBar";
 import { ConfirmBar, ConfirmCard, DoneCard, PayCard } from "@/components/phone/Checkout";
+import { Choices } from "@/components/phone/Choices";
 import { Bubble, StatusChip } from "@/components/phone/Conversation";
 import { Dock } from "@/components/phone/Dock";
 import { OrderCard } from "@/components/phone/OrderCard";
@@ -12,7 +13,7 @@ import { examplesFor } from "@/lib/agent/examples";
 import { pt } from "@/lib/i18n/phone";
 import type { ChatMessage } from "@/lib/phone/chat";
 import type { KioskData, Locale } from "@/types/menu";
-import type { CartLine } from "@/types/session";
+import type { CartLine, Session } from "@/types/session";
 
 // Sample data only: ids and options from data/kiosks/malo.json, prices as the server computes them.
 
@@ -37,6 +38,14 @@ const MESSAGES: Record<Locale, ChatMessage[]> = {
   ko: [
     { id: 1, role: "user", text: "치즈버거 세트 두 개, 하나는 피클 빼고요. 음료는 제로 콜라랑 사이다." },
     { id: 2, role: "model", text: "치즈버거 세트 두 개를 담았어요. 하나는 피클 없이 제로 콜라, 하나는 사이다예요." },
+  ],
+};
+
+const CHOICE: NonNullable<Session["pendingChoice"]> = {
+  templateId: "pick_item",
+  choices: [
+    { kind: "item", id: "bulgogi_burger" },
+    { kind: "item", id: "double_cheese_burger" },
   ],
 };
 
@@ -81,6 +90,7 @@ export function PhonePreview({ kiosk }: { kiosk: KioskData }) {
             <StatusChip text={pt("working", locale)} />
             <StatusChip text={pt("reconnecting", locale)} tone="warn" />
           </div>
+          <Choices kiosk={kiosk} pending={CHOICE} locale={locale} disabled={false} onPick={noop} />
         </div>
       </Frame>
 
@@ -134,7 +144,7 @@ export function PhonePreview({ kiosk }: { kiosk: KioskData }) {
         <div className="px-4">
           <ConfirmCard kiosk={kiosk} cart={CART} locale={locale} dine={kiosk.dineOptions?.eat_in.name[locale]} onPickMore={noop} />
         </div>
-        <ConfirmBar total={TOTAL} locale={locale} onPay={noop} voice="off" onMic={noop} onType={noop} />
+        <ConfirmBar total={TOTAL} locale={locale} onPay={noop} voice="off" onMic={noop} onTyping={noop} />
       </Frame>
 
       <Frame id="pay" title="Pay (P5)">

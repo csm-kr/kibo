@@ -1,7 +1,8 @@
 "use client";
 
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
-import { FOCUS } from "@/components/assistant/styles";
+import { FOCUS, PRESS } from "@/components/phone/ui";
 import type { AgentAction } from "@/lib/agent/actions";
 import { actionRow } from "@/lib/demo/actions";
 import { pt } from "@/lib/i18n/phone";
@@ -10,6 +11,7 @@ import type { SessionStatus } from "@/types/session";
 
 // D2 "What the AI did" (/demo only): each tool call Gemini made and what the KIBO server answered, in plain words
 // from menu data plus the tool name and result code. Not announced (aria-live): the cart announcements already are.
+// A white card with the phone's soft shadow (docs/UI_GUIDE.md "Phone design"), so /demo reads as one product.
 
 interface Props {
   kiosk: KioskData;
@@ -33,24 +35,24 @@ export function ActionStrip({ kiosk, actions, locale, status, beside }: Props) {
       data-action-strip
       aria-labelledby="demo-actions-title"
       // Shrinks (down to its toggle) before the phone or the guide above it does; the phone keeps its own minimum (DemoApp).
-      className="flex max-h-[40%] min-h-18 shrink flex-col gap-2 rounded-[26px] border border-[#E2DACB] bg-white p-2 text-[#15171C]"
+      className="flex max-h-[40%] min-h-18 shrink flex-col gap-2 rounded-sheet bg-white p-2 text-ink shadow-card"
     >
       <button
         type="button"
         aria-expanded={open}
         aria-controls="demo-actions"
         onClick={() => setOpen(!open)}
-        className={`flex min-h-14 w-full flex-none items-center gap-2 rounded-[18px] px-3 text-left text-base font-bold active:bg-[#F3EEE4] ${FOCUS}`}
+        className={`flex min-h-14 w-full flex-none items-center gap-2 rounded-tile px-3 text-left text-base font-bold active:bg-kibo-tint ${PRESS} ${FOCUS}`}
       >
         <span id="demo-actions-title" className="flex-1">
           {pt("aiActions", locale)}
         </span>
         {!open && actions.length > 0 && (
-          <span data-action-count className="flex h-8 min-w-8 items-center justify-center rounded-full bg-[#15171C] px-2 text-base text-white">
+          <span data-action-count className="flex h-8 min-w-8 items-center justify-center rounded-full bg-kibo-tint px-2 text-base font-semibold text-kibo-deep">
             {actions.length}
           </span>
         )}
-        <Chevron open={open} />
+        {open ? <ChevronUp size={20} strokeWidth={2} aria-hidden /> : <ChevronDown size={20} strokeWidth={2} aria-hidden />}
       </button>
       {open && (
         // Legend and rows scroll together, so a short screen still reaches every row; focusable for keyboard scrolling (I-067).
@@ -60,9 +62,9 @@ export function ActionStrip({ kiosk, actions, locale, status, beside }: Props) {
           role="group"
           aria-labelledby="demo-actions-title"
           tabIndex={0}
-          className={`flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto rounded-[18px] px-3 pb-2 ${FOCUS}`}
+          className={`flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto rounded-tile px-3 pb-2 ${FOCUS}`}
         >
-          <p className="text-base text-[#4B463F]">{pt("aiActionsLegend", locale)}</p>
+          <p className="text-base text-muted">{pt("aiActionsLegend", locale)}</p>
           {actions.length === 0 ? (
             <p className="text-base text-[#33302B]">{pt("aiActionsEmpty", locale)}</p>
           ) : (
@@ -75,10 +77,10 @@ export function ActionStrip({ kiosk, actions, locale, status, beside }: Props) {
                     key={actions.length - i}
                     data-action-tool={a.tool}
                     data-action-code={a.code}
-                    className={`flex flex-col border-l-4 pl-3 ${ok ? "border-[#3446D4]" : "border-[#7A2E0E]"}`}
+                    className={`flex flex-col border-l-4 pl-3 ${ok ? "border-kibo" : "border-staff-ink"}`}
                   >
                     <span className="text-lg font-bold">{row.text}</span>
-                    <span className={`font-mono text-base ${ok ? "text-[#4B463F]" : "text-[#7A2E0E]"}`}>{row.tech}</span>
+                    <span className={`font-mono text-base ${ok ? "text-muted" : "text-staff-ink"}`}>{row.tech}</span>
                   </li>
                 );
               })}
@@ -87,13 +89,5 @@ export function ActionStrip({ kiosk, actions, locale, status, beside }: Props) {
         </div>
       )}
     </section>
-  );
-}
-
-function Chevron({ open }: { open: boolean }) {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-none">
-      <path d={open ? "m6 15 6-6 6 6" : "m6 9 6 6 6-6"} />
-    </svg>
   );
 }

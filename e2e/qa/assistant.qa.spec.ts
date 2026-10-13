@@ -106,6 +106,10 @@ test("phone path: start to order number", async ({ page, request }, info) => {
   const checkout = await s.phone("requestCheckout", {}, { utteranceSeq: 2 });
   await expect(page.getByRole("heading", { name: "Please check your order" })).toBeVisible();
   expect(checkout.status).toBe("confirming");
+  // The text field opened on P1 ([Type instead]) stays open for the order (UX C3); close it for P4's own look.
+  await expect(page.getByRole("textbox", { name: "Type your order" })).toBeVisible();
+  await page.getByRole("button", { name: "Close", exact: true }).click();
+  await expect(page.getByRole("textbox", { name: "Type your order" })).toHaveCount(0);
   // The total and the whole [Yes, pay now] at every phone size, 320×700 included (I-134, R-009).
   await check(page, info, "P4-confirm", VIEWPORTS, async () => {
     await expect(page.getByRole("button", { name: "Yes, pay now" })).toBeInViewport({ ratio: 1 });
