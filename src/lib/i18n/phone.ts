@@ -92,6 +92,7 @@ const PHONE_TEXT = {
     en: "In a real store, you would now pay on the kiosk itself. KIBO never pays for you.",
   },
   tryAnotherPlace: { ko: "다른 곳에서 해 보기", en: "Try another place" },
+  howLearned: { ko: "KIBO가 이 키오스크를 배운 과정 보기", en: "How KIBO learned this kiosk" },
   // /demo scenario guide (src/components/demo/ScenarioGuide.tsx)
   scenarios: { ko: "시나리오", en: "Scenarios" },
   scenariosLead: {

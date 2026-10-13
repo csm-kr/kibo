@@ -93,6 +93,16 @@ export function DemoIntro(props: {
                   </li>
                 );
               })}
+              {/* The recorded run that taught KIBO the pizza kiosk (/learn): its own row under that card, so the three
+                  cards stay level (I-123), and outside the card, because a link cannot hold a link. */}
+              <li className="sm:col-start-3">
+                <Link
+                  href="/learn/doughhouse"
+                  className={`flex min-h-14 items-center rounded-tile px-2 text-base font-semibold text-kibo underline underline-offset-4 ${FOCUS}`}
+                >
+                  How KIBO learned the pizza kiosk
+                </Link>
+              </li>
             </ul>
           </nav>
           <div className="flex flex-col gap-2">

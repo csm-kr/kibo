@@ -30,6 +30,8 @@ export const LEARNED: Profile = { route: "/learned", root: "[data-learned-widget
 export const PAIRING: Profile = { route: "/kiosk", root: "[data-pairing-panel]", minFont: 18, minTarget: 56 };
 /** The root landing page `/`, judged by the phone numbers (a judge may open it on either device). */
 export const HOME: Profile = { route: "/", root: "body", minFont: 16, minTarget: 56 };
+/** /learn and the learn replay: KIBO's own pages, judged by the phone numbers like the landing page. */
+export const LEARN: Profile = { route: "/learn", root: "main", minFont: 16, minTarget: 56 };
 
 export interface Findings {
   h: string[];

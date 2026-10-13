@@ -55,6 +55,9 @@ Starts an order with the skill's own recipe, opens every category (following pag
 
 Regression test (`test_audit.mjs`, 4/4): complete skills pass; a skill missing three categories is rejected; a category disguised as a "control" is caught.
 
+## Watching a run (`/learn`)
+Learning runs offline (a browser and Gemini, minutes per run), so the product shows replays of real recorded runs, never a live or made-up one. With `TRACE_DIR` the learner writes one screenshot and one JSON line per turn; `npm run learn:runs` (`scripts/learn-runs.ts`) copies them to `public/learn/<runId>/` unchanged except for the image format (WebP ≤ 60 KB, ≤ 5 MB per run). `/learn/<runId>` steps through every turn: the screenshot, the action in plain words, the counts the learner had written down, and milestones (first items, all categories, coverage audit, self-test, finish). Shown (13-blind-kiosks:9): the `bk4-airport-shop` final run (the best blind final with unsafe 0; `bk3-ramen` ties at 10/0/0) and the traced Doughhouse run of the improved learner (`spikes/blind-kiosks/results/dev/gemini-doughhouse-after/`). The airport shop is not a first sighting: the learner was improved from its baseline run's failure patterns (`spikes/blind-kiosks/PROTOCOL.md`), and its orders were judged by the kiosk total only (I-183); the page says both.
+
 ## Runtime
 Tool call → arguments validated against the skill catalog → the in-page bridge replays the recipe → the kiosk's own total **and** cart lines are checked → session updated. On mismatch: stop, re-read the kiosk cart, offer staff or touch. No self-healing at runtime.
 

@@ -77,3 +77,8 @@ When an issue class in `docs/ISSUE.md` is seen for the **3rd time**, it becomes 
 - From: `broad-git-add` — I-035 (seen 10-12/2-kiosk:2, 10-13/2-kiosk:5, 10-14/13-blind-kiosks:6)
 - Why: other sessions edit and stage planning files while a step runs, so `git add -A` or a bare `git commit` puts their work into the step's commit.
 - Check: before the step commit, `git diff --cached --name-only` lists only the step's files; commit with `git commit <paths> -m …` so files staged by others stay out.
+
+### R-013 (proposed): A third-party kiosk screen shown scaled down never carries meaning alone; KIBO's own readable text beside it says what it shows
+- From: `unreadable-third-party-page` — I-096 (seen 10-13/6-learn:2, 10-13/10-assets:2), I-198 (10-14/13-blind-kiosks:9)
+- Why: learned and recorded kiosk screens cannot be restyled, and each time one was shown smaller (the `/demo` iframe, a deck picture, the `/learn` replay) its own text dropped to 4–8 px.
+- Check: on every QA screenshot or deck picture with a scaled kiosk page or recorded kiosk screenshot, the point it makes (what was tapped, what was added, what it learned) can be read from KIBO's text next to it at ≥ 16 px; if not, add a caption or log it with the screenshot name.

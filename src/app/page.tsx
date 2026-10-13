@@ -228,6 +228,9 @@ export default function Home() {
             <Link href="/demo?k=doughhouse" className={SECONDARY}>
               Try the learned pizza kiosk
             </Link>
+            <Link href="/learn" className={SECONDARY}>
+              Watch KIBO learn a new kiosk
+            </Link>
           </article>
         </div>
       </section>

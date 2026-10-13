@@ -23,7 +23,8 @@
     "capture:footage": "tsx --env-file=.env scripts/capture-footage.ts",
     "voice:build": "esbuild voice-relay/main.ts --bundle --platform=node --target=node24 --format=cjs --outfile=voice-relay/dist/server.cjs --external:firebase-admin --external:'firebase-admin/*' --external:bufferutil --external:utf-8-validate --log-level=warning",
     "voice:relay-check": "npm run voice:build && tsx --env-file=.env scripts/voice-relay-check.ts",
-    "grade:blind": "node spikes/blind-kiosks/grade/grade.mjs"
+    "grade:blind": "node spikes/blind-kiosks/grade/grade.mjs",
+    "learn:runs": "tsx scripts/learn-runs.ts"
   },
   "dependencies": {
     "@google/genai": "^2.28.0",

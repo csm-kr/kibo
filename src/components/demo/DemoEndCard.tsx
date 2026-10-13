@@ -39,6 +39,9 @@ export function DemoEndCard(props: {
         <button type="button" onClick={props.onTryAgain} className={PRIMARY}>
           {pt("tryAgain", locale)}
         </button>
+        <Link href={`/learn/${props.kioskId}`} className={SECONDARY}>
+          {pt("howLearned", locale)}
+        </Link>
         {others}
       </section>
     );
