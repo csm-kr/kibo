@@ -1,0 +1,110 @@
+#1 snapshot 
+#2 act []
+#3 record 
+#4 act []
+#5 record 
+#6 act []
+#7 record 
+#8 act []
+#9 act []
+#10 record 
+#11 act [{"op":"click","label":"✕","role":"","name":"","text":"","exact":false,"within":""},{"op":"click","label":"애플 시나몬 티","role":"","name":"","text":"","exact":false,"within":""}]
+#12 act [{"op":"click","label":"커피","role":"","name":"","text":"","exact":false,"within":""}]
+#13 record 
+#15 snapshot 
+#16 act []
+#17 act []
+#18 act []
+#19 record 
+#20 act [{"op":"click","label":"›","role":"","name":"","text":"","exact":false,"within":""}]
+#21 act []
+#22 act []
+#24 act []
+#25 record 
+#26 act [{"op":"click","label":"녹차라떼","role":"","name":"","text":"","exact":false,"within":""}]
+#27 act [{"op":"click","label":"녹차라떼","role":"","name":"","text":"","exact":false,"within":""}]
+#28 act []
+#29 act []
+#30 record 
+#31 act [{"op":"click","label":"티","role":"","name":"","text":"","exact":false,"within":""}]
+#33 act []
+#34 act []
+#35 act []
+#36 record 
+#37 act [{"op":"click","label":"캐모마일 티","role":"","name":"","text":"","exact":false,"within":""}]
+#38 act []
+#39 act []
+#40 record 
+#41 act [{"op":"click","label":"에이드·스무디","role":"","name":"","text":"","exact":false,"within":""}]
+#43 act []
+#44 act []
+#45 act []
+#46 record 
+#47 act [{"op":"click","label":"자몽에이드","role":"","name":"","text":"","exact":true,"within":""}]
+#48 act []
+#49 act []
+#50 record 
+#51 act [{"op":"click","label":"청포도에이드","role":"","name":"","text":"","exact":true,"within":""}]
+#53 act []
+#54 act []
+#55 record 
+#56 act [{"op":"click","label":"레귤러","role":"","name":"","text":"","exact":true,"within":""},{"op":"click","label":"보통","role":"","name":"","text":"","exact":true,"within":""},{"op":"click","label":"장바구니 담기","role":"","name":"","text":"","exact":true,"within":""}]
+#57 record 
+#58 act []
+#59 record 
+#60 act []
+#61 act []
+#63 snapshot 
+#64 act []
+#65 record 
+#66 act [{"op":"click","label":"베이커리·디저트","role":"","name":"","text":"","exact":true,"within":""}]
+#67 act []
+#68 act []
+#69 record 
+#70 act []
+#71 record 
+#72 records 
+#73 act []
+#74 audit 
+  audit #1: GAPS missing=40 unknown=0 hidden=1
+#75 act []
+#76 act []
+#77 record 
+#79 act []
+#80 act []
+#81 records 
+#82 testSkill 
+#83 testSkill 
+  test #2: PASS PASS PASS
+#85 testSkill 
+  test #3: FAIL FAIL FAIL
+#87 testSkill 
+#88 testSkill 
+  test #5: FAIL FAIL FAIL
+#89 testSkill 
+#91 testSkill 
+  test #7: PASS PASS PASS
+#92 audit 
+  audit #2: GAPS missing=39 unknown=0 hidden=1
+#94 audit 
+  audit #3: OK missing=0 unknown=0 hidden=0
+#96 testSkill 
+#98 testSkill 
+#99 testSkill 
+  test #10: 
+#101 testSkill 
+  test #11: 
+#102 testSkill 
+#104 testSkill 
+  test #13: PASS
+#105 testSkill 
+#106 testSkill 
+  test #15: PASS
+#108 testSkill 
+  test #16: PASS FAIL FAIL
+#110 testSkill 
+  test #17: PASS PASS PASS
+#111 audit 
+  audit #4: GAPS missing=39 unknown=0 hidden=1
+#112 testSkill 
+  test #18: PASS PASS PASS

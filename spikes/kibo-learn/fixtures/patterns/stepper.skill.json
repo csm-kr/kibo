@@ -1,0 +1,32 @@
+{
+  "kiosk": "모의 카페",
+  "categories": [],
+  "uiLabels": ["취소", "담기", "−", "+", "수량 빼기", "수량 더하기", "HOT", "ICED", "적게", "보통", "많이"],
+  "forbiddenLabels": ["주문하기"],
+  "dineOptions": {},
+  "catalog": [
+    {
+      "name": "라떼", "category": "메뉴", "price": 4000, "soldOut": false,
+      "optionGroups": [
+        { "name": "온도", "required": true, "min": 1, "max": 1, "options": [{ "name": "HOT", "priceDelta": 0 }, { "name": "ICED", "priceDelta": 0 }] },
+        { "name": "얼음량", "required": false, "min": 0, "max": 1, "appliesWhen": "온도=ICED",
+          "options": [{ "name": "적게", "priceDelta": 0 }, { "name": "보통", "priceDelta": 0 }, { "name": "많이", "priceDelta": 0 }] },
+        { "name": "추가", "type": "quantity", "required": false, "min": 0, "max": 6,
+          "select": [{ "op": "click", "label": "+", "within": "{option}" }],
+          "options": [{ "name": "에스프레소 샷", "priceDelta": 500, "maxQty": 3 }, { "name": "바닐라 시럽", "priceDelta": 300, "maxQty": 3 }] }
+      ]
+    },
+    { "name": "스콘", "category": "메뉴", "price": 3000, "soldOut": false, "optionGroups": [] }
+  ],
+  "recipes": {
+    "startOrder": [{ "op": "click", "label": "시작하기" }],
+    "addToCart": [
+      { "op": "click", "label": "{item}" },
+      { "op": "chooseOptions", "steps": [{ "op": "click", "label": "{option}" }] },
+      { "op": "click", "label": "담기" },
+      { "op": "repeat", "times": "{qtyMinus1}", "steps": [{ "op": "click", "label": "수량 더하기", "within": "{item}" }] }
+    ]
+  },
+  "cartTotalPattern": "합계 ([\\d,]+)원",
+  "notes": ["The temperature is required; 담기 without it shows an alert."]
+}

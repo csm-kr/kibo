@@ -1,0 +1,18 @@
+{
+  "kioskId": "doughhouse",
+  "provider": "gemini",
+  "model": "gemini-3.8-flash",
+  "startedAt": "2026-10-13T13:56:03.286Z",
+  "endedAt": "2026-10-13T14:00:04.258Z",
+  "gate": {
+    "tests": 2,
+    "testsPassedForFinish": true,
+    "audits": 2,
+    "auditOk": true,
+    "finished": true
+  },
+  "turns": 38,
+  "inputTokens": 352822,
+  "cachedInputTokens": 196701,
+  "outputTokens": 20279
+}

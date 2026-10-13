@@ -380,12 +380,14 @@ kioskId, kind: "learned", brand{ko,en}, locale, currency, page (/learned-kiosks/
 provenance{learnedBy, evidence, reviewed}, dineOptions{eat_in, take_out: exact kiosk labels},
 categories[{categoryId, name{ko,en}, label}],
 catalog[{itemId, name{ko,en}, label, category, price, soldOut,
-         optionGroups[{groupId, name{ko,en}, label, required, min, max, defaultOptionIds[], options[{optionId, name{ko,en}, label, priceDelta}]}]}],
+         optionGroups[{groupId, name{ko,en}, label, required, min, max, defaultOptionIds[], options[{optionId, name{ko,en}, label, priceDelta}],
+                       select?[steps] (how chooseOptions picks one option, e.g. the + in its row), after?[steps] (e.g. a wizard's 다음)}]}],
 uiLabels[], forbiddenLabels[] (a label containing any entry is never clicked: payment, card, checkout),
 checkout{label, name{ko,en}} (the kiosk's own button that ends the order, one of the forbidden labels; the phone's review says "tap 주문하기 on the kiosk and pay there"),
 recipes{startOrder, addToCart, removeLine, ...}, cartTotalPattern, cartLinePattern
 ```
-`label` is the exact text the kiosk shows; ids (ASCII snake_case) and `name.en` are added during human review. `skillSchema` (`src/lib/adapters/learned.ts`) checks it (names ≤ 40 chars, single line, no `<` or `>`, integer prices); `learnedToKiosk` normalizes it into the items shape (one `single` variant per item, a neutral placeholder image, no upsell rules) plus `learned` (page, recipes, labels by id) for the bridge.
+Recipe steps: `click`, `check`, `clickIfVisible`, `clickNth` on a `label`, `role`+`name` or `text`, optionally narrowed by `within` (the match whose closest ancestor holds that text); `forEach`, `repeat`, and `chooseOptions` (per option group of the item, its `select` steps or the op's own steps for each chosen option, then its `after` steps; one group id means the same steps on every item). Added in 13-blind-kiosks:4 (`spikes/kibo-learn/CHANGES.md`); `skills/doughhouse.json` uses none of them.
+`label` is the exact text the kiosk shows; ids (ASCII snake_case) and `name.en` are added during human review. `skillSchema` (`src/lib/adapters/learned.ts`) checks it (names ≤ 40 chars, single line, no `<` or `>`, integer prices); `learnedToKiosk` normalizes it into the items shape (one `single` variant per item, a neutral placeholder image, no upsell rules) plus `learned` (page, recipes, labels by id, group steps by id) for the bridge.
 
 ### `sessions/{sessionId}` — server only; clients read it through the SSE route (ADR-010)
 | Field | Type | Notes |

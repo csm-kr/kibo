@@ -1,0 +1,45 @@
+{
+  "n": 9,
+  "at": "2026-10-13T13:56:46.922Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "role": "radio",
+        "name": "오리지널"
+      },
+      {
+        "op": "click",
+        "label": "장바구니 담기"
+      }
+    ]
+  },
+  "resultSummary": "tapped 오리지널 → 장바구니 담기",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "role": "radio",
+            "name": "오리지널"
+          },
+          {
+            "op": "click",
+            "label": "장바구니 담기"
+          }
+        ]
+      },
+      "resultSummary": "tapped 오리지널 → 장바구니 담기"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 7335,
+  "outputTokens": 48
+}

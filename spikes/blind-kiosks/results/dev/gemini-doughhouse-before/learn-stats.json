@@ -1,0 +1,12 @@
+{
+  "provider": "gemini",
+  "model": "gemini-3.8-flash",
+  "cachedInputTokens": 191500,
+  "finished": true,
+  "turns": 59,
+  "acts": 41,
+  "tests": 1,
+  "inputTokens": 416373,
+  "outputTokens": 12319,
+  "minutes": "9.2"
+}

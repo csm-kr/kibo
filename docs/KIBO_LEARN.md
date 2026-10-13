@@ -38,12 +38,14 @@ jev-browser could not see the `div` tiles of our test kiosk at all (`NO_MATCH`),
   "cartTotalPattern": "<regex whose group 1 is the total>"
 }
 ```
+Since 13-blind-kiosks:4 (`spikes/kibo-learn/CHANGES.md`): a step may carry `"within": "<text>"` (the match nearest that text, e.g. the `+` in the shot's own row); the op `chooseOptions` runs, per option group, the group's own `select` steps for each chosen option and then its `after` steps (a wizard's `다음`); a group may be `"type": "quantity"` (options with `maxQty`, an order repeats the name per count) or carry `"appliesWhen": "<group>=<option>"`; `forbiddenLabels` lists checkout and payment buttons. The product bridge replays `within`, `chooseOptions`, `select` and `after` the same way.
 
 ## Learning loop (`learner.mjs`)
 Tools: `snapshot`, `act`, `reload`, `record` / `records` (findings survive memory pruning), `testSkill`, `audit`, `finish`.
 - Only the last 4 screens stay in the model's context; findings are kept with `record`.
 - A per-run input-token cap stops runaway cost.
-- **`finish` is accepted only if** the exact skill passed `testSkill` on ≥ 3 orders **and** passed the coverage audit.
+- **`finish` is accepted only if** the exact skill passed `testSkill` on ≥ 3 orders **and** passed the coverage audit. Since 13-blind-kiosks:4 the orders may come from several `testSkill` calls of the same exact skill (none failing), and a skill lint must pass (no navigation or stepper buttons as options, quantity groups with `select`, valid `appliesWhen`, no payment control in a recipe).
+- Payment and checkout controls are never tapped while learning or replaying (13-blind-kiosks:4).
 
 ## Coverage audit (`audit.mjs`, no AI)
 Starts an order with the skill's own recipe, opens every category (following pager arrows), and checks:
@@ -72,8 +74,9 @@ Only run 3 includes the ≥ 3 self-test finish gate and the coverage audit (`spi
 Evidence files are listed in `docs/TESTING.md`.
 
 ## Known gaps (next)
-1. **Quantity options** (extra shot "− 1 +") are not modelled; recorded as a "+" option.
-2. **Navigation recorded as options** ("Next" in multi-step sets). Recipes must handle navigation; options must be customer choices only. Add a lint that rejects navigation words and bare symbols as option names.
-3. **Conditional groups** (ice amount appears only for iced drinks) are missed.
+13-blind-kiosks:4 added a way to express items 1–3 and checks for them (quantity groups, the lint, `appliesWhen`, `chooseOptions`), tested on synthetic fixtures and the dev set only; whether the learner uses them on unseen kiosks is unverified until the final blind runs (`spikes/blind-kiosks/RESULTS.md`).
+1. **Quantity options** (extra shot "− 1 +"): expressible as `"type": "quantity"`; the product cart cannot order a count on a learned kiosk yet (I-190).
+2. **Navigation recorded as options** ("Next" in multi-step sets): the skill lint rejects navigation words and bare symbols as option names; wizard steps go in a group's `after`.
+3. **Conditional groups** (ice amount appears only for iced drinks): recorded with `appliesWhen`; the audit only sees each item's first screen, so it cannot point out a missed conditional group.
 4. Scope: web and webview kiosks. Native apps via OS accessibility APIs are roadmap.
 5. Skills are tied to the driver's labelling rules; record the driver version and re-learn when it changes.

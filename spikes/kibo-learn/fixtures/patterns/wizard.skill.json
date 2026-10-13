@@ -1,0 +1,32 @@
+{
+  "kiosk": "모의 매점",
+  "categories": [],
+  "uiLabels": ["이전", "다음", "담기"],
+  "forbiddenLabels": ["주문하기"],
+  "dineOptions": {},
+  "catalog": [
+    { "name": "팝콘", "category": "메뉴", "price": 5000, "soldOut": false, "recipe": "direct", "optionGroups": [] },
+    {
+      "name": "콤보", "category": "메뉴", "price": 9000, "soldOut": false, "recipe": "combo",
+      "optionGroups": [
+        { "name": "팝콘 맛", "required": true, "min": 1, "max": 1, "after": [{ "op": "click", "label": "다음" }],
+          "options": [{ "name": "고소", "priceDelta": 0 }, { "name": "카라멜", "priceDelta": 500 }] },
+        { "name": "음료", "required": true, "min": 1, "max": 1, "after": [{ "op": "click", "label": "다음" }],
+          "options": [{ "name": "콜라", "priceDelta": 0 }, { "name": "사이다", "priceDelta": 0 }, { "name": "제로콜라", "priceDelta": 300 }] }
+      ]
+    }
+  ],
+  "recipes": {
+    "startOrder": [{ "op": "click", "label": "시작하기" }],
+    "direct": [{ "op": "click", "label": "{item}" }, { "op": "repeat", "times": "{qtyMinus1}", "steps": [{ "op": "click", "label": "{item}" }] }],
+    "combo": [
+      { "op": "repeat", "times": "{qty}", "steps": [
+        { "op": "click", "label": "{item}" },
+        { "op": "chooseOptions", "steps": [{ "op": "click", "label": "{option}" }] },
+        { "op": "click", "label": "담기" }
+      ] }
+    ]
+  },
+  "cartTotalPattern": "합계 ([\\d,]+)원",
+  "notes": ["The combo is a three-step dialog: flavor, 다음, drink, 다음, then 담기."]
+}

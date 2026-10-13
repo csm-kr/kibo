@@ -1,0 +1,192 @@
+{
+  "kioskId": "dev",
+  "label": "openai-gureum",
+  "gradedAt": "2026-10-13T14:31:02.761Z",
+  "skill": "no skill",
+  "files": {
+    "skill": "spikes/blind-kiosks/results/dev/openai-gureum/skill.json",
+    "key": "spikes/blind-kiosks/grade/legacy/gureum/answer-key.json",
+    "app": "spikes/blind-kiosk/app/index.html"
+  },
+  "summary": "dev/openai-gureum: learning not finished, 10.0 min, 130 turns, 2026509 input tokens; no skill; items 0/40 (precision null), price 0/0, options exact 0/0 (openable 0/0); orders correct 0, safe refusal 0, unsafe 0, not learned 5 of 5 (cart lines read in 0)",
+  "learning": {
+    "provider": "openai",
+    "model": "gpt-6-luna",
+    "cachedInputTokens": 1560117,
+    "finished": false,
+    "turns": 130,
+    "acts": 90,
+    "tests": 4,
+    "inputTokens": 2026509,
+    "outputTokens": 26701,
+    "minutes": "10.0"
+  },
+  "catalog": {
+    "items": {
+      "key": 40,
+      "skill": 0,
+      "matched": 0,
+      "recall": 0,
+      "precision": null,
+      "missing": [
+        "밤 크림 라떼",
+        "홍시 스무디",
+        "애플 시나몬 티",
+        "아메리카노",
+        "카페라떼",
+        "바닐라라떼",
+        "카라멜 마키아토",
+        "카푸치노",
+        "콜드브루",
+        "콜드브루 라떼",
+        "아인슈페너",
+        "카페모카",
+        "에스프레소",
+        "연유라떼",
+        "헤이즐넛 아메리카노",
+        "초코라떼",
+        "녹차라떼",
+        "고구마라떼",
+        "딸기우유",
+        "얼그레이 티",
+        "캐모마일 티",
+        "유자차",
+        "페퍼민트 티",
+        "레몬에이드",
+        "자몽에이드",
+        "청포도에이드",
+        "딸기 요거트 스무디",
+        "망고 스무디",
+        "버터 크루아상",
+        "플레인 베이글",
+        "소금빵",
+        "초코 머핀",
+        "뉴욕 치즈케이크",
+        "티라미수",
+        "마카롱 (3개입)",
+        "초코칩 쿠키",
+        "브런치 세트",
+        "케이크 세트",
+        "투게더 세트",
+        "모닝 세트"
+      ],
+      "extra": []
+    },
+    "price": {
+      "correct": 0,
+      "of": 0
+    },
+    "category": {
+      "correct": 0,
+      "of": 0
+    },
+    "soldOut": {
+      "correct": 0,
+      "of": 0
+    },
+    "options": {
+      "itemsExact": 0,
+      "items": 0,
+      "openableExact": 0,
+      "openable": 0,
+      "groups": 0,
+      "groupsFound": 0,
+      "groupLabelsExact": 0,
+      "groupRulesCorrect": 0,
+      "quantityGroups": 0,
+      "quantityRecognized": 0,
+      "conditionalGroups": 0,
+      "conditionalFound": 0
+    },
+    "perItem": [],
+    "perGroup": []
+  },
+  "orders": {
+    "total": 5,
+    "correct": 0,
+    "safeRefusal": 0,
+    "unsafe": 0,
+    "notLearned": 5,
+    "linesChecked": 0,
+    "results": [
+      {
+        "id": "e1",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 9400,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "아메리카노 › ICED",
+          "아메리카노 › 바닐라 시럽",
+          "아메리카노 › 헤이즐넛 시럽"
+        ],
+        "order": null
+      },
+      {
+        "id": "e2",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 6000,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "카페라떼 › ICED"
+        ],
+        "order": null
+      },
+      {
+        "id": "e3",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 6700,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "브런치 세트 › ICED",
+          "브런치 세트 › 버터 크루아상",
+          "브런치 세트 › 데워주세요"
+        ],
+        "order": null
+      },
+      {
+        "id": "e4",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 10900,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "플레인 베이글 › 데워주세요",
+          "버터 크루아상 › 그대로 주세요"
+        ],
+        "order": null
+      },
+      {
+        "id": "e5",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 26700,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "카페모카 › ICED",
+          "얼그레이 티 › HOT",
+          "투게더 세트 › HOT",
+          "투게더 세트 › ICED"
+        ],
+        "order": null
+      }
+    ]
+  }
+}

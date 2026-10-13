@@ -1,0 +1,76 @@
+<!doctype html>
+<!-- Synthetic fixture for learner regression tests (spikes/kibo-learn/patterns.test.mjs), written from failure
+     pattern 6 in spikes/blind-kiosks/results/BASELINE.md: a set built in a multi-step dialog with "다음" / "이전",
+     where each step holds one option group. A plain item goes straight into the cart on a tap. -->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>패턴: 세트 단계</title>
+<style>
+  body { font-family: sans-serif; margin: 0; padding: 8px; }
+  .tile, .opt { cursor: pointer; border: 1px solid #999; padding: 12px; margin: 6px; display: inline-block; }
+  .opt.on { background: #333; color: #fff; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<section id="home"><h1>모의 매점</h1><button id="start">시작하기</button></section>
+<section id="menu" class="hidden">
+  <div class="tile" data-item="팝콘"><div>팝콘</div><div>5,000원</div></div>
+  <div class="tile" data-item="콤보"><div>콤보</div><div>9,000원</div></div>
+</section>
+<section id="wizard" class="hidden" role="dialog">
+  <h2 id="step-title"></h2>
+  <div id="s1"><span class="opt" data-v="고소" data-p="0">고소</span><span class="opt" data-v="카라멜" data-p="500">카라멜<br>+500원</span></div>
+  <div id="s2"><span class="opt" data-v="콜라" data-p="0">콜라</span><span class="opt" data-v="사이다" data-p="0">사이다</span><span class="opt" data-v="제로콜라" data-p="300">제로콜라<br>+300원</span></div>
+  <div id="s3"><p id="summary"></p></div>
+  <button id="prev">이전</button><button id="next">다음</button><button id="add">담기</button>
+</section>
+<section id="cart"><h2>장바구니</h2><ul id="lines"></ul><div id="total">합계 0원</div><button id="checkout">주문하기</button></section>
+<script>
+  const $ = (s) => document.querySelector(s);
+  const show = (el, on) => el.classList.toggle('hidden', !on);
+  const won = (n) => n.toLocaleString('en-US') + '원';
+  const TITLES = ['1/3 팝콘 맛 선택', '2/3 음료 선택', '3/3 확인'];
+  const lines = [];
+  let step = 0, pick = [null, null];
+  $('#start').onclick = () => { show($('#home'), false); show($('#menu'), true); };
+  document.querySelectorAll('.tile').forEach((t) => {
+    t.onclick = () => {
+      if (t.dataset.item === '팝콘') { lines.push({ name: '팝콘', unit: 5000 }); render(); return; }
+      step = 0; pick = [null, null];
+      document.querySelectorAll('.opt').forEach((o) => o.classList.remove('on'));
+      show($('#wizard'), true); draw();
+    };
+  });
+  document.querySelectorAll('#s1 .opt, #s2 .opt').forEach((o) => {
+    o.onclick = () => {
+      const i = o.parentElement.id === 's1' ? 0 : 1;
+      pick[i] = o;
+      o.parentElement.querySelectorAll('.opt').forEach((x) => x.classList.toggle('on', x === o));
+    };
+  });
+  function draw() {
+    $('#step-title').textContent = TITLES[step];
+    ['s1', 's2', 's3'].forEach((id, i) => show($('#' + id), i === step));
+    show($('#prev'), step > 0); show($('#next'), step < 2); show($('#add'), step === 2);
+    if (step === 2) $('#summary').textContent = '팝콘 ' + pick[0].dataset.v + ', 음료 ' + pick[1].dataset.v;
+  }
+  $('#next').onclick = () => {
+    if (!pick[step]) { alert('하나를 선택해 주세요.'); return; }
+    step++; draw();
+  };
+  $('#prev').onclick = () => { step--; draw(); };
+  $('#add').onclick = () => {
+    const unit = 9000 + Number(pick[0].dataset.p) + Number(pick[1].dataset.p);
+    lines.push({ name: '콤보 (' + pick[0].dataset.v + ', ' + pick[1].dataset.v + ')', unit });
+    show($('#wizard'), false); render();
+  };
+  function render() {
+    $('#lines').innerHTML = lines.map((l) => `<li>${l.name} ${won(l.unit)}</li>`).join('');
+    $('#total').textContent = '합계 ' + won(lines.reduce((a, l) => a + l.unit, 0));
+  }
+  $('#checkout').onclick = () => { show($('#menu'), false); };
+</script>
+</body>
+</html>

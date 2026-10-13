@@ -65,14 +65,19 @@ export interface KioskTheme {
   panel?: string;
 }
 
-/** One recipe step for the learned-kiosk bridge. String fields may hold `{placeholders}`. */
+/**
+ * One recipe step for the learned-kiosk bridge. String fields may hold `{placeholders}`. `within` picks, among
+ * matching targets, the one closest to that text (the + in its own row). `chooseOptions` runs, per option group of
+ * the item, the group's `select` steps (or its own `steps`) for each chosen option, then the group's `after` steps.
+ */
 export interface RecipeStep {
-  op: "click" | "check" | "clickIfVisible" | "clickNth" | "forEach" | "repeat";
+  op: "click" | "check" | "clickIfVisible" | "clickNth" | "forEach" | "repeat" | "chooseOptions";
   label?: string;
   role?: string;
   name?: string;
   text?: string;
   exact?: boolean;
+  within?: string;
   index?: number | string;
   over?: string;
   as?: string;
@@ -92,6 +97,8 @@ export interface LearnedKiosk {
   checkout: { label: string; name: LocalizedName };
   cartTotalPattern: string;
   cartLinePattern: string;
+  /** By group id: the group's own steps for chooseOptions (a stepper's +, a wizard's 다음). */
+  groupSteps: Record<string, { select?: RecipeStep[]; after?: RecipeStep[] }>;
   labels: {
     items: Record<string, string>;
     categories: Record<string, string>;

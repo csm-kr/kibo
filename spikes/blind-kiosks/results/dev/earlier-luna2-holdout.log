@@ -1,0 +1,5 @@
+PASS {"shown":58400,"expectedBySkill":58400,"handExpected":58400,"ms":1100}
+FAIL {"handExpected":13200,"error":"item not in catalog: 제로콜라"}
+FAIL {"handExpected":23400,"error":"locator.click: Timeout 3000ms exceeded."}
+PASS {"shown":18300,"expectedBySkill":18300,"handExpected":18300,"ms":1012}
+DETECTED {"shown":19000,"expectedBySkill":19800,"handExpected":"mismatch","ms":1084}

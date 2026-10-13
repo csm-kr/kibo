@@ -40,3 +40,16 @@ test('forbiddenSteps finds payment and order-confirm labels in the plan', () => 
   assert.deepEqual(forbiddenSteps(plannedSteps(s, order)), ['💳 신용/체크카드', '주문하기']);
   assert.deepEqual(forbiddenSteps([{ op: 'click', label: '닫기' }], ['닫기']), ['닫기']);
 });
+
+test('the plan follows chooseOptions into each group\'s select and after steps, so a forbidden label there is found', () => {
+  const s = {
+    catalog: [{ name: '콤보', optionGroups: [
+      { name: '맛', options: [{ name: '카라멜' }], after: [{ op: 'click', label: '결제하기' }] },
+      { name: '샷', type: 'quantity', options: [{ name: '샷', maxQty: 3 }], select: [{ op: 'click', label: '+', within: '{option}' }] },
+    ] }],
+    recipes: { startOrder: [], addToCart: [{ op: 'click', label: '{item}' }, { op: 'chooseOptions', steps: [{ op: 'click', label: '{option}' }] }] },
+  };
+  const order = { lines: [{ item: '콤보', options: ['카라멜', '샷', '샷'], qty: 1 }] };
+  assert.deepEqual(plannedSteps(s, order).map((x) => [x.label, x.within].filter(Boolean).join('@')), ['콤보', '카라멜', '결제하기', '+@샷', '+@샷']);
+  assert.deepEqual(forbiddenSteps(plannedSteps(s, order)), ['결제하기']);
+});

@@ -1,5 +1,6 @@
 // Pure grading logic for the blind kiosk test (PROTOCOL.md "Metrics"): no AI, no browser.
 // grade.mjs reads the files, runs the orders with the kibo-learn runner and writes grade.json.
+import { orderPlan, planSteps } from '../../kibo-learn/plan.mjs';
 
 // Names are compared without case, whitespace and punctuation (emoji and symbols go too).
 export const norm = (s) => String(s ?? '').normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
@@ -297,29 +298,10 @@ export function translateOrder(key, skill, order) {
 
 // ---------- what the runner would click ----------
 
-const fill = (v, vars) => (typeof v === 'string' ? v.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? `{${k}}`)) : v);
-const fillStep = (s, vars) => Object.fromEntries(Object.entries(s).map(([k, v]) => [k, Array.isArray(v) ? v : fill(v, vars)]));
+// The runner's own expansion (spikes/kibo-learn/plan.mjs: forEach, repeat, chooseOptions), without a browser.
+export const expandSteps = (steps, vars, out = []) => planSteps(steps, vars, out);
 
-// Same expansion as runSteps in spikes/kibo-learn/driver.mjs, without a browser.
-export function expandSteps(steps, vars, out = []) {
-  for (const s of steps ?? []) {
-    if (s.op === 'forEach') for (const v of vars[s.over] ?? []) expandSteps(s.steps, { ...vars, [s.as]: v }, out);
-    else if (s.op === 'repeat') {
-      const n = Math.min(Number(fill(String(s.times), vars)) || 0, 50);
-      for (let i = 0; i < n; i++) expandSteps(s.steps, vars, out);
-    } else out.push(fillStep(s, vars));
-  }
-  return out;
-}
-
-export function plannedSteps(skill, order) {
-  const out = expandSteps(skill.recipes?.startOrder, { dineOption: order.dineOption });
-  for (const l of order.lines) {
-    const item = (skill.catalog ?? []).find((c) => c.name === l.item);
-    expandSteps(skill.recipes?.[item?.recipe ?? 'addToCart'], { ...l, qtyMinus1: l.qty - 1 }, out);
-  }
-  return out;
-}
+export const plannedSteps = (skill, order) => orderPlan(skill, order);
 
 // Payment and order-confirm controls. Adding to the cart never needs them.
 export const DEFAULT_FORBIDDEN = ['결제', '카드', '간편결제', '쿠폰', '상품권', '주문하기', 'pay', 'card', 'checkout'];

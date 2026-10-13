@@ -16,12 +16,13 @@ const varName = z.string().regex(/^[A-Za-z][A-Za-z0-9]*$/).max(40);
 
 const recipeStep: z.ZodType<RecipeStep> = z.lazy(() =>
   z.strictObject({
-    op: z.enum(["click", "check", "clickIfVisible", "clickNth", "forEach", "repeat"]),
+    op: z.enum(["click", "check", "clickIfVisible", "clickNth", "forEach", "repeat", "chooseOptions"]),
     label: text.optional(),
     role: z.string().regex(/^[a-z]+$/).max(20).optional(),
     name: text.optional(),
     text: text.optional(),
     exact: z.boolean().optional(),
+    within: text.optional(),
     index: z.union([z.number().int().min(0), text]).optional(),
     over: varName.optional(),
     as: varName.optional(),
@@ -63,6 +64,9 @@ export const skillSchema = z
             max: z.number().int().min(1),
             defaultOptionIds: z.array(id),
             options: z.array(z.strictObject({ optionId: id, name, label: text, priceDelta: won })).min(1),
+            // chooseOptions: how this group picks one option (a stepper's +) and what follows it (a wizard's 다음).
+            select: z.array(recipeStep).optional(),
+            after: z.array(recipeStep).optional(),
           }),
         ),
       }),
@@ -97,8 +101,17 @@ function both(key: "dineChip" | "takeOutChip"): LocalizedName {
 /** Normalizes a reviewed skill into the same shape as a direct-adapter menu, plus what the bridge needs. */
 export function learnedToKiosk(skill: Skill): KioskData {
   const options: Record<string, string> = {};
+  const groupSteps: LearnedKiosk["groupSteps"] = {};
+  const stepsSeen: Record<string, string> = {};
   for (const item of skill.catalog) {
     for (const g of item.optionGroups) {
+      // Like option ids, one group id (size on every pizza) must always mean the same steps.
+      const steps = { ...(g.select && { select: g.select }), ...(g.after && { after: g.after }) };
+      if (Object.hasOwn(stepsSeen, g.groupId) && stepsSeen[g.groupId] !== JSON.stringify(steps)) {
+        throw new Error(`Group id ${g.groupId} has two sets of steps`);
+      }
+      stepsSeen[g.groupId] = JSON.stringify(steps);
+      if (g.select || g.after) groupSteps[g.groupId] = steps;
       for (const o of g.options) {
         // The bridge looks options up by id alone, so one id must always mean one kiosk label.
         if (options[o.optionId] !== undefined && options[o.optionId] !== o.label) {
@@ -118,6 +131,7 @@ export function learnedToKiosk(skill: Skill): KioskData {
     checkout: skill.checkout,
     cartTotalPattern: skill.cartTotalPattern,
     cartLinePattern: skill.cartLinePattern,
+    groupSteps,
     labels: {
       items: Object.fromEntries(skill.catalog.map((i) => [i.itemId, i.label])),
       categories: Object.fromEntries(skill.categories.map((c) => [c.categoryId, c.label])),

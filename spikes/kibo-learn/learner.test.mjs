@@ -10,22 +10,39 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 
-function runLearner({ maxTurns, fail, calls, maxInputTokens, timeout = 120_000 }) {
+function runLearner({ maxTurns, fail, calls, defaultCall, maxInputTokens, kiosk = 'kiosk/index.html', trace = false, env = {}, timeout = 120_000 }) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'kibo-learner-'));
-  fs.writeFileSync(path.join(dir, 'gcloud'), '#!/bin/sh\necho fake-token\n', { mode: 0o755 });
+  // Each call of the fake gcloud prints a new token: fake-token-1, fake-token-2, …
+  fs.writeFileSync(path.join(dir, 'gcloud'), '#!/bin/sh\necho x >> "$GCLOUD_LOG"\necho "fake-token-$(wc -l < "$GCLOUD_LOG" | tr -d \' \')"\n', { mode: 0o755 });
   const log = path.join(dir, 'requests.jsonl');
+  const gcloudLog = path.join(dir, 'gcloud.log');
+  const traceDir = path.join(dir, 'trace');
   const r = spawnSync(process.execPath, ['--import', pathToFileURL(path.join(here, 'fake_vertex.mjs')).href, path.join(here, 'learner.mjs')], {
     cwd: dir, encoding: 'utf8', timeout,
     env: { ...process.env, PATH: `${dir}:${process.env.PATH}`, PROVIDER: 'gemini', MAX_TURNS: String(maxTurns),
-      MAX_INPUT_TOKENS: String(maxInputTokens ?? 2_000_000),
-      KIOSK_URL: pathToFileURL(path.join(here, 'kiosk/index.html')).href, FAKE_VERTEX_LOG: log, FAKE_VERTEX_FAIL: fail ?? '',
-      FAKE_VERTEX_CALLS: JSON.stringify(calls ?? {}) },
+      MAX_INPUT_TOKENS: String(maxInputTokens ?? 2_000_000), GCLOUD_LOG: gcloudLog,
+      KIOSK_URL: pathToFileURL(path.join(here, kiosk)).href, FAKE_VERTEX_LOG: log, FAKE_VERTEX_FAIL: fail ?? '',
+      FAKE_VERTEX_CALLS: JSON.stringify(calls ?? {}), FAKE_VERTEX_DEFAULT: defaultCall ? JSON.stringify(defaultCall) : '',
+      ...(trace ? { TRACE_DIR: traceDir } : {}), ...env },
   });
   const requests = fs.existsSync(log) ? fs.readFileSync(log, 'utf8').trim().split('\n').map((l) => JSON.parse(l)) : [];
   const statsPath = path.join(dir, 'learn-stats.json');
   const stats = fs.existsSync(statsPath) ? JSON.parse(fs.readFileSync(statsPath, 'utf8')) : null;
+  const gcloudCalls = fs.existsSync(gcloudLog) ? fs.readFileSync(gcloudLog, 'utf8').trim().split('\n').length : 0;
+  const traceFiles = fs.existsSync(traceDir)
+    ? Object.fromEntries(fs.readdirSync(traceDir).map((f) => [f, fs.readFileSync(path.join(traceDir, f))])) : null;
   fs.rmSync(dir, { recursive: true, force: true });
-  return { r, requests, stats };
+  return { r, requests, stats, gcloudCalls, traceFiles };
+}
+
+// Width of a baseline or progressive JPEG, from its SOF0/SOF2 segment.
+function jpegWidth(buf) {
+  for (let i = 2; i < buf.length;) {
+    const marker = buf[i + 1];
+    if (marker === 0xc0 || marker === 0xc2) return buf.readUInt16BE(i + 7);
+    i += 2 + buf.readUInt16BE(i + 2);
+  }
+  return null;
 }
 
 test('I-185: the "Stop exploring" nudge never makes Vertex refuse the next request', () => {
@@ -85,4 +102,91 @@ test('the input-token cap stops the run and the process exits', () => {
   assert.equal(r.error?.code, undefined, 'the learner hung and was killed by the test timeout');
   assert.equal(r.status, 0, r.stderr);
   assert.equal(stats.turns, 3, 'three requests of 10 input tokens pass the cap of 25');
+});
+
+test('I-188: a 401 fetches a new access token and retries once, and cached tokens are counted', () => {
+  const { r, requests, stats, gcloudCalls } = runLearner({ maxTurns: 4, fail: '401@2' });
+  assert.equal(r.status, 0, r.stderr);
+  assert.match(r.stderr, /HTTP 401, fetching a new access token/);
+  assert.equal(stats.turns, 4);
+  assert.equal(requests.length, 5, 'four turns plus one retried request');
+  assert.equal(gcloudCalls, 2);
+  assert.equal(requests[1].auth, 'Bearer fake-token-1');
+  assert.equal(requests[2].auth, 'Bearer fake-token-2', 'the retry carries the new token');
+  assert.equal(stats.cachedInputTokens, 4 * 4, 'usageMetadata.cachedContentTokenCount of every answered turn');
+});
+
+test('I-188: the access token is fetched again once it is older than TOKEN_MAX_AGE_MS', () => {
+  const { r, gcloudCalls } = runLearner({ maxTurns: 3, defaultCall: { name: 'snapshot', args: {} }, env: { TOKEN_MAX_AGE_MS: '1' } });
+  assert.equal(r.status, 0, r.stderr);
+  assert.ok(gcloudCalls >= 3, `gcloud was called ${gcloudCalls} times`);
+});
+
+test('token budget: between pruning turns each request only adds to the end of the last one', () => {
+  const { r, requests } = runLearner({ maxTurns: 13, defaultCall: { name: 'snapshot', args: {} } });
+  assert.equal(r.status, 0, r.stderr);
+  for (const q of requests.slice(1)) {
+    const prev = requests[q.n - 2];
+    if (q.n % 4 !== 0) assert.equal(q.prefix, prev.full, `request ${q.n} changed the history it was sent before`);
+  }
+  assert.notEqual(requests[7].prefix, requests[6].full, 'turn 8 prunes old screens');
+  assert.ok(requests[12].length < requests[11].length + 1500, 'old trees are dropped, so requests stop growing by whole screens');
+});
+
+const START = '화면을 터치하여 주문을 시작하세요';
+const traceCalls = {
+  1: { name: 'act', args: { steps: [{ op: 'click', label: START }, { op: 'click', label: '🍽 먹고 갈게요' }] } },
+  2: { name: 'record', args: { kind: 'item', data: JSON.stringify([{ name: '마르게리따', category: '피자', optionGroups: [{ name: '사이즈' }, { name: '도우' }] }, { name: '콜라', category: '음료', optionGroups: [] }]) } },
+  3: { name: 'records', args: {} },
+};
+
+test('trace: TRACE_DIR writes a JSON and a 720 px JPEG per turn, with no prompt or token, and changes no request', () => {
+  const plain = runLearner({ maxTurns: 3, calls: traceCalls });
+  const traced = runLearner({ maxTurns: 3, calls: traceCalls, trace: true });
+  assert.equal(traced.r.status, 0, traced.r.stderr);
+  assert.equal(plain.traceFiles, null);
+  assert.deepEqual(traced.requests.map((q) => q.full), plain.requests.map((q) => q.full), 'the trace changed what the model was sent');
+  const f = traced.traceFiles;
+  assert.deepEqual(Object.keys(f).sort(), ['trace.json', 'turn-1.jpg', 'turn-1.json', 'turn-2.jpg', 'turn-2.json', 'turn-3.jpg', 'turn-3.json']);
+  for (const n of [1, 2, 3]) assert.equal(jpegWidth(f[`turn-${n}.jpg`]), 720);
+  const turn = (n) => JSON.parse(f[`turn-${n}.json`]);
+  assert.equal(turn(1).tool, 'act');
+  assert.deepEqual(turn(1).args, { steps: [{ op: 'click', label: START }, { op: 'click', label: '🍽 먹고 갈게요' }] });
+  assert.equal(turn(1).resultSummary, `tapped ${START} → 🍽 먹고 갈게요`);
+  assert.equal(turn(2).resultSummary, 'recorded item 마르게리따, 콜라');
+  assert.deepEqual(turn(2).discoveries, { items: 2, optionGroups: 2, categories: 2 });
+  assert.equal(turn(3).resultSummary, 'listed 2 items, 0 facts');
+  assert.deepEqual([turn(1).inputTokens, turn(1).outputTokens], [10, 1]);
+  const header = JSON.parse(f['trace.json']);
+  assert.equal(header.kioskId, 'kiosk');
+  assert.equal(header.model, 'gemini-3.8-flash');
+  assert.ok(header.startedAt && header.endedAt);
+  assert.deepEqual(header.gate, { tests: 0, testsPassedForFinish: false, audits: 0, auditOk: null, finished: false });
+  const all = Object.entries(f).filter(([k]) => k.endsWith('.json')).map(([, v]) => String(v)).join('\n');
+  assert.doesNotMatch(all, /KIBO Kiosk Learner|fake-token|Learn this kiosk|TAPPABLE LABELS/);
+});
+
+const stepperSkill = JSON.parse(fs.readFileSync(path.join(here, 'fixtures/patterns/stepper.skill.json'), 'utf8'));
+const order = (lines) => ({ lines: lines.map(([item, options, qty = 1]) => ({ category: '메뉴', item, options, qty })) });
+const testCall = (skill, orders) => ({ name: 'testSkill', args: { skillJson: JSON.stringify(skill), ordersJson: JSON.stringify(orders) } });
+
+test('pattern 4: orders from several testSkill calls count for the same exact skill', () => {
+  const { r, stats } = runLearner({ maxTurns: 3, kiosk: 'fixtures/patterns/stepper.html', calls: {
+    1: testCall(stepperSkill, [order([['스콘', []]])]),
+    2: testCall(stepperSkill, [order([['라떼', ['HOT']]]), order([['라떼', ['ICED', '에스프레소 샷', '에스프레소 샷']], ['스콘', [], 2]])]),
+    3: { name: 'finish', args: { skillJson: JSON.stringify(stepperSkill) } },
+  } });
+  assert.equal(r.status, 0, r.stderr);
+  assert.equal(stats.finished, true, r.stdout);
+});
+
+test('pattern 4: a changed skill starts the count again, so finish is refused', () => {
+  const changed = { ...stepperSkill, notes: ['changed'] };
+  const { r, stats } = runLearner({ maxTurns: 3, kiosk: 'fixtures/patterns/stepper.html', calls: {
+    1: testCall(stepperSkill, [order([['스콘', []]]), order([['라떼', ['HOT']]])]),
+    2: testCall(changed, [order([['스콘', [], 2]])]),
+    3: { name: 'finish', args: { skillJson: JSON.stringify(changed) } },
+  } });
+  assert.equal(r.status, 0, r.stderr);
+  assert.equal(stats.finished, false);
 });

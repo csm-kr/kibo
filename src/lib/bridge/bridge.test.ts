@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
+import doughhouseRaw from "../../../skills/doughhouse.json";
 import { getKiosk } from "@/lib/adapters/catalog";
+import { learnedToKiosk, skillSchema } from "@/lib/adapters/learned";
 import type { CartLine, PendingBridgeCommand, Session } from "@/types/session";
 import { BridgeError, changeVars, createBridge, expectedLines } from "./bridge";
 
@@ -72,6 +74,27 @@ describe("changeVars", () => {
     expect(out).toMatchObject({ commandId: "c1", ok: false });
     for (const e of els) expect(e.click).not.toHaveBeenCalled();
     expect(send).toHaveBeenCalledWith(expect.objectContaining({ type: "bridgeReport", args: expect.objectContaining({ ok: false }) }));
+  });
+
+  it("gives a chooseOptions recipe the chosen labels per group with the group's select and after steps", () => {
+    const raw = structuredClone(doughhouseRaw) as unknown as {
+      recipes: Record<string, unknown[]>;
+      catalog: { itemId: string; optionGroups: { groupId: string }[] }[];
+    };
+    raw.recipes.addToCart = [{ op: "click", label: "{item}" }, { op: "chooseOptions", steps: [{ op: "click", label: "{option}" }] }];
+    // One group id means the same steps on every item.
+    for (const g of raw.catalog.flatMap((i) => i.optionGroups)) {
+      if (g.groupId === "size") Object.assign(g, { after: [{ op: "click", label: "다음" }] });
+      if (g.groupId === "toppings") Object.assign(g, { select: [{ op: "click", label: "+", within: "{option}" }] });
+    }
+    const chooser = learnedToKiosk(skillSchema.parse(raw));
+    expect(
+      changeVars(chooser, { type: "addToCart", args: { itemId: "pepperoni", selections: { toppings: ["olive"], size: ["large"] } } }).vars.groups,
+    ).toEqual([
+      { options: ["라지"], after: [{ op: "click", label: "다음" }] },
+      { options: [] },
+      { options: ["올리브"], select: [{ op: "click", label: "+", within: "{option}" }] },
+    ]);
   });
 
   it("refuses a direct kiosk", () => {

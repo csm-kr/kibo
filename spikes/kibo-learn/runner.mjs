@@ -1,8 +1,9 @@
 // Replays a learned kiosk skill with no LLM in the loop, then checks the kiosk's own cart.
 import fs from 'node:fs';
 import { openKiosk, runSteps, snapshot } from './driver.mjs';
+import { isForbidden, lineVars, orderPlan } from './plan.mjs';
 
-// order: { dineOption, lines: [{ category, item, options: [], qty }] }
+// order: { dineOption, lines: [{ category, item, options: [], qty }] }. A quantity option is repeated in options.
 export function expectedTotal(skill, order) {
   let total = 0;
   for (const l of order.lines) {
@@ -16,13 +17,22 @@ export function expectedTotal(skill, order) {
 }
 
 export async function runOrder(skill, order) {
+  // The whole plan is checked before the kiosk opens: an order never goes near payment (pattern 3).
+  let bad;
+  try {
+    bad = orderPlan(skill, order).map((s) => [s.label, s.name, s.text].find((t) => t && isForbidden(t, skill.forbiddenLabels))).filter(Boolean);
+  } catch (e) {
+    return { ok: false, error: `refused before any click: ${e.message}` };
+  }
+  if (bad.length) return { ok: false, error: `refused before any click: the plan clicks a forbidden label: ${bad.join(', ')}` };
+  const opts = { forbidden: skill.forbiddenLabels };
   const { browser, page, alerts } = await openKiosk();
   const t0 = Date.now();
   try {
-    await runSteps(page, skill.recipes.startOrder, { dineOption: order.dineOption });
+    await runSteps(page, skill.recipes.startOrder, { dineOption: order.dineOption }, opts);
     for (const l of order.lines) {
       const item = skill.catalog.find((c) => c.name === l.item);
-      await runSteps(page, skill.recipes[item?.recipe ?? 'addToCart'], { ...l, qtyMinus1: l.qty - 1 });
+      await runSteps(page, skill.recipes[item?.recipe ?? 'addToCart'], lineVars(skill, l), opts);
     }
     const snap = await snapshot(page, alerts);
     const shown = Number((snap.match(new RegExp(skill.cartTotalPattern)) ?? [])[1]?.replace(/,/g, ''));

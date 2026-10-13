@@ -1,0 +1,5 @@
+FAIL {"handExpected":58400,"error":"nothing matches {\"op\":\"click\",\"role\":\"radio\",\"name\":\"베이컨\"} on this screen"}
+PASS {"shown":13200,"expectedBySkill":13200,"handExpected":13200,"ms":984}
+FAIL {"handExpected":23400,"error":"locator.click: Timeout 3000ms exceeded."}
+FAIL {"handExpected":18300,"error":"nothing matches {\"op\":\"click\",\"role\":\"radio\",\"name\":\"올리브\"} on this screen"}
+DETECTED {"handExpected":"mismatch","error":"nothing matches {\"op\":\"click\",\"role\":\"radio\",\"name\":\"베이컨\"} on this screen"}

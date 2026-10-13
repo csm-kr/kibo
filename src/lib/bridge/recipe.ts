@@ -5,7 +5,14 @@ import { clickables, findByLabel } from "./labels";
 // Replays a skill recipe on the kiosk page without AI (ADR-007). planSteps is pure: placeholders, loops and the
 // forbidden-label check all happen before the first click. runPlan clicks one located target per step.
 
-export type Vars = Record<string, string | number | string[]>;
+/** One option group of the line's item for chooseOptions: the chosen kiosk labels and the group's own steps. */
+export interface PlanGroup {
+  options: string[];
+  select?: RecipeStep[];
+  after?: RecipeStep[];
+}
+
+export type Vars = Record<string, string | number | string[] | PlanGroup[]>;
 
 export interface PlainStep {
   op: "click" | "check" | "clickIfVisible" | "clickNth";
@@ -15,6 +22,7 @@ export interface PlainStep {
   text?: string;
   exact?: boolean;
   index?: number;
+  within?: string;
 }
 
 export class RecipeError extends Error {
@@ -45,14 +53,24 @@ function count(v: number | string | undefined, vars: Vars): number {
   return n;
 }
 
-/** Expands forEach, repeat and {placeholders}; refuses any step aimed at a forbidden (payment) label. */
+/** Expands forEach, repeat, chooseOptions and {placeholders}; refuses any step aimed at a forbidden (payment) label. */
 export function planSteps(steps: RecipeStep[], vars: Vars, forbidden: string[]): PlainStep[] {
   const out: PlainStep[] = [];
   for (const s of steps) {
+    if (s.op === "chooseOptions") {
+      const groups = vars.groups;
+      if (!Array.isArray(groups) || !s.steps) throw new RecipeError("Bad chooseOptions step");
+      for (const g of groups as PlanGroup[]) {
+        for (const option of g.options) out.push(...planSteps(g.select ?? s.steps, { ...vars, option }, forbidden));
+        out.push(...planSteps(g.after ?? [], vars, forbidden));
+      }
+      continue;
+    }
     if (s.op === "forEach") {
       const list = s.over ? vars[s.over] : undefined;
-      if (!Array.isArray(list) || !s.as || !s.steps) throw new RecipeError("Bad forEach step");
-      for (const v of list) out.push(...planSteps(s.steps, { ...vars, [s.as]: v }, forbidden));
+      // A list of labels; the groups of chooseOptions are not something to loop over.
+      if (!Array.isArray(list) || list.some((v) => typeof v !== "string") || !s.as || !s.steps) throw new RecipeError("Bad forEach step");
+      for (const v of list as string[]) out.push(...planSteps(s.steps, { ...vars, [s.as]: v }, forbidden));
       continue;
     }
     if (s.op === "repeat") {
@@ -67,6 +85,7 @@ export function planSteps(steps: RecipeStep[], vars: Vars, forbidden: string[]):
     if (s.name !== undefined) step.name = fill(s.name, vars);
     if (s.text !== undefined) step.text = fill(s.text, vars);
     if (s.exact !== undefined) step.exact = s.exact;
+    if (s.within !== undefined) step.within = fill(s.within, vars);
     if (s.op === "clickNth") step.index = count(s.index, vars);
     if (!step.label && !(step.role && step.name) && !step.text) throw new RecipeError("Step has no target");
     for (const t of [step.label, step.name, step.text]) {
@@ -97,8 +116,28 @@ function matches(have: string, want: string, exact: boolean | undefined): boolea
   return exact ? have.trim() === want : have.includes(want);
 }
 
+/**
+ * The targets whose closest ancestor (or the element itself) holding `within` is nearest: the + in the shot's own
+ * row, not the syrup's. None when no ancestor holds it. Same rule as the learner's driver (spikes/kibo-learn).
+ */
+export function nearestWithin(found: Target[], within: string): Target[] {
+  const distance = (el: HTMLElement) => {
+    let d = 0;
+    for (let a: HTMLElement | null = el; a; a = a.parentElement, d++) if ((a.innerText ?? "").includes(within)) return d;
+    return Infinity;
+  };
+  const ds = found.map((t) => distance(t.el));
+  const min = Math.min(...ds);
+  return min === Infinity ? [] : found.filter((_, i) => ds[i] === min);
+}
+
 /** Every element the step could mean, in page order. */
 function candidates(doc: Document, step: PlainStep): Target[] {
+  const all = allCandidates(doc, step);
+  return step.within === undefined ? all : nearestWithin(all, step.within);
+}
+
+function allCandidates(doc: Document, step: PlainStep): Target[] {
   if (step.label !== undefined) {
     return findByLabel(doc, step.label).map((el) => ({ el: el as HTMLElement, label: step.label!, text: textOf(el as HTMLElement) }));
   }

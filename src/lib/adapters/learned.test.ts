@@ -36,6 +36,19 @@ describe("skills/doughhouse.json", () => {
     for (const b of bad) expect(skillSchema.safeParse(b).success).toBe(false);
   });
 
+  it("accepts within, chooseOptions and a group's select and after steps (13-blind-kiosks:4), and passes them to the bridge", () => {
+    const steps = [{ op: "click", label: "+", within: "{option}" }];
+    const item = { ...skill.catalog[0], optionGroups: [{ ...skill.catalog[0].optionGroups[0], select: steps, after: [{ op: "click", label: "다음" }] }] };
+    const withSteps = { ...skill, catalog: [item], recipes: { ...skill.recipes, addToCart: [{ op: "chooseOptions", steps: [{ op: "click", label: "{option}" }] }] } };
+    const parsed = skillSchema.parse(withSteps);
+    expect(learnedToKiosk(parsed).learned?.groupSteps).toEqual({ [item.optionGroups[0].groupId]: { select: steps, after: [{ op: "click", label: "다음" }] } });
+    expect(learnedToKiosk(skill).learned?.groupSteps).toEqual({});
+    expect(skillSchema.safeParse({ ...withSteps, recipes: { addToCart: [{ op: "click", label: "+", within: "a\nb" }] } }).success).toBe(false);
+    // One group id on two items must mean the same steps, as one option id means one label.
+    const twice = skillSchema.parse({ ...withSteps, catalog: [item, skill.catalog[1]] });
+    expect(() => learnedToKiosk(twice)).toThrow(/two sets of steps/);
+  });
+
   it("uses only known labels in recipes: placeholders, uiLabels, category or dine labels", () => {
     const known = new Set([
       ...skill.uiLabels,

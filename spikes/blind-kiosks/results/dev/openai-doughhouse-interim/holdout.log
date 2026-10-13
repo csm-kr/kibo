@@ -1,0 +1,5 @@
+FAIL {"handExpected":58400,"error":"refused before any click: option not in the item: 베이컨"}
+PASS {"shown":13200,"expectedBySkill":13200,"handExpected":13200,"ms":1188}
+FAIL {"handExpected":23400,"error":"locator.click: Timeout 3000ms exceeded."}
+FAIL {"handExpected":18300,"error":"refused before any click: option not in the item: 올리브"}
+DETECTED {"handExpected":"mismatch","error":"refused before any click: option not in the item: 베이컨"}

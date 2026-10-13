@@ -1,0 +1,1905 @@
+{
+  "kioskId": "dev",
+  "label": "earlier-blind-sol2",
+  "gradedAt": "2026-10-13T14:31:13.938Z",
+  "skill": "present",
+  "files": {
+    "skill": "spikes/blind-kiosk/results/blind-sol2/skill.json",
+    "key": "spikes/blind-kiosks/grade/legacy/gureum/answer-key.json",
+    "app": "spikes/blind-kiosk/app/index.html"
+  },
+  "summary": "dev/earlier-blind-sol2: learning finished, 16.1 min, 159 turns, 2932197 input tokens; items 40/40 (precision 1), price 40/40, options exact 3/35 (openable 9/32); orders correct 2, safe refusal 2, unsafe 1 of 5 (cart lines read in 0)",
+  "learning": {
+    "provider": "openai",
+    "model": "gpt-6.1-sol",
+    "cachedInputTokens": 1030197,
+    "finished": true,
+    "turns": 159,
+    "acts": 106,
+    "tests": 2,
+    "inputTokens": 2932197,
+    "outputTokens": 46755,
+    "minutes": "16.1"
+  },
+  "catalog": {
+    "items": {
+      "key": 40,
+      "skill": 40,
+      "matched": 40,
+      "recall": 1,
+      "precision": 1,
+      "missing": [],
+      "extra": []
+    },
+    "price": {
+      "correct": 40,
+      "of": 40
+    },
+    "category": {
+      "correct": 40,
+      "of": 40
+    },
+    "soldOut": {
+      "correct": 39,
+      "of": 40
+    },
+    "options": {
+      "itemsExact": 3,
+      "items": 35,
+      "openableExact": 9,
+      "openable": 32,
+      "groups": 136,
+      "groupsFound": 112,
+      "groupLabelsExact": 90,
+      "groupRulesCorrect": 110,
+      "quantityGroups": 11,
+      "quantityRecognized": 0,
+      "conditionalGroups": 22,
+      "conditionalFound": 0
+    },
+    "perItem": [
+      {
+        "name": "밤 크림 라떼",
+        "skillName": "밤 크림 라떼",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "샷 추가 500",
+            "적게 0",
+            "보통 0",
+            "많이 0"
+          ],
+          "extra": [
+            "+ 500"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "홍시 스무디",
+        "skillName": "홍시 스무디",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [],
+          "extra": [
+            "HOT 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "애플 시나몬 티",
+        "skillName": "애플 시나몬 티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "적게 0",
+            "보통 0",
+            "많이 0"
+          ],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "아메리카노",
+        "skillName": "아메리카노",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "샷 추가 500",
+            "적게 0",
+            "보통 0",
+            "많이 0"
+          ],
+          "extra": [
+            "+ 500"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "카페라떼",
+        "skillName": "카페라떼",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "샷 추가 500",
+            "적게 0",
+            "보통 0",
+            "많이 0"
+          ],
+          "extra": [
+            "+ 500"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "바닐라라떼",
+        "skillName": "바닐라라떼",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "샷 추가 500",
+            "적게 0",
+            "보통 0",
+            "많이 0"
+          ],
+          "extra": [
+            "+ 500"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "카라멜 마키아토",
+        "skillName": "카라멜 마키아토",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "샷 추가 500",
+            "적게 0",
+            "보통 0",
+            "많이 0"
+          ],
+          "extra": [
+            "+ 500"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "카푸치노",
+        "skillName": "카푸치노",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "샷 추가 500"
+          ],
+          "extra": [
+            "ICED 0",
+            "+ 500"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "콜드브루",
+        "skillName": "콜드브루",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [],
+          "extra": [
+            "HOT 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "콜드브루 라떼",
+        "skillName": "콜드브루 라떼",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [],
+          "extra": [
+            "HOT 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "아인슈페너",
+        "skillName": "아인슈페너",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "ICED 0",
+            "다락 블렌드 0",
+            "디카페인 500",
+            "샷 추가 500",
+            "적게 0",
+            "보통 0",
+            "많이 0"
+          ],
+          "extra": []
+        }
+      },
+      {
+        "name": "카페모카",
+        "skillName": "카페모카",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "샷 추가 500",
+            "적게 0",
+            "보통 0",
+            "많이 0"
+          ],
+          "extra": [
+            "+ 500"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "에스프레소",
+        "skillName": "에스프레소",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "샷 추가 500"
+          ],
+          "extra": [
+            "ICED 0",
+            "+ 500"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "연유라떼",
+        "skillName": "연유라떼",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "샷 추가 500",
+            "적게 0",
+            "보통 0",
+            "많이 0"
+          ],
+          "extra": [
+            "+ 500"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "헤이즐넛 아메리카노",
+        "skillName": "헤이즐넛 아메리카노",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "샷 추가 500",
+            "적게 0",
+            "보통 0",
+            "많이 0"
+          ],
+          "extra": [
+            "+ 500"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "초코라떼",
+        "skillName": "초코라떼",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "적게 0",
+            "보통 0",
+            "많이 0"
+          ],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "녹차라떼",
+        "skillName": "녹차라떼",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "적게 0",
+            "보통 0",
+            "많이 0"
+          ],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "고구마라떼",
+        "skillName": "고구마라떼",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "HOT 0",
+            "레귤러 0",
+            "라지 700",
+            "일반 우유 0",
+            "저지방 우유 0",
+            "두유 500",
+            "오트밀크 600"
+          ],
+          "extra": []
+        }
+      },
+      {
+        "name": "딸기우유",
+        "skillName": "딸기우유",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [],
+          "extra": [
+            "HOT 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "얼그레이 티",
+        "skillName": "얼그레이 티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "적게 0",
+            "보통 0",
+            "많이 0"
+          ],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "캐모마일 티",
+        "skillName": "캐모마일 티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "적게 0",
+            "보통 0",
+            "많이 0"
+          ],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "유자차",
+        "skillName": "유자차",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "적게 0",
+            "보통 0",
+            "많이 0"
+          ],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "페퍼민트 티",
+        "skillName": "페퍼민트 티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [],
+          "extra": [
+            "ICED 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "레몬에이드",
+        "skillName": "레몬에이드",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [],
+          "extra": [
+            "HOT 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "자몽에이드",
+        "skillName": "자몽에이드",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [],
+          "extra": [
+            "HOT 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "청포도에이드",
+        "skillName": "청포도에이드",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [],
+          "extra": [
+            "HOT 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "딸기 요거트 스무디",
+        "skillName": "딸기 요거트 스무디",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [],
+          "extra": [
+            "HOT 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "망고 스무디",
+        "skillName": "망고 스무디",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [],
+          "extra": [
+            "HOT 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "버터 크루아상",
+        "skillName": "버터 크루아상",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "플레인 베이글",
+        "skillName": "플레인 베이글",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "소금빵",
+        "skillName": "소금빵",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "데워주세요 0",
+            "그대로 주세요 0"
+          ],
+          "extra": []
+        }
+      },
+      {
+        "name": "초코 머핀",
+        "skillName": "초코 머핀",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "뉴욕 치즈케이크",
+        "skillName": "뉴욕 치즈케이크",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "티라미수",
+        "skillName": "티라미수",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "마카롱 (3개입)",
+        "skillName": "마카롱 (3개입)",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "초코칩 쿠키",
+        "skillName": "초코칩 쿠키",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "브런치 세트",
+        "skillName": "브런치 세트",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [],
+          "extra": [
+            "다음 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "케이크 세트",
+        "skillName": "케이크 세트",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [],
+          "extra": [
+            "다음 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "투게더 세트",
+        "skillName": "투게더 세트",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "아메리카노 0",
+            "카페라떼 700",
+            "바닐라라떼 1200",
+            "얼그레이 티 300",
+            "HOT 0",
+            "ICED 0"
+          ],
+          "extra": [
+            "다음 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "모닝 세트",
+        "skillName": "모닝 세트",
+        "price": true,
+        "category": true,
+        "soldOut": false
+      }
+    ],
+    "perGroup": [
+      {
+        "item": "밤 크림 라떼",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "밤 크림 라떼",
+        "group": "sizeCoffee",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "밤 크림 라떼",
+        "group": "bean",
+        "found": true,
+        "skillGroup": "원두 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "밤 크림 라떼",
+        "group": "shot",
+        "found": true,
+        "skillGroup": "에스프레소 샷 추가",
+        "labelsExact": false,
+        "rules": true,
+        "quantity": false
+      },
+      {
+        "item": "밤 크림 라떼",
+        "group": "milk",
+        "found": true,
+        "skillGroup": "우유 변경",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "밤 크림 라떼",
+        "group": "whip",
+        "found": true,
+        "skillGroup": "휘핑크림",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "밤 크림 라떼",
+        "group": "ice",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "홍시 스무디",
+        "group": "tempIced",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "홍시 스무디",
+        "group": "sizeDrink",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "애플 시나몬 티",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "애플 시나몬 티",
+        "group": "honey",
+        "found": true,
+        "skillGroup": "꿀 추가",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "애플 시나몬 티",
+        "group": "ice",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "아메리카노",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "아메리카노",
+        "group": "sizeCoffee",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "아메리카노",
+        "group": "bean",
+        "found": true,
+        "skillGroup": "원두 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "아메리카노",
+        "group": "shot",
+        "found": true,
+        "skillGroup": "에스프레소 샷 추가",
+        "labelsExact": false,
+        "rules": true,
+        "quantity": false
+      },
+      {
+        "item": "아메리카노",
+        "group": "syrup",
+        "found": true,
+        "skillGroup": "시럽 추가",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "아메리카노",
+        "group": "ice",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "카페라떼",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카페라떼",
+        "group": "sizeCoffee",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카페라떼",
+        "group": "bean",
+        "found": true,
+        "skillGroup": "원두 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카페라떼",
+        "group": "shot",
+        "found": true,
+        "skillGroup": "에스프레소 샷 추가",
+        "labelsExact": false,
+        "rules": true,
+        "quantity": false
+      },
+      {
+        "item": "카페라떼",
+        "group": "milk",
+        "found": true,
+        "skillGroup": "우유 변경",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카페라떼",
+        "group": "syrup",
+        "found": true,
+        "skillGroup": "시럽 추가",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카페라떼",
+        "group": "ice",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "바닐라라떼",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "바닐라라떼",
+        "group": "sizeCoffee",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "바닐라라떼",
+        "group": "bean",
+        "found": true,
+        "skillGroup": "원두 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "바닐라라떼",
+        "group": "shot",
+        "found": true,
+        "skillGroup": "에스프레소 샷 추가",
+        "labelsExact": false,
+        "rules": true,
+        "quantity": false
+      },
+      {
+        "item": "바닐라라떼",
+        "group": "milk",
+        "found": true,
+        "skillGroup": "우유 변경",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "바닐라라떼",
+        "group": "syrup",
+        "found": true,
+        "skillGroup": "시럽 추가",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "바닐라라떼",
+        "group": "ice",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "카라멜 마키아토",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카라멜 마키아토",
+        "group": "sizeCoffee",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카라멜 마키아토",
+        "group": "bean",
+        "found": true,
+        "skillGroup": "원두 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카라멜 마키아토",
+        "group": "shot",
+        "found": true,
+        "skillGroup": "에스프레소 샷 추가",
+        "labelsExact": false,
+        "rules": true,
+        "quantity": false
+      },
+      {
+        "item": "카라멜 마키아토",
+        "group": "milk",
+        "found": true,
+        "skillGroup": "우유 변경",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카라멜 마키아토",
+        "group": "syrup",
+        "found": true,
+        "skillGroup": "시럽 추가",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카라멜 마키아토",
+        "group": "ice",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "카푸치노",
+        "group": "tempHot",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "카푸치노",
+        "group": "sizeCoffee",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카푸치노",
+        "group": "bean",
+        "found": true,
+        "skillGroup": "원두 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카푸치노",
+        "group": "shot",
+        "found": true,
+        "skillGroup": "에스프레소 샷 추가",
+        "labelsExact": false,
+        "rules": true,
+        "quantity": false
+      },
+      {
+        "item": "카푸치노",
+        "group": "milk",
+        "found": true,
+        "skillGroup": "우유 변경",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카푸치노",
+        "group": "syrup",
+        "found": true,
+        "skillGroup": "시럽 추가",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "콜드브루",
+        "group": "tempIced",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "콜드브루",
+        "group": "sizeCoffee",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "콜드브루",
+        "group": "syrup",
+        "found": true,
+        "skillGroup": "시럽 추가",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "콜드브루",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음 양",
+        "labelsExact": true,
+        "rules": true,
+        "conditional": false
+      },
+      {
+        "item": "콜드브루 라떼",
+        "group": "tempIced",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "콜드브루 라떼",
+        "group": "sizeCoffee",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "콜드브루 라떼",
+        "group": "milk",
+        "found": true,
+        "skillGroup": "우유 변경",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "콜드브루 라떼",
+        "group": "syrup",
+        "found": true,
+        "skillGroup": "시럽 추가",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "콜드브루 라떼",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음 양",
+        "labelsExact": true,
+        "rules": true,
+        "conditional": false
+      },
+      {
+        "item": "아인슈페너",
+        "group": "tempIced",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "아인슈페너",
+        "group": "bean",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "아인슈페너",
+        "group": "shot",
+        "found": false,
+        "skillGroup": null,
+        "quantity": false
+      },
+      {
+        "item": "아인슈페너",
+        "group": "ice",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "카페모카",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카페모카",
+        "group": "sizeCoffee",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카페모카",
+        "group": "bean",
+        "found": true,
+        "skillGroup": "원두 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카페모카",
+        "group": "shot",
+        "found": true,
+        "skillGroup": "에스프레소 샷 추가",
+        "labelsExact": false,
+        "rules": true,
+        "quantity": false
+      },
+      {
+        "item": "카페모카",
+        "group": "milk",
+        "found": true,
+        "skillGroup": "우유 변경",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카페모카",
+        "group": "whip",
+        "found": true,
+        "skillGroup": "휘핑크림",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카페모카",
+        "group": "ice",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "에스프레소",
+        "group": "tempHot",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "에스프레소",
+        "group": "bean",
+        "found": true,
+        "skillGroup": "원두 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "에스프레소",
+        "group": "shot",
+        "found": true,
+        "skillGroup": "에스프레소 샷 추가",
+        "labelsExact": false,
+        "rules": true,
+        "quantity": false
+      },
+      {
+        "item": "연유라떼",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "연유라떼",
+        "group": "sizeCoffee",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "연유라떼",
+        "group": "bean",
+        "found": true,
+        "skillGroup": "원두 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "연유라떼",
+        "group": "shot",
+        "found": true,
+        "skillGroup": "에스프레소 샷 추가",
+        "labelsExact": false,
+        "rules": true,
+        "quantity": false
+      },
+      {
+        "item": "연유라떼",
+        "group": "milk",
+        "found": true,
+        "skillGroup": "우유 변경",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "연유라떼",
+        "group": "ice",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "헤이즐넛 아메리카노",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "헤이즐넛 아메리카노",
+        "group": "sizeCoffee",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "헤이즐넛 아메리카노",
+        "group": "bean",
+        "found": true,
+        "skillGroup": "원두 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "헤이즐넛 아메리카노",
+        "group": "shot",
+        "found": true,
+        "skillGroup": "에스프레소 샷 추가",
+        "labelsExact": false,
+        "rules": true,
+        "quantity": false
+      },
+      {
+        "item": "헤이즐넛 아메리카노",
+        "group": "syrup",
+        "found": true,
+        "skillGroup": "시럽 추가",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "헤이즐넛 아메리카노",
+        "group": "ice",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "초코라떼",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "초코라떼",
+        "group": "sizeDrink",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "초코라떼",
+        "group": "milk",
+        "found": true,
+        "skillGroup": "우유 변경",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "초코라떼",
+        "group": "whip",
+        "found": true,
+        "skillGroup": "휘핑크림",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "초코라떼",
+        "group": "ice",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "녹차라떼",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "녹차라떼",
+        "group": "sizeDrink",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "녹차라떼",
+        "group": "milk",
+        "found": true,
+        "skillGroup": "우유 변경",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "녹차라떼",
+        "group": "ice",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "고구마라떼",
+        "group": "tempHot",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "고구마라떼",
+        "group": "sizeDrink",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "고구마라떼",
+        "group": "milk",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "딸기우유",
+        "group": "tempIced",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "딸기우유",
+        "group": "sizeDrink",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "딸기우유",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음 양",
+        "labelsExact": true,
+        "rules": true,
+        "conditional": false
+      },
+      {
+        "item": "얼그레이 티",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "얼그레이 티",
+        "group": "honey",
+        "found": true,
+        "skillGroup": "꿀 추가",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "얼그레이 티",
+        "group": "ice",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "캐모마일 티",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "캐모마일 티",
+        "group": "honey",
+        "found": true,
+        "skillGroup": "꿀 추가",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "캐모마일 티",
+        "group": "ice",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "유자차",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "유자차",
+        "group": "ice",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "페퍼민트 티",
+        "group": "tempHot",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "페퍼민트 티",
+        "group": "honey",
+        "found": true,
+        "skillGroup": "꿀 추가",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "레몬에이드",
+        "group": "tempIced",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "레몬에이드",
+        "group": "sizeDrink",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "레몬에이드",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음 양",
+        "labelsExact": true,
+        "rules": true,
+        "conditional": false
+      },
+      {
+        "item": "자몽에이드",
+        "group": "tempIced",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "자몽에이드",
+        "group": "sizeDrink",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "자몽에이드",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음 양",
+        "labelsExact": true,
+        "rules": true,
+        "conditional": false
+      },
+      {
+        "item": "청포도에이드",
+        "group": "tempIced",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "청포도에이드",
+        "group": "sizeDrink",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "청포도에이드",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음 양",
+        "labelsExact": true,
+        "rules": true,
+        "conditional": false
+      },
+      {
+        "item": "딸기 요거트 스무디",
+        "group": "tempIced",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "딸기 요거트 스무디",
+        "group": "sizeDrink",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "딸기 요거트 스무디",
+        "group": "whip",
+        "found": true,
+        "skillGroup": "휘핑크림",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "망고 스무디",
+        "group": "tempIced",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "망고 스무디",
+        "group": "sizeDrink",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "버터 크루아상",
+        "group": "warm",
+        "found": true,
+        "skillGroup": "데우기",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "플레인 베이글",
+        "group": "warm",
+        "found": true,
+        "skillGroup": "데우기",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "플레인 베이글",
+        "group": "creamcheese",
+        "found": true,
+        "skillGroup": "토핑 추가",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "소금빵",
+        "group": "warm",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "초코 머핀",
+        "group": "warm",
+        "found": true,
+        "skillGroup": "데우기",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "브런치 세트",
+        "group": "set1_s1",
+        "found": true,
+        "skillGroup": "음료 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "브런치 세트",
+        "group": "set1_s1_temp",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "브런치 세트",
+        "group": "set1_s2",
+        "found": true,
+        "skillGroup": "베이커리 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "브런치 세트",
+        "group": "set1_s2_warm",
+        "found": true,
+        "skillGroup": "데우기",
+        "labelsExact": true,
+        "rules": true,
+        "conditional": false
+      },
+      {
+        "item": "케이크 세트",
+        "group": "set2_s1",
+        "found": true,
+        "skillGroup": "음료 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "케이크 세트",
+        "group": "set2_s1_temp",
+        "found": true,
+        "skillGroup": "온도 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "케이크 세트",
+        "group": "set2_s2",
+        "found": true,
+        "skillGroup": "케이크 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "투게더 세트",
+        "group": "set3_s1",
+        "found": true,
+        "skillGroup": "음료 선택 (두 잔, 순서대로)",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "투게더 세트",
+        "group": "set3_s1_temp",
+        "found": true,
+        "skillGroup": "온도 선택 (각 음료)",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "투게더 세트",
+        "group": "set3_s2",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "투게더 세트",
+        "group": "set3_s2_temp",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "투게더 세트",
+        "group": "set3_s3",
+        "found": true,
+        "skillGroup": "디저트 선택",
+        "labelsExact": true,
+        "rules": true
+      }
+    ]
+  },
+  "orders": {
+    "total": 5,
+    "correct": 2,
+    "safeRefusal": 2,
+    "unsafe": 1,
+    "linesChecked": 0,
+    "results": [
+      {
+        "id": "e1",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": false,
+        "expectedTotal": 9400,
+        "kioskTotal": 9400,
+        "skillPredicts": 9400,
+        "ms": 1361,
+        "totalCannotSee": [
+          "아메리카노 › ICED",
+          "아메리카노 › 바닐라 시럽",
+          "아메리카노 › 헤이즐넛 시럽"
+        ],
+        "order": {
+          "dineOption": "매장",
+          "lines": [
+            {
+              "category": "커피",
+              "item": "아메리카노",
+              "options": [
+                "ICED",
+                "라지",
+                "바닐라 시럽",
+                "헤이즐넛 시럽"
+              ],
+              "qty": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "e2",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 카페라떼 › 샷 추가",
+        "linesChecked": null,
+        "expectedTotal": 6000,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "카페라떼 › ICED"
+        ],
+        "order": null
+      },
+      {
+        "id": "e3",
+        "outcome": "unsafe",
+        "reason": "a step failed: no tappable label \"버터 크루아상\" on this screen",
+        "linesChecked": null,
+        "expectedTotal": 6700,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "브런치 세트 › ICED",
+          "브런치 세트 › 버터 크루아상",
+          "브런치 세트 › 데워주세요"
+        ],
+        "order": {
+          "dineOption": "포장",
+          "lines": [
+            {
+              "category": "세트",
+              "item": "브런치 세트",
+              "options": [
+                "카페라떼",
+                "ICED",
+                "버터 크루아상",
+                "데워주세요"
+              ],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "e4",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": false,
+        "expectedTotal": 10900,
+        "kioskTotal": 10900,
+        "skillPredicts": 10900,
+        "ms": 1340,
+        "totalCannotSee": [
+          "플레인 베이글 › 데워주세요",
+          "버터 크루아상 › 그대로 주세요"
+        ],
+        "order": {
+          "dineOption": "매장",
+          "lines": [
+            {
+              "category": "베이커리·디저트",
+              "item": "플레인 베이글",
+              "options": [
+                "데워주세요",
+                "크림치즈 추가"
+              ],
+              "qty": 2
+            },
+            {
+              "category": "베이커리·디저트",
+              "item": "버터 크루아상",
+              "options": [
+                "그대로 주세요"
+              ],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "e5",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 카페모카 › 샷 추가",
+        "linesChecked": null,
+        "expectedTotal": 26700,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "카페모카 › ICED",
+          "얼그레이 티 › HOT",
+          "투게더 세트 › HOT",
+          "투게더 세트 › ICED"
+        ],
+        "order": null
+      }
+    ]
+  }
+}

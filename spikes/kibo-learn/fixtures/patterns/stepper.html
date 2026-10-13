@@ -1,0 +1,100 @@
+<!doctype html>
+<!-- Synthetic fixture for learner regression tests (spikes/kibo-learn/patterns.test.mjs), written from the failure
+     patterns in spikes/blind-kiosks/results/BASELINE.md: quantity steppers in an option sheet (1), per-line quantity
+     buttons in the cart (5), a toggle with role="radio" and no pointer cursor (8), a group shown only for ICED (9),
+     a native alert(), and a checkout button that leads to payment (3). -->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>패턴: 스텝퍼</title>
+<style>
+  body { font-family: sans-serif; margin: 0; padding: 8px; }
+  .tile, .opt { cursor: pointer; border: 1px solid #999; padding: 12px; margin: 6px; display: inline-block; }
+  .seg [role=radio] { display: inline-block; padding: 10px; border: 1px solid #333; margin: 4px; }
+  .seg [aria-checked=true] { background: #333; color: #fff; }
+  .row { display: flex; gap: 8px; align-items: center; margin: 6px; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<section id="home"><h1>모의 카페</h1><button id="start">시작하기</button></section>
+<section id="menu" class="hidden">
+  <div class="tile" data-item="라떼"><div>라떼</div><div>4,000원</div></div>
+  <div class="tile" data-item="스콘"><div>스콘</div><div>3,000원</div></div>
+</section>
+<section id="sheet" class="hidden" role="dialog">
+  <h2 id="sheet-title"></h2>
+  <div id="g-temp"><h3>온도</h3>
+    <div class="seg" role="radiogroup"><div role="radio" tabindex="0" aria-checked="false" data-v="HOT">HOT</div><div role="radio" tabindex="0" aria-checked="false" data-v="ICED">ICED</div></div>
+  </div>
+  <div id="g-ice" class="hidden"><h3>얼음량</h3><span class="opt">적게</span><span class="opt">보통</span><span class="opt">많이</span></div>
+  <div id="g-extra"><h3>추가</h3>
+    <div class="row" data-extra="에스프레소 샷" data-price="500"><span>에스프레소 샷</span><span>+500원</span><button class="minus">−</button><span class="n">0</span><button class="plus">+</button></div>
+    <div class="row" data-extra="바닐라 시럽" data-price="300"><span>바닐라 시럽</span><span>+300원</span><button class="minus">−</button><span class="n">0</span><button class="plus">+</button></div>
+  </div>
+  <button id="cancel">취소</button><button id="add">담기</button>
+</section>
+<section id="cart"><h2>장바구니</h2><ul id="lines"></ul><div id="total">합계 0원</div><button id="checkout">주문하기</button></section>
+<section id="pay" class="hidden"><h2>카드 결제</h2><button>카드 결제</button></section>
+<script>
+  const $ = (s) => document.querySelector(s);
+  const show = (id, on) => $('#' + id).classList.toggle('hidden', !on);
+  const won = (n) => n.toLocaleString('en-US') + '원';
+  const PRICES = { 라떼: 4000, 스콘: 3000 };
+  const EXTRA = { '에스프레소 샷': 500, '바닐라 시럽': 300 };
+  let cur = null;
+  const lines = [];
+  $('#start').onclick = () => { show('home', false); show('menu', true); };
+  document.querySelectorAll('.tile').forEach((t) => { t.onclick = () => open(t.dataset.item); });
+  function open(item) {
+    cur = { item, temp: null, ice: null, extra: { '에스프레소 샷': 0, '바닐라 시럽': 0 } };
+    $('#sheet-title').textContent = item;
+    const drink = item === '라떼';
+    show('g-temp', drink); show('g-extra', drink); show('g-ice', false);
+    document.querySelectorAll('[role=radio]').forEach((r) => r.setAttribute('aria-checked', 'false'));
+    document.querySelectorAll('.row .n').forEach((n) => { n.textContent = '0'; });
+    show('sheet', true);
+  }
+  // Listeners, not onclick, and no pointer cursor: only the role says these can be tapped.
+  document.querySelectorAll('[role=radio]').forEach((r) => r.addEventListener('click', () => {
+    cur.temp = r.dataset.v;
+    document.querySelectorAll('[role=radio]').forEach((x) => x.setAttribute('aria-checked', String(x === r)));
+    show('g-ice', cur.temp === 'ICED');
+    if (cur.temp !== 'ICED') cur.ice = null;
+  }));
+  document.querySelectorAll('#g-ice .opt').forEach((b) => { b.onclick = () => { cur.ice = b.textContent; }; });
+  document.querySelectorAll('.row').forEach((row) => {
+    const n = row.querySelector('.n');
+    const key = row.dataset.extra;
+    row.querySelector('.plus').onclick = () => { cur.extra[key] = Math.min(3, cur.extra[key] + 1); n.textContent = cur.extra[key]; };
+    row.querySelector('.minus').onclick = () => { cur.extra[key] = Math.max(0, cur.extra[key] - 1); n.textContent = cur.extra[key]; };
+  });
+  $('#cancel').onclick = () => show('sheet', false);
+  $('#add').onclick = () => {
+    if (cur.item === '라떼' && !cur.temp) { alert('온도를 선택해 주세요.'); return; }
+    let unit = PRICES[cur.item];
+    const desc = [];
+    if (cur.temp) desc.push(cur.temp);
+    if (cur.ice) desc.push('얼음 ' + cur.ice);
+    for (const [k, v] of Object.entries(cur.extra)) if (v) { unit += EXTRA[k] * v; desc.push(k + ' ' + v); }
+    lines.push({ name: cur.item, desc, unit, qty: 1 });
+    show('sheet', false);
+    render();
+  };
+  function render() {
+    const ul = $('#lines');
+    ul.innerHTML = '';
+    lines.forEach((l, i) => {
+      const li = document.createElement('li');
+      li.innerHTML = `<span>${l.name}${l.desc.length ? ' (' + l.desc.join(', ') + ')' : ''}</span>
+        <button aria-label="수량 빼기">−</button> <span>${l.qty}</span> <button aria-label="수량 더하기">+</button> <span>${won(l.unit * l.qty)}</span>`;
+      li.querySelector('[aria-label="수량 더하기"]').onclick = () => { l.qty = Math.min(9, l.qty + 1); render(); };
+      li.querySelector('[aria-label="수량 빼기"]').onclick = () => { if (l.qty > 1) l.qty--; else lines.splice(i, 1); render(); };
+      ul.append(li);
+    });
+    $('#total').textContent = '합계 ' + won(lines.reduce((a, l) => a + l.unit * l.qty, 0));
+  }
+  $('#checkout').onclick = () => { show('menu', false); show('pay', true); };
+</script>
+</body>
+</html>

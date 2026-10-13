@@ -1,0 +1,129 @@
+#1 snapshot 
+#2 act []
+#3 act []
+#4 record 
+#5 act []
+#6 record 
+#7 act [{"op":"click","label":"홍시 스무디","role":"","name":"","text":"","exact":false,"within":""}]
+#8 act []
+#9 act []
+#10 record 
+#11 act [{"op":"click","label":"애플 시나몬 티","role":"","name":"","text":"","exact":false,"within":""}]
+#12 act [{"op":"click","label":"애플 시나몬 티","role":"","name":"","text":"","exact":false,"within":""}]
+#13 act []
+#14 act []
+#15 record 
+#16 act [{"op":"click","label":"커피","role":"","name":"","text":"","exact":true,"within":""}]
+#17 act [{"op":"click","label":"커피","role":"","name":"","text":"","exact":true,"within":""}]
+#19 snapshot 
+#20 act []
+#21 act []
+#22 record 
+#23 act []
+#24 record 
+#25 act [{"op":"click","label":"논커피","role":"","name":"","text":"","exact":true,"within":""}]
+#26 act []
+#27 act []
+#28 record 
+#29 act []
+#30 record 
+#31 act []
+#32 record 
+#33 act []
+#34 record 
+#35 act []
+#36 record 
+#37 act []
+#38 snapshot 
+#39 act [{"op":"click","label":"다음","role":"","name":"","text":"","exact":true,"within":""}]
+#40 act [{"op":"click","label":"다음","role":"","name":"","text":"","exact":true,"within":""}]
+#41 act []
+#43 snapshot 
+#44 act []
+#45 record 
+#46 act []
+#47 act [{"op":"click","label":"다음","role":"","name":"","text":"","exact":true,"within":""}]
+#48 act [{"op":"click","label":"HOT","role":"","name":"","text":"","exact":true,"within":""},{"op":"click","label":"다음","role":"","name":"","text":"","exact":true,"within":""}]
+#49 act [{"op":"click","label":"장바구니 담기","role":"","name":"","text":"","exact":true,"within":""}]
+#50 act []
+#51 act [{"op":"click","label":"장바구니 담기","role":"","name":"","text":"","exact":true,"within":""}]
+#52 act [{"op":"click","label":"데워주세요","role":"","name":"","text":"","exact":true,"within":""},{"op":"click","label":"장바구니 담기","role":"","name":"","text":"","exact":true,"within":""}]
+#53 act []
+#54 act []
+#55 act []
+#56 record 
+#58 act []
+#59 act []
+#60 act []
+#61 record 
+#62 reload 
+#63 act []
+#64 act []
+#65 act []
+#66 act []
+#67 act [{"op":"click","label":"레귤러","role":"","name":"","text":"","exact":true,"within":""},{"op":"click","label":"다락 블렌드","role":"","name":"","text":"","exact":true,"within":""},{"op":"click","label":"일반 우유","role":"","name":"","text":"","exact":true,"within":""},{"op":"click","label":"장바구니 담기","role":"","name":"","text":"","exact":true,"within":""}]
+#68 record 
+#69 act [{"op":"click","label":"HOT","role":"","name":"","text":"","exact":true,"within":""},{"op":"click","label":"레귤러","role":"","name":"","text":"","exact":true,"within":""},{"op":"click","label":"다락 블렌드","role":"","name":"","text":"","exact":true,"within":""},{"op":"click","label":"일반 우유","role":"","name":"","text":"","exact":true,"within":""}]
+#70 act []
+#71 act [{"op":"click","label":"레귤러","role":"","name":"","text":"","exact":true,"within":""},{"op":"click","label":"다락 블렌드","role":"","name":"","text":"","exact":true,"within":""},{"op":"click","label":"일반 우유","role":"","name":"","text":"","exact":true,"within":""},{"op":"click","label":"장바구니 담기","role":"","name":"","text":"","exact":true,"within":""}]
+#72 act []
+#73 act []
+#75 snapshot 
+#76 act [{"op":"click","label":"HOT","role":"","name":"","text":"","exact":true,"within":""}]
+#77 act []
+#78 act []
+#80 act []
+#81 records 
+#82 testSkill 
+  test #1: PASS FAIL FAIL
+#84 testSkill 
+  test #2: PASS PASS FAIL lint=1
+#85 testSkill 
+  test #3: PASS PASS FAIL
+#86 snapshot 
+#87 act [{"op":"click","label":"베이커리·디저트","role":"","name":"","text":"","exact":true,"within":""},{"op":"click","label":"버터 크루아상","role":"","name":"","text":"","exact":true,"within":""}]
+#88 act []
+#89 act []
+#90 act []
+#91 act []
+#92 record 
+#93 testSkill 
+  test #4: PASS PASS PASS
+#94 audit 
+  audit #1: GAPS missing=37 unknown=0 hidden=1 itemsMissingOptions=1
+#95 record 
+#96 record 
+#98 snapshot 
+#99 act [{"op":"click","label":"플레인 베이글","role":"","name":"","text":"","exact":true,"within":""}]
+#100 act []
+#101 act []
+#102 record 
+#103 act [{"op":"click","label":"초코 머핀","role":"","name":"","text":"","exact":true,"within":""}]
+#104 act [{"op":"click","label":"초코 머핀","role":"","name":"","text":"","exact":true,"within":""}]
+#105 act []
+#106 act []
+#107 act []
+#108 record 
+#109 record 
+#110 act [{"op":"click","label":"뉴욕 치즈케이크","role":"","name":"","text":"","exact":true,"within":""}]
+#111 act []
+#112 act []
+#113 record 
+#114 act []
+#115 record 
+#116 act [{"op":"click","label":"티라미수","role":"","name":"","text":"","exact":true,"within":""}]
+#117 act []
+#118 act []
+#119 record 
+#120 act []
+#121 record 
+#122 act [{"op":"click","label":"바닐라라떼","role":"","name":"","text":"","exact":true,"within":""}]
+#123 act []
+#124 act []
+#125 record 
+#126 act [{"op":"click","label":"카라멜 마키아토","role":"","name":"","text":"","exact":true,"within":""}]
+#127 act []
+#128 act []
+#129 record 
+#130 act [{"op":"click","label":"카푸치노","role":"","name":"","text":"","exact":true,"within":""}]
+{"provider":"openai","model":"gpt-6-luna","cachedInputTokens":1560117,"finished":false,"turns":130,"acts":90,"tests":4,"inputTokens":2026509,"outputTokens":26701,"minutes":"10.0"}

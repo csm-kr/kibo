@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getKiosk } from "@/lib/adapters/catalog";
-import { isForbiddenTarget, planSteps, RecipeError } from "./recipe";
+import { isForbiddenTarget, nearestWithin, planSteps, RecipeError } from "./recipe";
 
 const learned = getKiosk("doughhouse").learned!;
 const forbidden = learned.forbiddenLabels;
@@ -58,6 +58,56 @@ describe("planSteps", () => {
     expect(() => planSteps([{ op: "click", label: "{item}" }], { item: "💳 신용/체크카드" }, forbidden)).toThrow(RecipeError);
     expect(() => planSteps([{ op: "clickIfVisible", role: "button", name: "{x}" }], { x: "결제하기" }, forbidden)).toThrow(RecipeError);
     expect(() => planSteps([{ op: "click", text: "카드 결제" }], {}, forbidden)).toThrow(RecipeError);
+  });
+});
+
+describe("planSteps: chooseOptions and within (13-blind-kiosks:4)", () => {
+  const add = [
+    { op: "click" as const, label: "{item}" },
+    { op: "chooseOptions" as const, steps: [{ op: "click" as const, label: "{option}" }] },
+    { op: "click" as const, label: "담기" },
+  ];
+
+  it("runs each group's own select steps per chosen option, then the group's after steps", () => {
+    const groups = [
+      { options: ["카라멜"], after: [{ op: "click" as const, label: "다음" }] },
+      { options: ["에스프레소 샷", "에스프레소 샷"], select: [{ op: "click" as const, label: "+", within: "{option}" }] },
+      { options: [] },
+    ];
+    expect(planSteps(add, { item: "콤보", groups }, forbidden)).toEqual([
+      { op: "click", label: "콤보" },
+      { op: "click", label: "카라멜" },
+      { op: "click", label: "다음" },
+      { op: "click", label: "+", within: "에스프레소 샷" },
+      { op: "click", label: "+", within: "에스프레소 샷" },
+      { op: "click", label: "담기" },
+    ]);
+  });
+
+  it("refuses chooseOptions without groups, and a forbidden label in a group's steps", () => {
+    expect(() => planSteps(add, { item: "콤보" }, forbidden)).toThrow(RecipeError);
+    const groups = [{ options: ["콜라"], after: [{ op: "click" as const, label: "주문하기" }] }];
+    expect(() => planSteps(add, { item: "콤보", groups }, forbidden)).toThrow(RecipeError);
+  });
+});
+
+describe("nearestWithin", () => {
+  // Stand-ins for DOM elements: only parentElement and innerText are read.
+  const node = (innerText: string, parentElement: unknown = null) => ({ innerText, parentElement }) as unknown as HTMLElement;
+  const sheet = node("에스프레소 샷 +500원 − 0 +\n바닐라 시럽 +300원 − 0 +");
+  const shotRow = node("에스프레소 샷\n+500원\n−\n0\n+", sheet);
+  const syrupRow = node("바닐라 시럽\n+300원\n−\n0\n+", sheet);
+  const shotPlus = { el: node("+", shotRow), label: "+", text: "+" };
+  const syrupPlus = { el: node("+", syrupRow), label: "+", text: "+" };
+
+  it("keeps the target whose closest ancestor holds the text", () => {
+    expect(nearestWithin([shotPlus, syrupPlus], "에스프레소 샷")).toEqual([shotPlus]);
+    expect(nearestWithin([shotPlus, syrupPlus], "바닐라 시럽")).toEqual([syrupPlus]);
+  });
+
+  it("keeps every target at the same distance and none when no ancestor holds the text", () => {
+    expect(nearestWithin([shotPlus, syrupPlus], "없는 메뉴")).toEqual([]);
+    expect(nearestWithin([shotPlus, syrupPlus], "에스프레소 샷 +500원 − 0 +\n바닐라")).toEqual([shotPlus, syrupPlus]);
   });
 });
 

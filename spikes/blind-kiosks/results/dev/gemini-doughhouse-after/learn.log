@@ -1,0 +1,44 @@
+#1 act {"op":"click","label":"주문하기"}
+#2 act {"label":"화면을 터치하여 주문을 시작하세요","op":"click"}
+#3 act {"op":"click","label":"🍽 먹고 갈게요"}
+#4 snapshot 
+#5 act {"label":"마르게리따","op":"click"}
+#6 act {"role":"radio","name":"라지","op":"click"}
+#7 act {"role":"checkbox","op":"click","name":"베이컨"}
+#8 act {"label":"장바구니 담기","op":"click"}
+#9 act [{"name":"오리지널","role":"radio","op":"click"},{"op":"click","label":"장바구니 담기"}]
+#10 act {"label":"아니요, 괜찮아요","op":"click"}
+#11 reload 
+#12 act [{"op":"click","label":"화면을 터치하여 주문을 시작하세요"},{"label":"🍽 먹고 갈게요","op":"click"}]
+#13 act {"op":"click","label":"마르게리따"}
+#14 act {"op":"click","label":"+"}
+#15 act [{"op":"click","label":"닫기"},{"op":"click","label":"페퍼로니"}]
+#16 act [{"label":"닫기","op":"click"},{"op":"click","label":"불고기 피자"}]
+#17 act [{"op":"click","label":"닫기"}]
+#18 act {"label":"품절","op":"click"}
+#19 act {"label":"사이드","op":"click"}
+#20 act {"label":"치즈 오븐 스파게티","op":"click"}
+#21 act [{"op":"click","label":"닫기"},{"label":"갈릭디핑소스","op":"click"}]
+#22 act [{"label":"닫기","op":"click"},{"op":"click","label":"버팔로 윙 6조각"}]
+#23 act {"label":"장바구니 담기","op":"click"}
+#24 act {"op":"click","label":"음료"}
+#25 act {"op":"click","label":"콜라"}
+#26 act [{"op":"click","label":"닫기"},{"op":"click","label":"제로콜라"}]
+#27 act [{"label":"닫기","op":"click"},{"label":"사이다","op":"click"}]
+#28 act [{"op":"click","name":"500ml","role":"radio"},{"label":"장바구니 담기","op":"click"}]
+#29 reload 
+#30 act [{"label":"화면을 터치하여 주문을 시작하세요","op":"click"},{"op":"click","label":"🛍 가져갈게요"}]
+#31 audit 
+  audit #1: OK missing=0 unknown=0 hidden=0
+#32 record 
+#33 record 
+#34 testSkill 
+  test #1: PASS PASS PASS
+#35 finish 
+#36 testSkill 
+  test #2: PASS PASS PASS
+#37 audit 
+  audit #2: OK missing=0 unknown=0 hidden=0
+#38 finish 
+  finish audit: OK
+{"provider":"gemini","model":"gemini-3.8-flash","cachedInputTokens":196701,"finished":true,"turns":38,"acts":37,"tests":2,"inputTokens":352822,"outputTokens":20279,"minutes":"4.0"}

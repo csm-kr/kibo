@@ -1,0 +1,5 @@
+PASS {"shown":58400,"expectedBySkill":58400,"handExpected":58400,"ms":1509}
+PASS {"shown":13200,"expectedBySkill":13200,"handExpected":13200,"ms":1257}
+PASS {"shown":23400,"expectedBySkill":23400,"handExpected":23400,"ms":1684}
+PASS {"shown":18300,"expectedBySkill":18300,"handExpected":18300,"ms":1361}
+DETECTED {"shown":19000,"expectedBySkill":19800,"handExpected":"mismatch","ms":911}

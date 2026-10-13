@@ -1,5 +1,5 @@
 import { isForbiddenLabel } from "@/lib/adapters/learned";
-import type { KioskData, LearnedKiosk, MenuItem } from "@/types/menu";
+import type { KioskData, LearnedKiosk, MenuItem, RecipeStep } from "@/types/menu";
 import type { BridgeChange, CartLine, DineOption, PendingBridgeCommand, Session } from "@/types/session";
 import { clickables, findByLabel } from "./labels";
 import { planSteps, runPlan, type Vars } from "./recipe";
@@ -38,20 +38,33 @@ function requireItem(kiosk: KioskData, itemId: string): MenuItem {
   return item;
 }
 
-/** Selected option ids in the item's group order, checked against the item; required groups take their defaults. */
-function chosenOptions(item: MenuItem, selections: Record<string, string[]>): { optionId: string; priceDelta: number }[] {
+type Chosen = { optionId: string; priceDelta: number };
+
+/** Selected option ids per group, in the item's group order, checked against the item; required groups take their defaults. */
+function chosenByGroup(item: MenuItem, selections: Record<string, string[]>): { groupId: string; options: Chosen[] }[] {
   for (const groupId of Object.keys(selections)) {
     if (!item.optionGroups.some((g) => g.groupId === groupId)) throw new BridgeError("Not in the catalog");
   }
-  return item.optionGroups.flatMap((g) => {
+  return item.optionGroups.map((g) => {
     const given = Object.hasOwn(selections, g.groupId) ? selections[g.groupId] : [];
     const ids = given.length === 0 && g.required ? g.defaultOptionIds : given;
-    return ids.map((optionId) => {
-      const option = g.options.find((o) => o.optionId === optionId);
-      if (!option) throw new BridgeError("Not in the catalog");
-      return { optionId, priceDelta: option.priceDelta };
-    });
+    return {
+      groupId: g.groupId,
+      options: ids.map((optionId) => {
+        const option = g.options.find((o) => o.optionId === optionId);
+        if (!option) throw new BridgeError("Not in the catalog");
+        return { optionId, priceDelta: option.priceDelta };
+      }),
+    };
   });
+}
+
+function chosenOptions(item: MenuItem, selections: Record<string, string[]>): Chosen[] {
+  return chosenByGroup(item, selections).flatMap((g) => g.options);
+}
+
+function usesChooseOptions(steps: RecipeStep[]): boolean {
+  return steps.some((s) => s.op === "chooseOptions" || usesChooseOptions(s.steps ?? []));
 }
 
 function dineLabel(learned: LearnedKiosk, option: DineOption): string {
@@ -75,6 +88,13 @@ export function changeVars(kiosk: KioskData, change: BridgeChange): { recipe: st
           item: labelFor(learned.labels.items, itemId),
           options: chosenOptions(item, selections).map((o) => labelFor(learned.labels.options, o.optionId)),
           qtyMinus1: qty - 1,
+          // Only a recipe with chooseOptions needs the options split by group, with each group's own steps.
+          ...(usesChooseOptions(learned.recipes.addToCart ?? []) && {
+            groups: chosenByGroup(item, selections).map((g) => ({
+              options: g.options.map((o) => labelFor(learned.labels.options, o.optionId)),
+              ...learned.groupSteps[g.groupId],
+            })),
+          }),
         },
       };
     }

@@ -1,0 +1,55 @@
+#1 snapshot 
+#2 act []
+#3 act []
+#4 record 
+#5 act []
+#6 record 
+#7 act [{"op":"click","label":"페퍼로니","role":"","name":"","text":"","exact":false,"within":""}]
+#8 record 
+#9 act [{"op":"click","label":"불고기 피자","role":"","name":"","text":"","exact":false,"within":""}]
+#10 record 
+#11 act [{"op":"click","label":"사이드","role":"","name":"","text":"","exact":false,"within":""}]
+#12 act [{"op":"click","label":"치즈 오븐 스파게티","role":"","name":"","text":"","exact":false,"within":""}]
+#13 record 
+#14 act [{"op":"click","label":"갈릭디핑소스","role":"","name":"","text":"","exact":false,"within":""}]
+#15 record 
+#16 act [{"op":"click","label":"버팔로 윙 6조각","role":"","name":"","text":"","exact":false,"within":""}]
+#17 record 
+#18 act [{"op":"click","label":"음료","role":"","name":"","text":"","exact":false,"within":""}]
+#19 act [{"op":"click","label":"콜라","role":"","name":"","text":"","exact":false,"within":""}]
+#20 record 
+#21 act [{"op":"click","label":"제로콜라","role":"","name":"","text":"","exact":false,"within":""}]
+#22 record 
+#23 act [{"op":"click","label":"사이다","role":"","name":"","text":"","exact":false,"within":""}]
+#24 record 
+#25 act [{"op":"click","label":"장바구니 담기","role":"","name":"","text":"","exact":false,"within":""}]
+#26 snapshot 
+#27 reload 
+#28 audit 
+  audit #1: GAPS missing=0 unknown=1 hidden=0 itemsMissingOptions=0
+#29 finish 
+#31 snapshot 
+#32 act []
+#33 act []
+#34 record 
+#35 act []
+#36 act []
+#37 record 
+#38 audit 
+  audit #2: GAPS missing=10 unknown=0 hidden=0 itemsMissingOptions=0
+#39 records 
+#40 audit 
+  audit #3: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=0
+#41 testSkill 
+  test #1: FAIL FAIL FAIL
+#43 testSkill 
+  test #2: FAIL PASS PASS
+#45 testSkill 
+  test #3: PASS PASS PASS
+#47 testSkill 
+  test #4: PASS PASS PASS
+#48 audit 
+  audit #4: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=0
+#49 finish 
+  finish audit: OK
+{"provider":"openai","model":"gpt-6-luna","cachedInputTokens":239186,"finished":true,"turns":49,"acts":18,"tests":4,"inputTokens":295532,"outputTokens":13659,"minutes":"4.2"}

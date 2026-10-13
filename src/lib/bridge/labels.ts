@@ -3,6 +3,8 @@
 // through the frame's own window and never writes to the page (no marker attributes).
 
 const NATIVE = new Set(["BUTTON", "A", "INPUT", "LABEL"]);
+/** Toggles and tabs are often a <div role="radio"> with a listener and no pointer cursor (13-blind-kiosks:4). */
+const ROLES = new Set(["button", "radio", "checkbox", "tab", "option", "switch", "menuitem", "link"]);
 const PRICE = /^[+\-]?[\d,]+\s*원$/;
 const SHOW_TEXT = 4; // NodeFilter.SHOW_TEXT
 
@@ -43,7 +45,7 @@ function labelOf(el: HTMLElement, doc: Document, win: Window): string {
   return label || el.getAttribute("aria-label") || el.getAttribute("title") || value || lines[0] || "";
 }
 
-/** Every visible clickable (cursor: pointer, an onclick, or a native control), outermost only, in page order. */
+/** Every visible clickable (cursor: pointer, an onclick, a native control or a control role), outermost only, in page order. */
 export function clickables(doc: Document): Clickable[] {
   const win = doc.defaultView;
   if (!win || !doc.body) return [];
@@ -53,7 +55,7 @@ export function clickables(doc: Document): Clickable[] {
     const s = win.getComputedStyle(el);
     const r = el.getBoundingClientRect();
     if (s.visibility === "hidden" || r.width === 0 || r.height === 0) continue;
-    const clickable = s.cursor === "pointer" || el.onclick !== null || NATIVE.has(el.tagName);
+    const clickable = s.cursor === "pointer" || el.onclick !== null || NATIVE.has(el.tagName) || ROLES.has(el.getAttribute("role") ?? "");
     if (!clickable || hasAncestorIn(el, labelled)) continue;
     const label = labelOf(el, doc, win);
     if (!label) continue;

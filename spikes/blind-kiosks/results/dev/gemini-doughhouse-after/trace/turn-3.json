@@ -1,0 +1,35 @@
+{
+  "n": 3,
+  "at": "2026-10-13T13:56:15.625Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "🍽 먹고 갈게요"
+      }
+    ]
+  },
+  "resultSummary": "tapped 🍽 먹고 갈게요",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "🍽 먹고 갈게요"
+          }
+        ]
+      },
+      "resultSummary": "tapped 🍽 먹고 갈게요"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 2156,
+  "outputTokens": 26
+}

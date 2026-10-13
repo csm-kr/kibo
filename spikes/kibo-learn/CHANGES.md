@@ -12,3 +12,40 @@ Changes to `learner.mjs`, `driver.mjs`, `runner.mjs` and `audit.mjs` after the e
 - A bk2 run in step 1 wrote `learn-stats.json` and then never exited. Reproduced: an `audit` whose start recipe fails leaves the browser that `freshMenu` in `audit.mjs` opened (it is outside the `try`), and that connection keeps Node alive after the learner's last line.
 - The loop now runs inside `try`; on any way out (finish, turn cap, token cap, API error, a thrown error) the main browser is closed, `learn-stats.json` is written (with `error` after a crash) and the process exits with `process.exit` (0, or 1 after a crash), which also ends any browser the audit left open. `audit.mjs` itself is unchanged.
 - Tests in `learner.test.mjs`: a failed-start audit (hung for the 60 s test limit before the fix, 5 s after), a dropped connection, the token cap. The bk3 and bk4 baselines ran with this learner; bk1 and bk2 (step 2) ran without it, which changes nothing about how they explored.
+
+## 10-13, 13-blind-kiosks:4: learner gaps (the learner for the final runs)
+Fixes for the failure patterns in `spikes/blind-kiosks/results/BASELINE.md`, made and tested only on the dev set (Doughhouse, Gureum Darak Coffee) and on synthetic fixtures written from the pattern descriptions (`fixtures/patterns/stepper.html`, `wizard.html`). The four test kiosks were not opened. Numbers in brackets are the BASELINE pattern numbers.
+
+**New skill format** (backward compatible: every older skill still runs):
+- A step may carry `"within": "<text>"`: among the targets that match, the one whose closest ancestor holds that text (the `+` in the shot's own row, the `수량 더하기` on the item's own cart line) [1, 5].
+- Recipe op `chooseOptions`: per option group of the line's item, in catalog order, the group's own `select` steps (or the op's steps) once per chosen option, then the group's `after` steps (a wizard's `다음`) [1, 6].
+- Option groups may have `"type": "quantity"` with `maxQty` per option (an order repeats the name once per count), `select`, `after`, and `"appliesWhen": "<group>=<option>"` [1, 6, 9]. `forbiddenLabels` lists the kiosk's checkout and payment buttons [3].
+- One pure planner, `plan.mjs` (placeholders, `forEach`, `repeat`, `chooseOptions`), is used by the runner, the lint and the blind-kiosk grader, so "what would be clicked" is computed the same way everywhere. The product bridge (`src/lib/bridge/recipe.ts`, `src/lib/adapters/learned.ts`) replays `within`, `chooseOptions`, `select` and `after` with the same rules, with unit tests; `skills/doughhouse.json` is unchanged and still valid.
+
+**Driver and runner** (`driver.mjs`, `runner.mjs`):
+- Never taps a payment or checkout control: `act` refuses a step or target whose label or text holds 결제, 카드, 간편결제, 쿠폰, 상품권, 주문하기, pay, card or checkout (the grader's list) or a `forbiddenLabels` entry; the runner refuses a whole order before opening the kiosk when its plan names one [3].
+- Elements with a control role (`button`, `radio`, `checkbox`, `tab`, `option`, `switch`, `menuitem`, `link`) are tappable labels even without a pointer cursor or `onclick` [8]. Same rule in `src/lib/bridge/labels.ts`.
+- A label that matches several elements fails before any click with the text near each and "add within"; a missing label names the labels that contain it [1, 5, 8]. The snapshot adds `REPEATED LABELS: "+" ×2 near [에스프레소 샷 | 바닐라 시럽]` [1, 5].
+- `clickIfVisible` on an ambiguous label now fails, as the product bridge already did, instead of clicking the first match.
+- Cost: a replay is slower. The Doughhouse holdout took 0.9–1.7 s per order with this runner against 0.55–0.7 s before (same skills, `results/dev/gemini-doughhouse-*/holdout.log` vs `results/run3/holdout.log`), because every step marks the labels again and reads the target's text for the forbidden check (I-191).
+
+**Learner** (`learner.mjs`, `lint.mjs`, `audit.mjs`):
+- `act` takes `"steps"` (several steps, one screen back); `record` takes a JSON array [2].
+- The finish gate counts different passing orders of the exact same skill over several `testSkill` calls (still ≥ 3, none failed); any change to the skill starts again. `testSkill` says where the gate stands [4].
+- `lintSkill` (run by `testSkill` and `finish`) rejects options named like navigation or stepper buttons (다음, 확인, 담기, `+`, "… 더하기"), a quantity group without `select` or `maxQty`, an `appliesWhen` that names no option of another group, and recipes that click a payment control [1, 3, 6, 9].
+- The audit treats payment and checkout labels as known and never probes them [3]. It also opens every item that is not sold out and lists in `missingOptions` the choices on its first screen (radios, checkboxes, "+n원" labels) that none of its groups name; informational for `audit.ok`, but `finish` refuses once per skill while it is not empty (a second `finish` of the same skill is accepted, so a false alarm cannot block a run). Added after the first OpenAI dev run below left out a whole topping group.
+- The prompt asks for `audit` as soon as the catalog has every category, before testing [7], and describes the new fields. "A non-pizza item" became "an item from another category". After 60% of the token budget without a passing gate, a nudge every 10th turn says to write the skill [2, 7].
+- I-188: the gcloud access token is fetched again before it is 50 min old (`TOKEN_MAX_AGE_MS`) and once after a 401, then the request is retried.
+- I-187: `audit.mjs` `freshMenu` closes its browser when the start recipe fails.
+- Opt-in trace (`TRACE_DIR`): after every turn `turn-<n>.json` (tools, labels and ids only, one-line result, discoveries so far, tokens) and `turn-<n>.jpg` (the kiosk viewport, 720 px wide, JPEG quality 70), and `trace.json` (kiosk id, model, start and end, gate). It changes no request (tested).
+
+**Token cost** [2]:
+- Old screen trees, failed-test snapshots and old `records()` lists are replaced in blocks, every 4 turns keeping the last 2, instead of rewriting one older turn on every turn; between prunes a request only grows at its end, so the implicit prompt cache can serve the rest. Between 2 and 5 recent screens stay (before: 4).
+- `compactTree` drops unnamed and emoji-only images, separators and link urls, and folds runs of identical lines into one "(×n)"; the TAPPABLE LABELS line is untouched (tested on a fixture screen).
+- `learn-stats.json` records `cachedInputTokens` from `usageMetadata.cachedContentTokenCount` on the Gemini path too.
+- Measured on Doughhouse with Gemini (`gemini-3.8-flash`, cap 1M, one run each, 10-13): the learner before this step, with only the cached-token count added, finished in 59 turns, 9.2 min, 416,373 input tokens of which 191,500 cached (46%), 12,319 output (`results/dev/gemini-doughhouse-before/`); this step's learner (all changes above except the `missingOptions` audit, which came later) finished in 38 turns, 4.0 min, 352,822 input tokens of which 196,701 cached (56%), 20,279 output (`results/dev/gemini-doughhouse-after/`, with a trace). Uncached input fell from 224,873 to 156,121 tokens (−31%). The after run also has fewer turns (several steps per `act`), so the cache and the turn count are not separated. Both skills replay the Doughhouse holdout 4/4 and catch the rule violation. Cost in money is left out: the Vertex AI pricing page could not be read on 10-13, and the Gemini API prices in `docs/TESTING.md` are not Vertex prices (R-001).
+- Not changed: what the learner explores or decides is driven by the prompt and tools above, not by the pruning; the input-token cap still counts every prompt token, cached or not, as in the baseline.
+
+**Tests** (no AI, need Chrome): `node --test spikes/kibo-learn/patterns.test.mjs` (17), `node --test spikes/kibo-learn/learner.test.mjs` (12), `node --test spikes/blind-kiosks/grade/test/` (24), `node spikes/kibo-learn/test_audit.mjs <pizzaUrl> <blindUrl>` (4/4).
+
+**Dev-set runs with OpenAI** (development only, never published; `results/dev/`): see `results/dev/README.md`.
