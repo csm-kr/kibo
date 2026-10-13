@@ -37,7 +37,8 @@
     },
     {
       "dir": "8-scenarios",
-      "status": "pending"
+      "status": "completed",
+      "completed_at": "2026-10-13T09:20:08+0900"
     },
     {
       "dir": "9-polish",
