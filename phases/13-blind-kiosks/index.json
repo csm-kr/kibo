@@ -45,7 +45,9 @@
     {
       "step": 5,
       "name": "final-a",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-14T05:36:42+0900",
+      "summary": "Final runs with the step-4 learner (gemini-3.8-flash, 2M cap, TRACE_DIR, 30-min wrapper kill not reached, both started in parallel 10-14 05:37 KST, no crash, no rerun); results in spikes/blind-kiosks/results/<kiosk>/final/{learn.log, learn-stats.json, skill.json, grade.json, notes.md, trace/ (94 and 86 turn json+jpg, ~2.4 MB each)}. Grader changed in step 4, so both baseline skills were re-graded with it: baseline/regrade-step4/grade.json, identical numbers and outcomes (only the unsafe error wording changed). bk1-cinema baseline -> final: finished both (109 turns 7.4 min 1,068,732 input -> 94 turns 13.3 min 977,691 input, 62% cached); items 32/32 both, price 32 -> 31/32; options items exact 19 -> 18/25; quantity groups 0 -> 2/3; conditional 0/4 both; orders correct/safe refusal/unsafe 3/4/3 -> 6/4/0 (refusals: upsell acceptance not recorded x3, slush flavor names x1). bk2-bakery baseline -> final: token cap at turn 77, no skill -> finished (86 turns, 11.8 min, 693,862 input, 40% cached); items 0 -> 40/40, price 34/40 (sandwiches), quantity groups 0 -> 7/7, conditional 0 -> 16/19; orders 0/0/0 with 10 not learned -> 5 correct / 0 refused / 5 UNSAFE. Unsafe cause (I-193, P1, open, learner not changed per step rules): orders planning 15-20 steps meet the kiosk timeout modal \"계속 주문하시겠어요?\" before step 13 (per-step re-run of h1/h5/h10); its only button 계속 주문하기 contains the forbidden word 주문하기 (step-4 FORBIDDEN_WORDS), so the driver refused it at learning turn 14 and the skill lists it in forbiddenLabels; trigger of the modal unverified. No ya29./AIza/sk- in results. AC: lint, build, test (936 passed) green."
     },
     {
       "step": 6,

@@ -1,0 +1,35 @@
+{
+  "n": 68,
+  "at": "2026-10-13T20:42:44.224Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "스페셜 콤보"
+      }
+    ]
+  },
+  "resultSummary": "tapped 스페셜 콤보",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "스페셜 콤보"
+          }
+        ]
+      },
+      "resultSummary": "tapped 스페셜 콤보"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 10535,
+  "outputTokens": 27
+}

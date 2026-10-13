@@ -1,0 +1,51 @@
+{
+  "n": 45,
+  "at": "2026-10-13T20:40:37.171Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "전체 삭제"
+      },
+      {
+        "op": "click",
+        "label": "확인"
+      },
+      {
+        "op": "click",
+        "label": "핫푸드"
+      }
+    ]
+  },
+  "resultSummary": "tapped 전체 삭제 → 확인 → 핫푸드",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "전체 삭제"
+          },
+          {
+            "op": "click",
+            "label": "확인"
+          },
+          {
+            "op": "click",
+            "label": "핫푸드"
+          }
+        ]
+      },
+      "resultSummary": "tapped 전체 삭제 → 확인 → 핫푸드"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 8249,
+  "outputTokens": 52
+}

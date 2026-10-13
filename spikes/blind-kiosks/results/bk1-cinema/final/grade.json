@@ -1,0 +1,1094 @@
+{
+  "kioskId": "bk1-cinema",
+  "label": "final",
+  "gradedAt": "2026-10-13T20:51:49.849Z",
+  "skill": "present",
+  "files": {
+    "skill": "spikes/blind-kiosks/results/bk1-cinema/final/skill.json",
+    "key": "spikes/blind-kiosks/bk1-cinema/answer-key.json",
+    "app": "spikes/blind-kiosks/bk1-cinema/app/index.html"
+  },
+  "summary": "bk1-cinema/final: learning finished, 13.3 min, 94 turns, 977691 input tokens; items 32/32 (precision 1), price 31/32, options exact 18/25 (openable 21/22); orders correct 6, safe refusal 4, unsafe 0 of 10 (cart lines read in 0)",
+  "learning": {
+    "provider": "gemini",
+    "model": "gemini-3.8-flash",
+    "cachedInputTokens": 609457,
+    "finished": true,
+    "turns": 94,
+    "acts": 139,
+    "tests": 1,
+    "inputTokens": 977691,
+    "outputTokens": 29088,
+    "minutes": "13.3"
+  },
+  "catalog": {
+    "items": {
+      "key": 32,
+      "skill": 32,
+      "matched": 32,
+      "recall": 1,
+      "precision": 1,
+      "missing": [],
+      "extra": []
+    },
+    "price": {
+      "correct": 31,
+      "of": 32
+    },
+    "category": {
+      "correct": 32,
+      "of": 32
+    },
+    "soldOut": {
+      "correct": 32,
+      "of": 32
+    },
+    "options": {
+      "itemsExact": 18,
+      "items": 25,
+      "openableExact": 21,
+      "openable": 22,
+      "groups": 39,
+      "groupsFound": 30,
+      "groupLabelsExact": 29,
+      "groupRulesCorrect": 30,
+      "quantityGroups": 3,
+      "quantityRecognized": 2,
+      "conditionalGroups": 4,
+      "conditionalFound": 0
+    },
+    "perItem": [
+      {
+        "name": "싱글 콤보",
+        "skillName": "싱글 콤보",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "오리지널 0",
+            "카라멜 0",
+            "치즈 0",
+            "어니언 0",
+            "갈릭버터 0"
+          ],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "커플 콤보",
+        "skillName": "커플 콤보",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "오리지널 0",
+            "카라멜 0",
+            "치즈 0",
+            "어니언 0",
+            "갈릭버터 0"
+          ],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "스페셜 콤보",
+        "skillName": "스페셜 콤보",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "오리지널 0",
+            "카라멜 0",
+            "치즈 0",
+            "어니언 0",
+            "갈릭버터 0"
+          ],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "패밀리 콤보",
+        "skillName": "패밀리 콤보",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "M (기본) 0",
+            "L 업그레이드 1000",
+            "오리지널 0",
+            "카라멜 500",
+            "치즈 500",
+            "어니언 500",
+            "갈릭버터 500",
+            "반반 1000",
+            "오리지널 0",
+            "카라멜 0",
+            "치즈 0",
+            "어니언 0",
+            "갈릭버터 0",
+            "콜라 0",
+            "제로콜라 0",
+            "사이다 0",
+            "아이스티 500",
+            "레몬에이드 1000"
+          ],
+          "extra": []
+        }
+      },
+      {
+        "name": "오리지널 팝콘",
+        "skillName": "오리지널 팝콘",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "카라멜 팝콘",
+        "skillName": "카라멜 팝콘",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "치즈 팝콘",
+        "skillName": "치즈 팝콘",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "어니언 팝콘",
+        "skillName": "어니언 팝콘",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "갈릭버터 팝콘",
+        "skillName": "갈릭버터 팝콘",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "시나몬 버터 팝콘",
+        "skillName": "시나몬 버터 팝콘",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "반반 팝콘",
+        "skillName": "반반 팝콘",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "트러플 팝콘",
+        "skillName": "트러플 팝콘",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "S 0",
+            "M 1000",
+            "L 2000"
+          ],
+          "extra": []
+        }
+      },
+      {
+        "name": "콜라",
+        "skillName": "콜라",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "제로콜라",
+        "skillName": "제로콜라",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "사이다",
+        "skillName": "사이다",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "아이스티",
+        "skillName": "아이스티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "레몬에이드",
+        "skillName": "레몬에이드",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "자몽에이드",
+        "skillName": "자몽에이드",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "R 0",
+            "L 500"
+          ],
+          "extra": []
+        }
+      },
+      {
+        "name": "아메리카노",
+        "skillName": "아메리카노",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "생수",
+        "skillName": "생수",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "나쵸",
+        "skillName": "나쵸",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "프레첼",
+        "skillName": "프레첼",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "버터구이 오징어",
+        "skillName": "버터구이 오징어",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "츄러스",
+        "skillName": "츄러스",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "칠리 치즈 감자",
+        "skillName": "칠리 치즈 감자",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "클래식 핫도그",
+        "skillName": "클래식 핫도그",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "칠리 핫도그",
+        "skillName": "칠리 핫도그",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "치즈볼 (5개)",
+        "skillName": "치즈볼 (5개)",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "치킨 텐더",
+        "skillName": "치킨 텐더",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "소프트 아이스크림",
+        "skillName": "소프트 아이스크림",
+        "price": false,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "슬러시",
+        "skillName": "슬러시",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "블루 레몬 0",
+            "딸기 0",
+            "청포도 0"
+          ],
+          "extra": [
+            "콜라맛 0",
+            "오렌지맛 0",
+            "포도맛 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "초코칩 쿠키",
+        "skillName": "초코칩 쿠키",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      }
+    ],
+    "perGroup": [
+      {
+        "item": "싱글 콤보",
+        "group": "comboPopcornSize",
+        "found": true,
+        "skillGroup": "팝콘 사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "싱글 콤보",
+        "group": "comboFlavor",
+        "found": true,
+        "skillGroup": "팝콘 맛",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "싱글 콤보",
+        "group": "halfFlavors",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "싱글 콤보",
+        "group": "comboDrink1",
+        "found": true,
+        "skillGroup": "음료 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "커플 콤보",
+        "group": "comboPopcornSize",
+        "found": true,
+        "skillGroup": "팝콘 사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "커플 콤보",
+        "group": "comboFlavor",
+        "found": true,
+        "skillGroup": "팝콘 맛",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "커플 콤보",
+        "group": "halfFlavors",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "커플 콤보",
+        "group": "comboDrinks2",
+        "found": true,
+        "skillGroup": "음료 선택",
+        "labelsExact": true,
+        "rules": true,
+        "quantity": true
+      },
+      {
+        "item": "스페셜 콤보",
+        "group": "comboPopcornSize",
+        "found": true,
+        "skillGroup": "팝콘 사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "스페셜 콤보",
+        "group": "comboFlavor",
+        "found": true,
+        "skillGroup": "팝콘 맛",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "스페셜 콤보",
+        "group": "halfFlavors",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "스페셜 콤보",
+        "group": "comboDrinks2",
+        "found": true,
+        "skillGroup": "음료 선택",
+        "labelsExact": true,
+        "rules": true,
+        "quantity": true
+      },
+      {
+        "item": "패밀리 콤보",
+        "group": "comboPopcornSize",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "패밀리 콤보",
+        "group": "comboFlavor",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "패밀리 콤보",
+        "group": "halfFlavors",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "패밀리 콤보",
+        "group": "comboDrinks2",
+        "found": false,
+        "skillGroup": null,
+        "quantity": false
+      },
+      {
+        "item": "오리지널 팝콘",
+        "group": "popcornSize",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카라멜 팝콘",
+        "group": "popcornSize",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "치즈 팝콘",
+        "group": "popcornSize",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "어니언 팝콘",
+        "group": "popcornSize",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "갈릭버터 팝콘",
+        "group": "popcornSize",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "시나몬 버터 팝콘",
+        "group": "popcornSize",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "반반 팝콘",
+        "group": "popcornSize",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "반반 팝콘",
+        "group": "halfFlavors",
+        "found": true,
+        "skillGroup": "반반 맛 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "트러플 팝콘",
+        "group": "popcornSize",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "콜라",
+        "group": "drinkSize",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "제로콜라",
+        "group": "drinkSize",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "사이다",
+        "group": "drinkSize",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "아이스티",
+        "group": "drinkSize",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "레몬에이드",
+        "group": "drinkSize",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "자몽에이드",
+        "group": "drinkSize",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "아메리카노",
+        "group": "coffeeTemp",
+        "found": true,
+        "skillGroup": "온도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "아메리카노",
+        "group": "drinkSize",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "나쵸",
+        "group": "nachoSauce",
+        "found": true,
+        "skillGroup": "소스",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "버터구이 오징어",
+        "group": "squidSeason",
+        "found": true,
+        "skillGroup": "시즈닝",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "클래식 핫도그",
+        "group": "hotdogTopping",
+        "found": true,
+        "skillGroup": "토핑 추가",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "칠리 핫도그",
+        "group": "hotdogTopping",
+        "found": true,
+        "skillGroup": "토핑 추가",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "치킨 텐더",
+        "group": "tenderDip",
+        "found": true,
+        "skillGroup": "디핑 소스",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "슬러시",
+        "group": "slushFlavor",
+        "found": true,
+        "skillGroup": "맛 선택",
+        "labelsExact": false,
+        "rules": true
+      }
+    ]
+  },
+  "orders": {
+    "total": 10,
+    "correct": 6,
+    "safeRefusal": 4,
+    "unsafe": 0,
+    "linesChecked": 0,
+    "results": [
+      {
+        "id": "h1",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": false,
+        "expectedTotal": 10000,
+        "kioskTotal": 10000,
+        "skillPredicts": 10000,
+        "ms": 1054,
+        "totalCannotSee": [
+          "싱글 콤보 › 카라멜",
+          "싱글 콤보 › 콜라"
+        ],
+        "order": {
+          "dineOption": "상영관 입장 전 수령",
+          "lines": [
+            {
+              "category": "콤보",
+              "item": "싱글 콤보",
+              "options": [
+                "L 업그레이드",
+                "카라멜",
+                "콜라"
+              ],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h2",
+        "outcome": "safeRefusal",
+        "reason": "the skill has no way to accept the upsell for 나쵸",
+        "linesChecked": null,
+        "expectedTotal": 16500,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "커플 콤보 › 카라멜",
+          "커플 콤보 › 치즈",
+          "커플 콤보 › 콜라"
+        ],
+        "order": null
+      },
+      {
+        "id": "h3",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": false,
+        "expectedTotal": 16000,
+        "kioskTotal": 16000,
+        "skillPredicts": 16000,
+        "ms": 985,
+        "totalCannotSee": [
+          "반반 팝콘 › 오리지널",
+          "반반 팝콘 › 어니언",
+          "아메리카노 › ICE"
+        ],
+        "order": {
+          "dineOption": "상영관 입장 전 수령",
+          "lines": [
+            {
+              "category": "팝콘",
+              "item": "반반 팝콘",
+              "options": [
+                "L",
+                "오리지널",
+                "어니언"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "음료",
+              "item": "아메리카노",
+              "options": [
+                "ICE",
+                "L"
+              ],
+              "qty": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "h4",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": false,
+        "expectedTotal": 18000,
+        "kioskTotal": 18000,
+        "skillPredicts": 18000,
+        "ms": 862,
+        "totalCannotSee": [],
+        "order": {
+          "dineOption": "지금 바로 수령",
+          "lines": [
+            {
+              "category": "팝콘",
+              "item": "치즈 팝콘",
+              "options": [
+                "M"
+              ],
+              "qty": 2
+            },
+            {
+              "category": "음료",
+              "item": "제로콜라",
+              "options": [
+                "R"
+              ],
+              "qty": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "h5",
+        "outcome": "safeRefusal",
+        "reason": "the skill has no way to accept the upsell for 나쵸",
+        "linesChecked": null,
+        "expectedTotal": 22500,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "스페셜 콤보 › 갈릭버터",
+          "스페셜 콤보 › 사이다"
+        ],
+        "order": null
+      },
+      {
+        "id": "h6",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 슬러시 › 딸기",
+        "linesChecked": null,
+        "expectedTotal": 16800,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "클래식 핫도그 › 치즈",
+          "슬러시 › 딸기"
+        ],
+        "order": null
+      },
+      {
+        "id": "h7",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": false,
+        "expectedTotal": 14300,
+        "kioskTotal": 14300,
+        "skillPredicts": 14300,
+        "ms": 868,
+        "totalCannotSee": [],
+        "order": {
+          "dineOption": "상영관 입장 전 수령",
+          "lines": [
+            {
+              "category": "스낵",
+              "item": "나쵸",
+              "options": [
+                "할라피뇨 치즈 소스"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "스낵",
+              "item": "버터구이 오징어",
+              "options": [
+                "청양마요"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "음료",
+              "item": "레몬에이드",
+              "options": [
+                "L"
+              ],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h8",
+        "outcome": "safeRefusal",
+        "reason": "the skill has no way to accept the upsell for 나쵸",
+        "linesChecked": null,
+        "expectedTotal": 28500,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "싱글 콤보 › 오리지널",
+          "싱글 콤보 › 갈릭버터",
+          "커플 콤보 › 콜라"
+        ],
+        "order": null
+      },
+      {
+        "id": "h9",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": false,
+        "expectedTotal": 23300,
+        "kioskTotal": 23300,
+        "skillPredicts": 23300,
+        "ms": 1486,
+        "totalCannotSee": [],
+        "order": {
+          "dineOption": "상영관 입장 전 수령",
+          "lines": [
+            {
+              "category": "팝콘",
+              "item": "오리지널 팝콘",
+              "options": [
+                "S"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "팝콘",
+              "item": "시나몬 버터 팝콘",
+              "options": [
+                "L"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "음료",
+              "item": "생수",
+              "options": [],
+              "qty": 3
+            },
+            {
+              "category": "핫푸드",
+              "item": "치킨 텐더",
+              "options": [
+                "스위트칠리"
+              ],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h10",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": false,
+        "expectedTotal": 24500,
+        "kioskTotal": 24500,
+        "skillPredicts": 25500,
+        "ms": 1238,
+        "totalCannotSee": [
+          "커플 콤보 › 치즈",
+          "커플 콤보 › 제로콜라"
+        ],
+        "order": {
+          "dineOption": "지금 바로 수령",
+          "lines": [
+            {
+              "category": "콤보",
+              "item": "커플 콤보",
+              "options": [
+                "M (기본)",
+                "치즈",
+                "제로콜라",
+                "제로콜라"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "디저트",
+              "item": "소프트 아이스크림",
+              "options": [],
+              "qty": 2
+            },
+            {
+              "category": "핫푸드",
+              "item": "치즈볼 (5개)",
+              "options": [],
+              "qty": 1
+            },
+            {
+              "category": "스낵",
+              "item": "프레첼",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

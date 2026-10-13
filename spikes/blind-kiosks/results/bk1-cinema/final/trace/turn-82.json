@@ -1,0 +1,107 @@
+{
+  "n": 82,
+  "at": "2026-10-13T20:43:56.574Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "취소"
+      },
+      {
+        "op": "click",
+        "label": "콤보"
+      },
+      {
+        "op": "click",
+        "label": "싱글 콤보"
+      },
+      {
+        "op": "click",
+        "label": "다음"
+      },
+      {
+        "op": "click",
+        "label": "M (기본)"
+      },
+      {
+        "op": "click",
+        "label": "다음"
+      },
+      {
+        "op": "click",
+        "label": "오리지널"
+      },
+      {
+        "op": "click",
+        "label": "다음"
+      },
+      {
+        "op": "click",
+        "label": "콜라"
+      },
+      {
+        "op": "click",
+        "label": "다음"
+      }
+    ]
+  },
+  "resultSummary": "tapped 취소 → 콤보 → 싱글 콤보 → 다음 → M (기본) → 다음 → 오리지널 → 다음 → 콜라 → 다음",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "취소"
+          },
+          {
+            "op": "click",
+            "label": "콤보"
+          },
+          {
+            "op": "click",
+            "label": "싱글 콤보"
+          },
+          {
+            "op": "click",
+            "label": "다음"
+          },
+          {
+            "op": "click",
+            "label": "M (기본)"
+          },
+          {
+            "op": "click",
+            "label": "다음"
+          },
+          {
+            "op": "click",
+            "label": "오리지널"
+          },
+          {
+            "op": "click",
+            "label": "다음"
+          },
+          {
+            "op": "click",
+            "label": "콜라"
+          },
+          {
+            "op": "click",
+            "label": "다음"
+          }
+        ]
+      },
+      "resultSummary": "tapped 취소 → 콤보 → 싱글 콤보 → 다음 → M (기본) → 다음 → 오리지널 → 다음 → 콜라 → 다음"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 14555,
+  "outputTokens": 144
+}

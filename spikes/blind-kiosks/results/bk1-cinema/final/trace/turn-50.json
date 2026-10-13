@@ -1,0 +1,51 @@
+{
+  "n": 50,
+  "at": "2026-10-13T20:41:24.289Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "전체 삭제"
+      },
+      {
+        "op": "click",
+        "label": "확인"
+      },
+      {
+        "op": "click",
+        "label": "치킨 텐더"
+      }
+    ]
+  },
+  "resultSummary": "tapped 전체 삭제 → 확인 → 치킨 텐더",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "전체 삭제"
+          },
+          {
+            "op": "click",
+            "label": "확인"
+          },
+          {
+            "op": "click",
+            "label": "치킨 텐더"
+          }
+        ]
+      },
+      "resultSummary": "tapped 전체 삭제 → 확인 → 치킨 텐더"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 9156,
+  "outputTokens": 54
+}

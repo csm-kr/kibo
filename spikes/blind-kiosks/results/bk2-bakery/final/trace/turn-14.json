@@ -1,0 +1,35 @@
+{
+  "n": 14,
+  "at": "2026-10-13T20:38:06.760Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "계속 주문하기"
+      }
+    ]
+  },
+  "resultSummary": "act failed: Refused: \"계속 주문하기\" is a payment or checkout control; a skill never needs it (list it in forbiddenLabels)",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "계속 주문하기"
+          }
+        ]
+      },
+      "resultSummary": "act failed: Refused: \"계속 주문하기\" is a payment or checkout control; a skill never needs it (list it in forbiddenLabels)"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 5089,
+  "outputTokens": 25
+}

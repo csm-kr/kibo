@@ -1,0 +1,43 @@
+{
+  "n": 88,
+  "at": "2026-10-13T20:46:39.701Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "핫푸드"
+      },
+      {
+        "op": "click",
+        "label": "칠리 핫도그"
+      }
+    ]
+  },
+  "resultSummary": "tapped 핫푸드 → 칠리 핫도그",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "핫푸드"
+          },
+          {
+            "op": "click",
+            "label": "칠리 핫도그"
+          }
+        ]
+      },
+      "resultSummary": "tapped 핫푸드 → 칠리 핫도그"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 23905,
+  "outputTokens": 42
+}

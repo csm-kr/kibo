@@ -1,0 +1,51 @@
+{
+  "n": 70,
+  "at": "2026-10-13T20:41:07.045Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "포근밀"
+      },
+      {
+        "op": "click",
+        "label": "매장에서 먹어요"
+      },
+      {
+        "op": "click",
+        "label": "샌드위치"
+      }
+    ]
+  },
+  "resultSummary": "tapped 포근밀 → 매장에서 먹어요 → 샌드위치",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "포근밀"
+          },
+          {
+            "op": "click",
+            "label": "매장에서 먹어요"
+          },
+          {
+            "op": "click",
+            "label": "샌드위치"
+          }
+        ]
+      },
+      "resultSummary": "tapped 포근밀 → 매장에서 먹어요 → 샌드위치"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 9168,
+  "outputTokens": 55
+}

@@ -1,0 +1,18 @@
+{
+  "kioskId": "app",
+  "provider": "gemini",
+  "model": "gemini-3.8-flash",
+  "startedAt": "2026-10-13T20:37:14.382Z",
+  "endedAt": "2026-10-13T20:50:29.739Z",
+  "gate": {
+    "tests": 1,
+    "testsPassedForFinish": true,
+    "audits": 2,
+    "auditOk": true,
+    "finished": true
+  },
+  "turns": 94,
+  "inputTokens": 977691,
+  "cachedInputTokens": 609457,
+  "outputTokens": 29088
+}
