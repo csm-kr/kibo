@@ -16,7 +16,7 @@
       "status": "completed",
       "started_at": "2026-10-13T12:52:24+0900",
       "summary": "scripts/deck-shots.ts (npm run shots:deck, own dev server, memory store, /demo snapshots hit real Gemini) writes 12 real captures to docs/assets/deck/ (phone P3/P4/P6 at 2x, kiosk K1/K3/K6 scaled to 1080 high, /demo for malo, airport_rail, doughhouse at 1920x1080 2x, guide + 'What the AI did' close-up, architecture.png 2400 px + .svg; all < 600 KB). Cost: official prices in evidence/cost-per-order.json, USD per hero order from scripts/cost.ts (text $0.0648, voice $0.0886, upper bound $0.1085; cost.test.ts), TESTING ledger updated; measure-cost.ts now keeps stored prices on re-run. SUBMISSION.md 'Solution description (draft)' 998/1,024 chars (scripts/submission.test.ts) + 2-sentence elevator. docs/plan/DECK_FACTS.md: facts per deck slot with source and measured/design/unverified. I-072 reopened: the airport snapshot's AI reply offers window/aisle seats not in the data (2/2 captures), marked 'do not use' in DECK_FACTS.",
-      "completed_at": "2026-10-13T13:30:00+0900"
+      "completed_at": "2026-10-13T12:57:40+0900"
     },
     {
       "step": 2,
