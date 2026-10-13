@@ -57,7 +57,8 @@
     },
     {
       "dir": "12-phone-app",
-      "status": "pending"
+      "status": "completed",
+      "completed_at": "2026-10-13T20:22:24+0900"
     },
     {
       "dir": "13-blind-kiosks",
