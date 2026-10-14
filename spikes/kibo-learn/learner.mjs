@@ -3,10 +3,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { openKiosk, snapshot, act } from './driver.mjs';
 import { runOrder } from './runner.mjs';
 import { audit } from './audit.mjs';
 import { lintSkill } from './lint.mjs';
+import { uncoveredGroups } from './plan.mjs';
 
 // Flash-Lite by default: learning is many short tool turns, so input tokens dominate the cost.
 // PROVIDER=openai runs the same loop on OpenAI Chat Completions (dev-time tuning only; deck numbers come from Gemini).
@@ -36,6 +38,17 @@ function accessToken(renew = false) {
 }
 if (PROVIDER === 'gemini') accessToken();
 
+// Which learner made a run (I-202): the commit, and whether spikes/kibo-learn had uncommitted changes.
+function learnerVersion() {
+  const cwd = path.dirname(fileURLToPath(import.meta.url));
+  try {
+    const commit = execSync('git rev-parse HEAD', { cwd }).toString().trim();
+    const dirty = execSync('git status --porcelain -- .', { cwd }).toString().trim().length > 0;
+    return { commit, dirty };
+  } catch { return { commit: null, dirty: null }; }
+}
+const LEARNER = learnerVersion();
+
 const SYSTEM = `You are KIBO Kiosk Learner. You operate an unfamiliar self-order kiosk web UI that you have never seen.
 Goal: produce a SKILL that lets a program with no AI place any order on this kiosk.
 
@@ -46,12 +59,16 @@ act() takes "steps" (a list) to do several steps in one call, e.g. close a sheet
 
 Work like this:
 1. Explore: use snapshot/act to walk the whole flow (start, dine option, every category, open EVERY menu item to read its option groups, cart). Note popups that interrupt the flow (upsell, alerts) and sold-out items. Use reload to start over.
-   Never tap payment or checkout controls (order, pay, card, coupon): act refuses them and a skill never needs them. Put the kiosk's checkout button in forbiddenLabels.
+   A popup that can come up at any moment, between any two taps (a "still there?" timeout warning, an ad), goes in "interrupts".
+   Never tap payment controls (pay, card, coupon): act refuses them and a skill never needs them. Put them in forbiddenLabels.
+   One exception: the kiosk's order button (주문하기 / Order) opens its order review, where the kiosk shows the total it will charge
+   (take-out or other charges included). With something in the cart, open it once with {"op":"openReview","label":"<that button>"},
+   read the total and anything added to it, then tap only a back button there. Declare it in "review", and do not list the order button in forbiddenLabels.
 2. As soon as the catalog draft has every category, call audit with the skill. It walks every category without AI and lists priced tiles missing from your catalog and tappable labels you have not explained. Fix them (explore and record the items, or add real controls to uiLabels) until audit says ok. It also opens every item and lists, in missingOptions, choices on the item's screen that its option groups lack: add them.
-3. Call testSkill with at least 3 different orders covering: options from several groups, qty>1, an item from another category, and a popup. Orders may be split over several calls, but they count only for the exact same skill and only while none failed; any change to the skill starts the count again. Fix and retest until the gate says ok.
-4. Call finish with the final skill. finish is accepted only if this exact skill passed testSkill (>= 3 orders), audit and the skill lint.
+3. Call testSkill with at least 3 different orders that together use EVERY option group of every orderable item (a priced option of each group that has prices), qty>1, items from several categories, and a popup. An order passes only when the skill's own total equals the kiosk's total (on the order review when "review" is declared): the kiosk's total is what the customer pays. testSkill lists the option groups no passing order has used yet. When totals differ, fix prices, option deltas or "charges"; if you cannot make an option's price match, remove that option from the skill (orders with it are then refused) and say why in notes. Orders may be split over several calls, but they count only for the exact same skill and only while none failed; any change to the skill starts the count again. Fix and retest until the gate says ok.
+4. Call finish with the final skill. finish is accepted only if this exact skill passed testSkill (>= 3 orders, every option group used, "review" declared when the kiosk shows an order button), audit and the skill lint.
 
-Step format for act and recipes: {"op":"click"|"check"|"clickIfVisible", "label"?: string, "role"?: aria role, "name"?: accessible name, "exact"?: boolean, "text"?: visible text, "within"?: text}.
+Step format for act and recipes: {"op":"click"|"check"|"clickIfVisible"|"openReview", "label"?: string, "role"?: aria role, "name"?: accessible name, "exact"?: boolean, "text"?: visible text, "within"?: text}.
 Targeting, in order of preference:
 - "label": exact match against TAPPABLE LABELS in the snapshot (first text line of each clickable element). Best for tiles, tabs, toggles and buttons.
 - "role"+"name": for radios/checkboxes/dialog buttons (name match is substring unless exact:true).
@@ -66,7 +83,7 @@ Skill schema:
  "kiosk": string,
  "categories": [every category tab label, in order],
  "uiLabels": [tappable labels on the menu screens that are controls, not items or categories, e.g. close/cancel buttons],
- "forbiddenLabels": [the kiosk's checkout and payment buttons; never clicked],
+ "forbiddenLabels": [the kiosk's payment buttons; never clicked],
  "dineOptions": {"<our value: eat_in|take_out>": "<label to click>"},
  "catalog": [{"name","category","price":number,"soldOut":bool,"recipe"?: string,"optionGroups":[{"name","required":bool,"min":number,"max":number,
     "type"?: "single"|"multi"|"quantity", "appliesWhen"?: "<other group name>=<option name>", "select"?: [steps], "after"?: [steps],
@@ -74,6 +91,9 @@ Skill schema:
  "recipes": {"startOrder":[steps using {dineOption} = the label], "addToCart":[steps using {category},{item},{option},{qtyMinus1}], "<otherName>": [...] },
  (Items whose ordering flow differs from the common one may set "recipe":"<otherName>" in their catalog entry.)
  "cartTotalPattern": "JS regex string whose group 1 is the cart total digits as shown in the snapshot",
+ "interrupts"?: [{"text": "<a phrase shown only on the popup>", "dismiss": <one step that closes it and keeps the order; never one that orders, pays, adds or starts over>}] (the runner answers them before each step and after a step times out),
+ "review"?: {"open": [steps from the menu with a full cart to the order review, including one {"op":"openReview","label":"<order button>"}], "totalPattern": "JS regex, group 1 = the total on the review", "close"?: [steps back to the menu, e.g. a back button]},
+ "charges"?: [{"name","amount":number,"dineOption"?: "<dine label>"}] (amounts the review adds once per order, e.g. a take-out container; only for that dine choice when dineOption is given),
  "notes": [strings: popups, rules, quirks]
 }
 Option groups:
@@ -104,8 +124,10 @@ let finalSkill = null;
 const notes = { item: [], flow: [] };
 let lastTestTurn = 0;
 let lastPassedSkill = null;
-// The finish gate: >= 3 different orders passed for this exact skill (over one or more testSkill calls), none failed.
-let gate = { key: null, passed: new Set(), failed: false };
+// The finish gate, for this exact skill over one or more testSkill calls: >= 3 different orders passed and none failed
+// (an order passes only when the skill's total equals the kiosk's), the passing orders together used every option
+// group (uncoveredGroups, I-197), and the order review is declared when the kiosk showed its order button (I-195).
+let gate = { key: null, passed: new Map(), failed: false, reviewOpener: null };
 let lastAudit = null;
 const optionWarned = new Set();
 stats.audits = 0;
@@ -141,16 +163,27 @@ async function call(name, args) {
       const lint = lintSkill(skill);
       const results = [];
       for (const o of orders) results.push(await runOrder(skill, o));
-      console.log(`  test #${stats.tests}: ${results.map((r) => (r.ok ? 'PASS' : 'FAIL')).join(' ')}${lint.length ? ` lint=${lint.length}` : ''}`);
       const key = JSON.stringify(skill);
-      if (gate.key !== key) gate = { key, passed: new Set(), failed: false };
-      results.forEach((r, i) => { if (r.ok) gate.passed.add(JSON.stringify(orders[i])); else gate.failed = true; });
-      const ok = !lint.length && !gate.failed && gate.passed.size >= 3;
+      if (gate.key !== key) gate = { key, passed: new Map(), failed: false, reviewOpener: null };
+      results.forEach((r, i) => {
+        if (r.ok) gate.passed.set(JSON.stringify(orders[i]), orders[i]); else gate.failed = true;
+        if (r.reviewOpener) gate.reviewOpener = r.reviewOpener;
+      });
+      const uncovered = uncoveredGroups(skill, [...gate.passed.values()]);
+      const needReview = !skill.review && gate.reviewOpener;
+      const ok = !lint.length && !gate.failed && gate.passed.size >= 3 && !uncovered.length && !needReview;
       lastPassedSkill = ok ? key : null;
+      console.log(`  test #${stats.tests}: ${results.map((r) => (r.ok ? 'PASS' : 'FAIL')).join(' ')}${lint.length ? ` lint=${lint.length}` : ''}`
+        + `${uncovered.length ? ` uncovered=${uncovered.length}` : ''}${needReview ? ` review=${gate.reviewOpener}` : ''}`);
+      const missing = [
+        ...(gate.passed.size < 3 || gate.failed ? [`>= 3 different passing orders (now ${gate.passed.size}${gate.failed ? ', and one failed: fix the skill, which starts the count again' : ''})`] : []),
+        ...(lint.length ? ['no lint errors'] : []),
+        ...(uncovered.length ? [`passing orders that use these option groups (a priced option where the group has prices): ${uncovered.slice(0, 20).map((g) => `"${g.group}" (e.g. on ${g.item})`).join(', ')}${uncovered.length > 20 ? ` and ${uncovered.length - 20} more` : ''}`] : []),
+        ...(needReview ? [`"review": the kiosk shows its order button ${JSON.stringify(gate.reviewOpener)}; open it with {"op":"openReview","label":${JSON.stringify(gate.reviewOpener)}}, read the total there with totalPattern, and do not list it in forbiddenLabels`] : []),
+      ];
       return {
-        results, ...(lint.length ? { lint } : {}),
-        gate: ok ? 'ok: finish accepts this exact skill if the audit passes'
-          : `not yet: finish needs this exact skill to pass >= 3 different orders (now ${gate.passed.size}${gate.failed ? ', and one failed: fix the skill, which starts the count again' : ''})${lint.length ? ' and no lint errors' : ''}`,
+        results: results.map(({ shownTotal, expectedTotal, ...r }) => r), ...(lint.length ? { lint } : {}),
+        gate: ok ? 'ok: finish accepts this exact skill if the audit passes' : `not yet: finish needs, for this exact skill, ${missing.join('; ')}`,
       };
     }
     if (name === 'audit') {
@@ -164,7 +197,7 @@ async function call(name, args) {
       const sk = JSON.parse(args.skillJson);
       const lint = lintSkill(sk);
       if (lint.length) return { ok: false, error: 'Rejected by the skill lint.', lint };
-      if (JSON.stringify(sk) !== lastPassedSkill) return { ok: false, error: 'Rejected: this exact skill must pass testSkill on at least 3 different orders (none failing) before finish.' };
+      if (JSON.stringify(sk) !== lastPassedSkill) return { ok: false, error: 'Rejected: this exact skill must pass the testSkill gate first: at least 3 different orders (none failing), every option group used by a passing order, and "review" when the kiosk shows an order button.' };
       const cov = await audit(sk);
       lastAudit = cov.ok;
       console.log(`  finish audit: ${cov.ok ? 'OK' : 'GAPS'}`);
@@ -358,7 +391,7 @@ async function openaiLoop() {
 }
 
 await browser.close().catch(() => {});
-const result = { provider: PROVIDER, model: MODEL, cachedInputTokens: stats.cached, finished: !!finalSkill, turns: stats.turns, acts: stats.acts, tests: stats.tests, inputTokens: stats.inTok, outputTokens: stats.outTok, minutes: ((Date.now() - stats.t0) / 60000).toFixed(1), ...(crash ? { error: crash.message.split('\n')[0] } : {}) };
+const result = { provider: PROVIDER, model: MODEL, learner: LEARNER, cachedInputTokens: stats.cached, finished: !!finalSkill, turns: stats.turns, acts: stats.acts, tests: stats.tests, inputTokens: stats.inTok, outputTokens: stats.outTok, minutes: ((Date.now() - stats.t0) / 60000).toFixed(1), ...(crash ? { error: crash.message.split('\n')[0] } : {}) };
 console.log(JSON.stringify(result));
 if (finalSkill) fs.writeFileSync('skill.json', JSON.stringify(finalSkill, null, 2));
 fs.writeFileSync('learn-stats.json', JSON.stringify(result, null, 2));

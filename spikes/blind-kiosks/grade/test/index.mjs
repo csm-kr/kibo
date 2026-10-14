@@ -5,3 +5,4 @@ import './classify.test.mjs';
 import './catalog.test.mjs';
 import './noskill.test.mjs';
 import './cart.test.mjs';
+import './round3.test.mjs';

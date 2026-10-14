@@ -2,7 +2,7 @@
 import { chromium } from 'playwright-core';
 import { pathToFileURL } from 'node:url';
 import path from 'node:path';
-import { planSteps, isForbidden } from './plan.mjs';
+import { planSteps, isForbidden, isReviewOpener } from './plan.mjs';
 
 export const KIOSK_URL = process.env.KIOSK_URL ?? pathToFileURL(path.resolve('kiosk/index.html')).href;
 
@@ -90,6 +90,9 @@ function repeatedLine(marks) {
   return rep.length ? `\nREPEATED LABELS: ${rep.join('; ')} (add "within": "<text near the one you mean>" to a step)` : '';
 }
 
+// The tappable labels on screen now, as the snapshot names them.
+export const tappableLabels = async (page) => (await page.evaluate(MARK_CLICKABLES)).map((m) => m.label);
+
 export async function snapshot(page, alerts) {
   const tree = await page.locator('body').ariaSnapshot();
   const marks = await page.evaluate(MARK_CLICKABLES);
@@ -147,11 +150,16 @@ async function locate(page, step) {
 
 const describe = (s) => [s.label, s.name, s.text].find(Boolean);
 
-// One primitive step. Ops: click, check, clickIfVisible. Target by label (preferred), role+name, or text, optionally
-// narrowed by "within". A payment or checkout control is never clicked (isForbidden in plan.mjs, plus opts.forbidden).
+// One primitive step. Ops: click, check, clickIfVisible, openReview. Target by label (preferred), role+name, or text,
+// optionally narrowed by "within". A payment or checkout control is never clicked (isForbidden in plan.mjs, plus
+// opts.forbidden). openReview is the one exception: it taps only the kiosk's order button (isReviewOpener).
 export async function act(page, step, opts = {}) {
-  const refuse = (what) => new Error(`Refused: ${JSON.stringify(what)} is a payment or checkout control; a skill never needs it (list it in forbiddenLabels)`);
-  if (describe(step) && isForbidden(describe(step), opts.forbidden)) throw refuse(describe(step));
+  const review = step.op === 'openReview';
+  const allowed = (t) => (review ? isReviewOpener(t, opts.forbidden) : !isForbidden(t, opts.forbidden));
+  const refuse = (what) => new Error(review
+    ? `Refused: ${JSON.stringify(what)} is not the order button. openReview taps only the kiosk's order button (주문하기, Order) to open its order review; never a payment, send or forbiddenLabels control`
+    : `Refused: ${JSON.stringify(what)} is a payment or checkout control; a skill never needs it (list it in forbiddenLabels)`);
+  if (describe(step) && !allowed(describe(step))) throw refuse(describe(step));
   let loc = await locate(page, step);
   if (loc.missing && step.op === 'clickIfVisible') return;
   // The target may still be appearing (an animation, a dialog): look again for up to 3 s, as a click would wait.
@@ -161,14 +169,47 @@ export async function act(page, step, opts = {}) {
   }
   if (loc.missing) throw new Error(loc.missing);
   const text = await loc.evaluate((el) => `${el.getAttribute('data-kibo-label') ?? ''}\n${el.innerText ?? ''}`);
-  if (isForbidden(text, opts.forbidden)) throw refuse(text.trim().split('\n')[0]);
+  if (!allowed(text)) throw refuse(text.trim().split('\n')[0]);
   if (step.op === 'clickIfVisible') return loc.click({ timeout: 2000 });
   if (step.op === 'check') return loc.check({ timeout: 3000 });
   return loc.click({ timeout: 3000 });
 }
 
+// Answers the skill's interrupts (popups that can come up between any two steps, I-194) that are on screen now: one
+// whose text is visible gets its dismiss step, under the same payment rule as any step. Returns the texts answered.
+export async function answerInterrupts(page, interrupts, opts = {}) {
+  const answered = [];
+  for (const it of interrupts ?? []) {
+    if (!it?.text || !it.dismiss) continue;
+    const shown = await page.getByText(String(it.text)).filter({ visible: true }).count().catch(() => 0);
+    if (!shown) continue;
+    await act(page, { ...it.dismiss, op: it.dismiss.op === 'clickIfVisible' ? 'clickIfVisible' : 'click' }, opts);
+    await page.waitForTimeout(150);
+    answered.push(it.text);
+  }
+  return answered;
+}
+
+// One step with the skill's interrupts: answered before the step, and when the step fails (a click that timed out
+// under a popup, a target the popup hid) answered again and the step retried once. opts.answered collects
+// { text, afterError } for the result. A refused step is never retried.
+async function interruptible(page, step, opts) {
+  const note = (texts, afterError) => texts.forEach((text) => opts.answered?.push({ text, afterError }));
+  if (!opts.interrupts?.length) return act(page, step, opts);
+  note(await answerInterrupts(page, opts.interrupts, opts), false);
+  try {
+    return await act(page, step, opts);
+  } catch (e) {
+    if (/^Refused/.test(e.message)) throw e;
+    const texts = await answerInterrupts(page, opts.interrupts, opts).catch(() => []);
+    if (!texts.length) throw e;
+    note(texts, true);
+    return act(page, step, opts);
+  }
+}
+
 // Executes a recipe (list of steps with {placeholders}): the whole plan is expanded first (plan.mjs), then each
-// step runs in order. Control ops: forEach, repeat, chooseOptions.
+// step runs in order, answering opts.interrupts. Control ops: forEach, repeat, chooseOptions.
 export async function runSteps(page, steps, vars, opts = {}) {
-  for (const s of planSteps(steps, vars)) await act(page, s, opts);
+  for (const s of planSteps(steps, vars)) await interruptible(page, s, opts);
 }

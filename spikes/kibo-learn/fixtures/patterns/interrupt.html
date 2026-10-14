@@ -1,0 +1,80 @@
+<!doctype html>
+<!-- Synthetic fixture for learner regression tests (spikes/kibo-learn/patterns.test.mjs), written from I-194: a
+     "계속 주문하시겠어요?" modal that comes up in the middle of a line (after every 4th tap), or, with ?on=enter, at the
+     moment the pointer first reaches 담기, so the click under it times out. 계속 주문하기 keeps the order; 처음으로
+     empties the cart. 주문하기 leads to payment. -->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>패턴: 주문 중 안내창</title>
+<style>
+  body { font-family: sans-serif; margin: 0; padding: 8px; }
+  .tile, .opt { cursor: pointer; border: 1px solid #999; padding: 12px; margin: 6px; display: inline-block; }
+  .hidden { display: none !important; }
+  #modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 10; }
+  #modal .box { background: #fff; padding: 24px; }
+</style>
+</head>
+<body>
+<section id="home"><h1>모의 카페</h1><button id="start">시작하기</button></section>
+<section id="menu" class="hidden">
+  <div class="tile" data-item="라떼"><div>라떼</div><div>4,000원</div></div>
+  <div class="tile" data-item="머핀"><div>머핀</div><div>2,500원</div></div>
+</section>
+<section id="sheet" class="hidden" role="dialog">
+  <h2 id="title"></h2>
+  <div id="groups">
+    <div><h3>온도</h3><span class="opt" data-g="temp" data-v="HOT" data-p="0"><b>HOT</b></span><span class="opt" data-g="temp" data-v="ICED" data-p="500"><b>ICED</b> <small>+500원</small></span></div>
+    <div><h3>사이즈</h3><span class="opt" data-g="size" data-v="레귤러" data-p="0"><b>레귤러</b></span><span class="opt" data-g="size" data-v="라지" data-p="700"><b>라지</b> <small>+700원</small></span></div>
+  </div>
+  <button id="cancel">취소</button><button id="add">담기</button>
+</section>
+<section id="cart"><h2>장바구니</h2><ul id="lines"></ul><div id="total">합계 0원</div><button id="checkout">주문하기</button></section>
+<section id="pay" class="hidden"><h2>결제</h2><button>카드 결제</button></section>
+<div id="modal" class="hidden" role="dialog" aria-modal="true">
+  <div class="box"><p>계속 주문하시겠어요?</p><p>30초 후 처음 화면으로 돌아갑니다</p><button id="quit">처음으로</button> <button id="keep">계속 주문하기</button></div>
+</div>
+<script>
+  const $ = (s) => document.querySelector(s);
+  const show = (id, on) => $('#' + id).classList.toggle('hidden', !on);
+  const won = (n) => n.toLocaleString('en-US') + '원';
+  const PRICES = { 라떼: 4000, 머핀: 2500 };
+  const onEnter = new URLSearchParams(location.search).get('on') === 'enter';
+  let lines = [];
+  let cur = null;
+  let taps = 0;
+  let entered = false;
+  const modal = () => show('modal', true);
+  // Every 4th tap outside the modal brings it up right after that tap's own work: the next tap lands on its backdrop.
+  document.addEventListener('click', (e) => {
+    if (onEnter || e.target.closest('#modal')) return;
+    if (++taps % 4 === 0) setTimeout(modal, 0);
+  }, true);
+  // ?on=enter: the modal comes up as the pointer reaches 담기 the first time, so that click is intercepted.
+  $('#add').addEventListener('pointerenter', () => { if (onEnter && !entered) { entered = true; modal(); } });
+  $('#keep').onclick = () => show('modal', false);
+  $('#quit').onclick = () => { lines = []; render(); show('modal', false); show('sheet', false); show('menu', false); show('home', true); };
+  $('#start').onclick = () => { show('home', false); show('menu', true); };
+  document.querySelectorAll('.tile').forEach((t) => { t.onclick = () => open(t.dataset.item); });
+  function open(item) {
+    cur = { item, temp: null, size: null };
+    $('#title').textContent = item;
+    show('groups', item === '라떼');
+    show('sheet', true);
+  }
+  document.querySelectorAll('.opt').forEach((o) => { o.onclick = () => { cur[o.dataset.g] = o; }; });
+  $('#cancel').onclick = () => show('sheet', false);
+  $('#add').onclick = () => {
+    const picked = [cur.temp, cur.size].filter(Boolean);
+    lines.push({ name: cur.item, desc: picked.map((o) => o.dataset.v), unit: PRICES[cur.item] + picked.reduce((a, o) => a + Number(o.dataset.p), 0) });
+    show('sheet', false);
+    render();
+  };
+  function render() {
+    $('#lines').innerHTML = lines.map((l) => `<li>${l.name}${l.desc.length ? ' (' + l.desc.join(', ') + ')' : ''} ${won(l.unit)}</li>`).join('');
+    $('#total').textContent = '합계 ' + won(lines.reduce((a, l) => a + l.unit, 0));
+  }
+  $('#checkout').onclick = () => { if (lines.length) { show('menu', false); show('pay', true); } };
+</script>
+</body>
+</html>

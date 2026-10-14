@@ -1,0 +1,19 @@
+{
+  "kiosk": { "name": "모의 분식", "nameEn": "Mock Snack Bar", "domain": "snack bar (test fixture: spikes/kibo-learn/fixtures/patterns/review.html)" },
+  "flow": ["start", "dine or take-out", "menu with cart", "order review (adds 100원 for take-out)", "payment methods"],
+  "categories": [{ "label": "메뉴", "itemCount": 2 }],
+  "optionGroups": {
+    "size": { "title": "사이즈", "type": "single", "required": false, "min": 0, "max": 1, "default": null, "appliesWhen": null,
+      "options": [{ "id": "regular", "label": "레귤러", "priceDelta": 0 }, { "id": "large", "label": "라지", "priceDelta": 500 }] }
+  },
+  "items": [
+    { "name": "커피", "category": "메뉴", "basePrice": 3000, "soldOut": false, "timeLimited": null, "optionGroups": ["size"] },
+    { "name": "쿠키", "category": "메뉴", "basePrice": 1500, "soldOut": false, "timeLimited": null, "optionGroups": [] }
+  ],
+  "promotions": [{ "rule": "take-out", "effect": "+100원 container charge, shown on the order review only" }],
+  "holdoutOrders": [
+    { "id": "h1", "dine": "포장해요", "lines": [{ "item": "커피", "options": { "size": ["large"] }, "qty": 1 }], "expectedTotal": 3600, "patterns": ["take-out"] },
+    { "id": "h2", "dine": "먹고 가요", "lines": [{ "item": "쿠키", "options": {}, "qty": 1 }], "expectedTotal": 1500, "patterns": ["dine-in"] }
+  ],
+  "quirks": []
+}
