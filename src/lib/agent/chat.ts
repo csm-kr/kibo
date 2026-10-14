@@ -12,6 +12,7 @@ import { KIOSK_BUSY, waitForBridge } from "./bridgeWait";
 import { chatInstructions } from "./instructions";
 import { toolCallToCommand, toolResult } from "./mapping";
 import type { ModelClient, ModelTurn } from "./model";
+import { plainRequest, quickReply, type DoneCall } from "./quickReply";
 import { toolDeclarations } from "./tools";
 
 // The text agent (POST /api/chat): a Gemini function-calling loop over the same commands the phone sends.
@@ -131,6 +132,10 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
     return outcome;
   };
 
+  // A plain request in the screens' language may get its reply from the first round's results (quickReply.ts):
+  // the second model call only wrote a confirmation the server already knows (14-final:5).
+  const templated = (input.language === undefined || input.language === input.locale) && plainRequest(input.message, input.locale);
+
   // The cart before each call, so a remove or update can name its line.
   let cart = session.cart;
   const actions: AgentAction[] = [];
@@ -142,10 +147,12 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
     // Unchanged, so Gemini 3's thought signatures go back with the function calls.
     contents.push(out.content);
     const parts = [];
+    const done: DoneCall[] = [];
     for (const call of out.functionCalls) {
       const started = performance.now();
       const outcome = await run(call.name, call.args);
       actions.push(agentAction(call.name, call.args, outcome, performance.now() - started, cart));
+      done.push({ name: call.name, args: call.args, outcome, cartBefore: cart });
       if (outcome.ok) cart = outcome.response.cart;
       // Tool names and result codes only (SECURITY "Secrets and repo hygiene").
       console.info("chat tool:", toolNames.has(call.name) ? call.name : "unknown", outcome.ok ? "ok" : outcome.error.code);
@@ -153,6 +160,12 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
       parts.push({ functionResponse: { ...(call.id ? { id: call.id } : {}), name: call.name, response } });
     }
     contents.push({ role: "user", parts });
+    // Only the first round, and only when the model said nothing itself: its text may hold an answer.
+    const quick = round === 0 && templated && !out.text ? quickReply(kiosk, input.locale, done) : null;
+    if (quick) {
+      reply = quick;
+      break;
+    }
   }
 
   const latest = await store.get(input.sessionId);

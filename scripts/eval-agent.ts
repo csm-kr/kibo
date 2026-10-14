@@ -72,6 +72,8 @@ interface RequestLog {
   ms: number;
   /** Until the first command was committed; null when no command was accepted. */
   firstToolMs: number | null;
+  /** Each model call of the request, in ms (14-final:5): one entry means the reply needed no second round. */
+  rounds: number[];
   tools: ToolCall[];
   error?: string;
 }
@@ -94,8 +96,8 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 /** Model calls per backend that answered, so an auto run says how much Vertex served. */
 const served: Record<TextBackend, number> = { api: 0, vertex: 0 };
 
-/** Records each tool call and the result code the model received for it. */
-function recording(inner: ModelClient, calls: ToolCall[]): ModelClient {
+/** Records each tool call, the result code the model received for it, and how long each model call took. */
+function recording(inner: ModelClient, calls: ToolCall[], rounds: number[]): ModelClient {
   return {
     async generate(req) {
       // The previous round's results are the last user turn, in call order.
@@ -107,7 +109,9 @@ function recording(inner: ModelClient, calls: ToolCall[]): ModelClient {
       results.forEach((code, i) => {
         if (waiting[i]) waiting[i].code = code;
       });
+      const t0 = Date.now();
       const out = await inner.generate(req);
+      rounds.push(Date.now() - t0);
       if (out.backend) served[out.backend]++;
       for (const c of out.functionCalls) calls.push({ name: c.name, code: "unsent" });
       return out;
@@ -261,19 +265,24 @@ async function runCase(c: Case) {
     const stop = store.subscribe(sessionId, (s) => {
       if (firstAt === null && s && s.recentCommandIds.length > known) firstAt = Date.now();
     });
-    const log: RequestLog = { ms: 0, firstToolMs: null, tools: calls };
+    const rounds: number[] = [];
+    const log: RequestLog = { ms: 0, firstToolMs: null, rounds, tools: calls };
     try {
       // A new client per request, as the route makes one: it keeps one request on one backend.
-      const deps = () => ({ store, model: recording(geminiClient(), calls), usage, now });
-      let reply: string;
+      const deps = () => ({ store, model: recording(geminiClient(), calls, rounds), usage, now });
+      let out: Awaited<ReturnType<typeof runChat>>;
       try {
-        reply = (await runChat(deps(), input)).reply;
+        out = await runChat(deps(), input);
       } catch (e) {
         if (!(e instanceof CommandError && e.code === "RATE_LIMITED")) throw e;
         // Same chatRequestId: commands already applied come back as duplicates instead of applying twice.
         await sleep(RETRY_WAIT_MS);
-        reply = (await runChat(deps(), input)).reply;
+        out = await runChat(deps(), input);
       }
+      const reply = out.reply;
+      // A reply built from the results (14-final:5) sends them to no model, so their codes come from the actions.
+      const unsent = calls.filter((c) => c.code === "unsent");
+      if (unsent.length > 0) out.actions.slice(-unsent.length).forEach((a, i) => (unsent[i].code = a.code));
       chat = chatReducer(chat, { type: "reply", text: reply });
       lastReply = reply;
       languages.push(replyLanguage(reply, getKiosk(kioskId)));
@@ -387,6 +396,7 @@ async function main() {
   const reqs = results.flatMap((r) => r.requests).filter((q) => !q.error);
   const totals = reqs.map((q) => q.ms);
   const firsts = reqs.flatMap((q) => (q.firstToolMs === null ? [] : [q.firstToolMs]));
+  const roundMs = reqs.flatMap((q) => q.rounds);
   const latency = {
     requests: reqs.length,
     totalMedianMs: percentile(totals, 50),
@@ -394,6 +404,15 @@ async function main() {
     firstToolRequests: firsts.length,
     firstToolMedianMs: percentile(firsts, 50),
     firstToolP90Ms: percentile(firsts, 90),
+    // Model calls (14-final:5): how many each request needed, and how long one took.
+    modelCalls: roundMs.length,
+    roundMedianMs: percentile(roundMs, 50),
+    roundP90Ms: percentile(roundMs, 90),
+    callsPerRequest: Object.fromEntries(
+      [...new Set(reqs.map((q) => q.rounds.length))].sort((a, b) => a - b).map((n) => [n, reqs.filter((q) => q.rounds.length === n).length]),
+    ),
+    // Requests that changed something with a single model call: the reply was built from the tool results.
+    oneCallWithTools: reqs.filter((q) => q.rounds.length === 1 && q.tools.length > 0).length,
   };
   const pct = (n: number, d: number) => `${((100 * n) / d).toFixed(1)}%`;
 
@@ -432,6 +451,7 @@ async function main() {
     `- Overall: **${passed}/${results.length} (${pct(passed, results.length || 1)})**`,
     `- Latency per request (${latency.requests} requests): median ${latency.totalMedianMs} ms, p90 ${latency.totalP90Ms} ms`,
     `- Until the first command is applied (${latency.firstToolRequests} requests): median ${latency.firstToolMedianMs} ms, p90 ${latency.firstToolP90Ms} ms`,
+    `- Model calls: ${latency.modelCalls}, one call median ${latency.roundMedianMs} ms, p90 ${latency.roundP90Ms} ms; requests by calls ${JSON.stringify(latency.callsPerRequest)}; one call with tools ${latency.oneCallWithTools}`,
     "",
     "| Group | Pass |",
     "|---|---|",

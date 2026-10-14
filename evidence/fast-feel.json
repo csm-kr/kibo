@@ -1,0 +1,933 @@
+{
+  "date": "2026-10-14",
+  "step": "14-final:5 fast-feel",
+  "change": "A plain request in the screens language (ko or en, no question) whose first-round tool calls all succeed (setDineOption, addToCart, updateCart, removeFromCart, undoLastChange, requestCheckout, confirmCheckout; no upsell; direct kiosk; no model text beside the calls) gets its reply from fixed ko/en sentences over the results and menu data (src/lib/agent/quickReply.ts) instead of a second model call. Everything else is unchanged.",
+  "how": "npm run eval:agent (in process, no network to the route), text agent on Vertex AI global (GEMINI_TEXT_BACKEND=vertex from the local .env), gemini-3.8-flash thinking low; one full run before and one after on the same 70 cases, then a partial run of the 15 cases with templated turns. Timings in ms; one run each, Vertex latency varies a lot between runs (single model calls of 20-31 s in both runs, I-157).",
+  "before": {
+    "file": "evals/results/2026-10-14T12-42.{json,md}",
+    "cases": 70,
+    "passed": 70,
+    "subset": false,
+    "byGroup": {
+      "original": {
+        "pass": 44,
+        "total": 44
+      },
+      "colloquial": {
+        "pass": 12,
+        "total": 12
+      },
+      "language": {
+        "pass": 14,
+        "total": 14
+      }
+    },
+    "modelCallsByBackend": {
+      "api": 0,
+      "vertex": 206
+    },
+    "latency": {
+      "requests": 87,
+      "totalMedianMs": 7553,
+      "totalP90Ms": 19328,
+      "firstToolRequests": 87,
+      "firstToolMedianMs": 4087,
+      "firstToolP90Ms": 10700,
+      "modelCalls": 206,
+      "roundMedianMs": 2443,
+      "roundP90Ms": 8763,
+      "callsPerRequest": {
+        "2": 55,
+        "3": 32
+      },
+      "oneCallWithTools": 0
+    }
+  },
+  "after": {
+    "file": "evals/results/2026-10-14T12-59.{json,md}",
+    "cases": 70,
+    "passed": 69,
+    "subset": false,
+    "byGroup": {
+      "original": {
+        "pass": 44,
+        "total": 44
+      },
+      "colloquial": {
+        "pass": 12,
+        "total": 12
+      },
+      "language": {
+        "pass": 13,
+        "total": 14
+      }
+    },
+    "modelCallsByBackend": {
+      "api": 0,
+      "vertex": 172
+    },
+    "latency": {
+      "requests": 87,
+      "totalMedianMs": 7072,
+      "totalP90Ms": 26876,
+      "firstToolRequests": 85,
+      "firstToolMedianMs": 3902,
+      "firstToolP90Ms": 16930,
+      "modelCalls": 172,
+      "roundMedianMs": 2504,
+      "roundP90Ms": 13015,
+      "callsPerRequest": {
+        "1": 25,
+        "2": 39,
+        "3": 23
+      },
+      "oneCallWithTools": 23
+    }
+  },
+  "afterSubset": {
+    "file": "evals/results/2026-10-14T13-18.{json,md}",
+    "cases": 15,
+    "passed": 14,
+    "subset": true,
+    "byGroup": {
+      "original": {
+        "pass": 12,
+        "total": 12
+      },
+      "colloquial": {
+        "pass": 2,
+        "total": 2
+      },
+      "language": {
+        "pass": 0,
+        "total": 1
+      }
+    },
+    "modelCallsByBackend": {
+      "api": 0,
+      "vertex": 37
+    },
+    "latency": {
+      "requests": 28,
+      "totalMedianMs": 4234,
+      "totalP90Ms": 12334,
+      "firstToolRequests": 28,
+      "firstToolMedianMs": 2673,
+      "firstToolP90Ms": 10390,
+      "modelCalls": 37,
+      "roundMedianMs": 2176,
+      "roundP90Ms": 9652,
+      "callsPerRequest": {
+        "1": 23,
+        "2": 1,
+        "3": 4
+      },
+      "oneCallWithTools": 23
+    }
+  },
+  "templatedTurns": {
+    "note": "Requests that changed something with one model call after the change, paired with the same case and turn of the before run.",
+    "fullRun": {
+      "requests": 23,
+      "beforeMedianMs": 7421,
+      "beforeP90Ms": 19328,
+      "afterMedianMs": 3217,
+      "afterP90Ms": 19636,
+      "skippedModelTimeMedianMs": 3333,
+      "pairs": [
+        {
+          "case": "t1-ko-several",
+          "turn": 0,
+          "beforeMs": 9817,
+          "beforeModelCallsMs": [
+            5719,
+            2286,
+            1712
+          ],
+          "afterMs": 7757,
+          "afterModelCallsMs": [
+            7614
+          ],
+          "tools": [
+            "addToCart",
+            "addToCart",
+            "addToCart"
+          ]
+        },
+        {
+          "case": "t5-en-both-fries-large",
+          "turn": 1,
+          "beforeMs": 5781,
+          "beforeModelCallsMs": [
+            2923,
+            2855
+          ],
+          "afterMs": 2170,
+          "afterModelCallsMs": [
+            2160
+          ],
+          "tools": [
+            "updateCart",
+            "updateCart"
+          ]
+        },
+        {
+          "case": "t5-ko-fries-large",
+          "turn": 1,
+          "beforeMs": 4400,
+          "beforeModelCallsMs": [
+            1870,
+            2529
+          ],
+          "afterMs": 1735,
+          "afterModelCallsMs": [
+            1734
+          ],
+          "tools": [
+            "updateCart"
+          ]
+        },
+        {
+          "case": "t5-en-undo",
+          "turn": 0,
+          "beforeMs": 19328,
+          "beforeModelCallsMs": [
+            3292,
+            13991,
+            2042
+          ],
+          "afterMs": 1861,
+          "afterModelCallsMs": [
+            1859
+          ],
+          "tools": [
+            "addToCart"
+          ]
+        },
+        {
+          "case": "t5-en-undo",
+          "turn": 1,
+          "beforeMs": 6854,
+          "beforeModelCallsMs": [
+            1945,
+            1727,
+            3180
+          ],
+          "afterMs": 1591,
+          "afterModelCallsMs": [
+            1588
+          ],
+          "tools": [
+            "addToCart"
+          ]
+        },
+        {
+          "case": "t5-en-undo",
+          "turn": 2,
+          "beforeMs": 7913,
+          "beforeModelCallsMs": [
+            5290,
+            2620
+          ],
+          "afterMs": 26876,
+          "afterModelCallsMs": [
+            26875
+          ],
+          "tools": [
+            "undoLastChange"
+          ]
+        },
+        {
+          "case": "t5-ko-undo",
+          "turn": 0,
+          "beforeMs": 15965,
+          "beforeModelCallsMs": [
+            6486,
+            9477
+          ],
+          "afterMs": 3268,
+          "afterModelCallsMs": [
+            3266
+          ],
+          "tools": [
+            "addToCart"
+          ]
+        },
+        {
+          "case": "t5-ko-undo",
+          "turn": 1,
+          "beforeMs": 9107,
+          "beforeModelCallsMs": [
+            7229,
+            1866
+          ],
+          "afterMs": 1645,
+          "afterModelCallsMs": [
+            1643
+          ],
+          "tools": [
+            "addToCart"
+          ]
+        },
+        {
+          "case": "t5-ko-undo",
+          "turn": 2,
+          "beforeMs": 3245,
+          "beforeModelCallsMs": [
+            1478,
+            1766
+          ],
+          "afterMs": 1401,
+          "afterModelCallsMs": [
+            1399
+          ],
+          "tools": [
+            "undoLastChange"
+          ]
+        },
+        {
+          "case": "t5-ko-qty",
+          "turn": 0,
+          "beforeMs": 11735,
+          "beforeModelCallsMs": [
+            4440,
+            5240,
+            2051
+          ],
+          "afterMs": 3217,
+          "afterModelCallsMs": [
+            3216
+          ],
+          "tools": [
+            "addToCart"
+          ]
+        },
+        {
+          "case": "t5-ko-qty",
+          "turn": 1,
+          "beforeMs": 7421,
+          "beforeModelCallsMs": [
+            4085,
+            1894,
+            1439
+          ],
+          "afterMs": 3145,
+          "afterModelCallsMs": [
+            3143
+          ],
+          "tools": [
+            "updateCart"
+          ]
+        },
+        {
+          "case": "co-en-ill-pay",
+          "turn": 0,
+          "beforeMs": 47771,
+          "beforeModelCallsMs": [
+            45635,
+            2132
+          ],
+          "afterMs": 2455,
+          "afterModelCallsMs": [
+            2452
+          ],
+          "tools": [
+            "setDineOption",
+            "addToCart"
+          ]
+        },
+        {
+          "case": "co-en-ill-pay",
+          "turn": 1,
+          "beforeMs": 6407,
+          "beforeModelCallsMs": [
+            1855,
+            4549
+          ],
+          "afterMs": 9601,
+          "afterModelCallsMs": [
+            9598
+          ],
+          "tools": [
+            "requestCheckout"
+          ]
+        },
+        {
+          "case": "co-en-pay-in-one-message",
+          "turn": 0,
+          "beforeMs": 7616,
+          "beforeModelCallsMs": [
+            4064,
+            1472,
+            2076
+          ],
+          "afterMs": 4529,
+          "afterModelCallsMs": [
+            4527
+          ],
+          "tools": [
+            "setDineOption",
+            "addToCart",
+            "requestCheckout"
+          ]
+        },
+        {
+          "case": "co-ko-yes-after-card",
+          "turn": 0,
+          "beforeMs": 24415,
+          "beforeModelCallsMs": [
+            4552,
+            19859
+          ],
+          "afterMs": 30971,
+          "afterModelCallsMs": [
+            30966
+          ],
+          "tools": [
+            "setDineOption",
+            "addToCart"
+          ]
+        },
+        {
+          "case": "co-ko-yes-after-card",
+          "turn": 1,
+          "beforeMs": 3030,
+          "beforeModelCallsMs": [
+            1473,
+            1555
+          ],
+          "afterMs": 19636,
+          "afterModelCallsMs": [
+            19635
+          ],
+          "tools": [
+            "requestCheckout"
+          ]
+        },
+        {
+          "case": "co-ko-yes-after-card",
+          "turn": 2,
+          "beforeMs": 3120,
+          "beforeModelCallsMs": [
+            1421,
+            1696
+          ],
+          "afterMs": 1918,
+          "afterModelCallsMs": [
+            1916
+          ],
+          "tools": [
+            "confirmCheckout"
+          ]
+        },
+        {
+          "case": "r2-en-family",
+          "turn": 0,
+          "beforeMs": 7239,
+          "beforeModelCallsMs": [
+            5417,
+            1789
+          ],
+          "afterMs": 7072,
+          "afterModelCallsMs": [
+            7020
+          ],
+          "tools": [
+            "addToCart",
+            "addToCart"
+          ]
+        },
+        {
+          "case": "r2-ko-family",
+          "turn": 0,
+          "beforeMs": 8545,
+          "beforeModelCallsMs": [
+            6213,
+            2287
+          ],
+          "afterMs": 5440,
+          "afterModelCallsMs": [
+            5439
+          ],
+          "tools": [
+            "addToCart",
+            "addToCart"
+          ]
+        },
+        {
+          "case": "rco-en-ill-pay",
+          "turn": 0,
+          "beforeMs": 5912,
+          "beforeModelCallsMs": [
+            2186,
+            3726
+          ],
+          "afterMs": 1972,
+          "afterModelCallsMs": [
+            1969
+          ],
+          "tools": [
+            "addToCart"
+          ]
+        },
+        {
+          "case": "rco-en-ill-pay",
+          "turn": 1,
+          "beforeMs": 6291,
+          "beforeModelCallsMs": [
+            4561,
+            1728
+          ],
+          "afterMs": 1531,
+          "afterModelCallsMs": [
+            1529
+          ],
+          "tools": [
+            "requestCheckout"
+          ]
+        },
+        {
+          "case": "c-ko-one-more-of-that",
+          "turn": 1,
+          "beforeMs": 6013,
+          "beforeModelCallsMs": [
+            1726,
+            1632,
+            2651
+          ],
+          "afterMs": 9885,
+          "afterModelCallsMs": [
+            9881
+          ],
+          "tools": [
+            "updateCart"
+          ]
+        },
+        {
+          "case": "c-en-same-again",
+          "turn": 1,
+          "beforeMs": 8958,
+          "beforeModelCallsMs": [
+            1851,
+            5149,
+            1955
+          ],
+          "afterMs": 16933,
+          "afterModelCallsMs": [
+            16927
+          ],
+          "tools": [
+            "addToCart",
+            "addToCart"
+          ]
+        }
+      ]
+    },
+    "subsetRun": {
+      "requests": 23,
+      "beforeMedianMs": 7421,
+      "beforeP90Ms": 19328,
+      "afterMedianMs": 2674,
+      "afterP90Ms": 9655,
+      "skippedModelTimeMedianMs": 3333,
+      "pairs": [
+        {
+          "case": "t1-ko-several",
+          "turn": 0,
+          "beforeMs": 9817,
+          "beforeModelCallsMs": [
+            5719,
+            2286,
+            1712
+          ],
+          "afterMs": 6985,
+          "afterModelCallsMs": [
+            6843
+          ],
+          "tools": [
+            "addToCart",
+            "addToCart",
+            "addToCart"
+          ]
+        },
+        {
+          "case": "t5-en-both-fries-large",
+          "turn": 1,
+          "beforeMs": 5781,
+          "beforeModelCallsMs": [
+            2923,
+            2855
+          ],
+          "afterMs": 2110,
+          "afterModelCallsMs": [
+            2103
+          ],
+          "tools": [
+            "updateCart",
+            "updateCart"
+          ]
+        },
+        {
+          "case": "t5-ko-fries-large",
+          "turn": 1,
+          "beforeMs": 4400,
+          "beforeModelCallsMs": [
+            1870,
+            2529
+          ],
+          "afterMs": 1878,
+          "afterModelCallsMs": [
+            1874
+          ],
+          "tools": [
+            "updateCart"
+          ]
+        },
+        {
+          "case": "t5-en-undo",
+          "turn": 0,
+          "beforeMs": 19328,
+          "beforeModelCallsMs": [
+            3292,
+            13991,
+            2042
+          ],
+          "afterMs": 5983,
+          "afterModelCallsMs": [
+            5980
+          ],
+          "tools": [
+            "addToCart"
+          ]
+        },
+        {
+          "case": "t5-en-undo",
+          "turn": 1,
+          "beforeMs": 6854,
+          "beforeModelCallsMs": [
+            1945,
+            1727,
+            3180
+          ],
+          "afterMs": 1734,
+          "afterModelCallsMs": [
+            1733
+          ],
+          "tools": [
+            "addToCart"
+          ]
+        },
+        {
+          "case": "t5-en-undo",
+          "turn": 2,
+          "beforeMs": 7913,
+          "beforeModelCallsMs": [
+            5290,
+            2620
+          ],
+          "afterMs": 1799,
+          "afterModelCallsMs": [
+            1797
+          ],
+          "tools": [
+            "undoLastChange"
+          ]
+        },
+        {
+          "case": "t5-ko-undo",
+          "turn": 0,
+          "beforeMs": 15965,
+          "beforeModelCallsMs": [
+            6486,
+            9477
+          ],
+          "afterMs": 4463,
+          "afterModelCallsMs": [
+            4460
+          ],
+          "tools": [
+            "addToCart"
+          ]
+        },
+        {
+          "case": "t5-ko-undo",
+          "turn": 1,
+          "beforeMs": 9107,
+          "beforeModelCallsMs": [
+            7229,
+            1866
+          ],
+          "afterMs": 1779,
+          "afterModelCallsMs": [
+            1776
+          ],
+          "tools": [
+            "addToCart"
+          ]
+        },
+        {
+          "case": "t5-ko-undo",
+          "turn": 2,
+          "beforeMs": 3245,
+          "beforeModelCallsMs": [
+            1478,
+            1766
+          ],
+          "afterMs": 1434,
+          "afterModelCallsMs": [
+            1432
+          ],
+          "tools": [
+            "undoLastChange"
+          ]
+        },
+        {
+          "case": "t5-ko-qty",
+          "turn": 0,
+          "beforeMs": 11735,
+          "beforeModelCallsMs": [
+            4440,
+            5240,
+            2051
+          ],
+          "afterMs": 2017,
+          "afterModelCallsMs": [
+            2015
+          ],
+          "tools": [
+            "addToCart"
+          ]
+        },
+        {
+          "case": "t5-ko-qty",
+          "turn": 1,
+          "beforeMs": 7421,
+          "beforeModelCallsMs": [
+            4085,
+            1894,
+            1439
+          ],
+          "afterMs": 1704,
+          "afterModelCallsMs": [
+            1703
+          ],
+          "tools": [
+            "updateCart"
+          ]
+        },
+        {
+          "case": "co-en-ill-pay",
+          "turn": 0,
+          "beforeMs": 47771,
+          "beforeModelCallsMs": [
+            45635,
+            2132
+          ],
+          "afterMs": 2074,
+          "afterModelCallsMs": [
+            2071
+          ],
+          "tools": [
+            "setDineOption",
+            "addToCart"
+          ]
+        },
+        {
+          "case": "co-en-ill-pay",
+          "turn": 1,
+          "beforeMs": 6407,
+          "beforeModelCallsMs": [
+            1855,
+            4549
+          ],
+          "afterMs": 10715,
+          "afterModelCallsMs": [
+            10714
+          ],
+          "tools": [
+            "requestCheckout"
+          ]
+        },
+        {
+          "case": "co-en-pay-in-one-message",
+          "turn": 0,
+          "beforeMs": 7616,
+          "beforeModelCallsMs": [
+            4064,
+            1472,
+            2076
+          ],
+          "afterMs": 3025,
+          "afterModelCallsMs": [
+            3023
+          ],
+          "tools": [
+            "setDineOption",
+            "addToCart",
+            "requestCheckout"
+          ]
+        },
+        {
+          "case": "co-ko-yes-after-card",
+          "turn": 0,
+          "beforeMs": 24415,
+          "beforeModelCallsMs": [
+            4552,
+            19859
+          ],
+          "afterMs": 12334,
+          "afterModelCallsMs": [
+            12331
+          ],
+          "tools": [
+            "setDineOption",
+            "addToCart"
+          ]
+        },
+        {
+          "case": "co-ko-yes-after-card",
+          "turn": 1,
+          "beforeMs": 3030,
+          "beforeModelCallsMs": [
+            1473,
+            1555
+          ],
+          "afterMs": 1994,
+          "afterModelCallsMs": [
+            1992
+          ],
+          "tools": [
+            "requestCheckout"
+          ]
+        },
+        {
+          "case": "co-ko-yes-after-card",
+          "turn": 2,
+          "beforeMs": 3120,
+          "beforeModelCallsMs": [
+            1421,
+            1696
+          ],
+          "afterMs": 2674,
+          "afterModelCallsMs": [
+            2673
+          ],
+          "tools": [
+            "confirmCheckout"
+          ]
+        },
+        {
+          "case": "r2-en-family",
+          "turn": 0,
+          "beforeMs": 7239,
+          "beforeModelCallsMs": [
+            5417,
+            1789
+          ],
+          "afterMs": 5382,
+          "afterModelCallsMs": [
+            5314
+          ],
+          "tools": [
+            "addToCart",
+            "addToCart"
+          ]
+        },
+        {
+          "case": "r2-ko-family",
+          "turn": 0,
+          "beforeMs": 8545,
+          "beforeModelCallsMs": [
+            6213,
+            2287
+          ],
+          "afterMs": 6951,
+          "afterModelCallsMs": [
+            6947
+          ],
+          "tools": [
+            "addToCart",
+            "addToCart"
+          ]
+        },
+        {
+          "case": "rco-en-ill-pay",
+          "turn": 0,
+          "beforeMs": 5912,
+          "beforeModelCallsMs": [
+            2186,
+            3726
+          ],
+          "afterMs": 5956,
+          "afterModelCallsMs": [
+            5954
+          ],
+          "tools": [
+            "addToCart"
+          ]
+        },
+        {
+          "case": "rco-en-ill-pay",
+          "turn": 1,
+          "beforeMs": 6291,
+          "beforeModelCallsMs": [
+            4561,
+            1728
+          ],
+          "afterMs": 9655,
+          "afterModelCallsMs": [
+            9652
+          ],
+          "tools": [
+            "requestCheckout"
+          ]
+        },
+        {
+          "case": "c-ko-one-more-of-that",
+          "turn": 1,
+          "beforeMs": 6013,
+          "beforeModelCallsMs": [
+            1726,
+            1632,
+            2651
+          ],
+          "afterMs": 4234,
+          "afterModelCallsMs": [
+            4232
+          ],
+          "tools": [
+            "updateCart"
+          ]
+        },
+        {
+          "case": "c-en-same-again",
+          "turn": 1,
+          "beforeMs": 8958,
+          "beforeModelCallsMs": [
+            1851,
+            5149,
+            1955
+          ],
+          "afterMs": 2416,
+          "afterModelCallsMs": [
+            2410
+          ],
+          "tools": [
+            "addToCart",
+            "addToCart"
+          ]
+        }
+      ]
+    }
+  },
+  "failures": {
+    "after": "l-es-ambiguous-picker-en (reply language undetected): not on the template path (Spanish message, two model calls); also failed in the subset run, passed in 2026-10-14T13-22 and 13-23 (I-228).",
+    "subset": "same case"
+  },
+  "notMeasured": [
+    "Production (Cloud Run) latency",
+    "the Gemini API key backend",
+    "text cost per order (evidence/cost-per-order.json predates this change)",
+    "streaming the reply (not built)"
+  ]
+}

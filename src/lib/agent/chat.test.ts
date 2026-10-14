@@ -196,7 +196,8 @@ describe("runChat", () => {
   it("stops after 5 rounds; the 6th is never executed", async () => {
     const s = await demo();
     const { model, requests } = script([{ name: "addToCart", args: { itemId: "cola" } }]);
-    const req = input(s);
+    // A question keeps the model answering after the first round (no template reply).
+    const req = input(s, { message: "A cola?" });
     const out = await runChat(deps(model), req);
     expect(requests).toHaveLength(5);
     expect(out.reply).toBe("Sorry, could you say that again?");
@@ -259,6 +260,41 @@ describe("runChat", () => {
     const model: ModelClient = { generate: () => Promise.reject(new CommandError("RATE_LIMITED", "Please try again in a moment.")) };
     const err = await errorOf(runChat(deps(model), input(s)));
     expect(err).toMatchObject({ code: "RATE_LIMITED", message: "Please try again in a moment." });
+  });
+
+  it("tools that all went through: the reply comes from the results, with one model call (14-final:5)", async () => {
+    const s = await demo();
+    const { model, requests } = script([{ name: "addToCart", args: { itemId: "cola" } }], "Model reply.");
+    const out = await runChat(deps(model), input(s, { message: "One cola, please." }));
+    expect(requests).toHaveLength(1);
+    expect(out.reply).toMatch(/^Added 1 × Cola.*\. Total ₩1,800\.$/);
+    expect(out.cart).toHaveLength(1);
+
+    const ko = script([{ name: "removeFromCart", args: { lineId: out.cart[0].lineId } }], "Model reply.");
+    const removed = await runChat(deps(ko.model), input(s, { message: "콜라 빼 주세요.", locale: "ko" }));
+    expect(ko.requests).toHaveLength(1);
+    expect(removed.reply).toBe("콜라 뺐어요. 모두 0원이에요.");
+  });
+
+  it("the model still writes the reply after a failure, a question, another language, its own text, or an upsell", async () => {
+    const cases: { first: Call[] | string; extra?: Partial<ChatInput>; text?: string }[] = [
+      { first: [{ name: "addToCart", args: { itemId: "cheese_burger", variant: "set" } }] },
+      { first: [{ name: "addToCart", args: { itemId: "cola" } }], extra: { message: "One cola. Is it cold?" } },
+      { first: [{ name: "addToCart", args: { itemId: "cola" } }], extra: { message: "One cola, please.", language: "ja" } },
+      { first: [{ name: "addToCart", args: { itemId: "cola" } }], extra: { message: "Satu cola, ya." } },
+      { first: [{ name: "addToCart", args: { itemId: "cola" } }], extra: { message: "One cola, please." }, text: "Sure!" },
+      { first: [{ name: "addToCart", args: { itemId: "cheese_burger", variant: "single" } }], extra: { message: "One cheeseburger, please." } },
+    ];
+    for (const c of cases) {
+      const s = await demo();
+      const { model, requests } = script(c.first as Call[], "Model reply.");
+      const withText: ModelClient = c.text
+        ? { generate: async (req) => ({ ...(await model.generate(req)), ...(requests.length === 1 ? { text: c.text! } : {}) }) }
+        : model;
+      const out = await runChat(deps(withText), input(s, c.extra));
+      expect(requests).toHaveLength(2);
+      expect(out.reply).toBe("Model reply.");
+    }
   });
 
   it("never logs the message, history or reply", async () => {
