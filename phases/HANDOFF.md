@@ -39,6 +39,8 @@ Clean worktree `/private/tmp/claude-501/-Users-sungmincho-mac-Desktop-sm-apps-ki
 - The Mac sleeps on low battery (23:32–05:32 on 10-13/14 cost 6 h): `caffeinate -ims -t 172800` runs; keep it on power.
 
 ## Key documents
+- **Win plan and pre-submission gate (10-14):** `docs/plan/WIN_PLAN.md` (verified rules, wow points → app/video/deck, Ask-the-Expert questions, checklist). Research reports: `videos/orchestrator/research-10-14/`. Official deck template: `videos/orchestrator/template/`.
+- **KIBO Learn round 3 (10-14):** worktree `.claude/worktrees/learn-r3` (branch `learn-r3`): general learner fixes (I-194/I-195/I-197) + informed reruns, then two new blind kiosks built by independent agents in `scratchpad/sealed/{bk7-bubbletea,bk8-tableorder}` are copied in and learned once with the frozen commit (orchestrator does this; protocol in `spikes/blind-kiosks/ROUND3.md`). Merge `learn-r3` after phase 14.
 - Judge reviews and Q&A matrix: `docs/plan/judges/` (tech 7.4, impact 6.25, UX 7.9 of 10).
 - Sourced facts: `docs/plan/SOURCES.md` (English); Korean research notes `videos/orchestrator/SOURCES-research-ko.md`.
 - Expert reviews: `videos/deck-v1/EXPERT_REVIEW.md` (deck 6/10), `videos/submission-v1/EXPERT_REVIEW.md` (video 6/10).

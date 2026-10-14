@@ -36,3 +36,7 @@ npm run eval:agent
 ## Do not
 - Do not tune instructions to individual eval sentences.
 - Break existing tests.
+
+## Orchestrator notes (10-14 10:00, from web research)
+- Voice runs on two paths (`GEMINI_LIVE_BACKEND=auto`): the Gemini Developer API key path first, the Vertex AI relay (`kibo-voice`, `us-central1`) when the key cannot pay (ADR-012). Their language lists differ: the Developer API Live guide lists 99 languages (https://ai.google.dev/gemini-api/docs/live-guide), while the Cloud page lists 24 for Vertex AI Live (https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/live-api/configure-language-voice). Read both pages, record in `docs/plan/SOURCES.md` which of our picker languages are on each list (with the date read), and offer a language in the picker only if it is on both lists or if the picker says plainly which path supports it. Never write "99 languages" as a KIBO claim; the deck and video quote only the tested list.
+- The model in production is `gemini-3.8-live` (voice) and `gemini-3.8-flash` (text); name the exact model ids and regions wherever languages are claimed.

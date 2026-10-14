@@ -31,3 +31,9 @@ npm run scan:repo
 ## Do not
 - Do not create the GitHub repo, add a remote or push.
 - Do not rewrite git history.
+
+## Orchestrator notes (10-14 10:00, from web research)
+- Google Cloud DevRel's advice to hackathon entrants: judges check that the software does what the submission claims, so **link every claim in the README to where it lives** (file path and, after publishing, a permalink): the payment rule (`confirmCheckout` checks), the command endpoint, the state machine, the Gemini tool declarations, the voice relay, KIBO Learn's gate, each evidence file. Add a short "Where to check each claim" table.
+- State the exact model ids and regions (`gemini-3.8-flash`, `gemini-3.8-live`; Cloud Run `asia-northeast3`; voice relay `us-central1`; Vertex AI for the learner) and say which Google services do what: Gemini (Live voice agent, text agent, kiosk learner), Cloud Run (app + voice relay), Firestore (sessions, transactions), Firebase Hosting (short address), Secret Manager, Cloud Build/Artifact Registry, Cloud Monitoring uptime check. The submission description must mention Firebase, Firestore, Cloud Run and Gemini (the form asks for exactly these).
+- The architecture diagram in the README must match the code (judges check this); regenerate it if any box is not in the code.
+- A "Run it yourself in 5 minutes" block (clone, `.env.example`, `npm ci`, `npm run dev`, open `/demo`) that a judge can follow.
