@@ -89,15 +89,13 @@ Named by the orchestrator on 10-14 from web research. **Not re-read in 14-final:
 | S32 | QR remote-control products turn the phone into a touchpad for the kiosk (example named by the orchestrator: SiteKiosk Smart Kiosk Control). | No URL on file. | Unverified. Landing: category only | not used |
 | S33 | Gemini Live with the camera (Guided Vision) describes a screen but does not change a kiosk's cart. | No URL on file. | Unverified as a product statement. Landing says only what a camera assistant can do by nature: read the screen and say what to tap | not used |
 
-## 9. Candidates not yet verified (do not use until read)
+## 9. Verified by the orchestrator on 10-14 (were candidates; read with web access)
 
-The orchestrator found these on 10-14; 14-final:6 could not open them. A session with web access reads each page, fills the exact location, and moves the row into its section.
-
-| Claim | Source to read |
-|---|---|
-| Seoul 2025 Digital Competence Survey (n = 5,500, Nov–Dec 2025, report 2026-06): among kiosk users aged 55+, 63.3% report inconvenience; 74.0% at 65–74, 88.7% at 75+ (Seoul only, users only). Would replace the secondary S18 | https://saif.or.kr/research-report/3042, printed pp. 58, 166–171 |
-| Visitors: 15.05 million in Jan–Aug 2026 (+21.6%) | https://www.korea.kr/news/policyNewsView.do?newsId=148972696 |
-| Gemini Live session resumption can keep session data up to 24 h | https://docs.cloud.google.com/vertex-ai/generative-ai/docs/data-governance (KIBO does not enable session resumption; `docs/SECURITY.md` "Privacy line") |
+| Id | Fact | Source | Exact location | Used on |
+|---|---|---|---|---|
+| S34 | Seoul 2025 Digital Competence Survey: among kiosk users (n = 4,826), **31.7%** had trouble using a kiosk; **63.3%** of users aged 55+, **74.0%** at 65–74 and **88.7%** at 75+. Kiosk experience: 87.7% of all respondents, 71.7% of those 55+. Survey of 5,500 Seoul residents aged 19+ (3,000 under 55, 2,500 aged 55+), 2025-11-19 to 2025-12-19. Seoul only; the inconvenience shares are among kiosk users. | Seoul AI Foundation (서울AI재단), 「2025년 서울시민 디지털역량 실태조사 결과보고서」, published 2026-06-22. https://saif.or.kr/research-report/3042 (PDF: https://saif.or.kr/comm/getFile?srvcId=BBSTY1&upperNo=3042&fileTy=ATTACH&fileNo=2&board=7) | Ch. III §7 "2. 키오스크 이용 시 불편 경험 여부", printed p. 166 (Table III-43 p. 167); experience p. 161; survey design pp. 1–2 | not used yet (may replace S18) |
+| S35 | **15.05 million** foreign visitors to Korea in Jan–Aug 2026, **+21.6%** on the same period of 2025 (12.38 million); August 2026 alone 2.25 million (+23.3%). | Ministry of Culture, Sports and Tourism, press release via Korea Policy Briefing, 2026-09-28. https://www.korea.kr/news/policyNewsView.do?newsId=148972696 | First paragraph: "올해 8월까지 한국을 방문한 외국인 관광객이 누적 1505만 명으로, 지난해 같은 기간 1238만 명 대비 21.6% 늘었다" | not used yet |
+| S36 | Vertex AI: "Session resumption for Gemini Live API is disabled by default"; enabling it stores "text, video, and audio prompt data and model outputs, for up to 24 hours"; "Google won't use your data to train or fine-tune any AI/ML models without your prior permission or instruction." KIBO does not enable session resumption (`docs/SECURITY.md` "Privacy line"). | Google Cloud, "Vertex AI and zero data retention" (data governance), last updated 2026-10-13. https://docs.cloud.google.com/vertex-ai/generative-ai/docs/data-governance | Sections on session resumption and training | landing "Your data" (supports the wording), deck slide 06 |
 
 ## Claims we do not make
 

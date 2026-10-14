@@ -1,4 +1,4 @@
-# Orchestrator handoff (updated 10-14 14:15 KST, low battery, nothing running)
+# Orchestrator handoff (updated 10-14 20:10 KST; phase 14 resumed at step 6 on AC power, `.harness-logs/chain7.log`)
 
 The orchestrating session has run `/harness` since 10-12 22:30. The user delegated all decisions ("don't ask, decide; keep going") except things only a person can do (payments, logins, publishing). Reply to the user in Korean, short, conclusion first; numbers only with their evidence file (R-001). The user is often on battery: check `pmset -g batt` first and warn early.
 
@@ -44,4 +44,4 @@ Deck must use the official template (`videos/orchestrator/template/`); video str
 - `caffeinate -ims -t 172800` (pid 96980) prevents idle sleep only; a flat battery still sleeps the Mac (processes freeze and resume on wake).
 
 ## Waiting on people
-Real phone shots F01 (3–6 s, phone in hand + tall kiosk, the two customer lines) and F14 (larger text + screen reader) by 10-16 morning; Ask-the-Expert attendance 10-15 17:30 KST (questions in WIN_PLAN §6); a real-user test (even 3 people: 60+ or non-Korean readers, time + one quote, consent); team roles on the deck cover (assumed: Sungmin Cho product and engineering, Ye Seul Ahn research and user testing); approval to publish the GitHub repo, YouTube upload, and pressing submit (10-17).
+Real phone shots F01 (3–6 s, phone in hand + tall kiosk, the two customer lines) and F14 (larger text + screen reader) by 10-16 morning; Ask-the-Expert attendance 10-15 17:30 KST (questions in WIN_PLAN §6); a real-user test (even 3 people: 60+ or non-Korean readers, time + one quote, consent; Korean kit for the user: `videos/orchestrator/USER_TEST_KIT_ko.md`, results go to `evidence/human-runs.json` per `scripts/measure-touch.md`); team roles on the deck cover (assumed: Sungmin Cho product and engineering, Ye Seul Ahn research and user testing); approval to publish the GitHub repo, YouTube upload, and pressing submit (10-17).

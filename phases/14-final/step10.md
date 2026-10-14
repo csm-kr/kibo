@@ -24,3 +24,6 @@ npm run scan:repo
 ## Do not
 - Change features or scope while fixing; only fix what breaks a written rule.
 - Mark the step completed while an H rule fails on a changed screen.
+
+## Orchestrator notes (10-14 20:00, from KIBO Learn rounds 3–4)
+- Over-refusal to fix in this step (test first): the product bridge's `isForbiddenLabel` (`src/lib/adapters/learned.ts`) refuses any label that merely *contains* a forbidden word, so with "주문하기" forbidden it also refuses a kiosk modal's "계속 주문하기" ("keep ordering"), which round 3 showed breaks orders mid-line on real-looking kiosks (I-193/I-194). Port the learner's whole-label / whole-word rule (`isForbidden` in `spikes/kibo-learn/plan.mjs`; I-234, R-016) with tests: real payment labels ("결제하기", "카드 결제", "주문하기" as the checkout button, "Pay") stay refused, choices that contain a refused word ("계속 주문하기", "곱빼기") are allowed. This must never let the bridge reach a payment control (the AI can never reach paid); if in doubt keep refusing. `e2e/learned.spec.ts` must still pass.
