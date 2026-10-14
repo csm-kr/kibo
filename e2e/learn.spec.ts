@@ -24,7 +24,16 @@ test("/learn lists the recorded runs with their numbers", async ({ page }) => {
   await expect(blind).toContainText("37 of 37 items found");
   await expect(blind).toContainText("10 correct, 0 refused, 0 unsafe, of 10");
   await expect(blind).toContainText("spikes/blind-kiosks/results/bk4-airport-shop/final/grade-v2.json");
-  await expect(page.locator('[data-learn-run="doughhouse"]')).toContainText("4 correct, 0 refused, 0 unsafe, of 4");
+  const dough = page.locator('[data-learn-run="doughhouse"]');
+  await expect(dough).toContainText("4 correct, 0 refused, 0 unsafe, of 4");
+  // Its trace predates the restyle, and the card says so (14-final:3).
+  await expect(dough).toContainText("Recorded on 10-13, before the kiosk's look was restyled");
+  // The files behind the numbers sit in one footnote per card, not in the body.
+  await expect(fresh.locator("[data-learn-sources]")).toHaveCount(1);
+  // How the bridge gets onto a real kiosk, without claiming partners.
+  const real = page.locator("[data-learn-real]");
+  await expect(real).toContainText("one script tag");
+  await expect(real).toContainText("no kiosk vendor partnerships yet");
   await blind.getByRole("link", { name: "Watch this run" }).click();
   await expect(page).toHaveURL(/\/learn\/airport-shop$/);
 });
@@ -83,6 +92,21 @@ test("play advances by itself; the Doughhouse replay ends with an order button t
   await order.click();
   await expect(page).toHaveURL(/\/demo\?k=doughhouse$/);
   await expect(page.getByRole("link", { name: "How KIBO learned the pizza kiosk" })).toHaveAttribute("href", "/learn/doughhouse");
+});
+
+test("on a phone the action and [Play] are on the first screen; the picture can be shown larger", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/learn/airport-shop");
+  await expect(page.locator("[data-learn-turn]")).toHaveText(/Turn 1 of 64/, { timeout: 60_000 });
+  await expect(page.locator("[data-learn-action]")).toBeInViewport({ ratio: 1 });
+  await expect(page.locator("[data-learn-play]")).toBeInViewport({ ratio: 1 });
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const shot = page.getByRole("img", { name: "The kiosk screen after turn 1" });
+  const small = (await shot.boundingBox())!.width;
+  await page.locator("[data-learn-zoom]").click();
+  await expect(page.locator("[data-learn-zoom]")).toHaveAttribute("aria-pressed", "true");
+  await expect.poll(async () => (await shot.boundingBox())!.width).toBeGreaterThan(small * 1.4);
 });
 
 test("with reduced motion the replay never plays by itself", async ({ page }) => {

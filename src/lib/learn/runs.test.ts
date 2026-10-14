@@ -33,6 +33,16 @@ describe("recorded learn runs", () => {
     });
   }
 
+  it("each card picture is a part of its recorded screenshot, small enough to show at about its recorded size (I-198)", () => {
+    for (const { data, cover } of LEARN_RUNS) {
+      const shot = data.turns[cover.n - 1];
+      const { x, y, w, h } = cover.crop;
+      expect(x >= 0 && y >= 0 && x + w <= shot.width && y + h <= shot.height, data.runId).toBe(true);
+      // A card is at least about 440 px wide on a laptop; a crop this narrow draws at ≥ 0.9× the screenshot.
+      expect(w, data.runId).toBeLessThanOrEqual(490);
+    }
+  });
+
   it("only Doughhouse has an order button, and it opens the live demo kiosk", () => {
     expect(learnRun("doughhouse")?.demoKioskId).toBe("doughhouse");
     for (const id of ["themepark", "airport-shop"]) {

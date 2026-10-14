@@ -148,6 +148,25 @@
   }
 }
 
+/* A tap the bridge replays on a learned kiosk (14-final:3): one 400ms ring that spreads from the numbered mark, once
+   per real click; with reduced motion only the mark shows. */
+@keyframes kibo-tap {
+  from {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+@utility kibo-tap {
+  animation: kibo-tap 400ms ease-out both;
+  @media (prefers-reduced-motion: reduce) {
+    display: none;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

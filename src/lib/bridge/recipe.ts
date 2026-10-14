@@ -214,13 +214,33 @@ async function settle(doc: Document): Promise<void> {
   });
 }
 
-/** Clicks each step's target in order. Throws RecipeError on the first step that cannot be done; never retries. */
-export async function runPlan(doc: Document, plan: PlainStep[], opts: { forbiddenLabels: string[] }): Promise<void> {
+/** A click about to happen: the target's label and its box in the page's own pixels. */
+export interface TapEvent {
+  label: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+/**
+ * Clicks each step's target in order. Throws RecipeError on the first step that cannot be done; never retries.
+ * `onTap` hears each click right before it happens (only clicks that happen) and is awaited, so a host can show it.
+ */
+export async function runPlan(
+  doc: Document,
+  plan: PlainStep[],
+  opts: { forbiddenLabels: string[]; onTap?: (tap: TapEvent) => void | Promise<void> },
+): Promise<void> {
   for (const step of plan) {
     const target = await locate(doc, step);
     if (!target) continue;
     if (isForbiddenTarget(target, opts.forbiddenLabels)) throw new RecipeError("Refused a payment control");
     if (step.op === "check" && (target.el as HTMLInputElement).checked) continue;
+    if (opts.onTap) {
+      const r = target.el.getBoundingClientRect();
+      await opts.onTap({ label: target.label, x: r.x, y: r.y, w: r.width, h: r.height });
+    }
     target.el.click();
     await settle(doc);
   }

@@ -1,9 +1,71 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { getKiosk } from "@/lib/adapters/catalog";
-import { isForbiddenTarget, nearestWithin, planSteps, RecipeError } from "./recipe";
+import { isForbiddenTarget, nearestWithin, planSteps, RecipeError, runPlan } from "./recipe";
 
 const learned = getKiosk("doughhouse").learned!;
 const forbidden = learned.forbiddenLabels;
+
+/** A page of plain buttons, enough for labels, clicks and the settle wait; it records the order of taps and clicks. */
+function fakePage(labels: string[], log: string[]) {
+  const els = labels.map((text, i) => ({
+    tagName: "BUTTON",
+    onclick: null,
+    parentElement: null,
+    innerText: text,
+    getAttribute: () => null,
+    getBoundingClientRect: () => ({ x: 10, y: 100 * i, width: 80, height: 40 }),
+    click: vi.fn(() => log.push(`click ${text}`)),
+  }));
+  const doc = {
+    defaultView: {
+      getComputedStyle: () => ({ visibility: "visible", cursor: "pointer" }),
+      requestAnimationFrame: (cb: () => void) => setTimeout(cb, 0),
+      MutationObserver: class {
+        observe() {}
+        disconnect() {}
+      },
+    },
+    documentElement: {},
+    body: { querySelectorAll: () => els },
+    querySelectorAll: () => [],
+    createTreeWalker: () => ({ nextNode: () => null }),
+  } as unknown as Document;
+  return { doc, els };
+}
+
+describe("runPlan reports each real click (the visible replay, 14-final:3)", () => {
+  it("calls onTap with the target's label and box before each click it makes, and waits for it", async () => {
+    const log: string[] = [];
+    const { doc } = fakePage(["피자", "장바구니 담기"], log);
+    const onTap = vi.fn(async (t: { label: string; x: number; y: number; w: number; h: number }) => {
+      log.push(`tap ${t.label}`);
+    });
+    await runPlan(
+      doc,
+      [
+        { op: "click", label: "피자" },
+        // Not on this page: skipped, so it never shows as a tap.
+        { op: "clickIfVisible", role: "radio", name: "라지" },
+        { op: "click", label: "장바구니 담기" },
+      ],
+      { forbiddenLabels: forbidden, onTap },
+    );
+    expect(log).toEqual(["tap 피자", "click 피자", "tap 장바구니 담기", "click 장바구니 담기"]);
+    expect(onTap.mock.calls.map(([t]) => t)).toEqual([
+      { label: "피자", x: 10, y: 0, w: 80, h: 40 },
+      { label: "장바구니 담기", x: 10, y: 100, w: 80, h: 40 },
+    ]);
+  });
+
+  it("never reports a tap on a payment control it refuses", async () => {
+    const log: string[] = [];
+    const { doc, els } = fakePage(["결제하기"], log);
+    const onTap = vi.fn();
+    await expect(runPlan(doc, [{ op: "click", label: "결제하기" }], { forbiddenLabels: ["결제"], onTap })).rejects.toThrow(RecipeError);
+    expect(onTap).not.toHaveBeenCalled();
+    expect(els[0].click).not.toHaveBeenCalled();
+  });
+});
 
 describe("planSteps", () => {
   it("expands the learned addToCart recipe into plain steps", () => {

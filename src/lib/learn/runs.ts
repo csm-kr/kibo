@@ -18,8 +18,11 @@ export interface LearnRun {
   demoKioskId: string | null;
   /** Shown instead of the order button when there is no demo place. */
   noDemoReason?: string;
-  /** The recorded turn whose screenshot is the card picture, and what it shows. */
-  cover: { n: number; alt: string };
+  /**
+   * The recorded turn whose screenshot is the card picture, what it shows, and the part of it shown (screenshot
+   * pixels): a whole kiosk shrunk to a card was unreadable (I-198), one sheet at about its recorded size is not.
+   */
+  cover: { n: number; alt: string; crop: { x: number; y: number; w: number; h: number } };
 }
 
 export const LEARN_RUNS: LearnRun[] = [
@@ -35,6 +38,7 @@ export const LEARN_RUNS: LearnRun[] = [
     cover: {
       n: 6,
       alt: "Turn 6: the theme park kiosk's aquarium ticket sheet with discount types and passenger steppers, one adult set by the learner, in Korean",
+      crop: { x: 120, y: 310, w: 480, h: 545 },
     },
   },
   {
@@ -45,16 +49,24 @@ export const LEARN_RUNS: LearnRun[] = [
       "Built by a separate AI agent from a short brief; nobody working on the learner opened its app or answer key. The learner was improved after a first run on it, from that run's failure patterns, so this is not a first sighting.",
     demoKioskId: null,
     noDemoReason: "This kiosk was built for the test and is not in the live demo, so there is no order button here.",
-    cover: { n: 29, alt: "Turn 29: the airport shop kiosk's Americano sheet, with two extra espresso shots set by the learner, in Korean" },
+    cover: {
+      n: 29,
+      alt: "Turn 29: the airport shop kiosk's Americano sheet, with two extra espresso shots set by the learner, in Korean",
+      crop: { x: 153, y: 718, w: 414, h: 349 },
+    },
   },
   {
     data: doughhouse as LearnRunData,
     title: "Doughhouse pizza kiosk",
     phrase: "Doughhouse pizza kiosk",
     provenance:
-      "Built by the KIBO team, and the learner was developed on it, so this is not a blind test. It is the learned kiosk in the live demo.",
+      "Built by the KIBO team, and the learner was developed on it, so this is not a blind test. It is the learned kiosk in the live demo. Recorded on 10-13, before the kiosk's look was restyled on 10-14, so the pictures show the plain page it learned; its labels did not change.",
     demoKioskId: "doughhouse",
-    cover: { n: 13, alt: "Turn 13: the Doughhouse kiosk's margherita options (size, crust, toppings), in Korean" },
+    cover: {
+      n: 13,
+      alt: "Turn 13: the Doughhouse kiosk's margherita options (size, crust, toppings), in Korean, as it looked on 10-13",
+      crop: { x: 140, y: 100, w: 445, h: 255 },
+    },
   },
 ];
 

@@ -46,6 +46,7 @@ KIBO is a public demo that must stay up for three weeks of judging, handles a (s
 - **No runtime self-healing:** a failing recipe stops; the cart is re-read from the kiosk and the user is offered staff or touch. No automatic retry (double-add risk).
 - Recipe variables are checked against the skill catalog **before** any click. The bridge refuses forbidden labels (pay, card, complete order).
 - The bridge sends only order values, never code; it authenticates with `kioskToken` in an `Authorization` header (no cookies, so no CSRF); CORS allows exact origins only.
+- The tap marks and replay line (14-final:3) are drawn by KIBO's page around the kiosk page, from each click's label and box read before the click; nothing is written to the kiosk page, sent or stored, and a refused payment control is never reported as a tap. `/learned/<kiosk>` shows the QR and pairing code in KIBO's panel beside the page, because the unchanged kiosk page cannot; the claim URL stays inside the QR picture.
 - Commands are executed one at a time. Before each, the bridge checks the current screen (an idle kiosk is restarted and the cart re-added). Verification checks the kiosk's total **and** each cart line's text.
 
 ## Secrets and repo hygiene

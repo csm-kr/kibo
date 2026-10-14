@@ -76,6 +76,69 @@ describe("changeVars", () => {
     expect(send).toHaveBeenCalledWith(expect.objectContaining({ type: "bridgeReport", args: expect.objectContaining({ ok: false }) }));
   });
 
+  it("hands each real click to onTap, numbered, and returns the taps, the kiosk total and a replay time without the pause (14-final:3)", async () => {
+    const el = (text: string, y: number) => ({
+      tagName: "BUTTON",
+      onclick: null,
+      parentElement: null,
+      innerText: text,
+      getAttribute: () => null,
+      getBoundingClientRect: () => ({ x: 100, y, width: 300, height: 120 }),
+      click: vi.fn(),
+    });
+    const els = [el("화면을 터치하여 주문을 시작하세요", 900), el("🛍 가져갈게요", 600)];
+    const doc = {
+      defaultView: {
+        getComputedStyle: () => ({ visibility: "visible", cursor: "pointer" }),
+        requestAnimationFrame: (cb: () => void) => setTimeout(cb, 0),
+        MutationObserver: class {
+          observe() {}
+          disconnect() {}
+        },
+      },
+      documentElement: {},
+      body: { innerText: "장바구니 0개 · 합계 0원", querySelectorAll: () => els },
+      querySelectorAll: () => [],
+      createTreeWalker: () => ({ nextNode: () => null }),
+    } as unknown as Document;
+    const seen: { commandId: string; n: number; label: string; y: number }[] = [];
+    const PAUSE = 150;
+    const onTap = vi.fn(async (commandId: string, t: { n: number; label: string; y: number }) => {
+      seen.push({ commandId, n: t.n, label: t.label, y: t.y });
+      await new Promise((r) => setTimeout(r, PAUSE));
+    });
+    const send = vi.fn().mockResolvedValue({});
+    const bridge = createBridge({ doc, kiosk, sessionId: "s", kioskToken: "k", send, onTap });
+    const pending = { commandId: "c1", type: "setDineOption", args: { option: "take_out" }, source: "voice", at: 0 } as PendingBridgeCommand;
+    const out = await bridge.handle(pending, { cart: [], dineOption: null } as unknown as Session);
+
+    expect(seen).toEqual([
+      { commandId: "c1", n: 1, label: "화면을 터치하여 주문을 시작하세요", y: 900 },
+      { commandId: "c1", n: 2, label: "🛍 가져갈게요", y: 600 },
+    ]);
+    expect(out).toMatchObject({ commandId: "c1", ok: true, reported: true, kioskTotal: 0, cartBefore: [] });
+    expect(out?.change).toBe(pending);
+    expect(out?.taps.map((t) => [t.n, t.label, t.x, t.w])).toEqual([
+      [1, "화면을 터치하여 주문을 시작하세요", 100, 300],
+      [2, "🛍 가져갈게요", 100, 300],
+    ]);
+    // Two pauses of 150 ms happened, but the replay time is the bridge's own work only.
+    expect(out!.ms).toBeLessThan(2 * PAUSE);
+  });
+
+  it("a report that fails to send is marked not reported", async () => {
+    const doc = {
+      defaultView: { getComputedStyle: () => ({ visibility: "visible", cursor: "pointer" }) },
+      body: { innerText: "", querySelectorAll: () => [] },
+      createTreeWalker: () => ({ nextNode: () => null }),
+    } as unknown as Document;
+    const send = vi.fn().mockRejectedValue(new Error("offline"));
+    const bridge = createBridge({ doc, kiosk, sessionId: "s", kioskToken: "k", send });
+    const pending = { commandId: "c9", type: "addToCart", args: { itemId: "hawaiian" }, source: "voice", at: 0 } as PendingBridgeCommand;
+    const out = await bridge.handle(pending, { cart: [], dineOption: null } as unknown as Session);
+    expect(out).toMatchObject({ ok: false, reported: false, taps: [] });
+  });
+
   it("gives a chooseOptions recipe the chosen labels per group with the group's select and after steps", () => {
     const raw = structuredClone(doughhouseRaw) as unknown as {
       recipes: Record<string, unknown[]>;

@@ -31,6 +31,8 @@ test("/learn index", async ({ page }, info) => {
   await check(page, info, "index-top");
   await check(page, info, "index-cards", '[data-learn-run="themepark"]');
   await check(page, info, "index-cards-second", '[data-learn-run="airport-shop"]');
+  await check(page, info, "index-cards-third", '[data-learn-run="doughhouse"]');
+  await check(page, info, "index-real-kiosks", "[data-learn-real]");
 });
 
 test("learn replay: the fresh theme park run's finish and learned skill", async ({ page }, info) => {
@@ -50,6 +52,10 @@ test("learn replay: start, a stopped tap, the finish and the learned skill", asy
   for (let i = 1; i < 8; i++) await page.locator("[data-learn-next]").click();
   await expect(page.locator("[data-learn-action]")).toContainText("matches 4 buttons");
   await check(page, info, "replay-stopped-tap");
+
+  await page.locator("[data-learn-zoom]").click();
+  await check(page, info, "replay-larger-picture", "[data-learn-zoom]");
+  await page.locator("[data-learn-zoom]").click();
 
   await page.locator('[data-learn-milestone="finish"]').click();
   await expect(page.locator("[data-learn-skill]")).toBeVisible();

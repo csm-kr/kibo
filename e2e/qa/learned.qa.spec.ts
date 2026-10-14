@@ -1,8 +1,9 @@
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
 import { claim, command, readClaim } from "../helpers";
-import { LEARNED, qaState, type Findings } from "./checks";
+import { LEARNED, qaShot, qaState, type Findings } from "./checks";
 
-// UI QA of /learned/doughhouse: KIBO's widget over the learned kiosk page (QR, phone connected, bridge status).
+// UI QA of /learned/doughhouse: KIBO's panel beside the learned kiosk page (what it is, QR and code, phone connected,
+// what the bridge tapped) and the numbered tap marks over the page (14-final:3).
 // The kiosk page itself is not KIBO's UI (our development kiosk, learned by KIBO Learn) and is shown unchanged, so it is judged on the screenshots only.
 
 const VIEWPORTS = [
@@ -29,9 +30,11 @@ async function check(page: Page, info: TestInfo, state: string) {
   await page.setViewportSize(VIEWPORTS[0]);
 }
 
-test("learned kiosk widget: QR, then an order the bridge entered", async ({ page, request }, info) => {
+test("learned kiosk widget: QR, then an order the bridge entered, with its taps drawn", async ({ page, request }, info) => {
   await page.goto("/learned/doughhouse");
   const { sessionId, claimToken } = await readClaim(page);
+  // Drawn large enough to read (14-final:3): ≥ 0.8× at the judge laptop size.
+  expect(Number(await page.locator("iframe[data-learned-kiosk]").getAttribute("data-page-scale"))).toBeGreaterThanOrEqual(0.8);
   await check(page, info, "widget-qr");
 
   const { deviceToken } = await (await claim(request, sessionId, claimToken)).json();
@@ -40,7 +43,22 @@ test("learned kiosk widget: QR, then an order the bridge entered", async ({ page
     command(request, deviceToken, { sessionId, type, args, source: "voice", utteranceSeq });
   await phone("setDineOption", { option: "eat_in" }, 1);
   await expect(widget).toHaveAttribute("data-bridge-ok", "true");
+
+  // A longer pause per tap, so the screenshots catch a numbered mark at 1440 and then at 1280 wide.
+  const pause = (ms: number) => page.evaluate((v) => ((window as { __kiboTapPauseMs?: number }).__kiboTapPauseMs = v), ms);
+  await pause(2_500);
   await phone("addToCart", { itemId: "margherita", qty: 1, selections: { size: ["regular"], dough: ["original"] } }, 2);
-  await expect(widget).toContainText("Added: Margherita");
+  await expect(page.locator('[data-tap-mark="2"]')).toBeVisible();
+  await qaShot(page, info, LEARNED, "widget-tapping");
+  await page.setViewportSize(VIEWPORTS[1]);
+  await expect(page.locator('[data-tap-mark="3"]')).toBeVisible();
+  await qaShot(page, info, LEARNED, "widget-tapping");
+  await pause(0);
+  await page.setViewportSize(VIEWPORTS[0]);
+
+  await expect(widget.locator("[data-replay-caption]")).toHaveAttribute("data-replay-caption", "ok");
+  await expect(widget).toContainText("Added: Margherita. KIBO tapped 피자 → 마르게리따");
+  await expect(widget).toContainText("kiosk total 15,900원 ✓ matches");
+  await expect(page.locator("[data-tap-mark]")).toHaveCount(0);
   await check(page, info, "widget-added");
 });

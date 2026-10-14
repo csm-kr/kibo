@@ -180,6 +180,7 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
                 session={session}
                 kioskToken={tokens.kioskToken}
                 claimUrl={tokens.claimUrl}
+                clockOffset={demo.clockOffset}
                 strip
               />
             ) : (

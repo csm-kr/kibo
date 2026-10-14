@@ -2,13 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Check, ChevronLeft, ChevronRight, Circle, OctagonX, Pause, Play, TriangleAlert } from "lucide-react";
+import { ArrowLeft, Check, ChevronLeft, ChevronRight, Circle, Maximize2, Minimize2, OctagonX, Pause, Play, TriangleAlert } from "lucide-react";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { CARD, FOCUS, ICON, PRESS, PRIMARY, QUIET, SECONDARY } from "@/components/phone/ui";
 import { formatWon } from "@/lib/kiosk/menu";
 import type { LearnRun } from "@/lib/learn/runs";
 import { buildTimeline, formatClock } from "@/lib/learn/timeline";
-import { Fact, RunFacts } from "./Fact";
+import { Fact, RunFacts, runSources, Sources } from "./Fact";
 
 // The /learn/<runId> replay: one step per recorded turn of the learner's trace, the kiosk screenshot it took, the
 // action in plain words, the counters it had written down and the milestones. Playback is not real time; the clock
@@ -39,6 +39,7 @@ export function LearnPlayer({ run }: { run: LearnRun }) {
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState<(typeof SPEEDS)[number]>(1);
+  const [large, setLarge] = useState(false);
   const reduced = useSyncExternalStore(subscribeReduce, () => window.matchMedia(REDUCE).matches, () => false);
   const running = playing && !reduced && index < last;
 
@@ -75,21 +76,14 @@ export function LearnPlayer({ run }: { run: LearnRun }) {
         </p>
       </header>
 
-      <section data-learn-player aria-label="Replay" className="grid items-start gap-6 lg:grid-cols-[auto_minmax(0,1fr)]">
-        <figure className="mx-auto flex w-full max-w-[calc(45dvh*0.675)] flex-col gap-2 lg:w-[clamp(280px,calc((100dvh-280px)*0.675),480px)] lg:max-w-none">
-          <Image
-            src={`/learn/${data.runId}/${step.image}`}
-            alt={`The kiosk screen after turn ${step.n}`}
-            width={step.width}
-            height={step.height}
-            unoptimized
-            preload
-            className="h-auto w-full rounded-tile shadow-card"
-          />
-          <figcaption className="text-base text-muted">The kiosk as the learner saw it after this turn.</figcaption>
-        </figure>
-
-        <div className="flex min-w-0 flex-col gap-4">
+      {/* On phones the action and the controls come first, so [Play] is on the first screen (I-199); from lg the
+          picture is the left column. `large` shows the recorded screenshot at its own size (I-198). */}
+      <section
+        data-learn-player
+        aria-label="Replay"
+        className={`grid items-start gap-6 ${large ? "" : "lg:grid-cols-[auto_minmax(0,1fr)]"}`}
+      >
+        <div className={`flex min-w-0 flex-col gap-4 ${large ? "" : "lg:col-start-2 lg:row-start-1"}`}>
           <div className={`${CARD} flex flex-col gap-2`}>
             <p className="text-base font-semibold text-muted" data-learn-turn={step.n}>
               Turn {step.n} of {steps.length} · {formatClock(step.elapsedMs)} into the run
@@ -154,7 +148,34 @@ export function LearnPlayer({ run }: { run: LearnRun }) {
                 : `Not real time: each turn shows for ${STEP_MS / 1000} s at 1×. The clock above is the real time since the run started.`}
             </p>
           </div>
+        </div>
 
+        <figure
+          className={
+            large
+              ? "mx-auto flex w-full max-w-[720px] flex-col gap-2"
+              : "mx-auto flex w-full max-w-[calc(45dvh*0.675)] flex-col gap-2 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:w-[clamp(280px,calc((100dvh-280px)*0.675),480px)] lg:max-w-none"
+          }
+        >
+          <Image
+            src={`/learn/${data.runId}/${step.image}`}
+            alt={`The kiosk screen after turn ${step.n}`}
+            width={step.width}
+            height={step.height}
+            unoptimized
+            preload
+            className="h-auto w-full rounded-tile shadow-card"
+          />
+          <figcaption className="text-base text-muted">
+            The kiosk as the learner saw it after this turn; what it did is written beside it.
+          </figcaption>
+          <button type="button" data-learn-zoom aria-pressed={large} onClick={() => setLarge(!large)} className={`${QUIET} self-start`}>
+            {large ? <Minimize2 {...ICON} /> : <Maximize2 {...ICON} />}
+            {large ? "Smaller picture" : "Larger picture"}
+          </button>
+        </figure>
+
+        <div className={`flex min-w-0 flex-col gap-4 ${large ? "" : "lg:col-start-2 lg:row-start-2"}`}>
           <nav aria-labelledby="learn-milestones" className={`${CARD} flex flex-col gap-2`}>
             <h2 id="learn-milestones" className="text-xl font-bold">
               Milestones
@@ -222,12 +243,8 @@ export function LearnPlayer({ run }: { run: LearnRun }) {
                     "Nothing written down yet."
                   )}
                 </p>
-                <p className="text-base text-muted">
-                  What the learner had written down by this turn; the finished skill can hold more.{" "}
-                  <code className="[overflow-wrap:anywhere]">
-                    {data.sources.trace}/turn-{step.n}.json
-                  </code>
-                </p>
+                <p className="text-base text-muted">What the learner had written down by this turn; the finished skill can hold more.</p>
+                <Sources paths={[`${data.sources.trace}/turn-${step.n}.json`]} />
               </>
             )}
           </section>
@@ -250,6 +267,7 @@ function SkillSummary({ run }: { run: LearnRun }) {
       <div className="grid gap-4 lg:grid-cols-3">
         <RunFacts run={run} />
       </div>
+      <Sources paths={runSources(run)} />
       <div className={`${CARD} flex flex-col gap-3`}>
         <p>
           <span className="font-semibold">{categories.length} categories:</span> {categories.join(", ")}
@@ -285,7 +303,8 @@ function SkillSummary({ run }: { run: LearnRun }) {
             </tbody>
           </table>
         </div>
-        <Fact value={`${catalog.length} items in the skill`} path={data.sources.skill} />
+        <Fact value={`${catalog.length} items in the skill`} />
+        <Sources paths={[data.sources.skill]} />
       </div>
       {run.demoKioskId ? (
         <Link href={`/demo?k=${run.demoKioskId}`} data-learn-order className={`${SECONDARY} sm:max-w-md`}>

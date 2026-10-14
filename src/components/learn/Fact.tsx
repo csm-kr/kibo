@@ -1,15 +1,29 @@
 import type { LearnRun } from "@/lib/learn/runs";
 
-// One number from a recorded run, a short note, and the repo file that holds it (docs/RULE.md R-001).
+// One number from a recorded run and a short note; the repo files that hold the numbers go in one grey footnote line
+// under them (docs/RULE.md R-001), not in the body.
 
-export function Fact({ value, detail, path }: { value: string; detail?: string; path: string }) {
+export function Fact({ value, detail }: { value: string; detail?: string }) {
   return (
     <p className="flex flex-col gap-1 border-l-4 border-kibo pl-4">
       <span className="font-semibold">{value}</span>
       {detail && <span className="text-base text-muted">{detail}</span>}
-      <code className="text-base text-muted [overflow-wrap:anywhere]">{path}</code>
     </p>
   );
+}
+
+/** "Sources: a · b": the files behind the numbers above, small and grey. */
+export function Sources({ paths }: { paths: string[] }) {
+  return (
+    <p data-learn-sources className="text-base text-muted [overflow-wrap:anywhere]">
+      Sources: {[...new Set(paths)].join(" · ")}
+    </p>
+  );
+}
+
+/** The files behind RunFacts, in its order. */
+export function runSources(run: LearnRun): string[] {
+  return [run.data.sources.stats, run.data.grade.itemsSource, run.data.grade.ordersSource];
 }
 
 /** The run's headline numbers: time, catalog, orders without AI. */
@@ -19,15 +33,10 @@ export function RunFacts({ run }: { run: LearnRun }) {
   const o = grade.orders;
   return (
     <>
-      <Fact
-        value={`${data.minutes.toFixed(1)} min, ${data.turnCount} turns`}
-        detail={`${data.model}, ${data.inputTokens.toLocaleString("en-US")} input tokens`}
-        path={data.sources.stats}
-      />
+      <Fact value={`${data.minutes.toFixed(1)} min, ${data.turnCount} turns`} detail={`${data.model}, ${data.inputTokens.toLocaleString("en-US")} input tokens`} />
       <Fact
         value={`${grade.itemsFound} of ${grade.itemsOf} items found, ${grade.pricesCorrect} prices right`}
         detail={run.demoKioskId ? "Compared with the reviewed skill the demo uses" : "Compared with the kiosk builder's answer key"}
-        path={grade.itemsSource}
       />
       <Fact
         value={`Orders without AI: ${o.correct} correct, ${o.safeRefusal} refused, ${o.unsafe} unsafe, of ${o.total}`}
@@ -42,7 +51,6 @@ export function RunFacts({ run }: { run: LearnRun }) {
                     : ""
                 }`
         }
-        path={grade.ordersSource}
       />
     </>
   );

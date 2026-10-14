@@ -2,7 +2,8 @@ import { isForbiddenLabel } from "@/lib/adapters/learned";
 import type { KioskData, LearnedKiosk, MenuItem, RecipeStep } from "@/types/menu";
 import type { BridgeChange, CartLine, DineOption, PendingBridgeCommand, Session } from "@/types/session";
 import { clickables, findByLabel } from "./labels";
-import { planSteps, runPlan, type Vars } from "./recipe";
+import { planSteps, runPlan, type TapEvent, type Vars } from "./recipe";
+import type { ReplayResult, ReplayTap } from "./replayView";
 import { type KioskLine, parseKioskLine, readKioskLines, readKioskTotal, sameLines } from "./verify";
 
 // The in-page bridge for a learned kiosk (docs/ARCHITECTURE.md sequence 3): replays the one pending change on the
@@ -141,10 +142,8 @@ export interface BridgeReportArgs {
   kioskLines: string[];
 }
 
-export interface BridgeOutcome {
-  commandId: string;
-  ok: boolean;
-  /** Replay and verification time, before the report is sent. */
+export interface BridgeOutcome extends ReplayResult {
+  /** Replay and verification time, before the report is sent; the host's pauses in onTap are not counted. */
   ms: number;
 }
 
@@ -154,6 +153,8 @@ export interface BridgeConfig {
   sessionId: string;
   kioskToken: string;
   send(input: { sessionId: string; token: string; type: "bridgeReport"; args: BridgeReportArgs; source: "touch" }): Promise<unknown>;
+  /** Each click right before it happens, numbered per command, so the host can draw it (14-final:3); awaited. */
+  onTap?(commandId: string, tap: ReplayTap): void | Promise<void>;
 }
 
 export function createBridge(cfg: BridgeConfig) {
@@ -183,23 +184,24 @@ export function createBridge(cfg: BridgeConfig) {
     }
   }
 
-  async function replay(p: PendingBridgeCommand, session: Session): Promise<boolean> {
+  async function replay(p: PendingBridgeCommand, session: Session, onTap: (tap: TapEvent) => Promise<void>): Promise<boolean> {
     // Everything is checked and planned before the first click.
     const { recipe: name, vars } = changeVars(kiosk, p);
     const expected = expectedLines(kiosk, session.cart, p);
     const plan = planSteps(recipe(name), vars, forbidden);
     const home = onHome();
+    const opts = { forbiddenLabels: forbidden, onTap };
 
     if (p.type === "setDineOption") {
-      if (home) await runPlan(doc, plan, { forbiddenLabels: forbidden });
+      if (home) await runPlan(doc, plan, opts);
       // The kiosk has no way back to its dine question once an order has started.
       else if (session.dineOption !== p.args.option) throw new BridgeError("The kiosk order has already started");
     } else {
       if (home) {
         const start = { dineOption: dineLabel(learned, session.dineOption ?? "eat_in") };
-        await runPlan(doc, planSteps(recipe("startOrder"), start, forbidden), { forbiddenLabels: forbidden });
+        await runPlan(doc, planSteps(recipe("startOrder"), start, forbidden), opts);
       }
-      await runPlan(doc, plan, { forbiddenLabels: forbidden });
+      await runPlan(doc, plan, opts);
     }
 
     const seen = readKioskLines(doc, learned.cartLinePattern).map((l) => parseKioskLine(l, learned.cartLinePattern));
@@ -208,9 +210,19 @@ export function createBridge(cfg: BridgeConfig) {
 
   async function run(p: PendingBridgeCommand, session: Session): Promise<BridgeOutcome> {
     const started = performance.now();
+    const taps: ReplayTap[] = [];
+    // Time spent in the host's onTap (a pause so a person can see the tap) is not replay time.
+    let paused = 0;
+    const onTap = async (t: TapEvent) => {
+      const tap = { n: taps.length + 1, ...t };
+      taps.push(tap);
+      const before = performance.now();
+      await cfg.onTap?.(p.commandId, tap);
+      paused += performance.now() - before;
+    };
     let ok = false;
     try {
-      ok = await replay(p, session);
+      ok = await replay(p, session, onTap);
     } catch {
       ok = false;
     }
@@ -223,13 +235,15 @@ export function createBridge(cfg: BridgeConfig) {
         .slice(0, MAX_LINES)
         .map((l) => l.slice(0, MAX_LINE_CHARS)),
     };
-    const ms = Math.round(performance.now() - started);
+    const ms = Math.round(performance.now() - started - paused);
+    let reported = true;
     try {
       await cfg.send({ sessionId: cfg.sessionId, token: cfg.kioskToken, type: "bridgeReport", args, source: "touch" });
     } catch {
       // No report: the server counts the replay as failed after its timeout, which calls staff.
+      reported = false;
     }
-    return { commandId: p.commandId, ok, ms };
+    return { commandId: p.commandId, change: p, cartBefore: session.cart, taps, ok, reported, kioskTotal: args.kioskTotal, ms };
   }
 
   return {
