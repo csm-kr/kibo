@@ -1,0 +1,105 @@
+bk10-chicken self-check — 10 holdout orders placed in the UI
+app: file:///private/tmp/claude-501/-Users-sungmincho-mac-Desktop-sm-apps-kibo/5e4077f3-a03e-418a-bb20-c3c1f77daf49/scratchpad/sealed/bk10-chicken/app/index.html
+
+h1: PASS  dine=매장 식사
+  expectedTotal 22,500원 | key recompute 22,500원 | cart 22,500원 | review 총 결제 금액 22,500원 | payment screen "결제하실 금액 22,500원"
+  header badge: 매장 식사
+  popup total for 바삭 후라이드: 20,500원
+  payment stopped at method screen (waiting popup, no charge): true
+  patterns: dine-eat-in, bone-required, boneless-upcharge, sauce-first-free, sauce-paid-extra
+
+h2: PASS  dine=포장 주문 / 30분 후
+  expectedTotal 24,500원 | key recompute 24,500원 | cart 24,500원 | review 총 결제 금액 24,500원 | payment screen "결제하실 금액 24,500원"
+  header badge: 포장 주문 · 30분 후 픽업
+  popup total for 반반치킨: 21,000원
+  payment stopped at method screen (waiting popup, no charge): true
+  patterns: dine-pickup-time, banban-two-flavors, banban-flavor-upcharge
+
+h3: PASS  dine=매장 식사
+  expectedTotal 36,000원 | key recompute 36,000원 | cart 36,000원 | review 총 결제 금액 36,000원 | payment screen "결제하실 금액 36,000원"
+  header badge: 매장 식사
+  popup total for 치킨 한상세트: 26,000원
+  upsell popup → 변경할게요
+  age popup confirmed for 생맥주 500cc
+  raised 생맥주 500cc to 2 with cart +
+  payment stopped at method screen (waiting popup, no charge): true
+  patterns: set-upsell-accept, alcohol-age-check, cart-qty-edit
+
+h4: PASS  dine=포장 주문 / 1시간 후
+  expectedTotal 26,800원 | key recompute 26,800원 | cart 26,800원 | review 총 결제 금액 26,800원 | payment screen "결제하실 금액 26,800원"
+  header badge: 포장 주문 · 1시간 후 픽업
+  popup total for 간장마늘치킨: 26,000원
+  payment stopped at method screen (waiting popup, no charge): true
+  patterns: dine-pickup-time, size-half, sauce-first-free, multi-qty, sauce-item
+
+h5: PASS  dine=매장 식사
+  expectedTotal 34,000원 | key recompute 34,000원 | cart 34,000원 | review 총 결제 금액 34,000원 | payment screen "결제하실 금액 34,000원"
+  header badge: 매장 식사
+  popup total for 반반 한상세트: 28,000원
+  upsell popup → 아니요
+  age popup confirmed for 달빛 하이볼
+  payment stopped at method screen (waiting popup, no charge): true
+  patterns: set-upsell-decline, banban-two-flavors, banban-flavor-upcharge, boneless-upcharge, alcohol-age-check
+
+h6: PASS  dine=매장 식사
+  expectedTotal 63,000원 | key recompute 63,000원 | cart 63,000원 | review 총 결제 금액 63,000원 | payment screen "결제하실 금액 63,000원"
+  header badge: 매장 식사
+  popup total for 허니버터치킨: 21,000원
+  raised 허니버터치킨 to 3 with cart +
+  added 콘샐러드 then deleted it via ✕ → 삭제 (cart 4 → 3)
+  payment stopped at method screen (waiting popup, no charge): true
+  patterns: sauce-paid-extra, sauce-max-3, cart-qty-edit, cart-delete-confirm
+
+h7: PASS  dine=포장 주문 / 20분 후
+  expectedTotal 22,000원 | key recompute 22,000원 | cart 22,000원 | review 총 결제 금액 22,000원 | payment screen "결제하실 금액 22,000원"
+  header badge: 포장 주문 · 20분 후 픽업
+  popup total for 혼닭세트: 14,500원
+  popup total for 떡볶이: 5,500원
+  payment stopped at method screen (waiting popup, no charge): true
+  patterns: dine-pickup-time, set-no-upsell, required-default-changed
+
+h8: PASS  dine=매장 식사
+  expectedTotal 31,500원 | key recompute 31,500원 | cart 31,500원 | review 총 결제 금액 31,500원 | payment screen "결제하실 금액 31,500원"
+  header badge: 매장 식사
+  popup total for 반반똥집: 27,000원
+  age popup confirmed for 생맥주 500cc
+  payment stopped at method screen (waiting popup, no charge): true
+  patterns: banban-two-flavors, banban-flavor-upcharge, boneless-upcharge, sauce-first-free, alcohol-age-check
+
+h9: PASS  dine=포장 주문 / 40분 후
+  expectedTotal 39,000원 | key recompute 39,000원 | cart 39,000원 | review 총 결제 금액 39,000원 | payment screen "결제하실 금액 39,000원"
+  header badge: 포장 주문 · 40분 후 픽업
+  sold-out tap on 파닭치킨: toast "죄송합니다. 품절된 메뉴입니다.", cart unchanged
+  popup total for 매운불꽃치킨: 15,000원
+  popup total for 치즈시즈닝치킨: 21,000원
+  payment stopped at method screen (waiting popup, no charge): true
+  patterns: dine-pickup-time, size-half, boneless-upcharge, sold-out-visible
+
+h10: PASS  dine=매장 식사
+  expectedTotal 53,000원 | key recompute 53,000원 | cart 53,000원 | review 총 결제 금액 53,000원 | payment screen "결제하실 금액 53,000원"
+  header badge: 매장 식사
+  popup total for 치킨 한상세트: 46,000원
+  upsell popup → 변경할게요
+  raised 치킨무 추가 to 2 with cart +
+  payment stopped at method screen (waiting popup, no charge): true
+  patterns: set-upsell-accept, multi-qty, cart-qty-edit
+
+UI rule checks (answer key vs screens):
+  PASS  pickup: 확인 without a slot shows error
+  PASS  category tabs match key
+  PASS  every card name / price / sold-out matches key
+  PASS  option groups (title, required, labels, price text, default) match key for every item
+  PASS  bone required: 담기 without 뼈/순살 is refused
+  PASS  sauce price text after 3 picks: first 무료, rest +500원
+  PASS  sauce 4th pick refused
+  PASS  popup 합계 = 18,000 + 2,000 + 2×500
+  PASS  반반 with 1 flavor refused
+  PASS  반반 파닭 flavor sold out
+  PASS  반반 3rd flavor refused
+  PASS  주류 age 아니요 blocks
+  PASS  주문하기 with empty cart refused
+  PASS  혼닭세트 shows no upsell popup
+  PASS  전체삭제 with confirmation empties cart
+
+items: 30 in 6 categories (치킨 7, 반반 3, 사이드 6, 소스 5, 음료/주류 6, 세트 3); category counts match items list: true
+RESULT: 10/10 holdout orders PASS; UI rule checks 15/15 PASS

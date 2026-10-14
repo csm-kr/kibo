@@ -1,0 +1,298 @@
+{
+  "kiosk": {
+    "name": "달빛닭장",
+    "nameEn": "Moonlight Coop Chicken",
+    "domain": "Korean fried-chicken shop self-order kiosk (eat-in and pickup), portrait 720x1280"
+  },
+  "flow": [
+    "Attract screen: brand 달빛닭장, '주문하시려면 화면을 터치해 주세요' (tap anywhere)",
+    "Dine choice: '어디에서 드시겠어요?' with two buttons '매장 식사' (EAT IN) and '포장 주문' (TAKE OUT)",
+    "Pickup only: '픽업 시간을 선택해 주세요' with fixed slots '20분 후', '30분 후', '40분 후', '1시간 후', then '확인' (no price change; '확인' without a slot shows '픽업 시간을 선택해 주세요.')",
+    "Menu: header with dine badge and '처음으로'; category tabs 치킨 / 반반 / 사이드 / 소스 / 음료/주류 / 세트; 3-column item grid; cart list at the bottom with −/+ stepper, line price, ✕ delete, '전체삭제', '총 N개' + total, '주문하기'",
+    "Item option popup (items with options): option groups, 수량 stepper, '합계', '취소' / '장바구니 담기'. Items without options are added straight to the cart at quantity 1",
+    "Popups on the menu: age check for 주류 before adding; upsell '콜라 1.25L로 변경하시겠어요? +1,000원' right after adding 치킨 한상세트 or 반반 한상세트; delete confirmation; 전체삭제 confirmation; 처음으로 confirmation",
+    "Order review: '주문하실 메뉴를 확인해 주세요', 식사 방법 row, item list with options, '총 결제 금액', '이전으로' / '결제하기'",
+    "Payment method: '결제 수단을 선택해 주세요', '결제하실 금액 N원', 신용·체크카드 / 간편결제 / 모바일 상품권; tapping a method opens a waiting popup with '결제 취소' only (nothing is charged; end of flow)"
+  ],
+  "categories": [
+    { "label": "치킨", "itemCount": 7 },
+    { "label": "반반", "itemCount": 3 },
+    { "label": "사이드", "itemCount": 6 },
+    { "label": "소스", "itemCount": 5 },
+    { "label": "음료/주류", "itemCount": 6 },
+    { "label": "세트", "itemCount": 3 }
+  ],
+  "optionGroups": {
+    "size": {
+      "title": "사이즈 선택",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": "whole",
+      "appliesWhen": null,
+      "options": [
+        { "id": "whole", "label": "한 마리", "priceDelta": 0, "maxQty": 1 },
+        { "id": "half", "label": "반 마리", "priceDelta": -7000, "maxQty": 1 }
+      ]
+    },
+    "bone": {
+      "title": "뼈/순살 선택",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": null,
+      "appliesWhen": null,
+      "options": [
+        { "id": "bone", "label": "뼈", "priceDelta": 0, "maxQty": 1 },
+        { "id": "boneless", "label": "순살", "priceDelta": 2000, "maxQty": 1 }
+      ]
+    },
+    "sauce": {
+      "title": "소스 추가",
+      "type": "multi",
+      "required": false,
+      "min": 0,
+      "max": 3,
+      "default": null,
+      "appliesWhen": null,
+      "pricingRule": "첫 번째 소스 무료 · 두 번째부터 1개당 +500원 (최대 3개): the first selected sauce is free, every further sauce +500원; charged per chicken unit",
+      "freeFirst": 1,
+      "options": [
+        { "id": "yangnyeom", "label": "양념소스", "priceDelta": 500, "maxQty": 1 },
+        { "id": "honeymustard", "label": "허니머스타드", "priceDelta": 500, "maxQty": 1 },
+        { "id": "garlicmayo", "label": "갈릭마요", "priceDelta": 500, "maxQty": 1 },
+        { "id": "hotdip", "label": "매운디핑소스", "priceDelta": 500, "maxQty": 1 }
+      ]
+    },
+    "flavor2": {
+      "title": "반반 맛 선택",
+      "type": "multi",
+      "required": true,
+      "min": 2,
+      "max": 2,
+      "default": null,
+      "appliesWhen": null,
+      "options": [
+        { "id": "fried", "label": "후라이드", "priceDelta": 0, "maxQty": 1 },
+        { "id": "yangnyeom", "label": "양념", "priceDelta": 0, "maxQty": 1 },
+        { "id": "soygarlic", "label": "간장마늘", "priceDelta": 1000, "maxQty": 1 },
+        { "id": "fire", "label": "매운불꽃", "priceDelta": 1000, "maxQty": 1 },
+        { "id": "honeybutter", "label": "허니버터", "priceDelta": 1000, "maxQty": 1 },
+        { "id": "cheese", "label": "치즈시즈닝", "priceDelta": 2000, "maxQty": 1 },
+        { "id": "scallion", "label": "파닭", "priceDelta": 1000, "maxQty": 1, "soldOut": true }
+      ]
+    },
+    "setFlavor": {
+      "title": "치킨 맛 선택",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": null,
+      "appliesWhen": null,
+      "options": [
+        { "id": "fried", "label": "후라이드", "priceDelta": 0, "maxQty": 1 },
+        { "id": "yangnyeom", "label": "양념", "priceDelta": 0, "maxQty": 1 },
+        { "id": "soygarlic", "label": "간장마늘", "priceDelta": 1000, "maxQty": 1 }
+      ]
+    },
+    "spicy": {
+      "title": "맵기 선택",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": "medium",
+      "appliesWhen": null,
+      "options": [
+        { "id": "mild", "label": "순한맛", "priceDelta": 0, "maxQty": 1 },
+        { "id": "medium", "label": "보통맛", "priceDelta": 0, "maxQty": 1 },
+        { "id": "hot", "label": "매운맛", "priceDelta": 0, "maxQty": 1 }
+      ]
+    },
+    "colaUpsize": {
+      "title": "콜라 1.25L로 변경하시겠어요? +1,000원",
+      "type": "single",
+      "required": false,
+      "min": 0,
+      "max": 1,
+      "default": null,
+      "appliesWhen": "popup shown right after 치킨 한상세트 or 반반 한상세트 is added to the cart; '변경할게요' = cola125, '아니요' = no option (empty list). Applies to the whole quantity just added",
+      "options": [
+        { "id": "cola125", "label": "콜라 1.25L 변경", "priceDelta": 1000, "maxQty": 1 }
+      ]
+    }
+  },
+  "items": [
+    { "name": "바삭 후라이드", "category": "치킨", "basePrice": 18000, "soldOut": false, "timeLimited": null, "optionGroups": ["size", "bone", "sauce"] },
+    { "name": "달빛 양념치킨", "category": "치킨", "basePrice": 19000, "soldOut": false, "timeLimited": null, "optionGroups": ["size", "bone", "sauce"] },
+    { "name": "간장마늘치킨", "category": "치킨", "basePrice": 20000, "soldOut": false, "timeLimited": null, "optionGroups": ["size", "bone", "sauce"] },
+    { "name": "매운불꽃치킨", "category": "치킨", "basePrice": 20000, "soldOut": false, "timeLimited": null, "optionGroups": ["size", "bone", "sauce"] },
+    { "name": "허니버터치킨", "category": "치킨", "basePrice": 20000, "soldOut": false, "timeLimited": null, "optionGroups": ["size", "bone", "sauce"] },
+    { "name": "치즈시즈닝치킨", "category": "치킨", "basePrice": 21000, "soldOut": false, "timeLimited": null, "optionGroups": ["size", "bone", "sauce"] },
+    { "name": "파닭치킨", "category": "치킨", "basePrice": 21000, "soldOut": true, "timeLimited": null, "optionGroups": ["size", "bone", "sauce"] },
+
+    { "name": "반반치킨", "category": "반반", "basePrice": 19000, "soldOut": false, "timeLimited": null, "optionGroups": ["flavor2", "bone", "sauce"] },
+    { "name": "반반치즈볼", "category": "반반", "basePrice": 22000, "soldOut": false, "timeLimited": null, "optionGroups": ["flavor2", "bone", "sauce"] },
+    { "name": "반반똥집", "category": "반반", "basePrice": 23000, "soldOut": false, "timeLimited": null, "optionGroups": ["flavor2", "bone", "sauce"] },
+
+    { "name": "감자튀김", "category": "사이드", "basePrice": 3500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "치즈볼", "category": "사이드", "basePrice": 4000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "똥집튀김", "category": "사이드", "basePrice": 7000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "콘샐러드", "category": "사이드", "basePrice": 2000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "떡볶이", "category": "사이드", "basePrice": 5500, "soldOut": false, "timeLimited": null, "optionGroups": ["spicy"] },
+    { "name": "치킨무 추가", "category": "사이드", "basePrice": 500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+
+    { "name": "양념소스", "category": "소스", "basePrice": 500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "허니머스타드", "category": "소스", "basePrice": 500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "갈릭마요", "category": "소스", "basePrice": 500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "매운디핑소스", "category": "소스", "basePrice": 500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "치즈디핑소스", "category": "소스", "basePrice": 800, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+
+    { "name": "콜라 500ml", "category": "음료/주류", "basePrice": 2000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "제로콜라 500ml", "category": "음료/주류", "basePrice": 2000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "사이다 500ml", "category": "음료/주류", "basePrice": 2000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "콜라 1.25L", "category": "음료/주류", "basePrice": 3000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "생맥주 500cc", "category": "음료/주류", "basePrice": 4500, "soldOut": false, "timeLimited": null, "optionGroups": [], "ageCheck": true },
+    { "name": "달빛 하이볼", "category": "음료/주류", "basePrice": 6000, "soldOut": false, "timeLimited": null, "optionGroups": [], "ageCheck": true },
+
+    { "name": "혼닭세트", "category": "세트", "basePrice": 14500, "soldOut": false, "timeLimited": null, "optionGroups": ["setFlavor", "bone"] },
+    { "name": "치킨 한상세트", "category": "세트", "basePrice": 23000, "soldOut": false, "timeLimited": null, "optionGroups": ["setFlavor", "bone", "colaUpsize"] },
+    { "name": "반반 한상세트", "category": "세트", "basePrice": 25000, "soldOut": false, "timeLimited": null, "optionGroups": ["flavor2", "bone", "colaUpsize"] }
+  ],
+  "promotions": [
+    { "rule": "소스 추가 group on 치킨 and 반반 items: 첫 번째 소스 무료 · 두 번째부터 1개당 +500원", "effect": "per chicken unit, sauce charge = max(0, number of sauces - 1) x 500원" },
+    { "rule": "Set upsell popup after adding 치킨 한상세트 or 반반 한상세트: '콜라 1.25L로 변경하시겠어요? +1,000원'", "effect": "+1,000원 per set unit when '변경할게요' is tapped; nothing when '아니요'" }
+  ],
+  "holdoutOrders": [
+    {
+      "id": "h1",
+      "dine": "매장 식사",
+      "lines": [
+        { "item": "바삭 후라이드", "options": { "size": ["whole"], "bone": ["boneless"], "sauce": ["yangnyeom", "honeymustard"] }, "qty": 1 },
+        { "item": "콜라 500ml", "options": {}, "qty": 1 }
+      ],
+      "expectedTotal": 22500,
+      "patterns": ["dine-eat-in", "bone-required", "boneless-upcharge", "sauce-first-free", "sauce-paid-extra"]
+    },
+    {
+      "id": "h2",
+      "dine": "포장 주문",
+      "pickupTime": "30분 후",
+      "lines": [
+        { "item": "반반치킨", "options": { "flavor2": ["yangnyeom", "cheese"], "bone": ["bone"], "sauce": [] }, "qty": 1 },
+        { "item": "감자튀김", "options": {}, "qty": 1 }
+      ],
+      "expectedTotal": 24500,
+      "patterns": ["dine-pickup-time", "banban-two-flavors", "banban-flavor-upcharge"]
+    },
+    {
+      "id": "h3",
+      "dine": "매장 식사",
+      "lines": [
+        { "item": "치킨 한상세트", "options": { "setFlavor": ["soygarlic"], "bone": ["boneless"], "colaUpsize": ["cola125"] }, "qty": 1 },
+        { "item": "생맥주 500cc", "options": {}, "qty": 2 }
+      ],
+      "expectedTotal": 36000,
+      "patterns": ["set-upsell-accept", "alcohol-age-check", "cart-qty-edit"]
+    },
+    {
+      "id": "h4",
+      "dine": "포장 주문",
+      "pickupTime": "1시간 후",
+      "lines": [
+        { "item": "간장마늘치킨", "options": { "size": ["half"], "bone": ["bone"], "sauce": ["garlicmayo"] }, "qty": 2 },
+        { "item": "치즈디핑소스", "options": {}, "qty": 1 }
+      ],
+      "expectedTotal": 26800,
+      "patterns": ["dine-pickup-time", "size-half", "sauce-first-free", "multi-qty", "sauce-item"]
+    },
+    {
+      "id": "h5",
+      "dine": "매장 식사",
+      "lines": [
+        { "item": "반반 한상세트", "options": { "flavor2": ["fried", "fire"], "bone": ["boneless"], "colaUpsize": [] }, "qty": 1 },
+        { "item": "달빛 하이볼", "options": {}, "qty": 1 }
+      ],
+      "expectedTotal": 34000,
+      "patterns": ["set-upsell-decline", "banban-two-flavors", "banban-flavor-upcharge", "boneless-upcharge", "alcohol-age-check"]
+    },
+    {
+      "id": "h6",
+      "dine": "매장 식사",
+      "lines": [
+        { "item": "허니버터치킨", "options": { "size": ["whole"], "bone": ["bone"], "sauce": ["yangnyeom", "garlicmayo", "hotdip"] }, "qty": 3 }
+      ],
+      "expectedTotal": 63000,
+      "patterns": ["sauce-paid-extra", "sauce-max-3", "cart-qty-edit", "cart-delete-confirm"],
+      "note": "Placed as 1, then raised to 3 with the cart + button; a 콘샐러드 is added and removed with ✕ → 삭제 before ordering (not part of the final order)"
+    },
+    {
+      "id": "h7",
+      "dine": "포장 주문",
+      "pickupTime": "20분 후",
+      "lines": [
+        { "item": "혼닭세트", "options": { "setFlavor": ["yangnyeom"], "bone": ["bone"] }, "qty": 1 },
+        { "item": "떡볶이", "options": { "spicy": ["hot"] }, "qty": 1 },
+        { "item": "사이다 500ml", "options": {}, "qty": 1 }
+      ],
+      "expectedTotal": 22000,
+      "patterns": ["dine-pickup-time", "set-no-upsell", "required-default-changed"]
+    },
+    {
+      "id": "h8",
+      "dine": "매장 식사",
+      "lines": [
+        { "item": "반반똥집", "options": { "flavor2": ["soygarlic", "honeybutter"], "bone": ["boneless"], "sauce": ["honeymustard"] }, "qty": 1 },
+        { "item": "생맥주 500cc", "options": {}, "qty": 1 }
+      ],
+      "expectedTotal": 31500,
+      "patterns": ["banban-two-flavors", "banban-flavor-upcharge", "boneless-upcharge", "sauce-first-free", "alcohol-age-check"]
+    },
+    {
+      "id": "h9",
+      "dine": "포장 주문",
+      "pickupTime": "40분 후",
+      "lines": [
+        { "item": "매운불꽃치킨", "options": { "size": ["half"], "bone": ["boneless"], "sauce": [] }, "qty": 1 },
+        { "item": "치즈시즈닝치킨", "options": { "size": ["whole"], "bone": ["bone"], "sauce": [] }, "qty": 1 },
+        { "item": "콜라 1.25L", "options": {}, "qty": 1 }
+      ],
+      "expectedTotal": 39000,
+      "patterns": ["dine-pickup-time", "size-half", "boneless-upcharge", "sold-out-visible"],
+      "note": "파닭치킨 is sold out; tapping it shows '죄송합니다. 품절된 메뉴입니다.' and nothing is added"
+    },
+    {
+      "id": "h10",
+      "dine": "매장 식사",
+      "lines": [
+        { "item": "치킨 한상세트", "options": { "setFlavor": ["fried"], "bone": ["bone"], "colaUpsize": ["cola125"] }, "qty": 2 },
+        { "item": "치즈볼", "options": {}, "qty": 1 },
+        { "item": "치킨무 추가", "options": {}, "qty": 2 }
+      ],
+      "expectedTotal": 53000,
+      "patterns": ["set-upsell-accept", "multi-qty", "cart-qty-edit"]
+    }
+  ],
+  "quirks": [
+    "사이즈 선택 starts on 한 마리 (preselected); 뼈/순살 선택 has no default, so '장바구니 담기' without it shows '필수 선택 항목입니다.' under the group and '필수 옵션을 모두 선택해 주세요.' above the buttons",
+    "반 마리 is -7,000원 from the listed (한 마리) price; 순살 is +2,000원 for both sizes",
+    "소스 추가 price labels change live: every sauce shows '무료' until one is picked; then the first picked shows '무료' and the rest show '+500원'. A 4th sauce is refused with '소스는 최대 3개까지 선택할 수 있습니다.'",
+    "반반 맛 선택 needs exactly 2 different flavors; a 3rd tap is refused with '맛은 2가지까지만 선택할 수 있습니다.'; fewer than 2 gives '반반 맛을 2가지 선택해 주세요. (현재 N가지)'. The 파닭 flavor is shown greyed with '품절' and cannot be picked",
+    "파닭치킨 (치킨) is sold out: the card has a '품절' stamp and tapping it shows the toast '죄송합니다. 품절된 메뉴입니다.'",
+    "Items without options (most 사이드, all 소스, all 음료/주류) go straight into the cart at quantity 1 with the toast '장바구니에 담았습니다.'; more units are added with the cart + button or by tapping the card again",
+    "주류 (생맥주 500cc, 달빛 하이볼, marked with a '19' badge) show an age popup every time they are tapped: '아니요' → '만 19세 미만 고객은 주류를 주문할 수 없습니다.'; '네, 19세 이상입니다' adds one",
+    "The set upsell popup appears after the set is already in the cart; '변경할게요' converts the units just added into a line with '콜라 1.25L 변경(+1,000원)'. 혼닭세트 never shows the popup",
+    "Lines with identical item and options merge into one cart line (quantity adds up)",
+    "Cart − is disabled at quantity 1; removal is only through ✕ → '선택한 메뉴를 장바구니에서 삭제하시겠습니까?' → '삭제' (or '취소'). '전체삭제' also asks first",
+    "'처음으로' on the menu with items in the cart asks '주문을 취소하고 처음 화면으로 돌아가시겠습니까?'; from the dine or pickup screens it resets at once",
+    "'주문하기' with an empty cart shows the toast '메뉴를 먼저 선택해 주세요.'",
+    "Pickup time appears in the menu header badge as '포장 주문 · 30분 후 픽업' and on the review screen as '포장 주문 (픽업: 30분 후)'; it never changes the price",
+    "Item cards keep name and price in one element (DOM text '바삭 후라이드18,000원'); the payment amount is split into separate elements ('결제하실 금액', '50,000', '원')",
+    "The 소스 category sells sauce cups on their own (500원 each, 치즈디핑소스 800원); these are separate from the in-chicken 소스 추가 choice and have no free-first rule",
+    "Tapping a payment method opens a waiting popup ('카드를 IC 단말기에 끝까지 꽂아 주세요.' etc.) whose only button is '결제 취소'; no payment ever completes",
+    "Toasts fade after about 1.8 seconds (cosmetic only); no other timers, no idle reset"
+  ]
+}
