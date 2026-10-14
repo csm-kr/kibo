@@ -51,14 +51,22 @@ export interface PingReply {
   serverTime: number;
 }
 
-async function post<T>(path: string, body: object, token?: string): Promise<T> {
+/** A chat request may run several model calls (each cut at 40 s on the server); past this the phone gives up (I-250). */
+export const CHAT_TIMEOUT_MS = 90_000;
+
+async function post<T>(path: string, body: object, token?: string, timeoutMs?: number): Promise<T> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers.Authorization = `Bearer ${token}`;
+  const ctrl = timeoutMs ? new AbortController() : undefined;
+  const timer = ctrl ? setTimeout(() => ctrl.abort(), timeoutMs) : undefined;
   let res: Response;
   try {
-    res = await fetch(path, { method: "POST", headers, body: JSON.stringify(body) });
+    res = await fetch(path, { method: "POST", headers, body: JSON.stringify(body), signal: ctrl?.signal });
   } catch {
+    if (ctrl?.signal.aborted) throw new ApiError("NETWORK", "This is taking too long. Please try again.");
     throw new ApiError("NETWORK", "Connection problem. Please try again.");
+  } finally {
+    clearTimeout(timer);
   }
   let json: { ok?: boolean; error?: { code?: unknown; message?: unknown; detail?: ErrorDetail } };
   try {
@@ -146,5 +154,10 @@ export function chat(input: {
   language?: SpeechLanguage;
 }): Promise<ChatReply> {
   const { token, language, ...rest } = input;
-  return post("/api/chat", { ...rest, ...aiLanguageField({ locale: rest.locale, language }), chatRequestId: crypto.randomUUID() }, token);
+  return post(
+    "/api/chat",
+    { ...rest, ...aiLanguageField({ locale: rest.locale, language }), chatRequestId: crypto.randomUUID() },
+    token,
+    CHAT_TIMEOUT_MS,
+  );
 }

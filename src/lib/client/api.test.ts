@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { ApiError, chat, claim, createSession, liveToken, ping, sendCommand } from "./api";
+import { ApiError, CHAT_TIMEOUT_MS, chat, claim, createSession, liveToken, ping, sendCommand } from "./api";
 
 const fetchMock = vi.fn();
 
@@ -161,6 +161,22 @@ describe("claim and chat", () => {
     expect(body).not.toHaveProperty("token");
     expect(body).not.toHaveProperty("cartVersion");
     expect(r.reply).toBe("Done");
+  });
+
+  it("chat gives up after its deadline, so a hung model call cannot lock the phone (I-250)", async () => {
+    vi.useFakeTimers();
+    try {
+      fetchMock.mockImplementation(
+        (_url: string, init: RequestInit) =>
+          new Promise((_resolve, reject) => init.signal?.addEventListener("abort", () => reject(new DOMException("aborted", "AbortError")))),
+      );
+      const p = chat({ sessionId: "s", token: "d", message: "I'm done", history: [], utteranceSeq: 1, locale: "en" });
+      const settled = expect(p).rejects.toMatchObject({ code: "NETWORK", message: "This is taking too long. Please try again." });
+      await vi.advanceTimersByTimeAsync(CHAT_TIMEOUT_MS);
+      await settled;
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("sendCommand keeps a given commandId (voice: <liveSessionId>:<functionCallId>)", async () => {

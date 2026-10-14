@@ -214,7 +214,12 @@ describe("geminiClient, GEMINI_TEXT_BACKEND=auto", () => {
     const out = await t.client().generate(REQ);
     expect(out.backend).toBe("vertex");
     expect(t.vertexGen).toHaveBeenCalledTimes(1);
-    expect(t.vertexGen.mock.calls[0]).toEqual(t.apiGen.mock.calls[0]);
+    // The same request, except each call's own abort signal (I-250).
+    const withoutSignal = (req: unknown) => {
+      const r = req as { config: Record<string, unknown> };
+      return { ...r, config: { ...r.config, abortSignal: undefined } };
+    };
+    expect(withoutSignal((t.vertexGen.mock.calls[0] as unknown[])[0])).toEqual(withoutSignal(t.apiGen.mock.calls[0][0]));
     expect(log).toHaveBeenCalledWith("gemini text fallback api->vertex (402)");
     expect(JSON.stringify(log.mock.calls)).not.toContain("AIza");
   });
@@ -368,5 +373,33 @@ describe("geminiClient with the prompt cache", () => {
     expect(out.backend).toBe("vertex");
     const sent = t.vertexGen.mock.calls[0] as unknown as [{ config: Record<string, unknown> }];
     expect(sent[0].config.cachedContent).toBe("projects/p/locations/global/cachedContents/v1");
+  });
+});
+
+describe("geminiClient, deadline per model call (I-250)", () => {
+  const never = () => new Promise<never>(() => {});
+
+  it("a hung API-key call is given up after the deadline and sent once to Vertex, which answers", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const t = auto(never);
+    const out = await geminiClient({ ...t.deps, deadlineMs: 20 }).generate(REQ);
+    expect(out.backend).toBe("vertex");
+    expect(t.vertexGen).toHaveBeenCalledTimes(1);
+  });
+
+  it("when the backend it must stay on hangs, the request ends as UPSTREAM instead of waiting forever", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const t = auto(never);
+    t.vertexGen.mockImplementation(never);
+    const err = await geminiClient({ ...t.deps, deadlineMs: 20 }).generate(REQ).catch((e) => e);
+    expect(err).toBeInstanceOf(CommandError);
+    expect(err).toMatchObject({ code: "UPSTREAM" });
+  });
+
+  it("each call gets an abort signal, so the SDK can drop the hung request", async () => {
+    const t = auto(async () => OK);
+    await geminiClient({ ...t.deps, deadlineMs: 1000 }).generate(REQ);
+    const req = t.apiGen.mock.calls[0][0] as { config: { abortSignal?: AbortSignal } };
+    expect(req.config.abortSignal).toBeInstanceOf(AbortSignal);
   });
 });

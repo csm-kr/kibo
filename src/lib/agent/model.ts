@@ -147,10 +147,40 @@ export interface TextDeps {
   models: (backend: TextBackend) => Models;
   circuit: Circuit;
   now: () => number;
+  /** How long one model call may take before it is given up (I-250: a hung call locked the phone). */
+  deadlineMs: number;
 }
 
+// Above the slowest answers seen (Vertex single calls up to 31 s, 14-final:5), so only a hung call is cut.
+const MODEL_DEADLINE_MS = 40_000;
+
 function defaultTextDeps(): TextDeps {
-  return { backend: textBackendSetting(), models: (b) => textGenAI(b).models, circuit, now: Date.now };
+  return { backend: textBackendSetting(), models: (b) => textGenAI(b).models, circuit, now: Date.now, deadlineMs: MODEL_DEADLINE_MS };
+}
+
+/** A call that did not answer in time. Not an ApiError, so the first call of a request falls back like a network error. */
+class ModelDeadlineError extends Error {
+  constructor() {
+    super("model call deadline");
+    this.name = "ModelDeadlineError";
+  }
+}
+
+/** Runs `call` with an abort signal; gives up after `ms` even if the SDK ignores the signal. */
+async function withDeadline<T>(ms: number, call: (signal: AbortSignal) => Promise<T>): Promise<T> {
+  const ctrl = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const late = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      ctrl.abort();
+      reject(new ModelDeadlineError());
+    }, ms);
+  });
+  try {
+    return await Promise.race([call(ctrl.signal), late]);
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 /** The status worth a retry on Vertex, or null: billing, quota, server and network errors only, never a bad request. */
@@ -221,20 +251,22 @@ export function geminiClient(overrides: Partial<TextDeps> & { cache?: PromptCach
       };
       // Gemini 3 returns thought signatures with function calls; the caller sends `content` back unchanged.
       const inline = { model, contents: contents as Content[], config: { systemInstruction: system, tools: tools as ToolListUnion, ...config } };
-      const call = async (backend: TextBackend) => {
-        const models = deps.models(backend);
-        const name = cache ? await cache.get(backend, model, system, tools) : null;
-        if (!name) return models.generateContent(inline);
-        try {
-          // A request that names a cache may not also set the instructions or tools.
-          return await models.generateContent({ model, contents: contents as Content[], config: { cachedContent: name, ...config } });
-        } catch (e) {
-          if (!(e instanceof ApiError) || !CACHE_REFUSED.includes(e.status)) throw e;
-          cache!.drop(name);
-          console.error(`gemini cache refused (${e.status}), sent inline`);
-          return models.generateContent(inline);
-        }
-      };
+      const call = (backend: TextBackend) =>
+        withDeadline(deps.deadlineMs, async (abortSignal) => {
+          const models = deps.models(backend);
+          const sent = { ...inline, config: { ...inline.config, abortSignal } };
+          const name = cache ? await cache.get(backend, model, system, tools) : null;
+          if (!name) return models.generateContent(sent);
+          try {
+            // A request that names a cache may not also set the instructions or tools.
+            return await models.generateContent({ model, contents: contents as Content[], config: { cachedContent: name, ...config, abortSignal } });
+          } catch (e) {
+            if (!(e instanceof ApiError) || !CACHE_REFUSED.includes(e.status)) throw e;
+            cache!.drop(name);
+            console.error(`gemini cache refused (${e.status}), sent inline`);
+            return models.generateContent(sent);
+          }
+        });
       let out;
       try {
         out = await generateOn(deps, call, pinned);
