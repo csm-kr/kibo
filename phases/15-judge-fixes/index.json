@@ -24,7 +24,7 @@
       "status": "completed",
       "started_at": "2026-10-15T00:57:08+0900",
       "summary": "No phone control pays: /demo's card stand-in moved under the kiosk half ('Kiosk: insert card (demo)', [data-card-reader] in DemoApp, kiosk accent on the dark frame, counted as a kiosk tap; onCardStandIn and the cardStandIn string removed). Larger text on every phone screen: the app bar's globe+Aa button opens 'Language and text size' (AppBar, shared SettingSwitch) on /assistant (phone setting, root 115%) and /demo's phone (own state, CSS zoom 1.15 on the panel only, the kiosk canvas uses rem); /app has a switch beside the logo. A separate header button was not added (brand would get ~34px at 360 with larger text); on phones <= 380px with larger text the AI voice switch moves from the dock to that sheet. After each send/reply the newest message and its choices scroll fully into view (keepInView in Conversation.tsx), the cart summary hides while choices show, P4's reply sits above the card. Instructions name the pay button by lt('payNow', language) (test first). Copy: D1 'Talk or type to the phone next to the kiosk.', the open-field button is KeyboardOff + 'Hide' named 'Hide keyboard', landing diagram '/app'. QA: P3-reply-choices-large, D2-large-text, D2-payment reader assertion; textSpacing skips 1px sr-only boxes by computed size (zoom). I-259..I-265. lint, build, test (1116), test:e2e (48 passed, 17 @live skipped), qa:ui (48/48, 0 H) pass. evidence/bridge-replay.json and touch-hero.json rewritten by E2E (I-099) and left uncommitted.",
-      "completed_at": "2026-10-15T01:34:54+0900"
+      "completed_at": "2026-10-15T01:36:12+0900"
     },
     {
       "step": 3,
