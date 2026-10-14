@@ -1,0 +1,238 @@
+{
+  "kioskId": "bk8-tableorder",
+  "label": "final",
+  "grader": 2,
+  "gradedAt": "2026-10-14T03:42:50.747Z",
+  "skill": "no skill",
+  "files": {
+    "skill": "spikes/blind-kiosks/results/bk8-tableorder/final/skill.json",
+    "key": "spikes/blind-kiosks/bk8-tableorder/answer-key.json",
+    "app": "spikes/blind-kiosks/bk8-tableorder/app/index.html"
+  },
+  "summary": "bk8-tableorder/final: no learn-stats.json; no skill; items 0/37 (precision null), price 0/0, options exact 0/0 (openable 0/0); orders correct 0, safe refusal 0, unsafe 0, not learned 10 of 10 (cart lines read in 0)",
+  "learning": null,
+  "catalog": {
+    "items": {
+      "key": 37,
+      "skill": 0,
+      "matched": 0,
+      "recall": 0,
+      "precision": null,
+      "missing": [
+        "생삼겹살",
+        "숙성 목살",
+        "항정살",
+        "양념 돼지갈비",
+        "소갈비살",
+        "차돌박이",
+        "우삼겹",
+        "냉면",
+        "막국수",
+        "후식 냉면",
+        "잔치국수",
+        "공기밥",
+        "철판 볶음밥",
+        "열무 비빔밥",
+        "된장찌개",
+        "김치찌개",
+        "순두부찌개",
+        "부대찌개 (2인분)",
+        "갈비탕",
+        "계란찜",
+        "해물파전",
+        "김치전",
+        "도토리묵 무침",
+        "쌈채소 추가",
+        "계란말이",
+        "소주",
+        "맥주 (병)",
+        "생맥주 500cc",
+        "막걸리",
+        "복분자주",
+        "콜라",
+        "사이다",
+        "제로 콜라",
+        "식혜",
+        "수정과",
+        "바닐라 아이스크림",
+        "인절미 빙수"
+      ],
+      "extra": []
+    },
+    "price": {
+      "correct": 0,
+      "of": 0
+    },
+    "category": {
+      "correct": 0,
+      "of": 0
+    },
+    "soldOut": {
+      "correct": 0,
+      "of": 0
+    },
+    "options": {
+      "itemsExact": 0,
+      "items": 0,
+      "openableExact": 0,
+      "openable": 0,
+      "groups": 0,
+      "groupsFound": 0,
+      "groupLabelsExact": 0,
+      "groupRulesCorrect": 0,
+      "quantityGroups": 0,
+      "quantityRecognized": 0,
+      "conditionalGroups": 0,
+      "conditionalFound": 0
+    },
+    "perItem": [],
+    "perGroup": []
+  },
+  "orders": {
+    "total": 10,
+    "correct": 0,
+    "safeRefusal": 0,
+    "unsafe": 0,
+    "notLearned": 10,
+    "linesChecked": 0,
+    "results": [
+      {
+        "id": "h1",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 35500,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [],
+        "order": null
+      },
+      {
+        "id": "h2",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 29000,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "냉면 › 물",
+          "냉면 › 비빔",
+          "막국수 › 비빔"
+        ],
+        "order": null
+      },
+      {
+        "id": "h3",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 34500,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "김치찌개 › 매운맛",
+          "김치찌개 › 라면사리",
+          "순두부찌개 › 순한맛"
+        ],
+        "order": null
+      },
+      {
+        "id": "h4",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 65000,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [],
+        "order": null
+      },
+      {
+        "id": "h5",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 87000,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [],
+        "order": null
+      },
+      {
+        "id": "h6",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 62500,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "된장찌개 › 두부 추가"
+        ],
+        "order": null
+      },
+      {
+        "id": "h7",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 32500,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "후식 냉면 › 물"
+        ],
+        "order": null
+      },
+      {
+        "id": "h8",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 60500,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "부대찌개 (2인분) › 아주 매운맛",
+          "부대찌개 (2인분) › 라면사리"
+        ],
+        "order": null
+      },
+      {
+        "id": "h9",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 66500,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [],
+        "order": null
+      },
+      {
+        "id": "h10",
+        "outcome": "notLearned",
+        "reason": "no skill",
+        "linesChecked": null,
+        "expectedTotal": 38000,
+        "kioskTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "totalCannotSee": [
+          "김치찌개 › 보통맛"
+        ],
+        "order": null
+      }
+    ]
+  }
+}

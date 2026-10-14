@@ -1,0 +1,29 @@
+{
+  "kiosk": "모의 분식",
+  "categories": [],
+  "uiLabels": ["취소", "담기", "레귤러", "라지", "이전"],
+  "forbiddenLabels": ["결제하기"],
+  "dineOptions": { "eat_in": "먹고 가요", "take_out": "포장해요" },
+  "catalog": [
+    { "name": "커피", "category": "메뉴", "price": 3000, "soldOut": false, "optionGroups": [
+      { "name": "사이즈", "required": false, "min": 0, "max": 1, "options": [{ "name": "레귤러", "priceDelta": 0 }, { "name": "라지", "priceDelta": 500 }] }
+    ] },
+    { "name": "쿠키", "category": "메뉴", "price": 1500, "soldOut": false, "optionGroups": [] }
+  ],
+  "recipes": {
+    "startOrder": [{ "op": "click", "label": "시작하기" }, { "op": "click", "label": "{dineOption}" }],
+    "addToCart": [
+      { "op": "click", "label": "{item}" },
+      { "op": "forEach", "over": "options", "as": "option", "steps": [{ "op": "click", "label": "{option}" }] },
+      { "op": "click", "label": "담기" }
+    ]
+  },
+  "review": {
+    "open": [{ "op": "openReview", "label": "주문하기" }],
+    "totalPattern": "총 결제금액 ([\\d,]+)원",
+    "close": [{ "op": "click", "label": "이전" }]
+  },
+  "charges": [{ "name": "포장 용기", "amount": 100, "dineOption": "포장해요" }],
+  "cartTotalPattern": "합계 ([\\d,]+)원",
+  "notes": ["주문하기 opens the order review; take-out adds a 100원 container charge there."]
+}

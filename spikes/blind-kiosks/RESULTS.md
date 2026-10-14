@@ -129,3 +129,6 @@ Not improved, or new:
 - Orders are judged by the kiosk's total and the item names in its cart; options are not compared, and the kiosk's review and payment screens are never opened (bk5's take-out charge is invisible before them).
 - The bk2 rerun after the I-193 fix was informed by a test kiosk and is reported beside, never instead of, bk2's final.
 - No skill from these kiosks is in the product: bk6 (the only fresh one with unsafe 0) gets discounted ticket totals wrong (I-197) and orders passenger counts, which the product cart cannot express on a learned kiosk yet (I-190).
+
+## Round 3 (10-14): informed reruns, beside these numbers
+The learner was changed after these results (interrupts, verified totals on the kiosk's order review, an option-group coverage gate; frozen at `ea28477`) and bk2, bk5 and bk6 were learned once more with it. Those reruns are **informed** and never replace the numbers above: bk2 10 / 0 / 0 (skill total wrong 0 of 10), bk5 4 / 3 / 3 (0 of 7), bk6 10 / 0 / 0 (2 of 10). bk5's three unsafe take-out orders turned out to be an optional bag on its review that the grader does not read from the answer key (I-229). Everything, including two dev-set runs that did not finish, is in `ROUND3.md`.

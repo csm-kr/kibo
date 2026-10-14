@@ -2,8 +2,8 @@
 // kibo-learn runner (runner.mjs runOrder, which the learner's testSkill also uses and this grader must not change),
 // but the page stays open afterwards so the grader can read the kiosk's cart the way a person would: the visible
 // cart panel, or, when the cart is a closed drawer, after tapping the kiosk's own cart button.
-import { openKiosk, runSteps, snapshot } from '../../kibo-learn/driver.mjs';
-import { isForbidden, lineVars, orderPlan } from '../../kibo-learn/plan.mjs';
+import { openKiosk, runSteps, snapshot, answerInterrupts } from '../../kibo-learn/driver.mjs';
+import { isForbidden, lineVars, unsafeTargets } from '../../kibo-learn/plan.mjs';
 import { expectedTotal } from '../../kibo-learn/runner.mjs';
 
 // What a cart panel's heading or a cart button says (after any emoji). The grader is not bound by the skill's
@@ -65,16 +65,21 @@ export async function readCart(page, alerts, names) {
   return { text: '', source: null, head: null };
 }
 
-// Same contract as runOrder, plus cartSource and cartHead. `names` are the answer key's item names (ko and en).
+// Same contract as runOrder up to the menu cart's total (round 3: the skill's interrupts are answered the same way),
+// plus cartSource and cartHead. The order review, if the skill has one, is not opened here: grade.mjs replays the
+// order again with runOrder for the review total, so reading the cart (which may open a drawer) cannot disturb it.
+// `names` are the answer key's item names (ko and en).
 export async function runAndReadCart(skill, order, names) {
   let bad;
   try {
-    bad = orderPlan(skill, order).map((s) => [s.label, s.name, s.text].find((t) => t && isForbidden(t, skill.forbiddenLabels))).filter(Boolean);
+    bad = unsafeTargets(skill, order);
   } catch (e) {
     return { ok: false, error: `refused before any click: ${e.message}` };
   }
   if (bad.length) return { ok: false, error: `refused before any click: the plan clicks a forbidden label: ${bad.join(', ')}` };
-  const opts = { forbidden: skill.forbiddenLabels };
+  const answered = [];
+  const opts = { forbidden: skill.forbiddenLabels, interrupts: skill.interrupts, answered };
+  const interrupts = () => (answered.length ? { interruptsAnswered: answered } : {});
   const { browser, page, alerts } = await openKiosk();
   const t0 = Date.now();
   try {
@@ -83,14 +88,15 @@ export async function runAndReadCart(skill, order, names) {
       const item = skill.catalog.find((c) => c.name === l.item);
       await runSteps(page, skill.recipes[item?.recipe ?? 'addToCart'], lineVars(skill, l), opts);
     }
+    await answerInterrupts(page, skill.interrupts, opts);
     const snap = await snapshot(page, alerts);
     const shown = Number((snap.match(new RegExp(skill.cartTotalPattern)) ?? [])[1]?.replace(/,/g, ''));
     const want = expectedTotal(skill, order);
     const ms = Date.now() - t0; // the replay alone, as the runner reports it
     const cart = await readCart(page, alerts, names);
-    return { ok: shown === want, shownTotal: shown, expectedTotal: want, ms, cart: cart.text, cartSource: cart.source, cartHead: cart.head };
+    return { ok: shown === want, shownTotal: shown, expectedTotal: want, ms, cart: cart.text, cartSource: cart.source, cartHead: cart.head, ...interrupts() };
   } catch (e) {
-    return { ok: false, error: e.message.split('\n')[0], snapshot: await snapshot(page, alerts) };
+    return { ok: false, error: e.message.split('\n')[0], ...interrupts(), snapshot: await snapshot(page, alerts) };
   } finally {
     await browser.close();
   }

@@ -33,6 +33,24 @@ export const isForbidden = (text, extra = []) => {
   return lines.some((l) => isPayAction(bare(l)));
 };
 
+// A payment control the kiosk shows (결제하기, 카드 결제, Pay): what must still lie ahead after the order review opens.
+export const isPaymentControl = (label) => isForbidden(label) && PAYMENT.some((w) => bare(label).includes(w));
+
+// The one exception to isForbidden (round 3, I-195): the kiosk's order button may be tapped to open its order review,
+// where the kiosk shows the total it will charge before payment. Only with the op "openReview", only on a label that is
+// exactly an order word (a price or count may follow), never one that also names payment or sending, and never one in
+// the skill's own forbiddenLabels. The runner then checks that a payment step appeared (runner.mjs).
+const REVIEW_OPENERS = ['주문', '주문하기', 'order'];
+const NOT_A_REVIEW = [...PAYMENT, '쿠폰', '상품권', '완료', '전송', '접수', '확정', 'submit', 'send', 'place', 'confirm', 'complete', 'now'];
+export const isReviewOpener = (text, extra = []) => {
+  const lines = String(text ?? '').split('\n').filter((l) => norm(l));
+  if (!lines.length || !REVIEW_OPENERS.includes(bare(lines[0]))) return false;
+  const own = (extra ?? []).map(norm).filter(Boolean);
+  if (lines.some((l) => own.includes(norm(l)) || own.includes(bare(l)))) return false;
+  const all = bare(lines.join(' '));
+  return !NOT_A_REVIEW.some((w) => all.includes(w));
+};
+
 // Splits an order line's option names over the item's groups, in the skill's group order. A name repeated n times
 // is chosen n times (a quantity option). Each name goes to the first group at or after the previous one that has it.
 export function optionPlan(groups = [], options = []) {
@@ -85,4 +103,52 @@ export function orderPlan(skill, order) {
     planSteps(skill.recipes?.[item?.recipe ?? 'addToCart'], lineVars(skill, l), out);
   }
   return out;
+}
+
+// The targets of every step a replay may click that break the payment rule, found before the first click: order
+// steps, interrupt answers and the review's close steps that isForbidden refuses, any openReview outside review.open,
+// and an openReview (or a second one) that is not the order button.
+export function unsafeTargets(skill, order) {
+  const f = skill.forbiddenLabels;
+  const targets = (s) => [s.label, s.name, s.text].filter(Boolean);
+  const forbidden = (s) => s.op === 'openReview' || targets(s).some((t) => isForbidden(t, f));
+  const open = planSteps(skill.review?.open ?? [], {});
+  const openers = open.filter((s) => s.op === 'openReview');
+  const bad = [
+    ...orderPlan(skill, order).filter(forbidden),
+    ...(skill.interrupts ?? []).map((i) => i?.dismiss).filter(Boolean).filter(forbidden),
+    ...open.filter((s) => (s.op === 'openReview' ? !targets(s).every((t) => isReviewOpener(t, f)) : forbidden(s))),
+    ...openers.slice(1),
+    ...planSteps(skill.review?.close ?? [], {}).filter(forbidden),
+  ];
+  return bad.map((s) => targets(s)[0] ?? s.op);
+}
+
+// Option groups of orderable items that no order in `orders` exercised: { group, item, priced } in catalog order.
+// Groups with the same name, options and deltas on several items count once. A group with priced options counts only
+// when an order picked a priced one: a 0원 pick cannot show that a price is wrong (I-197).
+export function uncoveredGroups(skill, orders) {
+  const priced = (g) => (g.options ?? []).some((o) => (o.priceDelta ?? 0) !== 0);
+  const sig = (g) => JSON.stringify([g.name, (g.options ?? []).map((o) => [o.name, o.priceDelta ?? 0])]);
+  const all = new Map();
+  for (const it of skill.catalog ?? []) {
+    if (it.soldOut) continue;
+    for (const g of it.optionGroups ?? []) {
+      if ((g.options ?? []).length && !all.has(sig(g))) all.set(sig(g), { group: g.name, item: it.name, priced: priced(g) });
+    }
+  }
+  const used = new Set();
+  for (const o of orders ?? []) {
+    for (const l of o.lines ?? []) {
+      const groups = (skill.catalog ?? []).find((c) => c.name === l.item)?.optionGroups ?? [];
+      let plan;
+      try { plan = optionPlan(groups, l.options ?? []); } catch { continue; }
+      plan.forEach((p, j) => {
+        const g = groups[j];
+        const delta = (name) => (g.options ?? []).find((x) => x.name === name)?.priceDelta ?? 0;
+        if (p.picked.some((name) => !priced(g) || delta(name) !== 0)) used.add(sig(g));
+      });
+    }
+  }
+  return [...all].filter(([k]) => !used.has(k)).map(([, v]) => v);
 }

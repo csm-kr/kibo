@@ -1,0 +1,37 @@
+{
+  "n": 2,
+  "at": "2026-10-14T02:01:32.796Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "role": "button",
+        "name": "한국어"
+      }
+    ]
+  },
+  "resultSummary": "tapped 한국어",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "role": "button",
+            "name": "한국어"
+          }
+        ]
+      },
+      "resultSummary": "tapped 한국어"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 2573,
+  "outputTokens": 29
+}

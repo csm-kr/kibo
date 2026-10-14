@@ -1,0 +1,9 @@
+{
+  "kioskId": "doughhouse",
+  "code": 0,
+  "signal": null,
+  "killedAt30min": false,
+  "startedAt": "2026-10-14T01:27:33.209Z",
+  "endedAt": "2026-10-14T01:32:45.801Z",
+  "minutes": 5.2
+}

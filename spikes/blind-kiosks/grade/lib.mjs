@@ -199,7 +199,9 @@ const DINE_WORDS = { eat_in: [/dine-?in/i, /eat/i, /매장/, /먹/], take_out: [
 export function resolveDine(order, skill) {
   const opts = skill.dineOptions ?? {};
   const entries = Object.entries(opts).filter(([, v]) => norm(v));
-  const label = order.dine ?? order.pickup ?? order.dineOption ?? null;
+  // Round-3 fresh keys name the choice as orderType (eatIn/takeOut) or mode (takeout); pre-registered 10-14.
+  const kind = { eatin: 'dine-in', takeout: 'take-out' }[norm(order.orderType ?? order.mode ?? '').replace(/[^a-z]/g, '')];
+  const label = order.dine ?? order.pickup ?? order.dineOption ?? kind ?? null;
   if (label) {
     const n = norm(label);
     const hit = entries.find(([, v]) => norm(v) === n || norm(v).includes(n) || n.includes(norm(v)));
@@ -214,6 +216,11 @@ export function resolveDine(order, skill) {
   }
   return { ok: true, value: opts.eat_in ?? entries[0]?.[1] };
 }
+
+// The total an order is graded on. A pay-later device (a table-order tablet) shows a running table total after
+// earlier orders were sent; KIBO never sends an order, so such keys give this order's own amount as orderTotal
+// (round-3 fresh set, pre-registered 10-14).
+export const gradedTotal = (h) => h.orderTotal ?? h.expectedTotal;
 
 const refuse = (reason) => ({ ok: false, reason });
 const tally = (ids) => ids.reduce((m, id) => m.set(id, (m.get(id) ?? 0) + 1), new Map());
@@ -352,7 +359,7 @@ export function classify({ translation, forbidden = [], run, expectedTotal }) {
 export function notLearnedOrders(key) {
   const results = (key.holdoutOrders ?? []).map((h) => ({
     id: h.id, outcome: 'notLearned', reason: 'no skill', linesChecked: null,
-    expectedTotal: h.expectedTotal, kioskTotal: null, skillPredicts: null, ms: null,
+    expectedTotal: gradedTotal(h), kioskTotal: null, skillPredicts: null, ms: null,
     totalCannotSee: totalCannotSee(key, h), order: null,
   }));
   return { total: results.length, correct: 0, safeRefusal: 0, unsafe: 0, notLearned: results.length, linesChecked: 0, results };

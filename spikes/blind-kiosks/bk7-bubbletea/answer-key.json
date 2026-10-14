@@ -1,0 +1,283 @@
+{
+  "kiosk": {
+    "name": "펄린당 연남점",
+    "nameEn": "PEARLIN TEA HOUSE (Yeonnam)",
+    "domain": "Taiwanese-style bubble tea shop, self-order kiosk, portrait 720x1280"
+  },
+  "flow": [
+    "Attract screen: logo, winter-season banner, '화면을 터치하여 주문을 시작하세요'; 한국어 / English toggle buttons at the bottom (tapping them does not start the order)",
+    "Order type screen '어디에서 드시나요?': 매장 식사 (eat in) or 포장 (take out); the take-out card states the 200원 per-drink cup fee",
+    "Menu screen: header with order-type badge (take-out badge repeats '음료 1잔당 컵 200원') and 처음으로; 6 category tabs; 3-column item grid; cart panel at the bottom with quantity +/-, delete (X) with confirmation, 전체삭제, 주문 금액, 포장컵 비용 (take-out only), 합계, 주문하기",
+    "Item option modal: groups in order (size, temperature, ice, sweetness, extra shot, toppings or flavor), quantity stepper, 취소 / 'N원 담기'; missing required choice shows a red error",
+    "Set modal (drinks only, after 담기): step 1/3 drink only vs 스낵 세트로 변경 (-800원); step 2/3 choose snack; step 3/3 confirm set price -> 장바구니 담기",
+    "Stamp popup (once per session, right after the first item lands in the cart): 적립 안 함 / X, or 휴대폰 번호로 적립 -> keypad -> 확인 -> 적립 예정 -> 확인",
+    "Order review '주문 내역을 확인해 주세요': 주문 방식 switch (매장 식사/포장), lines with options, 주문 금액, set-discount note, 포장컵 비용, 총 결제 금액; 메뉴 추가 / 결제하기",
+    "Payment method screen: 결제하실 금액 (big), 신용·체크카드 / 간편결제 / 모바일 쿠폰; choosing one shows insert/scan guidance and '단말기 응답 대기 중' and stops there"
+  ],
+  "categories": [
+    { "label": "밀크티", "labelEn": "Milk Tea", "itemCount": 7 },
+    { "label": "과일티", "labelEn": "Fruit Tea", "itemCount": 6 },
+    { "label": "치즈폼", "labelEn": "Cheese Foam", "itemCount": 5 },
+    { "label": "커피", "labelEn": "Coffee", "itemCount": 5 },
+    { "label": "스낵", "labelEn": "Snacks", "itemCount": 5 },
+    { "label": "겨울 시즌", "labelEn": "Winter Season", "itemCount": 3 }
+  ],
+  "optionGroups": {
+    "size": {
+      "title": "사이즈", "type": "single", "required": true, "min": 1, "max": 1, "default": "M",
+      "appliesWhen": "tea drinks: 밀크티, 과일티, 치즈폼, 겨울 시즌",
+      "options": [
+        { "id": "M", "label": "M", "priceDelta": 0, "maxQty": 1 },
+        { "id": "L", "label": "L", "priceDelta": 700, "maxQty": 1 }
+      ]
+    },
+    "sizeCoffee": {
+      "title": "사이즈", "type": "single", "required": true, "min": 1, "max": 1, "default": "M",
+      "appliesWhen": "커피 category only",
+      "options": [
+        { "id": "M", "label": "M", "priceDelta": 0, "maxQty": 1 },
+        { "id": "L", "label": "L", "priceDelta": 500, "maxQty": 1 }
+      ]
+    },
+    "temp": {
+      "title": "온도", "type": "single", "required": true, "min": 1, "max": 1, "default": "ice",
+      "appliesWhen": "only drinks that offer both ICE and HOT (no ICE ONLY / HOT ONLY tag): 6 milk teas except 흑당 펄 밀크티, 자몽 그린티, 레몬 홍차, all 5 coffees",
+      "options": [
+        { "id": "ice", "label": "ICE", "priceDelta": 0, "maxQty": 1 },
+        { "id": "hot", "label": "HOT", "priceDelta": 0, "maxQty": 1 }
+      ]
+    },
+    "ice": {
+      "title": "얼음량", "type": "single", "required": true, "min": 1, "max": 1, "default": null,
+      "appliesWhen": "temp != hot. Hidden (and its choice cleared) when HOT is selected; never shown for HOT ONLY items; always shown for ICE ONLY items",
+      "options": [
+        { "id": "none", "label": "얼음 없음", "priceDelta": 0, "maxQty": 1 },
+        { "id": "less", "label": "얼음 적게", "priceDelta": 0, "maxQty": 1 },
+        { "id": "regular", "label": "얼음 보통", "priceDelta": 0, "maxQty": 1 },
+        { "id": "extra", "label": "얼음 많이", "priceDelta": 0, "maxQty": 1 }
+      ]
+    },
+    "sweet": {
+      "title": "당도", "type": "single", "required": true, "min": 1, "max": 1, "default": null,
+      "appliesWhen": "tea drinks (all drinks except 커피)",
+      "options": [
+        { "id": "s0", "label": "0%", "priceDelta": 0, "maxQty": 1 },
+        { "id": "s30", "label": "30%", "priceDelta": 0, "maxQty": 1 },
+        { "id": "s50", "label": "50%", "priceDelta": 0, "maxQty": 1 },
+        { "id": "s70", "label": "70%", "priceDelta": 0, "maxQty": 1 },
+        { "id": "s100", "label": "100%", "priceDelta": 0, "maxQty": 1 }
+      ]
+    },
+    "shot": {
+      "title": "샷 추가", "type": "quantity", "required": false, "min": 0, "max": 2, "default": null,
+      "appliesWhen": "커피 category only; stepper 0-2. In holdout lines the option id is repeated once per shot",
+      "options": [
+        { "id": "extraShot", "label": "에스프레소 샷", "priceDelta": 500, "maxQty": 2 }
+      ]
+    },
+    "topping": {
+      "title": "토핑", "type": "multi", "required": false, "min": 0, "max": 3, "default": null,
+      "appliesWhen": "tea drinks (all drinks except 커피). A 4th pick shows '토핑은 최대 3개까지 선택할 수 있어요.'",
+      "options": [
+        { "id": "pearl", "label": "타피오카 펄", "priceDelta": 500, "maxQty": 1 },
+        { "id": "whitePearl", "label": "화이트 펄", "priceDelta": 500, "maxQty": 1 },
+        { "id": "coconut", "label": "코코넛 젤리", "priceDelta": 500, "maxQty": 1 },
+        { "id": "aloe", "label": "알로에", "priceDelta": 600, "maxQty": 1, "soldOut": true },
+        { "id": "pudding", "label": "푸딩", "priceDelta": 700, "maxQty": 1 },
+        { "id": "redBean", "label": "팥", "priceDelta": 600, "maxQty": 1 },
+        { "id": "grassJelly", "label": "그라스젤리", "priceDelta": 600, "maxQty": 1, "soldOut": true },
+        { "id": "milkFoam", "label": "밀크폼", "priceDelta": 800, "maxQty": 1 },
+        { "id": "cheeseFoam", "label": "치즈폼", "priceDelta": 1000, "maxQty": 1 }
+      ]
+    },
+    "seasoning": {
+      "title": "맛 선택", "type": "single", "required": true, "min": 1, "max": 1, "default": "original",
+      "appliesWhen": "지파이 only",
+      "options": [
+        { "id": "original", "label": "오리지널", "priceDelta": 0, "maxQty": 1 },
+        { "id": "spicy", "label": "매콤", "priceDelta": 0, "maxQty": 1 },
+        { "id": "cheese", "label": "치즈 시즈닝", "priceDelta": 500, "maxQty": 1 }
+      ]
+    },
+    "setChoice": {
+      "title": "스낵 세트로 변경하시겠어요? (set modal step 1/3)", "type": "single", "required": true, "min": 1, "max": 1, "default": null,
+      "appliesWhen": "every drink (all categories except 스낵), shown after tapping 담기 in the option modal",
+      "options": [
+        { "id": "single", "label": "음료만 주문할게요", "priceDelta": 0, "maxQty": 1 },
+        { "id": "set", "label": "스낵 세트로 변경", "priceDelta": -800, "maxQty": 1 }
+      ]
+    },
+    "setSnack": {
+      "title": "함께 드실 스낵을 골라주세요 (set modal step 2/3)", "type": "single", "required": true, "min": 1, "max": 1, "default": null,
+      "appliesWhen": "setChoice = set. 지파이 is not offered in sets. Pressing 다음 with no snack shows '스낵을 선택해 주세요.'",
+      "options": [
+        { "id": "pineappleCake", "label": "펑리수", "priceDelta": 2500, "maxQty": 1 },
+        { "id": "nougatCracker", "label": "누가크래커", "priceDelta": 3500, "maxQty": 1 },
+        { "id": "eggTart", "label": "에그타르트", "priceDelta": 2800, "maxQty": 1, "soldOut": true },
+        { "id": "castella", "label": "대만 카스테라", "priceDelta": 3800, "maxQty": 1 }
+      ]
+    }
+  },
+  "items": [
+    { "name": "클래식 밀크티", "nameEn": "Classic Milk Tea", "category": "밀크티", "basePrice": 4300, "soldOut": false, "timeLimited": null, "optionGroups": ["size", "temp", "ice", "sweet", "topping", "setChoice", "setSnack"] },
+    { "name": "흑당 펄 밀크티", "nameEn": "Brown Sugar Pearl Milk Tea", "category": "밀크티", "basePrice": 5200, "soldOut": false, "timeLimited": null, "fixedTemp": "ice", "optionGroups": ["size", "ice", "sweet", "topping", "setChoice", "setSnack"] },
+    { "name": "얼그레이 밀크티", "nameEn": "Earl Grey Milk Tea", "category": "밀크티", "basePrice": 4500, "soldOut": false, "timeLimited": null, "optionGroups": ["size", "temp", "ice", "sweet", "topping", "setChoice", "setSnack"] },
+    { "name": "타로 밀크티", "nameEn": "Taro Milk Tea", "category": "밀크티", "basePrice": 4800, "soldOut": false, "timeLimited": null, "optionGroups": ["size", "temp", "ice", "sweet", "topping", "setChoice", "setSnack"] },
+    { "name": "우롱 밀크티", "nameEn": "Oolong Milk Tea", "category": "밀크티", "basePrice": 4500, "soldOut": false, "timeLimited": null, "optionGroups": ["size", "temp", "ice", "sweet", "topping", "setChoice", "setSnack"] },
+    { "name": "말차 밀크티", "nameEn": "Matcha Milk Tea", "category": "밀크티", "basePrice": 4900, "soldOut": false, "timeLimited": null, "optionGroups": ["size", "temp", "ice", "sweet", "topping", "setChoice", "setSnack"] },
+    { "name": "자스민 밀크티", "nameEn": "Jasmine Milk Tea", "category": "밀크티", "basePrice": 4500, "soldOut": false, "timeLimited": null, "optionGroups": ["size", "temp", "ice", "sweet", "topping", "setChoice", "setSnack"] },
+
+    { "name": "패션후르츠 그린티", "nameEn": "Passion Fruit Green Tea", "category": "과일티", "basePrice": 4800, "soldOut": false, "timeLimited": null, "fixedTemp": "ice", "optionGroups": ["size", "ice", "sweet", "topping", "setChoice", "setSnack"] },
+    { "name": "망고 우롱티", "nameEn": "Mango Oolong Tea", "category": "과일티", "basePrice": 5000, "soldOut": false, "timeLimited": null, "fixedTemp": "ice", "optionGroups": ["size", "ice", "sweet", "topping", "setChoice", "setSnack"] },
+    { "name": "자몽 그린티", "nameEn": "Grapefruit Green Tea", "category": "과일티", "basePrice": 4800, "soldOut": false, "timeLimited": null, "optionGroups": ["size", "temp", "ice", "sweet", "topping", "setChoice", "setSnack"] },
+    { "name": "리치 자스민티", "nameEn": "Lychee Jasmine Tea", "category": "과일티", "basePrice": 4900, "soldOut": false, "timeLimited": null, "fixedTemp": "ice", "optionGroups": ["size", "ice", "sweet", "topping", "setChoice", "setSnack"] },
+    { "name": "복숭아 우롱티", "nameEn": "Peach Oolong Tea", "category": "과일티", "basePrice": 4900, "soldOut": false, "timeLimited": null, "fixedTemp": "ice", "optionGroups": ["size", "ice", "sweet", "topping", "setChoice", "setSnack"] },
+    { "name": "레몬 홍차", "nameEn": "Lemon Black Tea", "category": "과일티", "basePrice": 4300, "soldOut": false, "timeLimited": null, "optionGroups": ["size", "temp", "ice", "sweet", "topping", "setChoice", "setSnack"] },
+
+    { "name": "치즈폼 우롱티", "nameEn": "Cheese Foam Oolong Tea", "category": "치즈폼", "basePrice": 5300, "soldOut": false, "timeLimited": null, "fixedTemp": "ice", "optionGroups": ["size", "ice", "sweet", "topping", "setChoice", "setSnack"] },
+    { "name": "치즈폼 홍차", "nameEn": "Cheese Foam Black Tea", "category": "치즈폼", "basePrice": 5300, "soldOut": false, "timeLimited": null, "fixedTemp": "ice", "optionGroups": ["size", "ice", "sweet", "topping", "setChoice", "setSnack"] },
+    { "name": "치즈폼 딸기 그린티", "nameEn": "Cheese Foam Strawberry Green Tea", "category": "치즈폼", "basePrice": 5800, "soldOut": false, "timeLimited": null, "fixedTemp": "ice", "optionGroups": ["size", "ice", "sweet", "topping", "setChoice", "setSnack"] },
+    { "name": "치즈폼 말차 라떼", "nameEn": "Cheese Foam Matcha Latte", "category": "치즈폼", "basePrice": 5800, "soldOut": false, "timeLimited": null, "fixedTemp": "ice", "optionGroups": ["size", "ice", "sweet", "topping", "setChoice", "setSnack"] },
+    { "name": "치즈폼 흑당 밀크티", "nameEn": "Cheese Foam Brown Sugar Milk Tea", "category": "치즈폼", "basePrice": 5900, "soldOut": true, "timeLimited": null, "fixedTemp": "ice", "optionGroups": ["size", "ice", "sweet", "topping", "setChoice", "setSnack"] },
+
+    { "name": "아메리카노", "nameEn": "Americano", "category": "커피", "basePrice": 3000, "soldOut": false, "timeLimited": null, "optionGroups": ["sizeCoffee", "temp", "ice", "shot", "setChoice", "setSnack"] },
+    { "name": "카페라떼", "nameEn": "Cafe Latte", "category": "커피", "basePrice": 3800, "soldOut": false, "timeLimited": null, "optionGroups": ["sizeCoffee", "temp", "ice", "shot", "setChoice", "setSnack"] },
+    { "name": "바닐라 라떼", "nameEn": "Vanilla Latte", "category": "커피", "basePrice": 4200, "soldOut": false, "timeLimited": null, "optionGroups": ["sizeCoffee", "temp", "ice", "shot", "setChoice", "setSnack"] },
+    { "name": "흑당 카페라떼", "nameEn": "Brown Sugar Cafe Latte", "category": "커피", "basePrice": 4500, "soldOut": false, "timeLimited": null, "optionGroups": ["sizeCoffee", "temp", "ice", "shot", "setChoice", "setSnack"] },
+    { "name": "원앙 커피 밀크티", "nameEn": "Yuanyang Coffee Milk Tea", "category": "커피", "basePrice": 4800, "soldOut": false, "timeLimited": null, "optionGroups": ["sizeCoffee", "temp", "ice", "shot", "setChoice", "setSnack"] },
+
+    { "name": "펑리수", "nameEn": "Pineapple Cake", "category": "스낵", "basePrice": 2500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "누가크래커", "nameEn": "Nougat Crackers", "category": "스낵", "basePrice": 3500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "에그타르트", "nameEn": "Egg Tart", "category": "스낵", "basePrice": 2800, "soldOut": true, "timeLimited": null, "optionGroups": [] },
+    { "name": "대만 카스테라", "nameEn": "Taiwanese Castella", "category": "스낵", "basePrice": 3800, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "지파이", "nameEn": "Jipai Chicken Cutlet", "category": "스낵", "basePrice": 5900, "soldOut": false, "timeLimited": null, "optionGroups": ["seasoning"] },
+
+    { "name": "군고구마 밀크티", "nameEn": "Roasted Sweet Potato Milk Tea", "category": "겨울 시즌", "basePrice": 5500, "soldOut": false, "timeLimited": null, "fixedTemp": "hot", "optionGroups": ["size", "sweet", "topping", "setChoice", "setSnack"] },
+    { "name": "생강 흑당 밀크티", "nameEn": "Ginger Brown Sugar Milk Tea", "category": "겨울 시즌", "basePrice": 5300, "soldOut": false, "timeLimited": null, "fixedTemp": "hot", "optionGroups": ["size", "sweet", "topping", "setChoice", "setSnack"] },
+    { "name": "딸기 펄 우유", "nameEn": "Strawberry Pearl Milk", "category": "겨울 시즌", "basePrice": 5800, "soldOut": false, "timeLimited": null, "fixedTemp": "ice", "optionGroups": ["size", "ice", "sweet", "topping", "setChoice", "setSnack"] }
+  ],
+  "promotions": [
+    {
+      "rule": "Drink + snack set: offered in a 3-step modal after every drink is added (담기). Snack choices 펑리수, 누가크래커, 대만 카스테라 (에그타르트 shown sold out; 지파이 not offered)",
+      "effect": "-800원 per set. Set unit price = drink price with its options + snack price - 800; line total = set unit x quantity (quantity comes from the option modal, the set shares it)"
+    },
+    {
+      "rule": "Take-out (포장) order type",
+      "effect": "+200원 disposable-cup fee per drink cup (sum of drink line quantities, set drinks included; snacks add nothing). Shown on the take-out card of the order-type screen, in the menu header badge, as '포장컵 비용 (N잔)' in the cart summary and as '포장컵 비용 (N잔 × 200원)' on the review; included in 총 결제 금액 and in the payment-screen amount. Switching to 매장 식사 on the review removes it"
+    },
+    {
+      "rule": "Stamp card popup (once per session after the first item is added)",
+      "effect": "No price effect. 1 stamp per drink, 10 stamps = one free M drink (not redeemable on this kiosk); an entered number is shown masked on the review screen"
+    }
+  ],
+  "takeoutFee": { "perDrinkCup": 200, "appliesTo": "drinks only", "visibleOn": ["order-type screen (take-out card)", "menu header badge", "cart summary", "order review summary", "included in payment amount"] },
+  "holdoutOrders": [
+    {
+      "id": "h1", "orderType": "eatIn", "language": "ko",
+      "lines": [
+        { "item": "타로 밀크티", "options": { "size": ["L"], "temp": ["ice"], "ice": ["less"], "sweet": ["s30"], "topping": ["pearl"], "setChoice": ["single"] }, "qty": 1 }
+      ],
+      "expectedTotal": 6000,
+      "patterns": ["eat-in", "size-L", "required-ice", "required-sweetness", "required-error-before-choosing", "topping", "set-declined", "stamp-popup-dismiss"]
+    },
+    {
+      "id": "h2", "orderType": "takeOut", "language": "ko",
+      "lines": [
+        { "item": "자몽 그린티", "options": { "size": ["M"], "temp": ["hot"], "sweet": ["s50"], "setChoice": ["single"] }, "qty": 2 }
+      ],
+      "expectedTotal": 10000,
+      "patterns": ["take-out-cup-fee", "hot-hides-ice", "default-size-M", "quantity-in-option-modal", "set-declined", "stamp-popup-dismiss"]
+    },
+    {
+      "id": "h3", "orderType": "eatIn", "language": "ko",
+      "lines": [
+        { "item": "얼그레이 밀크티", "options": { "size": ["L"], "temp": ["ice"], "ice": ["regular"], "sweet": ["s70"], "topping": ["pudding", "coconut", "cheeseFoam"], "setChoice": ["single"] }, "qty": 1 }
+      ],
+      "expectedTotal": 7400,
+      "patterns": ["toppings-max-3", "topping-4th-rejected-error", "sold-out-toppings-disabled", "size-L", "stamp-popup-dismiss"]
+    },
+    {
+      "id": "h4", "orderType": "eatIn", "language": "ko",
+      "lines": [
+        { "item": "흑당 펄 밀크티", "options": { "size": ["M"], "ice": ["less"], "sweet": ["s100"], "setChoice": ["set"], "setSnack": ["pineappleCake"] }, "qty": 1 }
+      ],
+      "expectedTotal": 6900,
+      "patterns": ["set-modal-3-steps", "set-discount", "ice-only-item-no-temp-group", "stamp-popup-phone-entry"]
+    },
+    {
+      "id": "h5", "orderType": "takeOut", "language": "ko",
+      "lines": [
+        { "item": "카페라떼", "options": { "sizeCoffee": ["L"], "temp": ["hot"], "shot": ["extraShot", "extraShot"], "setChoice": ["set"], "setSnack": ["castella"] }, "qty": 1 }
+      ],
+      "expectedTotal": 8500,
+      "patterns": ["coffee-size-L-500", "quantity-group-extra-shot", "hot-hides-ice", "set-discount", "take-out-cup-fee-on-set-drink", "stamp-popup-dismiss"]
+    },
+    {
+      "id": "h6", "orderType": "eatIn", "language": "en",
+      "lines": [
+        { "item": "망고 우롱티", "options": { "size": ["L"], "ice": ["none"], "sweet": ["s0"], "topping": ["whitePearl", "redBean"], "setChoice": ["single"] }, "qty": 1 },
+        { "item": "지파이", "options": { "seasoning": ["spicy"] }, "qty": 1 }
+      ],
+      "expectedTotal": 12700,
+      "patterns": ["english-toggle", "two-toppings", "snack-required-option-non-default", "multi-line", "stamp-popup-dismiss"]
+    },
+    {
+      "id": "h7", "orderType": "takeOut", "language": "ko",
+      "lines": [
+        { "item": "아메리카노", "options": { "sizeCoffee": ["M"], "temp": ["ice"], "ice": ["extra"], "shot": ["extraShot"], "setChoice": ["single"] }, "qty": 2 },
+        { "item": "누가크래커", "options": {}, "qty": 1 }
+      ],
+      "expectedTotal": 10900,
+      "patterns": ["cart-quantity-edit", "take-out-fee-drinks-only", "quantity-group-extra-shot", "stamp-popup-dismiss"]
+    },
+    {
+      "id": "h8", "orderType": "eatIn", "language": "ko",
+      "lines": [
+        { "item": "군고구마 밀크티", "options": { "size": ["L"], "sweet": ["s70"], "topping": ["redBean"], "setChoice": ["single"] }, "qty": 1 },
+        { "item": "치즈폼 딸기 그린티", "options": { "size": ["M"], "ice": ["regular"], "sweet": ["s50"], "setChoice": ["single"] }, "qty": 1 }
+      ],
+      "expectedTotal": 12600,
+      "patterns": ["hot-only-item-no-ice-group", "seasonal-category", "cheese-foam", "stamp-popup-dismiss"]
+    },
+    {
+      "id": "h9", "orderType": "takeOut", "language": "ko",
+      "lines": [
+        { "item": "패션후르츠 그린티", "options": { "size": ["M"], "ice": ["less"], "sweet": ["s30"], "topping": ["coconut"], "setChoice": ["set"], "setSnack": ["nougatCracker"] }, "qty": 2 }
+      ],
+      "expectedTotal": 16400,
+      "patterns": ["set-with-quantity-2", "set-discount-per-set", "take-out-cup-fee", "stamp-popup-dismiss"]
+    },
+    {
+      "id": "h10", "orderType": "takeOut", "language": "ko", "note": "start as 매장 식사 and switch to 포장 on the review screen",
+      "lines": [
+        { "item": "치즈폼 우롱티", "options": { "size": ["L"], "ice": ["regular"], "sweet": ["s50"], "topping": ["pearl"], "setChoice": ["single"] }, "qty": 1 },
+        { "item": "원앙 커피 밀크티", "options": { "sizeCoffee": ["M"], "temp": ["hot"], "setChoice": ["single"] }, "qty": 1 },
+        { "item": "펑리수", "options": {}, "qty": 2 }
+      ],
+      "expectedTotal": 16700,
+      "patterns": ["order-type-switch-on-review", "cart-delete-with-confirmation", "snack-quantity", "hot-hides-ice", "stamp-popup-dismiss"]
+    }
+  ],
+  "quirks": [
+    "Take-out cup fee: 200원 per drink cup, snacks excluded, set drinks included; it is not in item prices, it appears only as a separate line (cart summary, review) and in the totals.",
+    "Order type can be changed on the review screen with the 매장 식사 / 포장 switch; the cup fee appears or disappears immediately.",
+    "Items tagged ICE ONLY (all fruit teas except 자몽 그린티 and 레몬 홍차, all cheese foam, 흑당 펄 밀크티, 딸기 펄 우유) have no 온도 group; HOT ONLY items (군고구마 밀크티, 생강 흑당 밀크티) have no 온도 and no 얼음량 group. The cart summary still prints ICE/HOT for them.",
+    "온도 defaults to ICE. Choosing HOT hides 얼음량 and clears any ice choice; switching back to ICE requires choosing ice again.",
+    "사이즈 defaults to M and 맛 선택 (지파이) defaults to 오리지널; 당도 and 얼음량 have no default. Tapping 담기 with a required group empty shows '필수 옵션을 선택해 주세요: <group>' for the first missing group (in display order) and tints that group.",
+    "Coffee has no 당도 and no 토핑; it has 샷 추가 as a 0-2 stepper (+500원 each). Coffee size L is +500원, tea size L is +700원.",
+    "흑당 펄 밀크티 and 딸기 펄 우유 already include pearls; adding 타피오카 펄 is still charged.",
+    "Sold-out toppings (알로에, 그라스젤리) are disabled buttons labelled 품절. Sold-out items (치즈폼 흑당 밀크티, 에그타르트) show a 품절 mask; tapping them opens '품절된 메뉴입니다' alert. 에그타르트 is also shown sold out inside the set snack step.",
+    "The set modal appears after every drink 담기 (not for snacks). Step 1 '이전' returns to the option modal with choices kept. '음료만 주문할게요' adds the drink immediately. Set lines carry a SET chip and a '세트 스낵: … · 세트 할인 -800원' sub-line; their price already includes the discount.",
+    "The quantity chosen in the option modal applies to the whole set (qty 2 set = 2 drinks + 2 snacks, -1,600원).",
+    "The stamp popup appears exactly once per session, right after the first item (or set) is added, and must be closed (적립 안 함, X, or phone entry + 확인 + 확인). It never changes prices. Starting over (처음으로) resets it.",
+    "Identical lines (same item, same options, same set snack) merge into one cart line with a larger quantity.",
+    "Cart quantity '-' is disabled at 1 (deleting needs the X button and a '삭제하시겠습니까?' confirmation); '+' stops at 20. 전체삭제 also asks for confirmation. 주문하기 with an empty cart shows '장바구니가 비어 있습니다.'",
+    "Cart header '총 N개' counts line quantities (a set counts as 1).",
+    "Review shows 주문 금액 (already net of set discounts), a small '세트 할인 적용 (주문 금액에 포함)' note, 포장컵 비용 for take-out, and 총 결제 금액; the payment screen repeats the same amount as '결제하실 금액'.",
+    "처음으로 with items in the cart asks for confirmation and resets everything, including the language back to 한국어.",
+    "English mode translates all UI text, item and option names, but prices stay in the '4,500원' format. Language can only be changed on the attract screen.",
+    "In the DOM, menu card name and price are in the same element (e.g. '타로 밀크티4,800원').",
+    "The 겨울 시즌 category is a fixed seasonal menu; there is no clock and nothing is time-limited.",
+    "Payment screen stops after a method is chosen (insert/scan guidance, '단말기 응답 대기 중'); nothing is charged and there is no completion screen."
+  ]
+}

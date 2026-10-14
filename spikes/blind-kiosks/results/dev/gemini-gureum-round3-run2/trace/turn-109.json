@@ -1,0 +1,43 @@
+{
+  "n": 109,
+  "at": "2026-10-14T02:30:21.053Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "에이드·스무디"
+      },
+      {
+        "op": "click",
+        "label": "망고 스무디"
+      }
+    ]
+  },
+  "resultSummary": "tapped 에이드·스무디 → 망고 스무디",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "에이드·스무디"
+          },
+          {
+            "op": "click",
+            "label": "망고 스무디"
+          }
+        ]
+      },
+      "resultSummary": "tapped 에이드·스무디 → 망고 스무디"
+    }
+  ],
+  "discoveries": {
+    "items": 5,
+    "optionGroups": 25,
+    "categories": 2
+  },
+  "inputTokens": 84233,
+  "outputTokens": 44
+}

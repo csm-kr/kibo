@@ -1,0 +1,16 @@
+{
+  "provider": "gemini",
+  "model": "gemini-3.8-flash",
+  "learner": {
+    "commit": "ea28477d5a6c74946577f12bb66bc8103a8341be",
+    "dirty": false
+  },
+  "cachedInputTokens": 1418391,
+  "finished": false,
+  "turns": 111,
+  "acts": 151,
+  "tests": 2,
+  "inputTokens": 2009976,
+  "outputTokens": 62945,
+  "minutes": "17.4"
+}

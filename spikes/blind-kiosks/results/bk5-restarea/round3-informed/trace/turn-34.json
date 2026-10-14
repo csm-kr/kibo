@@ -1,0 +1,43 @@
+{
+  "n": 34,
+  "at": "2026-10-14T02:04:06.605Z",
+  "tool": "record",
+  "args": {
+    "kind": "item",
+    "names": [
+      "소떡소떡",
+      "핫바",
+      "떡볶이",
+      "야채김밥",
+      "참치김밥",
+      "순대",
+      "꼬치어묵"
+    ]
+  },
+  "resultSummary": "recorded item 소떡소떡, 핫바, 떡볶이, 야채김밥, 참치김밥, 순대, 꼬치어묵",
+  "calls": [
+    {
+      "tool": "record",
+      "args": {
+        "kind": "item",
+        "names": [
+          "소떡소떡",
+          "핫바",
+          "떡볶이",
+          "야채김밥",
+          "참치김밥",
+          "순대",
+          "꼬치어묵"
+        ]
+      },
+      "resultSummary": "recorded item 소떡소떡, 핫바, 떡볶이, 야채김밥, 참치김밥, 순대, 꼬치어묵"
+    }
+  ],
+  "discoveries": {
+    "items": 14,
+    "optionGroups": 0,
+    "categories": 2
+  },
+  "inputTokens": 6665,
+  "outputTokens": 241
+}

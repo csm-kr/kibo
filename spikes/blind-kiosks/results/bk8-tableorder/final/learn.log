@@ -1,0 +1,102 @@
+#1 act {"op":"click","label":"달무리화로"}
+#2 snapshot 
+#3 act {"op":"click","text":"주문 시작"}
+#4 record 
+#5 act {"op":"click","label":"생삼겹살"}
+#6 act {"label":"주문 담기","op":"click"}
+#7 act {"op":"click","label":"+"}
+#8 act {"label":"주문 담기","op":"click"}
+#9 act {"op":"openReview","label":"주문하기"}
+#10 act {"label":"돌아가기","op":"click"}
+#11 act {"label":"전체 삭제","op":"click"}
+#12 act {"op":"click","label":"삭제"}
+#13 act {"label":"생삼겹살","op":"click"}
+#14 act [{"label":"취소","op":"click"},{"op":"click","label":"숙성 목살"}]
+#15 act [{"op":"click","label":"취소"},{"op":"click","label":"항정살"}]
+#16 record 
+#17 act [{"label":"취소","op":"click"},{"label":"식사·면","op":"click"}]
+#18 act {"label":"냉면","op":"click"}
+#19 act {"label":"주문 담기","op":"click"}
+#20 act [{"label":"취소","op":"click"},{"op":"click","label":"막국수"}]
+#21 act [{"op":"click","label":"취소"},{"op":"click","label":"후식 냉면"}]
+#22 act [{"label":"취소","op":"click"},{"op":"click","label":"잔치국수"}]
+#23 act [{"op":"click","label":"취소"},{"label":"공기밥","op":"click"}]
+#24 act [{"label":"✕","within":"공기밥","op":"click"},{"op":"click","label":"철판 볶음밥"}]
+#25 act [{"label":"✕","within":"철판 볶음밥","op":"click"},{"op":"click","label":"열무 비빔밥"}]
+#26 act {"label":"✕","op":"click","within":"열무 비빔밥"}
+#27 record 
+#28 act {"label":"찌개","op":"click"}
+#29 act {"label":"된장찌개","op":"click"}
+#30 act [{"op":"click","label":"취소"},{"op":"click","label":"김치찌개"}]
+#31 act [{"label":"취소","op":"click"},{"op":"click","label":"순두부찌개"}]
+#32 act [{"op":"click","label":"취소"},{"op":"click","label":"부대찌개 (2인분)"}]
+#33 act [{"op":"click","label":"취소"},{"label":"갈비탕","op":"click"}]
+#34 act [{"label":"✕","within":"갈비탕","op":"click"},{"op":"click","label":"된장찌개"}]
+#35 act {"label":"취소","op":"click"}
+#36 record 
+#37 act {"label":"사이드","op":"click"}
+#38 act {"op":"click","label":"계란찜"}
+#39 act [{"within":"계란찜","op":"click","label":"✕"},{"label":"해물파전","op":"click"}]
+#40 act [{"label":"✕","within":"해물파전","op":"click"},{"op":"click","label":"김치전"}]
+#41 act [{"within":"김치전","op":"click","label":"✕"},{"op":"click","label":"도토리묵 무침"}]
+#42 act [{"op":"click","within":"도토리묵 무침","label":"✕"},{"op":"click","label":"쌈채소 추가"}]
+#43 act [{"op":"click","within":"쌈채소 추가","label":"✕"},{"label":"계란말이","op":"click"}]
+#44 act {"label":"✕","within":"계란말이","op":"click"}
+#45 record 
+#46 act {"op":"click","label":"주류·음료"}
+#47 act {"op":"click","label":"소주"}
+#48 act {"op":"click","label":"예"}
+#49 act {"label":"맥주 (병)","op":"click"}
+#50 act [{"op":"click","label":"전체 삭제"},{"op":"click","label":"삭제"}]
+#51 act {"label":"콜라","op":"click"}
+#52 act [{"op":"click","label":"전체 삭제"},{"label":"삭제","op":"click"}]
+#53 record 
+#54 act {"label":"디저트","op":"click"}
+#55 act {"label":"식혜","op":"click"}
+#56 act [{"within":"식혜","label":"✕","op":"click"},{"op":"click","label":"바닐라 아이스크림"}]
+#57 act [{"op":"click","within":"바닐라 아이스크림","label":"✕"},{"label":"인절미 빙수","op":"click"}]
+#58 act {"op":"click","within":"인절미 빙수","label":"✕"}
+#59 record 
+#60 act [{"label":"식사·면","op":"click"},{"label":"냉면","op":"click"}]
+#61 act [{"op":"click","label":"취소"},{"label":"공기밥","op":"click"}]
+#62 act {"op":"click","within":"공기밥","label":"+"}
+#63 act [{"label":"전체 삭제","op":"click"},{"label":"삭제","op":"click"}]
+#64 act [{"label":"고기","op":"click"},{"label":"생삼겹살","op":"click"}]
+#65 act [{"label":"취소","op":"click"},{"op":"click","label":"식사·면"},{"label":"냉면","op":"click"}]
+#66 act [{"label":"취소","op":"click"},{"op":"click","label":"찌개"},{"op":"click","label":"김치찌개"}]
+#67 act {"op":"click","label":"+","within":"수량"}
+#68 act [{"op":"click","label":"취소"},{"label":"고기","op":"click"},{"label":"생삼겹살","op":"click"}]
+#69 act {"label":"+","op":"click","within":"인분"}
+#70 act {"label":"취소","op":"click"}
+#71 reload 
+#72 act {"op":"click","text":"주문 시작"}
+#73 act [{"op":"click","label":"식사·면"},{"op":"click","label":"공기밥"}]
+#74 act {"op":"openReview","label":"주문하기"}
+#75 act {"op":"click","label":"돌아가기"}
+#76 audit 
+  audit #1: GAPS missing=1 unknown=0 hidden=2 itemsMissingOptions=0
+#77 audit 
+  audit #2: GAPS missing=1 unknown=0 hidden=2 itemsMissingOptions=0
+#78 act {"op":"click","label":"주문 내역"}
+#79 act {"op":"click","label":"닫기"}
+#80 audit 
+  audit #3: GAPS missing=1 unknown=0 hidden=2 itemsMissingOptions=0
+#81 records 
+#82 audit 
+  audit #4: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=0
+#83 testSkill 
+  test #1: FAIL FAIL FAIL lint=3 uncovered=4
+    order 1: review: no payment step appeared after the order button, so it may have sent the order; never open this kiosk's review
+    order 2: review: no payment step appeared after the order button, so it may have sent the order; never open this kiosk's review
+    order 3: review: no payment step appeared after the order button, so it may have sent the order; never open this kiosk's review
+#84 audit 
+  audit #5: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=3
+#85 testSkill 
+  test #2: FAIL FAIL FAIL uncovered=3 review=주문하기
+    order 1: the skill's total 34,500원 differs from the kiosk's unreadable; quote the kiosk's
+    order 2: the skill's total 51,000원 differs from the kiosk's unreadable; quote the kiosk's
+    order 3: the skill's total 47,500원 differs from the kiosk's unreadable; quote the kiosk's
+#86 testSkill 
+  test #3: PASS PASS PASS review=주문하기
+#87 testSkill 
+  test #4: PASS PASS PASS review=주문하기

@@ -1,0 +1,59 @@
+{
+  "n": 30,
+  "at": "2026-10-14T01:31:03.312Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "라지 (+4,000원)"
+      },
+      {
+        "op": "click",
+        "label": "치즈크러스트 (+3,000원)"
+      },
+      {
+        "op": "click",
+        "label": "베이컨 (+1,500원)"
+      },
+      {
+        "op": "click",
+        "label": "+"
+      }
+    ]
+  },
+  "resultSummary": "tapped 라지 (+4,000원) → 치즈크러스트 (+3,000원) → 베이컨 (+1,500원) → +",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "라지 (+4,000원)"
+          },
+          {
+            "op": "click",
+            "label": "치즈크러스트 (+3,000원)"
+          },
+          {
+            "op": "click",
+            "label": "베이컨 (+1,500원)"
+          },
+          {
+            "op": "click",
+            "label": "+"
+          }
+        ]
+      },
+      "resultSummary": "tapped 라지 (+4,000원) → 치즈크러스트 (+3,000원) → 베이컨 (+1,500원) → +"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 22377,
+  "outputTokens": 90
+}

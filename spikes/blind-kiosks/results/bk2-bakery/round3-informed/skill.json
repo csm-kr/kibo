@@ -1,0 +1,1851 @@
+{
+  "kiosk": "포근밀 BAKERY CAFE",
+  "categories": [
+    "커피",
+    "논커피",
+    "티",
+    "빵",
+    "케이크",
+    "샌드위치"
+  ],
+  "uiLabels": [
+    "처음으로",
+    "전체삭제",
+    "취소",
+    "담기",
+    "비우기",
+    "계속 주문하기",
+    "메뉴 추가하기",
+    "결제하기",
+    "−",
+    "+",
+    "✕",
+    "품절"
+  ],
+  "forbiddenLabels": [
+    "결제하기"
+  ],
+  "dineOptions": {
+    "eat_in": "매장에서 먹어요",
+    "take_out": "포장해 갈게요"
+  },
+  "cartTotalPattern": "총\\s*\\d+개\\s*([0-9,]+)원",
+  "review": {
+    "open": [
+      {
+        "op": "openReview",
+        "label": "주문하기"
+      }
+    ],
+    "totalPattern": "총 결제금액[^\\d]*([0-9,]+)원",
+    "close": [
+      {
+        "op": "click",
+        "label": "메뉴 추가하기"
+      }
+    ]
+  },
+  "interrupts": [
+    {
+      "text": "계속 주문하시겠어요?",
+      "dismiss": {
+        "op": "click",
+        "label": "계속 주문하기"
+      }
+    }
+  ],
+  "recipes": {
+    "startOrder": [
+      {
+        "op": "click",
+        "label": "포근밀"
+      },
+      {
+        "op": "click",
+        "label": "{dineOption}"
+      }
+    ],
+    "addToCart": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "chooseOptions",
+        "steps": [
+          {
+            "op": "click",
+            "label": "{option}"
+          }
+        ]
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "label": "+",
+            "within": "수량"
+          }
+        ]
+      },
+      {
+        "op": "click",
+        "label": "담기"
+      }
+    ],
+    "directToCart": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "label": "+",
+            "within": "{item}"
+          }
+        ]
+      }
+    ]
+  },
+  "catalog": [
+    {
+      "name": "아메리카노",
+      "category": "커피",
+      "price": 3800,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "온도 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            },
+            {
+              "name": "ICED",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "얼음 양",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도 선택=ICED",
+          "options": [
+            {
+              "name": "적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "샷 추가",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "에스프레소 샷"
+            }
+          ],
+          "options": [
+            {
+              "name": "에스프레소 샷",
+              "priceDelta": 500,
+              "maxQty": 3
+            }
+          ]
+        },
+        {
+          "name": "시럽 추가",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "multi",
+          "options": [
+            {
+              "name": "바닐라 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "헤이즐넛 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "카라멜 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "흑당 시럽",
+              "priceDelta": 700
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "카페라떼",
+      "category": "커피",
+      "price": 4300,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "온도 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            },
+            {
+              "name": "ICED",
+              "priceDelta": 500
+            }
+          ]
+        },
+        {
+          "name": "얼음 양",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도 선택=ICED",
+          "options": [
+            {
+              "name": "적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "우유 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "일반 우유",
+              "priceDelta": 0
+            },
+            {
+              "name": "저지방 우유",
+              "priceDelta": 0
+            },
+            {
+              "name": "오트 밀크",
+              "priceDelta": 600
+            },
+            {
+              "name": "두유",
+              "priceDelta": 500
+            }
+          ]
+        },
+        {
+          "name": "샷 추가",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "에스프레소 샷"
+            }
+          ],
+          "options": [
+            {
+              "name": "에스프레소 샷",
+              "priceDelta": 500,
+              "maxQty": 3
+            }
+          ]
+        },
+        {
+          "name": "시럽 추가",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "multi",
+          "options": [
+            {
+              "name": "바닐라 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "헤이즐넛 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "카라멜 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "흑당 시럽",
+              "priceDelta": 700
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "바닐라빈 라떼",
+      "category": "커피",
+      "price": 4800,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "온도 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            },
+            {
+              "name": "ICED",
+              "priceDelta": 500
+            }
+          ]
+        },
+        {
+          "name": "얼음 양",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도 선택=ICED",
+          "options": [
+            {
+              "name": "적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "우유 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "일반 우유",
+              "priceDelta": 0
+            },
+            {
+              "name": "저지방 우유",
+              "priceDelta": 0
+            },
+            {
+              "name": "오트 밀크",
+              "priceDelta": 600
+            },
+            {
+              "name": "두유",
+              "priceDelta": 500
+            }
+          ]
+        },
+        {
+          "name": "샷 추가",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "에스프레소 샷"
+            }
+          ],
+          "options": [
+            {
+              "name": "에스프레소 샷",
+              "priceDelta": 500,
+              "maxQty": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "카푸치노",
+      "category": "커피",
+      "price": 4300,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "온도 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            },
+            {
+              "name": "ICED",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "얼음 양",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도 선택=ICED",
+          "options": [
+            {
+              "name": "적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "우유 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "일반 우유",
+              "priceDelta": 0
+            },
+            {
+              "name": "저지방 우유",
+              "priceDelta": 0
+            },
+            {
+              "name": "오트 밀크",
+              "priceDelta": 600
+            },
+            {
+              "name": "두유",
+              "priceDelta": 500
+            }
+          ]
+        },
+        {
+          "name": "샷 추가",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "에스프레소 샷"
+            }
+          ],
+          "options": [
+            {
+              "name": "에스프레소 샷",
+              "priceDelta": 500,
+              "maxQty": 3
+            }
+          ]
+        },
+        {
+          "name": "시럽 추가",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "multi",
+          "options": [
+            {
+              "name": "바닐라 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "헤이즐넛 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "카라멜 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "흑당 시럽",
+              "priceDelta": 700
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "카라멜 마키아토",
+      "category": "커피",
+      "price": 5000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "온도 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            },
+            {
+              "name": "ICED",
+              "priceDelta": 500
+            }
+          ]
+        },
+        {
+          "name": "얼음 양",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도 선택=ICED",
+          "options": [
+            {
+              "name": "적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "우유 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "일반 우유",
+              "priceDelta": 0
+            },
+            {
+              "name": "저지방 우유",
+              "priceDelta": 0
+            },
+            {
+              "name": "오트 밀크",
+              "priceDelta": 600
+            },
+            {
+              "name": "두유",
+              "priceDelta": 500
+            }
+          ]
+        },
+        {
+          "name": "샷 추가",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "에스프레소 샷"
+            }
+          ],
+          "options": [
+            {
+              "name": "에스프레소 샷",
+              "priceDelta": 500,
+              "maxQty": 3
+            }
+          ]
+        },
+        {
+          "name": "시럽 추가",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "multi",
+          "options": [
+            {
+              "name": "바닐라 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "헤이즐넛 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "카라멜 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "흑당 시럽",
+              "priceDelta": 700
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "카페모카",
+      "category": "커피",
+      "price": 4900,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "온도 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            },
+            {
+              "name": "ICED",
+              "priceDelta": 500
+            }
+          ]
+        },
+        {
+          "name": "얼음 양",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도 선택=ICED",
+          "options": [
+            {
+              "name": "적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "우유 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "일반 우유",
+              "priceDelta": 0
+            },
+            {
+              "name": "저지방 우유",
+              "priceDelta": 0
+            },
+            {
+              "name": "오트 밀크",
+              "priceDelta": 600
+            },
+            {
+              "name": "두유",
+              "priceDelta": 500
+            }
+          ]
+        },
+        {
+          "name": "샷 추가",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "에스프레소 샷"
+            }
+          ],
+          "options": [
+            {
+              "name": "에스프레소 샷",
+              "priceDelta": 500,
+              "maxQty": 3
+            }
+          ]
+        },
+        {
+          "name": "시럽 추가",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "multi",
+          "options": [
+            {
+              "name": "바닐라 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "헤이즐넛 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "카라멜 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "흑당 시럽",
+              "priceDelta": 700
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "콜드브루",
+      "category": "커피",
+      "price": 4500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "온도 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "ICED ONLY",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "얼음 양",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "시럽 추가",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "multi",
+          "options": [
+            {
+              "name": "바닐라 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "헤이즐넛 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "카라멜 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "흑당 시럽",
+              "priceDelta": 700
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "에스프레소",
+      "category": "커피",
+      "price": 3000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "샷 추가",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "에스프레소 샷"
+            }
+          ],
+          "options": [
+            {
+              "name": "에스프레소 샷",
+              "priceDelta": 500,
+              "maxQty": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "초코라떼",
+      "category": "논커피",
+      "price": 4500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "온도 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            },
+            {
+              "name": "ICED",
+              "priceDelta": 500
+            }
+          ]
+        },
+        {
+          "name": "얼음 양",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도 선택=ICED",
+          "options": [
+            {
+              "name": "적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "우유 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "일반 우유",
+              "priceDelta": 0
+            },
+            {
+              "name": "저지방 우유",
+              "priceDelta": 0
+            },
+            {
+              "name": "오트 밀크",
+              "priceDelta": 600
+            },
+            {
+              "name": "두유",
+              "priceDelta": 500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "녹차라떼",
+      "category": "논커피",
+      "price": 4700,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "온도 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            },
+            {
+              "name": "ICED",
+              "priceDelta": 500
+            }
+          ]
+        },
+        {
+          "name": "얼음 양",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도 선택=ICED",
+          "options": [
+            {
+              "name": "적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "우유 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "일반 우유",
+              "priceDelta": 0
+            },
+            {
+              "name": "저지방 우유",
+              "priceDelta": 0
+            },
+            {
+              "name": "오트 밀크",
+              "priceDelta": 600
+            },
+            {
+              "name": "두유",
+              "priceDelta": 500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "고구마라떼",
+      "category": "논커피",
+      "price": 4800,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "온도 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            },
+            {
+              "name": "ICED",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "얼음 양",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도 선택=ICED",
+          "options": [
+            {
+              "name": "적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "우유 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "일반 우유",
+              "priceDelta": 0
+            },
+            {
+              "name": "저지방 우유",
+              "priceDelta": 0
+            },
+            {
+              "name": "오트 밀크",
+              "priceDelta": 600
+            },
+            {
+              "name": "두유",
+              "priceDelta": 500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "딸기라떼",
+      "category": "논커피",
+      "price": 5300,
+      "soldOut": true
+    },
+    {
+      "name": "레몬에이드",
+      "category": "논커피",
+      "price": 4800,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "온도 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "ICED ONLY",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "얼음 양",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "많이",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "흑임자 라떼",
+      "category": "논커피",
+      "price": 5000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "온도 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            },
+            {
+              "name": "ICED",
+              "priceDelta": 500
+            }
+          ]
+        },
+        {
+          "name": "얼음 양",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도 선택=ICED",
+          "options": [
+            {
+              "name": "적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "우유 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "일반 우유",
+              "priceDelta": 0
+            },
+            {
+              "name": "저지방 우유",
+              "priceDelta": 0
+            },
+            {
+              "name": "오트 밀크",
+              "priceDelta": 600
+            },
+            {
+              "name": "두유",
+              "priceDelta": 500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "캐모마일",
+      "category": "티",
+      "price": 3800,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "온도 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            },
+            {
+              "name": "ICED",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "얼음 양",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도 선택=ICED",
+          "options": [
+            {
+              "name": "적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "많이",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "페퍼민트",
+      "category": "티",
+      "price": 3800,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "온도 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            },
+            {
+              "name": "ICED",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "얼음 양",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도 선택=ICED",
+          "options": [
+            {
+              "name": "적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "많이",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "얼그레이",
+      "category": "티",
+      "price": 4000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "온도 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            },
+            {
+              "name": "ICED",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "얼음 양",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도 선택=ICED",
+          "options": [
+            {
+              "name": "적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "시럽 추가",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "multi",
+          "options": [
+            {
+              "name": "바닐라 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "헤이즐넛 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "카라멜 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "흑당 시럽",
+              "priceDelta": 700
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "유자차",
+      "category": "티",
+      "price": 4500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "온도 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            },
+            {
+              "name": "ICED",
+              "priceDelta": 500
+            }
+          ]
+        },
+        {
+          "name": "얼음 양",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도 선택=ICED",
+          "options": [
+            {
+              "name": "적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "많이",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "자몽차",
+      "category": "티",
+      "price": 4700,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "온도 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            },
+            {
+              "name": "ICED",
+              "priceDelta": 500
+            }
+          ]
+        },
+        {
+          "name": "얼음 양",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도 선택=ICED",
+          "options": [
+            {
+              "name": "적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "많이",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "로열 밀크티",
+      "category": "티",
+      "price": 5000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "온도 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            },
+            {
+              "name": "ICED",
+              "priceDelta": 500
+            }
+          ]
+        },
+        {
+          "name": "얼음 양",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도 선택=ICED",
+          "options": [
+            {
+              "name": "적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "시럽 추가",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "multi",
+          "options": [
+            {
+              "name": "바닐라 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "헤이즐넛 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "카라멜 시럽",
+              "priceDelta": 500
+            },
+            {
+              "name": "흑당 시럽",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "우유 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "일반 우유",
+              "priceDelta": 0
+            },
+            {
+              "name": "저지방 우유",
+              "priceDelta": 0
+            },
+            {
+              "name": "오트 밀크",
+              "priceDelta": 600
+            },
+            {
+              "name": "두유",
+              "priceDelta": 500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "소금빵",
+      "category": "빵",
+      "price": 3200,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "데우기",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "그대로 주세요",
+              "priceDelta": 0
+            },
+            {
+              "name": "따뜻하게 데워 주세요",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "버터 크루아상",
+      "category": "빵",
+      "price": 3800,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "데우기",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "그대로 주세요",
+              "priceDelta": 0
+            },
+            {
+              "name": "따뜻하게 데워 주세요",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "단팥빵",
+      "category": "빵",
+      "price": 2800,
+      "soldOut": false,
+      "recipe": "directToCart",
+      "optionGroups": []
+    },
+    {
+      "name": "앙버터",
+      "category": "빵",
+      "price": 4300,
+      "soldOut": true
+    },
+    {
+      "name": "크림치즈 베이글",
+      "category": "빵",
+      "price": 4200,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "데우기",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "그대로 주세요",
+              "priceDelta": 0
+            },
+            {
+              "name": "따뜻하게 데워 주세요",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "마늘 바게트",
+      "category": "빵",
+      "price": 4500,
+      "soldOut": false,
+      "recipe": "directToCart",
+      "optionGroups": []
+    },
+    {
+      "name": "소보로빵",
+      "category": "빵",
+      "price": 2600,
+      "soldOut": false,
+      "recipe": "directToCart",
+      "optionGroups": []
+    },
+    {
+      "name": "우유식빵",
+      "category": "빵",
+      "price": 6500,
+      "soldOut": false,
+      "recipe": "directToCart",
+      "optionGroups": []
+    },
+    {
+      "name": "딸기 생크림 케이크",
+      "category": "케이크",
+      "price": 6500,
+      "soldOut": false,
+      "recipe": "directToCart",
+      "optionGroups": []
+    },
+    {
+      "name": "초코 가나슈 케이크",
+      "category": "케이크",
+      "price": 6800,
+      "soldOut": false,
+      "recipe": "directToCart",
+      "optionGroups": []
+    },
+    {
+      "name": "뉴욕 치즈케이크",
+      "category": "케이크",
+      "price": 6300,
+      "soldOut": false,
+      "recipe": "directToCart",
+      "optionGroups": []
+    },
+    {
+      "name": "티라미수",
+      "category": "케이크",
+      "price": 6900,
+      "soldOut": true
+    },
+    {
+      "name": "당근 케이크",
+      "category": "케이크",
+      "price": 6200,
+      "soldOut": false,
+      "recipe": "directToCart",
+      "optionGroups": []
+    },
+    {
+      "name": "레몬 파운드",
+      "category": "케이크",
+      "price": 3900,
+      "soldOut": false,
+      "recipe": "directToCart",
+      "optionGroups": []
+    },
+    {
+      "name": "햄치즈 샌드위치",
+      "category": "샌드위치",
+      "price": 6300,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "데우기",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "그대로 주세요",
+              "priceDelta": 0
+            },
+            {
+              "name": "따뜻하게 데워 주세요",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "에그마요 샌드위치",
+      "category": "샌드위치",
+      "price": 5800,
+      "soldOut": false,
+      "recipe": "directToCart",
+      "optionGroups": []
+    },
+    {
+      "name": "치킨 클럽 샌드위치",
+      "category": "샌드위치",
+      "price": 7200,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "데우기",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "그대로 주세요",
+              "priceDelta": 0
+            },
+            {
+              "name": "따뜻하게 데워 주세요",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "베이컨 토마토 샌드위치",
+      "category": "샌드위치",
+      "price": 6900,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "데우기",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "그대로 주세요",
+              "priceDelta": 0
+            },
+            {
+              "name": "따뜻하게 데워 주세요",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "리코타 샐러드 샌드위치",
+      "category": "샌드위치",
+      "price": 6800,
+      "soldOut": false,
+      "recipe": "directToCart",
+      "optionGroups": []
+    },
+    {
+      "name": "크로크무슈",
+      "category": "샌드위치",
+      "price": 6500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "데우기",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "그대로 주세요",
+              "priceDelta": 0
+            },
+            {
+              "name": "따뜻하게 데워 주세요",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "포근밀 kiosk learned successfully"
+  ]
+}

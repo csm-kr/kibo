@@ -4,7 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { gradeCatalog, translateOrder, plannedSteps, forbiddenSteps, classify, totalCannotSee, notLearnedOrders, keyItemNames } from './lib.mjs';
+import { gradeCatalog, translateOrder, plannedSteps, forbiddenSteps, classify, totalCannotSee, notLearnedOrders, keyItemNames, gradedTotal } from './lib.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const BLIND_ROOT = path.resolve(HERE, '..');
@@ -16,28 +16,41 @@ async function gradeOrders(key, skill, appPath) {
   // The driver reads KIOSK_URL when it opens the kiosk.
   process.env.KIOSK_URL = pathToFileURL(appPath).href;
   const { runAndReadCart } = await import('./run.mjs');
+  const { runOrder } = await import('../../kibo-learn/runner.mjs');
   const names = key.items.flatMap(keyItemNames);
   const results = [];
   for (const h of key.holdoutOrders ?? []) {
     const translation = translateOrder(key, skill, h);
     let run = null;
+    let review = null;
     let forbidden = [];
     if (translation.ok) {
       forbidden = forbiddenSteps(plannedSteps(skill, translation.order), skill.forbiddenLabels ?? []);
       if (!forbidden.length) run = await runAndReadCart(skill, translation.order, names);
+      // Round 3 (I-195): a skill that declares its order review is replayed once more by the runner, which opens the
+      // review and reads the kiosk's total there (the total the customer pays, charges included).
+      if (run && !run.error && skill.review) review = await runOrder(skill, translation.order);
     }
-    const c = classify({ translation, forbidden, run, expectedTotal: h.expectedTotal });
+    // Grader v2 as it was: the menu cart's total. With a review, the kiosk's total is the review's.
+    const cartOnly = classify({ translation, forbidden, run, expectedTotal: gradedTotal(h) });
+    const kioskRun = review ? { ...run, shownTotal: review.kioskTotal, error: review.error ? `review replay: ${review.error}` : undefined } : run;
+    const c = review ? classify({ translation, forbidden, run: kioskRun, expectedTotal: gradedTotal(h) }) : cartOnly;
     results.push({
       id: h.id, outcome: c.outcome, reason: c.reason ?? null, linesChecked: c.linesChecked ?? null,
-      cartSource: run?.cartSource ?? null,
-      expectedTotal: h.expectedTotal, kioskTotal: run?.shownTotal ?? null, skillPredicts: run?.expectedTotal ?? null,
-      ms: run?.ms ?? null, totalCannotSee: totalCannotSee(key, h), order: translation.order ?? null,
+      cartSource: run?.cartSource ?? null, cartOnlyOutcome: cartOnly.outcome,
+      totalSource: review && !review.error ? 'review' : run && !run.error ? 'cart' : null,
+      expectedTotal: gradedTotal(h), kioskTotal: kioskRun?.shownTotal ?? null, cartTotal: run?.shownTotal ?? null,
+      skillPredicts: run?.expectedTotal ?? null,
+      ms: run?.ms ?? null, interruptsAnswered: [...(run?.interruptsAnswered ?? []), ...(review?.interruptsAnswered ?? [])].length,
+      totalCannotSee: totalCannotSee(key, h), order: translation.order ?? null,
     });
     console.error(`  ${h.id} ${c.outcome}${c.reason ? ` (${c.reason})` : ''}`);
   }
-  const n = (o) => results.filter((r) => r.outcome === o).length;
+  const n = (o, k = 'outcome') => results.filter((r) => r[k] === o).length;
   return {
     total: results.length, correct: n('correct'), safeRefusal: n('safeRefusal'), unsafe: n('unsafe'),
+    // The same orders judged by the menu cart's total only, as grader v2 did before round 3.
+    cartOnly: { correct: n('correct', 'cartOnlyOutcome'), safeRefusal: n('safeRefusal', 'cartOnlyOutcome'), unsafe: n('unsafe', 'cartOnlyOutcome') },
     // Orders whose cart lines the runner could read; the rest were judged by the kiosk total alone.
     linesChecked: results.filter((r) => r.linesChecked).length,
     results,
@@ -59,7 +72,7 @@ export async function gradeKiosk({ kioskId, skillPath, label, keyPath, appPath, 
     skill ? '' : 'no skill;',
     `items ${c.items.matched}/${c.items.key} (precision ${c.items.precision}), price ${c.price.correct}/${c.price.of},`,
     `options exact ${c.options.itemsExact}/${c.options.items} (openable ${c.options.openableExact}/${c.options.openable});`,
-    orders ? `orders correct ${orders.correct}, safe refusal ${orders.safeRefusal}, unsafe ${orders.unsafe}${orders.notLearned ? `, not learned ${orders.notLearned}` : ''} of ${orders.total} (cart lines read in ${orders.linesChecked})` : 'orders not run',
+    orders ? `orders correct ${orders.correct}, safe refusal ${orders.safeRefusal}, unsafe ${orders.unsafe}${orders.notLearned ? `, not learned ${orders.notLearned}` : ''} of ${orders.total} (cart lines read in ${orders.linesChecked}${skill?.review ? `; kiosk total from the order review; menu cart total only: ${orders.cartOnly.correct} / ${orders.cartOnly.safeRefusal} / ${orders.cartOnly.unsafe}` : ''})` : 'orders not run',
   ].filter(Boolean).join(' ');
   return {
     kioskId, label, grader: GRADER_VERSION, gradedAt: new Date().toISOString(), skill: skill ? 'present' : 'no skill',

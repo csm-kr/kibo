@@ -1,0 +1,31 @@
+{
+  "n": 15,
+  "at": "2026-10-14T02:16:53.059Z",
+  "tool": "record",
+  "args": {
+    "kind": "item",
+    "names": [
+      "홍시 스무디"
+    ]
+  },
+  "resultSummary": "recorded item 홍시 스무디",
+  "calls": [
+    {
+      "tool": "record",
+      "args": {
+        "kind": "item",
+        "names": [
+          "홍시 스무디"
+        ]
+      },
+      "resultSummary": "recorded item 홍시 스무디"
+    }
+  ],
+  "discoveries": {
+    "items": 2,
+    "optionGroups": 9,
+    "categories": 1
+  },
+  "inputTokens": 6655,
+  "outputTokens": 170
+}

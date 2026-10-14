@@ -28,11 +28,13 @@ function runLearner({ maxTurns, fail, calls, defaultCall, maxInputTokens, kiosk 
   const requests = fs.existsSync(log) ? fs.readFileSync(log, 'utf8').trim().split('\n').map((l) => JSON.parse(l)) : [];
   const statsPath = path.join(dir, 'learn-stats.json');
   const stats = fs.existsSync(statsPath) ? JSON.parse(fs.readFileSync(statsPath, 'utf8')) : null;
+  const lastSkillPath = path.join(dir, 'last-skill.json');
+  const lastSkill = fs.existsSync(lastSkillPath) ? JSON.parse(fs.readFileSync(lastSkillPath, 'utf8')) : null;
   const gcloudCalls = fs.existsSync(gcloudLog) ? fs.readFileSync(gcloudLog, 'utf8').trim().split('\n').length : 0;
   const traceFiles = fs.existsSync(traceDir)
     ? Object.fromEntries(fs.readdirSync(traceDir).map((f) => [f, fs.readFileSync(path.join(traceDir, f))])) : null;
   fs.rmSync(dir, { recursive: true, force: true });
-  return { r, requests, stats, gcloudCalls, traceFiles };
+  return { r, requests, stats, gcloudCalls, traceFiles, lastSkill };
 }
 
 // Width of a baseline or progressive JPEG, from its SOF0/SOF2 segment.
@@ -166,15 +168,24 @@ test('trace: TRACE_DIR writes a JSON and a 720 px JPEG per turn, with no prompt 
   assert.doesNotMatch(all, /KIBO Kiosk Learner|fake-token|Learn this kiosk|TAPPABLE LABELS/);
 });
 
-const stepperSkill = JSON.parse(fs.readFileSync(path.join(here, 'fixtures/patterns/stepper.skill.json'), 'utf8'));
-const order = (lines) => ({ lines: lines.map(([item, options, qty = 1]) => ({ category: '메뉴', item, options, qty })) });
+// Round 3: the gate also asks for the order review when the kiosk shows its order button, and for every option group
+// to be used by a passing order. stepper.skill.json predates both, so these tests add the review here.
+const stepperSkill = {
+  ...JSON.parse(fs.readFileSync(path.join(here, 'fixtures/patterns/stepper.skill.json'), 'utf8')),
+  forbiddenLabels: ['카드 결제'],
+  review: { open: [{ op: 'openReview', label: '주문하기' }], totalPattern: '합계 ([\\d,]+)원' },
+};
+const reviewSkill = JSON.parse(fs.readFileSync(path.join(here, 'fixtures/patterns/review.skill.json'), 'utf8'));
+const order = (lines, dineOption) => ({ ...(dineOption ? { dineOption } : {}), lines: lines.map(([item, options, qty = 1]) => ({ category: '메뉴', item, options, qty })) });
 const testCall = (skill, orders) => ({ name: 'testSkill', args: { skillJson: JSON.stringify(skill), ordersJson: JSON.stringify(orders) } });
+const finishCall = (skill) => ({ name: 'finish', args: { skillJson: JSON.stringify(skill) } });
+// The fake Vertex logs only hashes of what the learner sends, so these tests read the one line each testSkill prints.
 
 test('pattern 4: orders from several testSkill calls count for the same exact skill', () => {
   const { r, stats } = runLearner({ maxTurns: 3, kiosk: 'fixtures/patterns/stepper.html', calls: {
     1: testCall(stepperSkill, [order([['스콘', []]])]),
-    2: testCall(stepperSkill, [order([['라떼', ['HOT']]]), order([['라떼', ['ICED', '에스프레소 샷', '에스프레소 샷']], ['스콘', [], 2]])]),
-    3: { name: 'finish', args: { skillJson: JSON.stringify(stepperSkill) } },
+    2: testCall(stepperSkill, [order([['라떼', ['HOT']]]), order([['라떼', ['ICED', '적게', '에스프레소 샷', '에스프레소 샷']], ['스콘', [], 2]])]),
+    3: finishCall(stepperSkill),
   } });
   assert.equal(r.status, 0, r.stderr);
   assert.equal(stats.finished, true, r.stdout);
@@ -185,8 +196,67 @@ test('pattern 4: a changed skill starts the count again, so finish is refused', 
   const { r, stats } = runLearner({ maxTurns: 3, kiosk: 'fixtures/patterns/stepper.html', calls: {
     1: testCall(stepperSkill, [order([['스콘', []]]), order([['라떼', ['HOT']]])]),
     2: testCall(changed, [order([['스콘', [], 2]])]),
-    3: { name: 'finish', args: { skillJson: JSON.stringify(changed) } },
+    3: finishCall(changed),
   } });
   assert.equal(r.status, 0, r.stderr);
   assert.equal(stats.finished, false);
+});
+
+test('I-197: finish is refused while an option group has no passing self-test, and accepted once one uses it', () => {
+  const three = [order([['스콘', []]]), order([['라떼', ['HOT']]]), order([['라떼', ['ICED', '에스프레소 샷']], ['스콘', [], 2]])];
+  const refused = runLearner({ maxTurns: 2, kiosk: 'fixtures/patterns/stepper.html', calls: { 1: testCall(stepperSkill, three), 2: finishCall(stepperSkill) } });
+  assert.equal(refused.r.status, 0, refused.r.stderr);
+  assert.equal(refused.stats.finished, false, 'three passing orders, but none used 얼음량');
+  assert.match(refused.r.stdout, /test #1: PASS PASS PASS .*uncovered=1/);
+  const accepted = runLearner({ maxTurns: 3, kiosk: 'fixtures/patterns/stepper.html', calls: {
+    1: testCall(stepperSkill, three), 2: testCall(stepperSkill, [order([['라떼', ['ICED', '보통']]])]), 3: finishCall(stepperSkill) } });
+  assert.equal(accepted.stats.finished, true, accepted.r.stdout);
+});
+
+test("I-195: a self-test whose skill total differs from the kiosk's review total fails, so finish is refused", () => {
+  const noCharge = { ...reviewSkill, charges: [] };
+  const orders = [order([['커피', ['라지']]], '먹고 가요'), order([['쿠키', []], ['커피', []]], '먹고 가요'), order([['쿠키', []]], '포장해요')];
+  const { r, stats } = runLearner({ maxTurns: 2, kiosk: 'fixtures/patterns/review.html', calls: { 1: testCall(noCharge, orders), 2: finishCall(noCharge) } });
+  assert.equal(r.status, 0, r.stderr);
+  assert.match(r.stdout, /test #1: PASS PASS FAIL/);
+  assert.equal(stats.finished, false);
+  const fixed = runLearner({ maxTurns: 2, kiosk: 'fixtures/patterns/review.html', calls: { 1: testCall(reviewSkill, orders), 2: finishCall(reviewSkill) } });
+  assert.match(fixed.r.stdout, /test #1: PASS PASS PASS/);
+  assert.equal(fixed.stats.finished, true, fixed.r.stdout);
+});
+
+test('I-195: finish is refused for a skill without review on a kiosk that shows its order button', () => {
+  const { review, ...noReview } = stepperSkill;
+  const orders = [order([['스콘', []]]), order([['라떼', ['HOT', '바닐라 시럽']]]), order([['라떼', ['ICED', '적게']]])];
+  const { r, stats } = runLearner({ maxTurns: 2, kiosk: 'fixtures/patterns/stepper.html', calls: { 1: testCall(noReview, orders), 2: finishCall(noReview) } });
+  assert.equal(r.status, 0, r.stderr);
+  assert.match(r.stdout, /test #1: PASS PASS PASS .*review=주문하기/);
+  assert.equal(stats.finished, false);
+});
+
+test('I-202: learn-stats.json records the learner commit and whether spikes/kibo-learn had uncommitted changes', () => {
+  const { stats } = runLearner({ maxTurns: 1 });
+  assert.match(stats.learner.commit, /^[0-9a-f]{40}$/);
+  assert.equal(typeof stats.learner.dirty, 'boolean');
+});
+
+test('token budget: testSkill, audit and finish reuse the last skill sent when skillJson is left out', () => {
+  const orders = [order([['스콘', []]]), order([['라떼', ['HOT', '바닐라 시럽']]]), order([['라떼', ['ICED', '적게']]])];
+  const { r, stats } = runLearner({ maxTurns: 4, kiosk: 'fixtures/patterns/stepper.html', calls: {
+    1: testCall(stepperSkill, orders.slice(0, 2)),
+    2: { name: 'testSkill', args: { ordersJson: JSON.stringify(orders.slice(2)) } },
+    3: { name: 'audit', args: {} },
+    4: { name: 'finish', args: {} },
+  } });
+  assert.equal(r.status, 0, r.stderr);
+  assert.match(r.stdout, /test #2: PASS\n/, 'the second call counted for the same skill');
+  assert.equal(stats.finished, true, r.stdout);
+});
+
+test('diagnostics: a failed self-test order is explained in the log, and an unfinished run keeps its last skill', () => {
+  const noCharge = { ...reviewSkill, charges: [] };
+  const { r, lastSkill } = runLearner({ maxTurns: 1, kiosk: 'fixtures/patterns/review.html',
+    calls: { 1: testCall(noCharge, [order([['쿠키', []]], '포장해요')]) } });
+  assert.match(r.stdout, /test #1: FAIL[^\n]*\n {4}order 1: the skill's total 1,500원 differs from the kiosk's 1,600원/);
+  assert.deepEqual(lastSkill, noCharge);
 });

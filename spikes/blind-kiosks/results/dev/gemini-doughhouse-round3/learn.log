@@ -1,0 +1,42 @@
+#1 act {"op":"click","label":"화면을 터치하여 주문을 시작하세요"}
+#2 act {"label":"🍽 먹고 갈게요","op":"click"}
+#3 act {"op":"click","label":"마르게리따"}
+#4 act {"op":"click","label":"닫기"}
+#5 act {"op":"click","label":"페퍼로니"}
+#6 act [{"op":"click","label":"닫기"},{"label":"불고기 피자","op":"click"}]
+#7 act [{"label":"닫기","op":"click"},{"op":"click","label":"사이드"}]
+#8 act {"op":"click","label":"치즈 오븐 스파게티"}
+#9 act [{"label":"닫기","op":"click"},{"op":"click","label":"갈릭디핑소스"}]
+#10 act [{"label":"닫기","op":"click"},{"op":"click","label":"버팔로 윙 6조각"}]
+#11 act [{"op":"click","label":"닫기"},{"op":"click","label":"음료"}]
+#12 act {"op":"click","label":"콜라"}
+#13 act [{"label":"닫기","op":"click"},{"label":"제로콜라","op":"click"}]
+#14 act [{"label":"닫기","op":"click"},{"op":"click","label":"사이다"}]
+#15 act [{"op":"click","label":"500ml"},{"op":"click","label":"장바구니 담기"}]
+#16 act {"label":"주문하기","op":"openReview"}
+#17 reload 
+#18 act [{"label":"화면을 터치하여 주문을 시작하세요","op":"click"},{"op":"click","label":"🛍 가져갈게요"}]
+#19 act [{"label":"마르게리따","op":"click"},{"label":"장바구니 담기","op":"click"}]
+#20 act [{"op":"click","label":"레귤러"},{"label":"오리지널","op":"click"},{"op":"click","label":"장바구니 담기"}]
+#21 act {"op":"click","label":"아니요, 괜찮아요"}
+#22 act {"label":"주문하기","op":"openReview"}
+#23 record 
+#24 audit 
+  audit #1: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=3
+#25 audit 
+  audit #2: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=0
+#26 testSkill 
+  test #1: FAIL PASS FAIL
+#27 reload 
+#28 act [{"op":"click","label":"화면을 터치하여 주문을 시작하세요"},{"op":"click","label":"🍽 먹고 갈게요"}]
+#29 act {"label":"마르게리따","op":"click"}
+#30 act [{"label":"라지 (+4,000원)","op":"click"},{"op":"click","label":"치즈크러스트 (+3,000원)"},{"op":"click","label":"베이컨 (+1,500원)"},{"label":"+","op":"click"}]
+#31 act {"label":"장바구니 담기","op":"click"}
+#32 act [{"label":"아니요, 괜찮아요","op":"click"},{"label":"사이드","op":"click"},{"op":"click","label":"치즈 오븐 스파게티"},{"label":"장바구니 담기","op":"click"}]
+#33 audit 
+  audit #3: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=0
+#34 testSkill 
+  test #2: PASS PASS PASS
+#35 finish 
+  finish audit: OK
+{"provider":"gemini","model":"gemini-3.8-flash","learner":{"commit":"29aa17593840dd78cafa9e45dff7dc8f505dc37b","dirty":false},"cachedInputTokens":138526,"finished":true,"turns":35,"acts":45,"tests":2,"inputTokens":347025,"outputTokens":16993,"minutes":"5.2"}

@@ -1,0 +1,43 @@
+{
+  "n": 27,
+  "at": "2026-10-14T02:59:31.336Z",
+  "tool": "record",
+  "args": {
+    "kind": "item",
+    "names": [
+      "냉면",
+      "막국수",
+      "후식 냉면",
+      "잔치국수",
+      "공기밥",
+      "철판 볶음밥",
+      "열무 비빔밥"
+    ]
+  },
+  "resultSummary": "recorded item 냉면, 막국수, 후식 냉면, 잔치국수, 공기밥, 철판 볶음밥, 열무 비빔밥",
+  "calls": [
+    {
+      "tool": "record",
+      "args": {
+        "kind": "item",
+        "names": [
+          "냉면",
+          "막국수",
+          "후식 냉면",
+          "잔치국수",
+          "공기밥",
+          "철판 볶음밥",
+          "열무 비빔밥"
+        ]
+      },
+      "resultSummary": "recorded item 냉면, 막국수, 후식 냉면, 잔치국수, 공기밥, 철판 볶음밥, 열무 비빔밥"
+    }
+  ],
+  "discoveries": {
+    "items": 14,
+    "optionGroups": 6,
+    "categories": 2
+  },
+  "inputTokens": 8091,
+  "outputTokens": 906
+}

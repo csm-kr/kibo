@@ -1,0 +1,18 @@
+{
+  "kioskId": "gureum",
+  "provider": "gemini",
+  "model": "gemini-3.8-flash",
+  "startedAt": "2026-10-14T02:15:04.923Z",
+  "endedAt": "2026-10-14T02:32:27.532Z",
+  "gate": {
+    "tests": 2,
+    "testsPassedForFinish": false,
+    "audits": 3,
+    "auditOk": true,
+    "finished": false
+  },
+  "turns": 111,
+  "inputTokens": 2009976,
+  "cachedInputTokens": 1418391,
+  "outputTokens": 62945
+}

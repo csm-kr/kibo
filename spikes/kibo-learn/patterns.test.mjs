@@ -12,7 +12,8 @@ import { openKiosk, snapshot, act, compactTree } from './driver.mjs';
 import { runOrder } from './runner.mjs';
 import { audit } from './audit.mjs';
 import { lintSkill } from './lint.mjs';
-import { orderPlan, isForbidden } from './plan.mjs';
+import { orderPlan, isForbidden, isReviewOpener, uncoveredGroups } from './plan.mjs';
+import { expectedTotal } from './runner.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (f) => path.join(here, 'fixtures/patterns', f);
@@ -242,4 +243,157 @@ test('token budget: on a fixture screen every tappable label survives compactTre
     assert.ok(out.includes(`TAPPABLE LABELS: ${JSON.stringify(labels)}`));
     assert.ok(out.length <= snap.length);
   });
+});
+
+// ---------- round 3: interrupts (I-194), verified totals (I-195), option-group coverage (I-197) ----------
+
+const interruptSkill = () => skillOf('interrupt.skill.json');
+const latte = line('라떼', ['ICED', '라지']);
+
+test('I-194: a modal that comes up in the middle of a line stops a skill without interrupts', async () => {
+  useKiosk('interrupt.html');
+  const skill = interruptSkill();
+  delete skill.interrupts;
+  const r = await runOrder(skill, { lines: [latte, line('머핀', [])] });
+  assert.match(r.error ?? '', /Timeout|intercepts|no tappable label/);
+  assert.equal(r.ok, false);
+});
+
+test('I-194: the runner answers a declared interrupt before the next step and finishes the order', async () => {
+  useKiosk('interrupt.html');
+  const r = await runOrder(interruptSkill(), { lines: [latte, line('머핀', [])] });
+  assert.equal(r.error, undefined);
+  assert.equal(r.kioskTotal, 4000 + 500 + 700 + 2500);
+  assert.ok(r.ok);
+  assert.ok(r.interruptsAnswered.length >= 1);
+  assert.ok(r.interruptsAnswered.every((a) => a.text === '계속 주문하시겠어요?'));
+});
+
+test('I-194: after a click times out under an interrupt, the runner answers it and retries the step once', async () => {
+  useKiosk('interrupt.html?on=enter');
+  const r = await runOrder(interruptSkill(), { lines: [latte] });
+  assert.equal(r.error, undefined);
+  assert.ok(r.ok);
+  assert.deepEqual(r.interruptsAnswered.map((a) => [a.text, a.afterError]), [['계속 주문하시겠어요?', true]]);
+});
+
+test('I-194: an interrupt is answered only with a control that neither orders nor pays, checked before any click', async () => {
+  useKiosk('interrupt.html');
+  const skill = interruptSkill();
+  skill.interrupts = [{ text: '계속 주문하시겠어요?', dismiss: { op: 'click', label: '주문하기' } }];
+  const r = await runOrder(skill, { lines: [line('머핀', [])] });
+  assert.match(r.error, /refused before any click/);
+  assert.match(lintSkill(skill).join('\n'), /interrupt .*payment or checkout control/);
+  const named = interruptSkill();
+  named.interrupts = [{ text: '계속 주문하시겠어요?', dismiss: { op: 'click', label: '머핀' } }];
+  assert.match(lintSkill(named).join('\n'), /interrupt .*is an item, category or option/);
+  const vague = interruptSkill();
+  vague.interrupts = [{ text: '네', dismiss: { op: 'click', label: '계속 주문하기' } }];
+  assert.match(lintSkill(vague).join('\n'), /interrupt .*text/);
+  assert.deepEqual(lintSkill(interruptSkill()), []);
+});
+
+test('verified totals: only the order button opens the review; payment, send and listed labels never do', () => {
+  for (const ok of ['주문하기', '주문 하기', '주문하기 12,500원', '주문하기 (3)', '주문', 'Order', '🛒 주문하기']) assert.equal(isReviewOpener(ok), true, ok);
+  for (const bad of ['결제하기', '카드결제', '주문완료', '주문 전송', '바로 주문하기', '주문하기\n결제', 'Place order', 'Order now', 'Checkout',
+    'Pay', 'Submit order', '계속 주문하기', '장바구니', '']) assert.equal(isReviewOpener(bad), false, bad);
+  assert.equal(isReviewOpener('주문하기', ['주문하기']), false, "the skill's own forbiddenLabels always win");
+});
+
+test('verified totals: the driver opens the review only through openReview on the order button', async () => {
+  useKiosk('review.html');
+  const k = await openKiosk();
+  try {
+    for (const s of [{ op: 'click', label: '시작하기' }, { op: 'click', label: '포장해요' }, { op: 'click', label: '쿠키' }, { op: 'click', label: '담기' }]) await act(k.page, s);
+    await assert.rejects(act(k.page, { op: 'click', label: '주문하기' }), /payment or checkout/);
+    await assert.rejects(act(k.page, { op: 'openReview', label: '주문하기' }, { forbidden: ['주문하기'] }), /not the order button/);
+    await assert.rejects(act(k.page, { op: 'openReview', label: '쿠키' }), /not the order button/);
+    assert.ok(await k.page.isVisible('#menu'), 'still on the menu');
+    await act(k.page, { op: 'openReview', label: '주문하기' });
+    assert.ok(await k.page.isVisible('#review'));
+    await assert.rejects(act(k.page, { op: 'openReview', label: '결제하기' }), /not the order button/);
+    await assert.rejects(act(k.page, { op: 'click', label: '결제하기' }), /payment or checkout/);
+    assert.ok(await k.page.isVisible('#review'), 'still on the review');
+  } finally { await k.browser.close(); }
+});
+
+test("I-195: the kiosk's review total wins: a take-out charge the skill lacks fails the order with a flag", async () => {
+  useKiosk('review.html');
+  const skill = skillOf('review.skill.json');
+  delete skill.charges;
+  const r = await runOrder(skill, { dineOption: '포장해요', lines: [line('커피', ['라지'])] });
+  assert.equal(r.error, undefined);
+  assert.equal(r.cartTotal, 3500);
+  assert.equal(r.reviewTotal, 3600);
+  assert.equal(r.kioskTotal, 3600);
+  assert.equal(r.skillTotal, 3500);
+  assert.equal(r.totalSource, 'review');
+  assert.equal(r.ok, false);
+  assert.match(r.totalMismatch, /3,500.*3,600/);
+});
+
+test('I-195: with the charge in the skill, take-out and eat-in orders match the review total', async () => {
+  useKiosk('review.html');
+  const skill = skillOf('review.skill.json');
+  const take = await runOrder(skill, { dineOption: '포장해요', lines: [line('커피', ['라지']), line('쿠키', [])] });
+  assert.equal(take.error, undefined);
+  assert.deepEqual([take.kioskTotal, take.skillTotal, take.ok, take.totalMismatch], [5100, 5100, true, undefined]);
+  const eat = await runOrder(skill, { dineOption: '먹고 가요', lines: [line('커피', [])] });
+  assert.deepEqual([eat.kioskTotal, eat.skillTotal, eat.ok], [3000, 3000, true]);
+  assert.equal(expectedTotal(skill, { dineOption: '포장해요', lines: [line('쿠키', [], 2)] }), 3100);
+  assert.deepEqual(lintSkill(skill), []);
+});
+
+test('I-195: a skill without review on a kiosk with an order button says so, and the total comes from the cart', async () => {
+  useKiosk('review.html');
+  const skill = skillOf('review.skill.json');
+  delete skill.review;
+  delete skill.charges;
+  const r = await runOrder(skill, { dineOption: '포장해요', lines: [line('쿠키', [])] });
+  assert.equal(r.totalSource, 'cart');
+  assert.equal(r.kioskTotal, 1500);
+  assert.equal(r.reviewOpener, '주문하기');
+});
+
+test('I-195: an order button that sends the order (no payment step after it) is flagged and fails', async () => {
+  useKiosk('review.html?send=1');
+  const r = await runOrder(skillOf('review.skill.json'), { dineOption: '먹고 가요', lines: [line('쿠키', [])] });
+  assert.equal(r.ok, false);
+  assert.equal(r.reviewUnsafe, true);
+  assert.match(r.error, /no payment step/);
+});
+
+test('I-195: a review that would tap a payment control is refused before any click, and the lint says why', async () => {
+  useKiosk('review.html');
+  const skill = skillOf('review.skill.json');
+  skill.review.open = [{ op: 'openReview', label: '주문하기' }, { op: 'click', label: '결제하기' }];
+  const r = await runOrder(skill, { dineOption: '먹고 가요', lines: [line('쿠키', [])] });
+  assert.match(r.error, /refused before any click/);
+  assert.match(lintSkill(skill).join('\n'), /review.*payment or checkout control \(결제하기\)/);
+  const pay = skillOf('review.skill.json');
+  pay.review.open = [{ op: 'openReview', label: '결제하기' }];
+  assert.match((await runOrder(pay, { dineOption: '먹고 가요', lines: [line('쿠키', [])] })).error, /refused before any click/);
+  assert.match(lintSkill(pay).join('\n'), /openReview .*order button/);
+  const elsewhere = skillOf('review.skill.json');
+  elsewhere.recipes.addToCart.push({ op: 'openReview', label: '주문하기' });
+  assert.match(lintSkill(elsewhere).join('\n'), /openReview .*only in review.open/);
+  const charge = skillOf('review.skill.json');
+  charge.charges = [{ name: '포장 용기', amount: 100, dineOption: '포장' }];
+  assert.match(lintSkill(charge).join('\n'), /charge "포장 용기".*dineOption/);
+});
+
+test('I-197: coverage lists option groups no passing order used; a 0원 pick does not cover a priced group', () => {
+  const skill = skillOf('stepper.skill.json');
+  const o = (...lines) => ({ lines });
+  assert.deepEqual(uncoveredGroups(skill, [o(line('스콘', []))]).map((g) => g.group), ['온도', '얼음량', '추가']);
+  assert.deepEqual(uncoveredGroups(skill, [o(line('라떼', ['HOT', '바닐라 시럽']))]).map((g) => g.group), ['얼음량']);
+  assert.deepEqual(uncoveredGroups(skill, [o(line('라떼', ['ICED', '적게', '에스프레소 샷']))]), []);
+  // A group with priced options needs a priced pick: a 0원 pick cannot show a wrong price.
+  const sized = skillOf('review.skill.json');
+  assert.deepEqual(uncoveredGroups(sized, [o(line('커피', ['레귤러']))]).map((g) => [g.group, g.item]), [['사이즈', '커피']]);
+  assert.deepEqual(uncoveredGroups(sized, [o(line('커피', ['라지']))]), []);
+  // Sold-out items cannot be ordered, so their groups are not asked for; a group shared by two items counts once.
+  sized.catalog.push({ name: '라떼', category: '메뉴', price: 3500, soldOut: true, optionGroups: [{ name: '샷', options: [{ name: '샷 추가', priceDelta: 500 }] }] },
+    { name: '티', category: '메뉴', price: 2500, soldOut: false, optionGroups: [structuredClone(sized.catalog[0].optionGroups[0])] });
+  assert.deepEqual(uncoveredGroups(sized, [o(line('티', ['라지']))]), []);
 });

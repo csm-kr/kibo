@@ -1,0 +1,75 @@
+{
+  "n": 83,
+  "at": "2026-10-14T02:21:21.507Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "커피"
+      },
+      {
+        "op": "click",
+        "label": "아메리카노"
+      },
+      {
+        "op": "click",
+        "label": "HOT"
+      },
+      {
+        "op": "click",
+        "label": "레귤러"
+      },
+      {
+        "op": "click",
+        "label": "다락 블렌드"
+      },
+      {
+        "op": "click",
+        "label": "장바구니 담기"
+      }
+    ]
+  },
+  "resultSummary": "tapped 커피 → 아메리카노 → HOT → 레귤러 → 다락 블렌드 → 장바구니 담기",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "커피"
+          },
+          {
+            "op": "click",
+            "label": "아메리카노"
+          },
+          {
+            "op": "click",
+            "label": "HOT"
+          },
+          {
+            "op": "click",
+            "label": "레귤러"
+          },
+          {
+            "op": "click",
+            "label": "다락 블렌드"
+          },
+          {
+            "op": "click",
+            "label": "장바구니 담기"
+          }
+        ]
+      },
+      "resultSummary": "tapped 커피 → 아메리카노 → HOT → 레귤러 → 다락 블렌드 → 장바구니 담기"
+    }
+  ],
+  "discoveries": {
+    "items": 5,
+    "optionGroups": 25,
+    "categories": 2
+  },
+  "inputTokens": 17321,
+  "outputTokens": 98
+}

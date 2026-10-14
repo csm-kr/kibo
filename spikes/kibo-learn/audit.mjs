@@ -28,7 +28,7 @@ async function tappables(page, alerts) {
 async function optionGaps(skill) {
   const gaps = {};
   const dine = Object.values(skill.dineOptions ?? {})[0];
-  const opts = { forbidden: skill.forbiddenLabels };
+  const opts = { forbidden: skill.forbiddenLabels, interrupts: skill.interrupts };
   const k = await freshMenu(skill);
   try {
     for (const item of (skill.catalog ?? []).filter((c) => !c.soldOut)) {
@@ -66,7 +66,7 @@ async function freshMenu(skill) {
   const k = await openKiosk();
   const dine = Object.values(skill.dineOptions ?? {})[0];
   try {
-    await runSteps(k.page, skill.recipes?.startOrder, { dineOption: dine }, { forbidden: skill.forbiddenLabels });
+    await runSteps(k.page, skill.recipes?.startOrder, { dineOption: dine }, { forbidden: skill.forbiddenLabels, interrupts: skill.interrupts });
   } catch (e) {
     await k.browser.close();
     throw e;

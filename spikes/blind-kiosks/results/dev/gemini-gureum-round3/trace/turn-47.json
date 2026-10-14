@@ -1,0 +1,51 @@
+{
+  "n": 47,
+  "at": "2026-10-14T01:36:52.971Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "전체 취소"
+      },
+      {
+        "op": "click",
+        "label": "삭제"
+      },
+      {
+        "op": "click",
+        "label": "초코칩 쿠키"
+      }
+    ]
+  },
+  "resultSummary": "tapped 전체 취소 → 삭제 → 초코칩 쿠키",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "전체 취소"
+          },
+          {
+            "op": "click",
+            "label": "삭제"
+          },
+          {
+            "op": "click",
+            "label": "초코칩 쿠키"
+          }
+        ]
+      },
+      "resultSummary": "tapped 전체 취소 → 삭제 → 초코칩 쿠키"
+    }
+  ],
+  "discoveries": {
+    "items": 3,
+    "optionGroups": 10,
+    "categories": 1
+  },
+  "inputTokens": 9031,
+  "outputTokens": 54
+}

@@ -1,0 +1,72 @@
+<!doctype html>
+<!-- Synthetic fixture for learner regression tests (spikes/kibo-learn/patterns.test.mjs), written from I-195: the menu
+     screen's cart shows the items only; the order button (주문하기) opens an order review that adds a 100원 take-out
+     container charge and shows the final total, with 이전 (back to the menu) and 결제하기 (payment methods).
+     ?send=1 is a pay-later device: 주문하기 sends the order at once and shows an order number, with no payment step. -->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>패턴: 주문 확인 화면</title>
+<style>
+  body { font-family: sans-serif; margin: 0; padding: 8px; }
+  .tile, .opt { cursor: pointer; border: 1px solid #999; padding: 12px; margin: 6px; display: inline-block; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<section id="home"><h1>모의 분식</h1><button id="start">시작하기</button></section>
+<section id="where" class="hidden"><h2>어디서 드시나요?</h2><button data-where="eat">먹고 가요</button><button data-where="take">포장해요</button></section>
+<section id="menu" class="hidden">
+  <div class="tile" data-item="커피"><div>커피</div><div>3,000원</div></div>
+  <div class="tile" data-item="쿠키"><div>쿠키</div><div>1,500원</div></div>
+  <section id="sheet" class="hidden" role="dialog">
+    <h2 id="title"></h2>
+    <div id="sizes"><h3>사이즈</h3><span class="opt" data-v="레귤러" data-p="0"><b>레귤러</b></span><span class="opt" data-v="라지" data-p="500"><b>라지</b> <small>+500원</small></span></div>
+    <button id="cancel">취소</button><button id="add">담기</button>
+  </section>
+  <section id="cart"><h2>장바구니</h2><ul id="lines"></ul><div id="total">합계 0원</div><button id="checkout">주문하기</button></section>
+</section>
+<section id="review" class="hidden"><h2>주문 내역 확인</h2><ul id="review-lines"></ul><div id="review-total"></div>
+  <button id="back">이전</button><button id="to-pay">결제하기</button></section>
+<section id="pay" class="hidden"><h2>결제 수단 선택</h2><button>카드 결제</button><button>간편결제</button></section>
+<section id="sent" class="hidden"><h2>주문이 접수되었습니다</h2><p>주문번호 101</p><button id="again">처음으로</button></section>
+<script>
+  const $ = (s) => document.querySelector(s);
+  const show = (id, on) => $('#' + id).classList.toggle('hidden', !on);
+  const won = (n) => n.toLocaleString('en-US') + '원';
+  const PRICES = { 커피: 3000, 쿠키: 1500 };
+  const TAKE_OUT_CHARGE = 100;
+  const sendAtOnce = new URLSearchParams(location.search).get('send') === '1';
+  const lines = [];
+  let where = null;
+  let cur = null;
+  $('#start').onclick = () => { show('home', false); show('where', true); };
+  document.querySelectorAll('[data-where]').forEach((b) => { b.onclick = () => { where = b.dataset.where; show('where', false); show('menu', true); }; });
+  document.querySelectorAll('.tile').forEach((t) => { t.onclick = () => { cur = { item: t.dataset.item, size: null }; $('#title').textContent = cur.item; show('sizes', cur.item === '커피'); show('sheet', true); }; });
+  document.querySelectorAll('.opt').forEach((o) => { o.onclick = () => { cur.size = o; }; });
+  $('#cancel').onclick = () => show('sheet', false);
+  $('#add').onclick = () => {
+    const extra = cur.size ? Number(cur.size.dataset.p) : 0;
+    lines.push({ name: cur.item, desc: cur.size ? [cur.size.dataset.v] : [], unit: PRICES[cur.item] + extra });
+    show('sheet', false);
+    render();
+  };
+  const subtotal = () => lines.reduce((a, l) => a + l.unit, 0);
+  function render() {
+    $('#lines').innerHTML = lines.map((l) => `<li>${l.name}${l.desc.length ? ' (' + l.desc.join(', ') + ')' : ''} ${won(l.unit)}</li>`).join('');
+    $('#total').textContent = '합계 ' + won(subtotal());
+  }
+  $('#checkout').onclick = () => {
+    if (!lines.length) return;
+    show('menu', false);
+    if (sendAtOnce) { show('sent', true); return; }
+    const charge = where === 'take' ? TAKE_OUT_CHARGE : 0;
+    $('#review-lines').innerHTML = lines.map((l) => `<li>${l.name} ${won(l.unit)}</li>`).join('') + (charge ? `<li>포장 용기 ${won(charge)}</li>` : '');
+    $('#review-total').textContent = '총 결제금액 ' + won(subtotal() + charge);
+    show('review', true);
+  };
+  $('#back').onclick = () => { show('review', false); show('menu', true); };
+  $('#to-pay').onclick = () => { show('review', false); show('pay', true); };
+</script>
+</body>
+</html>

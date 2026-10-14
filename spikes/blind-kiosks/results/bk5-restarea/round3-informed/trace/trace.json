@@ -1,0 +1,18 @@
+{
+  "kioskId": "bk5-restarea",
+  "provider": "gemini",
+  "model": "gemini-3.8-flash",
+  "startedAt": "2026-10-14T02:01:27.982Z",
+  "endedAt": "2026-10-14T02:10:44.714Z",
+  "gate": {
+    "tests": 2,
+    "testsPassedForFinish": true,
+    "audits": 3,
+    "auditOk": true,
+    "finished": true
+  },
+  "turns": 73,
+  "inputTokens": 655570,
+  "cachedInputTokens": 379528,
+  "outputTokens": 14737
+}

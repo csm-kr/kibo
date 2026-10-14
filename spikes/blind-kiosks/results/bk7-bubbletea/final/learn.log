@@ -1,0 +1,89 @@
+#1 snapshot 
+#2 act {"op":"click","label":"펄린당"}
+#3 act {"op":"click","label":"매장에서 먹고 갈게요"}
+#4 act {"op":"click","label":"클래식 밀크티"}
+#5 act {"label":"HOT","op":"click"}
+#6 act {"op":"click","label":"취소"}
+#7 act {"op":"click","label":"흑당 펄 밀크티"}
+#8 act {"label":"치즈폼","within":"토핑","op":"click"}
+#9 act {"label":"치즈폼","within":"토핑","op":"click"}
+#10 act {"op":"click","name":"담기","role":"button"}
+#11 act {"op":"click","label":"얼음 보통"}
+#12 act {"op":"click","role":"button","name":"담기"}
+#13 act [{"label":"50%","op":"click"},{"role":"button","op":"click","name":"담기"}]
+#14 act {"label":"음료만 주문할게요","op":"click"}
+#15 act {"label":"적립 안 함","op":"click"}
+#16 act [{"label":"클래식 밀크티","op":"click"},{"label":"ICE","op":"click"},{"label":"얼음 보통","op":"click"},{"op":"click","label":"50%"},{"role":"button","name":"담기","op":"click"}]
+#17 act {"op":"click","label":"음료만 주문할게요"}
+#18 act {"label":"스낵","op":"click"}
+#19 act {"op":"click","label":"펑리수"}
+#20 act {"op":"click","role":"button","name":"담기"}
+#21 act {"op":"openReview","label":"주문하기"}
+#22 act {"label":"포장","op":"click"}
+#23 act {"op":"click","label":"‹ 메뉴 추가"}
+#24 act {"op":"click","label":"전체삭제"}
+#25 reload 
+#26 act [{"label":"펄린당","op":"click"},{"op":"click","label":"매장에서 먹고 갈게요"}]
+#27 act {"label":"과일티","op":"click"}
+#28 act {"op":"click","label":"치즈폼"}
+#29 act {"label":"커피","op":"click"}
+#30 act {"op":"click","label":"스낵"}
+#31 act {"op":"click","label":"겨울 시즌"}
+#32 act {"op":"click","label":"군고구마 밀크티"}
+#33 act {"label":"취소","op":"click"}
+#34 act {"op":"click","label":"딸기 펄 우유"}
+#35 act [{"op":"click","label":"취소"},{"label":"커피","op":"click"},{"label":"아메리카노","op":"click"}]
+#36 act [{"op":"click","label":"취소"},{"label":"카페라떼","op":"click"}]
+#37 act [{"op":"click","label":"취소"},{"op":"click","label":"바닐라 라떼"}]
+#38 act [{"op":"click","label":"취소"},{"op":"click","label":"흑당 카페라떼"}]
+#39 act [{"label":"취소","op":"click"},{"label":"원앙 커피 밀크티","op":"click"}]
+#40 act [{"op":"click","label":"취소"},{"label":"치즈폼","op":"click"},{"label":"치즈폼 우롱티","op":"click"}]
+#41 act [{"op":"click","label":"취소"},{"op":"click","label":"과일티"}]
+#42 act {"label":"자몽 그린티","op":"click"}
+#43 act [{"op":"click","label":"취소"},{"op":"click","label":"레몬 홍차"}]
+#44 act [{"label":"취소","op":"click"},{"op":"click","label":"밀크티"}]
+#45 act {"op":"click","label":"얼그레이 밀크티"}
+#46 act [{"label":"취소","op":"click"},{"op":"click","label":"겨울 시즌"},{"op":"click","label":"생강 흑당 밀크티"}]
+#47 act [{"op":"click","label":"취소"},{"label":"스낵","op":"click"},{"op":"click","label":"지파이"}]
+#48 act [{"label":"취소","op":"click"},{"label":"누가크래커","op":"click"}]
+#49 act [{"label":"취소","op":"click"},{"op":"click","label":"대만 카스테라"}]
+#50 act {"op":"click","label":"취소"}
+#51 act [{"op":"click","label":"펑리수"},{"name":"담기","op":"click","role":"button"},{"op":"openReview","label":"주문하기"}]
+#52 act {"op":"click","label":"적립 안 함"}
+#53 act {"op":"openReview","label":"주문하기"}
+#54 act {"label":"‹ 메뉴 추가","op":"click"}
+#55 act {"label":"펑리수","op":"click"}
+#56 act {"within":"수량","op":"click","label":"+"}
+#57 act {"label":"취소","op":"click"}
+#58 act [{"label":"밀크티","op":"click"},{"label":"클래식 밀크티","op":"click"},{"label":"타피오카 펄","op":"click","within":"토핑"}]
+#59 act {"label":"취소","op":"click"}
+#60 act [{"op":"click","label":"커피"},{"label":"아메리카노","op":"click"},{"op":"click","label":"+","within":"에스프레소 샷"}]
+#61 act {"label":"취소","op":"click"}
+#62 record 
+#63 audit 
+  audit #1: GAPS missing=0 unknown=0 hidden=1 itemsMissingOptions=0
+#64 audit 
+  audit #2: GAPS missing=0 unknown=0 hidden=1 itemsMissingOptions=0
+#65 audit 
+  audit #3: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=0
+#66 testSkill 
+  test #1: PASS lint=100 uncovered=3
+#67 audit 
+  audit #4: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=0
+#68 snapshot 
+#69 act [{"label":"밀크티","op":"click"},{"label":"클래식 밀크티","op":"click"}]
+#70 audit 
+  audit #5: GAPS missing=30 unknown=0 hidden=1 itemsMissingOptions=0
+#71 act {"label":"당도 0%","op":"click"}
+#72 testSkill 
+  test #2: FAIL uncovered=7
+    order 1: locator.click: Timeout 3000ms exceeded.
+#73 testSkill 
+  test #3: PASS PASS PASS
+#74 testSkill 
+  test #4: PASS PASS PASS
+#75 audit 
+  audit #6: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=0
+#76 finish 
+  finish audit: OK
+{"provider":"gemini","model":"gemini-3.8-flash","learner":{"commit":"abb849586575a2cf637aec04d297cdf76c4cd3c7","dirty":false},"cachedInputTokens":972703,"finished":true,"turns":76,"acts":91,"tests":4,"inputTokens":1694030,"outputTokens":83357,"minutes":"27.3"}

@@ -1,0 +1,37 @@
+{
+  "n": 99,
+  "at": "2026-10-14T03:42:39.941Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "주문하기",
+        "within": "돌아가기"
+      }
+    ]
+  },
+  "resultSummary": "act failed: Refused: \"주문하기\" is a payment or checkout control; a skill never needs it (list it in forbiddenLabels)",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "주문하기",
+            "within": "돌아가기"
+          }
+        ]
+      },
+      "resultSummary": "act failed: Refused: \"주문하기\" is a payment or checkout control; a skill never needs it (list it in forbiddenLabels)"
+    }
+  ],
+  "discoveries": {
+    "items": 37,
+    "optionGroups": 13,
+    "categories": 6
+  },
+  "inputTokens": 107023,
+  "outputTokens": 32
+}

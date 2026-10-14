@@ -1,0 +1,43 @@
+{
+  "n": 48,
+  "at": "2026-10-14T02:59:04.610Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "취소"
+      },
+      {
+        "op": "click",
+        "label": "누가크래커"
+      }
+    ]
+  },
+  "resultSummary": "tapped 취소 → 누가크래커",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "취소"
+          },
+          {
+            "op": "click",
+            "label": "누가크래커"
+          }
+        ]
+      },
+      "resultSummary": "tapped 취소 → 누가크래커"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 10183,
+  "outputTokens": 40
+}

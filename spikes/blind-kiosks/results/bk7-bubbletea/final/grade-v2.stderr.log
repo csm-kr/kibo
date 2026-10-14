@@ -1,0 +1,12 @@
+  h1 safeRefusal (option not in the skill: 타로 밀크티 › 30%)
+  h2 safeRefusal (option not in the skill: 자몽 그린티 › 50%)
+  h3 safeRefusal (option not in the skill: 얼그레이 밀크티 › 70%)
+  h4 safeRefusal (option not in the skill: 흑당 펄 밀크티 › 100%)
+  h5 safeRefusal (option not in the skill: 카페라떼 › 스낵 세트로 변경)
+  h6 safeRefusal (option not in the skill: 망고 우롱티 › 0%)
+  h7 safeRefusal (option not in the skill: 아메리카노 › 음료만 주문할게요)
+  h8 safeRefusal (option not in the skill: 군고구마 밀크티 › 70%)
+  h9 safeRefusal (option not in the skill: 패션후르츠 그린티 › 30%)
+  h10 safeRefusal (option not in the skill: 치즈폼 우롱티 › 50%)
+bk7-bubbletea/final: learning finished, 27.3 min, 76 turns, 1694030 input tokens; items 31/31 (precision 1), price 31/31, options exact 1/27 (openable 1/26); orders correct 0, safe refusal 10, unsafe 0 of 10 (cart lines read in 0; kiosk total from the order review; menu cart total only: 0 / 10 / 0)
+written: spikes/blind-kiosks/results/bk7-bubbletea/final/grade-v2.json
