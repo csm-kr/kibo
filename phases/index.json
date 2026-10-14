@@ -69,6 +69,10 @@
       "dir": "14-final",
       "status": "completed",
       "completed_at": "2026-10-14T22:52:11+0900"
+    },
+    {
+      "dir": "15-judge-fixes",
+      "status": "pending"
     }
   ]
 }

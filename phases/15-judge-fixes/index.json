@@ -1,0 +1,13 @@
+{
+  "project": "KIBO",
+  "phase": "15-judge-fixes",
+  "steps": [
+    { "step": 0, "name": "agent-recovery", "status": "pending" },
+    { "step": 1, "name": "learned-and-rail", "status": "pending" },
+    { "step": 2, "name": "phone-ux", "status": "pending" },
+    { "step": 3, "name": "learn-clarity", "status": "pending" },
+    { "step": 4, "name": "bridge-parity", "status": "pending" },
+    { "step": 5, "name": "ops-scale", "status": "pending" },
+    { "step": 6, "name": "qa", "status": "pending" }
+  ]
+}
