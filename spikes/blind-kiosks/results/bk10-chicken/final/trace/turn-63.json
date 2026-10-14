@@ -1,0 +1,85 @@
+{
+  "n": 63,
+  "at": "2026-10-14T04:57:19.738Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "전체삭제"
+      },
+      {
+        "op": "click",
+        "label": "전체삭제",
+        "within": "취소"
+      },
+      {
+        "op": "click",
+        "label": "세트"
+      },
+      {
+        "op": "click",
+        "label": "혼닭세트"
+      },
+      {
+        "op": "click",
+        "label": "후라이드"
+      },
+      {
+        "op": "click",
+        "label": "뼈"
+      },
+      {
+        "op": "click",
+        "label": "장바구니 담기"
+      }
+    ]
+  },
+  "resultSummary": "tapped 전체삭제 → 전체삭제 → 세트 → 혼닭세트 → 후라이드 → 뼈 → 장바구니 담기",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "전체삭제"
+          },
+          {
+            "op": "click",
+            "label": "전체삭제",
+            "within": "취소"
+          },
+          {
+            "op": "click",
+            "label": "세트"
+          },
+          {
+            "op": "click",
+            "label": "혼닭세트"
+          },
+          {
+            "op": "click",
+            "label": "후라이드"
+          },
+          {
+            "op": "click",
+            "label": "뼈"
+          },
+          {
+            "op": "click",
+            "label": "장바구니 담기"
+          }
+        ]
+      },
+      "resultSummary": "tapped 전체삭제 → 전체삭제 → 세트 → 혼닭세트 → 후라이드 → 뼈 → 장바구니 담기"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 40200,
+  "outputTokens": 117
+}

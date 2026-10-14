@@ -1,0 +1,75 @@
+{
+  "n": 52,
+  "at": "2026-10-14T04:53:04.002Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "취소"
+      },
+      {
+        "op": "click",
+        "label": "반반치킨"
+      },
+      {
+        "op": "click",
+        "label": "후라이드"
+      },
+      {
+        "op": "click",
+        "label": "양념"
+      },
+      {
+        "op": "click",
+        "label": "뼈"
+      },
+      {
+        "op": "click",
+        "label": "장바구니 담기"
+      }
+    ]
+  },
+  "resultSummary": "tapped 취소 → 반반치킨 → 후라이드 → 양념 → 뼈 → 장바구니 담기",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "취소"
+          },
+          {
+            "op": "click",
+            "label": "반반치킨"
+          },
+          {
+            "op": "click",
+            "label": "후라이드"
+          },
+          {
+            "op": "click",
+            "label": "양념"
+          },
+          {
+            "op": "click",
+            "label": "뼈"
+          },
+          {
+            "op": "click",
+            "label": "장바구니 담기"
+          }
+        ]
+      },
+      "resultSummary": "tapped 취소 → 반반치킨 → 후라이드 → 양념 → 뼈 → 장바구니 담기"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 27262,
+  "outputTokens": 95
+}

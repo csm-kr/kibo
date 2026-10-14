@@ -1,0 +1,173 @@
+{
+  "n": 60,
+  "at": "2026-10-14T04:56:45.163Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "달빛닭장"
+      },
+      {
+        "op": "click",
+        "label": "포장 주문"
+      },
+      {
+        "op": "click",
+        "label": "20분 후"
+      },
+      {
+        "op": "click",
+        "label": "확인"
+      },
+      {
+        "op": "click",
+        "label": "치킨"
+      },
+      {
+        "op": "click",
+        "label": "바삭 후라이드"
+      },
+      {
+        "op": "click",
+        "label": "반 마리"
+      },
+      {
+        "op": "click",
+        "label": "순살"
+      },
+      {
+        "op": "click",
+        "label": "양념소스"
+      },
+      {
+        "op": "click",
+        "label": "+",
+        "within": "수량"
+      },
+      {
+        "op": "click",
+        "label": "장바구니 담기"
+      },
+      {
+        "op": "click",
+        "label": "사이드"
+      },
+      {
+        "op": "click",
+        "label": "떡볶이"
+      },
+      {
+        "op": "click",
+        "label": "보통맛"
+      },
+      {
+        "op": "click",
+        "label": "장바구니 담기"
+      },
+      {
+        "op": "click",
+        "label": "음료/주류"
+      },
+      {
+        "op": "click",
+        "label": "생맥주 500cc"
+      },
+      {
+        "op": "click",
+        "label": "네, 19세 이상입니다"
+      }
+    ]
+  },
+  "resultSummary": "tapped 달빛닭장 → 포장 주문 → 20분 후 → 확인 → 치킨 → 바삭 후라이드 → 반 마리 → 순살 → 양념소스 → + → 장바구니 담기 → 사이드 → 떡볶이 → 보통맛 → 장바구니 담기 → 음료/주류 → 생맥주 500cc → 네, 19세 이상입니다",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "달빛닭장"
+          },
+          {
+            "op": "click",
+            "label": "포장 주문"
+          },
+          {
+            "op": "click",
+            "label": "20분 후"
+          },
+          {
+            "op": "click",
+            "label": "확인"
+          },
+          {
+            "op": "click",
+            "label": "치킨"
+          },
+          {
+            "op": "click",
+            "label": "바삭 후라이드"
+          },
+          {
+            "op": "click",
+            "label": "반 마리"
+          },
+          {
+            "op": "click",
+            "label": "순살"
+          },
+          {
+            "op": "click",
+            "label": "양념소스"
+          },
+          {
+            "op": "click",
+            "label": "+",
+            "within": "수량"
+          },
+          {
+            "op": "click",
+            "label": "장바구니 담기"
+          },
+          {
+            "op": "click",
+            "label": "사이드"
+          },
+          {
+            "op": "click",
+            "label": "떡볶이"
+          },
+          {
+            "op": "click",
+            "label": "보통맛"
+          },
+          {
+            "op": "click",
+            "label": "장바구니 담기"
+          },
+          {
+            "op": "click",
+            "label": "음료/주류"
+          },
+          {
+            "op": "click",
+            "label": "생맥주 500cc"
+          },
+          {
+            "op": "click",
+            "label": "네, 19세 이상입니다"
+          }
+        ]
+      },
+      "resultSummary": "tapped 달빛닭장 → 포장 주문 → 20분 후 → 확인 → 치킨 → 바삭 후라이드 → 반 마리 → 순살 → 양념소스 → + → 장바구니 담기 → 사이드 → 떡볶이 → 보통맛 → 장바구니 담기 → 음료/주류 → 생맥주 500cc → 네, 19세 이상입니다"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 36479,
+  "outputTokens": 286
+}

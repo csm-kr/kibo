@@ -50,3 +50,14 @@ Committed before either fresh kiosk is learned. The orchestrator read only the t
 - **Order of runs:** the Mac is on battery, so the two fresh runs go first (bk9, then bk10, one at a time), and the informed runs (bk7 attempt 2, Doughhouse, bk8) after them. The learner is frozen at `a9522a4`, so the order changes nothing about either set.
 - **Grading:** grader at this commit with the round-3 rules and the `declines` rule above. Both keys name the dine choice with `dine` (the kiosk's own label). bk10's `pickupTime` (a pickup slot with no price effect) is not graded: the grader checks the kiosk total and cart lines, and the slot shows in neither; recorded as a limit. A key `note` describes how a customer might reach the order, not part of it.
 - One learning run per kiosk (`gemini-3.8-flash`, 2M input-token cap, 30 min kill, `TRACE_DIR`), no rerun except once after a crash; both reported whatever the result.
+
+### Fresh results (round 4; learning code of `a9522a4`, run at `34532bc` which adds only these kiosks and the rules above; `learner.dirty: false`)
+| Kiosk | Learning | Items / prices | Orders correct / safe refusal / unsafe | Skill's own total ≠ kiosk's | Cost (USD, Gemini API list prices in `evidence/cost-per-order.json`) |
+|---|---|---|---|---|---|
+| `bk9-bunsik` | finished, 85 turns, 9.6 min, 1,369,557 input tokens (75% cached), 6,924 output, 2 self-tests | 32/32, 31/32 | **10 / 0 / 0** (cart lines read in 10) | 0 of 10 | 0.36 |
+| `bk10-chicken` | finished, 74 turns, 14.2 min, 1,444,182 input tokens (70% cached), 8,873 output, 3 self-tests | 30/30, 30/30 | **8 / 2 / 0** (kiosk total from the order review) | 2 of 8 (h1, h6) | 0.43 |
+| **Round 4 fresh, both** | | 62/62 items | **18 / 2 / 0 of 20** | 2 of 18 | 0.79 |
+- bk10's two refusals (h3, h10) ask for the set's "콜라 1.25L 변경" upsell, which the skill does not model, so they were refused before the first tap (safe).
+- Run one at a time, in this order: bk9 13:36–13:46, bk10 13:46–14:00 KST, 10-14; no crash, no rerun, no kill.
+- Compared with round 3's fresh pair (bk7 0/10/0, bk8 not learned) and phase 13's (bk5 4/3/3, bk6 10/0/0). Each round's fresh kiosks were new to the learner of that round; together: 32 correct / 15 refused / 3 unsafe / 10 not learned of 60 orders over 6 never-seen kiosks, with the last 3 unsafe in round 2.
+- Informed runs (bk7 attempt 2, Doughhouse regression, bk8) were not run yet (battery); they never count as unseen-kiosk results.

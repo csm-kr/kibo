@@ -1,0 +1,1143 @@
+{
+  "kiosk": "달빛닭장",
+  "categories": [
+    "치킨",
+    "반반",
+    "사이드",
+    "소스",
+    "음료/주류",
+    "세트"
+  ],
+  "uiLabels": [
+    "전체삭제",
+    "취소",
+    "장바구니 담기",
+    "−",
+    "+",
+    "삭제",
+    "이전으로",
+    "품절",
+    "아니요",
+    "네, 19세 이상입니다",
+    "변경할게요"
+  ],
+  "forbiddenLabels": [
+    "결제하기",
+    "처음으로"
+  ],
+  "dineOptions": {
+    "eat_in": "매장 식사",
+    "take_out": "포장 주문"
+  },
+  "catalog": [
+    {
+      "name": "바삭 후라이드",
+      "category": "치킨",
+      "price": 18000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "한 마리",
+              "priceDelta": 0
+            },
+            {
+              "name": "반 마리",
+              "priceDelta": -7000
+            }
+          ]
+        },
+        {
+          "name": "뼈/순살 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "뼈",
+              "priceDelta": 0
+            },
+            {
+              "name": "순살",
+              "priceDelta": 2000
+            }
+          ]
+        },
+        {
+          "name": "소스 추가 선택",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "options": [
+            {
+              "name": "양념소스",
+              "priceDelta": 0
+            },
+            {
+              "name": "허니머스타드",
+              "priceDelta": 0
+            },
+            {
+              "name": "갈릭마요",
+              "priceDelta": 0
+            },
+            {
+              "name": "매운디핑소스",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "달빛 양념치킨",
+      "category": "치킨",
+      "price": 19000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "한 마리",
+              "priceDelta": 0
+            },
+            {
+              "name": "반 마리",
+              "priceDelta": -7000
+            }
+          ]
+        },
+        {
+          "name": "뼈/순살 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "뼈",
+              "priceDelta": 0
+            },
+            {
+              "name": "순살",
+              "priceDelta": 2000
+            }
+          ]
+        },
+        {
+          "name": "소스 추가 선택",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "options": [
+            {
+              "name": "양념소스",
+              "priceDelta": 0
+            },
+            {
+              "name": "허니머스타드",
+              "priceDelta": 0
+            },
+            {
+              "name": "갈릭마요",
+              "priceDelta": 0
+            },
+            {
+              "name": "매운디핑소스",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "간장마늘치킨",
+      "category": "치킨",
+      "price": 20000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "한 마리",
+              "priceDelta": 0
+            },
+            {
+              "name": "반 마리",
+              "priceDelta": -7000
+            }
+          ]
+        },
+        {
+          "name": "뼈/순살 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "뼈",
+              "priceDelta": 0
+            },
+            {
+              "name": "순살",
+              "priceDelta": 2000
+            }
+          ]
+        },
+        {
+          "name": "소스 추가 선택",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "options": [
+            {
+              "name": "양념소스",
+              "priceDelta": 0
+            },
+            {
+              "name": "허니머스타드",
+              "priceDelta": 0
+            },
+            {
+              "name": "갈릭마요",
+              "priceDelta": 0
+            },
+            {
+              "name": "매운디핑소스",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "매운불꽃치킨",
+      "category": "치킨",
+      "price": 20000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "한 마리",
+              "priceDelta": 0
+            },
+            {
+              "name": "반 마리",
+              "priceDelta": -7000
+            }
+          ]
+        },
+        {
+          "name": "뼈/순살 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "뼈",
+              "priceDelta": 0
+            },
+            {
+              "name": "순살",
+              "priceDelta": 2000
+            }
+          ]
+        },
+        {
+          "name": "소스 추가 선택",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "options": [
+            {
+              "name": "양념소스",
+              "priceDelta": 0
+            },
+            {
+              "name": "허니머스타드",
+              "priceDelta": 0
+            },
+            {
+              "name": "갈릭마요",
+              "priceDelta": 0
+            },
+            {
+              "name": "매운디핑소스",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "허니버터치킨",
+      "category": "치킨",
+      "price": 20000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "한 마리",
+              "priceDelta": 0
+            },
+            {
+              "name": "반 마리",
+              "priceDelta": -7000
+            }
+          ]
+        },
+        {
+          "name": "뼈/순살 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "뼈",
+              "priceDelta": 0
+            },
+            {
+              "name": "순살",
+              "priceDelta": 2000
+            }
+          ]
+        },
+        {
+          "name": "소스 추가 선택",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "options": [
+            {
+              "name": "양념소스",
+              "priceDelta": 0
+            },
+            {
+              "name": "허니머스타드",
+              "priceDelta": 0
+            },
+            {
+              "name": "갈릭마요",
+              "priceDelta": 0
+            },
+            {
+              "name": "매운디핑소스",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "치즈시즈닝치킨",
+      "category": "치킨",
+      "price": 21000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "한 마리",
+              "priceDelta": 0
+            },
+            {
+              "name": "반 마리",
+              "priceDelta": -7000
+            }
+          ]
+        },
+        {
+          "name": "뼈/순살 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "뼈",
+              "priceDelta": 0
+            },
+            {
+              "name": "순살",
+              "priceDelta": 2000
+            }
+          ]
+        },
+        {
+          "name": "소스 추가 선택",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "options": [
+            {
+              "name": "양념소스",
+              "priceDelta": 0
+            },
+            {
+              "name": "허니머스타드",
+              "priceDelta": 0
+            },
+            {
+              "name": "갈릭마요",
+              "priceDelta": 0
+            },
+            {
+              "name": "매운디핑소스",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "파닭치킨",
+      "category": "치킨",
+      "price": 21000,
+      "soldOut": true
+    },
+    {
+      "name": "반반치킨",
+      "category": "반반",
+      "price": 19000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "반반 첫 번째 맛",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "후라이드",
+              "priceDelta": 0
+            },
+            {
+              "name": "양념",
+              "priceDelta": 0
+            },
+            {
+              "name": "치즈시즈닝",
+              "priceDelta": 2000
+            }
+          ]
+        },
+        {
+          "name": "반반 두 번째 맛",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "간장마늘",
+              "priceDelta": 1000
+            },
+            {
+              "name": "매운불꽃",
+              "priceDelta": 1000
+            },
+            {
+              "name": "허니버터",
+              "priceDelta": 1000
+            },
+            {
+              "name": "파닭",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "뼈/순살 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "뼈",
+              "priceDelta": 0
+            },
+            {
+              "name": "순살",
+              "priceDelta": 2000
+            }
+          ]
+        },
+        {
+          "name": "소스 추가 선택",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "options": [
+            {
+              "name": "양념소스",
+              "priceDelta": 0
+            },
+            {
+              "name": "허니머스타드",
+              "priceDelta": 0
+            },
+            {
+              "name": "갈릭마요",
+              "priceDelta": 0
+            },
+            {
+              "name": "매운디핑소스",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "반반치즈볼",
+      "category": "반반",
+      "price": 22000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "반반 첫 번째 맛",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "후라이드",
+              "priceDelta": 0
+            },
+            {
+              "name": "양념",
+              "priceDelta": 0
+            },
+            {
+              "name": "치즈시즈닝",
+              "priceDelta": 2000
+            }
+          ]
+        },
+        {
+          "name": "반반 두 번째 맛",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "간장마늘",
+              "priceDelta": 1000
+            },
+            {
+              "name": "매운불꽃",
+              "priceDelta": 1000
+            },
+            {
+              "name": "허니버터",
+              "priceDelta": 1000
+            },
+            {
+              "name": "파닭",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "뼈/순살 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "뼈",
+              "priceDelta": 0
+            },
+            {
+              "name": "순살",
+              "priceDelta": 2000
+            }
+          ]
+        },
+        {
+          "name": "소스 추가 선택",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "options": [
+            {
+              "name": "양념소스",
+              "priceDelta": 0
+            },
+            {
+              "name": "허니머스타드",
+              "priceDelta": 0
+            },
+            {
+              "name": "갈릭마요",
+              "priceDelta": 0
+            },
+            {
+              "name": "매운디핑소스",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "반반똥집",
+      "category": "반반",
+      "price": 23000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "반반 첫 번째 맛",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "후라이드",
+              "priceDelta": 0
+            },
+            {
+              "name": "양념",
+              "priceDelta": 0
+            },
+            {
+              "name": "치즈시즈닝",
+              "priceDelta": 2000
+            }
+          ]
+        },
+        {
+          "name": "반반 두 번째 맛",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "간장마늘",
+              "priceDelta": 1000
+            },
+            {
+              "name": "매운불꽃",
+              "priceDelta": 1000
+            },
+            {
+              "name": "허니버터",
+              "priceDelta": 1000
+            },
+            {
+              "name": "파닭",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "뼈/순살 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "뼈",
+              "priceDelta": 0
+            },
+            {
+              "name": "순살",
+              "priceDelta": 2000
+            }
+          ]
+        },
+        {
+          "name": "소스 추가 선택",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "options": [
+            {
+              "name": "양념소스",
+              "priceDelta": 0
+            },
+            {
+              "name": "허니머스타드",
+              "priceDelta": 0
+            },
+            {
+              "name": "갈릭마요",
+              "priceDelta": 0
+            },
+            {
+              "name": "매운디핑소스",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "감자튀김",
+      "category": "사이드",
+      "price": 3500,
+      "soldOut": false,
+      "recipe": "directAdd"
+    },
+    {
+      "name": "치즈볼",
+      "category": "사이드",
+      "price": 4000,
+      "soldOut": false,
+      "recipe": "directAdd"
+    },
+    {
+      "name": "똥집튀김",
+      "category": "사이드",
+      "price": 7000,
+      "soldOut": false,
+      "recipe": "directAdd"
+    },
+    {
+      "name": "콘샐러드",
+      "category": "사이드",
+      "price": 2000,
+      "soldOut": false,
+      "recipe": "directAdd"
+    },
+    {
+      "name": "떡볶이",
+      "category": "사이드",
+      "price": 5500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "맵기 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "순한맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "매운맛",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "치킨무 추가",
+      "category": "사이드",
+      "price": 500,
+      "soldOut": false,
+      "recipe": "directAdd"
+    },
+    {
+      "name": "양념소스",
+      "category": "소스",
+      "price": 500,
+      "soldOut": false,
+      "recipe": "directAdd"
+    },
+    {
+      "name": "허니머스타드",
+      "category": "소스",
+      "price": 500,
+      "soldOut": false,
+      "recipe": "directAdd"
+    },
+    {
+      "name": "갈릭마요",
+      "category": "소스",
+      "price": 500,
+      "soldOut": false,
+      "recipe": "directAdd"
+    },
+    {
+      "name": "매운디핑소스",
+      "category": "소스",
+      "price": 500,
+      "soldOut": false,
+      "recipe": "directAdd"
+    },
+    {
+      "name": "치즈디핑소스",
+      "category": "소스",
+      "price": 800,
+      "soldOut": false,
+      "recipe": "directAdd"
+    },
+    {
+      "name": "콜라 500ml",
+      "category": "음료/주류",
+      "price": 2000,
+      "soldOut": false,
+      "recipe": "directAdd"
+    },
+    {
+      "name": "제로콜라 500ml",
+      "category": "음료/주류",
+      "price": 2000,
+      "soldOut": false,
+      "recipe": "directAdd"
+    },
+    {
+      "name": "사이다 500ml",
+      "category": "음료/주류",
+      "price": 2000,
+      "soldOut": false,
+      "recipe": "directAdd"
+    },
+    {
+      "name": "콜라 1.25L",
+      "category": "음료/주류",
+      "price": 3000,
+      "soldOut": false,
+      "recipe": "directAdd"
+    },
+    {
+      "name": "생맥주 500cc",
+      "category": "음료/주류",
+      "price": 4500,
+      "soldOut": false,
+      "recipe": "directAdd"
+    },
+    {
+      "name": "달빛 하이볼",
+      "category": "음료/주류",
+      "price": 6000,
+      "soldOut": false,
+      "recipe": "directAdd"
+    },
+    {
+      "name": "혼닭세트",
+      "category": "세트",
+      "price": 14500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "치킨 맛 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "후라이드",
+              "priceDelta": 0
+            },
+            {
+              "name": "양념",
+              "priceDelta": 0
+            },
+            {
+              "name": "간장마늘",
+              "priceDelta": 1000
+            }
+          ]
+        },
+        {
+          "name": "뼈/순살 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "뼈",
+              "priceDelta": 0
+            },
+            {
+              "name": "순살",
+              "priceDelta": 2000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "치킨 한상세트",
+      "category": "세트",
+      "price": 23000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "치킨 맛 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "후라이드",
+              "priceDelta": 0
+            },
+            {
+              "name": "양념",
+              "priceDelta": 0
+            },
+            {
+              "name": "간장마늘",
+              "priceDelta": 1000
+            }
+          ]
+        },
+        {
+          "name": "뼈/순살 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "뼈",
+              "priceDelta": 0
+            },
+            {
+              "name": "순살",
+              "priceDelta": 2000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "반반 한상세트",
+      "category": "세트",
+      "price": 25000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "반반 첫 번째 맛",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "후라이드",
+              "priceDelta": 0
+            },
+            {
+              "name": "양념",
+              "priceDelta": 0
+            },
+            {
+              "name": "치즈시즈닝",
+              "priceDelta": 2000
+            }
+          ]
+        },
+        {
+          "name": "반반 두 번째 맛",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "간장마늘",
+              "priceDelta": 1000
+            },
+            {
+              "name": "매운불꽃",
+              "priceDelta": 1000
+            },
+            {
+              "name": "허니버터",
+              "priceDelta": 1000
+            },
+            {
+              "name": "파닭",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "뼈/순살 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "뼈",
+              "priceDelta": 0
+            },
+            {
+              "name": "순살",
+              "priceDelta": 2000
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "recipes": {
+    "startOrder": [
+      {
+        "op": "click",
+        "label": "달빛닭장"
+      },
+      {
+        "op": "click",
+        "label": "{dineOption}"
+      },
+      {
+        "op": "clickIfVisible",
+        "label": "20분 후"
+      },
+      {
+        "op": "clickIfVisible",
+        "label": "확인"
+      }
+    ],
+    "addToCart": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "chooseOptions",
+        "steps": [
+          {
+            "op": "click",
+            "label": "{option}"
+          }
+        ]
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "label": "+",
+            "within": "수량"
+          }
+        ]
+      },
+      {
+        "op": "click",
+        "label": "장바구니 담기"
+      },
+      {
+        "op": "clickIfVisible",
+        "label": "아니요"
+      }
+    ],
+    "directAdd": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "clickIfVisible",
+        "label": "네, 19세 이상입니다"
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "label": "+",
+            "within": "{item}"
+          }
+        ]
+      }
+    ]
+  },
+  "cartTotalPattern": "총\\s*\\d+개\\s*([\\d,]+)원",
+  "review": {
+    "open": [
+      {
+        "op": "openReview",
+        "label": "주문하기"
+      }
+    ],
+    "totalPattern": "총 결제 금액[^\\d]*([\\d,]+)원",
+    "close": [
+      {
+        "op": "click",
+        "label": "이전으로"
+      }
+    ]
+  },
+  "notes": [
+    "포장 주문 시 픽업 시간 20분 후 선택",
+    "주류 주문 시 만 19세 이상 확인"
+  ],
+  "declines": [
+    {
+      "choice": "아니요",
+      "offer": "콜라 1.25L로 변경하시겠어요?"
+    }
+  ]
+}

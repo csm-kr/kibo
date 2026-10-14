@@ -1,0 +1,93 @@
+#1 act {"label":"달빛닭장","op":"click"}
+#2 act {"label":"매장 식사","op":"click"}
+#3 act {"label":"처음으로","op":"click"}
+#4 act [{"op":"click","label":"달빛닭장"},{"op":"click","label":"포장 주문"}]
+#5 act {"label":"확인","op":"click"}
+#6 act [{"label":"20분 후","op":"click"},{"op":"click","label":"확인"}]
+#7 act {"op":"click","label":"바삭 후라이드"}
+#8 act {"label":"양념소스","op":"click"}
+#9 act {"op":"click","label":"허니머스타드"}
+#10 act {"op":"click","label":"장바구니 담기"}
+#11 act [{"op":"click","label":"한 마리"},{"op":"click","label":"뼈"}]
+#12 act {"op":"click","label":"장바구니 담기"}
+#13 act {"op":"openReview","label":"주문하기"}
+#14 act {"label":"이전으로","op":"click"}
+#15 act {"label":"전체삭제","op":"click"}
+#16 act {"label":"전체삭제","op":"click","within":"취소"}
+#17 act {"label":"달빛 양념치킨","op":"click"}
+#18 act {"within":"수량","op":"click","label":"+"}
+#19 act {"op":"click","label":"취소"}
+#20 act {"label":"품절","op":"click"}
+#21 act {"label":"반반","op":"click"}
+#22 act {"op":"click","label":"반반치킨"}
+#23 act {"label":"파닭","op":"click"}
+#24 act [{"label":"취소","op":"click"},{"op":"click","label":"반반치즈볼"}]
+#25 act [{"label":"취소","op":"click"},{"label":"반반똥집","op":"click"}]
+#26 act [{"label":"취소","op":"click"},{"op":"click","label":"사이드"}]
+#27 act {"label":"감자튀김","op":"click"}
+#28 act {"label":"감자튀김","op":"click"}
+#29 act {"op":"click","label":"치즈볼"}
+#30 act {"op":"click","label":"똥집튀김"}
+#31 act [{"op":"click","label":"전체삭제"},{"op":"click","label":"전체삭제","within":"취소"},{"label":"소스","op":"click"}]
+#32 act {"label":"치즈디핑소스","op":"click"}
+#33 act [{"op":"click","label":"전체삭제"},{"within":"취소","label":"전체삭제","op":"click"},{"op":"click","label":"음료/주류"}]
+#34 act {"label":"생맥주 500cc","op":"click"}
+#35 act {"op":"click","label":"네, 19세 이상입니다"}
+#36 act [{"op":"click","label":"전체삭제"},{"op":"click","label":"전체삭제","within":"취소"},{"label":"세트","op":"click"}]
+#37 act {"label":"혼닭세트","op":"click"}
+#38 act [{"label":"취소","op":"click"},{"op":"click","label":"치킨 한상세트"}]
+#39 act [{"op":"click","label":"취소"},{"op":"click","label":"반반 한상세트"}]
+#40 act {"label":"취소","op":"click"}
+#41 act [{"op":"click","label":"사이드"},{"label":"감자튀김","op":"click"}]
+#42 act {"within":"감자튀김","label":"+","op":"click"}
+#43 record 
+#44 audit 
+  audit #1: GAPS missing=0 unknown=0 hidden=1 itemsMissingOptions=5 hardClicks=0 requiredChoices=5 (opened 29 item screens, replayed 8 lines)
+#45 act [{"label":"사이드","op":"click"},{"op":"click","label":"떡볶이"}]
+#46 act {"label":"취소","op":"click"}
+#47 audit 
+  audit #2: GAPS missing=0 unknown=0 hidden=1 itemsMissingOptions=0 hardClicks=0 requiredChoices=0 (opened 0 item screens, replayed 5 lines)
+#48 act [{"label":"전체삭제","op":"click"},{"within":"취소","label":"전체삭제","op":"click"},{"op":"click","label":"사이드"},{"op":"click","label":"떡볶이"}]
+#49 act [{"label":"순한맛","op":"click"},{"op":"click","label":"장바구니 담기"}]
+#50 act [{"label":"반반","op":"click"},{"label":"반반치킨","op":"click"},{"op":"click","label":"후라이드"},{"label":"뼈","op":"click"},{"label":"장바구니 담기","op":"click"}]
+#51 act {"op":"click","label":"후라이드"}
+#52 act [{"op":"click","label":"취소"},{"op":"click","label":"반반치킨"},{"label":"후라이드","op":"click"},{"label":"양념","op":"click"},{"label":"뼈","op":"click"},{"label":"장바구니 담기","op":"click"}]
+#53 audit 
+  audit #3: GAPS missing=0 unknown=0 hidden=1 itemsMissingOptions=0 hardClicks=0 requiredChoices=0 (opened 0 item screens, replayed 3 lines)
+#54 reload 
+#55 audit 
+  audit #4: GAPS missing=0 unknown=0 hidden=1 itemsMissingOptions=0 hardClicks=0 requiredChoices=0 (opened 0 item screens, replayed 0 lines)
+#56 audit 
+  audit #5: GAPS missing=0 unknown=1 hidden=0 itemsMissingOptions=0 hardClicks=0 requiredChoices=0 (opened 0 item screens, replayed 0 lines)
+#57 audit 
+  audit #6: GAPS missing=0 unknown=0 hidden=1 itemsMissingOptions=0 hardClicks=0 requiredChoices=0 (opened 0 item screens, replayed 0 lines)
+#58 audit 
+  audit #7: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=0 hardClicks=0 requiredChoices=0 (opened 29 item screens, replayed 8 lines)
+#59 testSkill 
+  test #1: FAIL FAIL FAIL uncovered=7
+    order 1: the skill's total 36,000원 differs from the kiosk's unreadable; quote the kiosk's
+    order 2: locator.click: Timeout 3000ms exceeded.
+    order 3: locator.click: Timeout 3000ms exceeded.
+#60 act [{"label":"달빛닭장","op":"click"},{"label":"포장 주문","op":"click"},{"label":"20분 후","op":"click"},{"label":"확인","op":"click"},{"label":"치킨","op":"click"},{"op":"click","label":"바삭 후라이드"},{"op":"click","label":"반 마리"},{"op":"click","label":"순살"},{"op":"click","label":"양념소스"},{"op":"click","label":"+","within":"수량"},{"op":"click","label":"장바구니 담기"},{"label":"사이드","op":"click"},{"op":"click","label":"떡볶이"},{"label":"보통맛","op":"click"},{"op":"click","label":"장바구니 담기"},{"label":"음료/주류","op":"click"},{"op":"click","label":"생맥주 500cc"},{"label":"네, 19세 이상입니다","op":"click"}]
+#61 act {"op":"openReview","label":"주문하기"}
+#62 act {"op":"click","label":"이전으로"}
+#63 act [{"op":"click","label":"전체삭제"},{"op":"click","label":"전체삭제","within":"취소"},{"label":"세트","op":"click"},{"op":"click","label":"혼닭세트"},{"label":"후라이드","op":"click"},{"op":"click","label":"뼈"},{"label":"장바구니 담기","op":"click"}]
+#64 act [{"op":"click","label":"치킨 한상세트"},{"op":"click","label":"후라이드"},{"label":"뼈","op":"click"},{"label":"장바구니 담기","op":"click"}]
+#65 act {"label":"변경할게요","op":"click"}
+#66 act [{"label":"전체삭제","op":"click"},{"label":"전체삭제","within":"취소","op":"click"},{"label":"반반 한상세트","op":"click"},{"op":"click","label":"후라이드"},{"op":"click","label":"양념"},{"label":"뼈","op":"click"},{"op":"click","label":"장바구니 담기"}]
+#67 act {"label":"아니요","op":"click"}
+#68 audit 
+  audit #8: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=0 hardClicks=0 requiredChoices=0 (opened 0 item screens, replayed 5 lines)
+#69 testSkill 
+  test #2: PASS PASS FAIL uncovered=1
+    order 3: the skill's total 53,000원 differs from the kiosk's 54,000원; quote the kiosk's
+#70 act [{"op":"click","label":"반반"},{"label":"반반치즈볼","op":"click"}]
+#71 audit 
+  audit #9: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=0 hardClicks=0 requiredChoices=0 (opened 0 item screens, replayed 2 lines)
+#72 testSkill 
+  test #3: PASS PASS PASS
+#73 audit 
+  audit #10: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=0 hardClicks=0 requiredChoices=0 (opened 0 item screens, replayed 0 lines)
+#74 finish 
+  finish audit: OK
+{"provider":"gemini","model":"gemini-3.8-flash","learner":{"commit":"34532bc27a5e1938f6a60a2dbf65acc880e8a3e5","dirty":false},"cachedInputTokens":1018068,"finished":true,"turns":74,"acts":120,"tests":3,"inputTokens":1444182,"outputTokens":8873,"minutes":"14.2"}

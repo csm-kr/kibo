@@ -1,0 +1,1163 @@
+{
+  "kiosk": "보리별 분식",
+  "categories": [
+    "떡볶이",
+    "김밥",
+    "라면/우동",
+    "튀김/순대",
+    "세트",
+    "음료"
+  ],
+  "uiLabels": [
+    "오늘의 할인",
+    "전체 삭제",
+    "모두 삭제",
+    "취소",
+    "−",
+    "+",
+    "✕",
+    "삭제",
+    "주문 확인하기",
+    "담기",
+    "세트 담기",
+    "다음",
+    "이전으로",
+    "‹ 메뉴 더 담기",
+    "품절",
+    "적립할게요",
+    "적립 안 할게요"
+  ],
+  "forbiddenLabels": [
+    "처음으로",
+    "신용/체크카드",
+    "간편결제",
+    "모바일 상품권",
+    "카드 결제",
+    "현금 결제",
+    "카카오페이",
+    "네이버페이",
+    "토스페이"
+  ],
+  "dineOptions": {
+    "eat_in": "매장에서 먹어요",
+    "take_out": "포장해 갈게요"
+  },
+  "cartTotalPattern": "총 \\d+개 ([\\d,]+)원",
+  "recipes": {
+    "startOrder": [
+      {
+        "op": "click",
+        "label": "보리별 분식"
+      },
+      {
+        "op": "click",
+        "label": "{dineOption}"
+      }
+    ],
+    "addToCart": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "label": "+",
+            "within": "수량"
+          }
+        ]
+      },
+      {
+        "op": "chooseOptions",
+        "steps": [
+          {
+            "op": "click",
+            "label": "{option}"
+          }
+        ]
+      },
+      {
+        "op": "click",
+        "role": "button",
+        "name": "담기"
+      }
+    ],
+    "addSetToCart": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "chooseOptions",
+        "steps": [
+          {
+            "op": "click",
+            "label": "{option}"
+          }
+        ]
+      },
+      {
+        "op": "click",
+        "role": "button",
+        "name": "담기"
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "label": "+",
+            "within": "{item}"
+          }
+        ]
+      }
+    ]
+  },
+  "catalog": [
+    {
+      "name": "보리별 떡볶이",
+      "category": "떡볶이",
+      "price": 4500,
+      "optionGroups": [
+        {
+          "name": "맵기 선택",
+          "required": true,
+          "type": "single",
+          "options": [
+            {
+              "name": "1단계 순한맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "2단계 덜매운맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "3단계 보통맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "4단계 매운맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "5단계 아주매운맛",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑 추가",
+          "required": false,
+          "type": "multi",
+          "max": 3,
+          "options": [
+            {
+              "name": "삶은 계란",
+              "priceDelta": 500
+            },
+            {
+              "name": "어묵 추가",
+              "priceDelta": 1000
+            },
+            {
+              "name": "당면 사리",
+              "priceDelta": 1000
+            },
+            {
+              "name": "만두 사리",
+              "priceDelta": 1000
+            },
+            {
+              "name": "라면 사리",
+              "priceDelta": 1500
+            },
+            {
+              "name": "모짜렐라 치즈",
+              "priceDelta": 1500
+            },
+            {
+              "name": "비엔나 소시지",
+              "priceDelta": 1500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "치즈 떡볶이",
+      "category": "떡볶이",
+      "price": 5500,
+      "optionGroups": [
+        {
+          "name": "맵기 선택",
+          "required": true,
+          "type": "single",
+          "options": [
+            {
+              "name": "1단계 순한맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "2단계 덜매운맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "3단계 보통맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "4단계 매운맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "5단계 아주매운맛",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑 추가",
+          "required": false,
+          "type": "multi",
+          "max": 3,
+          "options": [
+            {
+              "name": "삶은 계란",
+              "priceDelta": 500
+            },
+            {
+              "name": "어묵 추가",
+              "priceDelta": 1000
+            },
+            {
+              "name": "당면 사리",
+              "priceDelta": 1000
+            },
+            {
+              "name": "만두 사리",
+              "priceDelta": 1000
+            },
+            {
+              "name": "라면 사리",
+              "priceDelta": 1500
+            },
+            {
+              "name": "모짜렐라 치즈",
+              "priceDelta": 1500
+            },
+            {
+              "name": "비엔나 소시지",
+              "priceDelta": 1500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "로제 떡볶이",
+      "category": "떡볶이",
+      "price": 5500,
+      "optionGroups": [
+        {
+          "name": "맵기 선택",
+          "required": true,
+          "type": "single",
+          "options": [
+            {
+              "name": "1단계 순한맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "2단계 덜매운맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "3단계 보통맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "4단계 매운맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "5단계 아주매운맛",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑 추가",
+          "required": false,
+          "type": "multi",
+          "max": 3,
+          "options": [
+            {
+              "name": "삶은 계란",
+              "priceDelta": 500
+            },
+            {
+              "name": "어묵 추가",
+              "priceDelta": 1000
+            },
+            {
+              "name": "당면 사리",
+              "priceDelta": 1000
+            },
+            {
+              "name": "만두 사리",
+              "priceDelta": 1000
+            },
+            {
+              "name": "라면 사리",
+              "priceDelta": 1500
+            },
+            {
+              "name": "모짜렐라 치즈",
+              "priceDelta": 1500
+            },
+            {
+              "name": "비엔나 소시지",
+              "priceDelta": 1500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "짜장 떡볶이",
+      "category": "떡볶이",
+      "price": 5500,
+      "optionGroups": [
+        {
+          "name": "맵기 선택",
+          "required": true,
+          "type": "single",
+          "options": [
+            {
+              "name": "1단계 순한맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "2단계 덜매운맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "3단계 보통맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "4단계 매운맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "5단계 아주매운맛",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑 추가",
+          "required": false,
+          "type": "multi",
+          "max": 3,
+          "options": [
+            {
+              "name": "삶은 계란",
+              "priceDelta": 500
+            },
+            {
+              "name": "어묵 추가",
+              "priceDelta": 1000
+            },
+            {
+              "name": "당면 사리",
+              "priceDelta": 1000
+            },
+            {
+              "name": "만두 사리",
+              "priceDelta": 1000
+            },
+            {
+              "name": "라면 사리",
+              "priceDelta": 1500
+            },
+            {
+              "name": "모짜렐라 치즈",
+              "priceDelta": 1500
+            },
+            {
+              "name": "비엔나 소시지",
+              "priceDelta": 1500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "궁중 떡볶이",
+      "category": "떡볶이",
+      "price": 6000,
+      "optionGroups": [
+        {
+          "name": "토핑 추가",
+          "required": false,
+          "type": "multi",
+          "max": 3,
+          "options": [
+            {
+              "name": "삶은 계란",
+              "priceDelta": 500
+            },
+            {
+              "name": "어묵 추가",
+              "priceDelta": 1000
+            },
+            {
+              "name": "당면 사리",
+              "priceDelta": 1000
+            },
+            {
+              "name": "만두 사리",
+              "priceDelta": 1000
+            },
+            {
+              "name": "라면 사리",
+              "priceDelta": 1500
+            },
+            {
+              "name": "모짜렐라 치즈",
+              "priceDelta": 1500
+            },
+            {
+              "name": "비엔나 소시지",
+              "priceDelta": 1500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "점심 쫄볶이",
+      "category": "떡볶이",
+      "price": 5000,
+      "optionGroups": [
+        {
+          "name": "맵기 선택",
+          "required": true,
+          "type": "single",
+          "options": [
+            {
+              "name": "1단계 순한맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "2단계 덜매운맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "3단계 보통맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "4단계 매운맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "5단계 아주매운맛",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑 추가",
+          "required": false,
+          "type": "multi",
+          "max": 3,
+          "options": [
+            {
+              "name": "삶은 계란",
+              "priceDelta": 500
+            },
+            {
+              "name": "어묵 추가",
+              "priceDelta": 1000
+            },
+            {
+              "name": "당면 사리",
+              "priceDelta": 1000
+            },
+            {
+              "name": "만두 사리",
+              "priceDelta": 1000
+            },
+            {
+              "name": "라면 사리",
+              "priceDelta": 1500
+            },
+            {
+              "name": "모짜렐라 치즈",
+              "priceDelta": 1500
+            },
+            {
+              "name": "비엔나 소시지",
+              "priceDelta": 1500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "보리별 김밥",
+      "category": "김밥",
+      "price": 3500,
+      "optionGroups": [
+        {
+          "name": "김밥 커팅",
+          "required": true,
+          "type": "single",
+          "options": [
+            {
+              "name": "썰어서",
+              "priceDelta": 0
+            },
+            {
+              "name": "통으로",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "김밥 추가",
+          "required": false,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "김밥 추가 1줄"
+            }
+          ],
+          "options": [
+            {
+              "name": "김밥 추가 1줄",
+              "priceDelta": 3000,
+              "maxQty": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "김치 김밥",
+      "category": "김밥",
+      "price": 4000,
+      "optionGroups": [
+        {
+          "name": "김밥 커팅",
+          "required": true,
+          "type": "single",
+          "options": [
+            {
+              "name": "썰어서",
+              "priceDelta": 0
+            },
+            {
+              "name": "통으로",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "김밥 추가",
+          "required": false,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "김밥 추가 1줄"
+            }
+          ],
+          "options": [
+            {
+              "name": "김밥 추가 1줄",
+              "priceDelta": 3000,
+              "maxQty": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "참치 김밥",
+      "category": "김밥",
+      "price": 4500,
+      "optionGroups": [
+        {
+          "name": "김밥 커팅",
+          "required": true,
+          "type": "single",
+          "options": [
+            {
+              "name": "썰어서",
+              "priceDelta": 0
+            },
+            {
+              "name": "통으로",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "김밥 추가",
+          "required": false,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "김밥 추가 1줄"
+            }
+          ],
+          "options": [
+            {
+              "name": "김밥 추가 1줄",
+              "priceDelta": 3000,
+              "maxQty": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "치즈 김밥",
+      "category": "김밥",
+      "price": 4500,
+      "optionGroups": [
+        {
+          "name": "김밥 커팅",
+          "required": true,
+          "type": "single",
+          "options": [
+            {
+              "name": "썰어서",
+              "priceDelta": 0
+            },
+            {
+              "name": "통으로",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "김밥 추가",
+          "required": false,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "김밥 추가 1줄"
+            }
+          ],
+          "options": [
+            {
+              "name": "김밥 추가 1줄",
+              "priceDelta": 3000,
+              "maxQty": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "돈까스 김밥",
+      "category": "김밥",
+      "price": 5000,
+      "optionGroups": [
+        {
+          "name": "김밥 커팅",
+          "required": true,
+          "type": "single",
+          "options": [
+            {
+              "name": "썰어서",
+              "priceDelta": 0
+            },
+            {
+              "name": "통으로",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "김밥 추가",
+          "required": false,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "김밥 추가 1줄"
+            }
+          ],
+          "options": [
+            {
+              "name": "김밥 추가 1줄",
+              "priceDelta": 3000,
+              "maxQty": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "멸치 김밥",
+      "category": "김밥",
+      "price": 4500,
+      "soldOut": true
+    },
+    {
+      "name": "보리별 라면",
+      "category": "라면/우동",
+      "price": 4000,
+      "optionGroups": [
+        {
+          "name": "면 익힘 정도",
+          "required": true,
+          "type": "single",
+          "options": [
+            {
+              "name": "꼬들하게",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "푹 익혀서",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "추가 재료",
+          "required": false,
+          "type": "multi",
+          "max": 3,
+          "options": [
+            {
+              "name": "계란",
+              "priceDelta": 500
+            },
+            {
+              "name": "치즈",
+              "priceDelta": 700
+            },
+            {
+              "name": "떡 사리",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "해물 라면",
+      "category": "라면/우동",
+      "price": 5500,
+      "optionGroups": [
+        {
+          "name": "추가 재료",
+          "required": false,
+          "type": "multi",
+          "max": 3,
+          "options": [
+            {
+              "name": "계란",
+              "priceDelta": 500
+            },
+            {
+              "name": "치즈",
+              "priceDelta": 700
+            },
+            {
+              "name": "떡 사리",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "만두 라면",
+      "category": "라면/우동",
+      "price": 5000,
+      "optionGroups": [
+        {
+          "name": "면 익힘 정도",
+          "required": true,
+          "type": "single",
+          "options": [
+            {
+              "name": "꼬들하게",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "푹 익혀서",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "추가 재료",
+          "required": false,
+          "type": "multi",
+          "max": 3,
+          "options": [
+            {
+              "name": "계란",
+              "priceDelta": 500
+            },
+            {
+              "name": "치즈",
+              "priceDelta": 700
+            },
+            {
+              "name": "떡 사리",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "짬뽕 라면",
+      "category": "라면/우동",
+      "price": 5500,
+      "optionGroups": [
+        {
+          "name": "면 익힘 정도",
+          "required": true,
+          "type": "single",
+          "options": [
+            {
+              "name": "꼬들하게",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "푹 익혀서",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "추가 재료",
+          "required": false,
+          "type": "multi",
+          "max": 3,
+          "options": [
+            {
+              "name": "계란",
+              "priceDelta": 500
+            },
+            {
+              "name": "치즈",
+              "priceDelta": 700
+            },
+            {
+              "name": "떡 사리",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "어묵 우동",
+      "category": "라면/우동",
+      "price": 5500,
+      "optionGroups": []
+    },
+    {
+      "name": "김치 우동",
+      "category": "라면/우동",
+      "price": 6000,
+      "optionGroups": []
+    },
+    {
+      "name": "모둠 튀김",
+      "category": "튀김/순대",
+      "price": 5000,
+      "optionGroups": []
+    },
+    {
+      "name": "김말이 튀김",
+      "category": "튀김/순대",
+      "price": 2500,
+      "optionGroups": []
+    },
+    {
+      "name": "고추 튀김",
+      "category": "튀김/순대",
+      "price": 3000,
+      "optionGroups": []
+    },
+    {
+      "name": "오징어 튀김",
+      "category": "튀김/순대",
+      "price": 3500,
+      "optionGroups": []
+    },
+    {
+      "name": "찹쌀 순대",
+      "category": "튀김/순대",
+      "price": 4500,
+      "optionGroups": [
+        {
+          "name": "순대 구성",
+          "required": true,
+          "type": "single",
+          "options": [
+            {
+              "name": "순대만",
+              "priceDelta": 0
+            },
+            {
+              "name": "내장 섞어서",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "군만두",
+      "category": "튀김/순대",
+      "price": 3500,
+      "optionGroups": []
+    },
+    {
+      "name": "보리별 세트",
+      "category": "세트",
+      "price": 9900,
+      "recipe": "addSetToCart",
+      "optionGroups": [
+        {
+          "name": "떡볶이 선택",
+          "required": true,
+          "type": "single",
+          "options": [
+            {
+              "name": "보리별 떡볶이",
+              "priceDelta": 0
+            },
+            {
+              "name": "치즈 떡볶이",
+              "priceDelta": 1000
+            },
+            {
+              "name": "로제 떡볶이",
+              "priceDelta": 1500
+            }
+          ]
+        },
+        {
+          "name": "맵기 선택",
+          "required": true,
+          "type": "single",
+          "after": [
+            {
+              "op": "click",
+              "label": "다음"
+            }
+          ],
+          "options": [
+            {
+              "name": "1단계 순한맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "2단계 덜매운맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "3단계 보통맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "4단계 매운맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "5단계 아주매운맛",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "김밥 선택",
+          "required": true,
+          "type": "single",
+          "options": [
+            {
+              "name": "보리별 김밥",
+              "priceDelta": 0
+            },
+            {
+              "name": "김치 김밥",
+              "priceDelta": 0
+            },
+            {
+              "name": "참치 김밥",
+              "priceDelta": 500
+            },
+            {
+              "name": "돈까스 김밥",
+              "priceDelta": 1000
+            }
+          ]
+        },
+        {
+          "name": "김밥 커팅",
+          "required": true,
+          "type": "single",
+          "after": [
+            {
+              "op": "click",
+              "label": "다음"
+            }
+          ],
+          "options": [
+            {
+              "name": "썰어서",
+              "priceDelta": 0
+            },
+            {
+              "name": "통으로",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "음료 선택",
+          "required": true,
+          "type": "single",
+          "options": [
+            {
+              "name": "콜라",
+              "priceDelta": 0
+            },
+            {
+              "name": "사이다",
+              "priceDelta": 0
+            },
+            {
+              "name": "오렌지 주스",
+              "priceDelta": 500
+            },
+            {
+              "name": "식혜",
+              "priceDelta": 500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "떡튀순 세트",
+      "category": "세트",
+      "price": 12000,
+      "optionGroups": [
+        {
+          "name": "맵기 선택",
+          "required": true,
+          "type": "single",
+          "options": [
+            {
+              "name": "1단계 순한맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "2단계 덜매운맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "3단계 보통맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "4단계 매운맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "5단계 아주매운맛",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "튀순 세트",
+      "category": "세트",
+      "price": 8500,
+      "optionGroups": []
+    },
+    {
+      "name": "콜라",
+      "category": "음료",
+      "price": 2000,
+      "optionGroups": []
+    },
+    {
+      "name": "사이다",
+      "category": "음료",
+      "price": 2000,
+      "optionGroups": []
+    },
+    {
+      "name": "오렌지 주스",
+      "category": "음료",
+      "price": 2500,
+      "optionGroups": []
+    },
+    {
+      "name": "식혜",
+      "category": "음료",
+      "price": 2500,
+      "optionGroups": []
+    },
+    {
+      "name": "생수",
+      "category": "음료",
+      "price": 1000,
+      "optionGroups": []
+    }
+  ],
+  "notes": [
+    "보리별 분식 키오스크"
+  ]
+}

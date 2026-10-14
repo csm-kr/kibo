@@ -1,0 +1,43 @@
+{
+  "n": 41,
+  "at": "2026-10-14T04:50:00.387Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "사이드"
+      },
+      {
+        "op": "click",
+        "label": "감자튀김"
+      }
+    ]
+  },
+  "resultSummary": "tapped 사이드 → 감자튀김",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "사이드"
+          },
+          {
+            "op": "click",
+            "label": "감자튀김"
+          }
+        ]
+      },
+      "resultSummary": "tapped 사이드 → 감자튀김"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 11429,
+  "outputTokens": 39
+}

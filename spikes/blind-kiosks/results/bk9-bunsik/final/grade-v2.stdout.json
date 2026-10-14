@@ -1,0 +1,1150 @@
+{
+  "kioskId": "bk9-bunsik",
+  "label": "final",
+  "grader": 2,
+  "gradedAt": "2026-10-14T04:45:59.155Z",
+  "skill": "present",
+  "files": {
+    "skill": "spikes/blind-kiosks/results/bk9-bunsik/final/skill.json",
+    "key": "spikes/blind-kiosks/bk9-bunsik/answer-key.json",
+    "app": "spikes/blind-kiosks/bk9-bunsik/app/index.html"
+  },
+  "summary": "bk9-bunsik/final: learning finished, 9.6 min, 85 turns, 1369557 input tokens; items 32/32 (precision 1), price 31/32, options exact 16/19 (openable 16/18); orders correct 10, safe refusal 0, unsafe 0 of 10 (cart lines read in 10)",
+  "learning": {
+    "provider": "gemini",
+    "model": "gemini-3.8-flash",
+    "learner": {
+      "commit": "34532bc27a5e1938f6a60a2dbf65acc880e8a3e5",
+      "dirty": false
+    },
+    "cachedInputTokens": 1025383,
+    "finished": true,
+    "turns": 85,
+    "acts": 120,
+    "tests": 2,
+    "inputTokens": 1369557,
+    "outputTokens": 6924,
+    "minutes": "9.6"
+  },
+  "catalog": {
+    "items": {
+      "key": 32,
+      "skill": 32,
+      "matched": 32,
+      "recall": 1,
+      "precision": 1,
+      "missing": [],
+      "extra": []
+    },
+    "price": {
+      "correct": 31,
+      "of": 32
+    },
+    "category": {
+      "correct": 32,
+      "of": 32
+    },
+    "soldOut": {
+      "correct": 32,
+      "of": 32
+    },
+    "options": {
+      "itemsExact": 16,
+      "items": 19,
+      "openableExact": 16,
+      "openable": 18,
+      "groups": 35,
+      "groupsFound": 33,
+      "groupLabelsExact": 33,
+      "groupRulesCorrect": 0,
+      "quantityGroups": 6,
+      "quantityRecognized": 5,
+      "conditionalGroups": 0,
+      "conditionalFound": 0
+    },
+    "perItem": [
+      {
+        "name": "보리별 떡볶이",
+        "skillName": "보리별 떡볶이",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "치즈 떡볶이",
+        "skillName": "치즈 떡볶이",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "로제 떡볶이",
+        "skillName": "로제 떡볶이",
+        "price": false,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "짜장 떡볶이",
+        "skillName": "짜장 떡볶이",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "궁중 떡볶이",
+        "skillName": "궁중 떡볶이",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "점심 쫄볶이",
+        "skillName": "점심 쫄볶이",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "보리별 김밥",
+        "skillName": "보리별 김밥",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "김치 김밥",
+        "skillName": "김치 김밥",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "참치 김밥",
+        "skillName": "참치 김밥",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "치즈 김밥",
+        "skillName": "치즈 김밥",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "돈까스 김밥",
+        "skillName": "돈까스 김밥",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "멸치 김밥",
+        "skillName": "멸치 김밥",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "썰어서 0",
+            "통으로 0",
+            "김밥 추가 1줄 3000"
+          ],
+          "extra": []
+        }
+      },
+      {
+        "name": "보리별 라면",
+        "skillName": "보리별 라면",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "해물 라면",
+        "skillName": "해물 라면",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "만두 라면",
+        "skillName": "만두 라면",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [],
+          "extra": [
+            "꼬들하게 0",
+            "보통 0",
+            "푹 익혀서 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "짬뽕 라면",
+        "skillName": "짬뽕 라면",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [],
+          "extra": [
+            "꼬들하게 0",
+            "보통 0",
+            "푹 익혀서 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "어묵 우동",
+        "skillName": "어묵 우동",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "김치 우동",
+        "skillName": "김치 우동",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "모둠 튀김",
+        "skillName": "모둠 튀김",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "김말이 튀김",
+        "skillName": "김말이 튀김",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "고추 튀김",
+        "skillName": "고추 튀김",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "오징어 튀김",
+        "skillName": "오징어 튀김",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "찹쌀 순대",
+        "skillName": "찹쌀 순대",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "군만두",
+        "skillName": "군만두",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "보리별 세트",
+        "skillName": "보리별 세트",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "떡튀순 세트",
+        "skillName": "떡튀순 세트",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "튀순 세트",
+        "skillName": "튀순 세트",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "콜라",
+        "skillName": "콜라",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "사이다",
+        "skillName": "사이다",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "오렌지 주스",
+        "skillName": "오렌지 주스",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "식혜",
+        "skillName": "식혜",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "생수",
+        "skillName": "생수",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      }
+    ],
+    "perGroup": [
+      {
+        "item": "보리별 떡볶이",
+        "group": "spice",
+        "found": true,
+        "skillGroup": "맵기 선택",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "보리별 떡볶이",
+        "group": "tteok_topping",
+        "found": true,
+        "skillGroup": "토핑 추가",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "치즈 떡볶이",
+        "group": "spice",
+        "found": true,
+        "skillGroup": "맵기 선택",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "치즈 떡볶이",
+        "group": "tteok_topping",
+        "found": true,
+        "skillGroup": "토핑 추가",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "로제 떡볶이",
+        "group": "spice",
+        "found": true,
+        "skillGroup": "맵기 선택",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "로제 떡볶이",
+        "group": "tteok_topping",
+        "found": true,
+        "skillGroup": "토핑 추가",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "짜장 떡볶이",
+        "group": "spice",
+        "found": true,
+        "skillGroup": "맵기 선택",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "짜장 떡볶이",
+        "group": "tteok_topping",
+        "found": true,
+        "skillGroup": "토핑 추가",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "궁중 떡볶이",
+        "group": "tteok_topping",
+        "found": true,
+        "skillGroup": "토핑 추가",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "점심 쫄볶이",
+        "group": "spice",
+        "found": true,
+        "skillGroup": "맵기 선택",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "점심 쫄볶이",
+        "group": "tteok_topping",
+        "found": true,
+        "skillGroup": "토핑 추가",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "보리별 김밥",
+        "group": "gimbap_cut",
+        "found": true,
+        "skillGroup": "김밥 커팅",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "보리별 김밥",
+        "group": "gimbap_extra",
+        "found": true,
+        "skillGroup": "김밥 추가",
+        "labelsExact": true,
+        "rules": false,
+        "quantity": true
+      },
+      {
+        "item": "김치 김밥",
+        "group": "gimbap_cut",
+        "found": true,
+        "skillGroup": "김밥 커팅",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "김치 김밥",
+        "group": "gimbap_extra",
+        "found": true,
+        "skillGroup": "김밥 추가",
+        "labelsExact": true,
+        "rules": false,
+        "quantity": true
+      },
+      {
+        "item": "참치 김밥",
+        "group": "gimbap_cut",
+        "found": true,
+        "skillGroup": "김밥 커팅",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "참치 김밥",
+        "group": "gimbap_extra",
+        "found": true,
+        "skillGroup": "김밥 추가",
+        "labelsExact": true,
+        "rules": false,
+        "quantity": true
+      },
+      {
+        "item": "치즈 김밥",
+        "group": "gimbap_cut",
+        "found": true,
+        "skillGroup": "김밥 커팅",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "치즈 김밥",
+        "group": "gimbap_extra",
+        "found": true,
+        "skillGroup": "김밥 추가",
+        "labelsExact": true,
+        "rules": false,
+        "quantity": true
+      },
+      {
+        "item": "돈까스 김밥",
+        "group": "gimbap_cut",
+        "found": true,
+        "skillGroup": "김밥 커팅",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "돈까스 김밥",
+        "group": "gimbap_extra",
+        "found": true,
+        "skillGroup": "김밥 추가",
+        "labelsExact": true,
+        "rules": false,
+        "quantity": true
+      },
+      {
+        "item": "멸치 김밥",
+        "group": "gimbap_cut",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "멸치 김밥",
+        "group": "gimbap_extra",
+        "found": false,
+        "skillGroup": null,
+        "quantity": false
+      },
+      {
+        "item": "보리별 라면",
+        "group": "noodle_firm",
+        "found": true,
+        "skillGroup": "면 익힘 정도",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "보리별 라면",
+        "group": "ramen_addin",
+        "found": true,
+        "skillGroup": "추가 재료",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "해물 라면",
+        "group": "ramen_addin",
+        "found": true,
+        "skillGroup": "추가 재료",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "만두 라면",
+        "group": "ramen_addin",
+        "found": true,
+        "skillGroup": "추가 재료",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "짬뽕 라면",
+        "group": "ramen_addin",
+        "found": true,
+        "skillGroup": "추가 재료",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "찹쌀 순대",
+        "group": "soondae_style",
+        "found": true,
+        "skillGroup": "순대 구성",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "보리별 세트",
+        "group": "set_tteok",
+        "found": true,
+        "skillGroup": "떡볶이 선택",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "보리별 세트",
+        "group": "spice",
+        "found": true,
+        "skillGroup": "맵기 선택",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "보리별 세트",
+        "group": "set_gimbap",
+        "found": true,
+        "skillGroup": "김밥 선택",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "보리별 세트",
+        "group": "gimbap_cut",
+        "found": true,
+        "skillGroup": "김밥 커팅",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "보리별 세트",
+        "group": "set_drink",
+        "found": true,
+        "skillGroup": "음료 선택",
+        "labelsExact": true,
+        "rules": false
+      },
+      {
+        "item": "떡튀순 세트",
+        "group": "spice",
+        "found": true,
+        "skillGroup": "맵기 선택",
+        "labelsExact": true,
+        "rules": false
+      }
+    ]
+  },
+  "orders": {
+    "total": 10,
+    "correct": 10,
+    "safeRefusal": 0,
+    "unsafe": 0,
+    "cartOnly": {
+      "correct": 10,
+      "safeRefusal": 0,
+      "unsafe": 0
+    },
+    "linesChecked": 10,
+    "results": [
+      {
+        "id": "h1",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "cartOnlyOutcome": "correct",
+        "totalSource": "cart",
+        "expectedTotal": 8000,
+        "kioskTotal": 8000,
+        "cartTotal": 8000,
+        "skillPredicts": 8000,
+        "ms": 866,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "보리별 떡볶이 › 3단계 보통맛",
+          "보리별 떡볶이 › 어묵 추가"
+        ],
+        "order": {
+          "dineOption": "매장에서 먹어요",
+          "lines": [
+            {
+              "category": "떡볶이",
+              "item": "보리별 떡볶이",
+              "options": [
+                "3단계 보통맛",
+                "삶은 계란",
+                "어묵 추가"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "음료",
+              "item": "콜라",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h2",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "cartOnlyOutcome": "correct",
+        "totalSource": "cart",
+        "expectedTotal": 18500,
+        "kioskTotal": 18500,
+        "cartTotal": 18500,
+        "skillPredicts": 18500,
+        "ms": 932,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "참치 김밥 › 통으로",
+          "김치 김밥 › 썰어서"
+        ],
+        "order": {
+          "dineOption": "포장해 갈게요",
+          "lines": [
+            {
+              "category": "김밥",
+              "item": "참치 김밥",
+              "options": [
+                "통으로",
+                "김밥 추가 1줄",
+                "김밥 추가 1줄"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "김밥",
+              "item": "김치 김밥",
+              "options": [
+                "썰어서"
+              ],
+              "qty": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "h3",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "cartOnlyOutcome": "correct",
+        "totalSource": "cart",
+        "expectedTotal": 11700,
+        "kioskTotal": 11700,
+        "cartTotal": 11700,
+        "skillPredicts": 11700,
+        "ms": 867,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "보리별 라면 › 꼬들하게"
+        ],
+        "order": {
+          "dineOption": "매장에서 먹어요",
+          "lines": [
+            {
+              "category": "라면/우동",
+              "item": "보리별 라면",
+              "options": [
+                "꼬들하게",
+                "계란",
+                "치즈"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "라면/우동",
+              "item": "해물 라면",
+              "options": [
+                "떡 사리"
+              ],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h4",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "cartOnlyOutcome": "correct",
+        "totalSource": "cart",
+        "expectedTotal": 14900,
+        "kioskTotal": 14900,
+        "cartTotal": 14900,
+        "skillPredicts": 14900,
+        "ms": 1147,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "보리별 세트 › 4단계 매운맛",
+          "보리별 세트 › 썰어서",
+          "보리별 세트 › 식혜"
+        ],
+        "order": {
+          "dineOption": "매장에서 먹어요",
+          "lines": [
+            {
+              "category": "세트",
+              "item": "보리별 세트",
+              "options": [
+                "로제 떡볶이",
+                "4단계 매운맛",
+                "참치 김밥",
+                "썰어서",
+                "식혜"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "튀김/순대",
+              "item": "김말이 튀김",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h5",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "cartOnlyOutcome": "correct",
+        "totalSource": "cart",
+        "expectedTotal": 20000,
+        "kioskTotal": 20000,
+        "cartTotal": 20000,
+        "skillPredicts": 20000,
+        "ms": 753,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "로제 떡볶이 › 2단계 덜매운맛",
+          "로제 떡볶이 › 라면 사리",
+          "로제 떡볶이 › 모짜렐라 치즈",
+          "로제 떡볶이 › 비엔나 소시지"
+        ],
+        "order": {
+          "dineOption": "포장해 갈게요",
+          "lines": [
+            {
+              "category": "떡볶이",
+              "item": "로제 떡볶이",
+              "options": [
+                "2단계 덜매운맛",
+                "라면 사리",
+                "모짜렐라 치즈",
+                "비엔나 소시지"
+              ],
+              "qty": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "h6",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "cartOnlyOutcome": "correct",
+        "totalSource": "cart",
+        "expectedTotal": 11500,
+        "kioskTotal": 11500,
+        "cartTotal": 11500,
+        "skillPredicts": 11500,
+        "ms": 965,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "점심 쫄볶이 › 1단계 순한맛",
+          "찹쌀 순대 › 내장 섞어서"
+        ],
+        "order": {
+          "dineOption": "매장에서 먹어요",
+          "lines": [
+            {
+              "category": "떡볶이",
+              "item": "점심 쫄볶이",
+              "options": [
+                "1단계 순한맛"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "튀김/순대",
+              "item": "찹쌀 순대",
+              "options": [
+                "내장 섞어서"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "음료",
+              "item": "사이다",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h7",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "cartOnlyOutcome": "correct",
+        "totalSource": "cart",
+        "expectedTotal": 23300,
+        "kioskTotal": 23300,
+        "cartTotal": 23300,
+        "skillPredicts": 23300,
+        "ms": 1138,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "보리별 세트 › 5단계 아주매운맛",
+          "보리별 세트 › 보리별 김밥",
+          "보리별 세트 › 통으로",
+          "보리별 세트 › 콜라"
+        ],
+        "order": {
+          "dineOption": "포장해 갈게요",
+          "lines": [
+            {
+              "category": "세트",
+              "item": "보리별 세트",
+              "options": [
+                "보리별 떡볶이",
+                "5단계 아주매운맛",
+                "보리별 김밥",
+                "통으로",
+                "콜라"
+              ],
+              "qty": 2
+            },
+            {
+              "category": "튀김/순대",
+              "item": "군만두",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h8",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "cartOnlyOutcome": "correct",
+        "totalSource": "cart",
+        "expectedTotal": 21000,
+        "kioskTotal": 21000,
+        "cartTotal": 21000,
+        "skillPredicts": 21000,
+        "ms": 981,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "떡튀순 세트 › 3단계 보통맛",
+          "궁중 떡볶이 › 당면 사리"
+        ],
+        "order": {
+          "dineOption": "매장에서 먹어요",
+          "lines": [
+            {
+              "category": "세트",
+              "item": "떡튀순 세트",
+              "options": [
+                "3단계 보통맛"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "떡볶이",
+              "item": "궁중 떡볶이",
+              "options": [
+                "당면 사리"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "음료",
+              "item": "생수",
+              "options": [],
+              "qty": 2
+            }
+          ]
+        }
+      },
+      {
+        "id": "h9",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "cartOnlyOutcome": "correct",
+        "totalSource": "cart",
+        "expectedTotal": 17200,
+        "kioskTotal": 17200,
+        "cartTotal": 17200,
+        "skillPredicts": 17200,
+        "ms": 1138,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "치즈 김밥 › 썰어서"
+        ],
+        "order": {
+          "dineOption": "포장해 갈게요",
+          "lines": [
+            {
+              "category": "김밥",
+              "item": "치즈 김밥",
+              "options": [
+                "썰어서",
+                "김밥 추가 1줄"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "라면/우동",
+              "item": "만두 라면",
+              "options": [
+                "계란",
+                "치즈",
+                "떡 사리"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "음료",
+              "item": "오렌지 주스",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h10",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "cartOnlyOutcome": "correct",
+        "totalSource": "cart",
+        "expectedTotal": 27000,
+        "kioskTotal": 27000,
+        "cartTotal": 27000,
+        "skillPredicts": 27000,
+        "ms": 1109,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "보리별 라면 › 푹 익혀서",
+          "짜장 떡볶이 › 2단계 덜매운맛",
+          "짜장 떡볶이 › 만두 사리"
+        ],
+        "order": {
+          "dineOption": "매장에서 먹어요",
+          "lines": [
+            {
+              "category": "라면/우동",
+              "item": "보리별 라면",
+              "options": [
+                "푹 익혀서"
+              ],
+              "qty": 3
+            },
+            {
+              "category": "떡볶이",
+              "item": "짜장 떡볶이",
+              "options": [
+                "2단계 덜매운맛",
+                "만두 사리"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "세트",
+              "item": "튀순 세트",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

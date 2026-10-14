@@ -1,0 +1,93 @@
+#1 act {"op":"click","label":"보리별 분식"}
+#2 act {"label":"매장에서 먹어요","op":"click"}
+#3 act {"op":"click","label":"보리별 떡볶이"}
+#4 act [{"label":"1단계 순한맛","op":"click"},{"role":"button","name":"담기","op":"click"}]
+#5 act {"op":"openReview","label":"주문 확인하기"}
+#6 act {"label":"주문 확인하기","op":"click"}
+#7 act {"label":"주문하기","op":"openReview"}
+#8 act {"op":"click","label":"적립 안 할게요"}
+#9 reload 
+#10 act [{"op":"click","label":"보리별 분식"},{"op":"click","label":"포장해 갈게요"}]
+#11 act [{"label":"보리별 떡볶이","op":"click"},{"label":"1단계 순한맛","op":"click"},{"role":"button","op":"click","name":"담기"}]
+#12 act {"label":"주문 확인하기","op":"click"}
+#13 act {"label":"‹ 메뉴 더 담기","op":"click"}
+#14 act {"op":"click","label":"전체 삭제"}
+#15 act {"op":"click","label":"모두 삭제"}
+#16 act {"label":"치즈 떡볶이","op":"click"}
+#17 act [{"op":"click","label":"✕"},{"label":"로제 떡볶이","op":"click"}]
+#18 act [{"op":"click","label":"✕"},{"label":"짜장 떡볶이","op":"click"}]
+#19 act [{"op":"click","label":"✕"},{"op":"click","label":"궁중 떡볶이"}]
+#20 act [{"op":"click","label":"✕"},{"label":"점심 쫄볶이","op":"click"}]
+#21 act [{"op":"click","label":"✕"},{"op":"click","label":"김밥"}]
+#22 act {"label":"보리별 김밥","op":"click"}
+#23 act [{"label":"✕","op":"click"},{"label":"김치 김밥","op":"click"}]
+#24 act {"label":"+","op":"click","within":"김밥 추가 1줄+3,000원"}
+#25 act {"label":"+","within":"김밥 추가 1줄+3,000원","op":"click"}
+#26 act {"label":"+","within":"김밥 추가 1줄+3,000원","op":"click"}
+#27 act {"within":"김밥 추가 1줄+3,000원","op":"click","label":"+"}
+#28 act [{"op":"click","label":"✕"},{"label":"참치 김밥","op":"click"}]
+#29 act [{"label":"✕","op":"click"},{"op":"click","label":"치즈 김밥"}]
+#30 act [{"label":"✕","op":"click"},{"label":"돈까스 김밥","op":"click"}]
+#31 act [{"op":"click","label":"✕"},{"op":"click","label":"라면/우동"}]
+#32 act {"op":"click","label":"보리별 라면"}
+#33 act [{"label":"✕","op":"click"},{"op":"click","label":"해물 라면"}]
+#34 act [{"op":"click","label":"✕"},{"op":"click","label":"만두 라면"}]
+#35 act [{"label":"✕","op":"click"},{"label":"짬뽕 라면","op":"click"}]
+#36 act [{"op":"click","label":"✕"},{"op":"click","label":"어묵 우동"}]
+#37 act [{"label":"✕","op":"click"},{"op":"click","label":"김치 우동"}]
+#38 act [{"label":"✕","op":"click"},{"op":"click","label":"튀김/순대"}]
+#39 act {"op":"click","label":"모둠 튀김"}
+#40 act [{"op":"click","label":"✕"},{"label":"김말이 튀김","op":"click"}]
+#41 act [{"label":"✕","op":"click"},{"op":"click","label":"고추 튀김"}]
+#42 act [{"op":"click","label":"✕"},{"label":"오징어 튀김","op":"click"}]
+#43 act [{"label":"✕","op":"click"},{"label":"찹쌀 순대","op":"click"}]
+#44 act [{"label":"✕","op":"click"},{"label":"군만두","op":"click"}]
+#45 act [{"label":"✕","op":"click"},{"op":"click","label":"세트"}]
+#46 act {"label":"보리별 세트","op":"click"}
+#47 act [{"op":"click","label":"보리별 떡볶이"},{"label":"1단계 순한맛","op":"click"},{"label":"다음","op":"click"}]
+#48 act [{"label":"보리별 김밥","op":"click"},{"op":"click","label":"썰어서"},{"op":"click","label":"다음"}]
+#49 act {"label":"✕","op":"click"}
+#50 act {"op":"click","label":"떡튀순 세트"}
+#51 act [{"op":"click","label":"✕"},{"label":"튀순 세트","op":"click"}]
+#52 act [{"op":"click","label":"✕"},{"label":"음료","op":"click"}]
+#53 act {"op":"click","label":"콜라"}
+#54 act [{"label":"✕","op":"click"},{"label":"사이다","op":"click"}]
+#55 act [{"op":"click","label":"✕"},{"op":"click","label":"오렌지 주스"}]
+#56 act [{"op":"click","label":"✕"},{"label":"식혜","op":"click"}]
+#57 act [{"op":"click","label":"✕"},{"op":"click","label":"생수"}]
+#58 act {"label":"✕","op":"click"}
+#59 act [{"op":"click","label":"세트"},{"op":"click","label":"보리별 세트"}]
+#60 act [{"op":"click","label":"보리별 떡볶이"},{"op":"click","label":"1단계 순한맛"},{"label":"다음","op":"click"}]
+#61 act [{"op":"click","label":"보리별 김밥"},{"label":"썰어서","op":"click"},{"op":"click","label":"다음"}]
+#62 act {"name":"담기","role":"button","op":"click"}
+#63 act [{"op":"click","label":"콜라"},{"op":"click","role":"button","name":"담기"}]
+#64 act [{"label":"김밥","op":"click"},{"label":"보리별 김밥","op":"click"}]
+#65 act {"label":"+","op":"click","within":"김밥 추가 1줄"}
+#66 act {"label":"✕","op":"click"}
+#67 act {"label":"주문 확인하기","op":"click"}
+#68 audit 
+  audit #1: GAPS missing=0 unknown=0 hidden=1 itemsMissingOptions=0 hardClicks=0 requiredChoices=0 (opened 31 item screens, replayed 12 lines)
+#69 reload 
+#70 act [{"op":"click","label":"보리별 분식"},{"op":"click","label":"매장에서 먹어요"}]
+#71 act [{"label":"라면/우동","op":"click"},{"op":"click","label":"어묵 우동"}]
+#72 act [{"label":"✕","op":"click"},{"label":"튀김/순대","op":"click"}]
+#73 act {"op":"click","label":"세트"}
+#74 act {"op":"click","label":"김밥"}
+#75 act {"label":"음료","op":"click"}
+#76 act {"label":"떡볶이","op":"click"}
+#77 act {"op":"click","label":"라면/우동"}
+#78 audit 
+  audit #2: GAPS missing=0 unknown=0 hidden=1 itemsMissingOptions=0 hardClicks=0 requiredChoices=0 (opened 0 item screens, replayed 3 lines)
+#79 audit 
+  audit #3: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=0 hardClicks=0 requiredChoices=0 (opened 31 item screens, replayed 12 lines)
+#80 testSkill 
+  test #1: PASS uncovered=4
+#81 records 
+#82 record 
+#83 testSkill 
+  test #2: PASS PASS
+#84 audit 
+  audit #4: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=0 hardClicks=0 requiredChoices=0 (opened 0 item screens, replayed 0 lines)
+#85 finish 
+  finish audit: OK
+{"provider":"gemini","model":"gemini-3.8-flash","learner":{"commit":"34532bc27a5e1938f6a60a2dbf65acc880e8a3e5","dirty":false},"cachedInputTokens":1025383,"finished":true,"turns":85,"acts":120,"tests":2,"inputTokens":1369557,"outputTokens":6924,"minutes":"9.6"}
