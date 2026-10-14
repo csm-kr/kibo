@@ -2,32 +2,32 @@
   "about": "Voice order E2E on /demo with real Gemini Live (e2e/voice.live.spec.ts, `npm run test:e2e:live`). Synthetic TTS voice (Gemini TTS, e2e/fixtures) through Chromium's fake microphone on a laptop, not a real phone. End of speech = the last voiced 40 ms mic frame sent to Live before the model's first output; the page sends the looping fixture once. (a) end of speech → first AI audio chunk; (b) end of speech → first 2 s highlight ring on the kiosk half. Medians over passing runs.",
   "model": "gemini-3.8-live",
   "firstRun": "2026-10-12T17:51:42.293Z",
-  "lastRun": "2026-10-14T11:37:49.958Z",
+  "lastRun": "2026-10-14T17:57:09.011Z",
   "summary": {
     "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)",
-    "runs": 2,
-    "passed": 2,
+    "runs": 4,
+    "passed": 4,
     "upstreamFailures": 0,
-    "aMedianMs": 2708,
-    "bMedianMs": 1833,
+    "aMedianMs": 2382,
+    "bMedianMs": 1669,
     "byFixture": {
       "hero-en": {
-        "runs": 1,
-        "passed": 1,
-        "aMedianMs": 2578,
-        "bMedianMs": 1864
+        "runs": 2,
+        "passed": 2,
+        "aMedianMs": 2380,
+        "bMedianMs": 1700
       },
       "hero-ko": {
-        "runs": 1,
-        "passed": 1,
-        "aMedianMs": 2837,
-        "bMedianMs": 1802
+        "runs": 2,
+        "passed": 2,
+        "aMedianMs": 2511,
+        "bMedianMs": 1584
       }
     }
   },
   "allAttempts": {
-    "attempted": 18,
-    "passed": 11,
+    "attempted": 20,
+    "passed": 13,
     "upstreamFailures": 6
   },
   "omitted": [
@@ -230,6 +230,36 @@
       "aMs": 2837,
       "bMs": 1802,
       "toolMs": 1596,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ],
+      "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)"
+    },
+    {
+      "at": "2026-10-14T17:56:50.199Z",
+      "fixture": "hero-en",
+      "connected": true,
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 2182,
+      "bMs": 1535,
+      "toolMs": 1476,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ],
+      "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)"
+    },
+    {
+      "at": "2026-10-14T17:57:09.011Z",
+      "fixture": "hero-ko",
+      "connected": true,
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 2185,
+      "bMs": 1365,
+      "toolMs": 1314,
       "commands": [
         "addToCart:ok",
         "addToCart:ok"

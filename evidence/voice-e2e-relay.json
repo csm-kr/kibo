@@ -2,32 +2,32 @@
   "about": "Voice order E2E on /demo through the kibo-voice relay to Vertex AI Live (relay mode of e2e/voice.live.spec.ts, `npm run test:e2e:live`): GEMINI_LIVE_BACKEND=vertex; the relay and a dev server run in one local process (scripts/e2e-relay-stack.ts), so the browser → relay hop is local, not Cloud Run; Vertex AI in VOICE_VERTEX_LOCATION or us-central1. Synthetic TTS voice (Gemini TTS, e2e/fixtures) through Chromium's fake microphone on a laptop, not a real phone. End of speech = the last voiced 40 ms mic frame sent to Live before the model's first output; the page sends the looping fixture once. (a) end of speech → first AI audio chunk; (b) end of speech → first 2 s highlight ring on the kiosk half. Medians over passing runs.",
   "model": "gemini-3.8-live",
   "firstRun": "2026-10-13T09:23:34.155Z",
-  "lastRun": "2026-10-14T11:38:45.974Z",
+  "lastRun": "2026-10-14T17:58:02.190Z",
   "summary": {
     "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)",
-    "runs": 2,
-    "passed": 2,
+    "runs": 4,
+    "passed": 4,
     "upstreamFailures": 0,
-    "aMedianMs": 2611,
-    "bMedianMs": 1641,
+    "aMedianMs": 2841,
+    "bMedianMs": 1715,
     "byFixture": {
       "hero-en": {
-        "runs": 1,
-        "passed": 1,
-        "aMedianMs": 2680,
-        "bMedianMs": 1780
+        "runs": 2,
+        "passed": 2,
+        "aMedianMs": 2841,
+        "bMedianMs": 1903
       },
       "hero-ko": {
-        "runs": 1,
-        "passed": 1,
-        "aMedianMs": 2542,
-        "bMedianMs": 1501
+        "runs": 2,
+        "passed": 2,
+        "aMedianMs": 2798,
+        "bMedianMs": 1575
       }
     }
   },
   "allAttempts": {
-    "attempted": 6,
-    "passed": 6,
+    "attempted": 8,
+    "passed": 8,
     "upstreamFailures": 0
   },
   "omitted": [
@@ -94,6 +94,36 @@
       "aMs": 2542,
       "bMs": 1501,
       "toolMs": 1303,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ],
+      "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)"
+    },
+    {
+      "at": "2026-10-14T17:57:29.165Z",
+      "fixture": "hero-en",
+      "connected": true,
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 3001,
+      "bMs": 2026,
+      "toolMs": 1626,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ],
+      "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)"
+    },
+    {
+      "at": "2026-10-14T17:58:02.190Z",
+      "fixture": "hero-ko",
+      "connected": true,
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 3053,
+      "bMs": 1649,
+      "toolMs": 1576,
       "commands": [
         "addToCart:ok",
         "addToCart:ok"
