@@ -14,6 +14,9 @@ The orchestrating session has run `/harness` since 10-12 22:30. The user delegat
 
 Production: `https://kibo-407514467119.asia-northeast3.run.app` (`kibo-00014-859`), voice relay `kibo-voice-00002-xfv` (`wss://kibo-voice-407514467119.asia-northeast3.run.app/ws`), short address `https://kibo-2026.web.app` (Firebase Hosting redirect). Models: `gemini-3.8-flash` (text, learner), `gemini-3.8-live` (voice); no retirement risk during judging (2.5 models retire 10-20, not used).
 
+- **GitHub (10-14 21:00):** private repo `https://github.com/csm-kr/kibo` created by the user's request; `origin` added; `main` and `feat-14-final` pushed (history scanned for key patterns: 0 hits; no `.env` tracked; no blob > 20 MB). Make it public only after the user says so (needed before submitting). Push again after phase 14 and after each merge.
+- **Preview revision:** `kibo-00015-huy` (phase 14 steps 0–7) at `https://preview---kibo-sm4ksacg7a-du.a.run.app` with 0 % traffic, `PUBLIC_ORIGIN` set to that URL, no `SHORT_APP_URL`; production stays `kibo-00014-859`. Remove the tag after the real deploy (`gcloud run services update-traffic kibo --remove-tags preview --region asia-northeast3`).
+
 ## KIBO Learn numbers so far (all `grade-v2.json`, grader v2 + round-3 rules)
 - Four test kiosks (learner tuned on them): baseline 5/10/5 → final 31/4/5 of 40 (phase 13).
 - Fresh hold-outs, round 2 learner (phase 13): bk5-restarea 4/3/3, bk6-themepark 10/0/0.
