@@ -12,6 +12,15 @@ const VIEWPORTS = [
 
 const STRICT = process.env.QA_ALL === "1";
 
+/** The replay plays by itself at 4×; pause it and go back to the first turn. */
+async function stopAtStart(page: Page) {
+  const play = page.locator("[data-learn-play]");
+  await expect(play).toHaveText("Pause", { timeout: 60_000 });
+  await play.click();
+  await expect(play).toHaveText(/^Play/);
+  await page.getByRole("slider", { name: "Turn" }).press("Home");
+}
+
 test.use({ viewport: VIEWPORTS[0], locale: "en-US" });
 
 async function check(page: Page, info: Parameters<typeof qaState>[1], state: string, scrollTo?: string) {
@@ -38,7 +47,7 @@ test("/learn index", async ({ page }, info) => {
 
 test("learn replay: the fresh theme park run's finish and learned skill", async ({ page }, info) => {
   await page.goto("/learn/themepark");
-  await expect(page.locator("[data-learn-turn]")).toHaveText(/Turn 1 of 87/, { timeout: 60_000 });
+  await stopAtStart(page);
   await page.locator('[data-learn-milestone="finish"]').click();
   await expect(page.locator("[data-learn-skill]")).toBeVisible();
   await check(page, info, "replay-themepark-skill", "[data-learn-skill]");
@@ -46,7 +55,8 @@ test("learn replay: the fresh theme park run's finish and learned skill", async 
 
 test("learn replay: start, a stopped tap, the finish and the learned skill", async ({ page }, info) => {
   await page.goto("/learn/airport-shop");
-  await expect(page.locator("[data-learn-turn]")).toHaveText(/Turn 1 of 64/, { timeout: 60_000 });
+  await stopAtStart(page);
+  await expect(page.locator("[data-learn-turn]")).toHaveText(/Turn 1 of 64/);
   await check(page, info, "replay-start");
 
   // Turn 8: an ambiguous label, shown with its warning icon.
@@ -66,7 +76,8 @@ test("learn replay: start, a stopped tap, the finish and the learned skill", asy
 
 test("learn replay: Doughhouse refused payment tap and the order button", async ({ page }, info) => {
   await page.goto("/learn/doughhouse");
-  await expect(page.locator("[data-learn-action]")).toContainText("Refused to tap 주문하기", { timeout: 60_000 });
+  await stopAtStart(page);
+  await expect(page.locator("[data-learn-action]")).toContainText("Refused to tap 주문하기 (Order)");
   await check(page, info, "replay-refused");
   await page.locator('[data-learn-milestone="finish"]').click();
   await expect(page.locator("[data-learn-order]")).toBeVisible();

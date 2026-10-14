@@ -18,9 +18,9 @@ function turn(n: number, tool: string, result: string, discoveries = none, args:
 const START = new Date(Date.UTC(2026, 9, 13, 21, 0, 0)).toISOString();
 
 describe("describeCall", () => {
-  it("says what was tapped, in order", () => {
+  it("says what was tapped, in order, with each Korean label's English gloss", () => {
     expect(describeCall({ tool: "act", args: {}, result: "tapped 데워 주세요 → 담기" })).toEqual({
-      text: "Tapped 데워 주세요 → 담기",
+      text: "Tapped 데워 주세요 (Heat it, please) → 담기 (Add)",
       outcome: "ok",
     });
   });
@@ -31,7 +31,7 @@ describe("describeCall", () => {
       args: {},
       result: 'act failed: Refused: "주문하기" is a payment or checkout control; a skill never needs it (list it in forbiddenLabels)',
     });
-    expect(r).toEqual({ text: "Refused to tap 주문하기: it is a payment or checkout button", outcome: "refused" });
+    expect(r).toEqual({ text: "Refused to tap 주문하기 (Order): it is a payment or checkout button", outcome: "refused" });
   });
 
   it("explains an ambiguous label instead of showing the JSON", () => {
@@ -40,12 +40,15 @@ describe("describeCall", () => {
       args: {},
       result: 'act failed: {"role":"button","name":"담기","op":"click"} matches 4 elements; add "within": "<text near the one you mean>" or "exact": true',
     });
-    expect(r).toEqual({ text: "Did not tap: “담기” matches 4 buttons on this screen", outcome: "failed" });
+    expect(r).toEqual({ text: "Did not tap: “담기 (Add)” matches 4 buttons on this screen", outcome: "failed" });
   });
 
   it("counts the names written down and the self-test result", () => {
     expect(describeCall({ tool: "record", args: { kind: "item", names: ["a", "b"] }, result: "recorded item a, b" }).text).toBe(
       "Wrote down 2 items: a, b",
+    );
+    expect(describeCall({ tool: "record", args: { kind: "item", names: ["김밥", "콜라"] }, result: "recorded item 김밥, 콜라" }).text).toBe(
+      "Wrote down 2 items: 김밥 (Kimbap), 콜라 (Cola)",
     );
     expect(describeCall({ tool: "record", args: { kind: "flow" }, result: "recorded a flow fact" }).text).toBe(
       "Wrote down a note about the order flow",

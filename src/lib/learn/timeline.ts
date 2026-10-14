@@ -1,6 +1,9 @@
 // A recorded KIBO Learn run (public/learn/<runId>/run.json, written by `npm run learn:runs` from the learner's
 // trace) turned into the /learn viewer's timeline. Nothing is added: one step per recorded turn, its own words come
-// from the turn's one-line result, and the counters are the trace's own discovery counts.
+// from the turn's one-line result, and the counters are the trace's own discovery counts. Korean labels carry their
+// English from the static glossary, so a judge who reads no Korean can follow a replay.
+
+import { gloss } from "./glossary";
 
 export interface Known {
   items: number;
@@ -92,11 +95,13 @@ export interface Milestone {
 export function describeCall(call: LearnCall): { text: string; outcome: Outcome } {
   const r = call.result;
   if (call.tool === "act") {
-    if (r.startsWith("tapped ")) return { text: `Tapped ${r.slice("tapped ".length)}`, outcome: "ok" };
+    if (r.startsWith("tapped ")) {
+      return { text: `Tapped ${r.slice("tapped ".length).split(" → ").map(gloss).join(" → ")}`, outcome: "ok" };
+    }
     const refused = r.match(/Refused: "([^"]+)" is a payment or checkout control/);
-    if (refused) return { text: `Refused to tap ${refused[1]}: it is a payment or checkout button`, outcome: "refused" };
+    if (refused) return { text: `Refused to tap ${gloss(refused[1])}: it is a payment or checkout button`, outcome: "refused" };
     const many = r.match(/"(?:label|name|text)":"([^"]+)".*matches (\d+) elements/);
-    if (many) return { text: `Did not tap: “${many[1]}” matches ${many[2]} buttons on this screen`, outcome: "failed" };
+    if (many) return { text: `Did not tap: “${gloss(many[1])}” matches ${many[2]} buttons on this screen`, outcome: "failed" };
     return { text: "A tap failed", outcome: "failed" };
   }
   if (call.tool === "reload") return { text: "Reloaded the kiosk to start over", outcome: "ok" };
@@ -104,7 +109,10 @@ export function describeCall(call: LearnCall): { text: string; outcome: Outcome 
   if (call.tool === "record") {
     const names = call.args.names ?? [];
     if (call.args.kind === "item" && names.length) {
-      return { text: `Wrote down ${names.length} ${names.length === 1 ? "item" : "items"}: ${names.join(", ")}`, outcome: "ok" };
+      return {
+        text: `Wrote down ${names.length} ${names.length === 1 ? "item" : "items"}: ${names.map(gloss).join(", ")}`,
+        outcome: "ok",
+      };
     }
     if (call.args.kind === "flow") return { text: "Wrote down a note about the order flow", outcome: "ok" };
   }

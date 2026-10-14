@@ -3,7 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { RunFacts, runSources, Sources } from "@/components/learn/Fact";
-import { CARD, ICON, QUIET, SECONDARY } from "@/components/phone/ui";
+import { CARD, FOCUS, ICON, QUIET, SECONDARY } from "@/components/phone/ui";
+import { LEARN_ALL_ROUNDS, LEARN_HEADLINE, LEARN_HEADLINE_DETAIL } from "@/lib/learn/headline";
 import { LEARN_RUNS } from "@/lib/learn/runs";
 
 export const metadata: Metadata = { title: "KIBO Learn — watch it learn a kiosk" };
@@ -30,6 +31,19 @@ export default function LearnIndex() {
             test, one by the KIBO team. One run per kiosk, Gemini 3.8 Flash on 10-13 and 10-14. These are replays of recorded runs, not
             live.
           </p>
+          {/* Word for word the headline in docs/plan/NUMBERS.md, with every never-seen kiosk one click away. */}
+          <div className="flex flex-col gap-1 border-l-4 border-kibo pl-4">
+            <p data-learn-headline className="font-semibold">
+              {LEARN_HEADLINE}
+            </p>
+            <p className="text-base text-muted">{LEARN_HEADLINE_DETAIL}</p>
+            <details data-learn-all-rounds className="text-base text-muted">
+              <summary className={`${FOCUS} inline-flex min-h-14 cursor-pointer items-center font-semibold underline`}>
+                Every never-seen kiosk so far
+              </summary>
+              <p>{LEARN_ALL_ROUNDS}</p>
+            </details>
+          </div>
         </header>
         <ul className="grid gap-6 lg:grid-cols-2">
           {LEARN_RUNS.map((run) => {

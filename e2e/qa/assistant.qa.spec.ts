@@ -16,7 +16,8 @@ const VIEWPORTS = [
 
 const STRICT = process.env.QA_ALL === "1";
 
-test.use({ viewport: VIEWPORTS[0], locale: "en-US", isMobile: true, hasTouch: true });
+// Its own address: this spec creates many sessions, and on the shared one it hit the 10 a minute limit (R-005, I-068).
+test.use({ viewport: VIEWPORTS[0], locale: "en-US", isMobile: true, hasTouch: true, extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.56" } });
 
 test.beforeAll(async ({ browser, request }) => {
   await warmPhone(browser, request);
@@ -479,19 +480,24 @@ test("P7: someone else is using this kiosk", async ({ page, request }, info) => 
   await check(page, info, "P7-taken");
 });
 
-test("PX: idle warning one minute before expiry", async ({ page, request }, info) => {
-  await page.clock.install();
-  const s = await openPhone(page, request);
-  await page.getByRole("button", { name: "Start" }).click();
-  await page.getByRole("button", { name: "Type instead" }).click();
-  await page.getByRole("button", { name: "Eat here" }).click();
-  await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
-  expect(s.sessionId).toBeTruthy();
+test.describe(() => {
+  // A second address: the tests above already make more than the 10 new sessions a minute one address may (R-005).
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.57" } });
 
-  // Sessions expire 10 min after the last activity. Moving only the page clock 9.5 min ahead shows the warning
-  // without waiting; the next 30 s ping re-measures the offset and hides it again.
-  await page.clock.setSystemTime(Date.now() + 9.5 * 60_000);
-  await expect(page.getByRole("alertdialog", { name: "Still ordering?" })).toBeVisible();
-  // The main viewport only: the warning goes away at the next ping, 30 s later.
-  await check(page, info, "PX-idle-warning", [VIEWPORTS[0]]);
+  test("PX: idle warning one minute before expiry", async ({ page, request }, info) => {
+    await page.clock.install();
+    const s = await openPhone(page, request);
+    await page.getByRole("button", { name: "Start" }).click();
+    await page.getByRole("button", { name: "Type instead" }).click();
+    await page.getByRole("button", { name: "Eat here" }).click();
+    await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
+    expect(s.sessionId).toBeTruthy();
+
+    // Sessions expire 10 min after the last activity. Moving only the page clock 9.5 min ahead shows the warning
+    // without waiting; the next 30 s ping re-measures the offset and hides it again.
+    await page.clock.setSystemTime(Date.now() + 9.5 * 60_000);
+    await expect(page.getByRole("alertdialog", { name: "Still ordering?" })).toBeVisible();
+    // The main viewport only: the warning goes away at the next ping, 30 s later.
+    await check(page, info, "PX-idle-warning", [VIEWPORTS[0]]);
+  });
 });

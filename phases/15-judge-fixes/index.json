@@ -29,7 +29,9 @@
     {
       "step": 3,
       "name": "learn-clarity",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-15T01:36:12+0900",
+      "summary": "One learner headline word for word from NUMBERS.md ('On two kiosks it had never seen, KIBO finished 16 of 20 orders hands-free, handed 2 to staff and refused 2; none was wrong (round 4, synthetic kiosks).'): src/lib/learn/headline.ts on the landing KIBO Learn card and the /learn header, each with 'Every never-seen kiosk so far' (32/15/3/10 of 60) in a details disclosure; copied into README, DECK_FACTS slot 12 and the SUBMISSION form text (trimmed to 1,020/1,024); NUMBERS row + retired wordings. /learn replay: static glossary src/lib/learn/glossary.ts (226 labels from the four runs, test fails on a missing one) glosses captions, notes and the learned menu as '세트 (Set)'; autoplay at 4x with a visible Pause, manual steps pause. No tap dot: the traces record no click positions (I-266). Landing: repo paths moved into one 'Sources (N files)' details per section, publishers stay visible. assistant.qa.spec got its own addresses (192.0.2.56/.57) after hitting the 10 sessions/min limit (R-005). I-238 seen again (fixed), I-266 new. lint, build, test (1121), test:e2e (51 passed, 17 @live skipped), qa:ui (48/48) pass."
     },
     {
       "step": 4,

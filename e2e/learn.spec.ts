@@ -1,4 +1,5 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+import { LEARN_HEADLINE } from "../src/lib/learn/headline";
 
 // /learn and /learn/<runId>: replays of recorded KIBO Learn runs (public/learn/, `npm run learn:runs`). No API calls
 // beyond page loads; its own address anyway (R-005).
@@ -7,6 +8,15 @@ test.use({
   viewport: { width: 1440, height: 900 },
   extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.40" },
 });
+
+/** The replay plays by itself at 4×; pause it and go back to the first turn. */
+async function stopAtStart(page: Page) {
+  const play = page.locator("[data-learn-play]");
+  await expect(play).toHaveText("Pause", { timeout: 60_000 });
+  await play.click();
+  await expect(play).toHaveText(/^Play/);
+  await page.getByRole("slider", { name: "Turn" }).press("Home");
+}
 
 test("/learn lists the recorded runs with their numbers", async ({ page }) => {
   await page.goto("/learn");
@@ -44,11 +54,22 @@ test("/learn lists the recorded runs with their numbers", async ({ page }) => {
   await expect(page).toHaveURL(/\/learn\/airport-shop$/);
 });
 
+test("the replay starts by itself at 4× with a visible Pause", async ({ page }) => {
+  await page.goto("/learn/airport-shop");
+  await expect(page.locator("[data-learn-play]")).toHaveText("Pause", { timeout: 60_000 });
+  await expect(page.getByRole("button", { name: "4×" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("[data-learn-turn]")).not.toHaveText(/Turn 1 of 64/, { timeout: 10_000 });
+});
+
 test("the viewer steps through the trace, reaches the finish and hides the order button for a test-only kiosk", async ({ page }) => {
   await page.goto("/learn/airport-shop");
+  await stopAtStart(page);
   const turn = page.locator("[data-learn-turn]");
-  await expect(turn).toHaveText(/Turn 1 of 64/, { timeout: 60_000 });
-  await expect(page.locator("[data-learn-action]")).toHaveText("Tapped 화면을 터치하여 주문을 시작하세요");
+  await expect(turn).toHaveText(/Turn 1 of 64/);
+  // Korean labels carry their English (src/lib/learn/glossary.ts).
+  await expect(page.locator("[data-learn-action]")).toHaveText(
+    "Tapped 화면을 터치하여 주문을 시작하세요 (Touch the screen to start your order)",
+  );
   await page.locator("[data-learn-next]").click();
   await expect(turn).toHaveText(/Turn 2 of 64/);
   await expect(page.getByRole("img", { name: "The kiosk screen after turn 2" })).toHaveAttribute("src", "/learn/airport-shop/turn-2.webp");
@@ -67,28 +88,30 @@ test("the viewer steps through the trace, reaches the finish and hides the order
   await expect(page.locator('[data-learn-count="Items"]')).toHaveText("37");
   const skill = page.locator("[data-learn-skill]");
   await expect(skill).toBeVisible();
-  await expect(skill.getByRole("rowheader", { name: "야채김밥" })).toBeVisible();
+  await expect(skill.getByRole("rowheader", { name: "야채김밥 (Vegetable kimbap)" })).toBeVisible();
   await expect(skill.locator("[data-learn-order]")).toHaveCount(0);
   await expect(skill.locator("[data-learn-no-order]")).toContainText("not in the live demo");
 });
 
 test("the theme park replay says it kept no notes and ends at its learned skill without an order button", async ({ page }) => {
   await page.goto("/learn/themepark");
-  await expect(page.locator("[data-learn-turn]")).toHaveText(/Turn 1 of 87/, { timeout: 60_000 });
+  await stopAtStart(page);
+  await expect(page.locator("[data-learn-turn]")).toHaveText(/Turn 1 of 87/);
   await expect(page.locator("[data-learn-no-notes]")).toBeVisible();
   await expect(page.locator("[data-learn-count]")).toHaveCount(0);
   await page.locator('[data-learn-milestone="finish"]').click();
   const skill = page.locator("[data-learn-skill]");
-  await expect(skill.getByRole("rowheader", { name: "종일 자유이용권" })).toBeVisible();
+  await expect(skill.getByRole("rowheader", { name: "종일 자유이용권 (All-day pass)" })).toBeVisible();
   await expect(skill.locator("[data-learn-order]")).toHaveCount(0);
   await expect(skill.locator("[data-learn-no-order]")).toContainText("not in the live demo");
 });
 
 test("play advances by itself; the Doughhouse replay ends with an order button to its live demo", async ({ page }) => {
   await page.goto("/learn/doughhouse");
+  await stopAtStart(page);
   const turn = page.locator("[data-learn-turn]");
-  await expect(turn).toHaveText(/Turn 1 of 38/, { timeout: 60_000 });
-  await expect(page.locator("[data-learn-action]")).toHaveText("Refused to tap 주문하기: it is a payment or checkout button");
+  await expect(turn).toHaveText(/Turn 1 of 38/);
+  await expect(page.locator("[data-learn-action]")).toHaveText("Refused to tap 주문하기 (Order): it is a payment or checkout button");
   await page.getByRole("button", { name: "16×" }).click();
   await page.locator("[data-learn-play]").click();
   await expect(turn).toHaveText(/Turn 38 of 38/, { timeout: 15_000 });
@@ -103,7 +126,8 @@ test("play advances by itself; the Doughhouse replay ends with an order button t
 test("on a phone the action and [Play] are on the first screen; the picture can be shown larger", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/learn/airport-shop");
-  await expect(page.locator("[data-learn-turn]")).toHaveText(/Turn 1 of 64/, { timeout: 60_000 });
+  await stopAtStart(page);
+  await expect(page.locator("[data-learn-turn]")).toHaveText(/Turn 1 of 64/);
   await expect(page.locator("[data-learn-action]")).toBeInViewport({ ratio: 1 });
   await expect(page.locator("[data-learn-play]")).toBeInViewport({ ratio: 1 });
 
@@ -127,3 +151,15 @@ test("the landing page links to /learn", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("link", { name: "Watch KIBO learn a new kiosk" })).toHaveAttribute("href", "/learn", { timeout: 60_000 });
 });
+
+// One learner headline, word for word, on both pages (docs/plan/NUMBERS.md); every never-seen kiosk one click away.
+for (const path of ["/", "/learn"]) {
+  test(`${path} shows the one learner headline and the all-rounds total behind one click`, async ({ page }) => {
+    await page.goto(path);
+    await expect(page.locator("[data-learn-headline]")).toHaveText(LEARN_HEADLINE, { timeout: 60_000 });
+    const all = page.locator("[data-learn-all-rounds]");
+    await expect(all.getByText("60 orders, 32 correct")).toBeHidden();
+    await all.getByText("Every never-seen kiosk so far").click();
+    await expect(all.getByText("60 orders, 32 correct", { exact: false })).toBeVisible();
+  });
+}

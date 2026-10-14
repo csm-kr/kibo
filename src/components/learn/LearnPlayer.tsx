@@ -7,12 +7,15 @@ import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { CARD, FOCUS, ICON, PRESS, PRIMARY, QUIET, SECONDARY } from "@/components/phone/ui";
 import { formatWon } from "@/lib/kiosk/menu";
 import type { LearnRun } from "@/lib/learn/runs";
+import { gloss, glossAll } from "@/lib/learn/glossary";
 import { buildTimeline, formatClock } from "@/lib/learn/timeline";
 import { Fact, RunFacts, runSources, Sources } from "./Fact";
 
 // The /learn/<runId> replay: one step per recorded turn of the learner's trace, the kiosk screenshot it took, the
 // action in plain words, the counters it had written down and the milestones. Playback is not real time; the clock
-// is. With reduced motion nothing advances by itself (docs/UI_QA.md "Motion").
+// is. It starts by itself at 4× with a visible Pause, so a judge sees KIBO learn without pressing anything; stepping
+// by hand pauses it. With reduced motion nothing advances by itself (docs/UI_QA.md "Motion"). Korean labels carry
+// their English from the static glossary (src/lib/learn/glossary.ts).
 
 /** One turn on screen at 1×. */
 const STEP_MS = 1200;
@@ -37,8 +40,8 @@ export function LearnPlayer({ run }: { run: LearnRun }) {
   // A run that never used `record` (bk6) has all-zero counters; they would read as "found nothing".
   const noNotes = steps.every((s) => s.known.items === 0 && s.known.optionGroups === 0 && s.known.categories === 0);
   const [index, setIndex] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const [speed, setSpeed] = useState<(typeof SPEEDS)[number]>(1);
+  const [playing, setPlaying] = useState(true);
+  const [speed, setSpeed] = useState<(typeof SPEEDS)[number]>(4);
   const [large, setLarge] = useState(false);
   const reduced = useSyncExternalStore(subscribeReduce, () => window.matchMedia(REDUCE).matches, () => false);
   const running = playing && !reduced && index < last;
@@ -56,6 +59,7 @@ export function LearnPlayer({ run }: { run: LearnRun }) {
 
   const step = steps[index];
   const go = (i: number) => {
+    setPlaying(false);
     setIndex(Math.max(0, Math.min(last, i)));
   };
   const togglePlay = () => {
@@ -188,10 +192,7 @@ export function LearnPlayer({ run }: { run: LearnRun }) {
                     <button
                       type="button"
                       data-learn-milestone={m.kind}
-                      onClick={() => {
-                        setPlaying(false);
-                        go(m.index);
-                      }}
+                      onClick={() => go(m.index)}
                       className={`flex min-h-14 w-full items-center gap-3 rounded-tile px-3 text-left text-xl active:bg-kibo-tint ${PRESS} ${FOCUS}`}
                     >
                       {reached ? <Check {...ICON} className="flex-none text-kibo" /> : <Circle {...ICON} className="flex-none text-muted" />}
@@ -237,7 +238,8 @@ export function LearnPlayer({ run }: { run: LearnRun }) {
                 <p className="text-base">
                   {step.latest ? (
                     <>
-                      <span className="font-semibold">Latest written down (turn {step.latest.n}):</span> {step.latest.names.join(", ")}
+                      <span className="font-semibold">Latest written down (turn {step.latest.n}):</span>{" "}
+                      {glossAll(step.latest.names).join(", ")}
                     </>
                   ) : (
                     "Nothing written down yet."
@@ -270,7 +272,7 @@ function SkillSummary({ run }: { run: LearnRun }) {
       <Sources paths={runSources(run)} />
       <div className={`${CARD} flex flex-col gap-3`}>
         <p>
-          <span className="font-semibold">{categories.length} categories:</span> {categories.join(", ")}
+          <span className="font-semibold">{categories.length} categories:</span> {glossAll(categories).join(", ")}
         </p>
         {/* Shorter than the screen, so the focused region is always fully in view (WCAG 2.4.11); it scrolls inside. */}
         <div role="region" aria-label="The learned menu, scrolls" tabIndex={0} className={`max-h-[60dvh] overflow-auto rounded-tile ${FOCUS}`}>
@@ -288,17 +290,17 @@ function SkillSummary({ run }: { run: LearnRun }) {
               {catalog.map((item) => (
                 <tr key={item.name} className="border-b border-line align-top">
                   <th scope="row" className="py-2 pr-4 font-semibold">
-                    {item.name}
+                    {gloss(item.name)}
                     {item.soldOut && <span className="font-normal text-muted"> (sold out)</span>}
                   </th>
-                  <td className="py-2 pr-4">{item.category}</td>
+                  <td className="py-2 pr-4">{gloss(item.category)}</td>
                   {/* A ticket priced 0 takes its fare from an option (passenger type); ₩0 read as a bug (I-245). */}
                   <td className="py-2 pr-4 text-right tabular-nums">
                     {item.price === 0 && item.groups.length ? "By option" : formatWon(item.price, "en")}
                   </td>
                   <td className="py-2">
                     {item.groups.length
-                      ? item.groups.map((g) => `${g.name}: ${g.options.join(", ")}`).join(" · ")
+                      ? item.groups.map((g) => `${gloss(g.name)}: ${glossAll(g.options).join(", ")}`).join(" · ")
                       : "None"}
                   </td>
                 </tr>

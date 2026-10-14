@@ -4,10 +4,12 @@ import Link from "next/link";
 import { FOCUS, PRIMARY, SECONDARY } from "@/components/assistant/styles";
 import { DEMO_ENVIRONMENTS, demoHref } from "@/components/demo/environments";
 import { SESSION_TTL_MS } from "@/lib/commands/session";
+import { LEARN_ALL_ROUNDS, LEARN_HEADLINE, LEARN_HEADLINE_DETAIL } from "@/lib/learn/headline";
 import { repoLink } from "@/lib/repo";
 
 // The root landing page: the first thing a judge sees after the video. Every picture is a capture of the running
-// app (`npm run shots:landing`), and every number names its evidence file or its source (docs/RULE.md R-001).
+// app (`npm run shots:landing`), and every number names its evidence file or its source (docs/RULE.md R-001):
+// publishers stay visible, repo files sit in one small "Sources" disclosure per section.
 // External facts come only from docs/plan/SOURCES.md (the S-ids in the comments below).
 
 // "Any kiosk" would overclaim: KIBO covers web and webview kiosks (docs/PRD.md, docs/ISSUE.md I-076).
@@ -338,12 +340,10 @@ export default function Home() {
             <Fact
               value="68 of 70 test orders passed"
               detail="text agent on gemini-3.8-flash (Vertex AI), typed in Korean, English and 7 more languages; cases written by the KIBO team"
-              path="evals/results/2026-10-14T20-26.md"
             />
             <Fact
               value="1.8 s median from end of speech to the kiosk highlight"
               detail="2 spoken orders (English, Korean) to gemini-3.8-live, synthetic voice on a laptop, not yet on a real phone; 1.6 s through the Vertex AI relay"
-              path="evidence/voice-e2e.json"
             />
           </article>
           <article className={`${CARD} flex flex-col gap-4`}>
@@ -352,21 +352,27 @@ export default function Home() {
               For a kiosk with no integration, Gemini explores its screens once and writes a skill: the menu plus click
               recipes. Orders are then replayed without AI and checked against the kiosk&apos;s own total.
             </p>
-            {/* The groups stay apart (docs/plan/NUMBERS.md): never-seen kiosks, the tuned test kiosks, our own kiosk. */}
-            <Fact
-              value="2 kiosks it had never seen: 62 of 62 items, 18 of 20 orders right, 2 refused, none wrong"
-              detail="built by other AI agents, learned once each by the latest learner; in 2 of the 18 the skill's own price differed from the kiosk's. All 6 never-seen kiosks so far: 32 right, 15 refused, 3 wrong (an earlier learner), 10 not learned, of 60 orders"
-              path="spikes/blind-kiosks/ROUND4.md"
-            />
+            {/* The groups stay apart (docs/plan/NUMBERS.md): never-seen kiosks, the tuned test kiosks, our own kiosk.
+                The headline is word for word the one in NUMBERS.md; every never-seen kiosk is one click away. */}
+            <div className="flex flex-col gap-1 border-l-4 border-[#3446D4] pl-4">
+              <p data-learn-headline className="font-bold text-[#15171C]">
+                {LEARN_HEADLINE}
+              </p>
+              <p className={EVIDENCE}>{LEARN_HEADLINE_DETAIL}</p>
+              <details data-learn-all-rounds className={EVIDENCE}>
+                <summary className={`${FOCUS} inline-flex min-h-14 cursor-pointer items-center font-semibold underline`}>
+                  Every never-seen kiosk so far
+                </summary>
+                <p>{LEARN_ALL_ROUNDS}</p>
+              </details>
+            </div>
             <Fact
               value="4 test kiosks: 134 of 134 items, 31 of 40 orders right"
               detail="built by other AI agents; 4 orders refused safely, 5 went wrong on one bakery kiosk (its pop-up blocked a tap); in 3 of the 31 the skill's own price differed from the kiosk's. The learner was improved using these kiosks' first runs, so this is not a blind result"
-              path="spikes/blind-kiosks/RESULTS.md"
             />
             <Fact
               value="Our pizza kiosk: learned in 5.2 min, 4 of 4 unseen orders replayed without AI"
               detail="Doughhouse, the kiosk the learner was developed on, so not a blind test; a planted rule break was also caught"
-              path="spikes/blind-kiosks/results/dev/gemini-doughhouse-round3/holdout.log"
             />
             <Link href="/demo?k=doughhouse" className={SECONDARY}>
               Try the learned pizza kiosk
@@ -394,6 +400,17 @@ export default function Home() {
           </ul>
           <p className={EVIDENCE}>No kiosk vendor or store has installed KIBO yet; there are no partnerships.</p>
         </article>
+        <Sources
+          paths={[
+            "evals/results/2026-10-14T20-26.md",
+            "evidence/voice-e2e.json",
+            "evidence/voice-e2e-relay.json",
+            "spikes/blind-kiosks/ROUND4.md",
+            "spikes/blind-kiosks/ROUND3.md",
+            "spikes/blind-kiosks/RESULTS.md",
+            "spikes/blind-kiosks/results/dev/gemini-doughhouse-round3/holdout.log",
+          ]}
+        />
       </section>
 
       <section data-landing-section="cloud" aria-labelledby="cloud" className="flex flex-col gap-6">
@@ -438,9 +455,9 @@ export default function Home() {
               {SESSION_MINUTES} minutes without activity and is then deleted. Speech and text are processed by Google
               Gemini under Google&apos;s terms.
             </p>
-            <Fact value="How we checked" detail="what the server stores and logs" path="docs/SECURITY.md" />
           </article>
         </div>
+        <Sources paths={["docs/SECURITY.md"]} note="How we checked what the server stores and logs" />
       </section>
 
       <section data-landing-section="access" aria-labelledby="access" className="flex flex-col gap-6">
@@ -503,19 +520,34 @@ function Shot({ src, alt, width, height }: { src: string; alt: string; width: nu
   );
 }
 
-/** One measured number, what it was measured on, and a link to the file in the public repo that holds it. */
-function Fact({ value, detail, path }: { value: string; detail: string; path: string }) {
+/** One measured number and what it was measured on; the file behind it is in its section's Sources. */
+function Fact({ value, detail }: { value: string; detail: string }) {
   return (
     <div className="flex flex-col gap-1 border-l-4 border-[#3446D4] pl-4">
       <p className="font-bold text-[#15171C]">{value}</p>
       <p className={EVIDENCE}>{detail}</p>
-      <a
-        href={repoLink(path)}
-        className={`${EVIDENCE} ${FOCUS} inline-flex min-h-14 items-center self-start font-mono underline [overflow-wrap:anywhere]`}
-      >
-        {path}
-      </a>
     </div>
+  );
+}
+
+/** The repo files behind a section's numbers, closed by default, each a link to the public repo. */
+function Sources({ paths, note }: { paths: string[]; note?: string }) {
+  return (
+    <details data-landing-sources className={EVIDENCE}>
+      <summary className={`${FOCUS} inline-flex min-h-14 cursor-pointer items-center underline`}>
+        Sources ({paths.length} {paths.length === 1 ? "file" : "files"})
+      </summary>
+      {note && <p>{note}:</p>}
+      <ul className="flex flex-col">
+        {paths.map((path) => (
+          <li key={path}>
+            <a href={repoLink(path)} className={`${FOCUS} inline-flex min-h-14 items-center font-mono underline [overflow-wrap:anywhere]`}>
+              {path}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </details>
   );
 }
 
