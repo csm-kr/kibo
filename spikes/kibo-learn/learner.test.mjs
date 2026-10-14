@@ -28,11 +28,13 @@ function runLearner({ maxTurns, fail, calls, defaultCall, maxInputTokens, kiosk 
   const requests = fs.existsSync(log) ? fs.readFileSync(log, 'utf8').trim().split('\n').map((l) => JSON.parse(l)) : [];
   const statsPath = path.join(dir, 'learn-stats.json');
   const stats = fs.existsSync(statsPath) ? JSON.parse(fs.readFileSync(statsPath, 'utf8')) : null;
+  const lastSkillPath = path.join(dir, 'last-skill.json');
+  const lastSkill = fs.existsSync(lastSkillPath) ? JSON.parse(fs.readFileSync(lastSkillPath, 'utf8')) : null;
   const gcloudCalls = fs.existsSync(gcloudLog) ? fs.readFileSync(gcloudLog, 'utf8').trim().split('\n').length : 0;
   const traceFiles = fs.existsSync(traceDir)
     ? Object.fromEntries(fs.readdirSync(traceDir).map((f) => [f, fs.readFileSync(path.join(traceDir, f))])) : null;
   fs.rmSync(dir, { recursive: true, force: true });
-  return { r, requests, stats, gcloudCalls, traceFiles };
+  return { r, requests, stats, gcloudCalls, traceFiles, lastSkill };
 }
 
 // Width of a baseline or progressive JPEG, from its SOF0/SOF2 segment.
@@ -236,4 +238,25 @@ test('I-202: learn-stats.json records the learner commit and whether spikes/kibo
   const { stats } = runLearner({ maxTurns: 1 });
   assert.match(stats.learner.commit, /^[0-9a-f]{40}$/);
   assert.equal(typeof stats.learner.dirty, 'boolean');
+});
+
+test('token budget: testSkill, audit and finish reuse the last skill sent when skillJson is left out', () => {
+  const orders = [order([['스콘', []]]), order([['라떼', ['HOT', '바닐라 시럽']]]), order([['라떼', ['ICED', '적게']]])];
+  const { r, stats } = runLearner({ maxTurns: 4, kiosk: 'fixtures/patterns/stepper.html', calls: {
+    1: testCall(stepperSkill, orders.slice(0, 2)),
+    2: { name: 'testSkill', args: { ordersJson: JSON.stringify(orders.slice(2)) } },
+    3: { name: 'audit', args: {} },
+    4: { name: 'finish', args: {} },
+  } });
+  assert.equal(r.status, 0, r.stderr);
+  assert.match(r.stdout, /test #2: PASS\n/, 'the second call counted for the same skill');
+  assert.equal(stats.finished, true, r.stdout);
+});
+
+test('diagnostics: a failed self-test order is explained in the log, and an unfinished run keeps its last skill', () => {
+  const noCharge = { ...reviewSkill, charges: [] };
+  const { r, lastSkill } = runLearner({ maxTurns: 1, kiosk: 'fixtures/patterns/review.html',
+    calls: { 1: testCall(noCharge, [order([['쿠키', []]], '포장해요')]) } });
+  assert.match(r.stdout, /test #1: FAIL[^\n]*\n {4}order 1: the skill's total 1,500원 differs from the kiosk's 1,600원/);
+  assert.deepEqual(lastSkill, noCharge);
 });

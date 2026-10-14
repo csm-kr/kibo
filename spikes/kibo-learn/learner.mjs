@@ -66,6 +66,7 @@ Work like this:
    read the total and anything added to it, then tap only a back button there. Declare it in "review", and do not list the order button in forbiddenLabels.
 2. As soon as the catalog draft has every category, call audit with the skill. It walks every category without AI and lists priced tiles missing from your catalog and tappable labels you have not explained. Fix them (explore and record the items, or add real controls to uiLabels) until audit says ok. It also opens every item and lists, in missingOptions, choices on the item's screen that its option groups lack: add them.
 3. Call testSkill with at least 3 different orders that together use EVERY option group of every orderable item (a priced option of each group that has prices), qty>1, items from several categories, and a popup. An order passes only when the skill's own total equals the kiosk's total (on the order review when "review" is declared): the kiosk's total is what the customer pays. testSkill lists the option groups no passing order has used yet. When totals differ, fix prices, option deltas or "charges"; if you cannot make an option's price match, remove that option from the skill (orders with it are then refused) and say why in notes. Orders may be split over several calls, but they count only for the exact same skill and only while none failed; any change to the skill starts the count again. Fix and retest until the gate says ok.
+   testSkill, audit and finish reuse the last skill you sent when you leave out skillJson: send the skill again only when you changed it.
 4. Call finish with the final skill. finish is accepted only if this exact skill passed testSkill (>= 3 orders, every option group used, "review" declared when the kiosk shows an order button), audit and the skill lint.
 
 Step format for act and recipes: {"op":"click"|"check"|"clickIfVisible"|"openReview", "label"?: string, "role"?: aria role, "name"?: accessible name, "exact"?: boolean, "text"?: visible text, "within"?: text}.
@@ -105,6 +106,9 @@ Option groups:
 Never invent data; only record what the UI shows.
 Test order format: {"dineOption":"<label>","lines":[{"category","item","options":[names],"qty"}]}.`;
 
+// Each skill sent stays in the context for the rest of the run (about 13k tokens for a 40-item kiosk), so a skill is
+// sent once per change: testSkill, audit and finish reuse the last skill sent when skillJson is left out.
+const SAME_SKILL = 'The skill as JSON. Leave it out to reuse the last skill you sent (to testSkill, audit or finish); send it only when it changed.';
 const stepSchema = { type: 'object', properties: { op: { type: 'string' }, label: { type: 'string' }, role: { type: 'string' }, name: { type: 'string' }, text: { type: 'string' }, exact: { type: 'boolean' }, within: { type: 'string' } }, required: ['op'] };
 const tools = [{ functionDeclarations: [
   { name: 'snapshot', description: 'Accessibility tree of the current kiosk screen (plus any alert text).', parameters: { type: 'object', properties: {} } },
@@ -112,9 +116,9 @@ const tools = [{ functionDeclarations: [
   { name: 'reload', description: 'Reload the kiosk to its initial screen.', parameters: { type: 'object', properties: {} } },
   { name: 'record', description: 'Save findings so they survive memory pruning. kind: item | flow. data: JSON string of one entry or an array of entries.', parameters: { type: 'object', properties: { kind: { type: 'string' }, data: { type: 'string' } }, required: ['kind', 'data'] } },
   { name: 'records', description: 'List everything recorded so far.', parameters: { type: 'object', properties: {} } },
-  { name: 'testSkill', description: 'Run the skill with the AI-free runner on a fresh kiosk for each order; returns pass/fail with kiosk cart total vs expected, the skill lint and the finish gate.', parameters: { type: 'object', properties: { skillJson: { type: 'string' }, ordersJson: { type: 'string', description: 'JSON array of orders' } }, required: ['skillJson', 'ordersJson'] } },
-  { name: 'audit', description: 'AI-free coverage check of the skill against the live kiosk.', parameters: { type: 'object', properties: { skillJson: { type: 'string' } }, required: ['skillJson'] } },
-  { name: 'finish', description: 'Submit the final skill.', parameters: { type: 'object', properties: { skillJson: { type: 'string' } }, required: ['skillJson'] } },
+  { name: 'testSkill', description: 'Run the skill with the AI-free runner on a fresh kiosk for each order; returns pass/fail with the kiosk total vs the skill total, the skill lint and the finish gate.', parameters: { type: 'object', properties: { skillJson: { type: 'string', description: SAME_SKILL }, ordersJson: { type: 'string', description: 'JSON array of orders' } }, required: ['ordersJson'] } },
+  { name: 'audit', description: 'AI-free coverage check of the skill against the live kiosk.', parameters: { type: 'object', properties: { skillJson: { type: 'string', description: SAME_SKILL } } } },
+  { name: 'finish', description: 'Submit the final skill.', parameters: { type: 'object', properties: { skillJson: { type: 'string', description: SAME_SKILL } } } },
 ] }];
 
 const { browser, page, alerts } = await openKiosk();
@@ -131,6 +135,14 @@ let gate = { key: null, passed: new Map(), failed: false, reviewOpener: null };
 let lastAudit = null;
 const optionWarned = new Set();
 stats.audits = 0;
+
+// The last skill sent to testSkill, audit or finish, as sent, and the last test results (for the run's files).
+let lastSkillJson = null;
+const skillArg = (args) => {
+  if (typeof args.skillJson === 'string' && args.skillJson.trim()) lastSkillJson = args.skillJson;
+  if (!lastSkillJson) throw new Error('no skill yet: send skillJson');
+  return lastSkillJson;
+};
 
 async function call(name, args) {
   try {
@@ -159,7 +171,7 @@ async function call(name, args) {
     }
     if (name === 'testSkill') {
       stats.tests++; lastTestTurn = stats.turns;
-      const skill = JSON.parse(args.skillJson); const orders = JSON.parse(args.ordersJson);
+      const skill = JSON.parse(skillArg(args)); const orders = JSON.parse(args.ordersJson);
       const lint = lintSkill(skill);
       const results = [];
       for (const o of orders) results.push(await runOrder(skill, o));
@@ -175,6 +187,8 @@ async function call(name, args) {
       lastPassedSkill = ok ? key : null;
       console.log(`  test #${stats.tests}: ${results.map((r) => (r.ok ? 'PASS' : 'FAIL')).join(' ')}${lint.length ? ` lint=${lint.length}` : ''}`
         + `${uncovered.length ? ` uncovered=${uncovered.length}` : ''}${needReview ? ` review=${gate.reviewOpener}` : ''}`);
+      // Why each failed order failed, for the run's notes (learn.log only; the model gets the full results).
+      results.forEach((r, i) => { if (!r.ok) console.log(`    order ${i + 1}: ${r.error ?? r.totalMismatch ?? 'failed'}`); });
       const missing = [
         ...(gate.passed.size < 3 || gate.failed ? [`>= 3 different passing orders (now ${gate.passed.size}${gate.failed ? ', and one failed: fix the skill, which starts the count again' : ''})`] : []),
         ...(lint.length ? ['no lint errors'] : []),
@@ -188,13 +202,14 @@ async function call(name, args) {
     }
     if (name === 'audit') {
       stats.audits++;
-      const r = await audit(JSON.parse(args.skillJson));
+      const r = await audit(JSON.parse(skillArg(args)));
       lastAudit = r.ok;
       console.log(`  audit #${stats.audits}: ${r.ok ? 'OK' : 'GAPS'} missing=${r.missingItems.length} unknown=${r.unknownLabels.length} hidden=${Object.keys(r.hiddenUnder).length} itemsMissingOptions=${Object.keys(r.missingOptions).length}`);
       return r;
     }
     if (name === 'finish') {
-      const sk = JSON.parse(args.skillJson);
+      const skillJson = skillArg(args);
+      const sk = JSON.parse(skillJson);
       const lint = lintSkill(sk);
       if (lint.length) return { ok: false, error: 'Rejected by the skill lint.', lint };
       if (JSON.stringify(sk) !== lastPassedSkill) return { ok: false, error: 'Rejected: this exact skill must pass the testSkill gate first: at least 3 different orders (none failing), every option group used by a passing order, and "review" when the kiosk shows an order button.' };
@@ -203,8 +218,8 @@ async function call(name, args) {
       console.log(`  finish audit: ${cov.ok ? 'OK' : 'GAPS'}`);
       if (!cov.ok) return { ok: false, error: 'Rejected by coverage audit. Explore and record what is missing, then test and audit again.', audit: cov };
       // Choices on an item's screen that its option groups lack: refused once per skill, so a false alarm cannot block finishing.
-      if (Object.keys(cov.missingOptions ?? {}).length && !optionWarned.has(args.skillJson)) {
-        optionWarned.add(args.skillJson);
+      if (Object.keys(cov.missingOptions ?? {}).length && !optionWarned.has(skillJson)) {
+        optionWarned.add(skillJson);
         return { ok: false, error: 'These items show choices that are not in their option groups. Add them (then test again), or call finish again with this same skill if they are not customer choices.', missingOptions: cov.missingOptions };
       }
       finalSkill = sk; return { ok: true };
@@ -394,6 +409,10 @@ await browser.close().catch(() => {});
 const result = { provider: PROVIDER, model: MODEL, learner: LEARNER, cachedInputTokens: stats.cached, finished: !!finalSkill, turns: stats.turns, acts: stats.acts, tests: stats.tests, inputTokens: stats.inTok, outputTokens: stats.outTok, minutes: ((Date.now() - stats.t0) / 60000).toFixed(1), ...(crash ? { error: crash.message.split('\n')[0] } : {}) };
 console.log(JSON.stringify(result));
 if (finalSkill) fs.writeFileSync('skill.json', JSON.stringify(finalSkill, null, 2));
+// An unfinished run keeps the last skill it sent, so its notes can say what it had (never graded as a learned skill).
+else if (lastSkillJson) {
+  try { fs.writeFileSync('last-skill.json', JSON.stringify(JSON.parse(lastSkillJson), null, 2)); console.log('last skill written to last-skill.json'); } catch { /* not JSON */ }
+}
 fs.writeFileSync('learn-stats.json', JSON.stringify(result, null, 2));
 traceHeader({ endedAt: new Date().toISOString(), ...(crash ? { error: result.error } : {}) });
 // Exit explicitly: any browser still open (a runner or audit that died mid-way) would keep Node alive after
