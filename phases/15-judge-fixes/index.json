@@ -7,7 +7,8 @@
       "name": "agent-recovery",
       "status": "completed",
       "started_at": "2026-10-14T23:31:04+0900",
-      "summary": "runChat never answers the generic retry after an applied change: serverReply (chat.ts) builds the reply from applied actions (summaryReply in quickReply.ts) plus the open question, or offers the last refusal's choices / the kiosk's categories and 3 real items via offerChoices (introOffer); 12 s REPLY_BUDGET_MS stops further model calls once a change is in (Korean/English writers only, I-256); a model error after an applied change also gets the server reply. Instructions: pendingChoice in <current_order>, read-back says open questions, say when an item has no option for a requested change. 4 recovery eval cases + generic-retry check; eval run evals/results/2026-10-14T23-41 (Vertex, 51/74, 17 Vertex 40 s deadline UPSTREAM, 5 fixed later by I-256; listed in NUMBERS.md, headline stays 68/70 because it predates the last fix). Issues I-253..I-256, I-157 seen."
+      "summary": "runChat never answers the generic retry after an applied change: serverReply (chat.ts) builds the reply from applied actions (summaryReply in quickReply.ts) plus the open question, or offers the last refusal's choices / the kiosk's categories and 3 real items via offerChoices (introOffer); 12 s REPLY_BUDGET_MS stops further model calls once a change is in (Korean/English writers only, I-256); a model error after an applied change also gets the server reply. Instructions: pendingChoice in <current_order>, read-back says open questions, say when an item has no option for a requested change. 4 recovery eval cases + generic-retry check; eval run evals/results/2026-10-14T23-41 (Vertex, 51/74, 17 Vertex 40 s deadline UPSTREAM, 5 fixed later by I-256; listed in NUMBERS.md, headline stays 68/70 because it predates the last fix). Issues I-253..I-256, I-157 seen.",
+      "completed_at": "2026-10-15T00:34:16+0900"
     },
     {
       "step": 1,
