@@ -57,7 +57,8 @@ export function tokenUsage(
 }
 
 export interface ModelClient {
-  generate(req: { system: string; contents: ModelTurn[]; tools: object[] }): Promise<{
+  /** `deadlineMs` overrides the client's per-call deadline for this call (I-268: later rounds wait less). */
+  generate(req: { system: string; contents: ModelTurn[]; tools: object[]; deadlineMs?: number }): Promise<{
     content: ModelTurn;
     functionCalls: { id?: string; name: string; args: unknown }[];
     text: string;
@@ -242,8 +243,9 @@ export function geminiClient(overrides: Partial<TextDeps> & { cache?: PromptCach
   const cache = overrides.cache !== undefined ? overrides.cache : overrides.models ? null : sharedCache;
   let pinned: TextBackend | undefined;
   return {
-    async generate({ system, contents, tools }) {
-      const deps = { ...defaultTextDeps(), ...overrides };
+    async generate({ system, contents, tools, deadlineMs }) {
+      const base = { ...defaultTextDeps(), ...overrides };
+      const deps = deadlineMs === undefined ? base : { ...base, deadlineMs };
       const config = {
         maxOutputTokens: MAX_OUTPUT_TOKENS,
         // Temperature stays the model default, as Google advises for Gemini 3.

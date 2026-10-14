@@ -3,7 +3,7 @@ import { CommandError } from "@/lib/commands/errors";
 import { MemoryUsageStore, type UsageStore } from "@/lib/limits/usage";
 import { claimSession, createSession, runCommand } from "@/lib/session/service";
 import { MemoryStore } from "@/lib/store/memory";
-import { runChat, type ChatInput } from "./chat";
+import { LATER_ROUND_DEADLINE_MS, runChat, type ChatInput } from "./chat";
 import type { ModelClient, ModelTurn } from "./model";
 
 /** 2026-10-13 12:00 KST */
@@ -411,6 +411,51 @@ describe("runChat", () => {
     expect(calls).toBe(2);
     expect(out.reply).toMatch(/^Added 1 × Cola.*\. Total ₩1,800\.$/);
     expect(out.total).toBe(1800);
+  });
+
+  it("a model error after a refusal that named choices is answered with those choices, not an error (I-268)", async () => {
+    const s = await demo();
+    const { model: inner } = script([{ name: "addToCart", args: { itemId: "shrimp_burger" } }]);
+    let calls = 0;
+    const failsLater: ModelClient = {
+      async generate(req) {
+        if (++calls === 2) throw new CommandError("UPSTREAM", "Please try again in a moment.");
+        return inner.generate(req);
+      },
+    };
+    const out = await runChat(deps(failsLater), input(s, { message: "A shrimp burger?" }));
+    expect(calls).toBe(2);
+    expect(out.reply).not.toBe("Sorry, could you say that again?");
+    expect(out.reply).toBe("How about one of these?");
+    expect(out.actions.map((a) => a.tool)).toEqual(["addToCart", "offerChoices"]);
+    expect(out.total).toBe(0);
+  });
+
+  it("a model error with nothing done and nothing to offer stays an error", async () => {
+    const s = await demo();
+    const fails: ModelClient = {
+      async generate() {
+        throw new CommandError("UPSTREAM", "Please try again in a moment.");
+      },
+    };
+    await expect(runChat(deps(fails), input(s, { message: "A cola?" }))).rejects.toMatchObject({ code: "UPSTREAM" });
+  });
+
+  it("calls after the first round get a shorter deadline, since the server can answer itself (I-268)", async () => {
+    const s = await demo();
+    const { model: inner } = script([{ name: "addToCart", args: { itemId: "cola" } }], "Added a cola.");
+    const seen: (number | undefined)[] = [];
+    const spy: ModelClient = {
+      async generate(req) {
+        seen.push((req as { deadlineMs?: number }).deadlineMs);
+        return inner.generate(req);
+      },
+    };
+    await runChat(deps(spy), input(s, { message: "A cola?" }));
+    expect(seen[0]).toBeUndefined();
+    expect(typeof seen[1]).toBe("number");
+    expect(seen[1]).toBe(LATER_ROUND_DEADLINE_MS);
+    expect(LATER_ROUND_DEADLINE_MS).toBeLessThan(40_000);
   });
 
   it("the time budget never cuts a request that has applied nothing", async () => {

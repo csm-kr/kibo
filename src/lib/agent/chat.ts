@@ -70,6 +70,13 @@ const CONFIRM_ON_CARD = "Please confirm on the card.";
 // model round costs 2–7 s, often only to write a confirmation the server can build from the results; so once 12 s
 // have passed and a change is in, the server replies itself. Nothing applied yet: the model keeps going.
 const REPLY_BUDGET_MS = 12_000;
+
+/**
+ * After the first round the server can always answer itself (applied changes, a refusal's choices), so a later model
+ * call that hangs is cut sooner than the client's 40 s (I-268: a second call hung to the deadline after a refusal).
+ * Healthy calls take about 3.5 s, p90 7.5 s (evals/results/2026-10-15-full.md).
+ */
+export const LATER_ROUND_DEADLINE_MS = 15_000;
 // Before the review: offering items there would pull the user out of checking or paying.
 const OFFER_STATES = new Set<SessionStatus>(["idle", "connected", "ordering"]);
 
@@ -205,11 +212,13 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
   for (let round = 0; round < MAX_ROUNDS; round++) {
     let out: Awaited<ReturnType<ModelClient["generate"]>>;
     try {
-      out = await model.generate({ system, contents, tools });
+      out = await model.generate({ system, contents, tools, ...(round > 0 ? { deadlineMs: LATER_ROUND_DEADLINE_MS } : {}) });
     } catch (e) {
-      // A deadline or upstream error after a change went in: an error would make the user repeat the order and get it
-      // twice, so the server says what was done instead. Nothing is retried (ARCHITECTURE "Region and secrets").
-      if (!(e instanceof CommandError) || !allDone.some((d) => d.outcome.ok)) throw e;
+      // A deadline or upstream error after a change went in, or after a refusal that named choices: an error would make
+      // the user repeat the order (and maybe get it twice), so the server answers from what it holds. With nothing done
+      // and nothing to offer it stays an error. Nothing is retried (ARCHITECTURE "Region and secrets").
+      const refusedWithChoices = lastRound.some((d) => !d.outcome.ok && d.outcome.error.detail?.templateId && d.outcome.error.detail.choices?.length);
+      if (!(e instanceof CommandError) || !(allDone.some((d) => d.outcome.ok) || refusedWithChoices)) throw e;
       stoppedEarly = true;
       break;
     }
