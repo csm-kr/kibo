@@ -1,0 +1,714 @@
+{
+  "what": "Forged commands sent to POST /api/command and POST /api/session/claim; each must be refused with the documented status and code and leave the public session unchanged. Controls are legit commands that must go through.",
+  "date": "2026-10-14T11:32:16.026Z",
+  "commit": "ee97ebea276905361c1907d32c2e6ebed0aaa54d",
+  "script": "scripts/attack-check.ts (npm run check:attacks)",
+  "target": "Local production build (node .next/standalone/server.js, NODE_ENV=production, STORE=memory) on http://127.0.0.1:<free port>; never the deployed service",
+  "rulesFrom": [
+    "docs/ARCHITECTURE.md (API, Commands and actors, /api/command processing order)",
+    "docs/SECURITY.md (Identity and permissions, Command handling)"
+  ],
+  "method": "Each attempt comes from its own X-Forwarded-For (192.0.2.x). For attacks on a live session, the public session (first event of GET /api/session/{id}/events) is read before and after; sessionUnchanged true means the refused command changed nothing. No AI is called (no /api/chat, no /api/live-token).",
+  "omitted": "Tokens, claim tokens, session ids and command ids are never written here.",
+  "summary": {
+    "attempts": 42,
+    "attacks": 37,
+    "refusedAsExpected": 37,
+    "controls": 5,
+    "controlsAsExpected": 5,
+    "unexpected": 0,
+    "unexpectedNames": []
+  },
+  "attempts": [
+    {
+      "name": "no_token",
+      "kind": "attack",
+      "tries": "addToCart with no Authorization header",
+      "expected": {
+        "status": 401,
+        "code": "UNAUTHORIZED"
+      },
+      "got": {
+        "status": 401,
+        "code": "UNAUTHORIZED",
+        "message": "Please scan the QR code on the kiosk again.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "wrong_token",
+      "kind": "attack",
+      "tries": "addToCart with a random token of the right shape",
+      "expected": {
+        "status": 401,
+        "code": "UNAUTHORIZED"
+      },
+      "got": {
+        "status": 401,
+        "code": "UNAUTHORIZED",
+        "message": "Please scan the QR code on the kiosk again.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "phone_card_action",
+      "kind": "attack",
+      "tries": "The phone's device token sends cardAction (the payment step)",
+      "expected": {
+        "status": 403,
+        "code": "FORBIDDEN"
+      },
+      "got": {
+        "status": 403,
+        "code": "FORBIDDEN",
+        "message": "This action is not allowed here.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "phone_touch_source",
+      "kind": "attack",
+      "tries": "The phone sends addToCart with source \"touch\" (the kiosk's source)",
+      "expected": {
+        "status": 400,
+        "code": "BAD_REQUEST"
+      },
+      "got": {
+        "status": 400,
+        "code": "BAD_REQUEST",
+        "message": "That request could not be understood.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "kiosk_voice_source",
+      "kind": "attack",
+      "tries": "The kiosk token sends addToCart with source \"voice\" (the phone AI's source)",
+      "expected": {
+        "status": 400,
+        "code": "BAD_REQUEST"
+      },
+      "got": {
+        "status": 400,
+        "code": "BAD_REQUEST",
+        "message": "That request could not be understood.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "kiosk_card_action_while_ordering",
+      "kind": "attack",
+      "tries": "The kiosk sends cardAction in `ordering`, before any review or confirm",
+      "expected": {
+        "status": 409,
+        "code": "CONFLICT"
+      },
+      "got": {
+        "status": 409,
+        "code": "CONFLICT",
+        "message": "Please confirm the order before paying.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "qty_0",
+      "kind": "attack",
+      "tries": "addToCart with qty 0",
+      "expected": {
+        "status": 400,
+        "code": "BAD_REQUEST"
+      },
+      "got": {
+        "status": 400,
+        "code": "BAD_REQUEST",
+        "message": "That request could not be understood.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "qty_11",
+      "kind": "attack",
+      "tries": "addToCart with qty 11 (max 10)",
+      "expected": {
+        "status": 400,
+        "code": "BAD_REQUEST"
+      },
+      "got": {
+        "status": 400,
+        "code": "BAD_REQUEST",
+        "message": "That request could not be understood.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "qty_negative",
+      "kind": "attack",
+      "tries": "addToCart with qty -1",
+      "expected": {
+        "status": 400,
+        "code": "BAD_REQUEST"
+      },
+      "got": {
+        "status": 400,
+        "code": "BAD_REQUEST",
+        "message": "That request could not be understood.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "qty_fraction",
+      "kind": "attack",
+      "tries": "addToCart with qty 1.5",
+      "expected": {
+        "status": 400,
+        "code": "BAD_REQUEST"
+      },
+      "got": {
+        "status": 400,
+        "code": "BAD_REQUEST",
+        "message": "That request could not be understood.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "client_price",
+      "kind": "attack",
+      "tries": "addToCart with an extra unitPrice: 0 argument (a price from the client)",
+      "expected": {
+        "status": 400,
+        "code": "BAD_REQUEST"
+      },
+      "got": {
+        "status": 400,
+        "code": "BAD_REQUEST",
+        "message": "That request could not be understood.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "unknown_item",
+      "kind": "attack",
+      "tries": "addToCart of an itemId that is not in the menu data",
+      "expected": [
+        {
+          "status": 400,
+          "code": "BAD_REQUEST"
+        },
+        {
+          "status": 422
+        }
+      ],
+      "got": {
+        "status": 400,
+        "code": "BAD_REQUEST",
+        "message": "That item is not on the menu.",
+        "sessionUnchanged": true
+      },
+      "pass": true,
+      "note": "Catalog check (ARCHITECTURE processing order step 6). The step lists NEEDS_CHOICE/SOLD_OUT/UNAVAILABLE (422) for catalog failures; an unknown item or an option outside the item's groups is BAD_REQUEST in src/lib/commands/cart.ts. Either counts as refused; got shows which."
+    },
+    {
+      "name": "option_of_another_item",
+      "kind": "attack",
+      "tries": "addToCart of the burger set with the nuggets' sauce (sweet_chili) as its side",
+      "expected": [
+        {
+          "status": 400,
+          "code": "BAD_REQUEST"
+        },
+        {
+          "status": 422
+        }
+      ],
+      "got": {
+        "status": 400,
+        "code": "BAD_REQUEST",
+        "message": "That side option is not available for the cheeseburger.",
+        "sessionUnchanged": true
+      },
+      "pass": true,
+      "note": "Catalog check (ARCHITECTURE processing order step 6). The step lists NEEDS_CHOICE/SOLD_OUT/UNAVAILABLE (422) for catalog failures; an unknown item or an option outside the item's groups is BAD_REQUEST in src/lib/commands/cart.ts. Either counts as refused; got shows which."
+    },
+    {
+      "name": "group_of_another_item",
+      "kind": "attack",
+      "tries": "addToCart of the burger set with a sauce group (only the nuggets have one)",
+      "expected": [
+        {
+          "status": 400,
+          "code": "BAD_REQUEST"
+        },
+        {
+          "status": 422
+        }
+      ],
+      "got": {
+        "status": 400,
+        "code": "BAD_REQUEST",
+        "message": "That option is not available for the cheeseburger.",
+        "sessionUnchanged": true
+      },
+      "pass": true,
+      "note": "Catalog check (ARCHITECTURE processing order step 6). The step lists NEEDS_CHOICE/SOLD_OUT/UNAVAILABLE (422) for catalog failures; an unknown item or an option outside the item's groups is BAD_REQUEST in src/lib/commands/cart.ts. Either counts as refused; got shows which."
+    },
+    {
+      "name": "string_600_chars",
+      "kind": "attack",
+      "tries": "addToCart with a 600-character itemId (ids are capped at 64)",
+      "expected": {
+        "status": 400,
+        "code": "BAD_REQUEST"
+      },
+      "got": {
+        "status": 400,
+        "code": "BAD_REQUEST",
+        "message": "That request could not be understood.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "unknown_command_type",
+      "kind": "attack",
+      "tries": "A command type that does not exist (\"markPaid\")",
+      "expected": {
+        "status": 400,
+        "code": "BAD_REQUEST"
+      },
+      "got": {
+        "status": 400,
+        "code": "BAD_REQUEST",
+        "message": "That request could not be understood.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "session_id_with_slash",
+      "kind": "attack",
+      "tries": "sessionId \"a/b\" (a path separator that would reach a Firestore document path)",
+      "expected": {
+        "status": 400,
+        "code": "BAD_REQUEST"
+      },
+      "got": {
+        "status": 400,
+        "code": "BAD_REQUEST",
+        "message": "That request could not be understood.",
+        "sessionUnchanged": null
+      },
+      "pass": true
+    },
+    {
+      "name": "unknown_session",
+      "kind": "attack",
+      "tries": "A well-formed sessionId that does not exist",
+      "expected": {
+        "status": 404,
+        "code": "NOT_FOUND"
+      },
+      "got": {
+        "status": 404,
+        "code": "NOT_FOUND",
+        "message": "This order could not be found.",
+        "sessionUnchanged": null
+      },
+      "pass": true
+    },
+    {
+      "name": "replayed_command_id",
+      "kind": "attack",
+      "tries": "Resends the applied addToCart with the same commandId",
+      "expected": {
+        "status": 200,
+        "duplicate": true
+      },
+      "got": {
+        "status": 200,
+        "duplicate": true,
+        "sessionStatus": "ordering",
+        "sessionUnchanged": true
+      },
+      "pass": true,
+      "note": "A retry is answered with the current state and duplicate: true; sessionUnchanged shows nothing was applied."
+    },
+    {
+      "name": "ai_confirm_too_soon",
+      "kind": "attack",
+      "tries": "AI confirmCheckout with a new utteranceSeq (6) but less than 1.5 s after the review opened",
+      "expected": {
+        "status": 409,
+        "code": "CONFLICT",
+        "message": "Please confirm on the card."
+      },
+      "got": {
+        "status": 409,
+        "code": "CONFLICT",
+        "message": "Please confirm on the card.",
+        "sessionUnchanged": true
+      },
+      "pass": true,
+      "note": "Sent within 7 ms of the review opening (the attempt must land before 1500 ms)."
+    },
+    {
+      "name": "ai_confirm_same_utterance",
+      "kind": "attack",
+      "tries": "AI confirmCheckout with the utteranceSeq that opened the review (5): the same user turn",
+      "expected": {
+        "status": 409,
+        "code": "CONFLICT",
+        "message": "Please confirm on the card."
+      },
+      "got": {
+        "status": 409,
+        "code": "CONFLICT",
+        "message": "Please confirm on the card.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "ai_confirm_without_utterance",
+      "kind": "attack",
+      "tries": "AI confirmCheckout with no utteranceSeq at all",
+      "expected": {
+        "status": 409,
+        "code": "CONFLICT",
+        "message": "Please confirm on the card."
+      },
+      "got": {
+        "status": 409,
+        "code": "CONFLICT",
+        "message": "Please confirm on the card.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "stale_cart_version",
+      "kind": "attack",
+      "tries": "A confirm-card tap carrying an older cartVersion than the one under review",
+      "expected": {
+        "status": 409,
+        "code": "CONFLICT",
+        "message": "Your order changed. Please check it again."
+      },
+      "got": {
+        "status": 409,
+        "code": "CONFLICT",
+        "message": "Your order changed. Please check it again.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "missing_cart_version",
+      "kind": "attack",
+      "tries": "A confirm-card tap with no cartVersion",
+      "expected": {
+        "status": 409,
+        "code": "CONFLICT",
+        "message": "Your order changed. Please check it again."
+      },
+      "got": {
+        "status": 409,
+        "code": "CONFLICT",
+        "message": "Your order changed. Please check it again.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "kiosk_card_action_while_confirming",
+      "kind": "attack",
+      "tries": "The kiosk sends cardAction in `confirming`, before the confirm",
+      "expected": {
+        "status": 409,
+        "code": "CONFLICT"
+      },
+      "got": {
+        "status": 409,
+        "code": "CONFLICT",
+        "message": "Please confirm the order before paying.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "ai_confirm_new_utterance_after_wait",
+      "kind": "control",
+      "tries": "AI confirmCheckout with a new utteranceSeq (6), matching cartVersion, more than 1.5 s after the AI opened the review",
+      "expected": {
+        "status": 200
+      },
+      "got": {
+        "status": 200,
+        "sessionStatus": "paying",
+        "sessionUnchanged": null
+      },
+      "pass": true
+    },
+    {
+      "name": "phone_card_action_voice_while_paying",
+      "kind": "attack",
+      "tries": "The phone sends cardAction with source \"voice\" in `paying`",
+      "expected": {
+        "status": 403,
+        "code": "FORBIDDEN"
+      },
+      "got": {
+        "status": 403,
+        "code": "FORBIDDEN",
+        "message": "This action is not allowed here.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "phone_card_action_text_while_paying",
+      "kind": "attack",
+      "tries": "The phone sends cardAction with source \"text\" in `paying`",
+      "expected": {
+        "status": 403,
+        "code": "FORBIDDEN"
+      },
+      "got": {
+        "status": 403,
+        "code": "FORBIDDEN",
+        "message": "This action is not allowed here.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "phone_card_action_button_while_paying",
+      "kind": "attack",
+      "tries": "The phone sends cardAction with source \"button\" in `paying`",
+      "expected": {
+        "status": 403,
+        "code": "FORBIDDEN"
+      },
+      "got": {
+        "status": 403,
+        "code": "FORBIDDEN",
+        "message": "This action is not allowed here.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "phone_paid_command_type",
+      "kind": "attack",
+      "tries": "The phone sends a made-up command type \"paid\" in `paying`",
+      "expected": {
+        "status": 400,
+        "code": "BAD_REQUEST"
+      },
+      "got": {
+        "status": 400,
+        "code": "BAD_REQUEST",
+        "message": "That request could not be understood.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "phone_status_paid_argument",
+      "kind": "attack",
+      "tries": "The phone sends confirmCheckout with args { status: \"paid\" } in `paying`",
+      "expected": {
+        "status": 400,
+        "code": "BAD_REQUEST"
+      },
+      "got": {
+        "status": 400,
+        "code": "BAD_REQUEST",
+        "message": "That request could not be understood.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "kiosk_card_action_while_paying",
+      "kind": "control",
+      "tries": "The kiosk's card action in `paying`",
+      "expected": {
+        "status": 200
+      },
+      "got": {
+        "status": 200,
+        "sessionStatus": "paid",
+        "sessionUnchanged": null
+      },
+      "pass": true
+    },
+    {
+      "name": "second_card_action_after_paid",
+      "kind": "attack",
+      "tries": "The kiosk sends cardAction again after `paid` (a second payment / order number)",
+      "expected": {
+        "status": 409,
+        "code": "CONFLICT",
+        "message": "This order is already paid."
+      },
+      "got": {
+        "status": 409,
+        "code": "CONFLICT",
+        "message": "This order is already paid.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "second_phone_claim",
+      "kind": "attack",
+      "tries": "A second phone claims the same session with the same QR claim token",
+      "expected": {
+        "status": 409,
+        "code": "CONFLICT",
+        "message": "Someone else is using this kiosk."
+      },
+      "got": {
+        "status": 409,
+        "code": "CONFLICT",
+        "message": "Someone else is using this kiosk.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "old_device_token_after_reissue",
+      "kind": "attack",
+      "tries": "The first phone's device token sends addToCart after the kiosk reissued the QR",
+      "expected": {
+        "status": 401,
+        "code": "UNAUTHORIZED"
+      },
+      "got": {
+        "status": 401,
+        "code": "UNAUTHORIZED",
+        "message": "Please scan the QR code on the kiosk again.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "old_claim_token_after_reissue",
+      "kind": "attack",
+      "tries": "Claims with the QR claim token that the reissue replaced",
+      "expected": {
+        "status": 401,
+        "code": "UNAUTHORIZED"
+      },
+      "got": {
+        "status": 401,
+        "code": "UNAUTHORIZED",
+        "message": "Please scan the QR code on the kiosk again.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "claim_reissued_qr",
+      "kind": "control",
+      "tries": "A new phone claims the reissued QR",
+      "expected": {
+        "status": 200
+      },
+      "got": {
+        "status": 200,
+        "sessionStatus": "connected",
+        "sessionUnchanged": null
+      },
+      "pass": true
+    },
+    {
+      "name": "cross_session_device_token",
+      "kind": "attack",
+      "tries": "Session A's device token sends addToCart to session B",
+      "expected": {
+        "status": 401,
+        "code": "UNAUTHORIZED"
+      },
+      "got": {
+        "status": 401,
+        "code": "UNAUTHORIZED",
+        "message": "Please scan the QR code on the kiosk again.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "cross_session_kiosk_token",
+      "kind": "attack",
+      "tries": "Session A's kiosk token sends reissueClaim to session B (to take its QR)",
+      "expected": {
+        "status": 401,
+        "code": "UNAUTHORIZED"
+      },
+      "got": {
+        "status": 401,
+        "code": "UNAUTHORIZED",
+        "message": "Please scan the QR code on the kiosk again.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "ai_confirm_on_kiosk_review",
+      "kind": "attack",
+      "tries": "AI confirmCheckout (new utteranceSeq 99, matching cartVersion, after 1.5 s) on a review the kiosk opened",
+      "expected": {
+        "status": 409,
+        "code": "CONFLICT",
+        "message": "Please confirm on the card."
+      },
+      "got": {
+        "status": 409,
+        "code": "CONFLICT",
+        "message": "Please confirm on the card.",
+        "sessionUnchanged": true
+      },
+      "pass": true
+    },
+    {
+      "name": "tap_confirm_matching_version",
+      "kind": "control",
+      "tries": "A tap on the phone's confirm card with the matching cartVersion",
+      "expected": {
+        "status": 200
+      },
+      "got": {
+        "status": 200,
+        "sessionStatus": "paying",
+        "sessionUnchanged": null
+      },
+      "pass": true
+    },
+    {
+      "name": "kiosk_card_action_after_tap_confirm",
+      "kind": "control",
+      "tries": "The kiosk's card action after the tap confirm",
+      "expected": {
+        "status": 200
+      },
+      "got": {
+        "status": 200,
+        "sessionStatus": "paid",
+        "sessionUnchanged": null
+      },
+      "pass": true
+    }
+  ]
+}

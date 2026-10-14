@@ -1,0 +1,103 @@
+{
+  "about": "Typed hero order on the deployed service: one demo session (POST /api/session, demo: true), then 6 typed turns sent to POST /api/chat one after another with the phone's history, locale en, from a laptop in Seoul over the internet. ms = request sent to JSON received, measured on the client (network included). The text backend and the code are whatever the named revision runs; reply text is not kept. One run, no retries (R-001).",
+  "url": "https://kibo-407514467119.asia-northeast3.run.app",
+  "revision": "kibo-00014-859",
+  "version": "0.1.0",
+  "at": "2026-10-14T11:28:45.949Z",
+  "turns": [
+    {
+      "turn": 1,
+      "message": "For here, please.",
+      "httpStatus": 200,
+      "ok": true,
+      "error": null,
+      "sessionStatus": "ordering",
+      "actions": [
+        "setDineOption:ok"
+      ],
+      "cartLines": 0,
+      "total": 0,
+      "ms": 6683
+    },
+    {
+      "turn": 2,
+      "message": "Two cheeseburger sets. One without pickles; drinks zero cola and cider.",
+      "httpStatus": 200,
+      "ok": true,
+      "error": null,
+      "sessionStatus": "ordering",
+      "actions": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ],
+      "cartLines": 2,
+      "total": 13800,
+      "ms": 5353
+    },
+    {
+      "turn": 3,
+      "message": "Make both fries large.",
+      "httpStatus": 200,
+      "ok": true,
+      "error": null,
+      "sessionStatus": "ordering",
+      "actions": [
+        "updateCart:ok",
+        "updateCart:ok"
+      ],
+      "cartLines": 2,
+      "total": 14800,
+      "ms": 4768
+    },
+    {
+      "turn": 4,
+      "message": "No, thanks.",
+      "httpStatus": 200,
+      "ok": true,
+      "error": null,
+      "sessionStatus": "confirming",
+      "actions": [
+        "requestCheckout:ok"
+      ],
+      "cartLines": 2,
+      "total": 14800,
+      "ms": 4321
+    },
+    {
+      "turn": 5,
+      "message": "That's all, I'll pay.",
+      "httpStatus": 200,
+      "ok": true,
+      "error": null,
+      "sessionStatus": "paying",
+      "actions": [
+        "confirmCheckout:ok"
+      ],
+      "cartLines": 2,
+      "total": 14800,
+      "ms": 4745
+    },
+    {
+      "turn": 6,
+      "message": "Yes, pay now.",
+      "httpStatus": 200,
+      "ok": true,
+      "error": null,
+      "sessionStatus": "paying",
+      "actions": [],
+      "cartLines": 2,
+      "total": 14800,
+      "ms": 1860
+    }
+  ],
+  "summary": {
+    "turns": 6,
+    "ok": 6,
+    "medianMs": 4757,
+    "minMs": 1860,
+    "maxMs": 6683,
+    "totalMs": 27730,
+    "finalStatus": "paying"
+  },
+  "note": "The model opened the review on turn 4 (\"No, thanks.\" after its dessert offer) and confirmed on turn 5 (\"That's all, I'll pay.\", a new utterance after the review was open, which the server allows); turn 6 found the order already in paying and called no tool. Kept as measured, not re-run."
+}

@@ -40,9 +40,16 @@ const MODES = {
 type Mode = keyof typeof MODES;
 const kiosk = getKiosk("malo");
 
+// Fixture generation the run used. v1 (10-12 to 10-14) had a click at the start and a ~140 ms noise tail that counted
+// as speech (I-237), so its end of speech came late; the headline summary uses the current fixtures only.
+const FIXTURES = "v2: 24 kHz, header and trailing chunk stripped (I-237)";
+
 interface Run {
   at: string;
   fixture: string;
+  fixtures?: string;
+  /** False when the mic never reached listening: Live (or the relay) did not connect, an upstream failure. */
+  connected?: boolean;
   pass: boolean;
   model: string | null;
   /** End of speech → first AI audio chunk, ms. */
@@ -64,31 +71,54 @@ function median(values: number[]): number | null {
   return s.length % 2 ? s[mid] : Math.round((s[mid - 1] + s[mid]) / 2);
 }
 
+/** Runs that happened but were taken out of the file before 10-14 (I-099), kept as counts. */
+interface Omitted {
+  when: string;
+  runs: number;
+  passed: number;
+  upstream: number;
+  why: string;
+}
+
 function record(mode: Mode, run: Run) {
   const { evidence, about } = MODES[mode];
-  const old = existsSync(evidence) ? (JSON.parse(readFileSync(evidence, "utf8")) as { runs: Run[] }) : { runs: [] };
-  const runs = [...old.runs, run];
-  const passed = runs.filter((r) => r.pass);
+  const old = existsSync(evidence)
+    ? (JSON.parse(readFileSync(evidence, "utf8")) as { runs: Run[]; omitted?: Omitted[] })
+    : { runs: [], omitted: [] };
+  const runs = [...old.runs, { ...run, fixtures: FIXTURES }];
+  const omitted = old.omitted ?? [];
+  const current = runs.filter((r) => r.fixtures === FIXTURES);
+  const passed = current.filter((r) => r.pass);
   const pick = (k: "aMs" | "bMs", rs: Run[]) => rs.flatMap((r) => (r[k] === null ? [] : [r[k]]));
-  const fixtures = [...new Set(runs.map((r) => r.fixture))];
+  const fixtures = [...new Set(current.map((r) => r.fixture))];
+  const failedUpstream = (r: Run) => !r.pass && r.connected === false;
   const out = {
     about,
     model: passed.find((r) => r.model)?.model ?? runs.find((r) => r.model)?.model ?? null,
     firstRun: runs[0]?.at ?? null,
     lastRun: run.at,
     summary: {
-      runs: runs.length,
+      fixtures: FIXTURES,
+      runs: current.length,
       passed: passed.length,
+      upstreamFailures: current.filter(failedUpstream).length,
       aMedianMs: median(pick("aMs", passed)),
       bMedianMs: median(pick("bMs", passed)),
       byFixture: Object.fromEntries(
         fixtures.map((f) => {
-          const rs = runs.filter((r) => r.fixture === f);
+          const rs = current.filter((r) => r.fixture === f);
           const ok = rs.filter((r) => r.pass);
           return [f, { runs: rs.length, passed: ok.length, aMedianMs: median(pick("aMs", ok)), bMedianMs: median(pick("bMs", ok)) }];
         }),
       ),
     },
+    // Every attempt on record, all fixture versions, including the omitted ones (R-001).
+    allAttempts: {
+      attempted: runs.length + omitted.reduce((n, o) => n + o.runs, 0),
+      passed: runs.filter((r) => r.pass).length + omitted.reduce((n, o) => n + o.passed, 0),
+      upstreamFailures: runs.filter(failedUpstream).length + omitted.reduce((n, o) => n + o.upstream, 0),
+    },
+    omitted,
     runs,
   };
   writeFileSync(evidence, JSON.stringify(out, null, 2) + "\n");
@@ -166,7 +196,7 @@ for (const { mode, fixture, ip } of RUNS) {
       const opened = await openPage(fixture, ip, MODES[mode].baseURL ?? info.project.use.baseURL);
       close = opened.close;
       const page = opened.page;
-      const run: Run = { at: new Date().toISOString(), fixture, pass: false, model: null, aMs: null, bMs: null, toolMs: null, commands: [] };
+      const run: Run = { at: new Date().toISOString(), fixture, connected: false, pass: false, model: null, aMs: null, bMs: null, toolMs: null, commands: [] };
       current = run;
 
       let cart: CartLine[] = [];
@@ -205,6 +235,7 @@ for (const { mode, fixture, ip } of RUNS) {
       const mic = page.locator("button[data-voice-state]");
       await mic.click();
       await expect(mic).toHaveAttribute("data-voice-state", /listening|thinking|speaking/, { timeout: 20_000 });
+      run.connected = true;
 
       // The page sends the sentence once (e2eMarks); stop the mic once the answer's first audio is in.
       await expect

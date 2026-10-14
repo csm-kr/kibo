@@ -336,13 +336,13 @@ export default function Home() {
               sides and drinks, removable ingredients and sold-out items.
             </p>
             <Fact
-              value="32 of 32 test orders passed"
-              detail="text agent on gemini-3.8-flash, Korean and English, cases written by the KIBO team"
-              path="evals/results/2026-10-13T02-54.md"
+              value="68 of 70 test orders passed"
+              detail="text agent on gemini-3.8-flash (Vertex AI), typed in Korean, English and 7 more languages; cases written by the KIBO team"
+              path="evals/results/2026-10-14T20-26.md"
             />
             <Fact
-              value="1.1 s median from end of speech to the kiosk highlight"
-              detail="6 spoken orders to gemini-3.8-live, synthetic voice on a laptop, not yet on a real phone"
+              value="1.8 s median from end of speech to the kiosk highlight"
+              detail="2 spoken orders (English, Korean) to gemini-3.8-live, synthetic voice on a laptop, not yet on a real phone; 1.6 s through the Vertex AI relay"
               path="evidence/voice-e2e.json"
             />
           </article>
@@ -352,21 +352,21 @@ export default function Home() {
               For a kiosk with no integration, Gemini explores its screens once and writes a skill: the menu plus click
               recipes. Orders are then replayed without AI and checked against the kiosk&apos;s own total.
             </p>
+            {/* The groups stay apart (docs/plan/NUMBERS.md): never-seen kiosks, the tuned test kiosks, our own kiosk. */}
             <Fact
-              value="4 of 4 unseen orders replayed, 0.7 to 5.2 s each"
-              detail="Doughhouse, a pizza kiosk we built"
-              path="spikes/kibo-learn/results/holdout.run2.log"
+              value="2 kiosks it had never seen: 62 of 62 items, 18 of 20 orders right, 2 refused, none wrong"
+              detail="built by other AI agents, learned once each by the latest learner; in 2 of the 18 the skill's own price differed from the kiosk's. All 6 never-seen kiosks so far: 32 right, 15 refused, 3 wrong (an earlier learner), 10 not learned, of 60 orders"
+              path="spikes/blind-kiosks/ROUND4.md"
             />
-            {/* Replaces the older café run, which predates the finish gate and audit (impact judge, 10-13). */}
             <Fact
               value="4 test kiosks: 134 of 134 items, 31 of 40 orders right"
               detail="built by other AI agents; 4 orders refused safely, 5 went wrong on one bakery kiosk (its pop-up blocked a tap); in 3 of the 31 the skill's own price differed from the kiosk's. The learner was improved using these kiosks' first runs, so this is not a blind result"
               path="spikes/blind-kiosks/RESULTS.md"
             />
             <Fact
-              value="2 kiosks it had never seen: 56 of 56 items, 14 of 20 orders right"
-              detail="built by other AI agents; 3 orders refused safely, 3 went wrong (take-out orders 100원 short); in 4 of the right ones the skill's own price differed from the kiosk's"
-              path="spikes/blind-kiosks/RESULTS.md"
+              value="Our pizza kiosk: learned in 5.2 min, 4 of 4 unseen orders replayed without AI"
+              detail="Doughhouse, the kiosk the learner was developed on, so not a blind test; a planted rule break was also caught"
+              path="spikes/blind-kiosks/results/dev/gemini-doughhouse-round3/holdout.log"
             />
             <Link href="/demo?k=doughhouse" className={SECONDARY}>
               Try the learned pizza kiosk

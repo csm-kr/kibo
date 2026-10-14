@@ -16,6 +16,9 @@
     "measure:cost": "tsx --env-file=.env scripts/measure-cost.ts",
     "voice:languages": "tsx --env-file=.env scripts/live-languages.ts",
     "load:check": "tsx --env-file=.env scripts/load-check.ts",
+    "measure:prod-latency": "tsx scripts/prod-latency.ts",
+    "check:shared-address": "tsx scripts/shared-address.ts",
+    "check:attacks": "tsx scripts/attack-check.ts",
     "lighthouse": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/lighthouse.ts",
     "pwa:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/pwa-check.ts",
     "fixtures:voice": "tsx --env-file=.env scripts/make-voice-fixtures.ts",
@@ -25,7 +28,8 @@
     "voice:build": "esbuild voice-relay/main.ts --bundle --platform=node --target=node24 --format=cjs --outfile=voice-relay/dist/server.cjs --external:firebase-admin --external:'firebase-admin/*' --external:bufferutil --external:utf-8-validate --log-level=warning",
     "voice:relay-check": "npm run voice:build && tsx --env-file=.env scripts/voice-relay-check.ts",
     "grade:blind": "node spikes/blind-kiosks/grade/grade.mjs",
-    "learn:runs": "tsx scripts/learn-runs.ts"
+    "learn:runs": "tsx scripts/learn-runs.ts",
+    "learn:cost": "tsx scripts/learn-cost.ts"
   },
   "dependencies": {
     "@google/genai": "^2.28.0",

@@ -61,7 +61,10 @@
     {
       "step": 7,
       "name": "numbers-final",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-14T20:25:12+0900",
+      "completed_at": "2026-10-14T20:55:00+0900",
+      "summary": "One source of truth: docs/plan/NUMBERS.md (claim, value, evidence, conditions, every place it appears; all eval runs with causes; retired numbers). Re-measured once on final code: eval 68/70 on Vertex (evals/results/2026-10-14T20-26; misses logged I-239), cost text $0.0080 / voice $0.0885 (voice hero cart 2/3; model's early confirmCheckout refused in 2 runs), prod typed latency median 4.8 s over 6 turns (scripts/prod-latency.ts, evidence/prod-latency.json), shared address 5/5 connected no 429 (scripts/shared-address.ts), forged commands 37/37 refused + 5/5 controls (scripts/attack-check.ts, attacks.ts, tested). Voice fixtures fixed (I-237: header click + C2PA chunk read as a 140 ms noise tail; 24 kHz, trimmed, fixtures.test.ts), live voice E2E 4/4 on both paths: highlight 1,833 ms direct / 1,641 ms relay, first audio 2,708 / 2,611 ms; voice spec now tags fixture version, keeps allAttempts and omitted; I-115 runs restored; all attempts 24/17 passed/6 upstream/1 model. scripts/learn-cost.ts -> evidence/learn-cost.json (groups apart, informed reruns labelled, Doughhouse dev runs). /learn: bk9 snack bar run first (npm run learn:runs -- bunsik), cards state when the skill total matched. Landing, README, DECK_FACTS, SUBMISSION (1,011 chars), KIBO_LEARN, ADR, STRATEGY, FOOTAGE, TESTING ledger aligned; cafe and stitched 44/44 retired. ARCHITECTURE step 6 fixed (I-240). Issues I-237..I-240, R-017 proposed. ACs: lint, test 1081, build; learn e2e + learn/landing QA pass."
     },
     {
       "step": 8,

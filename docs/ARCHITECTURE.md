@@ -354,7 +354,7 @@ Pages: `/kiosk?k=<kioskId>` (`&demo=1` shows the tap counter and timer; on a lan
 3. Match the token hash to an actor (`UNAUTHORIZED`), check the actor table (`FORBIDDEN`) and the actor's allowed `source` (`BAD_REQUEST`).
 4. If `commandId` is in `recentCommandIds`, return the current state with the stored `result` from `sessionSecrets.recentResults`, write nothing (except a repeated `reissueClaim`, which rotates the claim again).
 5. Check the state machine (`CONFLICT`, `GONE`).
-6. Validate against the adapter's catalog: item exists, options belong to the item, required groups, min/max, hours, sold out (`NEEDS_CHOICE`, `SOLD_OUT`, `UNAVAILABLE`).
+6. Validate against the adapter's catalog: item exists, options belong to the item and a group's min/max (`BAD_REQUEST`, like any other bad argument); a required choice missing, hours, sold out (`NEEDS_CHOICE`, `SOLD_OUT`, `UNAVAILABLE`).
 7. For commands that change the cart: build the new cart (prices and total come from menu data, never from arguments), `cartVersion + 1`, push the old cart on `undoStack`, set `lastChange`. On a learned kiosk a cart change waits in `pendingBridgeCommand` and is built this way only when the matching `bridgeReport` arrives. For every accepted command: set `status` and `screen`, clear `pendingChoice` (not on `bridgeReport`), append `commandId`, extend `expiresAt`.
 8. Commit. Firestore retries the transaction on contention, so touch and AI changes at the same moment serialize instead of overwriting each other.
 

@@ -21,7 +21,7 @@ Typed messages go at about 12 characters a second, and each kiosk change is held
 | `demo-pizza-1920x1080` | `/demo?k=doughhouse`, scenario "Pizza on a kiosk KIBO learned": the bridge taps the learned pizza kiosk, then the review. It ends there: on a learned kiosk the user pays on the kiosk itself | yes |
 
 ## Before using a clip
-- **Touch numbers.** Since the re-take of 10-13 (11-hardening:1, I-143), `kiosk-touch` follows the efficient path and its counter ends at **24 taps**, the number the `/demo` card, landing page and deck cite (`evidence/touch-hero-efficient.json`, `docs/TESTING.md`). Its seconds are Playwright pace with pauses for the viewer (17 s in this take), not a human timing: crop or blur the seconds, never quote them (R-001).
+- **Touch numbers.** Since the re-take of 10-13 (11-hardening:1, I-143), `kiosk-touch` follows the efficient path and its counter ends at **24 taps**, the number the `/demo` card, README and deck cite (`evidence/touch-hero-efficient.json`, `docs/plan/NUMBERS.md`). Every other number in the video comes from `docs/plan/NUMBERS.md` only. Its seconds are Playwright pace with pauses for the viewer (17 s in this take), not a human timing: crop or blur the seconds, never quote them (R-001).
 - **No voice.** Every clip is typed. The hero shot (0:35–1:25) needs a person speaking to a real phone (iOS Safari or Android Chrome) on the deployed app; **record that by hand**, with no notifications and no personal data on screen.
 - Check `manifest.json`: a clip with `"ok": false` failed twice (its `errors` say where) and has no video.
 - The AI's replies are not scripted, so wording differs between runs; read the screenshots before picking a take.

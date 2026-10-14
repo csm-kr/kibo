@@ -1,0 +1,62 @@
+{
+  "about": "5 /demo pages opened at once on the deployed service from one laptop (one address, headless Chromium, one browser context each), [Start] pressed on all, then held open 3 minutes with no AI message; checked every 15 s for the phone's \"Connected\" and the \"Busy right now. Reconnecting…\" line. Each /demo page holds two session streams and pings every 30 s. One run (R-001).",
+  "url": "https://kibo-407514467119.asia-northeast3.run.app",
+  "revision": "kibo-00014-859",
+  "at": "2026-10-14T11:32:25.021Z",
+  "holdMs": 180000,
+  "pages": [
+    {
+      "page": 1,
+      "connectedMs": 2080,
+      "busySeen": false,
+      "connectedAtEveryCheck": true,
+      "checks": 12,
+      "status429": [],
+      "otherErrors": []
+    },
+    {
+      "page": 2,
+      "connectedMs": 4314,
+      "busySeen": false,
+      "connectedAtEveryCheck": true,
+      "checks": 12,
+      "status429": [],
+      "otherErrors": []
+    },
+    {
+      "page": 3,
+      "connectedMs": 2057,
+      "busySeen": false,
+      "connectedAtEveryCheck": true,
+      "checks": 12,
+      "status429": [],
+      "otherErrors": []
+    },
+    {
+      "page": 4,
+      "connectedMs": 4404,
+      "busySeen": false,
+      "connectedAtEveryCheck": true,
+      "checks": 12,
+      "status429": [],
+      "otherErrors": []
+    },
+    {
+      "page": 5,
+      "connectedMs": 3486,
+      "busySeen": false,
+      "connectedAtEveryCheck": true,
+      "checks": 12,
+      "status429": [],
+      "otherErrors": []
+    }
+  ],
+  "summary": {
+    "pages": 5,
+    "reachedConnected": 5,
+    "connectedThroughout": 5,
+    "busySeen": 0,
+    "responses429": 0,
+    "otherApiErrors": 0
+  }
+}

@@ -22,12 +22,12 @@ Not injected into harness steps (lives under `docs/plan/`).
 6. Solution description ≤ 1,024 characters, naming how Firebase/Firestore, Cloud Run and Gemini are used
 
 ## Solution description (draft)
-For form field 6. **998 / 1,024 characters**, counted by `scripts/submission.test.ts` (it fails if the text grows past 1,024 or this count goes stale). No pricing or sales pitch (T&C).
+For form field 6. **1,011 / 1,024 characters**, counted by `scripts/submission.test.ts` (it fails if the text grows past 1,024 or this count goes stale). No pricing or sales pitch (T&C).
 
 ```text
-KIBO lets anyone order at an existing self-order kiosk by talking to their own phone, without replacing the kiosk. It is built for older adults, people with low vision and visitors who cannot read Korean. They scan the kiosk's QR code and speak or type in Korean or English. Gemini Live (voice) and Gemini Flash (text) turn each sentence into function calls such as addToCart. A Next.js app on Cloud Run checks every call against the kiosk's own menu data and a server-side state machine, then applies it in a Firestore transaction. Cloud Run streams each Firestore change to the kiosk and the phone, so the kiosk fills its own cart and highlights what changed. The AI can open a confirm card but cannot pay: payment needs the user's own yes or tap, then the card at the kiosk. For kiosks with no integration, KIBO Learn uses Gemini once to explore the kiosk's web screen and write a skill, then replays orders without AI. On our 42-case Korean and English test set, the text agent passed 42 of 42.
+KIBO lets anyone order at an existing self-order kiosk by talking to their own phone, without replacing the kiosk. It is built for older adults, people with low vision and visitors who cannot read Korean. They scan the kiosk's QR code and speak or type in Korean or English. Gemini Live (voice) and Gemini Flash (text) turn each sentence into function calls. A Next.js app on Cloud Run checks every call against the kiosk's own menu data and a server-side state machine, then applies it in a Firestore transaction. Cloud Run streams each Firestore change to the kiosk and the phone, so the kiosk fills its own cart. The AI can open a confirm card but cannot pay: payment needs the user's own yes or tap, then the card at the kiosk. For kiosks with no integration, KIBO Learn uses Gemini once to explore the kiosk's web screen and write a skill, then replays orders without AI. On two kiosks it had never seen, 18 of 20 orders were right and 2 were refused, none wrong. Our text agent passed 68 of 70 test cases.
 ```
-<!-- Evidence for "42 of 42": evals/results/2026-10-13T07-43.md (gemini-3.8-flash on the Gemini API, 10-13; cases written by the KIBO team, evals/agent-cases.json). Re-run `npm run eval:agent` before submitting and update the number if it changes. -->
+<!-- Evidence (docs/plan/NUMBERS.md): "18 of 20 … none wrong": spikes/blind-kiosks/ROUND4.md (bk9, bk10, grade-v2.json); "68 of 70": evals/results/2026-10-14T20-26.md (gemini-3.8-flash on Vertex AI, 10-14; cases written by the KIBO team, evals/agent-cases.json). Re-run `npm run eval:agent` before submitting and update the number if it changes. -->
 
 **Elevator (2 sentences):** KIBO turns your own phone into the voice of the self-order kiosk in front of you: say the order, and the kiosk fills its own cart. Gemini decides, the KIBO server checks every action against the kiosk's own data, and only you can confirm the payment.
 
@@ -53,9 +53,9 @@ KIBO lets anyone order at an existing self-order kiosk by talking to their own p
 | 0:00–0:25 | Problem: someone stuck at a complex kiosk; MALO simulator touch flow with a rising tap counter |
 | 0:25–0:35 | "Don't learn the kiosk. Just talk." |
 | 0:35–1:25 | Hero demo, real screens: phone and kiosk split; one sentence → cart fills itself → fries to large → confirm → card |
-| 1:25–1:40 | Touch N taps / M s vs K utterances / T s |
+| 1:25–1:40 | Touch vs talk: 24 taps on the efficient touch path (`evidence/touch-hero-efficient.json`) vs this order's messages and taps; human timings only once `evidence/human-runs.json` exists (`docs/plan/NUMBERS.md`) |
 | 1:40–1:55 | Korean-only kiosk, a visitor speaks English |
-| 1:55–2:25 | KIBO Learn: the agent explores the pizza kiosk (sped up) → one order replayed on it; blind cafe results shown as numbers |
+| 1:55–2:25 | KIBO Learn: the agent explores the pizza kiosk (sped up) → one order replayed on it; the never-seen kiosk results as numbers, only from `docs/plan/NUMBERS.md` (the older blind café run is retired) |
 | 2:25–2:40 | Architecture: Gemini, function calling, Firestore, Cloud Run → logo; 10 s spare |
 
 Made with our motion-graphics skill (`.claude/skills/motion-demo-video/`). Motion graphics frame real footage; they never fake a feature.

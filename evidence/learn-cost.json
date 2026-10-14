@@ -1,0 +1,612 @@
+{
+  "about": "Cost of every recorded KIBO Learn run (scripts/learn-cost.ts, `npm run learn:cost`, checked by scripts/learn-cost.test.ts): tokens from each run's learn-stats.json x the gemini-3.8-flash prices below, USD rounded to 4 decimals. Uncached input at flashInput, cached input at flashCachedInput, output at flashOutput. The learner called gemini-3.8-flash on Vertex AI, while these are the Gemini API's paid-tier list prices; the Vertex AI price for this model was not read (unverified). Thinking tokens are not recorded: the learner sums usageMetadata promptTokenCount, cachedContentTokenCount and candidatesTokenCount only (spikes/kibo-learn/learner.mjs) and sets no thinking config, so outputTokens does not include thoughtsTokenCount and these costs leave thinking out (output is a lower bound). `cachedRecorded: false` (a learner before 13-blind-kiosks:4, which wrote 0 for cached tokens) bills all input as uncached (input is an upper bound). `finished` is the learner's own flag (the finish gate passed and a skill was written); `skillWritten` is whether skill.json is in the run folder. Groups are kept apart on purpose: they used different learners on kiosks with different histories, so there is no combined total. `totals` sum every run in a group, including attempts the docs do not report as the result (`reported: false`); `totalsReportedRunsOnly` leaves those out. Read each group's note and each run's label before quoting a number.",
+  "prices": {
+    "source": "https://ai.google.dev/gemini-api/docs/pricing",
+    "readOn": "2026-10-13",
+    "tier": "Gemini API paid tier, USD per 1M tokens",
+    "validThrough": "2026-12-31 (the page says prices double from 2027-01-01)",
+    "flashInput": 0.75,
+    "flashCachedInput": 0.075,
+    "flashOutput": 3.75
+  },
+  "groups": [
+    {
+      "name": "four test kiosks, baseline",
+      "note": "bk1-bk4 with the phase 13 learner before its improvements. Cached tokens were not recorded, so all input is billed as uncached (upper bound).",
+      "totals": {
+        "runs": 5,
+        "finished": 2,
+        "minutes": 70.4,
+        "turns": 521,
+        "inputTokens": 8606766,
+        "cachedInputTokens": 0,
+        "uncachedInputTokens": 8606766,
+        "outputTokens": 92224,
+        "cachedRecordedInAll": false,
+        "usd": 6.8009
+      },
+      "totalsReportedRunsOnly": {
+        "runs": 4,
+        "finished": 2,
+        "minutes": 49.4,
+        "turns": 394,
+        "inputTokens": 6660870,
+        "cachedInputTokens": 0,
+        "uncachedInputTokens": 6660870,
+        "outputTokens": 58720,
+        "cachedRecordedInAll": false,
+        "usd": 5.2159
+      },
+      "runs": [
+        {
+          "kiosk": "bk1-cinema",
+          "runFolder": "spikes/blind-kiosks/results/bk1-cinema/baseline",
+          "group": "four test kiosks, baseline",
+          "label": "phase 13 baseline",
+          "reported": true,
+          "model": "gemini-3.8-flash",
+          "learner": null,
+          "minutes": 7.4,
+          "turns": 109,
+          "finished": true,
+          "skillWritten": true,
+          "cachedRecorded": false,
+          "inputTokens": 1068732,
+          "cachedInputTokens": 0,
+          "uncachedInputTokens": 1068732,
+          "outputTokens": 22840,
+          "usd": 0.8872
+        },
+        {
+          "kiosk": "bk2-bakery",
+          "runFolder": "spikes/blind-kiosks/results/bk2-bakery/baseline",
+          "group": "four test kiosks, baseline",
+          "label": "phase 13 baseline",
+          "reported": true,
+          "model": "gemini-3.8-flash",
+          "learner": null,
+          "minutes": 10.3,
+          "turns": 77,
+          "finished": false,
+          "skillWritten": false,
+          "cachedRecorded": false,
+          "inputTokens": 2007149,
+          "cachedInputTokens": 0,
+          "uncachedInputTokens": 2007149,
+          "outputTokens": 6357,
+          "usd": 1.5292
+        },
+        {
+          "kiosk": "bk3-ramen",
+          "runFolder": "spikes/blind-kiosks/results/bk3-ramen/baseline",
+          "group": "four test kiosks, baseline",
+          "label": "phase 13 baseline",
+          "reported": true,
+          "model": "gemini-3.8-flash",
+          "learner": null,
+          "minutes": 20.6,
+          "turns": 95,
+          "finished": true,
+          "skillWritten": true,
+          "cachedRecorded": false,
+          "inputTokens": 1582965,
+          "cachedInputTokens": 0,
+          "uncachedInputTokens": 1582965,
+          "outputTokens": 20044,
+          "usd": 1.2624
+        },
+        {
+          "kiosk": "bk4-airport-shop",
+          "runFolder": "spikes/blind-kiosks/results/bk4-airport-shop/baseline",
+          "group": "four test kiosks, baseline",
+          "label": "phase 13 baseline",
+          "reported": true,
+          "model": "gemini-3.8-flash",
+          "learner": null,
+          "minutes": 11.1,
+          "turns": 113,
+          "finished": false,
+          "skillWritten": false,
+          "cachedRecorded": false,
+          "inputTokens": 2002024,
+          "cachedInputTokens": 0,
+          "uncachedInputTokens": 2002024,
+          "outputTokens": 9479,
+          "usd": 1.5371
+        },
+        {
+          "kiosk": "bk4-airport-shop",
+          "runFolder": "spikes/blind-kiosks/results/bk4-airport-shop/baseline/crash1",
+          "group": "four test kiosks, baseline",
+          "label": "first try, stopped on an expired Vertex token (I-188); not the reported baseline",
+          "reported": false,
+          "model": "gemini-3.8-flash",
+          "learner": null,
+          "minutes": 21,
+          "turns": 127,
+          "finished": false,
+          "skillWritten": false,
+          "cachedRecorded": false,
+          "inputTokens": 1945896,
+          "cachedInputTokens": 0,
+          "uncachedInputTokens": 1945896,
+          "outputTokens": 33504,
+          "usd": 1.5851
+        }
+      ]
+    },
+    {
+      "name": "four test kiosks, final (learner tuned on them)",
+      "note": "bk1-bk4 after the learner was improved from their baseline failures (on the dev set only): not a blind result.",
+      "totals": {
+        "runs": 4,
+        "finished": 4,
+        "minutes": 41.2,
+        "turns": 290,
+        "inputTokens": 2775404,
+        "cachedInputTokens": 1507757,
+        "uncachedInputTokens": 1267647,
+        "outputTokens": 114459,
+        "cachedRecordedInAll": true,
+        "usd": 1.493
+      },
+      "runs": [
+        {
+          "kiosk": "bk1-cinema",
+          "runFolder": "spikes/blind-kiosks/results/bk1-cinema/final",
+          "group": "four test kiosks, final (learner tuned on them)",
+          "label": "phase 13 final",
+          "reported": true,
+          "model": "gemini-3.8-flash",
+          "learner": null,
+          "minutes": 13.3,
+          "turns": 94,
+          "finished": true,
+          "skillWritten": true,
+          "cachedRecorded": true,
+          "inputTokens": 977691,
+          "cachedInputTokens": 609457,
+          "uncachedInputTokens": 368234,
+          "outputTokens": 29088,
+          "usd": 0.431
+        },
+        {
+          "kiosk": "bk2-bakery",
+          "runFolder": "spikes/blind-kiosks/results/bk2-bakery/final",
+          "group": "four test kiosks, final (learner tuned on them)",
+          "label": "phase 13 final",
+          "reported": true,
+          "model": "gemini-3.8-flash",
+          "learner": null,
+          "minutes": 11.8,
+          "turns": 86,
+          "finished": true,
+          "skillWritten": true,
+          "cachedRecorded": true,
+          "inputTokens": 693862,
+          "cachedInputTokens": 276042,
+          "uncachedInputTokens": 417820,
+          "outputTokens": 52330,
+          "usd": 0.5303
+        },
+        {
+          "kiosk": "bk3-ramen",
+          "runFolder": "spikes/blind-kiosks/results/bk3-ramen/final",
+          "group": "four test kiosks, final (learner tuned on them)",
+          "label": "phase 13 final",
+          "reported": true,
+          "model": "gemini-3.8-flash",
+          "learner": null,
+          "minutes": 8,
+          "turns": 46,
+          "finished": true,
+          "skillWritten": true,
+          "cachedRecorded": true,
+          "inputTokens": 437774,
+          "cachedInputTokens": 227679,
+          "uncachedInputTokens": 210095,
+          "outputTokens": 19472,
+          "usd": 0.2477
+        },
+        {
+          "kiosk": "bk4-airport-shop",
+          "runFolder": "spikes/blind-kiosks/results/bk4-airport-shop/final",
+          "group": "four test kiosks, final (learner tuned on them)",
+          "label": "phase 13 final",
+          "reported": true,
+          "model": "gemini-3.8-flash",
+          "learner": null,
+          "minutes": 8.1,
+          "turns": 64,
+          "finished": true,
+          "skillWritten": true,
+          "cachedRecorded": true,
+          "inputTokens": 666077,
+          "cachedInputTokens": 394579,
+          "uncachedInputTokens": 271498,
+          "outputTokens": 13569,
+          "usd": 0.2841
+        }
+      ]
+    },
+    {
+      "name": "round 2 fresh hold-out",
+      "note": "bk5 and bk6, added after the phase 13 improvements and learned once; unseen by the learner's developers.",
+      "totals": {
+        "runs": 2,
+        "finished": 2,
+        "minutes": 26.2,
+        "turns": 176,
+        "inputTokens": 2128268,
+        "cachedInputTokens": 1418220,
+        "uncachedInputTokens": 710048,
+        "outputTokens": 52977,
+        "cachedRecordedInAll": true,
+        "usd": 0.8376
+      },
+      "runs": [
+        {
+          "kiosk": "bk5-restarea",
+          "runFolder": "spikes/blind-kiosks/results/bk5-restarea/final",
+          "group": "round 2 fresh hold-out",
+          "label": "fresh hold-out, learned once",
+          "reported": true,
+          "model": "gemini-3.8-flash",
+          "learner": null,
+          "minutes": 13.5,
+          "turns": 89,
+          "finished": true,
+          "skillWritten": true,
+          "cachedRecorded": true,
+          "inputTokens": 843596,
+          "cachedInputTokens": 556135,
+          "uncachedInputTokens": 287461,
+          "outputTokens": 24362,
+          "usd": 0.3487
+        },
+        {
+          "kiosk": "bk6-themepark",
+          "runFolder": "spikes/blind-kiosks/results/bk6-themepark/final",
+          "group": "round 2 fresh hold-out",
+          "label": "fresh hold-out, learned once",
+          "reported": true,
+          "model": "gemini-3.8-flash",
+          "learner": null,
+          "minutes": 12.7,
+          "turns": 87,
+          "finished": true,
+          "skillWritten": true,
+          "cachedRecorded": true,
+          "inputTokens": 1284672,
+          "cachedInputTokens": 862085,
+          "uncachedInputTokens": 422587,
+          "outputTokens": 28615,
+          "usd": 0.4889
+        }
+      ]
+    },
+    {
+      "name": "informed rerun",
+      "note": "Reruns on test kiosks after their results were read; never unseen-kiosk results. Each run carries its own label.",
+      "totals": {
+        "runs": 4,
+        "finished": 4,
+        "minutes": 52.9,
+        "turns": 357,
+        "inputTokens": 4910896,
+        "cachedInputTokens": 3210570,
+        "uncachedInputTokens": 1700326,
+        "outputTokens": 182708,
+        "cachedRecordedInAll": true,
+        "usd": 2.2012
+      },
+      "runs": [
+        {
+          "kiosk": "bk2-bakery",
+          "runFolder": "spikes/blind-kiosks/results/bk2-bakery/final-after-fix",
+          "group": "informed rerun",
+          "label": "informed by bk2 (ran after the I-193 fix that bk2 exposed; I-202)",
+          "reported": true,
+          "model": "gemini-3.8-flash",
+          "learner": null,
+          "minutes": 16.8,
+          "turns": 108,
+          "finished": true,
+          "skillWritten": true,
+          "cachedRecorded": true,
+          "inputTokens": 1867350,
+          "cachedInputTokens": 1320614,
+          "uncachedInputTokens": 546736,
+          "outputTokens": 87144,
+          "usd": 0.8359
+        },
+        {
+          "kiosk": "bk2-bakery",
+          "runFolder": "spikes/blind-kiosks/results/bk2-bakery/round3-informed",
+          "group": "informed rerun",
+          "label": "round 3 informed rerun (learner ea28477), never unseen",
+          "reported": true,
+          "model": "gemini-3.8-flash",
+          "learner": {
+            "commit": "ea28477d5a6c74946577f12bb66bc8103a8341be",
+            "dirty": false
+          },
+          "minutes": 15.6,
+          "turns": 97,
+          "finished": true,
+          "skillWritten": true,
+          "cachedRecorded": true,
+          "inputTokens": 1063159,
+          "cachedInputTokens": 569865,
+          "uncachedInputTokens": 493294,
+          "outputTokens": 62486,
+          "usd": 0.647
+        },
+        {
+          "kiosk": "bk5-restarea",
+          "runFolder": "spikes/blind-kiosks/results/bk5-restarea/round3-informed",
+          "group": "informed rerun",
+          "label": "round 3 informed rerun (learner ea28477), never unseen",
+          "reported": true,
+          "model": "gemini-3.8-flash",
+          "learner": {
+            "commit": "ea28477d5a6c74946577f12bb66bc8103a8341be",
+            "dirty": false
+          },
+          "minutes": 9.3,
+          "turns": 73,
+          "finished": true,
+          "skillWritten": true,
+          "cachedRecorded": true,
+          "inputTokens": 655570,
+          "cachedInputTokens": 379528,
+          "uncachedInputTokens": 276042,
+          "outputTokens": 14737,
+          "usd": 0.2908
+        },
+        {
+          "kiosk": "bk6-themepark",
+          "runFolder": "spikes/blind-kiosks/results/bk6-themepark/round3-informed",
+          "group": "informed rerun",
+          "label": "round 3 informed rerun (learner ea28477), never unseen",
+          "reported": true,
+          "model": "gemini-3.8-flash",
+          "learner": {
+            "commit": "ea28477d5a6c74946577f12bb66bc8103a8341be",
+            "dirty": false
+          },
+          "minutes": 11.2,
+          "turns": 79,
+          "finished": true,
+          "skillWritten": true,
+          "cachedRecorded": true,
+          "inputTokens": 1324817,
+          "cachedInputTokens": 940563,
+          "uncachedInputTokens": 384254,
+          "outputTokens": 18341,
+          "usd": 0.4275
+        }
+      ]
+    },
+    {
+      "name": "round 3 fresh",
+      "note": "bk7 and bk8, learned once with the frozen round 3 learning logic (ea28477). bk8 attempt 1 was killed at the 30 min cap and wrote no learn-stats.json (see notIncluded).",
+      "totals": {
+        "runs": 2,
+        "finished": 1,
+        "minutes": 49.3,
+        "turns": 175,
+        "inputTokens": 3702542,
+        "cachedInputTokens": 2470810,
+        "uncachedInputTokens": 1231732,
+        "outputTokens": 129581,
+        "cachedRecordedInAll": true,
+        "usd": 1.595
+      },
+      "runs": [
+        {
+          "kiosk": "bk7-bubbletea",
+          "runFolder": "spikes/blind-kiosks/results/bk7-bubbletea/final",
+          "group": "round 3 fresh",
+          "label": "fresh, learned once",
+          "reported": true,
+          "model": "gemini-3.8-flash",
+          "learner": {
+            "commit": "abb849586575a2cf637aec04d297cdf76c4cd3c7",
+            "dirty": false
+          },
+          "minutes": 27.3,
+          "turns": 76,
+          "finished": true,
+          "skillWritten": true,
+          "cachedRecorded": true,
+          "inputTokens": 1694030,
+          "cachedInputTokens": 972703,
+          "uncachedInputTokens": 721327,
+          "outputTokens": 83357,
+          "usd": 0.9265
+        },
+        {
+          "kiosk": "bk8-tableorder",
+          "runFolder": "spikes/blind-kiosks/results/bk8-tableorder/final-attempt2",
+          "group": "round 3 fresh",
+          "label": "attempt 2, the one rerun after attempt 1 was killed at the 30 min cap",
+          "reported": true,
+          "model": "gemini-3.8-flash",
+          "learner": {
+            "commit": "abb849586575a2cf637aec04d297cdf76c4cd3c7",
+            "dirty": false
+          },
+          "minutes": 22,
+          "turns": 99,
+          "finished": false,
+          "skillWritten": false,
+          "cachedRecorded": true,
+          "inputTokens": 2008512,
+          "cachedInputTokens": 1498107,
+          "uncachedInputTokens": 510405,
+          "outputTokens": 46224,
+          "usd": 0.6685
+        }
+      ]
+    },
+    {
+      "name": "round 4 fresh",
+      "note": "bk9 and bk10, learned once with the frozen round 4 learner (a9522a4).",
+      "totals": {
+        "runs": 2,
+        "finished": 2,
+        "minutes": 23.8,
+        "turns": 159,
+        "inputTokens": 2813739,
+        "cachedInputTokens": 2043451,
+        "uncachedInputTokens": 770288,
+        "outputTokens": 15797,
+        "cachedRecordedInAll": true,
+        "usd": 0.7902
+      },
+      "runs": [
+        {
+          "kiosk": "bk9-bunsik",
+          "runFolder": "spikes/blind-kiosks/results/bk9-bunsik/final",
+          "group": "round 4 fresh",
+          "label": "fresh, learned once",
+          "reported": true,
+          "model": "gemini-3.8-flash",
+          "learner": {
+            "commit": "34532bc27a5e1938f6a60a2dbf65acc880e8a3e5",
+            "dirty": false
+          },
+          "minutes": 9.6,
+          "turns": 85,
+          "finished": true,
+          "skillWritten": true,
+          "cachedRecorded": true,
+          "inputTokens": 1369557,
+          "cachedInputTokens": 1025383,
+          "uncachedInputTokens": 344174,
+          "outputTokens": 6924,
+          "usd": 0.361
+        },
+        {
+          "kiosk": "bk10-chicken",
+          "runFolder": "spikes/blind-kiosks/results/bk10-chicken/final",
+          "group": "round 4 fresh",
+          "label": "fresh, learned once",
+          "reported": true,
+          "model": "gemini-3.8-flash",
+          "learner": {
+            "commit": "34532bc27a5e1938f6a60a2dbf65acc880e8a3e5",
+            "dirty": false
+          },
+          "minutes": 14.2,
+          "turns": 74,
+          "finished": true,
+          "skillWritten": true,
+          "cachedRecorded": true,
+          "inputTokens": 1444182,
+          "cachedInputTokens": 1018068,
+          "uncachedInputTokens": 426114,
+          "outputTokens": 8873,
+          "usd": 0.4292
+        }
+      ]
+    },
+    {
+      "name": "development kiosk",
+      "note": "Doughhouse (dev set), the learner's own development kiosk: run 3 of phase 6 (cached tokens not recorded, so all its input is billed as uncached, an upper bound), the traced run /learn replays, and the round 3 run (newest). Not a blind result.",
+      "totals": {
+        "runs": 3,
+        "finished": 3,
+        "minutes": 14,
+        "turns": 136,
+        "inputTokens": 1182400,
+        "cachedInputTokens": 335227,
+        "uncachedInputTokens": 847173,
+        "outputTokens": 47177,
+        "cachedRecordedInAll": false,
+        "usd": 0.8374
+      },
+      "runs": [
+        {
+          "kiosk": "doughhouse",
+          "runFolder": "spikes/kibo-learn/results/run3",
+          "group": "development kiosk",
+          "label": "run 3 (phase 6)",
+          "reported": true,
+          "model": "gemini-3.8-flash",
+          "learner": null,
+          "minutes": 4.8,
+          "turns": 63,
+          "finished": true,
+          "skillWritten": true,
+          "cachedRecorded": false,
+          "inputTokens": 482553,
+          "cachedInputTokens": 0,
+          "uncachedInputTokens": 482553,
+          "outputTokens": 9905,
+          "usd": 0.3991
+        },
+        {
+          "kiosk": "doughhouse",
+          "runFolder": "spikes/blind-kiosks/results/dev/gemini-doughhouse-after",
+          "group": "development kiosk",
+          "label": "13-blind-kiosks:4 learner, traced (the /learn card)",
+          "reported": true,
+          "model": "gemini-3.8-flash",
+          "learner": null,
+          "minutes": 4,
+          "turns": 38,
+          "finished": true,
+          "skillWritten": true,
+          "cachedRecorded": true,
+          "inputTokens": 352822,
+          "cachedInputTokens": 196701,
+          "uncachedInputTokens": 156121,
+          "outputTokens": 20279,
+          "usd": 0.2079
+        },
+        {
+          "kiosk": "doughhouse",
+          "runFolder": "spikes/blind-kiosks/results/dev/gemini-doughhouse-round3",
+          "group": "development kiosk",
+          "label": "round 3 learner (newest Doughhouse run)",
+          "reported": true,
+          "model": "gemini-3.8-flash",
+          "learner": {
+            "commit": "29aa17593840dd78cafa9e45dff7dc8f505dc37b",
+            "dirty": false
+          },
+          "minutes": 5.2,
+          "turns": 35,
+          "finished": true,
+          "skillWritten": true,
+          "cachedRecorded": true,
+          "inputTokens": 347025,
+          "cachedInputTokens": 138526,
+          "uncachedInputTokens": 208499,
+          "outputTokens": 16993,
+          "usd": 0.2305
+        }
+      ]
+    }
+  ],
+  "notIncluded": [
+    {
+      "runFolder": "spikes/blind-kiosks/results/bk8-tableorder/final",
+      "reason": "round 3 fresh, attempt 1: killed at the 30 min cap (wrapper.json); no learn-stats.json, so its tokens are not recorded."
+    },
+    {
+      "runFolder": "spikes/blind-kiosks/results/bk7-bubbletea/round4-informed",
+      "reason": "round 4 informed, attempt 1: stopped by hand after 6.9 min (wrapper.json); no learn-stats.json. ROUND4.md quotes 895,649 input and 6,855 output tokens from its trace, at most $0.70 with input billed as uncached."
+    },
+    {
+      "runFolder": "spikes/blind-kiosks/results/bk1-cinema/baseline-crashed, spikes/blind-kiosks/results/bk2-bakery/baseline-crashed",
+      "reason": "earlier baseline attempts that stopped on a Vertex HTTP 400 at turn 81 (I-185), before the baseline/ runs; not a requested run folder."
+    },
+    {
+      "runFolder": "spikes/blind-kiosks/results/dev",
+      "reason": "dev-set runs (Doughhouse and Gureum, Gemini and OpenAI); not requested here."
+    }
+  ]
+}

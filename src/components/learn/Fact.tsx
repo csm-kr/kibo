@@ -48,7 +48,9 @@ export function RunFacts({ run }: { run: LearnRun }) {
               : `Unseen orders, judged by the kiosk's own total and its cart lines (item names).${
                   o.skillTotalDiffers
                     ? ` In ${o.skillTotalDiffers} of them the skill's own total was wrong, so the phone would have shown another price than the kiosk.`
-                    : ""
+                    : o.skillTotalDiffers === 0
+                      ? " The skill's own total matched the kiosk's in every one."
+                      : ""
                 }`
         }
       />

@@ -12,9 +12,15 @@ test("/learn lists the recorded runs with their numbers", async ({ page }) => {
   await page.goto("/learn");
   await expect(page.getByRole("heading", { name: "Watch KIBO learn a kiosk from its screens alone." })).toBeVisible({ timeout: 60_000 });
   const cards = page.locator("[data-learn-run]");
-  await expect(cards).toHaveCount(3);
-  // The fresh hold-out kiosk comes first, with its wrong-total caveat next to the order numbers (I-197).
-  const fresh = cards.first();
+  await expect(cards).toHaveCount(4);
+  // The round 4 fresh kiosk comes first, then the earlier fresh one with its wrong-total caveat (I-197, R-014).
+  const latest = cards.first();
+  await expect(latest).toHaveAttribute("data-learn-run", "bunsik");
+  await expect(latest).toContainText("never seen before this run");
+  await expect(latest).toContainText("9.6 min");
+  await expect(latest).toContainText("10 correct, 0 refused, 0 unsafe, of 10");
+  await expect(latest).toContainText("The skill's own total matched the kiosk's in every one.");
+  const fresh = cards.nth(1);
   await expect(fresh).toHaveAttribute("data-learn-run", "themepark");
   await expect(fresh).toContainText("never seen before this run");
   await expect(fresh).toContainText("10 correct, 0 refused, 0 unsafe, of 10");

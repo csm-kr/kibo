@@ -2,27 +2,43 @@
   "about": "Voice order E2E on /demo through the kibo-voice relay to Vertex AI Live (relay mode of e2e/voice.live.spec.ts, `npm run test:e2e:live`): GEMINI_LIVE_BACKEND=vertex; the relay and a dev server run in one local process (scripts/e2e-relay-stack.ts), so the browser → relay hop is local, not Cloud Run; Vertex AI in VOICE_VERTEX_LOCATION or us-central1. Synthetic TTS voice (Gemini TTS, e2e/fixtures) through Chromium's fake microphone on a laptop, not a real phone. End of speech = the last voiced 40 ms mic frame sent to Live before the model's first output; the page sends the looping fixture once. (a) end of speech → first AI audio chunk; (b) end of speech → first 2 s highlight ring on the kiosk half. Medians over passing runs.",
   "model": "gemini-3.8-live",
   "firstRun": "2026-10-13T09:23:34.155Z",
-  "lastRun": "2026-10-13T09:24:02.744Z",
+  "lastRun": "2026-10-14T11:38:45.974Z",
   "summary": {
+    "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)",
     "runs": 2,
     "passed": 2,
-    "aMedianMs": 2122,
-    "bMedianMs": 1148,
+    "upstreamFailures": 0,
+    "aMedianMs": 2611,
+    "bMedianMs": 1641,
     "byFixture": {
       "hero-en": {
         "runs": 1,
         "passed": 1,
-        "aMedianMs": 2089,
-        "bMedianMs": 1212
+        "aMedianMs": 2680,
+        "bMedianMs": 1780
       },
       "hero-ko": {
         "runs": 1,
         "passed": 1,
-        "aMedianMs": 2155,
-        "bMedianMs": 1084
+        "aMedianMs": 2542,
+        "bMedianMs": 1501
       }
     }
   },
+  "allAttempts": {
+    "attempted": 6,
+    "passed": 6,
+    "upstreamFailures": 0
+  },
+  "omitted": [
+    {
+      "when": "10-13 (12-phone-app:10)",
+      "runs": 2,
+      "passed": 2,
+      "upstream": 0,
+      "why": "both relay hero orders passed again locally; timings were not kept in the file (I-099), so only the count is recorded (docs/ISSUE.md I-104)"
+    }
+  ],
   "runs": [
     {
       "at": "2026-10-13T09:23:34.155Z",
@@ -35,7 +51,9 @@
       "commands": [
         "addToCart:ok",
         "addToCart:ok"
-      ]
+      ],
+      "fixtures": "v1: 48 kHz, click at the start and ~140 ms noise tail counted as speech (I-237)",
+      "connected": true
     },
     {
       "at": "2026-10-13T09:24:02.744Z",
@@ -48,7 +66,39 @@
       "commands": [
         "addToCart:ok",
         "addToCart:ok"
-      ]
+      ],
+      "fixtures": "v1: 48 kHz, click at the start and ~140 ms noise tail counted as speech (I-237)",
+      "connected": true
+    },
+    {
+      "at": "2026-10-14T11:38:10.807Z",
+      "fixture": "hero-en",
+      "connected": true,
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 2680,
+      "bMs": 1780,
+      "toolMs": 1464,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ],
+      "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)"
+    },
+    {
+      "at": "2026-10-14T11:38:45.974Z",
+      "fixture": "hero-ko",
+      "connected": true,
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 2542,
+      "bMs": 1501,
+      "toolMs": 1303,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ],
+      "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)"
     }
   ]
 }

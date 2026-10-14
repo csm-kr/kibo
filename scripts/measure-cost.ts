@@ -23,7 +23,7 @@ import { downsampleTo16k, int16ToBase64 } from "@/lib/voice/pcm";
 import { runToolCalls } from "@/lib/voice/toolRunner";
 import type { SessionStatus } from "@/types/session";
 import { costPerOrder, type Prices } from "./cost";
-import { ttsPcm } from "./wav";
+import { readWav } from "./wav";
 
 const ROOT = process.cwd();
 const RUNS = 3;
@@ -152,10 +152,9 @@ function byModality(details: ModalityTokenCount[] | undefined): Record<string, n
   return out;
 }
 
-/** 16 kHz PCM frames of 40 ms from a 48 kHz mono fixture. */
+/** 16 kHz PCM frames of 40 ms from a mono fixture at its own rate (24 kHz since I-237). */
 function frames(file: string): string[] {
-  const pcm = ttsPcm(readFileSync(join(ROOT, "e2e/fixtures", file)));
-  const rate = 48000;
+  const { rate, samples: pcm } = readWav(readFileSync(join(ROOT, "e2e/fixtures", file)));
   const per = (rate * FRAME_MS) / 1000;
   const out: string[] = [];
   for (let at = 0; at + per <= pcm.length; at += per) {

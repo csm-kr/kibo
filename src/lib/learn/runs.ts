@@ -1,4 +1,5 @@
 import airportShop from "../../../public/learn/airport-shop/run.json";
+import bunsik from "../../../public/learn/bunsik/run.json";
 import doughhouse from "../../../public/learn/doughhouse/run.json";
 import themepark from "../../../public/learn/themepark/run.json";
 import type { LearnRunData } from "./timeline";
@@ -26,6 +27,20 @@ export interface LearnRun {
 }
 
 export const LEARN_RUNS: LearnRun[] = [
+  {
+    data: bunsik as LearnRunData,
+    title: "Snack bar kiosk",
+    phrase: "snack bar kiosk",
+    provenance:
+      "Built by a separate AI agent from a short brief and never seen before this run: the learner was frozen first (round 4) and learned it once, in 9.6 min. Its orders were checked against the kiosk's total and cart afterwards.",
+    demoKioskId: null,
+    noDemoReason: "This kiosk was built for the test and is not in the live demo, so there is no order button here.",
+    cover: {
+      n: 3,
+      alt: "Turn 3: the snack bar kiosk's tteokbokki sheet with a required spice level and toppings, in Korean",
+      crop: { x: 140, y: 158, w: 440, h: 540 },
+    },
+  },
   {
     data: themepark as LearnRunData,
     title: "Theme park ticket kiosk",

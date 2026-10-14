@@ -1,0 +1,2961 @@
+{
+ "runId": "bunsik",
+ "kioskId": "bk9-bunsik",
+ "brand": "보리별 분식",
+ "provider": "gemini",
+ "model": "gemini-3.8-flash",
+ "startedAt": "2026-10-14T04:36:01.876Z",
+ "endedAt": "2026-10-14T04:45:39.118Z",
+ "gate": {
+  "tests": 2,
+  "testsPassedForFinish": true,
+  "audits": 4,
+  "auditOk": true,
+  "finished": true
+ },
+ "minutes": 9.6,
+ "turnCount": 85,
+ "inputTokens": 1369557,
+ "cachedInputTokens": 1025383,
+ "grade": {
+  "itemsFound": 32,
+  "itemsOf": 32,
+  "pricesCorrect": 31,
+  "orders": {
+   "total": 10,
+   "correct": 10,
+   "safeRefusal": 0,
+   "unsafe": 0,
+   "ruleViolationDetected": 0,
+   "linesChecked": 10,
+   "skillTotalDiffers": 0
+  },
+  "itemsSource": "spikes/blind-kiosks/results/bk9-bunsik/final/grade-v2.json",
+  "ordersSource": "spikes/blind-kiosks/results/bk9-bunsik/final/grade-v2.json"
+ },
+ "skill": {
+  "categories": [
+   "떡볶이",
+   "김밥",
+   "라면/우동",
+   "튀김/순대",
+   "세트",
+   "음료"
+  ],
+  "catalog": [
+   {
+    "name": "보리별 떡볶이",
+    "category": "떡볶이",
+    "price": 4500,
+    "soldOut": false,
+    "groups": [
+     {
+      "name": "맵기 선택",
+      "required": true,
+      "options": [
+       "1단계 순한맛",
+       "2단계 덜매운맛",
+       "3단계 보통맛",
+       "4단계 매운맛",
+       "5단계 아주매운맛"
+      ]
+     },
+     {
+      "name": "토핑 추가",
+      "required": false,
+      "options": [
+       "삶은 계란",
+       "어묵 추가",
+       "당면 사리",
+       "만두 사리",
+       "라면 사리",
+       "모짜렐라 치즈",
+       "비엔나 소시지"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "치즈 떡볶이",
+    "category": "떡볶이",
+    "price": 5500,
+    "soldOut": false,
+    "groups": [
+     {
+      "name": "맵기 선택",
+      "required": true,
+      "options": [
+       "1단계 순한맛",
+       "2단계 덜매운맛",
+       "3단계 보통맛",
+       "4단계 매운맛",
+       "5단계 아주매운맛"
+      ]
+     },
+     {
+      "name": "토핑 추가",
+      "required": false,
+      "options": [
+       "삶은 계란",
+       "어묵 추가",
+       "당면 사리",
+       "만두 사리",
+       "라면 사리",
+       "모짜렐라 치즈",
+       "비엔나 소시지"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "로제 떡볶이",
+    "category": "떡볶이",
+    "price": 5500,
+    "soldOut": false,
+    "groups": [
+     {
+      "name": "맵기 선택",
+      "required": true,
+      "options": [
+       "1단계 순한맛",
+       "2단계 덜매운맛",
+       "3단계 보통맛",
+       "4단계 매운맛",
+       "5단계 아주매운맛"
+      ]
+     },
+     {
+      "name": "토핑 추가",
+      "required": false,
+      "options": [
+       "삶은 계란",
+       "어묵 추가",
+       "당면 사리",
+       "만두 사리",
+       "라면 사리",
+       "모짜렐라 치즈",
+       "비엔나 소시지"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "짜장 떡볶이",
+    "category": "떡볶이",
+    "price": 5500,
+    "soldOut": false,
+    "groups": [
+     {
+      "name": "맵기 선택",
+      "required": true,
+      "options": [
+       "1단계 순한맛",
+       "2단계 덜매운맛",
+       "3단계 보통맛",
+       "4단계 매운맛",
+       "5단계 아주매운맛"
+      ]
+     },
+     {
+      "name": "토핑 추가",
+      "required": false,
+      "options": [
+       "삶은 계란",
+       "어묵 추가",
+       "당면 사리",
+       "만두 사리",
+       "라면 사리",
+       "모짜렐라 치즈",
+       "비엔나 소시지"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "궁중 떡볶이",
+    "category": "떡볶이",
+    "price": 6000,
+    "soldOut": false,
+    "groups": [
+     {
+      "name": "토핑 추가",
+      "required": false,
+      "options": [
+       "삶은 계란",
+       "어묵 추가",
+       "당면 사리",
+       "만두 사리",
+       "라면 사리",
+       "모짜렐라 치즈",
+       "비엔나 소시지"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "점심 쫄볶이",
+    "category": "떡볶이",
+    "price": 5000,
+    "soldOut": false,
+    "groups": [
+     {
+      "name": "맵기 선택",
+      "required": true,
+      "options": [
+       "1단계 순한맛",
+       "2단계 덜매운맛",
+       "3단계 보통맛",
+       "4단계 매운맛",
+       "5단계 아주매운맛"
+      ]
+     },
+     {
+      "name": "토핑 추가",
+      "required": false,
+      "options": [
+       "삶은 계란",
+       "어묵 추가",
+       "당면 사리",
+       "만두 사리",
+       "라면 사리",
+       "모짜렐라 치즈",
+       "비엔나 소시지"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "보리별 김밥",
+    "category": "김밥",
+    "price": 3500,
+    "soldOut": false,
+    "groups": [
+     {
+      "name": "김밥 커팅",
+      "required": true,
+      "options": [
+       "썰어서",
+       "통으로"
+      ]
+     },
+     {
+      "name": "김밥 추가",
+      "required": false,
+      "options": [
+       "김밥 추가 1줄"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "김치 김밥",
+    "category": "김밥",
+    "price": 4000,
+    "soldOut": false,
+    "groups": [
+     {
+      "name": "김밥 커팅",
+      "required": true,
+      "options": [
+       "썰어서",
+       "통으로"
+      ]
+     },
+     {
+      "name": "김밥 추가",
+      "required": false,
+      "options": [
+       "김밥 추가 1줄"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "참치 김밥",
+    "category": "김밥",
+    "price": 4500,
+    "soldOut": false,
+    "groups": [
+     {
+      "name": "김밥 커팅",
+      "required": true,
+      "options": [
+       "썰어서",
+       "통으로"
+      ]
+     },
+     {
+      "name": "김밥 추가",
+      "required": false,
+      "options": [
+       "김밥 추가 1줄"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "치즈 김밥",
+    "category": "김밥",
+    "price": 4500,
+    "soldOut": false,
+    "groups": [
+     {
+      "name": "김밥 커팅",
+      "required": true,
+      "options": [
+       "썰어서",
+       "통으로"
+      ]
+     },
+     {
+      "name": "김밥 추가",
+      "required": false,
+      "options": [
+       "김밥 추가 1줄"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "돈까스 김밥",
+    "category": "김밥",
+    "price": 5000,
+    "soldOut": false,
+    "groups": [
+     {
+      "name": "김밥 커팅",
+      "required": true,
+      "options": [
+       "썰어서",
+       "통으로"
+      ]
+     },
+     {
+      "name": "김밥 추가",
+      "required": false,
+      "options": [
+       "김밥 추가 1줄"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "멸치 김밥",
+    "category": "김밥",
+    "price": 4500,
+    "soldOut": true,
+    "groups": []
+   },
+   {
+    "name": "보리별 라면",
+    "category": "라면/우동",
+    "price": 4000,
+    "soldOut": false,
+    "groups": [
+     {
+      "name": "면 익힘 정도",
+      "required": true,
+      "options": [
+       "꼬들하게",
+       "보통",
+       "푹 익혀서"
+      ]
+     },
+     {
+      "name": "추가 재료",
+      "required": false,
+      "options": [
+       "계란",
+       "치즈",
+       "떡 사리"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "해물 라면",
+    "category": "라면/우동",
+    "price": 5500,
+    "soldOut": false,
+    "groups": [
+     {
+      "name": "추가 재료",
+      "required": false,
+      "options": [
+       "계란",
+       "치즈",
+       "떡 사리"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "만두 라면",
+    "category": "라면/우동",
+    "price": 5000,
+    "soldOut": false,
+    "groups": [
+     {
+      "name": "면 익힘 정도",
+      "required": true,
+      "options": [
+       "꼬들하게",
+       "보통",
+       "푹 익혀서"
+      ]
+     },
+     {
+      "name": "추가 재료",
+      "required": false,
+      "options": [
+       "계란",
+       "치즈",
+       "떡 사리"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "짬뽕 라면",
+    "category": "라면/우동",
+    "price": 5500,
+    "soldOut": false,
+    "groups": [
+     {
+      "name": "면 익힘 정도",
+      "required": true,
+      "options": [
+       "꼬들하게",
+       "보통",
+       "푹 익혀서"
+      ]
+     },
+     {
+      "name": "추가 재료",
+      "required": false,
+      "options": [
+       "계란",
+       "치즈",
+       "떡 사리"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "어묵 우동",
+    "category": "라면/우동",
+    "price": 5500,
+    "soldOut": false,
+    "groups": []
+   },
+   {
+    "name": "김치 우동",
+    "category": "라면/우동",
+    "price": 6000,
+    "soldOut": false,
+    "groups": []
+   },
+   {
+    "name": "모둠 튀김",
+    "category": "튀김/순대",
+    "price": 5000,
+    "soldOut": false,
+    "groups": []
+   },
+   {
+    "name": "김말이 튀김",
+    "category": "튀김/순대",
+    "price": 2500,
+    "soldOut": false,
+    "groups": []
+   },
+   {
+    "name": "고추 튀김",
+    "category": "튀김/순대",
+    "price": 3000,
+    "soldOut": false,
+    "groups": []
+   },
+   {
+    "name": "오징어 튀김",
+    "category": "튀김/순대",
+    "price": 3500,
+    "soldOut": false,
+    "groups": []
+   },
+   {
+    "name": "찹쌀 순대",
+    "category": "튀김/순대",
+    "price": 4500,
+    "soldOut": false,
+    "groups": [
+     {
+      "name": "순대 구성",
+      "required": true,
+      "options": [
+       "순대만",
+       "내장 섞어서"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "군만두",
+    "category": "튀김/순대",
+    "price": 3500,
+    "soldOut": false,
+    "groups": []
+   },
+   {
+    "name": "보리별 세트",
+    "category": "세트",
+    "price": 9900,
+    "soldOut": false,
+    "groups": [
+     {
+      "name": "떡볶이 선택",
+      "required": true,
+      "options": [
+       "보리별 떡볶이",
+       "치즈 떡볶이",
+       "로제 떡볶이"
+      ]
+     },
+     {
+      "name": "맵기 선택",
+      "required": true,
+      "options": [
+       "1단계 순한맛",
+       "2단계 덜매운맛",
+       "3단계 보통맛",
+       "4단계 매운맛",
+       "5단계 아주매운맛"
+      ]
+     },
+     {
+      "name": "김밥 선택",
+      "required": true,
+      "options": [
+       "보리별 김밥",
+       "김치 김밥",
+       "참치 김밥",
+       "돈까스 김밥"
+      ]
+     },
+     {
+      "name": "김밥 커팅",
+      "required": true,
+      "options": [
+       "썰어서",
+       "통으로"
+      ]
+     },
+     {
+      "name": "음료 선택",
+      "required": true,
+      "options": [
+       "콜라",
+       "사이다",
+       "오렌지 주스",
+       "식혜"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "떡튀순 세트",
+    "category": "세트",
+    "price": 12000,
+    "soldOut": false,
+    "groups": [
+     {
+      "name": "맵기 선택",
+      "required": true,
+      "options": [
+       "1단계 순한맛",
+       "2단계 덜매운맛",
+       "3단계 보통맛",
+       "4단계 매운맛",
+       "5단계 아주매운맛"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "튀순 세트",
+    "category": "세트",
+    "price": 8500,
+    "soldOut": false,
+    "groups": []
+   },
+   {
+    "name": "콜라",
+    "category": "음료",
+    "price": 2000,
+    "soldOut": false,
+    "groups": []
+   },
+   {
+    "name": "사이다",
+    "category": "음료",
+    "price": 2000,
+    "soldOut": false,
+    "groups": []
+   },
+   {
+    "name": "오렌지 주스",
+    "category": "음료",
+    "price": 2500,
+    "soldOut": false,
+    "groups": []
+   },
+   {
+    "name": "식혜",
+    "category": "음료",
+    "price": 2500,
+    "soldOut": false,
+    "groups": []
+   },
+   {
+    "name": "생수",
+    "category": "음료",
+    "price": 1000,
+    "soldOut": false,
+    "groups": []
+   }
+  ]
+ },
+ "sources": {
+  "trace": "spikes/blind-kiosks/results/bk9-bunsik/final/trace",
+  "stats": "spikes/blind-kiosks/results/bk9-bunsik/final/learn-stats.json",
+  "skill": "spikes/blind-kiosks/results/bk9-bunsik/final/skill.json",
+  "notes": "spikes/blind-kiosks/ROUND4.md"
+ },
+ "turns": [
+  {
+   "n": 1,
+   "at": "2026-10-14T04:36:04.591Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "보리별 분식"
+       }
+      ]
+     },
+     "result": "tapped 보리별 분식"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-1.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 2,
+   "at": "2026-10-14T04:36:09.994Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "매장에서 먹어요"
+       }
+      ]
+     },
+     "result": "tapped 매장에서 먹어요"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-2.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 3,
+   "at": "2026-10-14T04:36:13.802Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "보리별 떡볶이"
+       }
+      ]
+     },
+     "result": "tapped 보리별 떡볶이"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-3.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 4,
+   "at": "2026-10-14T04:36:18.838Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "1단계 순한맛"
+       },
+       {
+        "op": "click",
+        "name": "담기"
+       }
+      ]
+     },
+     "result": "tapped 1단계 순한맛 → 담기"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-4.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 5,
+   "at": "2026-10-14T04:36:21.845Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "openReview",
+        "label": "주문 확인하기"
+       }
+      ]
+     },
+     "result": "act failed: Refused: \"주문 확인하기\" is not the order button. openReview taps only the kiosk's order button (주문하기, Order) to open its order review; never a payment, send or forbiddenLabels control"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-5.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 6,
+   "at": "2026-10-14T04:36:24.988Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "주문 확인하기"
+       }
+      ]
+     },
+     "result": "tapped 주문 확인하기"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-6.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 7,
+   "at": "2026-10-14T04:36:30.593Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "openReview",
+        "label": "주문하기"
+       }
+      ]
+     },
+     "result": "tapped 주문하기"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-7.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 8,
+   "at": "2026-10-14T04:36:38.919Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "적립 안 할게요"
+       }
+      ]
+     },
+     "result": "tapped 적립 안 할게요"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-8.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 9,
+   "at": "2026-10-14T04:36:49.498Z",
+   "calls": [
+    {
+     "tool": "reload",
+     "args": {},
+     "result": "reloaded the kiosk"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-9.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 10,
+   "at": "2026-10-14T04:36:53.203Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "보리별 분식"
+       },
+       {
+        "op": "click",
+        "label": "포장해 갈게요"
+       }
+      ]
+     },
+     "result": "tapped 보리별 분식 → 포장해 갈게요"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-10.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 11,
+   "at": "2026-10-14T04:36:56.553Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "보리별 떡볶이"
+       },
+       {
+        "op": "click",
+        "label": "1단계 순한맛"
+       },
+       {
+        "op": "click",
+        "name": "담기"
+       }
+      ]
+     },
+     "result": "tapped 보리별 떡볶이 → 1단계 순한맛 → 담기"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-11.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 12,
+   "at": "2026-10-14T04:36:58.771Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "주문 확인하기"
+       }
+      ]
+     },
+     "result": "tapped 주문 확인하기"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-12.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 13,
+   "at": "2026-10-14T04:37:24.773Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "‹ 메뉴 더 담기"
+       }
+      ]
+     },
+     "result": "tapped ‹ 메뉴 더 담기"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-13.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 14,
+   "at": "2026-10-14T04:37:26.703Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "전체 삭제"
+       }
+      ]
+     },
+     "result": "tapped 전체 삭제"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-14.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 15,
+   "at": "2026-10-14T04:37:28.769Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "모두 삭제"
+       }
+      ]
+     },
+     "result": "tapped 모두 삭제"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-15.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 16,
+   "at": "2026-10-14T04:37:32.719Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "치즈 떡볶이"
+       }
+      ]
+     },
+     "result": "tapped 치즈 떡볶이"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-16.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 17,
+   "at": "2026-10-14T04:37:35.420Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "로제 떡볶이"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 로제 떡볶이"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-17.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 18,
+   "at": "2026-10-14T04:37:37.958Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "짜장 떡볶이"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 짜장 떡볶이"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-18.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 19,
+   "at": "2026-10-14T04:37:40.154Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "궁중 떡볶이"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 궁중 떡볶이"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-19.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 20,
+   "at": "2026-10-14T04:37:42.470Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "점심 쫄볶이"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 점심 쫄볶이"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-20.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 21,
+   "at": "2026-10-14T04:37:44.656Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "김밥"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 김밥"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-21.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 22,
+   "at": "2026-10-14T04:37:46.881Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "보리별 김밥"
+       }
+      ]
+     },
+     "result": "tapped 보리별 김밥"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-22.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 23,
+   "at": "2026-10-14T04:37:49.947Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "김치 김밥"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 김치 김밥"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-23.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 24,
+   "at": "2026-10-14T04:37:52.221Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "+",
+        "within": "김밥 추가 1줄+3,000원"
+       }
+      ]
+     },
+     "result": "tapped +"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-24.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 25,
+   "at": "2026-10-14T04:37:54.770Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "+",
+        "within": "김밥 추가 1줄+3,000원"
+       }
+      ]
+     },
+     "result": "tapped +"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-25.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 26,
+   "at": "2026-10-14T04:37:56.805Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "+",
+        "within": "김밥 추가 1줄+3,000원"
+       }
+      ]
+     },
+     "result": "tapped +"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-26.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 27,
+   "at": "2026-10-14T04:37:59.291Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "+",
+        "within": "김밥 추가 1줄+3,000원"
+       }
+      ]
+     },
+     "result": "tapped +"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-27.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 28,
+   "at": "2026-10-14T04:38:01.859Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "참치 김밥"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 참치 김밥"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-28.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 29,
+   "at": "2026-10-14T04:38:04.322Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "치즈 김밥"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 치즈 김밥"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-29.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 30,
+   "at": "2026-10-14T04:38:06.553Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "돈까스 김밥"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 돈까스 김밥"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-30.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 31,
+   "at": "2026-10-14T04:38:08.861Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "라면/우동"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 라면/우동"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-31.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 32,
+   "at": "2026-10-14T04:38:11.430Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "보리별 라면"
+       }
+      ]
+     },
+     "result": "tapped 보리별 라면"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-32.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 33,
+   "at": "2026-10-14T04:38:14.370Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "해물 라면"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 해물 라면"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-33.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 34,
+   "at": "2026-10-14T04:38:18.517Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "만두 라면"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 만두 라면"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-34.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 35,
+   "at": "2026-10-14T04:38:21.462Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "짬뽕 라면"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 짬뽕 라면"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-35.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 36,
+   "at": "2026-10-14T04:38:25.240Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "어묵 우동"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 어묵 우동"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-36.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 37,
+   "at": "2026-10-14T04:38:29.117Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "김치 우동"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 김치 우동"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-37.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 38,
+   "at": "2026-10-14T04:38:31.595Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "튀김/순대"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 튀김/순대"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-38.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 39,
+   "at": "2026-10-14T04:38:33.700Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "모둠 튀김"
+       }
+      ]
+     },
+     "result": "tapped 모둠 튀김"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-39.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 40,
+   "at": "2026-10-14T04:38:36.430Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "김말이 튀김"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 김말이 튀김"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-40.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 41,
+   "at": "2026-10-14T04:38:40.644Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "고추 튀김"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 고추 튀김"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-41.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 42,
+   "at": "2026-10-14T04:38:42.823Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "오징어 튀김"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 오징어 튀김"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-42.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 43,
+   "at": "2026-10-14T04:38:45.195Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "찹쌀 순대"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 찹쌀 순대"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-43.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 44,
+   "at": "2026-10-14T04:38:47.558Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "군만두"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 군만두"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-44.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 45,
+   "at": "2026-10-14T04:38:51.272Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "세트"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 세트"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-45.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 46,
+   "at": "2026-10-14T04:38:53.306Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "보리별 세트"
+       }
+      ]
+     },
+     "result": "tapped 보리별 세트"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-46.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 47,
+   "at": "2026-10-14T04:38:56.952Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "보리별 떡볶이"
+       },
+       {
+        "op": "click",
+        "label": "1단계 순한맛"
+       },
+       {
+        "op": "click",
+        "label": "다음"
+       }
+      ]
+     },
+     "result": "tapped 보리별 떡볶이 → 1단계 순한맛 → 다음"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-47.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 48,
+   "at": "2026-10-14T04:38:59.866Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "보리별 김밥"
+       },
+       {
+        "op": "click",
+        "label": "썰어서"
+       },
+       {
+        "op": "click",
+        "label": "다음"
+       }
+      ]
+     },
+     "result": "tapped 보리별 김밥 → 썰어서 → 다음"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-48.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 49,
+   "at": "2026-10-14T04:39:02.354Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       }
+      ]
+     },
+     "result": "tapped ✕"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-49.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 50,
+   "at": "2026-10-14T04:39:04.701Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "떡튀순 세트"
+       }
+      ]
+     },
+     "result": "tapped 떡튀순 세트"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-50.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 51,
+   "at": "2026-10-14T04:39:07.101Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "튀순 세트"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 튀순 세트"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-51.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 52,
+   "at": "2026-10-14T04:39:09.435Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "음료"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 음료"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-52.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 53,
+   "at": "2026-10-14T04:39:11.678Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "콜라"
+       }
+      ]
+     },
+     "result": "tapped 콜라"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-53.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 54,
+   "at": "2026-10-14T04:39:13.911Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "사이다"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 사이다"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-54.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 55,
+   "at": "2026-10-14T04:39:16.499Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "오렌지 주스"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 오렌지 주스"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-55.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 56,
+   "at": "2026-10-14T04:39:18.827Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "식혜"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 식혜"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-56.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 57,
+   "at": "2026-10-14T04:39:20.928Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "생수"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 생수"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-57.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 58,
+   "at": "2026-10-14T04:39:23.061Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       }
+      ]
+     },
+     "result": "tapped ✕"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-58.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 59,
+   "at": "2026-10-14T04:39:53.633Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "세트"
+       },
+       {
+        "op": "click",
+        "label": "보리별 세트"
+       }
+      ]
+     },
+     "result": "tapped 세트 → 보리별 세트"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-59.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 60,
+   "at": "2026-10-14T04:40:35.424Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "보리별 떡볶이"
+       },
+       {
+        "op": "click",
+        "label": "1단계 순한맛"
+       },
+       {
+        "op": "click",
+        "label": "다음"
+       }
+      ]
+     },
+     "result": "tapped 보리별 떡볶이 → 1단계 순한맛 → 다음"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-60.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 61,
+   "at": "2026-10-14T04:40:43.975Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "보리별 김밥"
+       },
+       {
+        "op": "click",
+        "label": "썰어서"
+       },
+       {
+        "op": "click",
+        "label": "다음"
+       }
+      ]
+     },
+     "result": "tapped 보리별 김밥 → 썰어서 → 다음"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-61.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 62,
+   "at": "2026-10-14T04:40:46.348Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "name": "담기"
+       }
+      ]
+     },
+     "result": "tapped 담기"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-62.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 63,
+   "at": "2026-10-14T04:40:48.923Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "콜라"
+       },
+       {
+        "op": "click",
+        "name": "담기"
+       }
+      ]
+     },
+     "result": "tapped 콜라 → 담기"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-63.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 64,
+   "at": "2026-10-14T04:40:57.667Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "김밥"
+       },
+       {
+        "op": "click",
+        "label": "보리별 김밥"
+       }
+      ]
+     },
+     "result": "tapped 김밥 → 보리별 김밥"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-64.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 65,
+   "at": "2026-10-14T04:41:02.856Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "+",
+        "within": "김밥 추가 1줄"
+       }
+      ]
+     },
+     "result": "tapped +"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-65.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 66,
+   "at": "2026-10-14T04:41:22.005Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       }
+      ]
+     },
+     "result": "tapped ✕"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-66.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 67,
+   "at": "2026-10-14T04:41:24.207Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "주문 확인하기"
+       }
+      ]
+     },
+     "result": "tapped 주문 확인하기"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-67.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 68,
+   "at": "2026-10-14T04:43:03.518Z",
+   "calls": [
+    {
+     "tool": "audit",
+     "args": {},
+     "result": "audit: 0 missing, 0 unknown, 1 hidden, 0 tapped choices, 0 items missing a required choice"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-68.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 69,
+   "at": "2026-10-14T04:43:09.410Z",
+   "calls": [
+    {
+     "tool": "reload",
+     "args": {},
+     "result": "reloaded the kiosk"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-69.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 70,
+   "at": "2026-10-14T04:43:12.018Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "보리별 분식"
+       },
+       {
+        "op": "click",
+        "label": "매장에서 먹어요"
+       }
+      ]
+     },
+     "result": "tapped 보리별 분식 → 매장에서 먹어요"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-70.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 71,
+   "at": "2026-10-14T04:43:14.691Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "라면/우동"
+       },
+       {
+        "op": "click",
+        "label": "어묵 우동"
+       }
+      ]
+     },
+     "result": "tapped 라면/우동 → 어묵 우동"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-71.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 72,
+   "at": "2026-10-14T04:43:17.622Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "✕"
+       },
+       {
+        "op": "click",
+        "label": "튀김/순대"
+       }
+      ]
+     },
+     "result": "tapped ✕ → 튀김/순대"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-72.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 73,
+   "at": "2026-10-14T04:43:23.320Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "세트"
+       }
+      ]
+     },
+     "result": "tapped 세트"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-73.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 74,
+   "at": "2026-10-14T04:43:26.067Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "김밥"
+       }
+      ]
+     },
+     "result": "tapped 김밥"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-74.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 75,
+   "at": "2026-10-14T04:43:28.751Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "음료"
+       }
+      ]
+     },
+     "result": "tapped 음료"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-75.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 76,
+   "at": "2026-10-14T04:43:31.536Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "떡볶이"
+       }
+      ]
+     },
+     "result": "tapped 떡볶이"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-76.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 77,
+   "at": "2026-10-14T04:43:40.028Z",
+   "calls": [
+    {
+     "tool": "act",
+     "args": {
+      "steps": [
+       {
+        "op": "click",
+        "label": "라면/우동"
+       }
+      ]
+     },
+     "result": "tapped 라면/우동"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-77.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 78,
+   "at": "2026-10-14T04:43:54.131Z",
+   "calls": [
+    {
+     "tool": "audit",
+     "args": {},
+     "result": "audit: 0 missing, 0 unknown, 1 hidden, 0 tapped choices, 0 items missing a required choice"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-78.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 79,
+   "at": "2026-10-14T04:44:49.365Z",
+   "calls": [
+    {
+     "tool": "audit",
+     "args": {},
+     "result": "audit ok"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-79.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 80,
+   "at": "2026-10-14T04:45:01.252Z",
+   "calls": [
+    {
+     "tool": "testSkill",
+     "args": {},
+     "result": "testSkill 1/1 passed"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-80.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 81,
+   "at": "2026-10-14T04:45:06.079Z",
+   "calls": [
+    {
+     "tool": "records",
+     "args": {},
+     "result": "listed 0 items, 0 facts"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-81.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 82,
+   "at": "2026-10-14T04:45:08.753Z",
+   "calls": [
+    {
+     "tool": "record",
+     "args": {
+      "kind": "flow",
+      "names": []
+     },
+     "result": "recorded a flow fact"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-82.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 83,
+   "at": "2026-10-14T04:45:20.352Z",
+   "calls": [
+    {
+     "tool": "testSkill",
+     "args": {},
+     "result": "testSkill 2/2 passed"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-83.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 84,
+   "at": "2026-10-14T04:45:32.148Z",
+   "calls": [
+    {
+     "tool": "audit",
+     "args": {},
+     "result": "audit ok"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-84.webp",
+   "width": 720,
+   "height": 1067
+  },
+  {
+   "n": 85,
+   "at": "2026-10-14T04:45:38.751Z",
+   "calls": [
+    {
+     "tool": "finish",
+     "args": {},
+     "result": "finish accepted"
+    }
+   ],
+   "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+   },
+   "image": "turn-85.webp",
+   "width": 720,
+   "height": 1067
+  }
+ ]
+}

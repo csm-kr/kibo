@@ -23,6 +23,15 @@ interface RunSource {
 
 const RUNS: RunSource[] = [
   {
+    // Round 4 fresh kiosk (spikes/blind-kiosks/ROUND4.md): never seen before this run, learner frozen at its commit;
+    // 10 correct of 10 under grader v2.
+    runId: "bunsik",
+    kioskId: "bk9-bunsik",
+    dir: "spikes/blind-kiosks/results/bk9-bunsik/final",
+    grade: "spikes/blind-kiosks/results/bk9-bunsik/final/grade-v2.json",
+    notes: "spikes/blind-kiosks/ROUND4.md",
+  },
+  {
     // Fresh hold-out (never seen before its run, added after the learner fixes) with unsafe = 0 and 10 correct of 10
     // under grader v2, which opens the closed cart drawer (13-blind-kiosks:10, I-183).
     runId: "themepark",
@@ -193,7 +202,9 @@ async function build(r: RunSource) {
 }
 
 async function main() {
-  for (const r of RUNS) {
+  // `npm run learn:runs -- bunsik` rebuilds only the named runs; with no names, all of them.
+  const only = process.argv.slice(2);
+  for (const r of RUNS.filter((x) => only.length === 0 || only.includes(x.runId))) {
     if (!existsSync(join(r.dir, "trace", "trace.json"))) throw new Error(`${r.dir}: no trace`);
     await build(r);
   }

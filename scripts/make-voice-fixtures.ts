@@ -1,54 +1,23 @@
 // Synthetic voice fixtures for e2e/voice.live.spec.ts: Gemini TTS speaks fixed order sentences, saved as WAV
-// (16-bit PCM mono, 48 kHz) with 1 s of silence before and 2 s after. No real person's voice.
-// Run with `npm run fixtures:voice` (reads GEMINI_API_KEY from .env). The key is never printed.
+// (16-bit PCM mono at the TTS rate, 24 kHz, not resampled) with 1 s of silence before and 2 s after; the sentence is
+// trimmed to 150 ms of quiet around the speech and faded in and out over 10 ms (`fixtureWav`, `scripts/wav.ts`).
+// No real person's voice. Run with `npm run fixtures:voice` (reads GEMINI_API_KEY from .env). The key is never printed.
+// `scripts/fixtures.test.ts` checks the files.
 
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { GoogleGenAI } from "@google/genai";
-import { ttsPcm } from "./wav";
+import { fixtureWav, readWav, ttsPcm } from "./wav";
 
 const MODEL = process.env.GEMINI_TTS_MODEL ?? "gemini-3.8-flash-tts";
-// Gemini TTS returns 16-bit little-endian PCM at 24 kHz, now with a WAV header (ttsPcm skips it).
+// Headerless TTS replies were 16-bit little-endian PCM at 24 kHz; a WAV reply states its own rate.
 const TTS_RATE = 24_000;
-const OUT_RATE = 48_000;
-const LEAD_S = 1;
-const TAIL_S = 2;
 
 export const FIXTURES: { file: string; text: string }[] = [
   { file: "hero-en.wav", text: "Two cheeseburger sets. One without pickles. Drinks zero cola and cider." },
   { file: "fries-en.wav", text: "Make both fries large." },
   { file: "hero-ko.wav", text: "치즈버거 세트 두 개 주세요. 하나는 피클 빼고, 음료는 제로콜라랑 사이다로요." },
 ];
-
-/** 24 kHz to 48 kHz by linear interpolation, padded with silence. */
-function toWav(pcm24: Int16Array): Buffer {
-  const speech = pcm24.length * 2;
-  const total = (LEAD_S + TAIL_S) * OUT_RATE + speech;
-  const samples = new Int16Array(total);
-  const start = LEAD_S * OUT_RATE;
-  for (let i = 0; i < speech; i++) {
-    const pos = i / 2;
-    const a = pcm24[Math.floor(pos)];
-    const b = pcm24[Math.min(pcm24.length - 1, Math.floor(pos) + 1)];
-    samples[start + i] = Math.round(a + (b - a) * (pos - Math.floor(pos)));
-  }
-  const data = Buffer.from(samples.buffer);
-  const h = Buffer.alloc(44);
-  h.write("RIFF", 0);
-  h.writeUInt32LE(36 + data.length, 4);
-  h.write("WAVE", 8);
-  h.write("fmt ", 12);
-  h.writeUInt32LE(16, 16);
-  h.writeUInt16LE(1, 20); // PCM
-  h.writeUInt16LE(1, 22); // mono
-  h.writeUInt32LE(OUT_RATE, 24);
-  h.writeUInt32LE(OUT_RATE * 2, 28);
-  h.writeUInt16LE(2, 32);
-  h.writeUInt16LE(16, 34);
-  h.write("data", 36);
-  h.writeUInt32LE(data.length, 40);
-  return Buffer.concat([h, data]);
-}
 
 async function main() {
   if (!process.env.GEMINI_API_KEY) {
@@ -70,9 +39,11 @@ async function main() {
     });
     const b64 = res.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data)?.inlineData?.data;
     if (!b64) throw new Error(`no audio for ${f.file}`);
-    const pcm = ttsPcm(Buffer.from(b64, "base64"));
-    writeFileSync(join(dir, f.file), toWav(pcm));
-    console.log(`${f.file}: ${(pcm.length / TTS_RATE).toFixed(2)} s of speech`);
+    const raw = Buffer.from(b64, "base64");
+    const { rate, samples } = raw.toString("ascii", 0, 4) === "RIFF" ? readWav(raw) : { rate: TTS_RATE, samples: ttsPcm(raw) };
+    const out = fixtureWav(samples, rate);
+    writeFileSync(join(dir, f.file), out);
+    console.log(`${f.file}: ${rate} Hz, ${(samples.length / rate).toFixed(2)} s from TTS, ${((out.length - 44) / 2 / rate).toFixed(2)} s written`);
   }
 }
 

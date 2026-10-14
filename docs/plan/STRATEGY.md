@@ -30,14 +30,14 @@ Sources: [overview](https://aibuildercup.com/), [themes and criteria](https://ai
 |---|---|---|---|---|---|
 | Technical & GenAI | 40% | Works; GenAI central; scalable; grounded; Google Cloud depth | Design: Live + 9 tools, server state machine, Firestore transactions, one-use tokens; KIBO Learn Gemini results | App is a skeleton; eval, latency, cost not measured; no deployment proof | Dev: text hero path on Cloud Run 10/13; eval set 10/13 evening; Live voice 10/14; deploy script with `--region`. Video: an off-menu request refused (grounding) and 5 s of Cloud Run / Firestore console (10/17) |
 | Impact | 25% | Problem fit; measurable viability | Personas; legal context (unverified); touch vs voice planned | No sourced statistic; no real users | Teammate: one government-sourced statistic and the decree text (10/14); 2–3 people aged 60+ or non-Korean readers try Flow A, notes with consent, no faces (10/15–16). Dev: measured cost per order (10/14, `docs/TESTING.md`) |
-| Innovation | 25% | Differentiation; GenAI beyond the surface | Phone as an accessibility layer over existing kiosks; KIBO Learn blind run 40/40 items | No comparison with alternatives | Teammate: comparison slide (new barrier-free kiosk / voice on the kiosk / AI tapping the screen every order / KIBO), qualitative or sourced (10/15). Dev: quote replay time only as measured (0.7–5.2 s per order so far, `holdout.run2.log`) |
+| Innovation | 25% | Differentiation; GenAI beyond the surface | Phone as an accessibility layer over existing kiosks; KIBO Learn blind run 40/40 items | No comparison with alternatives | Teammate: comparison slide (new barrier-free kiosk / voice on the kiosk / AI tapping the screen every order / KIBO), qualitative or sourced (10/15). Dev: quote replay time and learning results only from `docs/plan/NUMBERS.md` |
 | UX | 10% (+ Best UI/UX award) | Intuitive, accessible, clean, cohesive | Nielsen rules, journeys, accessibility spec, prototype 42 checks, `docs/UI_QA.md` | Judges arrive cold, often without a mic | Dev: `/demo` with tappable example sentences, automatic text fallback, [Try again] (10/14); QA pass at every phase end. Teammate: Lighthouse accessibility score and an incognito run on a non-dev laptop (10/16) |
 
 ## Top 5 moves (score gain per hour)
 1. **Video leads with the result:** real phone sentence → kiosk fills itself within the first 10 s; 5 s of Cloud Run / Firestore console next to the architecture diagram. About 1 h; touches every criterion.
 2. **`/demo` safe for a cold judge** (2–3 h): tappable sentences, text fallback, reset. The 40% asks whether it works.
 3. **Measure, then publish:** eval pass rate per type, median latency, cost per order, touch vs voice; each number with its evidence file (`docs/TESTING.md`).
-4. **Deck in the rubric's words** (teammate, ~4 h): "Accessibility", "integration with existing systems", "scalability"; a comparison slide; an honest limits slide (blind cafe orders 2/5–3/5, the rest refused before running, not mis-ordered).
+4. **Deck in the rubric's words** (teammate, ~4 h): "Accessibility", "integration with existing systems", "scalability"; a comparison slide; an honest limits slide (unsafe orders and skill-total mismatches from `docs/plan/NUMBERS.md`; the old blind café run is retired).
 5. **Small trial with older users** (teammate, 2–3 h): completion and time, with quotes. Feeds Impact and Most Impactful.
 
 ## Risks that lose it outright
@@ -45,7 +45,7 @@ Sources: [overview](https://aibuildercup.com/), [themes and criteria](https://ai
 - **Third-party IP:** real drink brands were in the hero script; renamed on 10-12 (`docs/ISSUE.md` I-009). Keep checking menu data, copy and the video.
 - **Fresh code:** scan git history for pre-hackathon code; gitleaks before going public. Harness files stay git-ignored.
 - **Downtime 10-19 to 11-06:** preview model retired (model ids are env vars; pick the replacement now), Gemini 429s, billing failure. `min-instances=1`, uptime alerts, daily smoke test, no deploys during judging.
-- **Overclaiming:** verify the barrier-free decree before quoting; replay time only as measured (0.7–5.2 s); say "web/webview kiosks", not "any kiosk"; no OpenAI numbers in public materials.
+- **Overclaiming:** verify the barrier-free decree before quoting; every number only from `docs/plan/NUMBERS.md`; say "web/webview kiosks", not "any kiosk"; no OpenAI numbers in public materials.
 - **Optics:** OpenAI learner code and results in `spikes/` will be public; label them development-only or keep them out. Images are made with Codex image generation for now (decided 10-12); credit it in the README as an offline design tool, not product AI.
 - **Admin:** mandatory deck template; video ≤ 2:50 and public; submit 10/17; confirm both members are eligible.
 

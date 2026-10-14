@@ -12,8 +12,8 @@ describe("recorded learn runs", () => {
       expect(t.steps).toHaveLength(data.turnCount);
       expect(t.steps.map((s) => s.n)).toEqual(data.turns.map((_, i) => i + 1));
       expect(t.milestones.at(-1)).toMatchObject({ kind: "finish", index: data.turnCount - 1 });
-      // The theme park run never used `record`, so it has no note milestones and its counters stay at 0.
-      if (data.runId === "themepark") {
+      // The theme park and snack bar runs never used `record`, so they have no note milestones and their counters stay at 0.
+      if (data.runId === "themepark" || data.runId === "bunsik") {
         expect(t.milestones.map((m) => m.kind).sort()).toEqual(["audit", "finish", "self-test"]);
         expect(t.steps.every((s) => s.known.items === 0 && s.known.categories === 0)).toBe(true);
       } else {
@@ -45,15 +45,18 @@ describe("recorded learn runs", () => {
 
   it("only Doughhouse has an order button, and it opens the live demo kiosk", () => {
     expect(learnRun("doughhouse")?.demoKioskId).toBe("doughhouse");
-    for (const id of ["themepark", "airport-shop"]) {
+    for (const id of ["bunsik", "themepark", "airport-shop"]) {
       expect(learnRun(id)?.demoKioskId).toBeNull();
       expect(learnRun(id)?.noDemoReason).toBeTruthy();
     }
     expect(learnRun("nope")).toBeUndefined();
   });
 
-  it("the fresh hold-out run comes first; both blind runs have unsafe = 0 under grader v2", () => {
-    expect(LEARN_RUNS.map((r) => r.data.runId)).toEqual(["themepark", "airport-shop", "doughhouse"]);
+  it("the round 4 fresh run comes first, Doughhouse last; every blind run has unsafe = 0 under grader v2", () => {
+    expect(LEARN_RUNS.map((r) => r.data.runId)).toEqual(["bunsik", "themepark", "airport-shop", "doughhouse"]);
+    expect(learnRun("bunsik")?.data.grade.orders).toMatchObject({ correct: 10, unsafe: 0, total: 10, linesChecked: 10, skillTotalDiffers: 0 });
+    expect(learnRun("bunsik")?.data.grade.ordersSource).toMatch(/bk9-bunsik\/final\/grade-v2\.json$/);
+    expect(learnRun("bunsik")?.data.minutes).toBe(9.6);
     expect(learnRun("themepark")?.data.grade.orders).toMatchObject({ correct: 10, unsafe: 0, total: 10, linesChecked: 10, skillTotalDiffers: 4 });
     expect(learnRun("themepark")?.data.grade.ordersSource).toMatch(/bk6-themepark\/final\/grade-v2\.json$/);
     expect(learnRun("airport-shop")?.data.grade.orders).toMatchObject({ correct: 10, unsafe: 0, total: 10, skillTotalDiffers: 0 });

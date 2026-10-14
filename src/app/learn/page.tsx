@@ -26,7 +26,7 @@ export default function LearnIndex() {
             must pass self-tests and a coverage audit, both without AI; after that, every order is replayed without AI.
           </p>
           <p className="text-base text-muted">
-            Limits: web and webview kiosks only. All three kiosks are synthetic: two built by other AI agents for the
+            Limits: web and webview kiosks only. All four kiosks are synthetic: three built by other AI agents for the
             test, one by the KIBO team. One run per kiosk, Gemini 3.8 Flash on 10-13 and 10-14. These are replays of recorded runs, not
             live.
           </p>

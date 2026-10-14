@@ -2,27 +2,57 @@
   "about": "Voice order E2E on /demo with real Gemini Live (e2e/voice.live.spec.ts, `npm run test:e2e:live`). Synthetic TTS voice (Gemini TTS, e2e/fixtures) through Chromium's fake microphone on a laptop, not a real phone. End of speech = the last voiced 40 ms mic frame sent to Live before the model's first output; the page sends the looping fixture once. (a) end of speech → first AI audio chunk; (b) end of speech → first 2 s highlight ring on the kiosk half. Medians over passing runs.",
   "model": "gemini-3.8-live",
   "firstRun": "2026-10-12T17:51:42.293Z",
-  "lastRun": "2026-10-12T23:29:24.104Z",
+  "lastRun": "2026-10-14T11:37:49.958Z",
   "summary": {
-    "runs": 8,
-    "passed": 8,
-    "aMedianMs": 2070,
-    "bMedianMs": 974,
+    "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)",
+    "runs": 2,
+    "passed": 2,
+    "upstreamFailures": 0,
+    "aMedianMs": 2708,
+    "bMedianMs": 1833,
     "byFixture": {
       "hero-en": {
-        "runs": 4,
-        "passed": 4,
-        "aMedianMs": 2196,
-        "bMedianMs": 1093
+        "runs": 1,
+        "passed": 1,
+        "aMedianMs": 2578,
+        "bMedianMs": 1864
       },
       "hero-ko": {
-        "runs": 4,
-        "passed": 4,
-        "aMedianMs": 1688,
-        "bMedianMs": 796
+        "runs": 1,
+        "passed": 1,
+        "aMedianMs": 2837,
+        "bMedianMs": 1802
       }
     }
   },
+  "allAttempts": {
+    "attempted": 18,
+    "passed": 11,
+    "upstreamFailures": 6
+  },
+  "omitted": [
+    {
+      "when": "10-13 ~15:10 KST (11-hardening:5)",
+      "runs": 2,
+      "passed": 0,
+      "upstream": 2,
+      "why": "hero-en and hero-ko failed at connect: the Gemini API key answered HTTP 402 (I-104); removed from the file then (I-099)"
+    },
+    {
+      "when": "10-13 ~17:20 KST (12-phone-app:5)",
+      "runs": 2,
+      "passed": 0,
+      "upstream": 2,
+      "why": "both hero orders failed at connect, key HTTP 402 (I-104); removed from the file then (I-099)"
+    },
+    {
+      "when": "10-13 ~18:25 KST (12-phone-app:9)",
+      "runs": 2,
+      "passed": 0,
+      "upstream": 2,
+      "why": "the direct path failed at connect, key HTTP 402 (I-104); removed from the file then (I-099)"
+    }
+  ],
   "runs": [
     {
       "at": "2026-10-12T17:51:42.293Z",
@@ -35,7 +65,9 @@
       "commands": [
         "addToCart:ok",
         "addToCart:ok"
-      ]
+      ],
+      "fixtures": "v1: 48 kHz, click at the start and ~140 ms noise tail counted as speech (I-237)",
+      "connected": true
     },
     {
       "at": "2026-10-12T17:52:01.880Z",
@@ -49,7 +81,9 @@
         "addToCart:ok",
         "addToCart:ok",
         "offerChoices:ok"
-      ]
+      ],
+      "fixtures": "v1: 48 kHz, click at the start and ~140 ms noise tail counted as speech (I-237)",
+      "connected": true
     },
     {
       "at": "2026-10-12T17:52:38.096Z",
@@ -62,7 +96,9 @@
       "commands": [
         "addToCart:ok",
         "addToCart:ok"
-      ]
+      ],
+      "fixtures": "v1: 48 kHz, click at the start and ~140 ms noise tail counted as speech (I-237)",
+      "connected": true
     },
     {
       "at": "2026-10-12T17:52:57.338Z",
@@ -75,7 +111,9 @@
       "commands": [
         "addToCart:ok",
         "addToCart:ok"
-      ]
+      ],
+      "fixtures": "v1: 48 kHz, click at the start and ~140 ms noise tail counted as speech (I-237)",
+      "connected": true
     },
     {
       "at": "2026-10-12T17:53:32.632Z",
@@ -88,7 +126,9 @@
       "commands": [
         "addToCart:ok",
         "addToCart:ok"
-      ]
+      ],
+      "fixtures": "v1: 48 kHz, click at the start and ~140 ms noise tail counted as speech (I-237)",
+      "connected": true
     },
     {
       "at": "2026-10-12T17:53:52.099Z",
@@ -101,7 +141,39 @@
       "commands": [
         "addToCart:ok",
         "addToCart:ok"
-      ]
+      ],
+      "fixtures": "v1: 48 kHz, click at the start and ~140 ms noise tail counted as speech (I-237)",
+      "connected": true
+    },
+    {
+      "at": "2026-10-12T22:16:00.000Z",
+      "fixture": "hero-en",
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 1739,
+      "bMs": 998,
+      "toolMs": null,
+      "commands": [],
+      "restored": "I-115: this run was removed from the file on 10-13 (7-environments:5); values from docs/ISSUE.md I-115, minute only, tool timing and commands not saved",
+      "fixtures": "v1: 48 kHz, click at the start and ~140 ms noise tail counted as speech (I-237)",
+      "connected": true
+    },
+    {
+      "at": "2026-10-12T22:16:30.000Z",
+      "fixture": "hero-ko",
+      "pass": false,
+      "model": "gemini-3.8-live",
+      "aMs": null,
+      "bMs": null,
+      "toolMs": null,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok",
+        "addToCart/undoLastChange:ok (alternating > 15 times, not saved one by one)"
+      ],
+      "restored": "I-115: the model looped addToCart and undoLastChange and never reached the hero cart; timed out after 60 s. Removed from the file on 10-13, restored from docs/ISSUE.md I-115 (time approximate)",
+      "fixtures": "v1: 48 kHz, click at the start and ~140 ms noise tail counted as speech (I-237)",
+      "connected": true
     },
     {
       "at": "2026-10-12T23:29:00.225Z",
@@ -115,7 +187,9 @@
         "addToCart:ok",
         "addToCart:ok",
         "offerChoices:ok"
-      ]
+      ],
+      "fixtures": "v1: 48 kHz, click at the start and ~140 ms noise tail counted as speech (I-237)",
+      "connected": true
     },
     {
       "at": "2026-10-12T23:29:24.104Z",
@@ -128,7 +202,39 @@
       "commands": [
         "addToCart:ok",
         "addToCart:ok"
-      ]
+      ],
+      "fixtures": "v1: 48 kHz, click at the start and ~140 ms noise tail counted as speech (I-237)",
+      "connected": true
+    },
+    {
+      "at": "2026-10-14T11:37:12.009Z",
+      "fixture": "hero-en",
+      "connected": true,
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 2578,
+      "bMs": 1864,
+      "toolMs": 1477,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ],
+      "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)"
+    },
+    {
+      "at": "2026-10-14T11:37:49.958Z",
+      "fixture": "hero-ko",
+      "connected": true,
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 2837,
+      "bMs": 1802,
+      "toolMs": 1596,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ],
+      "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)"
     }
   ]
 }
