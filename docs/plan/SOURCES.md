@@ -78,6 +78,27 @@ The "Deck v2" column says where the fact appears in `videos/deck-v2/` (slide num
 | G1b | Which of the phone picker's AI languages each voice path lists. **Gemini API (direct path, `gemini-3.8-live`):** Korean, English, Japanese, Chinese (Simplified), Spanish, Vietnamese, French, Thai and Indonesian are all on the G1 list. **Vertex AI Live (relay path, `us-central1`):** the Cloud page's "Languages supported" list (24 languages, page last updated 2026-10-13, read by the orchestrator 10-14) includes Korean `ko-KR`, English `en-US`, Japanese `ja-JP`, Spanish **`es-US`**, Vietnamese `vi-VN`, French `fr-FR`, Thai `th-TH` and Indonesian `id-ID`; it does **not** list Chinese. So on the relay path Chinese, and Spanish with our `es-ES` code, rest only on KIBO's own test below, not on a Google claim (I-226 closed by this read). | Google Cloud, "Configure language and voice" for the Live API, section "Languages supported", updated 2026-10-13. https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/live-api/configure-language-voice | KIBO's own check instead (not a Google claim): on 10-14 each of the 9 picker languages, with its code `ko-KR`, `en-US`, `ja-JP`, `cmn-CN`, `es-ES`, `vi-VN`, `fr-FR`, `th-TH`, `id-ID` in `inputAudioTranscription.languageCodes`, opened a session and got its reply transcript in that language on both paths, 18 of 18 (`evidence/live-languages.json`, `npm run voice:languages`; one typed turn each, spoken input untested). Say "tested by typing in 9 languages; speaking them is not tested yet" | not used |
 | G2 | Gemini API paid-tier prices used for KIBO's cost numbers (USD per 1M tokens): `gemini-3.8-flash` input 0.75, cached input 0.075, output incl. thinking 3.75; `gemini-3.8-live` text input 0.75, audio input 3.00, text output 4.50, audio output 12.00. Valid through 2026-12-31; the page says prices double from 2027-01-01. | Google AI for Developers, Gemini API pricing, read 2026-10-13 (copied into `evidence/cost-per-order.json`, `prices`). https://ai.google.dev/gemini-api/docs/pricing | Per-model price tables. Cache storage price not on file | slides 10, A3 |
 
+## 8. Prior art and alternatives (landing "Why not …?", 14-final:6)
+
+Named by the orchestrator on 10-14 from web research. **Not re-read in 14-final:6** (that session had no web access), so each row says who read it. Describe these only as below; never call KIBO "first" or "only".
+
+| Id | Claim | Source | Exact location and wording | Deck v2 |
+|---|---|---|---|---|
+| S30 | **[secondary]** A Korean company (iCOMSYS, 아이콤시스) registered a patent in March 2026 for a kiosk-support server: the customer scans a kiosk QR code and speaks through a phone call, and the server turns the speech into touch commands. The closest prior art to KIBO. | Electronic Times (전자신문), 2026-03-18. https://www.etnews.com/20260318000063 | Article body; read by the orchestrator 10-14, not by 14-final:6. The landing names "a Korean company" and links the article | not used |
+| S31 | Voice kiosks that add a microphone and voice software to the kiosk exist (example named by the orchestrator: GoodGang Labs). | No URL on file. | Unverified. The landing describes only the category, without a company name | not used |
+| S32 | QR remote-control products turn the phone into a touchpad for the kiosk (example named by the orchestrator: SiteKiosk Smart Kiosk Control). | No URL on file. | Unverified. Landing: category only | not used |
+| S33 | Gemini Live with the camera (Guided Vision) describes a screen but does not change a kiosk's cart. | No URL on file. | Unverified as a product statement. Landing says only what a camera assistant can do by nature: read the screen and say what to tap | not used |
+
+## 9. Candidates not yet verified (do not use until read)
+
+The orchestrator found these on 10-14; 14-final:6 could not open them. A session with web access reads each page, fills the exact location, and moves the row into its section.
+
+| Claim | Source to read |
+|---|---|
+| Seoul 2025 Digital Competence Survey (n = 5,500, Nov–Dec 2025, report 2026-06): among kiosk users aged 55+, 63.3% report inconvenience; 74.0% at 65–74, 88.7% at 75+ (Seoul only, users only). Would replace the secondary S18 | https://saif.or.kr/research-report/3042, printed pp. 58, 166–171 |
+| Visitors: 15.05 million in Jan–Aug 2026 (+21.6%) | https://www.korea.kr/news/policyNewsView.do?newsId=148972696 |
+| Gemini Live session resumption can keep session data up to 24 h | https://docs.cloud.google.com/vertex-ai/generative-ai/docs/data-governance (KIBO does not enable session resumption; `docs/SECURITY.md` "Privacy line") |
+
 ## Claims we do not make
 
 | Claim to avoid | Why | Say instead |
@@ -101,5 +122,7 @@ The "Deck v2" column says where the fact appears in `videos/deck-v2/` (slide num
 | "N people in Korea have low vision" | Registration does not separate low vision (S25) | "245,361 registered as visually disabled" |
 | "Multilingual" or "any language" without a list | KIBO's screens are Korean and English; AI languages are limited to what ships and is tested (G1) | Name the languages |
 | "99 languages" for KIBO | That is Gemini Live's list, not what KIBO tests (G1) | The tested list |
+| "KIBO is the first / only …", "no one else …" | Close prior art exists (S30–S33) | Say what KIBO does differently |
+| "No audio is ever stored" or "Google keeps nothing" | KIBO's own servers keep no audio; Google's retention follows its own terms and was not read (section 9) | "KIBO keeps no audio … processed by Google Gemini under Google's terms" |
 
 A disability group reportedly filed a constitutional complaint against Art. 10-2 of the Anti-Discrimination Act decree (S3); the outcome was not confirmed. Quote S3 as the current text, not as settled law.

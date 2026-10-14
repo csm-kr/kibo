@@ -56,6 +56,14 @@ KIBO is a public demo that must stay up for three weeks of judging, handles a (s
 - Before the repo goes public: scan the full history with gitleaks.
 - A project hook (`scripts/hooks/guard_bash.py`) blocks destructive shell commands and reading `.env` during agent sessions.
 
+## Privacy line (checked 10-14, 14-final:6)
+The landing says: "No account. KIBO keeps no audio, no conversation and no personal data; the order session ends after 10 minutes without activity and is then deleted. Speech and text are processed by Google Gemini under Google's terms." What backs each part, read in the code on 10-14:
+- **No account:** the phone gets a device token for one session (QR claim or pairing code); there is no sign-up or login anywhere.
+- **No audio:** on the direct path the phone streams audio to Gemini Live itself; KIBO's server never receives it. The relay (`voice-relay/relay.ts`) passes messages through in memory and logs only error names. Nothing writes audio to Firestore or disk.
+- **No conversation:** chat history lives in the phone's memory and travels with each `/api/chat` request; the server passes it to Gemini and keeps nothing. The session document holds ids, catalog values and reason codes only (no free text). Every `console.*` call in `src/` and `voice-relay/` logs a tool name, a result code, an HTTP status or an error name, never a message, transcript or token (grep of `src/` outside tests, 10-14). The text agent's prompt cache holds only the static rules and menu.
+- **Session ends after 10 minutes:** `SESSION_TTL_MS` (`src/lib/commands/session.ts`) is 10 minutes, extended only by activity; Firestore's TTL policy then deletes `sessions`, `sessionSecrets` and `pairCodes` on `expiresAt` (TTL deletion is not instant; Google does not promise a time).
+- **Google's side:** KIBO does not enable Gemini Live session resumption (no `sessionResumption` in `src/` or `voice-relay/` source). How long Google keeps request data follows the Gemini API terms (direct path, text agent on the key) and Google Cloud's terms (Vertex relay, Vertex fallback); KIBO makes no claim about it (`docs/plan/SOURCES.md` section 9).
+
 ## Reliability
 - Kiosk stores `{sessionId, kioskToken}` per kiosk in localStorage and resumes after a reload unless expired or paid.
 - The phone app's service worker (`public/sw.js`, scope `/app`) caches only a static offline page; it never caches or answers `/api`, session streams, `/assistant` or anything holding a token. `/app` keeps only the last order's session id, status and expiry for [Continue my order]; the device token stays under its own key, as before.

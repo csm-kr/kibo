@@ -53,7 +53,9 @@
     {
       "step": 6,
       "name": "impact-content",
-      "status": "pending"
+      "status": "completed",
+      "summary": "Landing: new 'Why it matters' section with four facts from docs/plan/SOURCES.md (S16 17.9% of 65+ can use a kiosk, S15 76.6% own a smartphone, S11 206 of 233 gave up midway, S23 18.9M visitors and language lowest-rated), each with 'Source:' and a publisher link, plus a law card (Digital Inclusion Act decree Art. 15 measure 5; disability decree Art. 10-2 amended 2025-11-18) calling KIBO a measure the decrees list, never compliant. New 'Why not …?' (barrier-free kiosk, shop app/QR, voice kiosk, Gemini Live camera, remote touchpad, the 2026-03 iCOMSYS phone-call patent as closest prior art; 'KIBO is not the first'), 'How KIBO gets onto a kiosk' card (direct adapter; script tag, kiosk-browser extension, WebView injection; native roadmap; no partnerships), 'No smartphone?' and 'Your data' (no account, no audio/conversation/personal data kept, session ends after SESSION_TTL_MS = 10 min and is TTL-deleted, Gemini under Google's terms; checked in SECURITY 'Privacy line', no sessionResumption in source). Evidence paths link to GitHub via src/lib/repo.ts (REPO_OWNER = csm-kr, confirm in step 9; tested); café 2/5, 3/5 fact replaced by the four-kiosk final (31/40, 5 unsafe, skill total wrong 3 of 31, not blind). Access line names the 9 tested languages. PRD Problem rewritten from SOURCES ids (2026-01-28 not 2027, two statutes apart, 3x claim removed) plus 'Why not' table, install path, no-smartphone and privacy. SOURCES: section 8 prior art S30-S33 and section 9 unverified candidates (no web access this session, I-236). Fixed the I-220 focus flake for real: a layout effect re-scrolls the focused control when the cart summary appears (6/6). Landing QA adds sections problem, whynot, trust and source-line asserts. ACs: lint, unit 1040, build, qa:ui 47/47. Issues I-235 fixed, I-236 open, I-220 fixed.",
+      "started_at": "2026-10-14T19:56:39+0900"
     },
     {
       "step": 7,

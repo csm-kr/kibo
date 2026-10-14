@@ -3,9 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { FOCUS, PRIMARY, SECONDARY } from "@/components/assistant/styles";
 import { DEMO_ENVIRONMENTS, demoHref } from "@/components/demo/environments";
+import { SESSION_TTL_MS } from "@/lib/commands/session";
+import { repoLink } from "@/lib/repo";
 
 // The root landing page: the first thing a judge sees after the video. Every picture is a capture of the running
-// app (`npm run shots:landing`), and every number names its evidence file (docs/RULE.md R-001).
+// app (`npm run shots:landing`), and every number names its evidence file or its source (docs/RULE.md R-001).
+// External facts come only from docs/plan/SOURCES.md (the S-ids in the comments below).
 
 // "Any kiosk" would overclaim: KIBO covers web and webview kiosks (docs/PRD.md, docs/ISSUE.md I-076).
 export const metadata: Metadata = {
@@ -38,6 +41,82 @@ const PEOPLE = [
   },
 ];
 
+/** External facts about the problem, each with its source line (docs/plan/SOURCES.md). */
+const PROBLEM = [
+  {
+    // S16
+    value: "17.9%",
+    text: "of Koreans aged 65 and over say they can order or check in at a kiosk; at 75 to 79 it is 8.3%.",
+    source: "KIHASA, Health and Welfare Forum, 2024 (2023 Survey of Older Koreans, 10,078 people)",
+    url: "https://www.kihasa.re.kr/api/kihasa/file/download?seq=28260",
+  },
+  {
+    // S15: ownership is not ability, so it sits next to the 17.9%, never as "can use KIBO".
+    value: "76.6%",
+    text: "of Koreans aged 65 and over own a smartphone.",
+    source: "Ministry of Health and Welfare, 2024 (2023 Survey of Older Koreans)",
+    url: "https://mohw.go.kr/board.es?act=view&bid=0027&list_no=1483352&mid=a10503010100&nPage=1",
+  },
+  {
+    // S11
+    value: "206 of 233",
+    text: "people who had trouble at a kiosk in the past year had given up an order midway.",
+    source: "Korea Consumer Agency, 2022 (500 people, 100 per age band)",
+    url: "https://clik.nanet.go.kr/clikr-collection/policyinfo/207/1037/2022/CLIKC6337614063940252_attach_1.pdf",
+  },
+  {
+    // S23
+    value: "18.9 million",
+    text: "visitors came to Korea in 2025. Language was the lowest-rated part of their trip: 79.3% satisfied.",
+    source: "Ministry of Culture, Sports and Tourism and KCTI, 2025 Foreign Visitor Survey, 2026",
+    url: "https://know.tour.go.kr/stat/fReportsOfForeignerDis19Re.do",
+  },
+];
+
+/**
+ * The obvious alternatives and the closest prior art (docs/plan/SOURCES.md, section 8). Never "first" or "only":
+ * each row says what KIBO does differently, nothing more.
+ */
+const ALTERNATIVES: { title: string; what: string; kibo: string; source?: { label: string; url: string } }[] = [
+  {
+    title: "Replace the kiosk with a barrier-free one",
+    what: "New hardware at every kiosk. About 466 verified barrier-free kiosks had been sold by 2025.",
+    kibo: "Works on the kiosk already there. Nothing is replaced.",
+    source: {
+      label: "Ministry of Health and Welfare estimate, 2025",
+      url: "https://mohw.go.kr/board.es?act=view&bid=0027&list_no=1487151&mid=a10503000000",
+    },
+  },
+  {
+    title: "The shop's own app or QR ordering",
+    what: "One app or page per shop, each with its own steps to learn.",
+    kibo: "One phone and one way of talking for every kiosk, and the order fills the kiosk in front of you.",
+  },
+  {
+    title: "A voice kiosk",
+    what: "A microphone and voice software added to each kiosk. You speak out loud at the kiosk, in the languages it offers.",
+    kibo: "Your own phone, in your own language. No new hardware on the kiosk.",
+  },
+  {
+    title: "Point Gemini Live's camera at the kiosk",
+    what: "It can read the screen and tell you what to tap, but you still tap every step yourself.",
+    kibo: "The kiosk's own cart changes, through actions KIBO's server checks against the menu data.",
+  },
+  {
+    title: "The phone as a remote touchpad",
+    what: "You scan a QR and steer the kiosk from your phone, but you still go through every screen.",
+    kibo: "You say the order; the steps happen for you.",
+  },
+  {
+    title: "A phone call to a kiosk support server",
+    what: "A Korean company registered a patent in March 2026 for a server that takes a kiosk QR scan and a phone call and turns the customer's speech into touch commands.",
+    kibo: "The closest idea. KIBO adds: the AI can fill the cart but the server never lets it pay, and KIBO Learn learns a web kiosk once, then replays orders without AI and checks the kiosk's own total.",
+    source: { label: "Electronic Times, 2026-03-18", url: "https://www.etnews.com/20260318000063" },
+  },
+];
+
+const SESSION_MINUTES = SESSION_TTL_MS / 60_000;
+
 const SAFETY = [
   "You approve every payment: by tapping the confirm card, or with a new “yes” after it appears.",
   "Card payment happens only on the kiosk itself.",
@@ -60,7 +139,7 @@ const ACCESS = [
   "Screen-reader labels, and cart changes announced when the AI voice is off",
   "Text and buttons when the microphone is unavailable",
   "Call staff always visible on the phone",
-  "Korean and English",
+  "Screens in Korean and English; the AI also answers in Japanese, Chinese, Spanish, Vietnamese, French, Thai and Indonesian (tested by typing, not yet by speaking)",
 ];
 
 export default function Home() {
@@ -116,6 +195,41 @@ export default function Home() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section data-landing-section="problem" aria-labelledby="problem" className="flex flex-col gap-6">
+        <h2 id="problem" className={H2}>
+          Why it matters
+        </h2>
+        <ul className="grid gap-6 lg:grid-cols-2">
+          {PROBLEM.map((f) => (
+            <li key={f.value} className="flex flex-col gap-1 border-l-4 border-[#3446D4] pl-4">
+              <p>
+                <span className="font-display text-[28px] leading-tight font-bold text-[#15171C]">{f.value}</span>{" "}
+                {f.text}
+              </p>
+              <SourceLink label={f.source} url={f.url} />
+            </li>
+          ))}
+        </ul>
+        <article className={`${CARD} flex flex-col gap-2`}>
+          <h3 className="font-bold text-[#15171C]">What Korean law asks of kiosk operators</h3>
+          <p>
+            Since 22 January 2026 the Digital Inclusion Act asks every kiosk operator to take one of five measures for
+            people who find digital devices hard. One of them is a website or mobile app that assists kiosk use, as long
+            as it gives equal access and use. Separately, the disability rules cover existing kiosks from 28 January
+            2026, and small sites may use compatible assistive software. KIBO is built as that kind of app. It works on
+            the kiosks already installed, and it does not by itself make a shop compliant.
+          </p>
+          <SourceLink
+            label="Digital Inclusion Act Enforcement Decree, Art. 15 (2026)"
+            url="https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EB%94%94%EC%A7%80%ED%84%B8%ED%8F%AC%EC%9A%A9%EB%B2%95%EC%8B%9C%ED%96%89%EB%A0%B9/%EC%A0%9C15%EC%A1%B0"
+          />
+          <SourceLink
+            label="Disability Anti-Discrimination Act Enforcement Decree, Art. 10-2, amended 2025-11-18"
+            url="https://www.law.go.kr/DRF/lawService.do?OC=test&target=law&MST=279851&type=HTML"
+          />
+        </article>
       </section>
 
       <section data-landing-section="how" aria-labelledby="how" className="flex flex-col gap-6">
@@ -186,6 +300,29 @@ export default function Home() {
         </ul>
       </section>
 
+      <section data-landing-section="whynot" aria-labelledby="whynot" className="flex flex-col gap-6">
+        <h2 id="whynot" className={H2}>
+          Why not …?
+        </h2>
+        <ul className="grid gap-6 lg:grid-cols-2">
+          {ALTERNATIVES.map((a) => (
+            <li key={a.title} className={`${CARD} flex flex-col gap-2`}>
+              <h3 className="font-bold text-[#15171C]">{a.title}</h3>
+              <p>{a.what}</p>
+              <p>
+                <span className="font-bold text-[#15171C]">KIBO: </span>
+                {a.kibo}
+              </p>
+              {a.source && <SourceLink label={a.source.label} url={a.source.url} />}
+            </li>
+          ))}
+        </ul>
+        <p>
+          KIBO is not the first to connect a phone to a kiosk. What it brings together: your own phone and language, real
+          changes to the kiosk&apos;s cart that the server checks, payment only by you, and kiosks learned once.
+        </p>
+      </section>
+
       <section data-landing-section="kiosks" aria-labelledby="kiosks" className="flex flex-col gap-6">
         <h2 id="kiosks" className={H2}>
           Works with kiosks that exist
@@ -220,10 +357,11 @@ export default function Home() {
               detail="Doughhouse, a pizza kiosk we built"
               path="spikes/kibo-learn/results/holdout.run2.log"
             />
+            {/* Replaces the older café run, which predates the finish gate and audit (impact judge, 10-13). */}
             <Fact
-              value="40 of 40 items found on a café kiosk it had never seen"
-              detail="example orders: 2 of 5 and 3 of 5 passed; the rest were refused before running"
-              path="spikes/blind-kiosk/results/v3run1/grade.txt, spikes/blind-kiosk/results/holdout.log"
+              value="4 test kiosks: 134 of 134 items, 31 of 40 orders right"
+              detail="built by other AI agents; 4 orders refused safely, 5 went wrong on one bakery kiosk (its pop-up blocked a tap); in 3 of the 31 the skill's own price differed from the kiosk's. The learner was improved using these kiosks' first runs, so this is not a blind result"
+              path="spikes/blind-kiosks/RESULTS.md"
             />
             <Fact
               value="2 kiosks it had never seen: 56 of 56 items, 14 of 20 orders right"
@@ -238,6 +376,24 @@ export default function Home() {
             </Link>
           </article>
         </div>
+        <article className={`${CARD} flex flex-col gap-4`}>
+          <h3 className="font-bold text-[#15171C]">How KIBO gets onto a kiosk</h3>
+          <ul className="flex flex-col gap-3">
+            <li>
+              <span className="font-bold text-[#15171C]">Kiosks that share their menu data:</span> a direct adapter reads
+              the menu and sends orders. The burger shop and the airport rail machine in the demo work this way.
+            </li>
+            <li>
+              <span className="font-bold text-[#15171C]">Web kiosks with no integration:</span> one small script in the
+              kiosk&apos;s page, added by the kiosk vendor or the store with a script tag, a kiosk-browser extension, or
+              injection into a kiosk app&apos;s WebView.
+            </li>
+            <li>
+              <span className="font-bold text-[#15171C]">Native kiosk apps:</span> on the roadmap, not built.
+            </li>
+          </ul>
+          <p className={EVIDENCE}>No kiosk vendor or store has installed KIBO yet; there are no partnerships.</p>
+        </article>
       </section>
 
       <section data-landing-section="cloud" aria-labelledby="cloud" className="flex flex-col gap-6">
@@ -260,6 +416,31 @@ export default function Home() {
             </div>
           ))}
         </dl>
+      </section>
+
+      <section data-landing-section="trust" aria-labelledby="trust" className="flex flex-col gap-6">
+        <h2 id="trust" className="sr-only">
+          No smartphone, and privacy
+        </h2>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <article className={`${CARD} flex flex-col gap-2`}>
+            <h3 className="font-bold text-[#15171C]">No smartphone?</h3>
+            <p>
+              KIBO is optional. The kiosk works exactly as before: by touch, with its large-text, lower-screen mode, and
+              with staff as today. A phone without a camera app can type the kiosk&apos;s 6-digit code instead of
+              scanning, and anyone who would rather not talk in a queue can type or tap.
+            </p>
+          </article>
+          <article className={`${CARD} flex flex-col gap-2`}>
+            <h3 className="font-bold text-[#15171C]">Your data</h3>
+            <p>
+              No account. KIBO keeps no audio, no conversation and no personal data; the order session ends after{" "}
+              {SESSION_MINUTES} minutes without activity and is then deleted. Speech and text are processed by Google
+              Gemini under Google&apos;s terms.
+            </p>
+            <Fact value="How we checked" detail="what the server stores and logs" path="docs/SECURITY.md" />
+          </article>
+        </div>
       </section>
 
       <section data-landing-section="access" aria-labelledby="access" className="flex flex-col gap-6">
@@ -322,13 +503,30 @@ function Shot({ src, alt, width, height }: { src: string; alt: string; width: nu
   );
 }
 
-/** One measured number, what it was measured on, and the file that holds it. */
+/** One measured number, what it was measured on, and a link to the file in the public repo that holds it. */
 function Fact({ value, detail, path }: { value: string; detail: string; path: string }) {
   return (
-    <p className="flex flex-col gap-1 border-l-4 border-[#3446D4] pl-4">
-      <span className="font-bold text-[#15171C]">{value}</span>
-      <span className={EVIDENCE}>{detail}</span>
-      <code className={`${EVIDENCE} [overflow-wrap:anywhere]`}>{path}</code>
+    <div className="flex flex-col gap-1 border-l-4 border-[#3446D4] pl-4">
+      <p className="font-bold text-[#15171C]">{value}</p>
+      <p className={EVIDENCE}>{detail}</p>
+      <a
+        href={repoLink(path)}
+        className={`${EVIDENCE} ${FOCUS} inline-flex min-h-14 items-center self-start font-mono underline [overflow-wrap:anywhere]`}
+      >
+        {path}
+      </a>
+    </div>
+  );
+}
+
+/** "Source:" and a link to the publisher's own document, tall enough to tap (56px, docs/UI_QA.md). */
+function SourceLink({ label, url }: { label: string; url: string }) {
+  return (
+    <p className={EVIDENCE}>
+      Source:{" "}
+      <a href={url} className={`${FOCUS} inline-flex min-h-14 items-center underline`}>
+        {label}
+      </a>
     </p>
   );
 }

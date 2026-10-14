@@ -22,21 +22,21 @@ Owners: **HF** = hotfix now (separate branch, deployed tonight) · **P13** = pha
 | B2 | Is it ever unsafe? | Goal: unsafe = 0 (refuse before the first click when a step is ambiguous). | Final table with unsafe column. | 5 unsafe in baseline (ambiguous `수량 더하기`). | **P13 step 4** |
 | B3 | Isn't the final run tuned to the test kiosks? | Yes for bk1–4 (patterns), so we add bk5/bk6 built and revealed after the fixes. | PROTOCOL "Fresh test set"; commit order. | Being built (independent agents). | P13 step 7 |
 | B4 | Can I see it learn and replay? | `/learn` timeline replay; the learned kiosk shows each replayed tap. | `/learn/<run>`; tap ripples + caption "4 taps, kiosk total ✓". | No (`/learned/doughhouse` renders at 0.56×, taps invisible, no English). | **P13 step 8 + P14** |
-| B5 | How does the bridge get onto a real vendor's kiosk? | Web kiosks: one script tag (or kiosk-browser extension / WebView injection) by the vendor or operator; native kiosks: adapter, roadmap. | One slide + landing section + README. | No. | **P14 + DECK** |
+| B5 | How does the bridge get onto a real vendor's kiosk? | Web kiosks: one script tag (or kiosk-browser extension / WebView injection) by the vendor or operator; native kiosks: adapter, roadmap. | One slide + landing section + README. | `/learn` (14-final:3) and landing "How KIBO gets onto a kiosk" (14-final:6); slide and README pending. | DECK, P14 step 9 |
 | B6 | "Third-party" Doughhouse? | It is our dev-set kiosk; say so. | Copy fix. | Wrong wording on `/demo`. | **P14** |
 
 ## C. Problem and impact
 | # | Question | Answer | Proof | Now | Owner |
 |---|---|---|---|---|---|
-| C1 | Is the problem real and how big? | Sourced statistics (older adults and kiosks; smartphone ownership 65+/70+; visitors). | Primary sources with dates. | **None sourced.** | Research agent → DECK, landing |
-| C2 | Is the legal driver right? | Correct dates of the kiosk accessibility rule + the Dec 2025 call-bell/staff option; why KIBO still helps. | Law text article numbers. | PRD date likely wrong. | Research → P14 docs fix |
+| C1 | Is the problem real and how big? | Sourced statistics (older adults and kiosks; smartphone ownership 65+/70+; visitors). | Primary sources with dates. | Landing "Why it matters" and PRD, from `docs/plan/SOURCES.md` (14-final:6). | DECK |
+| C2 | Is the legal driver right? | Correct dates of the kiosk accessibility rule + the Dec 2025 call-bell/staff option; why KIBO still helps. | Law text article numbers. | Fixed in PRD and the landing law card (14-final:6). | DECK |
 | C3 | Has a real older adult or non-Korean reader used it? | — | 5 people 60+, 3 non-Korean readers: completion, time, quotes (consent). | **No.** | **HUMAN** (biggest impact gain) |
-| C4 | Why not a barrier-free kiosk, the shop's mobile/QR ordering, or Gemini Live with the camera on the kiosk? | Comparison table: works on today's kiosk, no new hardware, AI acts but cannot pay, one phone for every kiosk. | Table slide + landing. | No. | DECK + P14 landing |
+| C4 | Why not a barrier-free kiosk, the shop's mobile/QR ordering, or Gemini Live with the camera on the kiosk? | Comparison table: works on today's kiosk, no new hardware, AI acts but cannot pay, one phone for every kiosk. | Table slide + landing. | Landing "Why not …?" with prior art (14-final:6); slide pending. | DECK |
 | C5 | Who installs the QR, why would an owner allow it? | Operator benefits (rescued orders, staff minutes, accessibility compliance option), setup steps. | Slide; numbers only if sourced. | No. | DECK |
 | C6 | What about people with no smartphone or who won't talk in a queue? | Kiosk keeps touch + large text + staff call; phone has typing; code entry without camera. | Scenario S8. | Features exist; no scenario. | VIDEO/DECK |
 | C7 | Does it understand how older people speak? | Colloquial requests → menu choice buttons, not a staff call. | Eval cases with vague/colloquial phrasing. | Live miss: "not spicy for my grandson" → staff. | **P14 eval + instructions** |
 | C8 | Languages for JAPAC? | Korean + English today; AI replies in the user's language. | — | ko/en only. | P14 optional (ja/zh) or state it plainly |
-| C9 | Privacy? | No account, no personal data, no audio stored, sessions expire. | One line on landing + slide. | Only in SECURITY.md. | P14 + DECK |
+| C9 | Privacy? | No account, no personal data, no audio stored, sessions expire. | One line on landing + slide. | Landing "Your data", checked in SECURITY "Privacy line" (14-final:6). | DECK |
 | C10 | Sustainability? | No kiosk replacement (cost, e-waste). | Sourced replacement cost if found. | No number. | Research → DECK |
 
 ## D. UX first impression

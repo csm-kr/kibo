@@ -2,7 +2,7 @@
 
 import { Bell, ChevronRight, Link2, Mic, Smartphone } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { ModalLayer } from "@/components/kiosk/ModalLayer";
 import { AppBar } from "@/components/phone/AppBar";
 import { ConfirmBar, ConfirmCard, DoneCard, PayCard } from "@/components/phone/Checkout";
@@ -262,6 +262,15 @@ export function AssistantPanel(props: Props) {
     io.observe(el);
     return () => io.disconnect();
   }, [screen]);
+  // The summary takes height from the scroll area. When keyboard focus scrolls the card away, the summary appears
+  // and would cover the control that just took focus (WCAG 2.4.11, I-220), so that control is brought back into view
+  // in the same render.
+  useLayoutEffect(() => {
+    const area = cartEnd.current?.closest("[data-phone-scroll]");
+    const focused = document.activeElement;
+    if (area && focused instanceof HTMLElement && focused !== area && area.contains(focused))
+      focused.scrollIntoView({ block: "nearest" });
+  }, [cartInView]);
 
   // Screens other than talk show only replies that came after they opened, so an old error never lingers there.
   const [opened, setOpened] = useState({ screen, count: chat.messages.length });
@@ -670,6 +679,7 @@ function Scroll({ children }: { children: ReactNode }) {
   // (WCAG 2.1.1). The ring sits inside, because the phone frame clips anything outside.
   return (
     <div
+      data-phone-scroll
       tabIndex={0}
       className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-6 focus-visible:outline-[3px] focus-visible:-outline-offset-[3px] focus-visible:outline-ink"
     >

@@ -12,7 +12,7 @@ const VIEWPORTS = [
   { width: 320, height: 700 },
 ];
 
-const SECTIONS = ["hero", "people", "how", "places", "safety", "kiosks", "cloud", "access", "footer"];
+const SECTIONS = ["hero", "people", "problem", "how", "places", "safety", "whynot", "kiosks", "cloud", "trust", "access", "footer"];
 
 const STRICT = process.env.QA_ALL === "1";
 
@@ -27,6 +27,12 @@ test("root landing page", async ({ page }, info) => {
   for (const [name, k] of [["burger shop", "malo"], ["airport rail", "airport_rail"], ["pizza shop", "doughhouse"]]) {
     await expect(page.getByRole("link", { name: `Try the ${name}` })).toHaveAttribute("href", `/demo?k=${k}`);
   }
+  // Every external fact shows its source, and evidence paths link to the public repo (docs/RULE.md R-001).
+  const problem = page.locator('[data-landing-section="problem"]');
+  await expect(problem.getByText("Source:")).toHaveCount(6);
+  for (const href of await page.locator('a[href*="github.com/"]').evaluateAll((as) => as.map((a) => a.getAttribute("href"))))
+    expect(href).toMatch(/^https:\/\/github\.com\/[^/]+\/kibo\/(blob|tree)\/main\//);
+  await expect(page.getByText("KIBO is not the first to connect a phone to a kiosk.")).toBeVisible();
   // Every capture on the page loads (the step forbids mockups; a missing file would show a broken image).
   // Lazy images below the fold have not loaded yet, so each file is fetched instead.
   const srcs = await page.locator("img").evaluateAll((imgs) => imgs.map((img) => (img as HTMLImageElement).src));

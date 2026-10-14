@@ -6,14 +6,36 @@ Let anyone order at an existing self-order kiosk by talking to their own phone, 
 One-line pitch: **"Don't learn the kiosk. Just talk."** Say one thing to your phone and the kiosk on the counter moves by itself until the order is done. Kiosks with no integration are connected by KIBO Learn.
 
 ## Problem
-- Self-order kiosks are everywhere, but older adults, people with low vision or speech/hearing difficulties, and visitors who cannot read Korean get stuck: many screens, small text, set/side/drink sub-steps, upsell pop-ups, time pressure from the queue.
-- Most kiosks do not take voice orders. Barrier-free models offer voice *guidance* at best. Adding voice ordering to the kiosk means new hardware (mic, speaker) and compute.
-- Korea's barrier-free kiosk requirement took full effect on 2026-01-28 for new installs, with existing units due by 2027-01-28 (reported; fines up to KRW 30M; barrier-free units cost about 3× a standard one). KIBO does **not** claim to satisfy the legal requirement (height, braille, sign language); it is a software complement that adds voice, language and large-text access to kiosks already installed. Verify the decree text before quoting it.
+Every number below is from `docs/plan/SOURCES.md` (ids in brackets); quote it only with its source line.
+- Self-order kiosks are everywhere, but older adults, people with low vision or speech/hearing difficulties, and visitors who cannot read Korean get stuck: many screens, small text, set/side/drink sub-steps, upsell pop-ups, time pressure from the queue. Older users' top complaints: too many steps (51.4%), cannot find the next button (51.0%), pressure from the people waiting (49.0%) (Korea Consumer Agency, 2020, 245 kiosk users aged 65+ in Seoul; S10).
+- **17.9% of Koreans aged 65+ say they can order or check in at a kiosk**, 8.3% at 75–79 (KIHASA, 2024; S16), while **76.6% own a smartphone** (MOHW, 2024; S15). Ownership is not ability, so we never say "76.6% can use KIBO".
+- 206 of the 233 people who had trouble at a kiosk in the past year had given up an order midway (Korea Consumer Agency, 2022, 500 people of all ages; S11).
+- 18,936,562 visitors came to Korea in 2025; language was the lowest-rated part of the trip, 79.3% satisfied (MCST and KCTI, 2026; S23). 245,361 Koreans are registered as visually disabled, 59.1% of them aged 65+ (MOHW, 2025; S25).
+- Adding voice ordering to the kiosk itself means new hardware (mic, speaker) and software at every unit; about 466 verified barrier-free kiosks had been sold by 2025 (MOHW estimate; S9).
+- **Law (Korea), two separate statutes.** (1) The Digital Inclusion Act, in force 2026-01-22, asks every kiosk operator to take one of five measures for people who struggle with digital devices, older people included; measure 5 is a website or mobile app that assists kiosk use, counted only if it gives equal access and use (Enforcement Decree Art. 15; S6). Kiosks installed on or before 2025-03-26 were due by 2026-01-28 (S7); the 2027-01-22 date is for small manufacturers and lessors, not operators (S8). (2) The Disability Anti-Discrimination Act requires reasonable accommodation at kiosks (Art. 15; S1); existing kiosks are covered from 2026-01-28 (S2, S5). Its decree, amended 2025-11-18, lets small sites (under 50 m², small businesses, small table-order devices) instead install compatible assistive devices or software, or assign staff and a call bell (S3); MOHW names a QR- or NFC-connected app or web page that gives a smartphone access to the kiosk as an example of such software (S4). Fine path for both: up to KRW 30 million after an ignored correction order (S4, S6).
+- **What KIBO is under these laws:** a type of measure the decrees list (an assisting app, compatible software). KIBO does **not** make a shop compliant and has no certification; equal access is judged case by case. It still helps because it works on the kiosks already installed: no replacement, no new hardware, and it adds voice, language and large-text access that a call bell does not. A disability group reportedly filed a constitutional complaint against the 2025 decree change; the outcome was not confirmed (SOURCES.md, last note).
 
 ## Why the phone
-- Everyone already carries the mic, speaker, compute and personal settings (language, font size, screen reader). The kiosk only needs to show a QR and accept commands, which is software.
+- Most people already carry the mic, speaker, compute and personal settings (language, font size, screen reader); 76.6% of Koreans aged 65+ own a smartphone (S15). The kiosk only needs to show a QR and accept commands, which is software.
 - **Learn once, use everywhere.** The same phone and the same way of speaking work at every kiosk; users never relearn each kiosk's UI.
 - No app install: scan the QR, a web page opens. The first time needs one microphone permission; the UI shows a large hint before the browser prompt.
+
+## Why not something else (landing "Why not …?")
+Never "first" or "only". Each line says what KIBO does differently.
+| Alternative | What KIBO does differently |
+|---|---|
+| Replace the kiosk with a barrier-free one (about 466 verified units sold by 2025, S9) | Works on the kiosk already there; nothing replaced |
+| The shop's own app or QR ordering | One phone and one way of talking for every kiosk; the order fills the kiosk in front of you |
+| A voice kiosk (mic and voice software added to each kiosk) | Own phone and own language; no kiosk hardware |
+| Gemini Live with the camera on the kiosk | It can describe the screen; KIBO changes the kiosk's own cart through server-checked actions |
+| The phone as a remote touchpad (QR remote control) | You say the order instead of moving through every screen |
+| Phone-call kiosk support: a Korean company's patent registered 2026-03 (QR scan + phone call, speech turned into touch commands; S30) | Closest idea. KIBO adds: the AI cannot pay (server-enforced), and KIBO Learn learns a web kiosk once and replays without AI with the kiosk's total verified |
+
+**How KIBO gets onto a kiosk:** a direct adapter for kiosks that share menu data; on web kiosks one script added by the vendor or store (script tag, kiosk-browser extension, WebView injection); native apps are roadmap. No vendor or store partnerships yet.
+
+**No smartphone, or won't talk in a queue:** KIBO is optional. The kiosk keeps touch and its large-text, lower-screen mode, and staff as today; a phone without a camera app types the 6-digit code; anyone can type or tap instead of talking.
+
+**Privacy (landing "Your data"):** no account; KIBO stores no audio, conversation or personal data; the order session expires after 10 minutes without activity (`SESSION_TTL_MS`) and Firestore deletes it by TTL. Speech and text are processed by Google Gemini under Google's terms. The check behind this line is in `docs/SECURITY.md` "Privacy line".
 
 ## Users
 | Persona | Situation | What the design must give them |
