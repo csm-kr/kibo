@@ -23,3 +23,7 @@ npm run scan:repo
 ## Do not
 - Change features or scope while fixing; only fix what breaks a written rule.
 - Mark the step completed while an H rule fails on a changed screen.
+
+## Orchestrator notes (10-15 00:40)
+- Step 0's eval on Vertex scored 51/74 with 17 cases cut by the new 40 s per-call deadline (Vertex `global` is slow under load, I-157). Production's primary text path is the Gemini API key (auto mode); Vertex is only the fallback. For the final headline, run `npm run eval:agent` **once** on the final code with `GEMINI_TEXT_BACKEND=auto` (the production setting: the API key first, Vertex fallback; it spends about USD 1 of the prepaid key, which is fine), and record the conditions in NUMBERS.md (backend, model, date, revision of the code). Keep every earlier run listed with its cause; do not rerun for a better number.
+- If the eval script runs cases in parallel, note the concurrency in NUMBERS.md; if Vertex fallbacks appear, say how many.
