@@ -6,12 +6,21 @@ import { planSteps, isForbidden, isReviewOpener } from './plan.mjs';
 
 export const KIOSK_URL = process.env.KIOSK_URL ?? pathToFileURL(path.resolve('kiosk/index.html')).href;
 
+// The browser has the kiosk's screen size: portrait 1080x1600 unless the device is another shape
+// (KIOSK_VIEWPORT=WxH, e.g. a landscape table-order tablet). A device setting, not a learning rule.
+export function kioskViewport(env = process.env) {
+  if (!env.KIOSK_VIEWPORT) return { width: 1080, height: 1600 };
+  const m = /^(\d+)x(\d+)$/.exec(env.KIOSK_VIEWPORT);
+  if (!m) throw new Error(`KIOSK_VIEWPORT must look like 1280x800, got ${env.KIOSK_VIEWPORT}`);
+  return { width: Number(m[1]), height: Number(m[2]) };
+}
+
 export async function openKiosk() {
   const browser = await chromium.launch({
     executablePath: process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     headless: true,
   });
-  const page = await browser.newPage({ viewport: { width: 1080, height: 1600 } });
+  const page = await browser.newPage({ viewport: kioskViewport() });
   const alerts = [];
   // Kiosks often use native alert() for errors; capture the text so the agent can read it.
   page.on('dialog', (d) => { alerts.push(d.message()); d.dismiss(); });

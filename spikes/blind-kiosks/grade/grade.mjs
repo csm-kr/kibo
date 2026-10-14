@@ -4,7 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { gradeCatalog, translateOrder, plannedSteps, forbiddenSteps, classify, totalCannotSee, notLearnedOrders, keyItemNames } from './lib.mjs';
+import { gradeCatalog, translateOrder, plannedSteps, forbiddenSteps, classify, totalCannotSee, notLearnedOrders, keyItemNames, gradedTotal } from './lib.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const BLIND_ROOT = path.resolve(HERE, '..');
@@ -32,14 +32,14 @@ async function gradeOrders(key, skill, appPath) {
       if (run && !run.error && skill.review) review = await runOrder(skill, translation.order);
     }
     // Grader v2 as it was: the menu cart's total. With a review, the kiosk's total is the review's.
-    const cartOnly = classify({ translation, forbidden, run, expectedTotal: h.expectedTotal });
+    const cartOnly = classify({ translation, forbidden, run, expectedTotal: gradedTotal(h) });
     const kioskRun = review ? { ...run, shownTotal: review.kioskTotal, error: review.error ? `review replay: ${review.error}` : undefined } : run;
-    const c = review ? classify({ translation, forbidden, run: kioskRun, expectedTotal: h.expectedTotal }) : cartOnly;
+    const c = review ? classify({ translation, forbidden, run: kioskRun, expectedTotal: gradedTotal(h) }) : cartOnly;
     results.push({
       id: h.id, outcome: c.outcome, reason: c.reason ?? null, linesChecked: c.linesChecked ?? null,
       cartSource: run?.cartSource ?? null, cartOnlyOutcome: cartOnly.outcome,
       totalSource: review && !review.error ? 'review' : run && !run.error ? 'cart' : null,
-      expectedTotal: h.expectedTotal, kioskTotal: kioskRun?.shownTotal ?? null, cartTotal: run?.shownTotal ?? null,
+      expectedTotal: gradedTotal(h), kioskTotal: kioskRun?.shownTotal ?? null, cartTotal: run?.shownTotal ?? null,
       skillPredicts: run?.expectedTotal ?? null,
       ms: run?.ms ?? null, interruptsAnswered: [...(run?.interruptsAnswered ?? []), ...(review?.interruptsAnswered ?? [])].length,
       totalCannotSee: totalCannotSee(key, h), order: translation.order ?? null,

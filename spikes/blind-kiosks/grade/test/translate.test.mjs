@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { translateOrder, resolveDine, totalCannotSee } from '../lib.mjs';
+import { translateOrder, resolveDine, totalCannotSee, gradedTotal } from '../lib.mjs';
 import { key, skill } from './fixture.mjs';
 
 const order = (lines, extra = {}) => ({ id: 'h', dine: '매장', lines, expectedTotal: 0, ...extra });
@@ -89,4 +89,16 @@ test('an answer-key mistake throws instead of grading', () => {
 test('totalCannotSee lists choices a wrong pick would not change the total for', () => {
   const o = order([{ item: '아메리카노', options: { temp: ['iced'], ice: ['less'], shot: ['shot'] }, qty: 1 }]);
   assert.deepEqual(totalCannotSee(key, o), ['아메리카노 › 적게']);
+});
+
+test('round-3 fresh set (pre-registered 10-14): orderType and mode name the dine choice', () => {
+  const s = skill();
+  assert.equal(resolveDine({ orderType: 'takeOut', patterns: ['order-type-switch-on-review'] }, s).value, '포장할게요');
+  assert.equal(resolveDine({ orderType: 'eatIn' }, s).value, '매장에서 먹어요');
+  assert.equal(resolveDine({ mode: 'takeout' }, s).value, '포장할게요');
+});
+
+test('round-3 fresh set (pre-registered 10-14): an order with its own orderTotal is graded on it', () => {
+  assert.equal(gradedTotal({ orderTotal: 32500, expectedTotal: 68000 }), 32500);
+  assert.equal(gradedTotal({ expectedTotal: 6000 }), 6000);
 });

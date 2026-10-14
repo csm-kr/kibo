@@ -64,6 +64,16 @@ Tokens × the Gemini API paid-tier prices in `evidence/cost-per-order.json` (`ge
 ## Fresh test set (round 3)
 Two new kiosks, built by independent agents under the Builder rules of `PROTOCOL.md`, will be learned **once** with the frozen learner `ea28477`, one run each with the same caps (`gemini-3.8-flash`, 2M input-token cap, 30 min kill, `TRACE_DIR`), and graded with the grader at that commit. Nobody who changed the learner has seen them: not their briefs, apps or answer keys. The learner is not changed after seeing them; any later change is reported separately and never re-measured on them. Their results will be the round-3 unseen-kiosk numbers; the informed reruns above are not.
 
+### Rules fixed before the fresh runs (orchestrator, 10-14 ~12:00 KST)
+Written and committed before either fresh kiosk was learned. The orchestrator read the two answer keys' order-level field names (not the apps' code) and rendered bk8's start screen once at the learner's default size, to write these rules; nobody changed learning logic after that.
+- **Kiosks:** `bk7-bubbletea` (bubble tea shop, portrait kiosk) and `bk8-tableorder` (table-order tablet at a Korean BBQ restaurant, landscape 1280×800, orders are sent to the kitchen and paid at the counter). Built 10-14 by two independent agents from short briefs, kept outside the repo until the commit that adds them, after this one.
+- **Device size:** bk8's page is a fixed 1280×800 landscape screen; at the learner's default 1080×1600 its right edge is off screen. The browser gets the device's size through `KIOSK_VIEWPORT=1280x800` (new in `driver.mjs`, default unchanged, `viewport.test.mjs`) for learning and grading bk8. bk7 uses the default like every earlier kiosk. This is a screen setting taken from the brief, not a learning rule; learning logic stays as frozen in `ea28477`.
+- **Dine choice:** these keys name it `orderType` (`eatIn`/`takeOut`); the grader reads it like `dine` (`resolveDine`, test in `translate.test.mjs`). bk5's `mode` field is read the same way; bk5's numbers above are not re-graded.
+- **Pay-later device (bk8):** KIBO stops before the control that sends an order to the kitchen, as it stops before payment. An order is graded on its own amount, `orderTotal`, when the key gives one (`gradedTotal`); `expectedTotal` there is the running table total.
+- **Follow-up orders (`startsAfter`, bk8 h7 and h10):** they assume an earlier order was already sent to the kitchen, which KIBO never does. They are replayed as written on a fresh table and graded on `orderTotal`, but reported in their own row and left out of the headline count (8 orders). bk8 h7 asks for 1 portion of meat, which the kiosk allows only after a meat order was sent, so a refusal there is expected.
+- **Staff calls (bk8 h5):** not order lines; the order total excludes them, as the key does.
+- **Everything else:** grader v2 with round 3's review totals and interrupts, at this commit; one learning run per kiosk (`gemini-3.8-flash`, 2M input-token cap, 30 min kill, `TRACE_DIR`), no rerun except once after a crash; both reported whatever the result.
+
 ## Limits
 - One run per kiosk; run-to-run spread is unknown. The test kiosks are synthetic, built by AI agents from briefs.
 - The bk2, bk5 and bk6 reruns are informed and must never be quoted as unseen-kiosk results.
