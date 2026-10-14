@@ -1,7 +1,7 @@
 {
-  "date": "2026-10-14T16:48:49.348Z",
+  "date": "2026-10-14T17:20:45.650Z",
   "taps": 41,
-  "seconds": 4,
+  "seconds": 3,
   "total": 14800,
   "note": "automated Playwright run on /kiosk, not a human timing"
 }
