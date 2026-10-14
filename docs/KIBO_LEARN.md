@@ -61,6 +61,8 @@ Learning runs offline (a browser and Gemini, minutes per run), so the product sh
 ## Runtime
 Tool call → arguments validated against the skill catalog → the in-page bridge replays the recipe → the kiosk's own total **and** cart lines are checked → session updated. On mismatch: stop, re-read the kiosk cart, offer staff or touch. No self-healing at runtime.
 
+A skill depends on the kiosk's labels, roles and cart text, not its look. The Doughhouse page was restyled on 10-14 (14-final:2) with CSS only; `spikes/kibo-learn/restyle.test.mjs` shows the labels, accessibility tree and cart text are unchanged on every screen, and the run 3 skill still replays its holdout 4/4 (`results/run3/holdout.restyled.log`). A change to a label would need re-learning (gap 8 below).
+
 ## Results so far
 **Blind kiosk test (13-blind-kiosks, 10-13 to 10-14; full tables in `spikes/blind-kiosks/RESULTS.md`).** Six synthetic kiosks built by separate AI agents, 10 holdout orders each, graded without AI by `spikes/blind-kiosks/grade/` (grader v2: kiosk total plus the item names in the kiosk's cart, opening a closed cart drawer; options are not compared). Gemini 3.8 Flash, one run per kiosk and phase. Orders are correct / safe refusal / **unsafe**.
 

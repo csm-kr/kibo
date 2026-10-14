@@ -51,7 +51,8 @@ Measure in CSS px at these sizes. Phone numbers apply as written; kiosk numbers 
 | Contrast | all text ≥ 4.5:1; never color alone |
 | Colors | Kiosk: MALO palette. Phone: KIBO blue `#3446D4` for primary buttons, mic, selection, order number. Shared: cream, ink, warning |
 | Radius | phone: tiles 18px, sheets 26px; kiosk canvas: tiles 32px, sheets 48px; pills full |
-| Product tile (kiosk canvas) | photo 272px high, name 40px bold, price 40px teal, kcal 40px, badge top-left |
+| Product tile (kiosk canvas) | photo 272px high and never blank, name 48px bold, price 56px in the kiosk colour, kcal 40px, badge top-left, soft card shadow (no outline) |
+| Kiosk mark | the drawn speech-bubble mark (`BrandMark.tsx`); no capital letter on a coloured tile, nothing that recalls a real chain |
 | Set sheet | step label with steps left, 3-column photo options, selected = 6px teal border + tint ring (kiosk canvas) |
 | AI change | 6–8px teal ring (kiosk canvas) for 2 s on the kiosk tile and cart chip + "Added by AI: …" status; on a Korean kiosk also KIBO's English subtitle row for 6 s |
 | Motion | state feedback only: 2 s highlight fade, 0.5 s card-insert slide, listening pulse |

@@ -1,7 +1,6 @@
 "use client";
 
-import Image from "next/image";
-import { useMemo, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { useNow } from "@/hooks/useNow";
 import { useQrSrc } from "@/hooks/useQrSrc";
 import { ApiError, sendCommand, type CommandReply } from "@/lib/client/api";
@@ -9,6 +8,7 @@ import type { ErrorDetail } from "@/lib/commands/errors";
 import type { CommandType } from "@/lib/commands/schemas";
 import { errorCopy, type ScreenErrorCode } from "@/lib/i18n/errors";
 import { kt, languageName } from "@/lib/i18n/kiosk";
+import { formatWon, tilePrice } from "@/lib/kiosk/menu";
 import { kioskScreen, startOverStep } from "@/lib/kiosk/screen";
 import { kiboWorking } from "@/lib/kiosk/timers";
 import type { KioskData, Locale } from "@/types/menu";
@@ -21,9 +21,10 @@ import { PairCode } from "./PairCode";
 import { PaymentScreen } from "./PaymentScreen";
 import { ReviewScreen } from "./ReviewScreen";
 import { StartOver } from "./StartOver";
-import { KioskImage } from "./KioskImage";
+import { BrandMark } from "./BrandMark";
+import { DINE_SIZES, KioskImage, preloadKioskImages } from "./KioskImage";
 import { KioskToolbar } from "./KioskToolbar";
-import { FOCUS } from "./styles";
+import { CARD_SHADOW, FOCUS } from "./styles";
 
 // All sizes are 1080x1920 canvas px (docs/UI_GUIDE.md). Text uses the k-text-* utilities (>= 40px).
 
@@ -83,6 +84,14 @@ export function KioskScreen(props: Props) {
     count: 0,
     startAt: null,
   });
+
+  // While K1 waits, fetch every menu picture, so the menu and sheets never open on blank photos (14-final:2).
+  // After a short delay, so the hero and the QR come first.
+  const baseKiosk = props.kiosk;
+  useEffect(() => {
+    const t = setTimeout(() => preloadKioskImages(baseKiosk), 300);
+    return () => clearTimeout(t);
+  }, [baseKiosk]);
 
   const touchStarted = touch.forId === sessionId && touch.started;
   const screen = kioskScreen(session, { touchStarted }, kiosk);
@@ -274,13 +283,8 @@ export function Header({ kiosk, children }: { kiosk: KioskData; children?: React
   // The wordmark is the store's logo, so it keeps one spelling in every language.
   const wordmark = kiosk.brand.name.en;
   return (
-    <header className="flex h-36 flex-none items-center gap-6 bg-(--k-primary) px-12">
-      <span
-        aria-hidden
-        className="flex size-22 items-center justify-center rounded-[24px] bg-(--k-accent) font-display text-[56px] font-bold text-[#1E1B18]"
-      >
-        {wordmark[0]}
-      </span>
+    <header className="flex h-36 flex-none items-center gap-6 border-b-8 border-(--k-accent) bg-(--k-primary) px-12">
+      <BrandMark kiosk={kiosk} />
       <span className="k-text-56 font-display font-bold tracking-wide text-(--k-bg)">{wordmark}</span>
       {children}
     </header>
@@ -301,18 +305,37 @@ function Attract(props: {
   const { kiosk, claimUrl, canStart, large } = props;
   const { locale, domain } = kiosk;
   const qrSrc = useQrSrc(claimUrl);
+  // The store's own offer on the hero: its NEW item, else its BEST one, with the tile's price. Menu data only.
+  const promo =
+    kiosk.items.find((i) => i.badge === "new" && !i.soldOut) ?? kiosk.items.find((i) => i.badge === "best" && !i.soldOut);
 
   return (
     <>
       <Header kiosk={kiosk} />
-      <div className="relative min-h-0 flex-1 bg-(--k-primary-tint)">
-        {kiosk.hero && <KioskImage src={kiosk.hero} sizes="1080px" inset="p-12" preload />}
+      <div className="relative min-h-0 flex-1 bg-(--k-primary-tint) [container-type:size]">
+        {/* A pictogram hero keeps its bottom free for the offer below; a photo just runs under it. */}
+        {kiosk.hero && <KioskImage src={kiosk.hero} sizes="1080px" inset={promo ? "px-12 pt-12 pb-36" : "p-12"} preload />}
+        {promo && (
+          // Only while the hero is tall enough to hold it (large text shrinks the hero), so it never covers the
+          // tagline below.
+          <p className={`absolute bottom-8 left-12 hidden items-center gap-6 rounded-full bg-white py-3 pr-10 pl-3 [@container(min-height:240px)]:flex ${CARD_SHADOW}`}>
+            <span
+              className={`k-text-40 rounded-full px-6 font-display font-bold ${
+                promo.badge === "best" ? "bg-(--k-accent) text-[#1E1B18]" : "bg-(--k-primary) text-white"
+              }`}
+            >
+              {kt(promo.badge === "best" ? "badgeBest" : "badgeNew", locale)}
+            </span>
+            <span className="k-text-40 font-bold">{promo.name[locale]}</span>
+            <span className="k-text-40 font-display font-bold text-(--k-primary)">{formatWon(tilePrice(promo), locale)}</span>
+          </p>
+        )}
       </div>
       <h1 className="k-text-72 flex-none px-16 pt-12 pb-10 font-bold text-(--k-primary-dark)">
         {kiosk.brand.tagline[locale]}
       </h1>
       <div className="grid flex-none grid-cols-2 gap-8 px-12">
-        <div className="flex flex-col items-center gap-6 rounded-[32px] border-[6px] border-(--k-primary) bg-white p-8 text-center">
+        <div className={`flex flex-col items-center gap-6 rounded-[32px] border-[6px] border-(--k-primary) bg-white p-8 text-center ${CARD_SHADOW}`}>
           <h2 className="k-text-48 font-bold text-(--k-primary)">{kt("talkTitle", locale, domain)}</h2>
           {qrSrc && claimUrl ? (
             // A data URL, so next/image would add nothing.
@@ -329,7 +352,7 @@ function Attract(props: {
           type="button"
           onClick={props.onTouch}
           disabled={!canStart}
-          className={`flex flex-col items-center justify-center gap-6 rounded-[32px] bg-(--k-primary) p-8 text-center text-white active:bg-(--k-primary-dark) disabled:opacity-60 ${FOCUS}`}
+          className={`flex flex-col items-center justify-center gap-6 rounded-[32px] bg-(--k-primary) p-8 text-center text-white active:bg-(--k-primary-dark) disabled:opacity-60 ${CARD_SHADOW} ${FOCUS}`}
         >
           <svg width="128" height="128" viewBox="0 0 24 24" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V10" />
@@ -340,10 +363,11 @@ function Attract(props: {
           <span className="k-text-40 text-(--k-primary-tint)">{kt("touchHint", locale)}</span>
         </button>
       </div>
-      <PairCode kiosk={kiosk} claimUrl={claimUrl} pairCode={props.pairCode} pairUrl={props.pairUrl} className="mx-12 mt-8 flex-none" />
+      <PairCode kiosk={kiosk} claimUrl={claimUrl} pairCode={props.pairCode} pairUrl={props.pairUrl} className={`mx-12 mt-8 flex-none ${CARD_SHADOW}`} />
       <div className="flex flex-none flex-wrap items-center justify-between gap-4 px-12 py-10">
         {kiosk.locales.length > 1 ? (
-          <div role="group" aria-label={kt("language", locale)} className="flex gap-4">
+          // One segmented control: the chosen language is the dark half.
+          <div role="group" aria-label={kt("language", locale)} className="flex gap-2 rounded-full border-4 border-[#1E1B18] bg-white p-1">
             {kiosk.locales.map((l) => (
               <button
                 key={l}
@@ -351,9 +375,8 @@ function Attract(props: {
                 lang={l}
                 aria-pressed={l === locale}
                 onClick={() => props.onLocale(l)}
-                className={`k-text-40 min-h-22 rounded-[24px] border-4 border-[#1E1B18] px-8 font-bold ${
-                  l === locale ? "bg-[#1E1B18] text-white" : "bg-white"
-                } ${FOCUS}`}
+                // 72px inside the 4px frame and 4px padding: the row stays 88px tall like the button beside it.
+                className={`k-text-40 min-h-18 rounded-full px-8 font-bold ${l === locale ? "bg-[#1E1B18] text-white" : "bg-white"} ${FOCUS}`}
               >
                 {languageName(l)}
               </button>
@@ -366,7 +389,7 @@ function Attract(props: {
           type="button"
           aria-pressed={large}
           onClick={props.onLarge}
-          className={`k-text-40 min-h-22 rounded-[24px] border-4 border-[#1E1B18] px-8 font-bold ${large ? "bg-[#1E1B18] text-white" : "bg-white"} ${FOCUS}`}
+          className={`k-text-40 min-h-22 rounded-full border-4 border-[#1E1B18] px-8 font-bold ${large ? "bg-[#1E1B18] text-white" : "bg-white"} ${FOCUS}`}
         >
           {kt("largeText", locale)}
         </button>
@@ -382,20 +405,26 @@ function Dine(props: { kiosk: KioskData; phoneConnected: boolean; onPick(o: Dine
   const dine = kiosk.dineOptions;
   if (!dine) return null;
   return (
-    <div className="flex flex-1 flex-col gap-16 px-12 pt-16">
-      <h1 className="k-text-72 text-center font-bold">{kt("dineQuestion", locale)}</h1>
-      <div className="grid grid-cols-2 gap-10">
+    <div className="flex min-h-0 flex-1 flex-col gap-16 px-12 pt-16">
+      <h1 className="k-text-72 flex-none text-center font-bold">{kt("dineQuestion", locale)}</h1>
+      {/* The two photo cards take the free height, so the screen has no empty half (14-final:2). */}
+      <div className="grid min-h-0 flex-1 grid-cols-2 gap-10">
         {options.map((o) => (
           <button
             key={o}
             type="button"
             onClick={() => onPick(o)}
-            className={`overflow-hidden rounded-[32px] border-[6px] border-[#1E1B18] bg-white active:bg-(--k-primary-tint) ${FOCUS}`}
+            className={`flex max-h-[1040px] min-h-0 flex-col overflow-hidden rounded-[32px] bg-white active:bg-(--k-primary-tint) ${CARD_SHADOW} ${FOCUS}`}
           >
-            <span className="relative block h-160">
-              <Image src={dine[o].image} alt="" fill sizes="480px" className="object-cover" />
+            <span className="relative block min-h-60 w-full flex-1">
+              <KioskImage src={dine[o].image} sizes={DINE_SIZES} />
             </span>
-            <span className="k-text-56 block px-6 py-10 font-bold">{dine[o].name[locale]}</span>
+            <span className="k-text-56 flex w-full flex-none items-center justify-center gap-4 px-6 py-10 font-bold">
+              {dine[o].name[locale]}
+              <svg width="56" height="56" viewBox="0 0 24 24" aria-hidden fill="none" stroke="var(--k-primary)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 6l6 6-6 6" />
+              </svg>
+            </span>
           </button>
         ))}
       </div>

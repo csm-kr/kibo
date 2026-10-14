@@ -10,12 +10,12 @@ import type { KioskData, MenuItem } from "@/types/menu";
 import type { CartLine, ChangeKind, LineInput, Session } from "@/types/session";
 import { CartBar } from "./CartBar";
 import { Header } from "./KioskScreen";
-import { KioskImage } from "./KioskImage";
+import { ICON_SIZES, ITEM_SIZES, KioskImage } from "./KioskImage";
 import { KioskToolbar } from "./KioskToolbar";
 import { ModalLayer } from "./ModalLayer";
 import { ProductSheet } from "./ProductSheet";
 import { UpsellPopup } from "./UpsellPopup";
-import { FOCUS, SCRIM } from "./styles";
+import { CARD_SHADOW, FOCUS, SCRIM } from "./styles";
 
 // K3 menu with K4 sheet, K5 upsell and the AI-change highlight (docs/UX.md Flow A6–A7, Flow B). Canvas px.
 
@@ -186,8 +186,8 @@ export function MenuScreen(props: {
                   current ? "border-(--k-primary) bg-white font-bold text-(--k-primary-dark)" : "border-transparent text-[#33302B]"
                 } ${FOCUS}`}
               >
-                <span className="relative size-20 overflow-hidden rounded-full bg-white">
-                  <KioskImage src={c.icon} sizes="80px" inset="p-3" />
+                <span className={`relative size-20 overflow-hidden rounded-full bg-white ${current ? "ring-4 ring-(--k-primary)" : ""}`}>
+                  <KioskImage src={c.icon} sizes={ICON_SIZES} inset="p-3" />
                 </span>
                 <span className="k-text-40">{c.name[locale]}</span>
               </button>
@@ -196,7 +196,7 @@ export function MenuScreen(props: {
         </nav>
 
         <div className="min-h-0 flex-1 overflow-y-auto p-8">
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 gap-8">
             {items.map((item) => {
               const ring = flash?.itemId === item.itemId;
               return (
@@ -272,12 +272,12 @@ function ProductTile(props: { kiosk: KioskData; item: MenuItem; available: boole
       type="button"
       disabled={blocked !== null}
       onClick={props.onOpen}
-      className={`relative flex flex-col overflow-hidden rounded-[32px] border-4 border-[#E2DACB] bg-white text-left active:border-(--k-primary) ${
-        props.ring ? "k-ring" : ""
+      className={`relative flex flex-col overflow-hidden rounded-[32px] bg-white text-left active:bg-(--k-primary-tint) ${
+        props.ring ? "k-ring" : CARD_SHADOW
       } ${FOCUS}`}
     >
       <span className="relative block h-68 w-full flex-none">
-        <KioskImage src={item.image} sizes="380px" />
+        <KioskImage src={item.image} sizes={ITEM_SIZES} />
         {blocked && (
           <span className="k-text-48 absolute inset-0 flex items-center justify-center bg-[#FFF1CC]/90 px-6 text-center font-bold text-[#7A2E0E]">
             {blocked}
@@ -293,15 +293,18 @@ function ProductTile(props: { kiosk: KioskData; item: MenuItem; available: boole
           {kt(item.badge === "best" ? "badgeBest" : "badgeNew", locale)}
         </span>
       )}
-      <span className="flex flex-col px-6 pt-4 pb-6">
-        <span className="k-text-40 font-bold">{item.name[locale]}</span>
+      {/* Name, then a large price; kcal sits quietly beside the price (14-final:2). */}
+      <span className="flex flex-1 flex-col px-7 pt-5 pb-7">
+        <span className="k-text-48 font-bold">{item.name[locale]}</span>
         {item.subtitle && <span className="k-text-40 text-[#4B463F]">{item.subtitle[locale]}</span>}
-        <span className="k-text-40 font-bold text-(--k-primary)">{formatWon(tilePrice(item), locale)}</span>
-        {item.kcal !== null && (
-          <span className="k-text-40 text-[#4B463F]">
-            {item.kcal} {kt("kcal", locale)}
-          </span>
-        )}
+        <span className="mt-auto flex flex-wrap items-baseline justify-between gap-x-4 pt-3">
+          <span className="k-text-56 font-display font-bold text-(--k-primary)">{formatWon(tilePrice(item), locale)}</span>
+          {item.kcal !== null && (
+            <span className="k-text-40 text-[#4B463F]">
+              {item.kcal} {kt("kcal", locale)}
+            </span>
+          )}
+        </span>
       </span>
     </button>
   );

@@ -5,15 +5,106 @@
 <title>도우하우스 피자 키오스크</title>
 <!-- Black-box kiosk: built independently of KIBO. No API, no data export, partly non-semantic markup like many real kiosks. -->
 <style>
-  body { font-family: system-ui, sans-serif; margin: 0; background: #faf6f0; }
-  .screen { display: none; padding: 24px; } .screen.on { display: block; }
-  .tile { display: inline-block; width: 180px; margin: 8px; padding: 16px; background: #fff; border-radius: 12px; cursor: pointer; }
-  .tabs span { padding: 10px 18px; margin-right: 6px; background: #eee; border-radius: 20px; cursor: pointer; }
-  .tabs span.sel { background: #c0392b; color: #fff; }
-  .modal, .popup { display: none; position: fixed; inset: 10% 20%; background: #fff; padding: 24px; border: 2px solid #333; overflow: auto; }
+  /* Look only. Every text, element and handler below is unchanged: a learned skill taps this page by its
+     labels, roles and names, and spikes/kibo-learn/restyle.test.mjs checks that they stay the same.
+     Pictures are background images (no text), so they add nothing a skill or a screen reader reads. */
+  :root {
+    --red: #c8372d; --red-dark: #9e2a22; --cream: #fff8ee; --paper: #fff; --ink: #2b2320; --muted: #6b5e55;
+    --line: #eadfcf; --tint: #fdebe7; --gold: #f2b544;
+    --shadow: 0 2px 4px rgba(43, 35, 32, 0.06), 0 10px 28px rgba(43, 35, 32, 0.1);
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+    margin: 0; background: var(--cream); color: var(--ink); font-size: 30px; line-height: 1.4;
+    padding: 132px 0 360px; min-height: 100vh; word-break: keep-all;
+  }
+  /* Brand bar: a picture, so it is not page text. */
+  body::before {
+    content: ""; position: fixed; top: 0; left: 0; right: 0; height: 112px; z-index: 5;
+    background: var(--red) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='640' height='72' viewBox='0 0 640 72'><path d='M8 10 L64 10 L36 66 Z' fill='%23f2b544'/><path d='M8 10 L64 10 L60 18 L12 18 Z' fill='%23e58e3a'/><circle cx='30' cy='28' r='5' fill='%239e2a22'/><circle cx='44' cy='34' r='4' fill='%239e2a22'/><circle cx='36' cy='46' r='4' fill='%239e2a22'/><text x='84' y='50' font-family='Apple SD Gothic Neo, Noto Sans KR, sans-serif' font-size='42' font-weight='800' fill='white'>도우하우스</text><text x='300' y='48' font-family='Helvetica, Arial, sans-serif' font-size='24' font-weight='700' letter-spacing='5' fill='%23ffd9cf'>DOUGHHOUSE PIZZA</text></svg>") no-repeat 40px center / auto 64px;
+    box-shadow: 0 4px 0 var(--gold);
+  }
+
+  .screen { display: none; padding: 32px 40px; } .screen.on { display: block; }
+  h2 { font-size: 52px; font-weight: 800; margin: 24px 0 32px; letter-spacing: -0.5px; }
+
+  /* Home: a big pizza picture over the store name and one large start button. */
+  #home.on { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 500px); text-align: center;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'><circle cx='200' cy='200' r='190' fill='%23e58e3a'/><circle cx='200' cy='200' r='160' fill='%23c8372d'/><circle cx='200' cy='200' r='150' fill='%23f6d36b'/><circle cx='140' cy='140' r='26' fill='%23b8322a'/><circle cx='250' cy='120' r='24' fill='%23b8322a'/><circle cx='280' cy='230' r='26' fill='%23b8322a'/><circle cx='170' cy='260' r='24' fill='%23b8322a'/><circle cx='210' cy='190' r='20' fill='%23b8322a'/><path d='M110 200 q14 -18 28 0 q-14 18 -28 0z' fill='%232f7d4f'/><path d='M230 280 q14 -18 28 0 q-14 18 -28 0z' fill='%232f7d4f'/><path d='M300 160 q14 -18 28 0 q-14 18 -28 0z' fill='%232f7d4f'/></svg>") no-repeat center 40px / 560px 560px; padding-top: 640px; }
+  #home h1 { font-size: 112px; font-weight: 900; color: var(--red); margin: 0 0 12px; letter-spacing: -2px; }
+  #startBtn { display: block; width: auto; margin: 32px 0 0; padding: 40px 72px; background: var(--red); color: #fff; font-size: 44px; font-weight: 800; border-radius: 999px; box-shadow: 0 10px 0 var(--red-dark), var(--shadow); }
+
+  /* Eat here or take out: two photo cards. */
+  #where h2 { text-align: center; margin-top: 64px; font-size: 64px; }
+  #where .tile { width: calc(50% - 32px); margin: 16px; padding: 380px 24px 40px; font-size: 48px; font-weight: 800; text-align: center; vertical-align: top;
+    background-repeat: no-repeat; background-position: center 40px; background-size: 320px 320px; }
+  #where .tile[data-where="매장"] { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><circle cx='100' cy='100' r='96' fill='%23fdebe7'/><text x='100' y='132' font-size='96' text-anchor='middle'>🍽️</text></svg>"); }
+  #where .tile[data-where="포장"] { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><circle cx='100' cy='100' r='96' fill='%23fdf1d6'/><text x='100' y='132' font-size='96' text-anchor='middle'>🛍️</text></svg>"); }
+
+  /* Cards: menu items, the dine choice and the card payment. */
+  .tile { display: inline-block; width: 180px; margin: 8px; padding: 16px; background: var(--paper); border-radius: 28px; cursor: pointer; box-shadow: var(--shadow); border: 3px solid transparent; }
+  .tile:active { border-color: var(--red); background: var(--tint); }
+
+  /* Menu: category pills, then a three-column grid of item cards with a picture on top. */
+  /* Inline (not inline-block) like before, so the page text reads the same. */
+  .tabs { margin: 0 0 32px; white-space: nowrap; line-height: 112px; }
+  .tabs span { padding: 18px 44px; margin-right: 16px; background: var(--paper); color: var(--ink); border-radius: 999px; cursor: pointer; font-size: 36px; font-weight: 700; box-shadow: var(--shadow); }
+  .tabs span.sel { background: var(--red); color: #fff; box-shadow: 0 6px 0 var(--red-dark); }
+  #items { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  #items .tile { position: relative; width: auto; margin: 0; padding: 252px 24px 28px; min-height: 400px; font-size: 32px; font-weight: 800; color: var(--red);
+    background-repeat: no-repeat; background-position: center 24px; background-size: 210px 210px; }
+  /* The name is the card's first line (before the <br>), the price the second. */
+  #items .tile::first-line { color: var(--ink); font-size: 38px; }
+  /* Sold out: the bold 품절 mark stays the most prominent text on the card, as before. */
+  #items .tile b { position: absolute; top: 96px; left: 50%; transform: translateX(-50%) rotate(-6deg); padding: 6px 28px; font-size: 44px; font-weight: 900; color: #fff; background: rgba(43, 35, 32, 0.88); border-radius: 16px; }
+  #items .tile:has(b) { background-color: #f1ebe3; color: var(--muted); filter: grayscale(0.85); }
+  #items[data-cat="피자"] .tile { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><circle cx='100' cy='100' r='96' fill='%23fde8c8'/><text x='100' y='134' font-size='104' text-anchor='middle'>🍕</text></svg>"); }
+  #items[data-cat="피자"] .tile[data-i="1"] { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><circle cx='100' cy='100' r='96' fill='%23fcd9cf'/><text x='100' y='134' font-size='104' text-anchor='middle'>🍕</text></svg>"); }
+  #items[data-cat="피자"] .tile[data-i="2"] { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><circle cx='100' cy='100' r='96' fill='%23f3e0c7'/><text x='100' y='134' font-size='104' text-anchor='middle'>🍕</text><text x='150' y='70' font-size='48' text-anchor='middle'>🥩</text></svg>"); }
+  #items[data-cat="피자"] .tile[data-i="3"] { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><circle cx='100' cy='100' r='96' fill='%23fff0c2'/><text x='100' y='134' font-size='104' text-anchor='middle'>🍕</text><text x='154' y='68' font-size='44' text-anchor='middle'>🥔</text></svg>"); }
+  #items[data-cat="사이드"] .tile[data-i="0"] { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><circle cx='100' cy='100' r='96' fill='%23fde3d2'/><text x='100' y='134' font-size='104' text-anchor='middle'>🍝</text></svg>"); }
+  #items[data-cat="사이드"] .tile[data-i="1"] { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><circle cx='100' cy='100' r='96' fill='%23f5f0dc'/><text x='100' y='134' font-size='104' text-anchor='middle'>🧄</text></svg>"); }
+  #items[data-cat="사이드"] .tile[data-i="2"] { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><circle cx='100' cy='100' r='96' fill='%23fbdcc6'/><text x='100' y='134' font-size='104' text-anchor='middle'>🍗</text></svg>"); }
+  #items[data-cat="음료"] .tile { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><circle cx='100' cy='100' r='96' fill='%23ecdcd2'/><text x='100' y='134' font-size='104' text-anchor='middle'>🥤</text></svg>"); }
+  #items[data-cat="음료"] .tile[data-i="1"] { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><circle cx='100' cy='100' r='96' fill='%23d9d4d0'/><text x='100' y='134' font-size='104' text-anchor='middle'>🥤</text><circle cx='152' cy='52' r='26' fill='%232b2320'/><text x='152' y='63' font-size='32' font-family='Arial' font-weight='700' fill='white' text-anchor='middle'>0</text></svg>"); }
+  #items[data-cat="음료"] .tile[data-i="2"] { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><circle cx='100' cy='100' r='96' fill='%23dff3e4'/><text x='100' y='134' font-size='104' text-anchor='middle'>🥤</text></svg>"); }
+
+  /* Pay */
+  #pay h2 { margin-top: 64px; }
+  #cardPay { display: block; width: auto; max-width: 600px; padding: 300px 40px 48px; font-size: 48px; font-weight: 800; text-align: center;
+    background: var(--paper) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><circle cx='100' cy='100' r='96' fill='%23fdebe7'/><rect x='38' y='58' width='124' height='84' rx='12' fill='%23c8372d'/><rect x='38' y='76' width='124' height='16' fill='%232b2320'/><rect x='52' y='106' width='26' height='20' rx='4' fill='%23f2b544'/><rect x='92' y='116' width='56' height='8' rx='4' fill='%23fdebe7'/></svg>") no-repeat center 40px / 220px 220px; }
+  #done { margin-top: 40px; font-size: 40px; font-weight: 800; color: var(--red-dark); }
+
+  /* Option sheet and the side-menu offer: centred cards over a dimmed page. */
+  .modal, .popup { display: none; position: fixed; left: 56px; right: 56px; top: 50%; transform: translateY(-50%); max-height: calc(100% - 96px); overflow: auto; z-index: 20;
+    background: var(--cream); padding: 48px; border-radius: 40px; box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3), 0 0 0 200vmax rgba(43, 35, 32, 0.55); }
   .modal.on, .popup.on { display: block; }
-  .err { color: #c0392b; min-height: 1em; }
-  #cartbar { position: fixed; bottom: 0; left: 0; right: 0; background: #222; color: #fff; padding: 12px; }
+  .modal h3 { font-size: 52px; font-weight: 800; margin: 0 0 24px; }
+  fieldset { border: 0; margin: 0 0 20px; padding: 24px 24px 12px; background: var(--paper); border-radius: 28px; box-shadow: var(--shadow); }
+  legend { float: left; width: 100%; font-size: 34px; font-weight: 800; margin-bottom: 12px; }
+  label { display: inline-flex; align-items: center; gap: 12px; margin: 0 12px 12px 0; padding: 16px 28px 16px 20px; border: 3px solid var(--line); border-radius: 999px; background: var(--paper); font-size: 32px; font-weight: 600; }
+  label:has(input:checked) { border-color: var(--red); background: var(--tint); color: var(--red-dark); }
+  input[type=radio], input[type=checkbox] { width: 32px; height: 32px; margin: 0; accent-color: var(--red); }
+  #optBody + div { display: flex; align-items: center; gap: 24px; margin: 8px 0; padding: 20px 24px; background: var(--paper); border-radius: 28px; font-size: 34px; font-weight: 800; box-shadow: var(--shadow); }
+  #qty { min-width: 48px; text-align: center; font-size: 44px; }
+  button { font: inherit; cursor: pointer; border: 0; }
+  #minus, #plus { width: 88px; height: 88px; border-radius: 50%; background: var(--paper); border: 4px solid var(--ink); font-size: 44px; font-weight: 800; line-height: 1; }
+  .err { color: var(--red-dark); min-height: 1em; font-size: 32px; font-weight: 700; }
+  #addBtn, #upYes { min-height: 104px; padding: 0 64px; margin-right: 16px; border-radius: 999px; background: var(--red); color: #fff; font-size: 40px; font-weight: 800; box-shadow: 0 8px 0 var(--red-dark); }
+  #cancelBtn, #upNo { min-height: 104px; padding: 0 56px; margin-right: 16px; border-radius: 999px; background: var(--paper); color: var(--ink); font-size: 40px; font-weight: 700; border: 4px solid var(--line); }
+  .popup { top: 50%; padding-top: 300px; text-align: center;
+    background: var(--cream) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><circle cx='100' cy='100' r='96' fill='%23f5f0dc'/><text x='100' y='134' font-size='104' text-anchor='middle'>🧄</text></svg>") no-repeat center 48px / 220px 220px; }
+  .popup p { font-size: 44px; font-weight: 800; margin: 0 0 40px; }
+
+  /* Cart: a white panel along the bottom with the total and a large order button on the right. */
+  #cartbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 10; background: var(--paper); color: var(--ink); padding: 32px 400px 32px 40px; min-height: 220px;
+    font-size: 40px; font-weight: 800; border-radius: 40px 40px 0 0; box-shadow: 0 -10px 32px rgba(43, 35, 32, 0.14); }
+  #cartTotal { color: var(--red); }
+  #cartList { list-style: none; margin: 16px 0 0; padding: 0; max-height: 200px; overflow: auto; font-size: 30px; font-weight: 600; color: var(--muted); }
+  #cartList li { padding: 8px 0; border-top: 2px solid var(--line); }
+  #cartList button { margin-left: 16px; padding: 6px 24px; border-radius: 999px; background: var(--tint); color: var(--red-dark); font-size: 28px; font-weight: 700; }
+  #checkout { position: absolute; top: 32px; right: 40px; bottom: 32px; width: 320px; max-height: 156px; border-radius: 32px; background: var(--red); color: #fff; font-size: 52px; font-weight: 900; box-shadow: 0 8px 0 var(--red-dark); }
 </style>
 </head>
 <body>
@@ -77,6 +168,7 @@ $('startBtn').onclick = () => show('where');
 document.querySelectorAll('[data-where]').forEach((t) => t.onclick = () => { where = t.dataset.where; show('menu'); tab('피자'); });
 
 function tab(cat) {
+  $('items').dataset.cat = cat; // picks the item pictures in the style sheet; nothing reads it
   $('tabs').innerHTML = Object.keys(MENU).map((c) => `<span class="${c === cat ? 'sel' : ''}">${c}</span>`).join('');
   [...$('tabs').children].forEach((s) => s.onclick = () => tab(s.textContent));
   $('items').innerHTML = MENU[cat].map((m, i) => `<div class="tile" data-i="${i}">${m.name}<br>${m.price.toLocaleString()}원${m.soldOut ? '<br><b>품절</b>' : ''}</div>`).join('');

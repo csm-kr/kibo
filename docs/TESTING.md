@@ -46,6 +46,7 @@ The full UI QA pass (numbers, visual heuristics, flows, journeys, states) is in 
 ```
 python3 -m pytest -q scripts/        # harness executor (local) and Bash guard hook
 (cd spikes/kibo-learn && node test_audit.mjs <pizzaUrl> <blindUrl>)   # coverage audit regression (fixtures are relative)
+node --test spikes/kibo-learn/restyle.test.mjs   # the pizza kiosk still shows the labels, roles, names and cart text a skill needs
 python3 design/prototype/e2e_check.py   # prototype state logic (42 checks)
 ```
 
@@ -54,6 +55,7 @@ python3 design/prototype/e2e_check.py   # prototype state logic (42 checks)
 |---|---|---|---|
 | Learn a non-blind pizza kiosk (Gemini 3.8 Flash), run 3, **with the finish gate and coverage audit** | finished: 4.8 min, 63 turns, 482,553 input tokens; self-test 3/3 orders (one call); audit passed (0 missing, 0 unknown, 0 hidden), 10-13 | `spikes/kibo-learn/results/run3/learn-stats.json`, `learn.log`, `skill.json` | measured |
 | Replay unseen pizza orders, run 3 skill | 4/4 + 1 rule violation detected; 546–697 ms per order | `spikes/kibo-learn/results/run3/holdout.log` | measured |
+| Same holdout after the pizza kiosk restyle (14-final:2, look only) | 4/4 + 1 rule violation detected; 736–918 ms per order, one run, 10-14. Tappable labels, accessibility tree and cart text identical to the page before on 14 screens | `spikes/kibo-learn/results/run3/holdout.restyled.log` (`node spikes/kibo-learn/holdout-restyled.mjs`); `node --test spikes/kibo-learn/restyle.test.mjs` | measured |
 | Learn a non-blind pizza kiosk (Gemini 3.8 Flash), run 2, before the gate and audit | 5.5 min, 72 turns, 635,725 input tokens | `spikes/kibo-learn/results/stats.run2.json`, `learn.run2.log` | measured |
 | Replay unseen pizza orders, run 2 skill | 4/4 + 1 rule violation detected | `spikes/kibo-learn/results/holdout.run2.log` | measured |
 | Blind cafe learning success (Gemini) | 2/3 (10.3 min, 15.1 min) | `spikes/blind-kiosk/results/v3run{1,2,3}/learn-stats.json` | measured |

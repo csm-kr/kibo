@@ -9,10 +9,10 @@ import { formatWon, lineLabel } from "@/lib/kiosk/menu";
 import type { KioskData } from "@/types/menu";
 import type { CartLine, Session } from "@/types/session";
 import { Header } from "./KioskScreen";
-import { KioskImage } from "./KioskImage";
+import { ITEM_SIZES, KioskImage } from "./KioskImage";
 import { KioskToolbar } from "./KioskToolbar";
 import { ModalLayer } from "./ModalLayer";
-import { FOCUS, SCRIM } from "./styles";
+import { CARD_SHADOW, FOCUS, SCRIM } from "./styles";
 
 // K6 order review (status `confirming`, docs/UX.md A8). A quantity change sends the session back to `ordering`
 // on the server, and the screen follows the stream. Canvas px.
@@ -73,7 +73,7 @@ export function ReviewScreen(props: {
         ))}
       </ul>
 
-      <section className="flex flex-none flex-col gap-8 border-t-4 border-[#E2DACB] bg-white px-12 py-10">
+      <section className="relative z-10 flex flex-none flex-col gap-8 rounded-t-[48px] bg-white px-12 py-10 shadow-[0_-12px_32px_rgb(30_27_24/0.12)]">
         {kiosk.dineOptions && (
           <div className="flex items-baseline justify-between gap-6">
             <span className="k-text-40 text-[#4B463F]">{kt("dineLabel", locale)}</span>
@@ -145,9 +145,9 @@ function ReviewLine(props: { kiosk: KioskData; line: CartLine; disabled: boolean
   const item = findItem(kiosk, line.itemId);
   const label = lineLabel(kiosk, line, locale);
   return (
-    <li className="flex flex-none gap-8 rounded-[32px] border-4 border-[#E2DACB] bg-white p-6">
+    <li className={`flex flex-none gap-8 rounded-[32px] bg-white p-8 ${CARD_SHADOW}`}>
       <span className="relative size-40 flex-none overflow-hidden rounded-[24px] bg-(--k-panel)">
-        {item && <KioskImage src={item.image} sizes="160px" />}
+        {item && <KioskImage src={item.image} sizes={ITEM_SIZES} />}
       </span>
       <div className="flex min-w-0 flex-1 flex-col gap-4">
         <p className="k-text-48 font-bold">{label.title}</p>

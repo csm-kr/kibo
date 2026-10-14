@@ -207,16 +207,18 @@ async function main() {
       await saveWebp(encoder, await place.screenshot({ clip: top }), `place-${kioskId}`, 800, 600);
     }
     await placeCtx.close();
-    // The learned kiosk is its own page (our development kiosk), unchanged. Its small tiles leave a 1080-wide frame almost
-    // empty, so it is taken 540 wide at 2x, where the pizza tiles fill the picture.
-    const learnedCtx = await browser.newContext({ viewport: { width: 540, height: 405 }, deviceScaleFactor: 2 });
+    // The learned kiosk is its own page (our development kiosk), drawn for a 1080-wide frame (restyled in 14-final:2),
+    // so it is taken in its own 1080x1600 frame, and the top 4:3 (brand bar, tabs, first row of cards) is kept,
+    // above its fixed cart panel.
+    const learnedCtx = await browser.newContext({ viewport: { width: 1080, height: 1600 } });
     const learned = await learnedCtx.newPage();
     await learned.goto(`${BASE}/learned-kiosks/doughhouse/index.html`);
     await learned.locator("#startBtn").click();
     await learned.getByText("🍽 먹고 갈게요").click();
     await learned.locator("#menu.on").waitFor();
+    await learned.evaluate(() => window.scrollTo(0, 0));
     await settled(learned);
-    await saveWebp(encoder, await learned.screenshot(), "place-doughhouse", 800, 600);
+    await saveWebp(encoder, await learned.screenshot({ clip: { x: 0, y: 0, width: 1080, height: 810 } }), "place-doughhouse", 800, 600);
     await learnedCtx.close();
   } finally {
     await browser.close();

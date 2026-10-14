@@ -87,3 +87,8 @@ When an issue class in `docs/ISSUE.md` is seen for the **3rd time**, it becomes 
 - From: `unexercised-option-group` — I-192 (seen 10-13/13-blind-kiosks:4), I-197 (10-14/13-blind-kiosks:8, 10-14/13-blind-kiosks:10)
 - Why: three skills passed the finish gate with 3 of 3 self-tests, then failed or mispriced orders whose option groups no self-test had used (Doughhouse toppings, bk6 discounts, bk1 and bk2 prices), and the order counts alone hid it.
 - Check: each blind-kiosk results table (`spikes/blind-kiosks/RESULTS.md`, `/learn` cards) shows the "skill total wrong" count from `skillPredicts` vs `kioskTotal` in `grade-v2.json`; a learner change to the gate on the dev set has a test with an option group the self-tests skip.
+
+### R-015 (proposed): Check every name, mark and picture a screen shows against real brands before it ships, not only text
+- From: `third-party-brand` — I-009 (seen 10-12/session), I-107 (10-13/7-environments:2), I-217 (10-14/14-final:2)
+- Why: real names slipped into docs and data twice, then a logo shape (a capital M on a gold tile beside burgers) recalled a real chain; third-party IP disqualifies the entry, and the name tests in `catalog.test.ts` cannot see a shape or a colour.
+- Check: names and taglines pass the real-brand list in `src/lib/adapters/catalog.test.ts`; for each new or changed mark, logo, hero or menu picture, the step's QA report says what it shows and that it uses no single capital letter on a coloured tile, no real product shape or packaging and no real store screen (UI_QA "Kiosk mark").

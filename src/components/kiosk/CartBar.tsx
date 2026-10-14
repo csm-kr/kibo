@@ -32,13 +32,17 @@ export function CartBar(props: {
   const count = lines.reduce((n, l) => n + l.line.qty, 0);
   const hasPending = lines.some((l) => l.pending);
   return (
-    <section aria-label={vocabularyOf(kiosk).cart[locale]} className="flex flex-none flex-col gap-6 border-t-4 border-[#E2DACB] bg-white px-12 py-8">
+    // A white panel lifted over the menu, like a real kiosk's cart drawer (14-final:2).
+    <section
+      aria-label={vocabularyOf(kiosk).cart[locale]}
+      className="relative z-10 flex flex-none flex-col gap-6 rounded-t-[48px] bg-white px-12 pt-10 pb-8 shadow-[0_-12px_32px_rgb(30_27_24/0.12)]"
+    >
       <div className="flex items-baseline justify-between">
         <span className="k-text-48 font-bold">
           {count}
           {kt("cartCount", locale, domain)}
         </span>
-        <span className="k-text-56 font-display font-bold text-(--k-primary)">{formatWon(props.total, locale)}</span>
+        <span className="k-text-72 font-display font-bold text-(--k-primary)">{formatWon(props.total, locale)}</span>
       </div>
       {/* Focusable: with three or more lines the row scrolls, and a keyboard must reach it too (WCAG 2.1.1). */}
       <ul tabIndex={0} className={`flex h-38 gap-6 overflow-x-auto px-2 py-2 ${FOCUS}`}>
@@ -52,7 +56,7 @@ export function CartBar(props: {
             <li
               key={ring ? `${line.lineId}:${props.ringKey}` : line.lineId}
               className={`flex max-w-full flex-none flex-col justify-center rounded-[32px] border-4 px-8 ${
-                pending ? "border-dashed border-[#4B463F] bg-(--k-panel)" : "border-[#E2DACB] bg-(--k-bg)"
+                pending ? "border-dashed border-[#4B463F] bg-(--k-panel)" : "border-transparent bg-(--k-panel)"
               } ${ring ? "k-ring" : ""}`}
             >
               <span className="k-text-40 truncate font-bold">
@@ -79,9 +83,12 @@ export function CartBar(props: {
           type="button"
           onClick={props.onOrder}
           disabled={lines.length === 0 || hasPending}
-          className={`k-text-56 min-h-32 flex-1 rounded-full bg-(--k-accent) font-bold text-[#1E1B18] disabled:bg-[#E2DACB] disabled:text-[#4B463F] ${FOCUS}`}
+          className={`k-text-56 flex min-h-32 flex-1 items-center justify-center gap-4 rounded-full bg-(--k-accent) font-bold text-[#1E1B18] disabled:bg-[#E2DACB] disabled:text-[#4B463F] ${FOCUS}`}
         >
           {kt("order", locale, domain)}
+          <svg width="56" height="56" viewBox="0 0 24 24" aria-hidden fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 6l6 6-6 6" />
+          </svg>
         </button>
       </div>
     </section>

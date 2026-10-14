@@ -7,9 +7,9 @@ import { kt, stepLabel, variantWord } from "@/lib/i18n/kiosk";
 import { draftSelections, formatWon, sheetPrice, sheetSteps, type SheetDraft } from "@/lib/kiosk/menu";
 import type { KioskData, Locale, MenuItem, MenuOption, Variant } from "@/types/menu";
 import type { LineInput } from "@/types/session";
-import { KioskImage } from "./KioskImage";
+import { ITEM_SIZES, KioskImage } from "./KioskImage";
 import { ModalLayer } from "./ModalLayer";
-import { FOCUS, SCRIM } from "./styles";
+import { CARD_SHADOW, FOCUS, SCRIM } from "./styles";
 
 // K4: set → side → drink → ingredients and quantity (docs/UX.md screen map). Canvas px.
 
@@ -85,7 +85,7 @@ export function ProductSheet(props: {
       >
         <div className="flex flex-none items-center gap-8 border-b-4 border-[#E2DACB] px-12 pt-12 pb-8">
           <span className="relative size-50 flex-none overflow-hidden rounded-[32px] bg-white">
-            <KioskImage src={item.image} sizes="200px" />
+            <KioskImage src={item.image} sizes={ITEM_SIZES} />
           </span>
           <div className="min-w-0 flex-1">
             <h2 id={titleId} className="k-text-56 font-bold">
@@ -154,7 +154,7 @@ export function ProductSheet(props: {
             </>
           )}
           {isLast && (
-            <div className="mt-10 flex items-center justify-between rounded-[32px] bg-white p-8">
+            <div className={`mt-10 flex items-center justify-between rounded-[32px] bg-white p-8 ${CARD_SHADOW}`}>
               <span className="k-text-48 font-bold">{kt("quantity", locale, domain)}</span>
               <div className="flex items-center gap-8">
                 <button
@@ -242,12 +242,12 @@ function Choice(props: {
       disabled={props.disabled}
       onClick={props.onPick}
       className={`relative flex min-h-50 flex-col overflow-hidden rounded-[32px] border-[6px] bg-white text-left disabled:opacity-60 ${
-        selected ? "border-(--k-primary) shadow-[0_0_0_8px_var(--k-primary-tint)]" : "border-[#E2DACB]"
+        selected ? "border-(--k-primary) shadow-[0_0_0_8px_var(--k-primary-tint)]" : `border-transparent ${CARD_SHADOW}`
       } ${FOCUS}`}
     >
       {image && (
         <span className="relative block h-50 w-full flex-none">
-          <KioskImage src={image} sizes="300px" />
+          <KioskImage src={image} sizes={ITEM_SIZES} />
         </span>
       )}
       <span className="k-text-40 block px-6 pt-4 font-bold">

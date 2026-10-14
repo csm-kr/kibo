@@ -7,7 +7,7 @@ import { doneCountdown } from "@/lib/kiosk/timers";
 import type { KioskData } from "@/types/menu";
 import type { Session } from "@/types/session";
 import { Header } from "./KioskScreen";
-import { FOCUS } from "./styles";
+import { CARD_SHADOW, FOCUS } from "./styles";
 
 // K8 (status `paid`, docs/UX.md A10–A11): receipt question, then the order number with a visible 10 s countdown
 // before the attract screen (WCAG 2.2.1). Nothing prints. Canvas px.
@@ -45,7 +45,9 @@ export function DoneScreen(props: {
       <Header kiosk={kiosk} />
       {!showNumber ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-16 px-12">
-          <ReceiptIcon />
+          <span className="flex size-64 items-center justify-center rounded-full bg-(--k-primary-tint)">
+            <ReceiptIcon />
+          </span>
           <h1 className="k-text-72 text-center font-bold">{kt("receiptQuestion", locale)}</h1>
           <div className="grid w-full grid-cols-2 gap-8">
             <button
@@ -69,9 +71,16 @@ export function DoneScreen(props: {
         </div>
       ) : (
         <div className="flex flex-1 flex-col items-center justify-center gap-10 px-12 text-center">
-          <h1 className="k-text-56 font-bold text-[#4B463F]">{kt("orderNumber", locale, domain)}</h1>
-          <p className="font-display text-[240px] leading-none font-bold text-(--k-primary)">{session.orderNumber}</p>
-          <p className="k-text-56 font-bold">{kt("pickupHint", locale, domain)}</p>
+          {/* The number on a ticket-like card, the one thing to remember. */}
+          <div className={`flex w-full flex-col items-center gap-8 rounded-[48px] bg-white px-12 py-16 ${CARD_SHADOW}`}>
+            <h1 className="k-text-56 flex items-center gap-4 font-bold text-[#4B463F]">
+              <DoneIcon />
+              {kt("orderNumber", locale, domain)}
+            </h1>
+            <p className="font-display text-[240px] leading-none font-bold text-(--k-primary)">{session.orderNumber}</p>
+            <span aria-hidden className="h-0 w-full border-t-4 border-dashed border-[#E2DACB]" />
+            <p className="k-text-56 font-bold">{kt("pickupHint", locale, domain)}</p>
+          </div>
           {!keepNumber && (
             <p role="timer" className="k-text-48 mt-12 rounded-full bg-(--k-panel) px-12 py-6 font-bold text-[#33302B]">
               {backInSeconds(left, locale)}
@@ -80,6 +89,16 @@ export function DoneScreen(props: {
         </div>
       )}
     </div>
+  );
+}
+
+function DoneIcon() {
+  return (
+    <span aria-hidden className="flex size-16 flex-none items-center justify-center rounded-full bg-(--k-primary)">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M5 12.5l4.5 4.5L19 7.5" />
+      </svg>
+    </span>
   );
 }
 

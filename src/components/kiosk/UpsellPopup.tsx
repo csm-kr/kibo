@@ -4,9 +4,9 @@ import { findItem } from "@/lib/adapters/catalog";
 import { kt } from "@/lib/i18n/kiosk";
 import { formatWon } from "@/lib/kiosk/menu";
 import type { KioskData } from "@/types/menu";
-import { KioskImage } from "./KioskImage";
+import { ITEM_SIZES, KioskImage } from "./KioskImage";
 import { ModalLayer } from "./ModalLayer";
-import { FOCUS, SCRIM } from "./styles";
+import { CARD_SHADOW, FOCUS, SCRIM } from "./styles";
 
 // K5: the dessert offer, once per order. The server picks the items (result.upsell) and marks the offer made.
 
@@ -31,10 +31,10 @@ export function UpsellPopup(props: { kiosk: KioskData; offerItemIds: string[]; o
               key={item.itemId}
               type="button"
               onClick={() => props.onAdd(item.itemId)}
-              className={`flex flex-col overflow-hidden rounded-[32px] border-[6px] border-[#E2DACB] bg-white text-left active:border-(--k-primary) ${FOCUS}`}
+              className={`flex flex-col overflow-hidden rounded-[32px] border-[6px] border-transparent bg-white text-left active:border-(--k-primary) ${CARD_SHADOW} ${FOCUS}`}
             >
               <span className="relative block h-68 w-full">
-                <KioskImage src={item.image} sizes="440px" />
+                <KioskImage src={item.image} sizes={ITEM_SIZES} />
               </span>
               <span className="k-text-48 block px-8 pt-6 font-bold">{item.name[locale]}</span>
               <span className="flex items-center justify-between gap-4 px-8 pt-2 pb-8">

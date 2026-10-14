@@ -45,7 +45,10 @@ The phone is KIBO's product: KIBO blue for the filled primary button, the mic, s
 
 ## Components
 - Touch targets ≥ 56×56px. Phone components are in "Phone design".
-- Product tile (kiosk canvas): photo 272px high, name 40px bold, price 40px in teal, kcal 40px secondary color, badge top-left (BEST mustard, NEW teal), sold-out overlay with text.
+- Kiosk header: the store's mark (`BrandMark.tsx`: a cream speech bubble with a line drawing of what the store sells, burger or train, in the kiosk colour; never a capital letter on a coloured tile, which can recall a real chain, 14-final:2), the wordmark, and an 8px accent stripe under the bar.
+- Kiosk cards (kiosk canvas): white, 32px radius, the soft two-layer shadow `CARD_SHADOW` (`src/components/kiosk/styles.ts`) instead of an outline; summary areas (cart bar, review and payment totals) are a white panel with a 48px rounded top and an upward shadow. An element showing the AI ring drops the card shadow (both are box-shadows).
+- Product tile (kiosk canvas): photo 272px high, name 48px bold, price 56px Space Grotesk in the kiosk colour with kcal 40px secondary color beside it, badge top-left (BEST mustard, NEW teal), sold-out overlay with text. Every kiosk picture is fetched on K1 (`preloadKioskImages`), so none is blank when shown.
+- K1 hero: the store's own offer from menu data (its NEW item, else BEST, with the tile price) on a white pill, shown only while the hero is at least 240px tall.
 - Bottom sheet for set steps: step label ("Step 2 of 4 · set"), photo options in a 3-column grid, selected = 6px teal border + tint ring (kiosk canvas).
 - AI change: kiosk tile and cart chip get a teal 6–8px ring (kiosk canvas) for 2 s plus a status line "Added by AI: …". While the kiosk shows Korean, KIBO's English subtitle ("AI added: Cheeseburger set · Fries (M) · Zero cola") takes its own row under the toolbar for 6 s: KIBO blue `#3446D4` with white 40px text and a "KIBO" tag, so it never reads as the kiosk's own UI (14-final:0).
 - KIBO working: from the moment the phone sends a message until the AI answers (at most 20 s), the toolbar row on K2, K3 and K6 shows a KIBO-blue pill with the "KIBO" tag and "처리하고 있어요 · Working…" (40px canvas), in place of the row's controls; the AI's own change line wins when both apply (14-final:1).

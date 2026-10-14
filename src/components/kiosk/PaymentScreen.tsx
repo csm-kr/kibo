@@ -9,7 +9,7 @@ import type { KioskData } from "@/types/menu";
 import type { Session } from "@/types/session";
 import { Header } from "./KioskScreen";
 import { KioskToolbar } from "./KioskToolbar";
-import { FOCUS } from "./styles";
+import { CARD_SHADOW, FOCUS } from "./styles";
 
 // K7 virtual payment (status `paying`, docs/UX.md A9): method → insert card → approving → cardAction.
 // No real card, network or bank: the "insert card" button stands in for the card reader. Only cardAction,
@@ -103,7 +103,7 @@ export function PaymentScreen(props: {
         )}
       </div>
 
-      <section className="flex flex-none flex-col gap-8 border-t-4 border-[#E2DACB] bg-white px-12 py-10">
+      <section className="relative z-10 flex flex-none flex-col gap-8 rounded-t-[48px] bg-white px-12 py-10 shadow-[0_-12px_32px_rgb(30_27_24/0.12)]">
         <div className="flex items-baseline justify-between gap-6">
           <span className="k-text-48 font-bold">{kt("total", locale)}</span>
           <span className="k-text-72 font-display font-bold text-(--k-primary)">{formatWon(session.total, locale)}</span>
@@ -132,7 +132,7 @@ function MethodButton(props: { label: string; note?: string; icon: ReactNode; on
       onClick={props.onClick}
       className={`flex min-h-100 flex-col items-center justify-center gap-6 rounded-[32px] border-[6px] p-6 text-center ${
         enabled
-          ? "border-(--k-primary) bg-white text-(--k-primary-dark) active:bg-(--k-primary-tint)"
+          ? `border-(--k-primary) bg-white text-(--k-primary-dark) active:bg-(--k-primary-tint) ${CARD_SHADOW}`
           : "border-[#E2DACB] bg-(--k-panel) text-[#4B463F]"
       } ${FOCUS}`}
     >
@@ -143,19 +143,33 @@ function MethodButton(props: { label: string; note?: string; icon: ReactNode; on
   );
 }
 
-/** A plain slot drawing with a card sliding toward it and an arrow pointing at the real slot below the screen. */
+/** A card sliding into a reader slot, and an arrow pointing at the real slot below the screen. */
 function CardSlot() {
   return (
-    <div aria-hidden className="flex flex-1 flex-col items-center justify-center gap-6 overflow-hidden py-8">
-      <div className="k-card-insert flex h-72 w-110 flex-col justify-between rounded-[32px] bg-(--k-primary) p-8">
-        <span className="h-14 w-20 rounded-[12px] bg-(--k-accent)" />
-        <span className="h-6 w-60 rounded-full bg-(--k-primary-tint)" />
+    <div aria-hidden className="flex flex-1 flex-col items-center justify-center gap-8 overflow-hidden py-8">
+      <div className="k-card-insert flex h-72 w-110 flex-col justify-between rounded-[32px] bg-(--k-primary) p-8 shadow-[0_16px_32px_rgb(30_27_24/0.25)]">
+        <span className="flex items-start justify-between">
+          <span className="h-14 w-20 rounded-[12px] bg-(--k-accent)" />
+          <span className="flex gap-2 pt-2">
+            <span className="size-10 rounded-full bg-white/40" />
+            <span className="-ml-5 size-10 rounded-full bg-white/25" />
+          </span>
+        </span>
+        <span className="flex gap-4">
+          {[0, 1, 2, 3].map((i) => (
+            <span key={i} className="h-4 w-16 rounded-full bg-(--k-primary-tint)" />
+          ))}
+        </span>
       </div>
-      <div className="h-8 w-130 rounded-full bg-[#1E1B18]" />
-      <svg width="160" height="160" viewBox="0 0 24 24" fill="none" stroke="#1E1B18" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 4v15" />
-        <path d="M6 13l6 6 6-6" />
-      </svg>
+      <div className="flex h-20 w-140 items-center justify-center rounded-[40px] bg-[#2A2622] shadow-[0_12px_24px_rgb(30_27_24/0.2)]">
+        <span className="h-4 w-120 rounded-full bg-black" />
+      </div>
+      <span className="flex size-40 items-center justify-center rounded-full bg-(--k-primary-tint)">
+        <svg width="112" height="112" viewBox="0 0 24 24" fill="none" stroke="var(--k-primary-dark)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 4v15" />
+          <path d="M6 13l6 6 6-6" />
+        </svg>
+      </span>
     </div>
   );
 }

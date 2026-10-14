@@ -58,7 +58,8 @@ test("hero order by touch, efficient path: options chosen while adding", async (
   const counter = page.locator("[data-demo-counter]");
   const taps = Number(await counter.getAttribute("data-taps"));
   const seconds = Number(await counter.getAttribute("data-seconds"));
-  expect(taps).toBeGreaterThan(0);
+  // The cited touch count (evidence/touch-hero-efficient.json): a kiosk restyle must not change the path (14-final:2).
+  expect(taps).toBe(24);
 
   if (existsSync(EVIDENCE) && !process.env.EVIDENCE) return;
   mkdirSync("evidence", { recursive: true });
