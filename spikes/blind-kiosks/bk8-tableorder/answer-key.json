@@ -1,0 +1,278 @@
+{
+  "kiosk": {
+    "name": "달무리화로",
+    "nameEn": "Dalmuri Hwaro (charcoal BBQ and noodles)",
+    "domain": "Table-order tablet on each table of a Korean BBQ and noodle restaurant (table 12, landscape 1280x800). Orders go to the kitchen; payment is made at the counter."
+  },
+  "flow": [
+    "Attract screen: brand, '12번 테이블', '화면을 터치하면 주문이 시작됩니다' and a '주문 시작' pill; '직원 호출' and language buttons in the top right. No dine-in/take-out step.",
+    "Menu screen: header (brand, '12번 테이블', '주문 내역' with running table total, '직원 호출', language), category tabs on the left, item grid in the middle, '주문 담기' list on the right with '주문 금액', '주문하기' and the note '결제는 카운터에서 해주세요'.",
+    "Item popup (meat, noodles, stews): option groups with 필수/선택 tags, a '인분' stepper for meat or a '수량' stepper for others, inline error line, '취소' and '주문 담기 | <price>'. Items without options (sides, rice, drinks, desserts) are added with one tap and a toast.",
+    "Alcohol age confirmation popup ('주류 주문 확인', '만 19세 이상이십니까?', 아니오/예) on the first alcohol tap of the session.",
+    "Order review popup '주문 확인' after tapping '주문하기': lines, '주문 금액', '아래 메뉴를 주방으로 주문할까요?', '돌아가기' / '주문하기'. The second '주문하기' sends the order to the kitchen.",
+    "Order-sent confirmation screen (stop here): '주문이 주방으로 전달되었습니다', '12번 테이블 · N차 주문', '이번 주문 금액', '테이블 총 주문금액', '결제는 카운터에서 해주세요', buttons '주문 내역 보기' / '추가 주문하기'.",
+    "Order history popup '주문 내역' (from the header or the confirmation screen): every sent order (1차, 2차 …) with its lines and amount, and '테이블 총 주문금액'."
+  ],
+  "categories": [
+    { "label": "고기", "itemCount": 7 },
+    { "label": "식사·면", "itemCount": 7 },
+    { "label": "찌개", "itemCount": 5 },
+    { "label": "사이드", "itemCount": 6 },
+    { "label": "주류·음료", "itemCount": 8 },
+    { "label": "디저트", "itemCount": 4 }
+  ],
+  "optionGroups": {
+    "noodle_style": {
+      "title": "물/비빔 선택",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": null,
+      "appliesWhen": null,
+      "options": [
+        { "id": "mul", "label": "물", "priceDelta": 0, "maxQty": 1 },
+        { "id": "bibim", "label": "비빔", "priceDelta": 0, "maxQty": 1 }
+      ]
+    },
+    "size_up": {
+      "title": "사이즈",
+      "type": "multi",
+      "required": false,
+      "min": 0,
+      "max": 1,
+      "default": null,
+      "appliesWhen": null,
+      "options": [
+        { "id": "gopbaegi", "label": "곱빼기", "priceDelta": 2000, "maxQty": 1 }
+      ]
+    },
+    "spice": {
+      "title": "맵기 선택",
+      "type": "single",
+      "required": true,
+      "min": 1,
+      "max": 1,
+      "default": null,
+      "appliesWhen": null,
+      "options": [
+        { "id": "mild", "label": "순한맛", "priceDelta": 0, "maxQty": 1 },
+        { "id": "medium", "label": "보통맛", "priceDelta": 0, "maxQty": 1 },
+        { "id": "hot", "label": "매운맛", "priceDelta": 0, "maxQty": 1 },
+        { "id": "xhot", "label": "아주 매운맛", "priceDelta": 0, "maxQty": 1 }
+      ]
+    },
+    "addins": {
+      "title": "추가 재료",
+      "type": "multi",
+      "required": false,
+      "min": 0,
+      "max": 2,
+      "default": null,
+      "appliesWhen": null,
+      "options": [
+        { "id": "ramen", "label": "라면사리", "priceDelta": 1500, "maxQty": 1 },
+        { "id": "cheese", "label": "치즈", "priceDelta": 2000, "maxQty": 1 },
+        { "id": "egg", "label": "계란", "priceDelta": 1000, "maxQty": 1 },
+        { "id": "tofu", "label": "두부 추가", "priceDelta": 1500, "maxQty": 1 },
+        { "id": "beef", "label": "우삼겹 추가", "priceDelta": 4000, "maxQty": 1 }
+      ]
+    }
+  },
+  "items": [
+    { "name": "생삼겹살", "category": "고기", "basePrice": 16000, "soldOut": false, "timeLimited": null, "optionGroups": [], "unit": "1인분 150g", "meat": true },
+    { "name": "숙성 목살", "category": "고기", "basePrice": 16000, "soldOut": false, "timeLimited": null, "optionGroups": [], "unit": "1인분 150g", "meat": true },
+    { "name": "항정살", "category": "고기", "basePrice": 18000, "soldOut": false, "timeLimited": null, "optionGroups": [], "unit": "1인분 130g", "meat": true },
+    { "name": "양념 돼지갈비", "category": "고기", "basePrice": 15000, "soldOut": false, "timeLimited": null, "optionGroups": [], "unit": "1인분 250g", "meat": true },
+    { "name": "소갈비살", "category": "고기", "basePrice": 24000, "soldOut": false, "timeLimited": null, "optionGroups": [], "unit": "1인분 130g", "meat": true },
+    { "name": "차돌박이", "category": "고기", "basePrice": 19000, "soldOut": true, "timeLimited": null, "optionGroups": [], "unit": "1인분 120g", "meat": true },
+    { "name": "우삼겹", "category": "고기", "basePrice": 17000, "soldOut": false, "timeLimited": null, "optionGroups": [], "unit": "1인분 150g", "meat": true },
+
+    { "name": "냉면", "category": "식사·면", "basePrice": 9000, "soldOut": false, "timeLimited": null, "optionGroups": ["noodle_style", "size_up"] },
+    { "name": "막국수", "category": "식사·면", "basePrice": 9000, "soldOut": false, "timeLimited": null, "optionGroups": ["noodle_style", "size_up"] },
+    { "name": "후식 냉면", "category": "식사·면", "basePrice": 5000, "soldOut": false, "timeLimited": null, "optionGroups": ["noodle_style"] },
+    { "name": "잔치국수", "category": "식사·면", "basePrice": 7000, "soldOut": false, "timeLimited": null, "optionGroups": ["size_up"] },
+    { "name": "공기밥", "category": "식사·면", "basePrice": 1000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "철판 볶음밥", "category": "식사·면", "basePrice": 4000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "열무 비빔밥", "category": "식사·면", "basePrice": 8000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+
+    { "name": "된장찌개", "category": "찌개", "basePrice": 8000, "soldOut": false, "timeLimited": null, "optionGroups": ["addins"] },
+    { "name": "김치찌개", "category": "찌개", "basePrice": 9000, "soldOut": false, "timeLimited": null, "optionGroups": ["spice", "addins"] },
+    { "name": "순두부찌개", "category": "찌개", "basePrice": 9000, "soldOut": false, "timeLimited": null, "optionGroups": ["spice", "addins"] },
+    { "name": "부대찌개 (2인분)", "category": "찌개", "basePrice": 19000, "soldOut": false, "timeLimited": null, "optionGroups": ["spice", "addins"] },
+    { "name": "갈비탕", "category": "찌개", "basePrice": 13000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+
+    { "name": "계란찜", "category": "사이드", "basePrice": 5000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "해물파전", "category": "사이드", "basePrice": 15000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "김치전", "category": "사이드", "basePrice": 11000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "도토리묵 무침", "category": "사이드", "basePrice": 10000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "쌈채소 추가", "category": "사이드", "basePrice": 3000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "계란말이", "category": "사이드", "basePrice": 9000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+
+    { "name": "소주", "category": "주류·음료", "basePrice": 5000, "soldOut": false, "timeLimited": null, "optionGroups": [], "alcohol": true },
+    { "name": "맥주 (병)", "category": "주류·음료", "basePrice": 5000, "soldOut": false, "timeLimited": null, "optionGroups": [], "alcohol": true },
+    { "name": "생맥주 500cc", "category": "주류·음료", "basePrice": 5500, "soldOut": false, "timeLimited": null, "optionGroups": [], "alcohol": true },
+    { "name": "막걸리", "category": "주류·음료", "basePrice": 6000, "soldOut": false, "timeLimited": null, "optionGroups": [], "alcohol": true },
+    { "name": "복분자주", "category": "주류·음료", "basePrice": 12000, "soldOut": false, "timeLimited": null, "optionGroups": [], "alcohol": true },
+    { "name": "콜라", "category": "주류·음료", "basePrice": 2500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "사이다", "category": "주류·음료", "basePrice": 2500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "제로 콜라", "category": "주류·음료", "basePrice": 2500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+
+    { "name": "식혜", "category": "디저트", "basePrice": 3000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "수정과", "category": "디저트", "basePrice": 3000, "soldOut": true, "timeLimited": null, "optionGroups": [] },
+    { "name": "바닐라 아이스크림", "category": "디저트", "basePrice": 2500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "인절미 빙수", "category": "디저트", "basePrice": 9000, "soldOut": false, "timeLimited": null, "optionGroups": [] }
+  ],
+  "promotions": [],
+  "staffCall": {
+    "button": "직원 호출",
+    "options": ["물", "냅킨", "물티슈", "불판 교체", "앞접시", "수저 세트"],
+    "type": "multi",
+    "min": 1,
+    "price": 0,
+    "addsToOrder": false
+  },
+  "languages": ["한국어", "English", "日本語", "中文"],
+  "holdoutOrders": [
+    {
+      "id": "h1",
+      "lines": [
+        { "item": "생삼겹살", "options": {}, "qty": 2 },
+        { "item": "공기밥", "options": {}, "qty": 1 },
+        { "item": "콜라", "options": {}, "qty": 1 }
+      ],
+      "orderTotal": 35500,
+      "expectedTotal": 35500,
+      "patterns": ["meat-portions", "first-meat-min-2", "one-tap-add", "order-sent-confirmation"]
+    },
+    {
+      "id": "h2",
+      "lines": [
+        { "item": "냉면", "options": { "noodle_style": ["mul"] }, "qty": 1 },
+        { "item": "냉면", "options": { "noodle_style": ["bibim"], "size_up": ["gopbaegi"] }, "qty": 1 },
+        { "item": "막국수", "options": { "noodle_style": ["bibim"] }, "qty": 1 }
+      ],
+      "orderTotal": 29000,
+      "expectedTotal": 29000,
+      "patterns": ["noodle-required-choice", "noodle-size-up", "same-item-different-options"]
+    },
+    {
+      "id": "h3",
+      "lines": [
+        { "item": "김치찌개", "options": { "spice": ["hot"], "addins": ["ramen", "cheese"] }, "qty": 1 },
+        { "item": "순두부찌개", "options": { "spice": ["mild"], "addins": ["egg"] }, "qty": 2 },
+        { "item": "공기밥", "options": {}, "qty": 2 }
+      ],
+      "orderTotal": 34500,
+      "expectedTotal": 34500,
+      "patterns": ["stew-spice-required", "stew-addins-max-2", "popup-quantity"]
+    },
+    {
+      "id": "h4",
+      "lines": [
+        { "item": "소주", "options": {}, "qty": 2 },
+        { "item": "맥주 (병)", "options": {}, "qty": 1 },
+        { "item": "양념 돼지갈비", "options": {}, "qty": 3 },
+        { "item": "계란찜", "options": {}, "qty": 1 }
+      ],
+      "orderTotal": 65000,
+      "expectedTotal": 65000,
+      "patterns": ["alcohol-age-confirm-yes", "meat-portions", "first-meat-min-2"]
+    },
+    {
+      "id": "h5",
+      "lines": [
+        { "item": "항정살", "options": {}, "qty": 2 },
+        { "item": "소갈비살", "options": {}, "qty": 2 },
+        { "item": "쌈채소 추가", "options": {}, "qty": 1 }
+      ],
+      "staffCall": ["물", "불판 교체"],
+      "orderTotal": 87000,
+      "expectedTotal": 87000,
+      "patterns": ["staff-call-free-not-in-order", "meat-portions"]
+    },
+    {
+      "id": "h6",
+      "language": "English",
+      "lines": [
+        { "item": "숙성 목살", "options": {}, "qty": 3 },
+        { "item": "된장찌개", "options": { "addins": ["tofu"] }, "qty": 1 },
+        { "item": "사이다", "options": {}, "qty": 2 }
+      ],
+      "orderTotal": 62500,
+      "expectedTotal": 62500,
+      "patterns": ["language-switch-en", "stew-addins-without-spice", "meat-portions"]
+    },
+    {
+      "id": "h7",
+      "startsAfter": ["h1"],
+      "lines": [
+        { "item": "우삼겹", "options": {}, "qty": 1 },
+        { "item": "후식 냉면", "options": { "noodle_style": ["mul"] }, "qty": 2 },
+        { "item": "생맥주 500cc", "options": {}, "qty": 1 }
+      ],
+      "orderTotal": 32500,
+      "expectedTotal": 68000,
+      "patterns": ["additional-order-running-table-total", "extra-meat-1-portion-allowed-after-first-meat-order", "alcohol-age-confirm-yes", "order-history"]
+    },
+    {
+      "id": "h8",
+      "lines": [
+        { "item": "부대찌개 (2인분)", "options": { "spice": ["xhot"], "addins": ["ramen", "beef"] }, "qty": 1 },
+        { "item": "잔치국수", "options": { "size_up": ["gopbaegi"] }, "qty": 1 },
+        { "item": "해물파전", "options": {}, "qty": 1 },
+        { "item": "막걸리", "options": {}, "qty": 2 }
+      ],
+      "orderTotal": 60500,
+      "expectedTotal": 60500,
+      "patterns": ["stew-addins-max-2", "noodle-size-up", "alcohol-age-confirm-yes"]
+    },
+    {
+      "id": "h9",
+      "language": "日本語",
+      "lines": [
+        { "item": "생삼겹살", "options": {}, "qty": 2 },
+        { "item": "항정살", "options": {}, "qty": 1 },
+        { "item": "열무 비빔밥", "options": {}, "qty": 1 },
+        { "item": "식혜", "options": {}, "qty": 2 },
+        { "item": "바닐라 아이스크림", "options": {}, "qty": 1 }
+      ],
+      "orderTotal": 66500,
+      "expectedTotal": 66500,
+      "patterns": ["language-switch-ja", "first-meat-min-2-counts-cart-total", "desserts"]
+    },
+    {
+      "id": "h10",
+      "language": "中文",
+      "startsAfter": ["h4"],
+      "lines": [
+        { "item": "김치찌개", "options": { "spice": ["medium"] }, "qty": 1 },
+        { "item": "철판 볶음밥", "options": {}, "qty": 2 },
+        { "item": "인절미 빙수", "options": {}, "qty": 1 },
+        { "item": "복분자주", "options": {}, "qty": 1 }
+      ],
+      "orderTotal": 38000,
+      "expectedTotal": 103000,
+      "patterns": ["language-switch-zh", "additional-order-running-table-total", "stew-spice-required", "alcohol-age-confirm-yes"]
+    }
+  ],
+  "quirks": [
+    "expectedTotal is the '테이블 총 주문금액' shown on the order-sent confirmation screen right after the holdout is sent; orderTotal is that order's own '이번 주문 금액'. Each holdout starts from a freshly loaded page (empty table) unless 'startsAfter' lists holdouts that were sent first in the same session; then expectedTotal includes them.",
+    "Nothing is charged at the table. The flow ends at the order-sent confirmation; '결제는 카운터에서 해주세요' is shown in the cart, review, confirmation and history.",
+    "For meat, qty means 인분 (portions). The 인분 stepper starts at 1인분 and goes up in steps of 1.",
+    "First meat order rule: until an order containing meat has been sent, the meat portions in the 주문 담기 list (all meat items together) must reach 2. Tapping '주문 담기' in a meat popup when (meat already in the list + this amount) < 2 shows the inline error '첫 고기 주문은 2인분 이상부터 가능합니다' and nothing is added. If the list is later reduced below 2 meat portions, tapping '주문하기' shows the same message in an '알림' popup. Once a meat order has been sent, 1인분 additions are allowed.",
+    "Because the check counts the list, 2인분 of one meat followed by 1인분 of another is accepted (h9), but 1인분 as the first meat line is rejected.",
+    "Items without options (sides, rice, drinks, desserts) are added with a single tap (qty 1, toast '… 담았습니다'); more units are added by tapping again or with '+' in the 주문 담기 list. Meat, noodles and stews open a popup.",
+    "Alcohol (소주, 맥주 (병), 생맥주 500cc, 막걸리, 복분자주; marked with a red '19' badge) asks '만 19세 이상이십니까?' on the first alcohol tap of the session. '예' adds the drink and is remembered until the page is reloaded; '아니오' adds nothing and shows '만 19세 미만은 주류를 주문할 수 없습니다'. The question is asked again on the next alcohol tap after '아니오'.",
+    "Stew add-ins (추가 재료) allow at most 2; a third tap shows '최대 2개까지 선택할 수 있습니다' and is ignored. Tapping a selected add-in removes it.",
+    "Required groups (물/비빔 선택, 맵기 선택) have no default; '주문 담기' without them shows '필수 옵션을 선택해 주세요: <group>'. 된장찌개 and 갈비탕 have no spice level.",
+    "곱빼기 is a checkbox-style option (+2,000원) on 냉면, 막국수 and 잔치국수; 후식 냉면 has no size-up.",
+    "Identical item + options merge into one line in 주문 담기; different options make separate lines. The '−' in the list stops at 1; '✕' removes the line; '전체 삭제' asks for confirmation.",
+    "직원 호출 (header and attract screen) opens its own popup with 물, 냅킨, 물티슈, 불판 교체, 앞접시, 수저 세트 (multi-select, at least one; otherwise '요청할 항목을 선택해 주세요'). '호출하기' only shows a toast; requests are free and never appear in 주문 담기, the order, the history or any total.",
+    "Sold-out items (차돌박이, 수정과) show a '품절' cover; tapping shows the toast '품절된 메뉴입니다' and nothing is added.",
+    "The language button opens a popup with 한국어 / English / 日本語 / 中文. Category, item, option and UI labels change; prices stay in the form '16,000원' in every language. The brand name stays '달무리화로'. The 주문 담기 list and sent orders are kept when the language changes.",
+    "The order-sent confirmation screen does not time out; '추가 주문하기' returns to the menu, '주문 내역 보기' opens the history.",
+    "The header '주문 내역' button shows the running table total (0원 before the first order).",
+    "Toasts disappear after about 2 seconds; nothing else depends on time."
+  ]
+}

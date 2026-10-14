@@ -1,0 +1,139 @@
+bk7-bubbletea self-check  2026-10-14T01:09:22.260Z
+app: file:///private/tmp/claude-501/-Users-sungmincho-mac-Desktop-sm-apps-kibo/5e4077f3-a03e-418a-bb20-c3c1f77daf49/scratchpad/sealed/bk7-bubbletea/app/index.html
+[1] answer key vs app/menu.js
+  ok   item count 31 == 31
+  ok   category 밀크티 has 7 items
+  ok   category 과일티 has 6 items
+  ok   category 치즈폼 has 5 items
+  ok   category 커피 has 5 items
+  ok   category 스낵 has 5 items
+  ok   category 겨울 시즌 has 3 items
+  ok   set discount matches
+  ok   take-out cup fee matches
+  ok   items/groups/options match
+[2] holdout totals recomputed from the answer key
+  ok   h1 6,000원 == expected 6,000원
+  ok   h2 10,000원 == expected 10,000원
+  ok   h3 7,400원 == expected 7,400원
+  ok   h4 6,900원 == expected 6,900원
+  ok   h5 8,500원 == expected 8,500원
+  ok   h6 12,700원 == expected 12,700원
+  ok   h7 10,900원 == expected 10,900원
+  ok   h8 12,600원 == expected 12,600원
+  ok   h9 16,400원 == expected 16,400원
+  ok   h10 16,700원 == expected 16,700원
+[3] h1 (eatIn, ko) — 타로 밀크티 x1
+  ok   h1 담기 before required choices shows "⚠ 필수 옵션을 선택해 주세요: 얼음량"
+  ok   h1 option button shows 6,000원 for 타로 밀크티 ("6,000원 담기")
+  ok   h1 stamp popup appeared after first add and was dismissed
+  ok   h1 no popup left after adding 타로 밀크티
+  ok   h1 cart 합계 6,000원 == 6,000원
+  ok   h1 review 총 결제 금액 6,000원 == expected 6,000원
+  ok   h1 payment screen 결제하실 금액 6,000원 == expected 6,000원
+  ok   h1 no page errors
+[3] h2 (takeOut, ko) — 자몽 그린티 x2
+  ok   h2 HOT hides the 얼음량 group
+  ok   h2 option button shows 9,600원 for 자몽 그린티 ("9,600원 담기")
+  ok   h2 stamp popup appeared after first add and was dismissed
+  ok   h2 no popup left after adding 자몽 그린티
+  ok   h2 cart 합계 10,000원 == 10,000원
+  ok   h2 review 총 결제 금액 10,000원 == expected 10,000원
+  ok   h2 payment screen 결제하실 금액 10,000원 == expected 10,000원
+  ok   h2 no page errors
+[3] h3 (eatIn, ko) — 얼그레이 밀크티 x1
+  ok   h3 4th topping rejected: "⚠ 토핑은 최대 3개까지 선택할 수 있어요."
+  ok   h3 two sold-out toppings are disabled
+  ok   h3 option button shows 7,400원 for 얼그레이 밀크티 ("7,400원 담기")
+  ok   h3 stamp popup appeared after first add and was dismissed
+  ok   h3 no popup left after adding 얼그레이 밀크티
+  ok   h3 cart 합계 7,400원 == 7,400원
+  ok   h3 review 총 결제 금액 7,400원 == expected 7,400원
+  ok   h3 payment screen 결제하실 금액 7,400원 == expected 7,400원
+  ok   h3 no page errors
+[3] h4 (eatIn, ko) — 흑당 펄 밀크티 x1
+  ok   h4 option button shows 5,200원 for 흑당 펄 밀크티 ("5,200원 담기")
+  ok   h4 set step 3 shows set price 6,900원
+  ok   h4 empty phone number shows error
+  ok   h4 stamp popup appeared after first add and was dismissed
+  ok   h4 no popup left after adding 흑당 펄 밀크티
+  ok   h4 cart 합계 6,900원 == 6,900원
+  ok   h4 review shows masked stamp number
+  ok   h4 review 총 결제 금액 6,900원 == expected 6,900원
+  ok   h4 payment screen 결제하실 금액 6,900원 == expected 6,900원
+  ok   h4 no page errors
+[3] h5 (takeOut, ko) — 카페라떼 x1
+  ok   h5 HOT hides the 얼음량 group on coffee
+  ok   h5 option button shows 5,300원 for 카페라떼 ("5,300원 담기")
+  ok   h5 set step 2 without snack shows error
+  ok   h5 set step 3 shows set price 8,300원
+  ok   h5 stamp popup appeared after first add and was dismissed
+  ok   h5 no popup left after adding 카페라떼
+  ok   h5 cart 합계 8,500원 == 8,500원
+  ok   h5 review 총 결제 금액 8,500원 == expected 8,500원
+  ok   h5 payment screen 결제하실 금액 8,500원 == expected 8,500원
+  ok   h5 no page errors
+[3] h6 (eatIn, en) — 망고 우롱티 x1, 지파이 x1
+  ok   h6 option button shows 6,800원 for 망고 우롱티 ("Add 6,800원")
+  ok   h6 stamp popup appeared after first add and was dismissed
+  ok   h6 no popup left after adding 망고 우롱티
+  ok   h6 option button shows 5,900원 for 지파이 ("Add 5,900원")
+  ok   h6 no popup left after adding 지파이
+  ok   h6 cart 합계 12,700원 == 12,700원
+  ok   h6 review is in English
+  ok   h6 review 총 결제 금액 12,700원 == expected 12,700원
+  ok   h6 payment screen 결제하실 금액 12,700원 == expected 12,700원
+  ok   h6 no page errors
+[3] h7 (takeOut, ko) — 아메리카노 x2, 누가크래커 x1
+  ok   h7 option button shows 3,500원 for 아메리카노 ("3,500원 담기")
+  ok   h7 stamp popup appeared after first add and was dismissed
+  ok   h7 no popup left after adding 아메리카노
+  ok   h7 cart + raised 아메리카노 to 2
+  ok   h7 option button shows 3,500원 for 누가크래커 ("3,500원 담기")
+  ok   h7 no popup left after adding 누가크래커
+  ok   h7 cart 합계 10,900원 == 10,900원
+  ok   h7 review 총 결제 금액 10,900원 == expected 10,900원
+  ok   h7 payment screen 결제하실 금액 10,900원 == expected 10,900원
+  ok   h7 no page errors
+[3] h8 (eatIn, ko) — 군고구마 밀크티 x1, 치즈폼 딸기 그린티 x1
+  ok   h8 HOT ONLY item has no 온도/얼음량 groups
+  ok   h8 option button shows 6,800원 for 군고구마 밀크티 ("6,800원 담기")
+  ok   h8 stamp popup appeared after first add and was dismissed
+  ok   h8 no popup left after adding 군고구마 밀크티
+  ok   h8 option button shows 5,800원 for 치즈폼 딸기 그린티 ("5,800원 담기")
+  ok   h8 no popup left after adding 치즈폼 딸기 그린티
+  ok   h8 cart 합계 12,600원 == 12,600원
+  ok   h8 review 총 결제 금액 12,600원 == expected 12,600원
+  ok   h8 payment screen 결제하실 금액 12,600원 == expected 12,600원
+  ok   h8 no page errors
+[3] h9 (takeOut, ko) — 패션후르츠 그린티 x2
+  ok   h9 option button shows 10,600원 for 패션후르츠 그린티 ("10,600원 담기")
+  ok   h9 set step 3 shows set price 16,000원
+  ok   h9 stamp popup appeared after first add and was dismissed
+  ok   h9 no popup left after adding 패션후르츠 그린티
+  ok   h9 cart 합계 16,400원 == 16,400원
+  ok   h9 review 총 결제 금액 16,400원 == expected 16,400원
+  ok   h9 payment screen 결제하실 금액 16,400원 == expected 16,400원
+  ok   h9 no page errors
+[3] h10 (takeOut, ko) — 치즈폼 우롱티 x1, 원앙 커피 밀크티 x1, 펑리수 x2
+  ok   h10 option button shows 6,500원 for 치즈폼 우롱티 ("6,500원 담기")
+  ok   h10 stamp popup appeared after first add and was dismissed
+  ok   h10 no popup left after adding 치즈폼 우롱티
+  ok   h10 option button shows 4,800원 for 원앙 커피 밀크티 ("4,800원 담기")
+  ok   h10 no popup left after adding 원앙 커피 밀크티
+  ok   h10 option button shows 5,000원 for 펑리수 ("5,000원 담기")
+  ok   h10 no popup left after adding 펑리수
+  ok   h10 delete asks "'클래식 밀크티' 메뉴를 삭제하시겠습니까?"
+  ok   h10 cancel keeps the line
+  ok   h10 confirm removes the line
+  ok   h10 cart 합계 16,300원 == 16,300원
+  ok   h10 switching to 포장 on review adds the cup-fee line
+  ok   h10 review 총 결제 금액 16,700원 == expected 16,700원
+  ok   h10 payment screen 결제하실 금액 16,700원 == expected 16,700원
+  ok   h10 no page errors
+[4] misc popups and errors
+  ok   empty-cart 주문하기 shows error popup
+  ok   sold-out item shows 품절 popup
+  ok   처음으로 with empty cart returns to attract
+
+holdouts placed in the app with matching totals: 10/10 (h1, h2, h3, h4, h5, h6, h7, h8, h9, h10)
+RESULT: PASS

@@ -1,0 +1,64 @@
+bk8-tableorder self-check — 2026-10-14
+app: file:///private/tmp/claude-501/-Users-sungmincho-mac-Desktop-sm-apps-kibo/5e4077f3-a03e-418a-bb20-c3c1f77daf49/scratchpad/sealed/bk8-tableorder/app/index.html
+holdouts placed through the UI: 10/10 totals match answer-key.json
+overall: PASS
+
+== answer key vs app data ==
+PASS  item count  — app 37, key 37
+PASS  category count  — app 6, key 6
+PASS  category 고기  — app 7, key 7
+PASS  category 식사·면  — app 7, key 7
+PASS  category 찌개  — app 5, key 5
+PASS  category 사이드  — app 6, key 6
+PASS  category 주류·음료  — app 8, key 8
+PASS  category 디저트  — app 4, key 4
+PASS  items (name, price, soldOut, category, groups, alcohol, meat)
+PASS  option groups
+PASS  h1 arithmetic  — order 35,500원, table 35,500원
+PASS  h2 arithmetic  — order 29,000원, table 29,000원
+PASS  h3 arithmetic  — order 34,500원, table 34,500원
+PASS  h4 arithmetic  — order 65,000원, table 65,000원
+PASS  h5 arithmetic  — order 87,000원, table 87,000원
+PASS  h6 arithmetic  — order 62,500원, table 62,500원
+PASS  h7 arithmetic  — order 32,500원, table 68,000원
+PASS  h8 arithmetic  — order 60,500원, table 60,500원
+PASS  h9 arithmetic  — order 66,500원, table 66,500원
+PASS  h10 arithmetic  — order 38,000원, table 103,000원
+== holdout orders placed through the UI ==
+PASS  h1 placed via UI  — review 35,500원, this order 35,500원, table total 35,500원; key 35,500원 / 35,500원
+PASS  h1 history  — total 35,500원, orders 1
+PASS  h2 placed via UI  — review 29,000원, this order 29,000원, table total 29,000원; key 29,000원 / 29,000원
+PASS  h2 history  — total 29,000원, orders 1
+PASS  h3 placed via UI  — review 34,500원, this order 34,500원, table total 34,500원; key 34,500원 / 34,500원
+PASS  h3 history  — total 34,500원, orders 1
+PASS  h4 placed via UI  — review 65,000원, this order 65,000원, table total 65,000원; key 65,000원 / 65,000원
+PASS  h4 history  — total 65,000원, orders 1
+PASS  h5 staff call is free  — toast "직원을 호출했습니다 · 물, 불판 교체", cart 87,000원 -> 87,000원
+PASS  h5 placed via UI  — review 87,000원, this order 87,000원, table total 87,000원; key 87,000원 / 87,000원
+PASS  h5 history  — total 87,000원, orders 1, staff items in history: false
+PASS  h6 placed via UI (English)  — review 62,500원, this order 62,500원, table total 62,500원; key 62,500원 / 62,500원
+PASS  h6 history  — total 62,500원, orders 1
+PASS  h7 placed via UI after h1  — review 32,500원, this order 32,500원, table total 68,000원; key 32,500원 / 68,000원
+PASS  h7 history  — total 68,000원, orders 2
+PASS  h8 placed via UI  — review 60,500원, this order 60,500원, table total 60,500원; key 60,500원 / 60,500원
+PASS  h8 history  — total 60,500원, orders 1
+PASS  h9 placed via UI (日本語)  — review 66,500원, this order 66,500원, table total 66,500원; key 66,500원 / 66,500원
+PASS  h9 history  — total 66,500원, orders 1
+PASS  h10 placed via UI (中文) after h4  — review 38,000원, this order 38,000원, table total 103,000원; key 38,000원 / 103,000원
+PASS  h10 history  — total 103,000원, orders 2
+== popups, confirmations and errors ==
+PASS  first meat 1인분 shows error, nothing added  — 첫 고기 주문은 2인분 이상부터 가능합니다
+PASS  meat 2인분 accepted  — 32,000원
+PASS  list reduced to 1인분 blocks 주문하기 with notice  — ! / 알림 / 첫 고기 주문은 2인분 이상부터 가능합니다 / 확인
+PASS  전체 삭제 asks for confirmation and empties the list
+PASS  empty 주문하기 shows error toast
+PASS  sold-out item cannot be added
+PASS  noodle without 물/비빔 shows required error
+PASS  third add-in rejected (max 2)  — 최대 2개까지 선택할 수 있습니다, selected 2
+PASS  stew without spice shows required error
+PASS  alcohol 아니오 adds nothing  — ! / 알림 / 만 19세 미만은 주류를 주문할 수 없습니다 / 확인
+PASS  alcohol 예 adds; remembered for the session  — 11,000원
+PASS  staff call without selection shows error  — 요청할 항목을 선택해 주세요
+PASS  language switch changes labels, keeps "16,000원" and the list  — 🥓 BEST Fresh Pork Belly150g 16,000원/portion | 🥓 BEST 鲜五花肉150g 16,000원/1人份
+PASS  attract screen language button (stays on attract)
+PASS  no page errors
