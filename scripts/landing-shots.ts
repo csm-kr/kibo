@@ -1,29 +1,16 @@
-import { spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { mkdirSync, statSync, writeFileSync } from "node:fs";
 import { chromium, type Page } from "@playwright/test";
+import { sheetsSettled, startShotsServer } from "./shotsServer";
 
-// Real product screenshots for the landing page (`npm run shots:landing`). Starts its own dev server with the
-// in-memory store, drives every state through the API the way the E2E specs do (no model calls), and writes
+// Real product screenshots for the landing page (`npm run shots:landing`). Starts the local production build with the
+// in-memory store (scripts/shotsServer.ts; `SHOTS_DEV=1` for a dev server), drives every state through the API the way the E2E specs do (no model calls), and writes
 // .webp files to public/landing/. Never mockups: every image is the running app.
 
-const PORT = 3300;
-const BASE = `http://localhost:${PORT}`;
+let BASE = "";
 const OUT = "public/landing";
 /** Each image must stay under this size (the step's budget). */
 const MAX_BYTES = 300 * 1024;
-
-async function waitForServer() {
-  for (let i = 0; i < 240; i++) {
-    try {
-      if ((await fetch(`${BASE}/api/health`)).ok) return;
-    } catch {
-      // Not listening yet.
-    }
-    await new Promise((r) => setTimeout(r, 500));
-  }
-  throw new Error("dev server did not start");
-}
 
 async function api<T>(path: string, body: object, token?: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
@@ -51,6 +38,7 @@ const heroLines = [
 async function settled(page: Page) {
   await page.evaluate(() => document.fonts.ready);
   await page.waitForFunction(() => [...document.images].every((img) => img.complete && img.naturalWidth > 0));
+  await sheetsSettled(page);
 }
 
 /** Re-encodes a PNG screenshot as WebP at the given size, in the browser's own encoder (no extra dependency). */
@@ -80,14 +68,10 @@ async function saveWebp(encoder: Page, png: Buffer, name: string, width: number,
 
 async function main() {
   mkdirSync(OUT, { recursive: true });
-  const server = spawn("npx", ["next", "dev", "--port", String(PORT)], {
-    env: { ...process.env, STORE: "memory", KIBO_DEV_CACHE: "off" },
-    stdio: "ignore",
-    detached: true,
-  });
+  const server = await startShotsServer();
+  BASE = server.base;
   const browser = await chromium.launch();
   try {
-    await waitForServer();
     const encoder = await browser.newPage();
 
     // Kiosk: K1 attract with the QR, then K3 with the AI highlight right after the phone's two lines.
@@ -118,8 +102,9 @@ async function main() {
     // Taken inside the 2 s highlight of the second line.
     await kiosk.locator(".k-ring").first().waitFor();
     await settled(kiosk);
-    // Below the header, right of the category rail: the "AI가 담았어요" line and the ringed tile.
-    const highlight = { x: 260, y: 144, width: 820, height: 615 };
+    // Below the header, full width so KIBO's English subtitle row is whole (14-final:0): the "AI가 담았어요" line, the
+    // subtitle and the ringed tile, 4:3.
+    const highlight = { x: 0, y: 144, width: 1080, height: 810 };
     await saveWebp(encoder, await kiosk.screenshot({ clip: highlight }), "kiosk-ai-highlight", 820, 615);
     await kioskCtx.close();
 
@@ -222,7 +207,7 @@ async function main() {
     await learnedCtx.close();
   } finally {
     await browser.close();
-    if (server.pid) process.kill(-server.pid);
+    server.stop();
   }
 }
 

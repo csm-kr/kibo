@@ -1,13 +1,12 @@
-import { spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { mkdirSync, statSync, writeFileSync } from "node:fs";
-import { createServer } from "node:net";
 import { join } from "node:path";
 import { chromium, type Browser, type BrowserContextOptions, type Page } from "@playwright/test";
 import sharp from "sharp";
+import { sheetsSettled, startShotsServer } from "./shotsServer";
 
-// Real captures for the submission deck (`npm run shots:deck`, docs/plan/DECK_FACTS.md). Starts its own dev server
-// with the in-memory store and writes PNGs (and the architecture SVG) to docs/assets/deck/. Slot 7 wireframes are
+// Real captures for the submission deck (`npm run shots:deck`, docs/plan/DECK_FACTS.md). Starts the local production
+// build with the in-memory store (scripts/shotsServer.ts; `SHOTS_DEV=1` for a dev server) and writes PNGs (and the architecture SVG) to docs/assets/deck/. Slot 7 wireframes are
 // driven through the API like scripts/landing-shots.ts (no model). Slot 11 /demo snapshots tap a scenario's first
 // sentence, which goes to real Gemini through /api/chat, so "What the AI did" lists real tool calls. Never mockups.
 
@@ -16,29 +15,6 @@ const OUT = "docs/assets/deck";
 const MAX_BYTES = 600 * 1024;
 const MODEL_TIMEOUT_MS = 90_000;
 let BASE = "";
-
-function freePort(): Promise<number> {
-  return new Promise((resolve, reject) => {
-    const srv = createServer();
-    srv.once("error", reject);
-    srv.listen(0, () => {
-      const addr = srv.address();
-      srv.close(() => (typeof addr === "object" && addr ? resolve(addr.port) : reject(new Error("no port"))));
-    });
-  });
-}
-
-async function waitForServer() {
-  for (let i = 0; i < 240; i++) {
-    try {
-      if ((await fetch(`${BASE}/api/health`)).ok) return;
-    } catch {
-      // Not listening yet.
-    }
-    await new Promise((r) => setTimeout(r, 500));
-  }
-  throw new Error("dev server did not start");
-}
 
 /** Own addresses for the dev server's per-IP limits (R-005). */
 const xff = (n: number) => ({ "X-Forwarded-For": `192.0.2.${150 + n}` });
@@ -69,6 +45,7 @@ const heroLines = [
 async function settled(page: Page) {
   await page.evaluate(() => document.fonts.ready);
   await page.waitForFunction(() => [...document.images].every((img) => img.complete && img.naturalWidth > 0), null, { timeout: 15_000 });
+  await sheetsSettled(page);
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
 }
 
@@ -244,16 +221,11 @@ async function warm(browser: Browser) {
 
 async function main() {
   mkdirSync(OUT, { recursive: true });
-  BASE = `http://localhost:${await freePort()}`;
-  const server = spawn("npx", ["next", "dev", "--port", BASE.split(":").pop() ?? ""], {
-    env: { ...process.env, STORE: "memory", KIBO_DEV_CACHE: "off" },
-    stdio: "ignore",
-    detached: true,
-  });
+  const server = await startShotsServer();
+  BASE = server.base;
   const browser = await chromium.launch();
   try {
-    await waitForServer();
-    await warm(browser);
+    if (server.mode === "dev") await warm(browser);
     await phoneWireframes(browser);
     await kioskWireframes(browser);
     await architecture(browser);
@@ -262,7 +234,7 @@ async function main() {
     await demoSnapshot(browser, 4, "doughhouse", "learned-pizza", true);
   } finally {
     await browser.close();
-    if (server.pid) process.kill(-server.pid);
+    server.stop();
   }
 }
 

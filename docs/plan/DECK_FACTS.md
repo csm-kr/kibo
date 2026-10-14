@@ -4,7 +4,7 @@ Not injected into harness steps (lives under `docs/plan/`). For the deck owner: 
 
 **Status:** **measured** = a saved result file in the repo; **design** = what the code and docs do (cite the file, not a number); **unverified** = not checked, say so on the slide or leave it out (R-001). Numbers come only from `evidence/*`, `evals/results/*`, `spikes/*/results/*` and the evidence ledger in `docs/TESTING.md`. No OpenAI numbers in public material; no claim of legal compliance; no pricing or sales pitch (T&C).
 
-Pictures: real captures in `docs/assets/deck/` (`npm run shots:deck`, `scripts/deck-shots.ts`). Never mockups.
+Pictures: real captures in `docs/assets/deck/` (`npm run shots:deck`, `scripts/deck-shots.ts`). Never mockups. All retaken 10-14 (14-final:8) from the local production build of the final UI, each under 600 KB; video stills are in `videos/footage/2026-10-14/` (git-ignored, `docs/plan/FOOTAGE.md`).
 
 ## 1 Team
 | Fact | Source | Status |
@@ -50,11 +50,13 @@ Real screens, not drawings. MALO hero order (two cheeseburger sets, one without 
 | `docs/assets/deck/wireframe-phone-P3-talk.png` | Phone talk screen with the two lines and total | measured (capture) |
 | `docs/assets/deck/wireframe-phone-P4-confirm.png` | Phone confirm card: total and [Yes, pay now] fixed at the bottom | measured (capture) |
 | `docs/assets/deck/wireframe-phone-P6-order-number.png` | Phone order number | measured (capture) |
-| `docs/assets/deck/wireframe-kiosk-K1-attract.png` | Kiosk attract screen with the QR | measured (capture) |
-| `docs/assets/deck/wireframe-kiosk-K3-menu-ai-added.png` | Kiosk menu inside the 2 s "AI가 담았어요" highlight | measured (capture) |
+| `docs/assets/deck/wireframe-kiosk-K1-attract.png` | Kiosk attract screen with the QR, the short address `kibo-2026.web.app` and the 6-digit code | measured (capture) |
+| `docs/assets/deck/wireframe-kiosk-K3-menu-ai-added.png` | Kiosk menu inside the 2 s "AI가 담았어요" highlight, with KIBO's English subtitle row ("AI added: …") | measured (capture) |
 | `docs/assets/deck/wireframe-kiosk-K6-review.png` | Kiosk order review | measured (capture) |
+| `videos/footage/2026-10-14/two-device-1440x900--phone--06-paying.png`, `two-device-1440x900--06-paying.png` | The pay step (I-146): the phone says "Insert your card into the kiosk", the laptop kiosk shows its payment screen and the step in English | measured (footage still) |
+| `videos/footage/2026-10-14/two-device-1440x900--phone--02-code-typed.png` | Connecting without a camera: the kiosk's 6-digit code typed on the phone's `/app` | measured (footage still) |
 
-Phone captures are 390×844 CSS px at 2×; kiosk captures are the 1080×1920 canvas scaled to 1080 px high. Kiosk text is Korean: add English captions on the slide.
+Phone captures are 390×844 CSS px at 2×; kiosk captures are the 1080×1920 canvas scaled to 1080 px high. Kiosk text is Korean: add English captions on the slide (the K3 subtitle row already carries one). In the K3 picture the second cart chip is cut at the right edge (a sideways-scrolling row, I-244) and the subtitle names only the second set (I-243): crop above the cart bar or caption it.
 
 ## 8 Architecture
 | Fact | Source | Status |
@@ -71,7 +73,7 @@ Phone captures are 390×844 CSS px at 2×; kiosk captures are the 1080×1920 can
 | Text agent on the Gemini API key, falling back once per call to Vertex AI on 402, 429 or 5xx | ADR-011; `src/lib/agent/model.ts` | design (fallback unit-tested only, not exercised live) |
 | Firestore transactions serialize touch and AI changes at the same moment; idempotent `commandId` | `docs/ARCHITECTURE.md` "`/api/command` processing order" | design |
 | Next.js (App Router, TypeScript strict), Playwright, Vitest | `package.json` | design |
-| 748 unit tests (747 passed, 1 skipped) on 10-13 | `npm run test` run in 10-assets:1; no saved log | **unverified** as a saved result: re-run and save the output before quoting |
+| 1,082 unit tests (1,081 passed, 1 skipped) on 10-14 | `npm run test` run in 14-final:8; no saved log | **unverified** as a saved result: re-run and save the output before quoting |
 
 ## 10 Cost
 | Fact | Source | Status |
@@ -92,8 +94,10 @@ Real `/demo` at 1920×1080 (2×) after the first sentence of a scenario, sent to
 |---|---|---|
 | `docs/assets/deck/snapshot-demo-malo-1920x1080.png` | Burger kiosk, phone and scenario guide after the hero sentence | measured (capture) |
 | `docs/assets/deck/snapshot-demo-airport_rail-1920x1080.png` | Airport rail ticket machine after "Two adult tickets to City Center" | usable: the AI's reply offers a window or aisle seat, which is the express ticket's optional `seat` group in `data/kiosks/airport_rail.json` (an earlier note here was a false positive, I-072) |
-| `docs/assets/deck/snapshot-demo-doughhouse-1920x1080.png` | Learned pizza kiosk, the bridge entered the line | measured (capture); the learned page itself is unchanged third-party text drawn at about 0.5×, unreadable at slide size (I-096): let the phone and "What the AI did" carry the slide, or add a caption |
+| `docs/assets/deck/snapshot-demo-doughhouse-1920x1080.png` | Learned pizza kiosk (our development kiosk, restyled), the bridge entered the line; KIBO's strip under it names the taps and "kiosk total 23,400원 ✓ matches" | measured (capture); the page is drawn about 0.5× in `/demo`, so let KIBO's strip, the phone and "What the AI did" carry the slide (R-013) |
 | `docs/assets/deck/snapshot-demo-malo-guide-and-ai-actions.png` | Scenario guide and "What the AI did" close up | measured (capture) |
+| `videos/footage/2026-10-14/learned-replay-1440x900--03-tapping.png`, `--04-matches.png` | `/learned/doughhouse` at 1440×900 (page about 0.8×): a numbered tap mark mid-replay, then the verified line | measured (footage still) |
+| `videos/footage/2026-10-14/demo-lang-<code>-1920x1080--02-reply.png` | The Korean kiosk with the phone's AI answering in Japanese, Chinese, Spanish, Vietnamese, French, Thai or Indonesian (typed) | measured (footage still); say "typed", spoken input untested |
 
 The model's reply text differs per capture. Read it before using a picture: a reply that offers something not in the kiosk data (popularity or taste words, a choice the item has no option group for) must not go on a slide (I-072).
 
