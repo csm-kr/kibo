@@ -303,6 +303,26 @@ describe("payment safety", () => {
     expect(confirm(s, "phone", "button", T0 + 2000).session.status).toBe("paying");
   });
 
+  it("confirmTapOnly: an AI confirm that would pass is refused with the tap message; a tap and the kiosk still confirm", () => {
+    const s = phoneConfirming();
+    const tapOnly = (actor: Actor, now: number) => ({ ...ctx(actor, now), confirmTapOnly: true });
+    const ai = cmd("confirmCheckout", {}, { source: "voice", utteranceSeq: 4, cartVersion: s.cartVersion });
+    const refused = catchError(() => applyCommand(s, ai, tapOnly("phone", T0 + 3600)));
+    expect(refused.code).toBe("CONFLICT");
+    expect(refused.message).toBe("Please confirm on the card.");
+    const tap = cmd("confirmCheckout", {}, { source: "button", cartVersion: s.cartVersion });
+    expect(applyCommand(s, tap, tapOnly("phone", T0 + 2000)).session.status).toBe("paying");
+    const kiosk = applyCommand(ordering(), cmd("requestCheckout"), ctx("kiosk")).session;
+    const touch = cmd("confirmCheckout", {}, { cartVersion: kiosk.cartVersion });
+    expect(applyCommand(kiosk, touch, tapOnly("kiosk", T0 + 1000)).session.status).toBe("paying");
+  });
+
+  it("confirmTapOnly off (the default) keeps the AI confirm after a new utterance", () => {
+    const s = phoneConfirming();
+    const ai = cmd("confirmCheckout", {}, { source: "text", utteranceSeq: 4, cartVersion: s.cartVersion });
+    expect(applyCommand(s, ai, { ...ctx("phone", T0 + 3600), confirmTapOnly: false }).session.status).toBe("paying");
+  });
+
   it("a kiosk confirm must come from touch", () => {
     const s = applyCommand(ordering(), cmd("requestCheckout"), ctx("kiosk")).session;
     expect(catchError(() => confirm(s, "kiosk", "voice", T0 + 10000, { utteranceSeq: 9 })).code).toBe("BAD_REQUEST");

@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { CommandError, HTTP_STATUS } from "@/lib/commands/errors";
 import { SESSION_TTL_MS } from "@/lib/commands/session";
 import { MemoryStore } from "@/lib/store/memory";
@@ -280,6 +280,27 @@ describe("runCommand", () => {
     expect(retry.result?.claimToken).toBeUndefined();
     const staff = body(sessionId, "callStaff", { reasonCode: "stuck" }, { source: "button" });
     expect((await runCommand(store, { body: staff, bearer: deviceToken }, T0 + 7)).status).toBe("paying");
+  });
+
+  it("CONFIRM_TAP_ONLY=1 refuses an AI confirm after a new utterance; unset it is accepted", async () => {
+    const aiConfirm = async () => {
+      const { store, sessionId, claimToken } = await setup();
+      const { deviceToken } = await claimSession(store, { sessionId, claimToken }, T0);
+      const run = (type: string, args: object, extra: Record<string, unknown>, at: number) =>
+        runCommand(store, { body: body(sessionId, type, args, { source: "text", ...extra }), bearer: deviceToken }, at);
+      await run("setDineOption", { option: "eat_in" }, { utteranceSeq: 1 }, T0 + 1);
+      const added = await run("addToCart", SET_ORDER, { utteranceSeq: 1 }, T0 + 1);
+      await run("requestCheckout", {}, { utteranceSeq: 1 }, T0 + 2);
+      return run("confirmCheckout", {}, { utteranceSeq: 2, cartVersion: added.cartVersion }, T0 + 5000);
+    };
+    try {
+      vi.stubEnv("CONFIRM_TAP_ONLY", "1");
+      expect(await code(aiConfirm())).toBe("CONFLICT");
+      vi.stubEnv("CONFIRM_TAP_ONLY", "");
+      expect((await aiConfirm()).status).toBe("paying");
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 
   it("binds source to the actor: the kiosk sends only touch, the phone never touch", async () => {

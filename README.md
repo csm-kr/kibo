@@ -145,7 +145,7 @@ Every value comes from [`docs/plan/NUMBERS.md`](docs/plan/NUMBERS.md) and the ev
 | Claim | Value | Evidence |
 |---|---|---|
 | Text agent evaluation | 68 of 70 cases (Korean, English and 7 more languages typed), `gemini-3.8-flash` on Vertex AI, 10-14; per request median 5.7 s, p90 11.9 s; until the first command median 3.4 s. Cases written by the KIBO team, not an external benchmark | [`evals/results/2026-10-14T20-26.md`](evals/results/2026-10-14T20-26.md) |
-| Typed order on the deployed service | median 4.8 s per turn (6 typed turns, 1.9–6.7 s), one run from a laptop in Seoul | [`evidence/prod-latency.json`](evidence/prod-latency.json) |
+| Typed order on the deployed service | median 3.5 s, p90 9.4 s per turn (12 typed turns in 4 sessions, 2.0–9.7 s), one run from a laptop in Seoul | [`evidence/prod-latency.json`](evidence/prod-latency.json) |
 | Voice order on `/demo` | 2/2 runs passed direct (English, Korean): end of speech → kiosk highlight median 1,833 ms, → first AI audio 2,708 ms (target ≤ 2 s, missed). Through the Vertex AI relay 2/2: 1,641 ms and 2,611 ms. All attempts on record: 24, 17 passed, 6 failed upstream (the API key's credits ran out), 1 failed in the model. Synthetic voice on a laptop, not a real phone | [`evidence/voice-e2e.json`](evidence/voice-e2e.json), [`evidence/voice-e2e-relay.json`](evidence/voice-e2e-relay.json) |
 | Cost per hero order | text $0.0080, voice $0.0885 (median of 3; Gemini API list prices) | [`evidence/cost-per-order.json`](evidence/cost-per-order.json) |
 | Forged commands | 37 of 37 refused; 5 of 5 legitimate controls accepted | [`evidence/forged-commands.json`](evidence/forged-commands.json) |

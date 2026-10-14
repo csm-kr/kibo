@@ -45,7 +45,10 @@
     {
       "step": 5,
       "name": "ops-scale",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-15T02:23:14+0900",
+      "summary": "CI and ops written, not run against GCP (no gcloud allowed): cloudbuild.yaml (npm ci + scripts/ci-check.sh = lint, unit tests, build, check:attacks; docker build/push to cloud-run-source-deploy/kibo:$BUILD_ID; deploy with deploy.sh's flags plus --no-traffic --tag candidate, PUBLIC_ORIGIN from $PROJECT_NUMBER, _SHORT_APP_URL/_VOICE_RELAY_URL substitutions; /api/health?deep=1 on the tag URL must be 200 and name the revision; then update-traffic --to-revisions <checked rev>=100, pinned instead of --to-latest). scripts/ops-setup.sh: dry run by default, --apply idempotent: Firestore TTL for sessions/sessionSecrets/pairCodes, uptime check kibo-deep-health, e-mail channels from ALERT_EMAILS, alert policy. scripts/ops.test.ts (fake gcloud/npm, 7 tests). CONFIRM_TAP_ONLY=1 (test first): CommandContext.confirmTapOnly refuses every AI confirmCheckout with 'Please confirm on the card.', read per command in service.ts; tests on and off in machine.test.ts and service.test.ts. Docs: ARCHITECTURE 'Capacity and scale-out' (240 slots / ~120 two-screen orders, per-instance limits, compiled menus; path: concurrency, custom-token listeners or fan-out tier, Memorystore, menus in Firestore with TTL cache; stream cost from 10-13 billing ~KRW 3,530/day above idle per instance, price page not read) + CONFIRM_TAP_ONLY env row; SECURITY 'Background voice'; OPERATIONS 'CI' and 'Setup once'. prod-latency.ts now 12 turns in 4 sessions with p90 and keeps the old run under `earlier`: median 3.5 s, p90 9.4 s on kibo-00016-zj9 (this phase not deployed), NUMBERS/README/DECK_FACTS/TESTING updated (landing and SUBMISSION quote no typed latency). I-267. lint, test (1149), build pass.",
+      "completed_at": "2026-10-15T02:40:00+0900"
     },
     {
       "step": 6,

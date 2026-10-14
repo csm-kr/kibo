@@ -1,0 +1,96 @@
+# CI and deploy for the kibo service, run by a Cloud Build trigger on push to main (docs/plan/OPERATIONS.md "CI").
+# The trigger is created by a person; nothing here runs from a laptop. The order is the safety:
+#   1. the same checks as scripts/ci-check.sh (lint, unit tests, production build, forged commands);
+#   2. build and push the image;
+#   3. deploy it as a revision that gets no traffic, tagged `candidate`;
+#   4. /api/health?deep=1 on the candidate's own URL must answer 200 and name that revision;
+#   5. only then all traffic moves to it. A failure at any step leaves the serving revision untouched.
+# Flags match scripts/deploy.sh (explained in OPERATIONS "Deploy"); keep the two in step. The region is explicit.
+# Built-in substitutions: $PROJECT_ID, $PROJECT_NUMBER, $BUILD_ID. Bash variables are written $$NAME.
+substitutions:
+  _REGION: asia-northeast3
+  _SERVICE: kibo
+  # Optional, as in scripts/deploy.sh; set them on the trigger. Empty leaves them off the service.
+  _SHORT_APP_URL: ""
+  _VOICE_RELAY_URL: ""
+options:
+  logging: CLOUD_LOGGING_ONLY
+timeout: 2400s
+steps:
+  - id: checks
+    name: node:24
+    entrypoint: sh
+    args: ["-c", "npm ci && sh scripts/ci-check.sh"]
+    env: ["NEXT_TELEMETRY_DISABLED=1"]
+
+  - id: image
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - $_REGION-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/$_SERVICE:$BUILD_ID
+      - .
+
+  - id: push
+    name: gcr.io/cloud-builders/docker
+    args: ["push", "$_REGION-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/$_SERVICE:$BUILD_ID"]
+
+  - id: candidate
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: bash
+    args:
+      - -euc
+      - |
+        ENV="STORE=firestore,GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GEMINI_TEXT_BACKEND=auto,GEMINI_TEXT_MODEL=gemini-3.8-flash,GEMINI_TEXT_THINKING=low,GEMINI_LIVE_MODEL=gemini-3.8-live,GEMINI_LIVE_BACKEND=auto,PUBLIC_ORIGIN=https://$_SERVICE-$PROJECT_NUMBER.$_REGION.run.app"
+        if [ -n "$_SHORT_APP_URL" ]; then ENV="$$ENV,SHORT_APP_URL=$_SHORT_APP_URL"; fi
+        if [ -n "$_VOICE_RELAY_URL" ]; then ENV="$$ENV,VOICE_RELAY_URL=$_VOICE_RELAY_URL"; fi
+        gcloud run deploy $_SERVICE \
+          --image $_REGION-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/$_SERVICE:$BUILD_ID \
+          --project $PROJECT_ID \
+          --region $_REGION \
+          --no-traffic \
+          --tag candidate \
+          --service-account kibo-runtime@$PROJECT_ID.iam.gserviceaccount.com \
+          --allow-unauthenticated \
+          --min-instances 1 \
+          --max-instances 3 \
+          --concurrency 80 \
+          --timeout 900 \
+          --cpu 1 \
+          --memory 1Gi \
+          --set-secrets GEMINI_API_KEY=gemini-api-key:latest \
+          --set-env-vars "$$ENV"
+
+  - id: health
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: bash
+    args:
+      - -euc
+      - |
+        gcloud run services describe $_SERVICE --project $PROJECT_ID --region $_REGION --format json > /workspace/service.json
+        REV=$$(python3 -c 'import json;print(json.load(open("/workspace/service.json"))["status"]["latestCreatedRevisionName"])')
+        URL=$$(python3 -c 'import json;print(next(t["url"] for t in json.load(open("/workspace/service.json"))["status"]["traffic"] if t.get("tag")=="candidate"))')
+        echo "candidate $$REV at $$URL"
+        # The deep check caches its result for 60 s per instance and the first call may wake the revision: retry for 2 min.
+        for i in $$(seq 1 12); do
+          if curl -fsS --max-time 20 "$$URL/api/health?deep=1" > /workspace/deep.json &&
+            curl -fsS --max-time 10 "$$URL/api/health" | grep -q "\"revision\":\"$$REV\""; then
+            echo "deep health ok on $$REV"
+            echo "$$REV" > /workspace/candidate-revision
+            exit 0
+          fi
+          sleep 10
+        done
+        echo "deep health failed on $$REV; traffic not moved"
+        exit 1
+
+  # Equal to --to-latest unless another build created a newer revision meanwhile; naming the checked one is safer.
+  - id: traffic
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: bash
+    args:
+      - -euc
+      - |
+        REV=$$(cat /workspace/candidate-revision)
+        gcloud run services update-traffic $_SERVICE --project $PROJECT_ID --region $_REGION --to-revisions "$$REV=100"
+        echo "DEPLOYED $$REV"

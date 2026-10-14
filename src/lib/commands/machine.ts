@@ -32,6 +32,8 @@ export interface CommandContext {
   kiosk: KioskData;
   newLineId: () => string;
   newOrderNumber: () => number;
+  /** Strict sites (CONFIRM_TAP_ONLY): only a tap on the confirm card, never the AI, confirms. Default off. */
+  confirmTapOnly?: boolean;
 }
 
 export interface CommandResult {
@@ -121,6 +123,7 @@ function isValidChoice(k: KioskData, c: ChoiceRef): boolean {
 function isConfirmed(s: Session, cmd: Command, ctx: CommandContext): boolean {
   if (ctx.actor === "kiosk") return cmd.source === "touch";
   if (cmd.source === "button") return true;
+  if (ctx.confirmTapOnly) return false;
   // A null seq means the kiosk opened the review or an edit reopened it: the phone's AI never saw a "yes" after it, so only a tap counts.
   return (
     cmd.utteranceSeq !== undefined &&

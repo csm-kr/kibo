@@ -270,6 +270,7 @@ export async function runCommand(
             kiosk: getKiosk(s.kioskId),
             newLineId: () => lineId,
             newOrderNumber: () => orderNumber,
+            confirmTapOnly: process.env.CONFIRM_TAP_ONLY === "1",
           });
         } catch (e) {
           if (e instanceof CommandError && e.code === "GONE") return expire(s);
