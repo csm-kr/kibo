@@ -72,7 +72,8 @@
     },
     {
       "dir": "15-judge-fixes",
-      "status": "pending"
+      "status": "completed",
+      "completed_at": "2026-10-15T03:46:57+0900"
     }
   ]
 }
