@@ -327,7 +327,13 @@ describe("runChat", () => {
       const session = (await store.get(s.sessionId))!;
       expect(session.pendingChoice).toEqual({
         templateId: "pick_item",
-        choices: [{ kind: "item", id: "cheese_burger" }, { kind: "item", id: "soft_cone" }, { kind: "item", id: "chicken_nuggets" }],
+        // [Call staff] last: nothing the user asked for may be among them (15-judge-fixes:1).
+        choices: [
+          { kind: "item", id: "cheese_burger" },
+          { kind: "item", id: "soft_cone" },
+          { kind: "item", id: "chicken_nuggets" },
+          { kind: "staff", id: "staff" },
+        ],
       });
       expect(session.recentCommandIds).toEqual([`${req.chatRequestId}:0`]);
       expect(out.actions.map((a) => [a.tool, a.code])).toEqual([["offerChoices", "ok"]]);
@@ -421,6 +427,35 @@ describe("runChat", () => {
     expect(out.reply).toBe("We do not have that.");
   });
 
+  it("checkout before the dine option is held for the tap, so the phone can send it again (15-judge-fixes:1)", async () => {
+    const s = await demo();
+    await runChat(deps(script([{ name: "addToCart", args: { itemId: "cola" } }], "Added.").model), input(s));
+    const { model } = script(
+      [{ name: "requestCheckout" }],
+      [{ name: "offerChoices", args: { templateId: "pick_dine", choices: [{ kind: "dine", id: "eat_in" }, { kind: "dine", id: "take_out" }] } }],
+      "Eat here or take out?",
+    );
+    const out = await runChat(deps(model), input(s, { message: "That's all, I'll pay", utteranceSeq: 2 }));
+    expect(out.heldForDine).toBe(true);
+    expect(out.status).toBe("ordering");
+  });
+
+  it("nothing is held when the request changed the cart, called staff, or asked no dine question", async () => {
+    const s = await demo();
+    const dine = { name: "offerChoices", args: { templateId: "pick_dine", choices: [{ kind: "dine", id: "eat_in" }, { kind: "dine", id: "take_out" }] } };
+    // Sending it again would add the cola twice.
+    const added = await runChat(deps(script([{ name: "addToCart", args: { itemId: "cola" } }, dine], "Eat here or take out?").model), input(s));
+    expect(added.heldForDine).toBe(false);
+
+    const t = await demo();
+    const staff = await runChat(deps(script([{ name: "callStaff", args: { reasonCode: "unknown_info" } }, dine], "Staff is coming.").model), input(t));
+    expect(staff.heldForDine).toBe(false);
+
+    const u = await demo();
+    const question = await runChat(deps(script("Cola is 2,000 won.").model), input(u, { message: "How much is a cola?" }));
+    expect(question.heldForDine).toBe(false);
+  });
+
   it("never logs the message, history or reply", async () => {
     const s = await demo();
     const logs = (["log", "info", "warn", "error"] as const).map((name) => vi.spyOn(console, name));
@@ -505,6 +540,25 @@ describe("runChat on a learned kiosk (I-155)", () => {
     const session = (await store.get(s.sessionId))!;
     expect(session.recentCommandIds).toEqual([`${req.chatRequestId}:0`]);
     expect(session.pendingBridgeCommand).toMatchObject({ type: "setDineOption" });
+  });
+
+  it("an order before the dine option: the add is refused, the server shows the dine buttons, and the reply says the order is held (15-judge-fixes:1)", async () => {
+    const s = await learned();
+    const PEPPERONI = { itemId: "pepperoni", options: [{ groupId: "size", optionIds: ["large"] }, { groupId: "dough", optionIds: ["thin"] }] };
+    // The judge's case: the model asked in words only, so nothing on the phone could answer it.
+    const { model } = script([{ name: "addToCart", args: PEPPERONI }, { name: "addToCart", args: { itemId: "cola" } }], "Eat here or take out?");
+    const out = await runChat(deps(model), input(s, { message: "One large pepperoni pizza with thin crust and a cola" }));
+
+    expect(out.reply).toBe("Eat here or take out?");
+    expect(out.heldForDine).toBe(true);
+    expect(out.actions.map((a) => [a.tool, a.code])).toEqual([
+      ["addToCart", "NEEDS_CHOICE"],
+      ["addToCart", "NEEDS_CHOICE"],
+      ["offerChoices", "ok"],
+    ]);
+    const session = (await store.get(s.sessionId))!;
+    expect(session.pendingChoice?.templateId).toBe("pick_dine");
+    expect(session.pendingBridgeCommand).toBeNull();
   });
 
   it("never waits on a direct kiosk", async () => {

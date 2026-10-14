@@ -20,7 +20,7 @@ export function Bubble({ m, locale, large = true }: { m: ChatMessage; locale: Lo
   return (
     <p className={`max-w-[88%] rounded-tile px-4 py-3 ${large ? "text-xl" : "text-base"} ${BUBBLE[m.role]}`}>
       {m.role !== "notice" && <span className="sr-only">{who}: </span>}
-      {m.text}
+      {m.shown ?? m.text}
     </p>
   );
 }

@@ -13,7 +13,10 @@
     {
       "step": 1,
       "name": "learned-and-rail",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-15T00:34:16+0900",
+      "summary": "Order survives the dine question: learned-kiosk addToCart without a dine option is NEEDS_CHOICE pick_dine (needsDine, machine.ts); runChat always ends a dine refusal on the pick_dine buttons and returns heldForDine when nothing else changed; the phone keeps that message (useChat held, phone/chat.ts) and after the dine tap reaches the session re-sends it shown as 'Continuing your order…' (chooseDine, AssistantPanel; voice open: the tap label goes to Live). Rail: instructions say the machine is at the airport, never swap a destination, say what it sells and offerChoices with a new choice kind staff (id staff, [Call staff] → callStaff user_request) last; introOffer fallback also ends with staff. No alias added (fictional places). E2E demo-learned 'order before dine survives the Eat here tap'; eval runner gained a tapDine turn; 3 new recovery cases; eval 00-46 18/21 (2 MALO failures pre-existing in 00-18), 00-54 3/3 new cases. I-257, I-258; ARCHITECTURE, SECURITY, UX, USER_JOURNEY, TESTING, NUMBERS updated.",
+      "completed_at": "2026-10-15T00:58:00+0900"
     },
     {
       "step": 2,

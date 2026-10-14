@@ -140,6 +140,16 @@ describe("buildInstructions", () => {
       expect(buildInstructions(getKiosk("malo"), { locale: "en" })).not.toMatch(/sold-out ticket/);
     });
 
+    // Judges asked for "Seoul Station" and "the airport": the AI called staff at once, or quietly sold City Center.
+    it("a destination it does not sell: says what it sells and offers it with staff last, never a silent swap (15-judge-fixes:1)", () => {
+      expect(t).toMatch(/every ticket goes from the airport to the place in its name/);
+      expect(t).toMatch(/a ticket to the airport, or to a place that is not in the menu data/);
+      expect(t).toMatch(/never pick another ticket for them/i);
+      expect(t).toMatch(/offerChoices with pick_item and at most 5 of those tickets, then \{kind: staff, id: staff\} last/);
+      expect(t).toMatch(/Call callStaff only when the user asks for staff/);
+      expect(buildInstructions(getKiosk("malo"), { locale: "en" })).not.toMatch(/to the airport/);
+    });
+
     it("takes its best-seller example from its own data", () => {
       expect(t).toContain("The Express to City Center is marked as a best seller.");
     });
@@ -157,14 +167,23 @@ describe("buildInstructions", () => {
     });
   });
 
+  it("a dine question asked for an order is a button question, and the order is never asked again (15-judge-fixes:1)", () => {
+    const LINE = "NEEDS_CHOICE with pick_dine: call offerChoices with it and ask eat here or take out. Never ask the user to repeat the order: after the tap the phone sends it again.";
+    expect(text).toContain(LINE);
+    expect(buildInstructions(getKiosk("doughhouse"), { locale: "en" })).toContain(LINE);
+    expect(buildInstructions(getKiosk("airport_rail"), { locale: "en" })).not.toContain(LINE);
+  });
+
   it("explains replay, remove-and-add and paying on the kiosk only for a learned kiosk", () => {
     const LEARNED = [
       "This kiosk is operated by replaying its own screens.",
       "Changes take a few seconds.",
       "To change an item, remove it and add it again.",
       "The user pays on the kiosk itself.",
-      // The kiosk asks eat-in or take-out once, before its menu (I-095).
-      "If the dine option is not chosen yet, ask eat here or take out and call setDineOption before the first addToCart; this kiosk cannot change it later.",
+      // The kiosk asks eat-in or take-out once, before its menu (I-095); the order waits for the tap (15-judge-fixes:1).
+      "The dine option must be set before the first addToCart; this kiosk cannot change it later.",
+      "If the user said eat here or take out, call setDineOption first, then addToCart in the same response.",
+      "If not, call offerChoices with pick_dine (eat_in, take_out) and ask eat here or take out; add nothing yet.",
     ];
     const learned = buildInstructions(getKiosk("doughhouse"), { locale: "en" });
     for (const line of LEARNED) {

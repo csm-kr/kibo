@@ -78,6 +78,8 @@ Pressing "Order by touch" runs the familiar kiosk flow (dine option → category
 | **Misheard** | Shows what it heard. **[Undo]** once or "No, cancel that" reverts the last change | Last change reverted | 3, 9 |
 | **Ambiguous** ("one burger") | Asks with **choice buttons** (photos): cheeseburger / bulgogi / double… then "Make it a set?" No need to remember options | Shows the category | 6, 5 |
 | **Sold out** | "The shrimp burger is sold out." + two similar items as buttons | Sold-out mark | 9 |
+| **Order before the dine option** (a learned kiosk, which asks it before its menu; or "I'll pay" on MALO with none chosen) | "Eat here or take out?" with the two buttons; nothing is added yet. After the tap the phone sends the same message again, shown as "Continuing your order…", so the user never retypes it (15-judge-fixes:1). With voice open, the tap goes to the conversation as the answer | Moves to the menu once the dine option is in, then the lines appear | 3, 6 |
+| **Place the machine does not sell** (a real station, "to the airport") | Never swaps in another ticket: "This machine doesn't sell that. It sells express tickets to City Center, 39 min, 10,500 won, and …", then the matching tickets as buttons with **[Call staff]** last (the same staff call as the header) | Unchanged | 9, 6 |
 | **Not in kiosk data** (halal etc.) | Does not guess: "This kiosk doesn't have that information. **I've called staff.**" | Staff banner | 9, 10 |
 | **User is stuck** | **[Call staff]** always visible at the top | Staff banner | 3, 10 |
 | **Phone screen off / disconnected** | Reopening on the same phone **continues** (token stored on the phone); cart kept | "Connection paused" after 60 s without ping; touch still works | 3, 9 |

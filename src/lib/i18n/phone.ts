@@ -44,6 +44,8 @@ const PHONE_TEXT = {
   you: { ko: "나", en: "You" },
   assistant: { ko: "KIBO", en: "KIBO" },
   working: { ko: "처리하고 있어요…", en: "Working…" },
+  // The order the AI held for the dine question, sent again after the tap (15-judge-fixes:1).
+  continuingOrder: { ko: "이어서 주문할게요…", en: "Continuing your order…" },
   cartTitle: { ko: "내 주문", en: "Your order" },
   cartEmpty: { ko: "아직 담은 것이 없어요.", en: "Nothing in your order yet." },
   total: { ko: "합계", en: "Total" },

@@ -6,6 +6,8 @@ export interface ChatMessage {
   /** `notice` is the screen's own plain-words message (an error), never sent to the model. */
   role: "user" | "model" | "notice";
   text: string;
+  /** What the bubble shows instead of `text` (a message sent again: "Continuing your order…"); history keeps `text`. */
+  shown?: string;
 }
 
 export interface ChatState {
@@ -14,33 +16,39 @@ export interface ChatState {
   utteranceSeq: number;
   busy: boolean;
   nextId: number;
+  /** An order the agent could not place before the dine option; sent again after the dine tap (15-judge-fixes:1). */
+  held: string | null;
 }
 
 export type ChatAction =
-  | { type: "send"; text: string }
-  | { type: "reply"; text: string }
+  | { type: "send"; text: string; shown?: string }
+  | { type: "reply"; text: string; heldForDine?: boolean }
   | { type: "notice"; text: string }
   /** What voice heard or said: shown and kept as history, but not a typed message (no busy, no count). */
   | { type: "voice"; role: "user" | "model"; text: string }
   | { type: "reset" };
 
-export const initialChat: ChatState = { messages: [], utteranceSeq: 0, busy: false, nextId: 1 };
+export const initialChat: ChatState = { messages: [], utteranceSeq: 0, busy: false, nextId: 1, held: null };
 
 /** /api/chat takes the last 10 turns. */
 const HISTORY_TURNS = 10;
 /** /api/chat refuses a longer history turn; a model reply can exceed it. */
 const MAX_TURN_CHARS = 1000;
 
-function add(state: ChatState, role: ChatMessage["role"], text: string): Pick<ChatState, "messages" | "nextId"> {
-  return { messages: [...state.messages, { id: state.nextId, role, text }], nextId: state.nextId + 1 };
+function add(state: ChatState, role: ChatMessage["role"], text: string, shown?: string): Pick<ChatState, "messages" | "nextId"> {
+  const m: ChatMessage = shown === undefined ? { id: state.nextId, role, text } : { id: state.nextId, role, text, shown };
+  return { messages: [...state.messages, m], nextId: state.nextId + 1 };
 }
 
 export function chatReducer(state: ChatState, action: ChatAction): ChatState {
   switch (action.type) {
     case "send":
-      return { ...state, ...add(state, "user", action.text), utteranceSeq: state.utteranceSeq + 1, busy: true };
-    case "reply":
-      return { ...state, ...add(state, "model", action.text), busy: false };
+      // Whatever the user sends next replaces a held order, including the held order itself sent again.
+      return { ...state, ...add(state, "user", action.text, action.shown), utteranceSeq: state.utteranceSeq + 1, busy: true, held: null };
+    case "reply": {
+      const asked = action.heldForDine ? (state.messages.findLast((m) => m.role === "user")?.text ?? null) : null;
+      return { ...state, ...add(state, "model", action.text), busy: false, held: asked };
+    }
     case "notice":
       return { ...state, ...add(state, "notice", action.text), busy: false };
     case "voice":

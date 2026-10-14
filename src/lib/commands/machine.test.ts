@@ -537,6 +537,7 @@ describe("offerChoices", () => {
     ["option", "extra_cream"],
     ["dine", "drive_thru"],
     ["yesno", "maybe"],
+    ["staff", "manager"],
   ])("rejects an unknown %s id", (kind, id) => {
     const c = cmd("offerChoices", { templateId: "pick_item", choices: [{ kind, id }] }, { source: "voice" });
     expect(catchError(() => applyCommand(phoneOrdering(), c, ctx("phone"))).code).toBe("BAD_REQUEST");
@@ -548,6 +549,8 @@ describe("offerChoices", () => {
       { kind: "option", id: "zero_cola" },
       { kind: "dine", id: "take_out" },
       { kind: "yesno", id: "no" },
+      // The last way out of a list that has nothing right (15-judge-fixes:1).
+      { kind: "staff", id: "staff" },
     ];
     const c = cmd("offerChoices", { templateId: "pick_option", choices }, { source: "voice" });
     expect(applyCommand(phoneOrdering(), c, ctx("phone")).session.pendingChoice?.choices).toEqual(choices);
@@ -781,6 +784,19 @@ describe("learned kiosk (doughhouse)", () => {
     const done = applyCommand(waiting, report(waiting, { kioskTotal: 0, kioskLines: [] }), lctx("kiosk", T0 + 2000)).session;
     expect(done.dineOption).toBe("eat_in");
     expect(done.status).toBe("ordering");
+  });
+
+  it("an add before the dine option → NEEDS_CHOICE pick_dine, because this kiosk cannot change it later (15-judge-fixes:1)", () => {
+    const s: Session = { ...newSession({ sessionId: SID, kioskId: "doughhouse", demo: false, now: T0 }), status: "connected" };
+    const err = catchError(() => applyCommand(s, voice("addToCart", PIZZA), lctx("phone")));
+    expect(err.code).toBe("NEEDS_CHOICE");
+    expect(err.detail).toEqual({
+      templateId: "pick_dine",
+      choices: [
+        { kind: "dine", id: "eat_in" },
+        { kind: "dine", id: "take_out" },
+      ],
+    });
   });
 
   it("updateCart → CONFLICT with a plain remove-and-add message", () => {

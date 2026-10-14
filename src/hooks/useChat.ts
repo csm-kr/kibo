@@ -33,13 +33,15 @@ export function useChat(opts: {
   const [state, dispatch] = useReducer(chatReducer, initialChat);
 
   /** True when the agent answered; false when nothing was sent or the request failed (the notice says why). */
-  async function send(text: string, cartVersion?: number): Promise<boolean> {
+  /** `shown`: the bubble's words when the phone, not the user, sends it (a held order sent again). */
+  async function send(text: string, cartVersion?: number, shown?: string): Promise<boolean> {
     const message = text.trim().slice(0, 500);
     if (!message || !opts.sessionId || !opts.token || state.busy) return false;
     const history = historyFor(state.messages);
     const utteranceSeq = opts.nextSeq ? opts.nextSeq() : state.utteranceSeq + 1;
-    dispatch({ type: "send", text: message });
-    opts.onSend?.();
+    dispatch({ type: "send", text: message, shown });
+    // /demo counts what the user sent; a held order sent again after a tap is not a new message from them.
+    if (shown === undefined) opts.onSend?.();
     try {
       const r = await chat({
         sessionId: opts.sessionId,
@@ -51,7 +53,7 @@ export function useChat(opts: {
         locale: opts.locale,
         language: opts.language,
       });
-      dispatch({ type: "reply", text: r.reply });
+      dispatch({ type: "reply", text: r.reply, heldForDine: r.heldForDine });
       if (r.actions?.length) opts.onActions?.(r.actions);
       return true;
     } catch (e) {
@@ -66,6 +68,10 @@ export function useChat(opts: {
     /** Messages sent so far; never goes back, like the server's per-session count. */
     sent: state.utteranceSeq,
     send,
+    /** An order the agent held for the dine question (15-judge-fixes:1); null when there is none. */
+    held: state.held,
+    /** Sends the held order again, shown as `shown` ("Continuing your order…"). */
+    resend: (shown: string) => (state.held ? send(state.held, undefined, shown) : Promise.resolve(false)),
     notice: (text: string) => dispatch({ type: "notice", text }),
     /** What voice heard or said, into the same conversation. */
     voice: (role: "user" | "model", text: string) => dispatch({ type: "voice", role, text }),

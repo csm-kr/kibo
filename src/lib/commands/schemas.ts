@@ -59,7 +59,7 @@ const commandSchema = z.discriminatedUnion("type", [
       templateId: z.enum(["pick_item", "pick_variant", "pick_option", "pick_dine", "yes_no", "alternatives", "upsell"]),
       choices: z
         // Variant ids are camelCase ("largeSet"), so they are allowed next to the snake_case id pattern.
-        .array(z.strictObject({ kind: z.enum(["item", "variant", "option", "dine", "yesno"]), id: z.union([id, variant]) }))
+        .array(z.strictObject({ kind: z.enum(["item", "variant", "option", "dine", "yesno", "staff"]), id: z.union([id, variant]) }))
         .min(1)
         .max(6),
     }),

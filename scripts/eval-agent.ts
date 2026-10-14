@@ -19,7 +19,7 @@ import { getKiosk } from "@/lib/adapters/catalog";
 import { MemoryStore } from "@/lib/store/memory";
 import type { SpeechLanguage } from "@/lib/i18n/languages";
 import type { Locale } from "@/types/menu";
-import type { CartLine, Session, SessionStatus } from "@/types/session";
+import type { CartLine, DineOption, Session, SessionStatus } from "@/types/session";
 import { FALLBACK } from "@/lib/agent/chat";
 import { checkGrounding, internalWords, offersToPay, replyLanguage, saysCannot, type GroundingResult } from "./grounding";
 
@@ -60,7 +60,8 @@ interface Case {
   language?: SpeechLanguage;
   /** Every reply must be in this language (replyLanguage, no AI); only the detected codes are kept. */
   replyIn?: string;
-  turns: string[];
+  /** A string is a typed message; `tapDine` is a tap on a dine button, after which the phone sends a held order again. */
+  turns: (string | { tapDine: DineOption })[];
   expect: Expect;
 }
 
@@ -245,11 +246,24 @@ async function runCase(c: Case) {
   // Replies that were the generic "say that again" (15-judge-fixes:0): a user repeats the order and gets it twice.
   let genericRetries = 0;
 
-  for (const message of c.turns) {
+  for (const turn of c.turns) {
+    let message: string;
+    let shown: string | undefined;
+    if (typeof turn === "string") message = turn;
+    else {
+      // Like AssistantPanel's chooseDine (15-judge-fixes:1): the tap goes to the session; a held order is sent again
+      // once the session has the dine option (a learned kiosk sets it after the bridge's report).
+      const body = { sessionId, commandId: randomUUID(), type: "setDineOption", args: { option: turn.tapDine }, source: "button" };
+      await runCommand(store, { body, bearer: deviceToken! }, now());
+      for (let i = 0; i < 50 && (await store.get(sessionId))?.dineOption !== turn.tapDine; i++) await sleep(100);
+      if (chat.held === null) continue;
+      message = chat.held;
+      shown = "Continuing your order…";
+    }
     const session = (await store.get(sessionId))!;
     before = session.cart;
     const history = historyFor(chat.messages);
-    chat = chatReducer(chat, { type: "send", text: message });
+    chat = chatReducer(chat, { type: "send", text: message, shown });
     // Like AssistantPanel: the phone sends the confirm card's cartVersion only while the card shows.
     const input = {
       sessionId,
@@ -288,7 +302,7 @@ async function runCase(c: Case) {
       // A reply built from the results (14-final:5) sends them to no model, so their codes come from the actions.
       const unsent = calls.filter((c) => c.code === "unsent");
       if (unsent.length > 0) out.actions.slice(-unsent.length).forEach((a, i) => (unsent[i].code = a.code));
-      chat = chatReducer(chat, { type: "reply", text: reply });
+      chat = chatReducer(chat, { type: "reply", text: reply, heldForDine: out.heldForDine });
       lastReply = reply;
       if (reply === FALLBACK) genericRetries++;
       languages.push(replyLanguage(reply, getKiosk(kioskId)));

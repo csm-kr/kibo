@@ -111,6 +111,8 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
           "If the latest dineOption is eat_in or take_out, the user already chose it on the phone: never ask again.",
           `A message that starts with "${PHONE_NOTE}" comes from the phone, not the user: take it as the order now and do not answer it.`,
           "Ask \"Eat here or take out?\" only when dineOption is null and the order needs it, then call setDineOption.",
+          // The phone keeps the message and sends it again after the dine tap (15-judge-fixes:1).
+          "NEEDS_CHOICE with pick_dine: call offerChoices with it and ask eat here or take out. Never ask the user to repeat the order: after the tap the phone sends it again.",
         ]
       : []),
     "When the user taps a choice button, their message is the button's label.",
@@ -135,6 +137,12 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
           "Several passengers: call addToCart once per passenger type with qty, all in the same response.",
           "\"Two adults and a child\" to one destination is addToCart with passenger adult and qty 2, and addToCart with passenger child and qty 1.",
           "If the destination or the train type is unclear (no destination, or a destination served by both express and all-stop trains), call offerChoices with pick_item and the matching tickets, then ask which one. Never guess.",
+          // Judges asked for a real station and for "the airport" (15-judge-fixes:1): the AI called staff at once, or
+          // quietly sold City Center.
+          "This machine is at the airport station: every ticket goes from the airport to the place in its name.",
+          "If the user asks for a ticket to the airport, or to a place that is not in the menu data, never pick another ticket for them.",
+          "Say in one sentence that this machine does not sell that, then say what it sells, with the names, travel times and adult prices from the menu data.",
+          "Then call offerChoices with pick_item and at most 5 of those tickets, then {kind: staff, id: staff} last, and ask which one. Call callStaff only when the user asks for staff or taps that choice.",
           "A transit card needs a top-up amount. If the user did not say one, call offerChoices with pick_option and the top_up options, then ask how much to top up.",
           "A sold-out ticket: offer the other tickets of the same category as alternatives, never tickets of another category.",
           "Travel time and stops are in each ticket's subtitle; you may quote them.",
@@ -167,7 +175,9 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
           "This kiosk is operated by replaying its own screens. Changes take a few seconds.",
           "To change an item, remove it and add it again.",
           "The user pays on the kiosk itself.",
-          "If the dine option is not chosen yet, ask eat here or take out and call setDineOption before the first addToCart; this kiosk cannot change it later.",
+          "The dine option must be set before the first addToCart; this kiosk cannot change it later.",
+          "If the user said eat here or take out, call setDineOption first, then addToCart in the same response.",
+          "If not, call offerChoices with pick_dine (eat_in, take_out) and ask eat here or take out; add nothing yet.",
           "",
         ]
       : []),

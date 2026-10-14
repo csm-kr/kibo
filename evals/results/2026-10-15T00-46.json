@@ -1,0 +1,1180 @@
+{
+  "date": "2026-10-14T15:46:44.342Z",
+  "model": "gemini-3.8-flash",
+  "backend": "vertex",
+  "modelCallsByBackend": {
+    "api": 0,
+    "vertex": 50
+  },
+  "thinkingLevel": "low",
+  "evalClock": "14:00 KST",
+  "subset": [
+    "lg-en-pay-on-kiosk",
+    "lg-ko-pay-on-kiosk",
+    "co-en-ill-pay",
+    "co-en-pay-in-one-message",
+    "r2-en-family",
+    "r2-ko-family",
+    "r9-en-destination",
+    "r9-ko-destination",
+    "r3-ko-card-top-up",
+    "r6-en-sold-out",
+    "r8-en-platform",
+    "r8-ko-timetable",
+    "r8-en-not-sold-here",
+    "rco-en-ill-pay",
+    "r-ko-applied-never-generic",
+    "r-en-readback-pending",
+    "r-en-unsupported-modifier",
+    "r-en-out-of-domain",
+    "r-en-pizza-order-before-dine",
+    "r-en-rail-unknown-destination",
+    "r-en-rail-to-the-airport"
+  ],
+  "cases": 21,
+  "passed": 18,
+  "passRate": 0.8571428571428571,
+  "byGroup": {
+    "original": {
+      "pass": 14,
+      "total": 14
+    },
+    "recovery": {
+      "pass": 4,
+      "total": 7
+    }
+  },
+  "byKiosk": {
+    "doughhouse": {
+      "pass": 3,
+      "total": 3
+    },
+    "malo": {
+      "pass": 4,
+      "total": 6
+    },
+    "airport_rail": {
+      "pass": 11,
+      "total": 12
+    }
+  },
+  "byType": {
+    "grounded-reply": {
+      "pass": 2,
+      "total": 2
+    },
+    "checkout": {
+      "pass": 3,
+      "total": 3
+    },
+    "2-same-item-different-options": {
+      "pass": 2,
+      "total": 2
+    },
+    "9-ambiguous": {
+      "pass": 2,
+      "total": 2
+    },
+    "3-missing-required-choice": {
+      "pass": 1,
+      "total": 1
+    },
+    "6-sold-out-or-hours": {
+      "pass": 1,
+      "total": 1
+    },
+    "8-not-in-data": {
+      "pass": 3,
+      "total": 3
+    },
+    "12-recovery": {
+      "pass": 4,
+      "total": 7
+    }
+  },
+  "latency": {
+    "requests": 29,
+    "totalMedianMs": 9846,
+    "totalP90Ms": 22838,
+    "firstToolRequests": 28,
+    "firstToolMedianMs": 6947,
+    "firstToolP90Ms": 11962,
+    "modelCalls": 50,
+    "roundMedianMs": 4859,
+    "roundP90Ms": 11961,
+    "callsPerRequest": {
+      "1": 10,
+      "2": 17,
+      "3": 2
+    },
+    "oneCallWithTools": 8
+  },
+  "notCovered": [
+    {
+      "type": "7-count-limits",
+      "reason": "Count limits (max 3 toppings) need the learned Doughhouse kiosk, which has no LearnedAdapter yet."
+    }
+  ],
+  "results": [
+    {
+      "id": "lg-en-pay-on-kiosk",
+      "kioskId": "doughhouse",
+      "type": "grounded-reply",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "confirming",
+      "cart": [
+        {
+          "itemId": "cheese_oven_spaghetti",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": []
+      },
+      "requests": [
+        {
+          "ms": 10143,
+          "firstToolMs": 7484,
+          "rounds": [
+            7478,
+            2621
+          ],
+          "tools": [
+            {
+              "name": "setDineOption",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 25338,
+          "firstToolMs": 3598,
+          "rounds": [
+            3594,
+            21737
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 10933,
+          "firstToolMs": 6981,
+          "rounds": [
+            6977,
+            3890
+          ],
+          "tools": [
+            {
+              "name": "requestCheckout",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lg-ko-pay-on-kiosk",
+      "kioskId": "doughhouse",
+      "type": "grounded-reply",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "confirming",
+      "cart": [
+        {
+          "itemId": "cheese_oven_spaghetti",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": []
+      },
+      "requests": [
+        {
+          "ms": 12477,
+          "firstToolMs": 8609,
+          "rounds": [
+            8608,
+            3867
+          ],
+          "tools": [
+            {
+              "name": "setDineOption",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 9673,
+          "firstToolMs": 4809,
+          "rounds": [
+            4798,
+            4859
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 9814,
+          "firstToolMs": 4863,
+          "rounds": [
+            4842,
+            4942
+          ],
+          "tools": [
+            {
+              "name": "requestCheckout",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "co-en-ill-pay",
+      "kioskId": "malo",
+      "type": "checkout",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "confirming",
+      "cart": [
+        {
+          "itemId": "cola",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "size": [
+              "m"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 26005,
+          "firstToolMs": 25582,
+          "rounds": [
+            25578
+          ],
+          "tools": [
+            {
+              "name": "setDineOption",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 6948,
+          "firstToolMs": 6947,
+          "rounds": [
+            6944
+          ],
+          "tools": [
+            {
+              "name": "requestCheckout",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "co-en-pay-in-one-message",
+      "kioskId": "malo",
+      "type": "checkout",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "confirming",
+      "cart": [
+        {
+          "itemId": "zero_cola",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "size": [
+              "m"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 8146,
+          "firstToolMs": 8143,
+          "rounds": [
+            8141
+          ],
+          "tools": [
+            {
+              "name": "setDineOption",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "requestCheckout",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r2-en-family",
+      "kioskId": "airport_rail",
+      "type": "2-same-item-different-options",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "express_city_center",
+          "variant": "single",
+          "qty": 2,
+          "selections": {
+            "passenger": [
+              "adult"
+            ]
+          }
+        },
+        {
+          "itemId": "express_city_center",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "passenger": [
+              "child"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 9500,
+          "firstToolMs": 9391,
+          "rounds": [
+            9390
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r2-ko-family",
+      "kioskId": "airport_rail",
+      "type": "2-same-item-different-options",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "all_stop_old_town",
+          "variant": "single",
+          "qty": 2,
+          "selections": {
+            "passenger": [
+              "adult"
+            ]
+          }
+        },
+        {
+          "itemId": "all_stop_old_town",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "passenger": [
+              "child"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 8078,
+          "firstToolMs": 8077,
+          "rounds": [
+            8076
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r9-en-destination",
+      "kioskId": "airport_rail",
+      "type": "9-ambiguous",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "express_city_center"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_city_center"
+          },
+          {
+            "kind": "item",
+            "id": "express_city_center_return"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 10531,
+          "firstToolMs": 7549,
+          "rounds": [
+            7546,
+            2965
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r9-ko-destination",
+      "kioskId": "airport_rail",
+      "type": "9-ambiguous",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "express_city_center"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_city_center"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 9846,
+          "firstToolMs": 6130,
+          "rounds": [
+            6129,
+            3715
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r3-ko-card-top-up",
+      "kioskId": "airport_rail",
+      "type": "3-missing-required-choice",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_option",
+        "choices": [
+          {
+            "kind": "option",
+            "id": "top_up_0"
+          },
+          {
+            "kind": "option",
+            "id": "top_up_10000"
+          },
+          {
+            "kind": "option",
+            "id": "top_up_20000"
+          },
+          {
+            "kind": "option",
+            "id": "top_up_30000"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 8533,
+          "firstToolMs": 4234,
+          "rounds": [
+            4232,
+            4298
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r6-en-sold-out",
+      "kioskId": "airport_rail",
+      "type": "6-sold-out-or-hours",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "alternatives",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "day_pass"
+          },
+          {
+            "kind": "item",
+            "id": "two_day_pass"
+          },
+          {
+            "kind": "item",
+            "id": "transit_card"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 9659,
+          "firstToolMs": 4920,
+          "rounds": [
+            4919,
+            4739
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r8-en-platform",
+      "kioskId": "airport_rail",
+      "type": "8-not-in-data",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": "unknown_info",
+      "requests": [
+        {
+          "ms": 16898,
+          "firstToolMs": 3002,
+          "rounds": [
+            3001,
+            13896
+          ],
+          "tools": [
+            {
+              "name": "callStaff",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r8-ko-timetable",
+      "kioskId": "airport_rail",
+      "type": "8-not-in-data",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": "unknown_info",
+      "requests": [
+        {
+          "ms": 9076,
+          "firstToolMs": 3374,
+          "rounds": [
+            3373,
+            5702
+          ],
+          "tools": [
+            {
+              "name": "callStaff",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r8-en-not-sold-here",
+      "kioskId": "airport_rail",
+      "type": "8-not-in-data",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "express_city_center"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_city_center"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_harbor_gate"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_expo_park"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_riverside"
+          },
+          {
+            "kind": "staff",
+            "id": "staff"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 8635,
+          "firstToolMs": 5463,
+          "rounds": [
+            5462,
+            3170
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rco-en-ill-pay",
+      "kioskId": "airport_rail",
+      "type": "checkout",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "confirming",
+      "cart": [
+        {
+          "itemId": "all_stop_riverside",
+          "variant": "single",
+          "qty": 2,
+          "selections": {
+            "passenger": [
+              "adult"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 3429,
+          "firstToolMs": 3428,
+          "rounds": [
+            3428
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 5151,
+          "firstToolMs": 5150,
+          "rounds": [
+            5149
+          ],
+          "tools": [
+            {
+              "name": "requestCheckout",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-ko-applied-never-generic",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "bulgogi_burger",
+          "variant": "set",
+          "qty": 2,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "cider"
+            ]
+          }
+        },
+        {
+          "itemId": "apple_pie",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 22838,
+          "firstToolMs": 22836,
+          "rounds": [
+            22833
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-en-readback-pending",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_option",
+        "choices": [
+          {
+            "kind": "option",
+            "id": "cola"
+          },
+          {
+            "kind": "option",
+            "id": "zero_cola"
+          },
+          {
+            "kind": "option",
+            "id": "cider"
+          },
+          {
+            "kind": "option",
+            "id": "iced_coffee"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": [
+          "spicy_chicken_burger"
+        ]
+      },
+      "requests": [
+        {
+          "ms": 12722,
+          "firstToolMs": 8046,
+          "rounds": [
+            3947,
+            4094,
+            4616
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "NEEDS_CHOICE"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 2345,
+          "firstToolMs": null,
+          "rounds": [
+            2344
+          ],
+          "tools": []
+        }
+      ]
+    },
+    {
+      "id": "r-en-unsupported-modifier",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": false,
+      "reason": "unsupported change not said",
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "spicy_chicken_burger",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "upsell",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "soft_cone"
+          },
+          {
+            "kind": "item",
+            "id": "apple_pie"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 18169,
+          "firstToolMs": 11962,
+          "rounds": [
+            11961,
+            6205
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-en-out-of-domain",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": false,
+      "reason": "staff called",
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": "unknown_info",
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": []
+      },
+      "requests": [
+        {
+          "ms": 15718,
+          "firstToolMs": 7935,
+          "rounds": [
+            7934,
+            7783
+          ],
+          "tools": [
+            {
+              "name": "callStaff",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-en-pizza-order-before-dine",
+      "kioskId": "doughhouse",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "pepperoni",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "size": [
+              "large"
+            ],
+            "dough": [
+              "thin"
+            ],
+            "toppings": [
+              "double_cheese"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_option",
+        "choices": [
+          {
+            "kind": "option",
+            "id": "ml_500"
+          },
+          {
+            "kind": "option",
+            "id": "l_1_25"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 19373,
+          "firstToolMs": 4220,
+          "rounds": [
+            4220,
+            15133
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 11410,
+          "firstToolMs": 3442,
+          "rounds": [
+            3441,
+            3001,
+            4763
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "NEEDS_CHOICE"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-en-rail-unknown-destination",
+      "kioskId": "airport_rail",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": false,
+      "reason": "choices miss staff",
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "express_city_center"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_harbor_gate"
+          },
+          {
+            "kind": "item",
+            "id": "day_pass"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 9695,
+          "firstToolMs": 9694,
+          "rounds": [
+            9692
+          ],
+          "tools": []
+        }
+      ]
+    },
+    {
+      "id": "r-en-rail-to-the-airport",
+      "kioskId": "airport_rail",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "express_city_center"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_city_center"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_harbor_gate"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_expo_park"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_riverside"
+          },
+          {
+            "kind": "staff",
+            "id": "staff"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 13516,
+          "firstToolMs": 8700,
+          "rounds": [
+            8699,
+            4816
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

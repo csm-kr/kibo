@@ -22,7 +22,8 @@ export type TemplateId =
   | "upsell";
 
 export interface ChoiceRef {
-  kind: "item" | "variant" | "option" | "dine" | "yesno";
+  /** `staff` (id "staff"): a [Call staff] button after choices that may all be wrong (15-judge-fixes:1). */
+  kind: "item" | "variant" | "option" | "dine" | "yesno" | "staff";
   id: string;
 }
 

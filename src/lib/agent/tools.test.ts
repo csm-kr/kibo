@@ -64,7 +64,7 @@ describe("toolDeclarations", () => {
       "alternatives",
       "upsell",
     ]);
-    expect(offer.choices.items!.properties!.kind.enum).toEqual(["item", "variant", "option", "dine", "yesno"]);
+    expect(offer.choices.items!.properties!.kind.enum).toEqual(["item", "variant", "option", "dine", "yesno", "staff"]);
   });
 
   it("gives the no-argument tools an empty object", () => {

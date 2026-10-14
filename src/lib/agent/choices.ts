@@ -17,6 +17,9 @@ const YES_NO: Record<string, Record<Locale, string>> = {
   no: { ko: "아니요", en: "No" },
 };
 
+/** The header's staff button in the same words. */
+const STAFF: Record<Locale, string> = { ko: "직원 호출", en: "Call staff" };
+
 const QUESTION: Record<TemplateId, Record<Locale, string>> = {
   pick_item: { ko: "어떤 메뉴로 드릴까요?", en: "Which one would you like?" },
   pick_variant: { ko: "세트로 드릴까요?", en: "Make it a set?" },
@@ -67,6 +70,8 @@ export function choiceLabel(k: KioskData, choice: ChoiceRef, locale: Locale): st
       return choice.id === "eat_in" || choice.id === "take_out" ? (k.dineOptions?.[choice.id].name[locale] ?? "") : "";
     case "yesno":
       return Object.hasOwn(YES_NO, choice.id) ? YES_NO[choice.id][locale] : "";
+    case "staff":
+      return choice.id === "staff" ? STAFF[locale] : "";
   }
 }
 

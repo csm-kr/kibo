@@ -2,7 +2,7 @@
 
 import { Bell, ChevronRight, Link2, Mic, Smartphone } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useCallback, useEffect, useEffectEvent, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { ModalLayer } from "@/components/kiosk/ModalLayer";
 import { AppBar } from "@/components/phone/AppBar";
 import { ConfirmBar, ConfirmCard, DoneCard, PayCard } from "@/components/phone/Checkout";
@@ -238,9 +238,34 @@ export function AssistantPanel(props: Props) {
 
   function pickChoice(choice: ChoiceRef, label: string) {
     // Dine choices go straight to the session; any other tap is the user's answer to the agent's question.
-    if (choice.kind === "dine") void command("setDineOption", { option: choice.id });
+    if (choice.kind === "dine") void chooseDine(choice.id as DineOption);
+    // The same command as the header's [Call staff].
+    else if (choice.kind === "staff") void command("callStaff", { reasonCode: "user_request" });
     else say(label);
   }
+
+  /**
+   * A dine tap. When the AI held an order for this question (15-judge-fixes:1), the order goes on once the session
+   * has the dine option (a learned kiosk sets it only after the bridge replayed it): typed, the phone sends the held
+   * message again; with voice open, the tap goes to the Live conversation as the user's answer, since the model there
+   * still holds the order it asked about.
+   */
+  const [afterDine, setAfterDine] = useState<{ option: DineOption; voice: boolean } | null>(null);
+  async function chooseDine(option: DineOption) {
+    const asked = session?.pendingChoice?.templateId === "pick_dine";
+    if (!(await command("setDineOption", { option }))) return;
+    if (voiceOpen ? asked : chat.held !== null) setAfterDine({ option, voice: voiceOpen });
+  }
+  // The tap that was already followed up; each tap sets a new object, so it goes on once.
+  const continued = useRef<typeof afterDine>(null);
+  const continueOrder = useEffectEvent(() => {
+    if (!afterDine || continued.current === afterDine) return;
+    if (session?.dineOption !== afterDine.option || session.pendingBridgeCommand) return;
+    continued.current = afterDine;
+    if (afterDine.voice) say(kiosk.dineOptions?.[afterDine.option].name[locale] ?? afterDine.option);
+    else void chat.resend(pt("continuingOrder", locale));
+  });
+  useEffect(() => continueOrder(), [session, afterDine]);
 
   // [No thanks] on an offer: the AI hears it, and the buttons go away at once, because a "no" changes nothing on
   // the server that would clear them. Keyed by the offer, so a later one shows again.
@@ -422,7 +447,7 @@ export function AssistantPanel(props: Props) {
                   key={option}
                   type="button"
                   disabled={busy}
-                  onClick={() => void command("setDineOption", { option })}
+                  onClick={() => void chooseDine(option)}
                   className={`min-h-15 overflow-hidden rounded-tile bg-white text-left shadow-card active:bg-kibo-tint disabled:opacity-60 ${PRESS} ${FOCUS}`}
                 >
                   {/* A learned kiosk's dine "photo" is only a placeholder ring: text-only buttons there (I-103). */}

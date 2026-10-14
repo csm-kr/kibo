@@ -56,7 +56,10 @@ export function Choices(props: {
             type="button"
             disabled={props.disabled}
             onClick={() => props.onPick(choice, label)}
-            className={`flex min-h-15 items-center gap-3 rounded-tile bg-white px-3 py-2 text-left shadow-card active:bg-kibo-tint disabled:opacity-60 ${PRESS} ${FOCUS}`}
+            // [Call staff] looks like the header's staff button, apart from the answers.
+            className={`flex min-h-15 items-center gap-3 rounded-tile px-3 py-2 text-left disabled:opacity-60 ${
+              choice.kind === "staff" ? "bg-staff-tint text-staff-ink" : "bg-white shadow-card active:bg-kibo-tint"
+            } ${PRESS} ${FOCUS}`}
           >
             {photo && <Image src={photo} alt="" width={48} height={48} className="size-12 flex-none rounded-[12px] bg-cream object-cover" />}
             {/* The tap sends only the name; the price is from menu data, like the kiosk tile's. */}

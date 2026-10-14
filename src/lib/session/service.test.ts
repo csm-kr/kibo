@@ -390,6 +390,11 @@ describe("learned kiosk commands", () => {
     const store = new MemoryStore();
     const created = await createSession(store, { kioskId: "doughhouse" }, T0);
     const { deviceToken } = await claimSession(store, { sessionId: created.sessionId, claimToken: created.claimToken }, T0);
+    // This kiosk asks the dine option before the first add (15-judge-fixes:1), so it is mirrored first.
+    const dine = body(created.sessionId, "setDineOption", { option: "eat_in" }, { source: "button" });
+    await runCommand(store, { body: dine, bearer: deviceToken }, T0);
+    const mirrored = body(created.sessionId, "bridgeReport", { commandId: dine.commandId, ok: true, kioskTotal: 0, kioskLines: [] });
+    await runCommand(store, { body: mirrored, bearer: created.kioskToken }, T0);
     return { store, deviceToken, ...created };
   }
 
@@ -397,7 +402,7 @@ describe("learned kiosk commands", () => {
     const { store, sessionId, kioskToken, deviceToken } = await learned();
     const add = body(sessionId, "addToCart", PIZZA, { source: "voice", utteranceSeq: 1 });
     const res = await runCommand(store, { body: add, bearer: deviceToken }, T0 + 1);
-    expect(res).toEqual({ ok: true, pending: true, status: "connected", cart: [], total: 0, cartVersion: 0, dineOption: null, result: { pending: true } });
+    expect(res).toEqual({ ok: true, pending: true, status: "ordering", cart: [], total: 0, cartVersion: 0, dineOption: "eat_in", result: { pending: true } });
 
     // A retry of the same command is answered pending again and applies nothing.
     const again = await runCommand(store, { body: add, bearer: deviceToken }, T0 + 2);

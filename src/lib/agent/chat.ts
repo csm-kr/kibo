@@ -51,6 +51,11 @@ export interface ChatResponse {
   cartVersion: number;
   /** What the AI did in this request, for /demo (ids and codes only). */
   actions: AgentAction[];
+  /**
+   * The request ordered something but changed nothing because the dine option was missing, and it ended on the dine
+   * buttons: after the user's tap the phone sends the same message again, so the order is not lost (15-judge-fixes:1).
+   */
+  heldForDine: boolean;
 }
 
 const MAX_ROUNDS = 5;
@@ -167,7 +172,8 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
       const offer = detail
         ? { templateId: detail.templateId, choices: detail.choices!.slice(0, 6) }
         : intro && intro.choices.length > 0
-          ? { templateId: "pick_item", choices: intro.choices }
+          ? // [Call staff] last: the request matched nothing, so none of these may be what the user wants.
+            { templateId: "pick_item", choices: [...intro.choices, { kind: "staff", id: "staff" }] }
           : null;
       if (offer) {
         const t = performance.now();
@@ -239,8 +245,23 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
 
   if (stoppedEarly || !reply) reply = await serverReply();
 
-  const latest = await store.get(input.sessionId);
+  let latest = await store.get(input.sessionId);
   if (!latest) throw new CommandError("NOT_FOUND", "This order could not be found.");
+  // A refused add or checkout that needs the dine option is always asked with buttons, even when the model asked in
+  // words only, so the phone has something to tap and knows to send the order again.
+  const dineRefused = allDone.some((d) => !d.outcome.ok && d.outcome.error.detail?.templateId === "pick_dine");
+  const dineOpen = kiosk.dineOptions !== undefined && latest.dineOption === null && !latest.pendingBridgeCommand;
+  if (dineRefused && dineOpen && !latest.pendingChoice && OFFER_STATES.has(latest.status)) {
+    const offer = { templateId: "pick_dine", choices: [{ kind: "dine", id: "eat_in" }, { kind: "dine", id: "take_out" }] };
+    const t = performance.now();
+    const outcome = await execute("offerChoices", offer);
+    record("offerChoices", offer, outcome, performance.now() - t);
+    latest = (await store.get(input.sessionId)) ?? latest;
+  }
+  const dineAsked = actions.some((a) => a.tool === "offerChoices" && a.code === "ok" && a.args.templateId === "pick_dine");
+  // Only a request that changed nothing (an offer is not a change): sending it again must not add anything twice.
+  const changedNothing = !allDone.some((d) => d.outcome.ok && d.name !== "offerChoices");
+  const heldForDine = dineOpen && dineAsked && changedNothing && latest.pendingChoice?.templateId === "pick_dine";
   return {
     reply,
     status: latest.status,
@@ -248,5 +269,6 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
     total: latest.total,
     cartVersion: latest.cartVersion,
     actions,
+    heldForDine,
   };
 }

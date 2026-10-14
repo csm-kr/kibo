@@ -30,6 +30,24 @@ describe("chatReducer", () => {
     expect(s.messages[1]).toMatchObject({ role: "notice", text: "The connection is unstable." });
   });
 
+  it("a reply held for the dine question keeps the user's message until it is sent again (15-judge-fixes:1)", () => {
+    const sent = chatReducer(initialChat, { type: "send", text: "One large pepperoni pizza" });
+    const held = chatReducer(sent, { type: "reply", text: "Eat here or take out?", heldForDine: true });
+    expect(held.held).toBe("One large pepperoni pizza");
+    expect(chatReducer(sent, { type: "reply", text: "Added." }).held).toBeNull();
+
+    // Sent again after the tap: the bubble says so, the history keeps the user's own words.
+    const again = chatReducer(held, { type: "send", text: "One large pepperoni pizza", shown: "Continuing your order…" });
+    expect(again.held).toBeNull();
+    expect(again.utteranceSeq).toBe(2);
+    expect(again.messages.at(-1)).toEqual({ id: 3, role: "user", text: "One large pepperoni pizza", shown: "Continuing your order…" });
+    expect(historyFor(again.messages).at(-1)).toEqual({ role: "user", text: "One large pepperoni pizza" });
+
+    // Anything else the user says first replaces the held order.
+    expect(chatReducer(held, { type: "send", text: "Is it halal?" }).held).toBeNull();
+    expect(chatReducer(held, { type: "reset" }).held).toBeNull();
+  });
+
   it("message ids stay unique", () => {
     let s = initialChat;
     for (let i = 0; i < 4; i++) s = sendAndReply(s, `q${i}`, `a${i}`);

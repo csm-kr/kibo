@@ -113,6 +113,8 @@ function isValidChoice(k: KioskData, c: ChoiceRef): boolean {
       return k.dineOptions !== undefined && (c.id === "eat_in" || c.id === "take_out");
     case "yesno":
       return c.id === "yes" || c.id === "no";
+    case "staff":
+      return c.id === "staff";
   }
 }
 
@@ -201,15 +203,7 @@ function transition(s: Session, cmd: Command, ctx: CommandContext): { next: Sess
     case "requestCheckout":
       requireStatus(s, ["ordering"], "Please add something to your order first.");
       if (s.cart.length === 0) throw new CommandError("CONFLICT", "Your cart is empty.");
-      if (k.dineOptions && s.dineOption === null) {
-        throw new CommandError("NEEDS_CHOICE", "Eat here or take out?", {
-          templateId: "pick_dine",
-          choices: [
-            { kind: "dine", id: "eat_in" },
-            { kind: "dine", id: "take_out" },
-          ],
-        });
-      }
+      if (k.dineOptions && s.dineOption === null) throw needsDine();
       return {
         next: {
           ...s,
@@ -249,6 +243,17 @@ function transition(s: Session, cmd: Command, ctx: CommandContext): { next: Sess
     case "bridgeReport":
       throw new CommandError("CONFLICT", NO_BRIDGE_CHANGE);
   }
+}
+
+/** The dine question as buttons (pick_dine), so the AI or the server can offer it with offerChoices. */
+function needsDine(): CommandError {
+  return new CommandError("NEEDS_CHOICE", "Eat here or take out?", {
+    templateId: "pick_dine",
+    choices: [
+      { kind: "dine", id: "eat_in" },
+      { kind: "dine", id: "take_out" },
+    ],
+  });
 }
 
 // Learned kiosks (KIBO Learn): the kiosk page is the source of truth. A cart change is validated here, then waits in
@@ -315,6 +320,9 @@ function learnedTransition(s: Session, cmd: Command, ctx: CommandContext): { nex
 
     case "addToCart":
       requireStatus(base, CART_EDITABLE, "Please start an order first.");
+      // The page asks eat-in or take-out once, before its menu, and cannot change it later (I-095); asking first also
+      // shows the question as buttons, so the phone can send the held order again after the tap (15-judge-fixes:1).
+      if (ctx.kiosk.dineOptions && base.dineOption === null) throw needsDine();
       // Validation only: the line is added when the bridge reports the kiosk's total.
       addLine(ctx.kiosk, base.cart, cmd.args, ctx.now, ctx.newLineId);
       return wait({ type: "addToCart", args: cmd.args });

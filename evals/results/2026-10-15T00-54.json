@@ -1,0 +1,228 @@
+{
+  "date": "2026-10-14T15:54:00.166Z",
+  "model": "gemini-3.8-flash",
+  "backend": "vertex",
+  "modelCallsByBackend": {
+    "api": 0,
+    "vertex": 6
+  },
+  "thinkingLevel": "low",
+  "evalClock": "14:00 KST",
+  "subset": [
+    "r-en-rail-unknown-destination",
+    "r-en-rail-to-the-airport",
+    "r-en-pizza-order-before-dine"
+  ],
+  "cases": 3,
+  "passed": 3,
+  "passRate": 1,
+  "byGroup": {
+    "recovery": {
+      "pass": 3,
+      "total": 3
+    }
+  },
+  "byKiosk": {
+    "doughhouse": {
+      "pass": 1,
+      "total": 1
+    },
+    "airport_rail": {
+      "pass": 2,
+      "total": 2
+    }
+  },
+  "byType": {
+    "12-recovery": {
+      "pass": 3,
+      "total": 3
+    }
+  },
+  "latency": {
+    "requests": 4,
+    "totalMedianMs": 11981,
+    "totalP90Ms": 16915,
+    "firstToolRequests": 4,
+    "firstToolMedianMs": 11790,
+    "firstToolP90Ms": 16862,
+    "modelCalls": 6,
+    "roundMedianMs": 4410,
+    "roundP90Ms": 16852,
+    "callsPerRequest": {
+      "1": 3,
+      "3": 1
+    },
+    "oneCallWithTools": 1
+  },
+  "notCovered": [
+    {
+      "type": "7-count-limits",
+      "reason": "Count limits (max 3 toppings) need the learned Doughhouse kiosk, which has no LearnedAdapter yet."
+    }
+  ],
+  "results": [
+    {
+      "id": "r-en-pizza-order-before-dine",
+      "kioskId": "doughhouse",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "pepperoni",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "size": [
+              "large"
+            ],
+            "dough": [
+              "thin"
+            ],
+            "toppings": [
+              "double_cheese"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_option",
+        "choices": [
+          {
+            "kind": "option",
+            "id": "ml_500"
+          },
+          {
+            "kind": "option",
+            "id": "l_1_25"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 16915,
+          "firstToolMs": 16862,
+          "rounds": [
+            16852
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 12181,
+          "firstToolMs": 3270,
+          "rounds": [
+            3264,
+            4296,
+            4410
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "NEEDS_CHOICE"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-en-rail-unknown-destination",
+      "kioskId": "airport_rail",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "express_city_center"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_harbor_gate"
+          },
+          {
+            "kind": "item",
+            "id": "day_pass"
+          },
+          {
+            "kind": "staff",
+            "id": "staff"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 11820,
+          "firstToolMs": 11790,
+          "rounds": [
+            11788
+          ],
+          "tools": []
+        }
+      ]
+    },
+    {
+      "id": "r-en-rail-to-the-airport",
+      "kioskId": "airport_rail",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "express_city_center"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_harbor_gate"
+          },
+          {
+            "kind": "item",
+            "id": "day_pass"
+          },
+          {
+            "kind": "staff",
+            "id": "staff"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 11981,
+          "firstToolMs": 11980,
+          "rounds": [
+            11980
+          ],
+          "tools": []
+        }
+      ]
+    }
+  ]
+}

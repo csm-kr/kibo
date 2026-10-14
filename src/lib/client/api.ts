@@ -140,6 +140,8 @@ export interface ChatReply {
   cartVersion: number;
   /** What the AI did in this request (ids and codes only), for /demo. */
   actions: AgentAction[];
+  /** The order waits for the dine tap; the phone sends the message again after it (15-judge-fixes:1). */
+  heldForDine?: boolean;
 }
 
 /** One user utterance to the text agent; `cartVersion` only when the confirm card is showing. */

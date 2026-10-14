@@ -86,6 +86,57 @@ test("learned pizza kiosk on /demo: the bridge enters the order, the phone never
   await expect(cart.getByText("Garlic dipping sauce", { exact: true })).toHaveCount(0);
 });
 
+// The judge's case (15-judge-fixes:1): an order typed before the dine option got only "Eat here or take out?", and
+// after the tap the cart stayed empty. Now the agent holds it, and the phone sends it again after the tap. /api/chat is
+// answered here, but every change goes through the real API, the bridge and the kiosk page.
+test("an order typed before the dine option survives the Eat here tap, without retyping", async ({ page, request }) => {
+  const s = await startLearnedDemo(page);
+  const kioskLines = page.frameLocator("iframe[data-learned-kiosk]").locator("#cartList li");
+  const ORDER = "One large pepperoni pizza with thin crust and extra cheese, and a cola";
+  const sent: { message: string; history: { role: string; text: string }[] }[] = [];
+  const reply = (text: string, heldForDine: boolean) => ({
+    ok: true,
+    reply: text,
+    status: "connected",
+    cart: [],
+    total: 0,
+    cartVersion: 0,
+    actions: [],
+    heldForDine,
+  });
+  await page.route("**/api/chat", async (route) => {
+    const body = route.request().postDataJSON() as (typeof sent)[number];
+    sent.push(body);
+    const ai = (type: string, args: object) =>
+      command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "text", utteranceSeq: sent.length });
+    if (sent.length === 1) {
+      // What the server does when the add is refused for the dine option: the question as buttons, the order held.
+      await ai("offerChoices", { templateId: "pick_dine", choices: [{ kind: "dine", id: "eat_in" }, { kind: "dine", id: "take_out" }] });
+      return route.fulfill({ json: reply("Eat here or take out?", true) });
+    }
+    await ai("addToCart", { itemId: "pepperoni", qty: 1, selections: { size: ["large"], dough: ["thin"], toppings: ["double_cheese"] } });
+    return route.fulfill({ json: reply("Added a large pepperoni.", false) });
+  });
+
+  await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "dine");
+  await page.getByRole("textbox", { name: "Type your order" }).fill(ORDER);
+  await page.getByRole("button", { name: "Send" }).click();
+  await expect(page.getByText("Eat here or take out?").first()).toBeVisible();
+  await expect(kioskLines).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Eat here" }).click();
+  await expect(kioskLines).toHaveCount(1, { timeout: 15_000 });
+  await expect(kioskLines.nth(0)).toContainText("페퍼로니 (라지, 씬");
+  await expect(phoneScreen(page).getByText("Continuing your order…")).toBeVisible();
+  // The same words went again, after the user's message and the question in the history; nothing was typed twice.
+  expect(sent.map((b) => b.message)).toEqual([ORDER, ORDER]);
+  expect(sent[1].history).toEqual([
+    { role: "user", text: ORDER },
+    { role: "model", text: "Eat here or take out?" },
+  ]);
+  await expect(page.getByRole("textbox", { name: "Type your order" })).toHaveValue("");
+});
+
 test("@live typing a pizza order reaches real Gemini and the kiosk's own cart gets the line", async ({ page }) => {
   test.skip(process.env.E2E_LIVE !== "1", "calls real Gemini; run `npm run test:e2e:live`");
   await startLearnedDemo(page);

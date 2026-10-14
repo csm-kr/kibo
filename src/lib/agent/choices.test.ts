@@ -23,6 +23,9 @@ describe("choiceLabel", () => {
     expect(choiceLabel(k, { kind: "dine", id: "take_out" }, "en")).toBe("Take out");
     expect(choiceLabel(k, { kind: "yesno", id: "yes" }, "ko")).toBe("네");
     expect(choiceLabel(k, { kind: "yesno", id: "no" }, "en")).toBe("No");
+    expect(choiceLabel(rail, { kind: "staff", id: "staff" }, "en")).toBe("Call staff");
+    expect(choiceLabel(rail, { kind: "staff", id: "staff" }, "ko")).toBe("직원 호출");
+    expect(choicePrice(rail, { kind: "staff", id: "staff" }, "en")).toBeNull();
   });
 
   it("returns an empty label for ids that are not in the data", () => {

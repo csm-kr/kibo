@@ -655,6 +655,36 @@
       "locale": "en",
       "turns": ["Two tickets to the airport, please."],
       "expect": { "ask": {} }
+    },
+    {
+      "id": "r-en-pizza-order-before-dine",
+      "kioskId": "doughhouse",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "en",
+      "turns": ["One large pepperoni pizza with thin crust and extra cheese, and a cola.", { "tapDine": "eat_in" }],
+      "expect": {
+        "cart": [{ "itemId": "pepperoni", "variant": "single", "qty": 1, "selections": { "size": ["large"], "dough": ["thin"], "toppings": ["double_cheese"] } }],
+        "choices": { "templateId": "pick_option", "ids": ["ml_500", "l_1_25"] }
+      }
+    },
+    {
+      "id": "r-en-rail-unknown-destination",
+      "kioskId": "airport_rail",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "en",
+      "turns": ["Two adult tickets to Seoul Station on the express train."],
+      "expect": { "choices": { "templateId": "pick_item", "ids": ["express_city_center", "staff"] } }
+    },
+    {
+      "id": "r-en-rail-to-the-airport",
+      "kioskId": "airport_rail",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "en",
+      "turns": ["Two tickets to the airport, please."],
+      "expect": { "choices": { "templateId": "pick_item", "ids": ["staff"] } }
     }
   ]
 }

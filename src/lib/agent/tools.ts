@@ -6,7 +6,7 @@ import type { KioskData } from "@/types/menu";
 
 const VARIANTS = ["single", "set", "largeSet"];
 const TEMPLATES = ["pick_item", "pick_variant", "pick_option", "pick_dine", "yes_no", "alternatives", "upsell"];
-const CHOICE_KINDS = ["item", "variant", "option", "dine", "yesno"];
+const CHOICE_KINDS = ["item", "variant", "option", "dine", "yesno", "staff"];
 
 function unique(ids: string[]): string[] {
   return [...new Set(ids)];
