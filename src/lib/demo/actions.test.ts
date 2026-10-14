@@ -43,9 +43,21 @@ describe("actionRow", () => {
       "Asked which one: Cola, Cider",
       "Called staff",
       "Opened the confirm card",
-      "Moved to payment after your yes",
+      "You confirmed by saying yes",
       "Tried something this kiosk does not have → the server refused it",
     ]);
+  });
+
+  it("a confirm is always the user's own: a tap on the card or a new yes, never the AI alone", () => {
+    expect(actionRow(malo, act("confirmCheckout", {}, "ok", 120), "en")).toEqual({
+      text: "You confirmed by saying yes",
+      tech: "confirmCheckout ✓ 120 ms · needs your tap or a new 'yes'",
+    });
+    expect(actionRow(malo, { ...act("confirmCheckout", {}, "ok", 90), tap: true }, "en")).toEqual({
+      text: "You tapped Yes, pay now",
+      tech: "confirmCheckout ✓ 90 ms · needs your tap or a new 'yes'",
+    });
+    expect(actionRow(malo, { ...act("confirmCheckout", {}), tap: true }, "ko").text).toBe("'네, 결제할게요'를 눌러 확인했어요");
   });
 
   it("a learned kiosk's pending add says the kiosk is entering it", () => {

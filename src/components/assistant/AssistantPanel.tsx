@@ -194,6 +194,14 @@ export function AssistantPanel(props: Props) {
     }
   }
 
+  /** [Yes, pay now]. /demo lists the user's own confirm next to the AI's actions, so the safety rule shows (D2). */
+  async function confirmByTap(cartVersion: number) {
+    const started = performance.now();
+    if (await command("confirmCheckout", {}, cartVersion)) {
+      props.onActions?.([{ tool: "confirmCheckout", args: {}, code: "ok", tap: true, ms: Math.round(performance.now() - started) }]);
+    }
+  }
+
   /**
    * While voice is open, a typed line, an example or a choice tap is one user turn on the same Live conversation, so
    * the voice model never misses a change. Otherwise it goes to /api/chat. The confirm card shows `cartVersion`; a
@@ -429,7 +437,7 @@ export function AssistantPanel(props: Props) {
           <ConfirmBar
             total={session.total}
             locale={locale}
-            onPay={() => void command("confirmCheckout", {}, session.cartVersion)}
+            onPay={() => void confirmByTap(session.cartVersion)}
             payDisabled={busy}
             voice={voice.state}
             micDisabled={!deviceToken}

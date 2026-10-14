@@ -95,13 +95,18 @@ test("/demo Use my phone instead: the judge's phone claims a demo session; [Try 
   const checkout = await phone("requestCheckout", {}, { source: "voice", utteranceSeq: 2 });
   await phone("confirmCheckout", {}, { source: "button", cartVersion: checkout.cartVersion });
 
-  // Paying happens on the kiosk half, as at a real kiosk.
+  // Paying happens on the kiosk half, as at a real kiosk; the panel says the Korean kiosk's step in English.
   const root = kioskRoot(page);
   await expect(root).toHaveAttribute("data-screen", "payment");
+  await expect(panel.locator("[data-panel-change]")).toHaveText("Confirmed by you");
+  await expect(panel.locator("[data-kiosk-step]")).toContainText("Tap 카드 (Card), then 카드 넣기 (Insert card)");
+  // The caption's copy is for the phone-half demo; here the panel holds it, once.
+  await expect(page.locator("[data-kiosk-step]")).toHaveCount(1);
   await root.getByRole("button", { name: "카드", exact: true }).click();
   await root.getByRole("button", { name: "카드 넣기" }).click();
   await expect(root).toHaveAttribute("data-screen", "done");
   await expect(panel.locator("[data-panel-order]")).toHaveText(/^Paid · order number \d+$/);
+  await expect(panel.locator("[data-panel-change]")).toHaveText("Paid at the kiosk · confirmed by you");
   // No touch-vs-talk card: the judge's messages and taps happened on their own phone.
   await expect(page.getByText("Touch vs talk")).toHaveCount(0);
 

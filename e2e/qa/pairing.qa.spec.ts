@@ -1,5 +1,5 @@
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
-import { claim, command, readClaim, textLines } from "../helpers";
+import { claim, command, kioskRoot, readClaim, textLines } from "../helpers";
 import { PAIRING, qaState, type Findings } from "./checks";
 
 // UI QA of KIBO's pairing panel (12-phone-app:4): /kiosk on a landscape screen (a laptop as the kiosk) and /demo
@@ -42,6 +42,15 @@ for (const vp of [
     await command(request, deviceToken, { sessionId, type: "addToCart", args: ITEM, source: "voice", utteranceSeq: 1 });
     await expect(panel.locator("[data-panel-order]")).toHaveText(/^Ordering · 1 item/);
     await check(page, info, "kiosk-pairing-connected");
+
+    // The user confirms on the phone; the Korean kiosk asks for the card and the panel says so in English (14-final:0).
+    await command(request, deviceToken, { sessionId, type: "setDineOption", args: { option: "eat_in" }, source: "button" });
+    const review = await command(request, deviceToken, { sessionId, type: "requestCheckout", args: {}, source: "voice", utteranceSeq: 2 });
+    await command(request, deviceToken, { sessionId, type: "confirmCheckout", args: {}, source: "button", cartVersion: review.cartVersion });
+    await expect(kioskRoot(page)).toHaveAttribute("data-screen", "payment");
+    await expect(panel.locator("[data-panel-change]")).toHaveText("Confirmed by you");
+    await expect(panel.locator("[data-kiosk-step]")).toContainText("Tap 카드 (Card), then 카드 넣기 (Insert card)");
+    await check(page, info, "kiosk-pairing-paying");
   });
 }
 

@@ -117,8 +117,10 @@ function okText(k: KioskData, a: AgentAction, locale: Locale): string {
       return ko ? "직원을 호출했어요" : "Called staff";
     case "requestCheckout":
       return ko ? "확인 카드를 열었어요" : "Opened the confirm card";
+    // Only the user can confirm: a tap on the confirm card, or a new "yes" after it appeared (server rule).
     case "confirmCheckout":
-      return ko ? "'네'라는 답을 듣고 결제 단계로 넘겼어요" : "Moved to payment after your yes";
+      if (a.tap) return ko ? "'네, 결제할게요'를 눌러 확인했어요" : "You tapped Yes, pay now";
+      return ko ? "'네'라고 답해서 확인했어요" : "You confirmed by saying yes";
     default:
       return TRIED_UNKNOWN[locale];
   }
@@ -127,7 +129,8 @@ function okText(k: KioskData, a: AgentAction, locale: Locale): string {
 export function actionRow(k: KioskData, a: AgentAction, locale: Locale): ActionRow {
   if (a.code === "ok" && a.tool !== "unknown") {
     const pending = a.pending ? (locale === "ko" ? " · 키오스크가 입력 중" : " · kiosk entering it") : "";
-    return { text: okText(k, a, locale), tech: `${a.tool} ✓ ${a.ms} ms${pending}` };
+    const rule = a.tool === "confirmCheckout" ? " · needs your tap or a new 'yes'" : "";
+    return { text: okText(k, a, locale), tech: `${a.tool} ✓ ${a.ms} ms${pending}${rule}` };
   }
   const tried = Object.hasOwn(TRIED, a.tool) ? TRIED[a.tool](itemTitleFor(k, a, locale), locale) : TRIED_UNKNOWN[locale];
   const reason = a.tool === "confirmCheckout" && a.code === "CONFLICT" ? CONFIRM_CARD : (REASON[a.code] ?? REFUSED);

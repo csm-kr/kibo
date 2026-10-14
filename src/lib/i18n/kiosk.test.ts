@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { KIOSK_TEXT, kt, languageName, receiptInSeconds, TICKET_TEXT } from "./kiosk";
+import { aiSubtitle, KIOSK_TEXT, kt, languageName, receiptInSeconds, TICKET_TEXT } from "./kiosk";
 
 const HANGUL = /[가-힣]/;
 
@@ -43,5 +43,22 @@ describe("kiosk strings", () => {
   it("names each language in itself", () => {
     expect(languageName("ko")).toBe("한국어");
     expect(languageName("en")).toBe("English");
+  });
+});
+
+describe("aiSubtitle", () => {
+  it("is KIBO's English line under the kiosk's Korean AI banner", () => {
+    expect(aiSubtitle("add", "food", "Cheeseburger set · Fries (M) · Zero cola · No pickles")).toBe(
+      "AI added: Cheeseburger set · Fries (M) · Zero cola · No pickles",
+    );
+    expect(aiSubtitle("update", "food", "Cheeseburger set")).toBe("AI changed: Cheeseburger set");
+    expect(aiSubtitle("remove", "food", "Cola")).toBe("AI removed: Cola");
+    expect(aiSubtitle("undo", "food", "")).toBe("AI undid the last change");
+    expect(aiSubtitle("clear", "food", "")).toBe("AI cleared the cart");
+  });
+
+  it("a ticket machine says chose and tickets (R-007)", () => {
+    expect(aiSubtitle("add", "ticket", "Express")).toBe("AI chose: Express");
+    expect(aiSubtitle("clear", "ticket", "")).toBe("AI cleared the tickets");
   });
 });

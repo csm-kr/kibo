@@ -25,6 +25,11 @@ export function KioskToolbar(props: {
   onClaimUrl?(claimUrl: string, pairCode?: string): void;
   /** K3's 2 s "AI가 담았어요: …" line; it takes this row instead of covering the tiles (I-045). */
   status?: string | null;
+  /**
+   * KIBO's English subtitle of that line ("AI added: Cheeseburger set · …"). Not the kiosk's own UI, so it is KIBO
+   * blue, and it gets its own row under this one (R-006): the kiosk screen moves down while it shows.
+   */
+  subtitle?: string | null;
 }) {
   const { kiosk, session, onClaimUrl } = props;
   const [qrOpen, setQrOpen] = useState(false);
@@ -41,30 +46,38 @@ export function KioskToolbar(props: {
 
   const status = props.status ?? null;
   return (
-    <div className="flex h-28 flex-none items-center bg-(--k-panel) px-12">
-      {/* Positioned here, not on the row: the QR sheet must cover the screen root, not this row. */}
-      <div className="relative flex h-full min-w-0 flex-1 items-center">
-        {/* While the status shows, the row's own controls are hidden (not focusable) rather than covered. */}
-        <div className={`flex min-w-0 flex-1 items-center justify-between gap-6 ${status ? "invisible" : ""}`}>
-          <ToolbarItems
-            kiosk={kiosk}
-            session={session}
-            claimUrl={props.claimUrl}
-            canReissue={canReissue}
-            onConnect={connectOtherPhone}
-            onQr={() => setQrOpen(true)}
-          />
+    <>
+      <div className="flex h-28 flex-none items-center bg-(--k-panel) px-12">
+        {/* Positioned here, not on the row: the QR sheet must cover the screen root, not this row. */}
+        <div className="relative flex h-full min-w-0 flex-1 items-center">
+          {/* While the status shows, the row's own controls are hidden (not focusable) rather than covered. */}
+          <div className={`flex min-w-0 flex-1 items-center justify-between gap-6 ${status ? "invisible" : ""}`}>
+            <ToolbarItems
+              kiosk={kiosk}
+              session={session}
+              claimUrl={props.claimUrl}
+              canReissue={canReissue}
+              onConnect={connectOtherPhone}
+              onQr={() => setQrOpen(true)}
+            />
+          </div>
+          <div aria-live="polite" className="pointer-events-none absolute inset-0 flex items-center">
+            {status && (
+              <p className="k-text-40 w-full truncate rounded-full bg-(--k-primary-dark) px-12 py-3 text-center font-bold text-white">
+                {status}
+              </p>
+            )}
+          </div>
         </div>
-        <div aria-live="polite" className="pointer-events-none absolute inset-0 flex items-center">
-          {status && (
-            <p className="k-text-40 w-full truncate rounded-full bg-(--k-primary-dark) px-12 py-3 text-center font-bold text-white">
-              {status}
-            </p>
-          )}
-        </div>
+        {qrOpen && <QrSheet kiosk={kiosk} claimUrl={props.claimUrl} pairCode={props.pairCode} pairUrl={props.pairUrl} onClose={() => setQrOpen(false)} />}
       </div>
-      {qrOpen && <QrSheet kiosk={kiosk} claimUrl={props.claimUrl} pairCode={props.pairCode} pairUrl={props.pairUrl} onClose={() => setQrOpen(false)} />}
-    </div>
+      {props.subtitle && (
+        <p data-kiosk-subtitle lang="en" className="k-text-40 flex flex-none items-center gap-6 bg-[#3446D4] px-12 py-4 text-white">
+          <span className="flex-none rounded-full bg-white px-4 font-display font-bold text-[#3446D4]">KIBO</span>
+          <span className="min-w-0">{props.subtitle}</span>
+        </p>
+      )}
+    </>
   );
 }
 

@@ -5,7 +5,9 @@
     {
       "step": 0,
       "name": "kiosk-english",
-      "status": "pending"
+      "status": "completed",
+      "summary": "Korean kiosk stays Korean; KIBO adds an English subtitle row under each AI change on K3 for 6 s (aiSubtitle in src/lib/i18n/kiosk.ts, KioskToolbar subtitle prop, KIBO blue, 40px canvas), the kiosk's review/payment/receipt step in English on the /demo caption and the pairing panel (kioskStep in src/lib/kiosk/pairing.ts), changeLine ('Waiting for you to confirm' / 'Confirmed by you' / 'Paid at the kiosk · confirmed by you', never 'by the AI' from confirming on), and a 'You tapped Yes, pay now' row in What the AI did (AgentAction.tap, reported by AssistantPanel confirmByTap; AI confirm reads 'You confirmed by saying yes', tech line '· needs your tap or a new yes'). Doughhouse no longer called third-party. Payment rule unchanged. Tests first (pairing, actions, kiosk i18n), E2E asserts in two-device, kiosk-pairing, demo-actions; new QA state kiosk-pairing-paying; screenshots in phases/14-final/qa/. Issues I-207, I-208, I-209 (fixed).",
+      "started_at": "2026-10-14T08:35:09+0900"
     },
     {
       "step": 1,
@@ -57,5 +59,6 @@
       "name": "qa",
       "status": "pending"
     }
-  ]
+  ],
+  "created_at": "2026-10-14T08:35:09+0900"
 }

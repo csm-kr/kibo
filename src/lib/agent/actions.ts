@@ -13,6 +13,8 @@ export interface AgentAction {
   code: "ok" | ErrorCode | "NETWORK";
   /** A learned kiosk accepted it; the bridge is entering it on the kiosk. */
   pending?: boolean;
+  /** Not the AI's: the user tapped the confirm card's [Yes, pay now] (/demo shows it in the same list). */
+  tap?: boolean;
   /** Around the command, in ms. */
   ms: number;
 }

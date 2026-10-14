@@ -24,7 +24,7 @@ export const PHONE: Profile = { route: "/assistant", root: "body", minFont: 16, 
 export const DEMO: Profile = { route: "/demo", root: "[data-demo-check]", minFont: 16, minTarget: 56 };
 /** /demo: the D2 scenario guide column, judged by the phone numbers like the phone column next to it. */
 export const DEMO_GUIDE: Profile = { route: "/demo", root: "[data-scenario-guide]", minFont: 16, minTarget: 56 };
-/** /learned/<kiosk>: KIBO's corner widget only; the learned kiosk page in the iframe is third-party and unchanged. */
+/** /learned/<kiosk>: KIBO's corner widget only; the learned kiosk page in the iframe is not KIBO's UI and is shown unchanged. */
 export const LEARNED: Profile = { route: "/learned", root: "[data-learned-widget]", minFont: 16, minTarget: 56 };
 /** KIBO's pairing panel beside a landscape kiosk (/kiosk, /demo "Use my phone"): phone numbers, text >= 18px. */
 export const PAIRING: Profile = { route: "/kiosk", root: "[data-pairing-panel]", minFont: 18, minTarget: 56 };

@@ -137,6 +137,8 @@ test("phone path: AI highlight on K3 and the staff banner", async ({ page, reque
   });
   await expect(root).toHaveAttribute("data-screen", "menu");
   await expect(buttonWithText(page, "치즈버거")).toHaveClass(/k-ring/);
+  // KIBO's English subtitle under the Korean AI line (14-final:0).
+  await expect(page.locator("[data-kiosk-subtitle]")).toContainText("AI added: Cheeseburger set");
   // The screenshot is taken first, inside the 2 s highlight.
   await check(page, info, "K3-ai-highlight");
 

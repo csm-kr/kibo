@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { CartLine, Session, SessionStatus } from "@/types/session";
-import { orderLine, phoneLink } from "./pairing";
+import { getKiosk } from "@/lib/adapters/catalog";
+import { changeLine, kioskStep, orderLine, phoneLink } from "./pairing";
 
 const T = 1_000_000_000_000;
 const LINE: CartLine = { lineId: "a1", itemId: "cheese_burger", variant: "set", qty: 2, selections: {}, unitPrice: 6900 };
@@ -77,5 +78,46 @@ describe("orderLine", () => {
     expect(lines[1]).toBe("Buying · 2 tickets · ₩21,000");
     expect(lines[3]).toBe("Paid · reference number 45");
     for (const l of lines) expect(l.toLowerCase()).not.toContain("order");
+  });
+});
+
+describe("changeLine", () => {
+  it("before the review, says who made the last cart change", () => {
+    const at = T;
+    expect(changeLine(session("ordering"))).toBeNull();
+    expect(changeLine(session("ordering", { lastChange: { lineId: "a1", kind: "add", source: "voice", at } }))).toBe("Last change: by the AI");
+    expect(changeLine(session("ordering", { lastChange: { lineId: "a1", kind: "add", source: "button", at } }))).toBe("Last change: on the phone");
+    expect(changeLine(session("ordering", { lastChange: { lineId: "a1", kind: "add", source: "touch", at } }))).toBe("Last change: on the kiosk");
+  });
+
+  it("from the review on, never credits the AI: only a person confirms and the kiosk takes the card", () => {
+    const ai = { lineId: "a1", kind: "add" as const, source: "voice" as const, at: T };
+    expect(changeLine(session("confirming", { lastChange: ai }))).toBe("Waiting for you to confirm");
+    expect(changeLine(session("paying", { lastChange: ai }))).toBe("Confirmed by you");
+    expect(changeLine(session("paid", { lastChange: ai, orderNumber: 860 }))).toBe("Paid at the kiosk · confirmed by you");
+    expect(changeLine(session("expired", { lastChange: ai }))).toBeNull();
+  });
+});
+
+describe("kioskStep", () => {
+  const malo = getKiosk("malo");
+  const rail = getKiosk("airport_rail");
+
+  it("mirrors the Korean kiosk's payment step in English, with the kiosk's own button labels", () => {
+    expect(kioskStep(malo, session("paying"))).toBe(
+      "Kiosk: payment. Tap 카드 (Card), then 카드 넣기 (Insert card). Demo only, no money is charged.",
+    );
+    expect(kioskStep(malo, session("confirming"))).toBe("Kiosk: order review. Nothing is paid until you confirm.");
+    expect(kioskStep(malo, session("paid", { orderNumber: 860 }))).toBe("Kiosk: receipt question, then the order number.");
+  });
+
+  it("says nothing before the review, and a ticket machine says tickets (R-007)", () => {
+    expect(kioskStep(malo, session("ordering"))).toBeNull();
+    expect(kioskStep(rail, session("confirming"))).toBe("Kiosk: ticket review. Nothing is paid until you confirm.");
+    expect(kioskStep(rail, session("paid", { orderNumber: 45 }))).toBe("Kiosk: receipt question, then the reference number.");
+  });
+
+  it("a learned kiosk has no KIBO payment step: the user pays on the kiosk itself", () => {
+    expect(kioskStep(getKiosk("doughhouse"), session("confirming"))).toBeNull();
   });
 });

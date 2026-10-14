@@ -3,7 +3,7 @@ import { claim, command, readClaim } from "../helpers";
 import { LEARNED, qaState, type Findings } from "./checks";
 
 // UI QA of /learned/doughhouse: KIBO's widget over the learned kiosk page (QR, phone connected, bridge status).
-// The kiosk page itself is third-party and shown unchanged, so it is judged on the screenshots only.
+// The kiosk page itself is not KIBO's UI (our development kiosk, learned by KIBO Learn) and is shown unchanged, so it is judged on the screenshots only.
 
 const VIEWPORTS = [
   { width: 1440, height: 900 },

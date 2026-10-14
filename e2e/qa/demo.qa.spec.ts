@@ -84,6 +84,7 @@ test("D1 to D3", async ({ page, request }, info) => {
     const drink = drinks[seq - 1];
     await ai("addToCart", { itemId: "cheese_burger", variant: "set", qty: 1, selections: { drink: [drink] } }, seq++);
     await expect(page.getByRole("region", { name: "Your order" }).locator("li")).toHaveCount(seq - 1);
+    await expect(page.locator("[data-kiosk-subtitle]")).toContainText("AI added: Cheeseburger set");
   });
 
   await ai("requestCheckout", {}, seq++);
@@ -94,6 +95,7 @@ test("D1 to D3", async ({ page, request }, info) => {
   await page.getByRole("button", { name: "Yes, pay now" }).click();
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "payment");
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "pay");
+  await expect(page.locator("[data-kiosk-step]")).toContainText("Kiosk: payment. Tap 카드 (Card)");
   await check(page, info, "D2-payment");
 
   await page.getByRole("button", { name: "Insert the card at the kiosk" }).click();

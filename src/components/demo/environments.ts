@@ -44,7 +44,7 @@ export const DEMO_ENVIRONMENTS: DemoEnvironment[] = [
     place: { en: "Pizza shop", ko: "피자 가게" },
     short: "pizza shop",
     how: "Doughhouse · no integration, learned by KIBO Learn",
-    persona: "KIBO learned this third-party screen once and replays orders without AI.",
+    persona: "Our development pizza kiosk: KIBO learned it once and replays orders without AI.",
     caption: "Pizza shop kiosk (learned by KIBO Learn)",
     image: "/landing/place-doughhouse.webp",
   },

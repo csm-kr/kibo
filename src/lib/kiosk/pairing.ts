@@ -1,4 +1,5 @@
-import type { KioskDomain } from "@/types/menu";
+import { kt, type KioskTextKey } from "@/lib/i18n/kiosk";
+import type { KioskData, KioskDomain } from "@/types/menu";
 import type { Session } from "@/types/session";
 import { formatWon } from "./menu";
 import { phonePaused } from "./timers";
@@ -34,5 +35,47 @@ export function orderLine(session: Session, domain: KioskDomain): string {
       return `Paid · ${ticket ? "reference" : "order"} number ${session.orderNumber ?? ""}`.trim();
     case "expired":
       return ticket ? "This purchase has ended" : "This order has ended";
+  }
+}
+
+/**
+ * Who moved the order last. From the review on only a person can move it (a tap or a new "yes", then the kiosk's
+ * card), so it never says "by the AI" there: `lastChange` records cart changes only and would still name the AI.
+ */
+export function changeLine(session: Session): string | null {
+  switch (session.status) {
+    case "confirming":
+      return "Waiting for you to confirm";
+    case "paying":
+      return "Confirmed by you";
+    case "paid":
+      return "Paid at the kiosk · confirmed by you";
+    case "expired":
+      return null;
+  }
+  const source = session.lastChange?.source;
+  if (!source) return null;
+  return `Last change: ${source === "voice" || source === "text" ? "by the AI" : source === "button" ? "on the phone" : "on the kiosk"}`;
+}
+
+/** "카드 (Card)": the Korean kiosk's own label, then what it means. */
+const both = (key: KioskTextKey) => `${kt(key, "ko")} (${kt(key, "en")})`;
+
+/**
+ * The kiosk's current step in English, for KIBO's side of the screen (/demo caption, pairing panel): the kiosk itself
+ * stays Korean. Learned kiosks have none: the user reviews and pays on the kiosk page.
+ */
+export function kioskStep(kiosk: KioskData, session: Session): string | null {
+  if (kiosk.kind === "learned") return null;
+  const ticket = kiosk.domain === "ticket";
+  switch (session.status) {
+    case "confirming":
+      return `Kiosk: ${ticket ? "ticket" : "order"} review. Nothing is paid until you confirm.`;
+    case "paying":
+      return `Kiosk: payment. Tap ${both("payCard")}, then ${both("insertCardButton")}. Demo only, no money is charged.`;
+    case "paid":
+      return `Kiosk: receipt question, then the ${ticket ? "reference" : "order"} number.`;
+    default:
+      return null;
   }
 }

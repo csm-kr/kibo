@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } fro
 import type { CommandReply } from "@/lib/client/api";
 import { findItem, isAvailableNow } from "@/lib/adapters/catalog";
 import type { CommandType } from "@/lib/commands/schemas";
-import { kt, type KioskTextKey } from "@/lib/i18n/kiosk";
+import { aiSubtitle, kt, type KioskTextKey } from "@/lib/i18n/kiosk";
 import { formatWon, lineLabel, tilePrice } from "@/lib/kiosk/menu";
 import type { KioskData, MenuItem } from "@/types/menu";
 import type { CartLine, ChangeKind, LineInput, Session } from "@/types/session";
@@ -20,6 +20,7 @@ import { FOCUS, SCRIM } from "./styles";
 // K3 menu with K4 sheet, K5 upsell and the AI-change highlight (docs/UX.md Flow A6–A7, Flow B). Canvas px.
 
 const RING_MS = 2000;
+const SUBTITLE_MS = 6000;
 /** An AI change does not move the screen if someone touched the kiosk this recently. */
 const TOUCH_HOLD_MS = 5000;
 
@@ -87,6 +88,9 @@ export function MenuScreen(props: {
     lc && Date.now() + props.clockOffset - lc.at < RING_MS ? null : changeKey,
   );
   const [flash, setFlash] = useState<Flash | null>(null);
+  // KIBO's English line under an AI change on a Korean kiosk (judges, tourists). It stays longer than the 2 s ring:
+  // a whole set with its options takes a few seconds to read.
+  const [subtitle, setSubtitle] = useState<{ key: string; text: string } | null>(null);
   if (changeKey !== seenKey) {
     setSeenKey(changeKey);
     if (lc && changeKey) {
@@ -95,7 +99,14 @@ export function MenuScreen(props: {
       const line = session.cart.find((l) => l.lineId === lc.lineId);
       const name = line ? lineLabel(kiosk, line, locale).title : itemId ? (findItem(kiosk, itemId)?.name[locale] ?? "") : "";
       const text = kt(AI_TEXT[lc.kind], locale, domain);
+      let subtitle: string | null = null;
+      if (ai && locale !== "en") {
+        const en = line ? lineLabel(kiosk, line, "en") : null;
+        const enName = en ? [en.title, en.detail].filter(Boolean).join(" · ") : itemId ? (findItem(kiosk, itemId)?.name.en ?? "") : "";
+        subtitle = aiSubtitle(lc.kind, domain, enName);
+      }
       setFlash({ key: changeKey, lineId: lc.lineId, itemId, status: ai ? (name ? `${text}: ${name}` : text) : null });
+      if (subtitle) setSubtitle({ key: changeKey, text: subtitle });
       // Never move the screen under someone choosing (sheet open or a touch in the last 5 s).
       const target = session.screen.category;
       if (ai && target && !sheetItem && !recentTouch) setCategory(target);
@@ -107,6 +118,12 @@ export function MenuScreen(props: {
     const t = setTimeout(() => setFlash(null), RING_MS);
     return () => clearTimeout(t);
   }, [flash]);
+
+  useEffect(() => {
+    if (!subtitle) return;
+    const t = setTimeout(() => setSubtitle(null), SUBTITLE_MS);
+    return () => clearTimeout(t);
+  }, [subtitle]);
 
   useEffect(() => () => clearTimeout(touchTimer.current), []);
 
@@ -149,6 +166,7 @@ export function MenuScreen(props: {
         send={send}
         onClaimUrl={props.onClaimUrl}
         status={flash?.status ?? null}
+        subtitle={subtitle?.text ?? null}
       />
 
       <div className="relative flex min-h-0 flex-1">

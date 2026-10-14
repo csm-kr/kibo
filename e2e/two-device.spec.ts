@@ -89,6 +89,8 @@ test("laptop kiosk and phone: scan in /app, order, confirm on the phone, pay on 
       command(phone.request, deviceToken, { sessionId, type, args, source: "voice", utteranceSeq });
     await ai("addToCart", { itemId: "cheese_burger", variant: "set", qty: 1, selections: { drink: ["zero_cola"] } }, 1);
     await expect(buttonWithText(kiosk, "치즈버거")).toHaveClass(/k-ring/);
+    // The kiosk stays Korean; KIBO's English subtitle says what the AI just did (D1).
+    await expect(kiosk.locator("[data-kiosk-subtitle]")).toHaveText(/^KIBO\s*AI added: Cheeseburger set · .*Zero cola/);
     await expect(phone.getByRole("region", { name: "Your order" }).getByText("Cheeseburger set", { exact: true })).toBeVisible();
     await expect(panel.locator("[data-panel-order]")).toHaveText(/^Ordering · 1 item · ₩[\d,]+$/);
     await expect(panel.getByText("Last change: by the AI")).toBeVisible();
@@ -99,6 +101,11 @@ test("laptop kiosk and phone: scan in /app, order, confirm on the phone, pay on 
     await phone.getByRole("button", { name: "Yes, pay now" }).click();
     await expect(kioskRoot(kiosk)).toHaveAttribute("data-screen", "payment");
     await expect(phone.getByRole("heading", { name: "Insert your card into the kiosk" })).toBeVisible();
+    // The user confirmed, never the AI (D2); the panel says the kiosk's payment step in English.
+    await expect(panel.locator("[data-panel-change]")).toHaveText("Confirmed by you");
+    await expect(panel.locator("[data-kiosk-step]")).toHaveText(
+      "Kiosk: payment. Tap 카드 (Card), then 카드 넣기 (Insert card). Demo only, no money is charged.",
+    );
 
     // The card goes into the kiosk (A), and the number shows on the phone (B).
     const root = kioskRoot(kiosk);
@@ -107,6 +114,8 @@ test("laptop kiosk and phone: scan in /app, order, confirm on the phone, pay on 
     await expect(root).toHaveAttribute("data-screen", "done");
     await expect(phone.getByRole("heading", { name: "Order number" })).toBeVisible();
     await expect(panel.locator("[data-panel-order]")).toHaveText(/^Paid · order number \d+$/);
+    await expect(panel.locator("[data-panel-change]")).toHaveText("Paid at the kiosk · confirmed by you");
+    await expect(panel.getByText("by the AI")).toHaveCount(0);
   } finally {
     await browser.close();
   }

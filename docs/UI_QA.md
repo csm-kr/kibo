@@ -53,7 +53,7 @@ Measure in CSS px at these sizes. Phone numbers apply as written; kiosk numbers 
 | Radius | phone: tiles 18px, sheets 26px; kiosk canvas: tiles 32px, sheets 48px; pills full |
 | Product tile (kiosk canvas) | photo 272px high, name 40px bold, price 40px teal, kcal 40px, badge top-left |
 | Set sheet | step label with steps left, 3-column photo options, selected = 6px teal border + tint ring (kiosk canvas) |
-| AI change | 6–8px teal ring (kiosk canvas) for 2 s on the kiosk tile and cart chip + "Added by AI: …" status |
+| AI change | 6–8px teal ring (kiosk canvas) for 2 s on the kiosk tile and cart chip + "Added by AI: …" status; on a Korean kiosk also KIBO's English subtitle row for 6 s |
 | Motion | state feedback only: 2 s highlight fade, 0.5 s card-insert slide, listening pulse |
 | Phone screen | one task per screen; only the last two messages large; staff button always in the header; cart and total readable on the phone alone |
 | Anti-patterns | no glass blur, gradient text, neon glow, "Powered by AI", emoji icons, same radius everywhere |
@@ -150,7 +150,7 @@ Until then the `qa` step checks the angles from code and the prototype and says 
 
 **Learn replays (10-14, 13-blind-kiosks:9):** `e2e/qa/learn.qa.spec.ts` (profile `LEARN`, root `main`, the phone numbers) checks `/learn` (L1, top and the run cards) and `/learn/<runId>` (L2: the first turn, a stopped tap, a refused payment tap, the finish and the learned skill with or without [Order on this kiosk]) at 1440×900, 1280×720 and 390×844 (with the reflow check). The kiosk screenshots inside are recorded third-party screens and are judged on the screenshots only. `e2e/learn.spec.ts` (not QA) steps, plays at 16×, jumps to the finish and follows the order button.
 
-**Learned kiosk (10-13, 6-learn:2):** `e2e/qa/learned.qa.spec.ts` checks `/learned/doughhouse` (QR, then an item the bridge entered) at 1440×900, 1280×720 and 1920×1080. Profile `LEARNED` measures only KIBO's widget (`[data-learned-widget]`); the learned kiosk page in the iframe is third-party and unchanged, so it is judged on the screenshots. Since 6-learn:3, `e2e/qa/learned-phone.qa.spec.ts` checks the phone on a learned kiosk at the four phone sizes (P2 and P3 "The kiosk is entering it…" at 390 and 320 wide, P3 "Please check the kiosk screen" after 15 s, P3 mismatch, P4 without a pay button; the test sends the bridge's reports itself), and `e2e/qa/demo.qa.spec.ts` checks D1, D2 and D3 with `/demo?k=doughhouse` at 1440×900.
+**Learned kiosk (10-13, 6-learn:2):** `e2e/qa/learned.qa.spec.ts` checks `/learned/doughhouse` (QR, then an item the bridge entered) at 1440×900, 1280×720 and 1920×1080. Profile `LEARNED` measures only KIBO's widget (`[data-learned-widget]`); the learned kiosk page in the iframe (our development kiosk, learned by KIBO Learn) is not KIBO's UI and is shown unchanged, so it is judged on the screenshots. Since 6-learn:3, `e2e/qa/learned-phone.qa.spec.ts` checks the phone on a learned kiosk at the four phone sizes (P2 and P3 "The kiosk is entering it…" at 390 and 320 wide, P3 "Please check the kiosk screen" after 15 s, P3 mismatch, P4 without a pay button; the test sends the bridge's reports itself), and `e2e/qa/demo.qa.spec.ts` checks D1, D2 and D3 with `/demo?k=doughhouse` at 1440×900.
 
 **What the script checks:**
 - **axe-core** (H) with the WCAG 2.0/2.1/2.2 A and AA tags, with `target-size` turned on explicitly (off by default). Contrast results marked "incomplete" (text over images) go to human review.

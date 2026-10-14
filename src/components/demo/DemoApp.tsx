@@ -15,6 +15,7 @@ import { examplesFor } from "@/lib/agent/examples";
 import { buildComparison, HERO_KIOSK } from "@/lib/demo/compare";
 import { EDIT_PATH_TAPS, HUMAN_RUNS, TOUCH_RUN } from "@/lib/demo/evidence";
 import { scenariosFor } from "@/lib/demo/scenarios";
+import { kioskStep } from "@/lib/kiosk/pairing";
 import { pt } from "@/lib/i18n/phone";
 import type { KioskData, Locale } from "@/types/menu";
 import { ActionStrip } from "./ActionStrip";
@@ -130,6 +131,7 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
       />
     ) : undefined;
   const beside = !ownPhone && wide && scenariosFor(kiosk.kioskId).length > 0;
+  const step = session ? kioskStep(kiosk, session) : null;
   const actionStrip = (
     <ActionStrip
       // Moving between the columns remounts it, so it opens or folds for where it now is.
@@ -163,6 +165,12 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
           className={`flex h-full flex-none flex-col gap-2 ${learned ? "w-[calc((100dvh-72px)*27/40)]" : "w-[calc((100dvh-72px)*9/16)]"}`}
         >
           <Caption id="demo-kiosk-caption" text={environmentOf(kiosk.kioskId).caption} />
+          {/* The kiosk stays Korean; KIBO says its step in English (with the judge's own phone the pairing panel does). */}
+          {!ownPhone && step && (
+            <p data-kiosk-step aria-live="polite" className="flex-none rounded-tile bg-white px-3 py-2 text-base/normal font-semibold text-kibo-deep shadow-card">
+              {step}
+            </p>
+          )}
           <div className="min-h-0 flex-1 overflow-hidden rounded-[18px]" onPointerDownCapture={countTap("kioskTaps")}>
             {learned ? (
               // Keyed by session: [Try again] reloads the kiosk page, so the new order never starts on the old cart.

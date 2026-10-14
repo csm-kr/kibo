@@ -1,4 +1,5 @@
 import type { KioskDomain, Locale, Variant } from "@/types/menu";
+import type { ChangeKind } from "@/types/session";
 
 // Every kiosk string lives here in Korean and English; the kiosk's language row switches between them (I-019).
 // Wording follows real kiosks (docs/UX.md "Copy"). TICKET_TEXT replaces the food words on ticket machines.
@@ -192,6 +193,24 @@ export function demoCounterText(taps: number, seconds: number, locale: Locale): 
 /** "45초 남았어요" */
 export function secondsLeftText(seconds: number, locale: Locale): string {
   return locale === "ko" ? `${seconds}초 남았어요` : `${seconds} s left`;
+}
+
+const AI_SUBTITLE: Record<ChangeKind, string> = {
+  add: "AI added",
+  update: "AI changed",
+  remove: "AI removed",
+  undo: "AI undid the last change",
+  clear: "AI cleared the cart",
+};
+
+/**
+ * KIBO's English line under the kiosk's own AI banner ("AI가 담았어요: …"), so an English reader sees what the Korean
+ * kiosk just did; the kiosk itself stays Korean (it stands for an existing kiosk). `name` is the line in English.
+ */
+export function aiSubtitle(kind: ChangeKind, domain: KioskDomain, name: string): string {
+  const ticket = domain === "ticket";
+  const verb = ticket && kind === "add" ? "AI chose" : ticket && kind === "clear" ? "AI cleared the tickets" : AI_SUBTITLE[kind];
+  return name ? `${verb}: ${name}` : verb;
 }
 
 export function variantWord(variant: Variant, locale: Locale): string {

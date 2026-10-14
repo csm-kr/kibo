@@ -207,7 +207,7 @@ async function main() {
       await saveWebp(encoder, await place.screenshot({ clip: top }), `place-${kioskId}`, 800, 600);
     }
     await placeCtx.close();
-    // The learned kiosk is the third-party page itself, unchanged. Its small tiles leave a 1080-wide frame almost
+    // The learned kiosk is its own page (our development kiosk), unchanged. Its small tiles leave a 1080-wide frame almost
     // empty, so it is taken 540 wide at 2x, where the pizza tiles fill the picture.
     const learnedCtx = await browser.newContext({ viewport: { width: 540, height: 405 }, deviceScaleFactor: 2 });
     const learned = await learnedCtx.newPage();

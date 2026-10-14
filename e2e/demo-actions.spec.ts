@@ -77,6 +77,18 @@ test("open at 1440 wide: each action in plain words with its tool and code, newe
   await expect(toggle(page)).toHaveAttribute("aria-expanded", "false");
   await expect(strip(page).locator("[data-action-count]")).toHaveText(String(MIXED_ACTIONS.length));
   await expect(rows).toHaveCount(0);
+
+  // The user's own tap on [Yes, pay now] goes in the list too, so the safety rule shows (D2); the kiosk caption
+  // says the Korean kiosk's payment step in English (D1).
+  await toggle(page).click();
+  await command(request, s.deviceToken, { sessionId: s.sessionId, type: "requestCheckout", args: {}, source: "text", utteranceSeq: 3 });
+  await expect(page.locator("[data-kiosk-step]")).toHaveText("Kiosk: order review. Nothing is paid until you confirm.");
+  await page.getByRole("button", { name: "Yes, pay now" }).click();
+  await expect(rows.first()).toContainText("You tapped Yes, pay now");
+  await expect(rows.first()).toContainText(/confirmCheckout ✓ \d+ ms · needs your tap or a new 'yes'/);
+  await expect(page.locator("[data-kiosk-step]")).toHaveText(
+    "Kiosk: payment. Tap 카드 (Card), then 카드 넣기 (Insert card). Demo only, no money is charged.",
+  );
 });
 
 test.describe(() => {

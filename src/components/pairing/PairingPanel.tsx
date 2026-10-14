@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { CARD } from "@/components/phone/ui";
 import { useNow } from "@/hooks/useNow";
 import { useQrSrc } from "@/hooks/useQrSrc";
-import { orderLine, phoneLink } from "@/lib/kiosk/pairing";
+import { changeLine, kioskStep, orderLine, phoneLink } from "@/lib/kiosk/pairing";
 import type { KioskData } from "@/types/menu";
 import type { Session } from "@/types/session";
 
@@ -31,6 +31,9 @@ export function PairingPanel(props: {
   const link = phoneLink(session, now, clockOffset);
   const src = useQrSrc(claimUrl);
   const address = props.pairUrl ?? (claimUrl ? `${new URL(claimUrl).host}/app` : null);
+  const change = session ? changeLine(session) : null;
+  // The kiosk stays Korean; this says its step in English (payment buttons, "no money is charged").
+  const step = session ? kioskStep(kiosk, session) : null;
 
   return (
     <aside
@@ -98,9 +101,14 @@ export function PairingPanel(props: {
             <p aria-live="polite" data-panel-order className="text-[32px]/tight font-bold">
               {orderLine(session, kiosk.domain)}
             </p>
-            {session.lastChange && (
-              <p className="text-lg text-muted">
-                Last change: {session.lastChange.source === "voice" || session.lastChange.source === "text" ? "by the AI" : session.lastChange.source === "button" ? "on the phone" : "on the kiosk"}
+            {change && (
+              <p data-panel-change className="text-lg text-muted">
+                {change}
+              </p>
+            )}
+            {step && (
+              <p data-kiosk-step className="text-lg/normal font-semibold text-kibo-deep">
+                {step}
               </p>
             )}
           </section>
