@@ -25,9 +25,9 @@ test("choosing 日本語 sends language ja with voice and text, keeps English sc
   await page.getByRole("button", { name: "Type instead" }).click();
   await page.getByRole("button", { name: "Eat here" }).click();
 
-  await page.getByRole("button", { name: "Language: English" }).click();
+  await page.getByRole("button", { name: "Language and text size: English" }).click();
   await page.getByRole("dialog", { name: "Language" }).getByRole("button", { name: /^日本語/ }).click();
-  await expect(page.getByRole("button", { name: "Language: 日本語" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Language and text size: 日本語" })).toBeVisible();
   // English screens, Japanese mic label.
   await expect(page.getByText("Nothing in your order yet.")).toBeVisible();
   await expect(page.locator("[data-voice-state]")).toContainText("押して話す");
@@ -53,10 +53,10 @@ test("choosing 日本語 sends language ja with voice and text, keeps English sc
   expect(bodies.chat).toMatchObject({ locale: "en", language: "ja" });
 
   await page.reload();
-  await expect(page.getByRole("button", { name: "Language: 日本語" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Language and text size: 日本語" })).toBeVisible();
 
   // Back to English: the AI language ends, and nothing extra is sent.
-  await page.getByRole("button", { name: "Language: 日本語" }).click();
+  await page.getByRole("button", { name: "Language and text size: 日本語" }).click();
   await page.getByRole("dialog", { name: "Language" }).getByRole("button", { name: /^English/ }).click();
   expect(await page.evaluate(() => localStorage.getItem("kibo.phone.aiLang"))).toBe("");
 });

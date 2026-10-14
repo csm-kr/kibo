@@ -61,7 +61,7 @@ journey
     Uses an example sentence: 5: Judge
     Watches the kiosk on the left move by itself: 5: Judge
   section End
-    Confirms, taps the stand-in card button: 4: Judge
+    Confirms, taps the card reader under the kiosk: 4: Judge
     Sees the order number, clicks Try again or opens /kiosk: 4: Judge
 ```
 | Stage | Thinking | Drop-off risk | What must work |

@@ -52,16 +52,16 @@ test("the hero order by text: this session's counts next to the efficient touch 
   await page.getByRole("button", { name: "Send" }).click();
   await expect(page.getByRole("heading", { name: "Please check your order" })).toBeVisible();
 
-  // Taps 4 and 5: the confirm card and the card stand-in.
+  // Tap 4: the confirm card. Then the card stand-in, under the kiosk: a kiosk tap (15-judge-fixes:2).
   await page.getByRole("button", { name: "Yes, pay now" }).click();
-  await page.getByRole("button", { name: "Insert the card at the kiosk" }).click();
+  await page.getByRole("button", { name: "Kiosk: insert card (demo)" }).click();
   await expect(page.locator("[data-phone-screen]")).toHaveAttribute("data-phone-screen", "done");
 
   await expect(card(page)).toBeVisible();
   await expect(card(page).getByRole("heading", { name: "This order with KIBO" })).toBeVisible();
   await expect(value(page, "sentences")).toHaveText("2");
-  await expect(value(page, "phone-taps")).toHaveText("5");
-  await expect(value(page, "kiosk-taps")).toHaveText("0");
+  await expect(value(page, "phone-taps")).toHaveText("4");
+  await expect(value(page, "kiosk-taps")).toHaveText("1");
   // No touch time to set it against (an automated run), so this order's seconds are not shown either (14-final:1).
   await expect(value(page, "seconds")).toHaveCount(0);
   await expect(card(page)).toContainText("Counted in this browser for this order");
@@ -81,5 +81,5 @@ test("the hero order by text: this session's counts next to the efficient touch 
 
   // Counting stopped at `paid`: the kiosk's receipt answer adds nothing.
   await page.getByRole("button", { name: "출력 안 함" }).click();
-  await expect(value(page, "kiosk-taps")).toHaveText("0");
+  await expect(value(page, "kiosk-taps")).toHaveText("1");
 });

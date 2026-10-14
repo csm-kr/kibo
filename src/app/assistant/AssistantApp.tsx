@@ -15,6 +15,7 @@ import type { KioskData, Locale } from "@/types/menu";
 const noSubscribe = () => () => {};
 const setLocale = (locale: Locale) => setPhoneSettings({ locale });
 const setAiVoice = (aiVoice: boolean) => setPhoneSettings({ aiVoice });
+const setLargeText = (largeText: boolean) => setPhoneSettings({ largeText });
 
 /** Standalone /assistant: owns the claim and the connection; /demo passes its own tokens to AssistantPanel. */
 export function AssistantApp({ sessionId, kiosks }: { sessionId: string | null; kiosks: Record<string, KioskData> }) {
@@ -46,6 +47,8 @@ export function AssistantApp({ sessionId, kiosks }: { sessionId: string | null; 
         onLanguageChange={setPhoneLanguage}
         voiceOutput={settings.aiVoice}
         onVoiceOutputChange={setAiVoice}
+        largeText={settings.largeText}
+        onLargeTextChange={setLargeText}
         mode="phone"
         examples={examplesFor(kiosk.kioskId, settings.locale)}
         claimError={ps.claimError}

@@ -7,7 +7,7 @@ import { ModalLayer } from "@/components/kiosk/ModalLayer";
 import { AppBar } from "@/components/phone/AppBar";
 import { ConfirmBar, ConfirmCard, DoneCard, PayCard } from "@/components/phone/Checkout";
 import { Choices } from "@/components/phone/Choices";
-import { LastMessage, Messages, StatusChip } from "@/components/phone/Conversation";
+import { keepInView, LastMessage, Messages, StatusChip } from "@/components/phone/Conversation";
 import { Dock, TypingSheet, voiceActive } from "@/components/phone/Dock";
 import { AiLanguageProvider } from "@/components/phone/language";
 import { OrderCard } from "@/components/phone/OrderCard";
@@ -28,6 +28,7 @@ import type { SpeechLanguage } from "@/lib/i18n/languages";
 import { formatWon } from "@/lib/kiosk/menu";
 import { idleWarning, staffBannerVisible } from "@/lib/kiosk/timers";
 import { bridgeNotice, phoneScreen, type BridgeNotice, type PhoneLocal } from "@/lib/phone/screen";
+import { LARGE_TEXT_SCALE } from "@/lib/phone/settings";
 import type { KioskData, Locale, LocalizedName } from "@/types/menu";
 import type { DineOption, Session } from "@/types/session";
 
@@ -40,6 +41,8 @@ const MIC_HINT_KEY = "kibo.phone.micHintSeen";
 const noSubscribe = () => () => {};
 /** Under this many seconds a /demo order shows its voice time left. */
 const SHOW_VOICE_LEFT = 60;
+/** The cart summary's height with its padding, in rem; it may wrap to two lines with larger text. */
+const SUMMARY_REM = 6;
 
 interface Props {
   kiosk: KioskData;
@@ -52,8 +55,6 @@ interface Props {
   onLanguageChange?: (language: SpeechLanguage) => void;
   mode: "phone" | "demo";
   examples?: string[];
-  /** /demo only: stands in for the card action on the kiosk (Flow C4). */
-  onCardStandIn?: () => void;
   claimError?: PhoneLocal["claimError"];
   streamState?: StreamState;
   /** Server time minus local time, from ping; session times are server time. */
@@ -75,6 +76,20 @@ interface Props {
   /** /assistant: the AI voice setting kept on the phone (/app settings); /demo keeps its own, on by default. */
   voiceOutput?: boolean;
   onVoiceOutputChange?: (on: boolean) => void;
+  /**
+   * Larger text, in the app bar's sheet (15-judge-fixes:2). /assistant keeps it in the phone settings, which scale the
+   * root font size; /demo keeps its own and zooms only this panel, because the kiosk canvas beside it uses rem too.
+   */
+  largeText?: boolean;
+  onLargeTextChange?: (on: boolean) => void;
+}
+
+/** A small phone (CSS px, so larger text does not change it): with larger text the dock has no room to spare. */
+const NARROW = "(max-width: 380px)";
+function subscribeNarrow(cb: () => void) {
+  const mq = window.matchMedia(NARROW);
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
 }
 
 export type SayFn = (text: string) => Promise<SendResult>;
@@ -150,6 +165,10 @@ export function AssistantPanel(props: Props) {
   const [ownVoiceOutput, setOwnVoiceOutput] = useState(true);
   const voiceOutput = props.voiceOutput ?? ownVoiceOutput;
   const setVoiceOutput = props.onVoiceOutputChange ?? setOwnVoiceOutput;
+  // On a small phone with larger text the AI voice switch leaves the dock for the app bar's sheet, so the dock's
+  // row keeps room for [Type] and the mic (15-judge-fixes:2).
+  const narrow = useSyncExternalStore(subscribeNarrow, () => window.matchMedia(NARROW).matches, () => false);
+  const voiceInBar = mode === "phone" && Boolean(props.largeText) && narrow;
   /** One plain sentence in the dock: why voice stopped, or the noise suggestion. */
   const [voiceNote, setVoiceNote] = useState<string | null>(null);
   const voice = useLiveVoice({
@@ -322,6 +341,23 @@ export function AssistantPanel(props: Props) {
   const retrying = props.streamState === "retrying";
   const ended = screen === "ended" || screen === "taken";
   const itemsInCart = session ? session.cart.reduce((n, l) => n + l.qty, 0) : 0;
+  const choicesShown = screen === "talk" && Boolean(session?.pendingChoice) && pendingKey !== declined;
+  const summaryShown = mode === "phone" && itemsInCart > 0 && !cartInView && !choicesShown;
+
+  // P3: after each send and reply, the newest message and the choices under it come fully into view above the dock;
+  // on a small phone with larger text they were left under it (15-judge-fixes:2).
+  const turnRef = useRef<HTMLDivElement>(null);
+  const lastId = chat.messages.at(-1)?.id ?? 0;
+  const showTurn = useEffectEvent(() => {
+    const turn = turnRef.current;
+    if (!turn || (lastId === 0 && !choicesShown)) return;
+    const bubbles = turn.querySelectorAll("[data-bubble]");
+    // Room for the cart summary, which appears once the card below scrolls out of view.
+    const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+    const reserve = mode === "phone" && itemsInCart > 0 && !choicesShown && !summaryShown ? SUMMARY_REM * rootPx : 0;
+    keepInView(bubbles[bubbles.length - 1] ?? turn, turn, reserve);
+  });
+  useEffect(() => showTurn(), [lastId, working, choicesShown, pendingKey]);
 
   const bridgeLine = notice && (
     <BridgeLine notice={notice} locale={locale} onCallStaff={() => void command("callStaff", { reasonCode: "user_request" })} />
@@ -353,6 +389,7 @@ export function AssistantPanel(props: Props) {
       onMic={toggleVoice}
       voiceOutput={voiceOutput}
       onVoiceOutput={setVoiceOutput}
+      voiceSwitch={!voiceInBar}
       typing={typing}
       onTyping={(open) => (open ? focusText() : setTyping(false))}
       onSend={say}
@@ -473,17 +510,19 @@ export function AssistantPanel(props: Props) {
         <>
           <Scroll>
             <h1 className="sr-only">{pt("cartTitle", locale, kiosk.domain)}</h1>
-            <Messages messages={chat.messages} locale={locale} working={working} />
-            {session.pendingChoice && pendingKey !== declined && (
-              <Choices
-                kiosk={kiosk}
-                pending={session.pendingChoice}
-                locale={locale}
-                disabled={busy}
-                onPick={pickChoice}
-                onDecline={decline}
-              />
-            )}
+            <div ref={turnRef} className="flex flex-col gap-4">
+              <Messages messages={chat.messages} locale={locale} />
+              {choicesShown && (
+                <Choices
+                  kiosk={kiosk}
+                  pending={session.pendingChoice!}
+                  locale={locale}
+                  disabled={busy}
+                  onPick={pickChoice}
+                  onDecline={decline}
+                />
+              )}
+            </div>
             <div className="flex flex-col">
               <OrderCard
                 kiosk={kiosk}
@@ -500,7 +539,8 @@ export function AssistantPanel(props: Props) {
           </Scroll>
           {/* The phone only: /demo's laptop column has room for the card, and a summary appearing there as keyboard
               focus scrolls the card away would shrink the area under the focused control. */}
-          {mode === "phone" && itemsInCart > 0 && !cartInView && (
+          {/* Not while choices show: the pill would cover the buttons the AI just asked about (15-judge-fixes:2). */}
+          {summaryShown && (
             <div className="flex-none px-4 pt-2 pb-2">
               <button
                 type="button"
@@ -526,6 +566,8 @@ export function AssistantPanel(props: Props) {
       body = session && (
         <>
           <Scroll>
+            {/* The AI's reply above the card: below [Pick more] it sat under the bottom bar (15-judge-fixes:2). */}
+            <LastMessage messages={fresh} locale={locale} />
             <ConfirmCard
               kiosk={kiosk}
               cart={session.cart}
@@ -535,7 +577,6 @@ export function AssistantPanel(props: Props) {
               pickMoreDisabled={busy}
               autoFocus
             />
-            <LastMessage messages={fresh} locale={locale} />
           </Scroll>
           <ConfirmBar
             total={session.total}
@@ -586,12 +627,8 @@ export function AssistantPanel(props: Props) {
       body = session && (
         <Scroll>
           {/* In /demo the kiosk is on the left, so the picture points there (I-069). */}
+          {/* Only words here: no phone control may pay. /demo's card stand-in is on the kiosk half (15-judge-fixes:2). */}
           <PayCard total={session.total} locale={locale} mirrored={mode === "demo"} />
-          {mode === "demo" && props.onCardStandIn && (
-            <button type="button" onClick={props.onCardStandIn} className={PRIMARY}>
-              {pt("cardStandIn", locale)}
-            </button>
-          )}
           <LastMessage messages={fresh} locale={locale} />
         </Scroll>
       );
@@ -639,6 +676,9 @@ export function AssistantPanel(props: Props) {
       data-phone-screen={screen}
       data-mode={mode}
       data-ai-language={language}
+      data-large-text={props.largeText || undefined}
+      // /demo: larger text zooms this panel only (the phone scales its root font size instead).
+      style={mode === "demo" && props.largeText ? { zoom: LARGE_TEXT_SCALE } : undefined}
       className="relative flex h-full min-h-0 flex-col bg-cream text-ink"
     >
       <AppBar
@@ -649,6 +689,9 @@ export function AssistantPanel(props: Props) {
         onLocaleChange={props.onLocaleChange}
         language={language}
         onLanguageChange={props.onLanguageChange}
+        largeText={props.largeText}
+        onLargeText={props.onLargeTextChange}
+        voice={voiceInBar ? { on: voiceOutput, onChange: setVoiceOutput } : undefined}
         onStaff={ended ? undefined : () => void command("callStaff", { reasonCode: "user_request" })}
         staffDisabled={!session || !deviceToken}
       />

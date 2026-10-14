@@ -130,7 +130,8 @@ test("/assistant at 360×800 in Korean with larger text: a cart summary when the
   await page.getByRole("button", { name: "매장에서 먹기" }).click();
   await expect(mic).not.toHaveAttribute("data-compact", "true");
 
-  // A question with six photo choices pushes the cart card below the fold, as judges saw after a change.
+  // A question with six photo choices pushes the cart card below the fold, as judges saw after a change. The summary
+  // stays away while choices show: it would cover them (15-judge-fixes:2).
   await phone("addToCart", { itemId: "bulgogi_burger", variant: "set", qty: 1, selections: { drink: ["zero_cola"] } });
   await phone("offerChoices", {
     templateId: "pick_item",
@@ -140,7 +141,15 @@ test("/assistant at 360×800 in Korean with larger text: a cart summary when the
   });
   await expect(page.getByRole("button", { name: /^치즈버거 · [\d,]+원$/ })).toBeVisible();
   const summary = page.locator("[data-cart-summary]");
-  await expect(summary).toHaveText(/^내 주문 1개 · 7,200원$/);
+  await expect(summary).toHaveCount(0);
+
+  // A long cart scrolled to the top: now the summary keeps the total in view, and a tap goes to it.
+  for (const itemId of ["cheese_burger", "double_cheese_burger", "classic_burger", "fries_m"]) {
+    await phone("addToCart", { itemId, variant: "single", qty: 1, selections: {} });
+  }
+  await expect(page.getByRole("region", { name: "내 주문" }).locator("li")).toHaveCount(5);
+  await page.locator("[data-phone-scroll]").evaluate((el) => el.scrollTo({ top: 0 }));
+  await expect(summary).toHaveText(/^내 주문 5개 · [\d,]+원$/);
   await summary.click();
   await expect(page.getByText("합계", { exact: true })).toBeInViewport();
   await expect(summary).toHaveCount(0);
@@ -151,7 +160,7 @@ test("/demo on a phone says to use a laptop on D1 straight away, without left or
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/demo");
   await expect(page.locator("[data-demo-narrow-note]")).toContainText("Open this on a laptop to see the kiosk and the phone side by side.");
-  await expect(page.getByText("Talk or type on the right.")).toBeHidden();
+  await expect(page.getByText("Talk or type to the phone next to the kiosk.")).toBeHidden();
   await expect(page.getByText("Talk or type to the phone.")).toBeVisible();
 });
 

@@ -18,7 +18,7 @@ const BUBBLE: Record<ChatMessage["role"], string> = {
 export function Bubble({ m, locale, large = true }: { m: ChatMessage; locale: Locale; large?: boolean }) {
   const who = m.role === "user" ? pt("you", locale) : pt("assistant", locale);
   return (
-    <p className={`max-w-[88%] rounded-tile px-4 py-3 ${large ? "text-xl" : "text-base"} ${BUBBLE[m.role]}`}>
+    <p data-bubble={m.role} className={`max-w-[88%] rounded-tile px-4 py-3 ${large ? "text-xl" : "text-base"} ${BUBBLE[m.role]}`}>
       {m.role !== "notice" && <span className="sr-only">{who}: </span>}
       {m.shown ?? m.text}
     </p>
@@ -26,18 +26,12 @@ export function Bubble({ m, locale, large = true }: { m: ChatMessage; locale: Lo
 }
 
 /** P3: only the last two messages large; older ones behind "Earlier messages" (heuristic 8). */
-export function Messages({ messages, locale, working }: { messages: ChatMessage[]; locale: Locale; working: boolean }) {
+export function Messages({ messages, locale }: { messages: ChatMessage[]; locale: Locale }) {
   const older = messages.slice(0, -2);
   const latest = messages.slice(-2);
-  const lastId = messages.at(-1)?.id ?? 0;
-  const endRef = useRef<HTMLDivElement>(null);
-  // The user usually taps a suggestion or Send at the bottom; the answer appears up here, so bring it into view.
-  useEffect(() => {
-    if (lastId > 0 || working) endRef.current?.scrollIntoView({ block: "nearest" });
-  }, [lastId, working]);
   if (messages.length === 0) return null;
   return (
-    <div ref={endRef} className="flex scroll-mt-4 flex-col gap-2">
+    <div className="flex flex-col gap-2">
       {older.length > 0 && (
         <details className="flex flex-col gap-2">
           <summary className={`flex min-h-14 cursor-pointer items-center rounded-tile px-2 text-base font-semibold text-muted ${FOCUS}`}>
@@ -60,12 +54,34 @@ export function Messages({ messages, locale, working }: { messages: ChatMessage[
 /** Other screens show only the newest reply or notice, so an answer or an error is never lost. */
 export function LastMessage({ messages, locale }: { messages: ChatMessage[]; locale: Locale }) {
   const last = messages.at(-1);
+  const ref = useRef<HTMLDivElement>(null);
+  const shownId = last && last.role !== "user" ? last.id : 0;
+  // A reply that lands below the fold (under P4's bottom bar or the dock) would go unread (15-judge-fixes:2).
+  useEffect(() => {
+    if (shownId > 0) keepInView(ref.current, ref.current);
+  }, [shownId]);
   if (!last || last.role === "user") return null;
   return (
-    <div className="flex flex-col">
+    <div ref={ref} className="flex flex-col">
       <Bubble m={last} locale={locale} />
     </div>
   );
+}
+
+/**
+ * Scrolls the phone's scroll area so everything from the top of `from` to the bottom of `to` is in view, with
+ * `reserve` px kept free at the bottom (for the cart summary that may appear there). When it does not fit, its top
+ * goes to the top, so the start of a reply is never cut. Instant, so reduced motion needs nothing more.
+ */
+export function keepInView(from: Element | null, to: Element | null, reserve = 0) {
+  const area = from?.closest("[data-phone-scroll]");
+  if (!from || !to || !area) return;
+  const box = area.getBoundingClientRect();
+  const gap = 16;
+  const top = from.getBoundingClientRect().top - gap;
+  const bottom = to.getBoundingClientRect().bottom + gap + reserve;
+  if (top < box.top || bottom - top > box.height) area.scrollTop += top - box.top;
+  else if (bottom > box.bottom) area.scrollTop += bottom - box.bottom;
 }
 
 /** A small state pill above the dock ("Listening…", "Working…"); the dot is decoration, the words carry the state. */

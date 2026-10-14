@@ -1,6 +1,6 @@
 "use client";
 
-import { Keyboard, Mic, Volume2, VolumeX, X } from "lucide-react";
+import { Keyboard, KeyboardOff, Mic, Volume2, VolumeX } from "lucide-react";
 import { useId, useState, type FormEvent, type ReactNode } from "react";
 import type { VoiceState } from "@/hooks/useLiveVoice";
 import { pt, type PhoneTextKey } from "@/lib/i18n/phone";
@@ -50,6 +50,8 @@ export function Dock(props: {
   onMic(): void;
   voiceOutput: boolean;
   onVoiceOutput(on: boolean): void;
+  /** False on a small phone with larger text: the AI voice switch moves to the app bar's sheet (15-judge-fixes:2). */
+  voiceSwitch?: boolean;
   typing: boolean;
   onTyping(open: boolean): void;
   onSend(text: string): void;
@@ -115,11 +117,13 @@ export function Dock(props: {
             <button
               type="button"
               aria-expanded={typing}
+              // Open, it only hides the field and the keyboard ("Close" read as ending the order, 15-judge-fixes:2).
+              aria-label={typing ? pt("closeTyping", locale) : undefined}
               onClick={() => props.onTyping(!typing)}
               className={`${SIDE} ${compact ? "" : "mt-4"} justify-self-start`}
             >
-              {typing ? <X {...ICON} /> : <Keyboard {...ICON} />}
-              <span>{pt(typing ? "closeTyping" : "typeButton", locale)}</span>
+              {typing ? <KeyboardOff {...ICON} /> : <Keyboard {...ICON} />}
+              <span>{pt(typing ? "closeTypingShort" : "typeButton", locale)}</span>
             </button>
           )}
           <button
@@ -140,17 +144,21 @@ export function Dock(props: {
               <span lang={ai.lang}>{ai.t(micAction(state), locale)}</span>
             </span>
           </button>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={props.voiceOutput}
-            onClick={() => props.onVoiceOutput(!props.voiceOutput)}
-            className={`${SIDE} ${compact ? "" : "mt-4"} justify-self-end`}
-          >
-            {props.voiceOutput ? <Volume2 {...ICON} /> : <VolumeX {...ICON} />}
-            <span className="sr-only">{pt("aiVoice", locale)}</span>
-            <span aria-hidden>{pt(props.voiceOutput ? "voiceOn" : "voiceOff", locale)}</span>
-          </button>
+          {props.voiceSwitch === false ? (
+            <span />
+          ) : (
+            <button
+              type="button"
+              role="switch"
+              aria-checked={props.voiceOutput}
+              onClick={() => props.onVoiceOutput(!props.voiceOutput)}
+              className={`${SIDE} ${compact ? "" : "mt-4"} justify-self-end`}
+            >
+              {props.voiceOutput ? <Volume2 {...ICON} /> : <VolumeX {...ICON} />}
+              <span className="sr-only">{pt("aiVoice", locale)}</span>
+              <span aria-hidden>{pt(props.voiceOutput ? "voiceOn" : "voiceOff", locale)}</span>
+            </button>
+          )}
         </div>
       </div>
     </div>

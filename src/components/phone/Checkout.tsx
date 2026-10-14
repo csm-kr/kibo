@@ -1,6 +1,6 @@
 "use client";
 
-import { Keyboard, Mic, X } from "lucide-react";
+import { Keyboard, KeyboardOff, Mic } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
 import type { VoiceState } from "@/hooks/useLiveVoice";
 import { payMethodHint, pt } from "@/lib/i18n/phone";
@@ -96,11 +96,12 @@ export function ConfirmBar(props: {
           <button
             type="button"
             aria-expanded={typing}
+            aria-label={typing ? pt("closeTyping", locale) : undefined}
             onClick={() => props.onTyping(!typing)}
             className={`${COMPACT} min-h-22 text-ink active:bg-kibo-tint`}
           >
-            {typing ? <X {...ICON} /> : <Keyboard {...ICON} />}
-            <span>{pt(typing ? "closeTyping" : "typeButton", locale)}</span>
+            {typing ? <KeyboardOff {...ICON} /> : <Keyboard {...ICON} />}
+            <span>{pt(typing ? "closeTypingShort" : "typeButton", locale)}</span>
           </button>
         )}
         <button

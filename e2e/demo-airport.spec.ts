@@ -60,7 +60,7 @@ test("airport rail on /demo: tickets on both halves, confirm, card stand-in, ref
   await page.getByRole("button", { name: "Yes, pay now" }).click();
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "payment");
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "pay");
-  await page.getByRole("button", { name: "Insert the card at the kiosk" }).click();
+  await page.getByRole("button", { name: "Kiosk: insert card (demo)" }).click();
 
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "done");
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "done");

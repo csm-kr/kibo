@@ -245,6 +245,18 @@ describe("buildInstructions with untrusted learned text (I-152)", () => {
   });
 });
 
+describe("the pay button by the label the user sees (15-judge-fixes:2)", () => {
+  it("names the confirm button in the AI's language, as the phone shows it", () => {
+    const ja = buildInstructions(k, { locale: "en", language: "ja" });
+    expect(ja).toContain('"はい、支払います"');
+    expect(ja).not.toContain('"Yes, pay now"');
+    const ko = buildInstructions(k, { locale: "ko", language: "ko" });
+    expect(ko).toContain('"네, 결제할게요"');
+    expect(ko).not.toContain('"Yes, pay now"');
+    expect(buildInstructions(k, { locale: "en" })).toContain('"Yes, pay now"');
+  });
+});
+
 describe("language and the dine option (14-final:4)", () => {
   it("speaks the language the user chose, and the user's own language over it", () => {
     const ja = buildInstructions(k, { locale: "en", language: "ja" });

@@ -322,7 +322,7 @@ function scenarioClip(name: string, kioskId: string, scenarioId: string, dine: b
         await page.getByRole("button", { name: "Yes, pay now" }).click();
         await watch.until("paying", status("paying"), 15_000);
         await rec.mark("paying");
-        await page.getByRole("button", { name: "Insert the card at the kiosk" }).click();
+        await page.getByRole("button", { name: "Kiosk: insert card (demo)" }).click();
         await watch.until("paid", status("paid"), 30_000);
         await rec.mark("paid");
         await skipReceipt(page);
@@ -366,7 +366,7 @@ const CLIPS: Clip[] = [
         await page.getByRole("button", { name: "Yes, pay now" }).click();
         await watch.until("paying", status("paying"), 15_000);
         await rec.mark("paying");
-        await page.getByRole("button", { name: "Insert the card at the kiosk" }).click();
+        await page.getByRole("button", { name: "Kiosk: insert card (demo)" }).click();
         await watch.until("paid", status("paid"), 30_000);
         await rec.mark("paid");
         await skipReceipt(page);

@@ -113,7 +113,7 @@ test("phone path: start to order number", async ({ page, request }, info) => {
   expect(checkout.status).toBe("confirming");
   // The text field opened on P1 ([Type instead]) stays open for the order (UX C3); close it for P4's own look.
   await expect(page.getByRole("textbox", { name: "Type your order" })).toBeVisible();
-  await page.getByRole("button", { name: "Close", exact: true }).click();
+  await page.getByRole("button", { name: "Hide keyboard", exact: true }).click();
   await expect(page.getByRole("textbox", { name: "Type your order" })).toHaveCount(0);
   // The total and the whole [Yes, pay now] at every phone size, 320×700 included (I-134, R-009).
   await check(page, info, "P4-confirm", VIEWPORTS, async () => {
@@ -144,8 +144,8 @@ test("P-lang: the language picker, then the phone with the AI in Japanese (14-fi
   await page.getByRole("button", { name: "Eat here" }).click();
   await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
 
-  await page.getByRole("button", { name: "Language: English" }).click();
-  const picker = page.getByRole("dialog", { name: "Language" });
+  await page.getByRole("button", { name: "Language and text size: English" }).click();
+  const picker = page.getByRole("dialog", { name: "Language and text size" });
   await expect(picker.getByRole("button", { name: /^English/ })).toBeFocused();
   await check(page, info, "P-lang-picker");
 
@@ -160,7 +160,7 @@ test("P-lang: the language picker, then the phone with the AI in Japanese (14-fi
   await check(page, info, "P3-ja", [VIEWPORTS[0], VIEWPORTS[3]]);
 
   await s.phone("requestCheckout", {}, { utteranceSeq: 2 });
-  await page.getByRole("button", { name: "Close", exact: true }).click();
+  await page.getByRole("button", { name: "Hide keyboard", exact: true }).click();
   await check(page, info, "P4-confirm-ja", [VIEWPORTS[0], VIEWPORTS[3]], async () => {
     await expect(page.getByRole("button", { name: "はい、支払います" })).toBeInViewport({ ratio: 1 });
   });
@@ -404,16 +404,68 @@ test("P3 in Korean with larger text: the dock while typing, and the cart summary
   await expect(page.locator("[data-voice-state]")).toHaveAttribute("data-compact", "true");
   await check(page, info, "P3-typing-ko-large", [VIEWPORTS[1], VIEWPORTS[3]], () => input.focus());
 
-  // Six photo choices push the cart card down; the one-line summary above the dock keeps the total in view.
-  await phone("offerChoices", {
-    templateId: "pick_item",
-    choices: ["cheese_burger", "double_cheese_burger", "classic_burger", "bacon_cheese_burger", "shrimp_burger", "spicy_chicken_burger"].map(
-      (id) => ({ kind: "item", id }),
-    ),
-  });
-  await page.locator("[data-phone-screen]").getByRole("heading", { name: "어떤 메뉴로 드릴까요?" }).scrollIntoViewIfNeeded();
+  // A long cart scrolled back to the top: the card's total is out of view, and the one-line summary above the dock
+  // keeps it in view. (Choices hide the summary since 15-judge-fixes:2, so the cart itself pushes the total down.)
+  for (const itemId of ["cheese_burger", "double_cheese_burger", "classic_burger", "fries_m"]) {
+    await phone("addToCart", { itemId, variant: "single", qty: 1, selections: {} });
+  }
+  await expect(page.getByRole("region", { name: "내 주문" }).locator("li")).toHaveCount(5);
+  await page.locator("[data-phone-scroll]").evaluate((el) => el.scrollTo({ top: 0 }));
   await expect(page.locator("[data-cart-summary]")).toBeVisible();
-  await check(page, info, "P3-cart-summary-ko-large", [VIEWPORTS[1], VIEWPORTS[3]]);
+  await check(page, info, "P3-cart-summary-ko-large", [VIEWPORTS[1], VIEWPORTS[3]], async () => {
+    await page.locator("[data-phone-scroll]").evaluate((el) => el.scrollTo({ top: 0 }));
+  });
+  await ctx.close();
+});
+
+test("P3 at 360×800 with larger text: the AI's reply and its choices stay above the dock (15-judge-fixes:2)", async ({
+  browser,
+  request,
+}, info) => {
+  const ctx = await browser.newContext({ viewport: VIEWPORTS[1], locale: "en-US", isMobile: true, hasTouch: true });
+  const page = await ctx.newPage();
+  await page.addInitScript(() => localStorage.setItem("kibo.phone.largeText", "on"));
+  const res = await request.post("/api/session", { data: { kioskId: "malo" } });
+  const created = (await res.json()) as { sessionId: string; claimUrl: string };
+  await page.goto(created.claimUrl);
+  const key = `kibo.phone.${created.sessionId}`;
+  await expect.poll(() => page.evaluate((k) => localStorage.getItem(k), key)).not.toBeNull();
+  const deviceToken = (await page.evaluate((k) => localStorage.getItem(k), key)) ?? "";
+  await page.getByRole("button", { name: "Start" }).click();
+  await page.getByRole("button", { name: "Type instead" }).click();
+  await page.getByRole("button", { name: "Eat here" }).click();
+  await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
+
+  // The judge's order (no model): the route adds the set and offers dessert, as the agent would, then replies.
+  await page.route("**/api/chat", async (route) => {
+    const ai = (type: string, args: object) =>
+      command(request, deviceToken, { sessionId: created.sessionId, type, args, source: "text", utteranceSeq: 1 });
+    await ai("addToCart", { itemId: "bulgogi_burger", variant: "set", qty: 1, selections: { side: ["fries_l"], drink: ["cider"] } });
+    await ai("offerChoices", { templateId: "upsell", choices: [{ kind: "item", id: "soft_cone" }, { kind: "item", id: "apple_pie" }] });
+    await route.fulfill({
+      json: {
+        ok: true,
+        reply: "Added Bulgogi burger set with Fries (L) and Cider. Would you like a dessert too?",
+        status: "ordering",
+        cart: [],
+        total: 0,
+        cartVersion: 0,
+        actions: [],
+      },
+    });
+  });
+  await page.getByRole("textbox", { name: "Type your order" }).fill("A bulgogi burger set with large fries and a cider");
+  await page.getByRole("button", { name: "Send", exact: true }).click();
+  await expect(page.getByRole("button", { name: "No thanks" })).toBeVisible();
+
+  // The last choice and the reply's start are whole on screen, not under the dock, and no summary covers them.
+  const shown = async () => {
+    await expect(page.getByRole("button", { name: "No thanks" })).toBeInViewport({ ratio: 1 });
+    await expect(page.locator('[data-bubble="model"]').last()).toBeInViewport();
+    await expect(page.locator("[data-cart-summary]")).toHaveCount(0);
+  };
+  await shown();
+  await check(page, info, "P3-reply-choices-large", [VIEWPORTS[1]], shown);
   await ctx.close();
 });
 

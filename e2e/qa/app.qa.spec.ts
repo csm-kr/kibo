@@ -65,7 +65,8 @@ test("/app home: first visit, then Korean with larger text and an order to conti
 
   await page.goto("/app");
   await page.getByRole("button", { name: "한국어" }).click();
-  await page.getByRole("switch", { name: "큰 글씨" }).click();
+  // The one at the top of the page (15-judge-fixes:2); the settings card has the same switch.
+  await page.getByRole("switch", { name: "큰 글씨" }).first().click();
   await expect(page.getByRole("link", { name: "하던 주문 이어서 하기" })).toBeVisible();
   await check(page, info, "P0-home-continue-ko-large");
 });

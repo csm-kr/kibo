@@ -1,13 +1,14 @@
 "use client";
 
-import { Check, Link2, ScanLine } from "lucide-react";
+import { ALargeSmall, Check, Link2, ScanLine } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore, type FormEvent } from "react";
 import { InAppNote } from "@/components/app/InAppNote";
 import { ServiceWorker } from "@/components/app/ServiceWorker";
-import { CARD, FOCUS, ICON, PRESS, PRIMARY, SECONDARY } from "@/components/phone/ui";
+import { SettingSwitch } from "@/components/phone/SettingSwitch";
+import { CARD, COMPACT, FOCUS, ICON, PRESS, PRIMARY, SECONDARY } from "@/components/phone/ui";
 import { setPhoneSettings, usePhoneSettings } from "@/hooks/usePhoneSettings";
 import { ApiError, pair } from "@/lib/client/api";
 import { errorCopy } from "@/lib/i18n/errors";
@@ -34,7 +35,21 @@ export function AppHome() {
       <ServiceWorker />
       <div className="mx-auto flex w-full max-w-md flex-col gap-6">
         <div className="flex flex-col gap-4">
-          <Image src="/kibo-logo.svg" alt="KIBO" width={148} height={40} unoptimized preload className="h-10 w-auto self-start" />
+          <div className="flex items-center justify-between gap-3">
+            <Image src="/kibo-logo.svg" alt="KIBO" width={148} height={40} unoptimized preload className="h-10 w-auto" />
+            {/* Larger text at the top, where a low-vision user looks first; the settings card below has it too
+                (15-judge-fixes:2). The check mark shows the state beside the color. */}
+            <button
+              type="button"
+              role="switch"
+              aria-checked={largeText}
+              onClick={() => setPhoneSettings({ largeText: !largeText })}
+              className={`${COMPACT} ${largeText ? "bg-kibo-tint text-kibo-deep" : "text-ink"} active:bg-kibo-tint`}
+            >
+              {largeText ? <Check {...ICON} /> : <ALargeSmall {...ICON} />}
+              <span>{pt("largeText", locale)}</span>
+            </button>
+          </div>
           <h1 className="text-2xl leading-tight font-bold">{pt("appTagline", locale)}</h1>
         </div>
 
@@ -82,8 +97,8 @@ export function AppHome() {
             {pt("settings", locale)}
           </h2>
           <LanguagePicker locale={locale} />
-          <Toggle label={pt("aiVoice", locale)} on={aiVoice} locale={locale} onChange={(v) => setPhoneSettings({ aiVoice: v })} />
-          <Toggle label={pt("largeText", locale)} on={largeText} locale={locale} onChange={(v) => setPhoneSettings({ largeText: v })} />
+          <SettingSwitch label={pt("aiVoice", locale)} on={aiVoice} locale={locale} onChange={(v) => setPhoneSettings({ aiVoice: v })} />
+          <SettingSwitch label={pt("largeText", locale)} on={largeText} locale={locale} onChange={(v) => setPhoneSettings({ largeText: v })} />
         </section>
       </div>
     </main>
@@ -183,31 +198,5 @@ function LanguagePicker({ locale }: { locale: Locale }) {
         })}
       </div>
     </div>
-  );
-}
-
-/** A full-width row: the setting's name, then the switch with its state in words. */
-function Toggle(props: { label: string; on: boolean; locale: Locale; onChange(on: boolean): void }) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={props.on}
-      onClick={() => props.onChange(!props.on)}
-      className={`flex min-h-14 w-full items-center justify-between gap-3 rounded-tile text-left text-xl font-semibold active:bg-kibo-tint ${PRESS} ${FOCUS}`}
-    >
-      <span>{props.label}</span>
-      <span className="flex flex-none items-center gap-2">
-        <span aria-hidden className="text-base font-normal text-muted">
-          {pt(props.on ? "settingOn" : "settingOff", props.locale)}
-        </span>
-        <span
-          aria-hidden
-          className={`flex h-8 w-14 items-center rounded-full p-1 ${props.on ? "justify-end bg-kibo" : "justify-start bg-field"}`}
-        >
-          <span className="size-6 rounded-full bg-white" />
-        </span>
-      </span>
-    </button>
   );
 }

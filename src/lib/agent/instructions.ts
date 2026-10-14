@@ -1,4 +1,4 @@
-import { LANGUAGES, type SpeechLanguage } from "@/lib/i18n/languages";
+import { LANGUAGES, lt, type SpeechLanguage } from "@/lib/i18n/languages";
 import { PHONE_NOTE } from "@/lib/voice/dineNote";
 import type { KioskData, Locale } from "@/types/menu";
 import type { CartLine, DineOption, Session, SessionStatus } from "@/types/session";
@@ -54,6 +54,8 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
   const ticket = kiosk.domain === "ticket";
   const vocabulary = kiosk.vocabulary;
   const best = kiosk.items.find((i) => i.badge === "best");
+  // The confirm button as the phone labels it in this language, so the AI names the words on screen (15-judge-fixes:2).
+  const payNow = lt("payNow", language, kiosk.domain);
 
   const rules = [
     `You are KIBO, a friendly ordering helper. You operate the ${brand} ${ticket ? "ticket machine" : "kiosk"} for the user.`,
@@ -161,10 +163,10 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
           "Status confirming means the order is ready on the kiosk; do not change the cart then unless the user asks.",
         ]
       : [
-          "When the user is done or wants to pay, call requestCheckout. It shows the order on the phone; ask the user to check their order and say yes or tap \"Yes, pay now\".",
+          `When the user is done or wants to pay, call requestCheckout. It shows the order on the phone; ask the user to check their order and say yes or tap "${payNow}".`,
           "Call confirmCheckout only when the user clearly says yes in a new turn after their order appeared.",
           "Never call requestCheckout and confirmCheckout in the same turn.",
-          "If confirmCheckout is refused with \"Please confirm on the card.\", ask the user to tap \"Yes, pay now\" on the phone. Do not retry.",
+          `If confirmCheckout is refused with "Please confirm on the card.", ask the user to tap "${payNow}" on the phone. Do not retry.`,
           "Payment happens on the kiosk with a card. You never pay and cannot complete a payment.",
           "Status confirming means the user is checking their order; paying means the user is paying at the kiosk; do not change the cart then.",
         ]),

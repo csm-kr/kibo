@@ -65,7 +65,10 @@ test("judge path: intro, order on both halves, confirm, card stand-in, order num
   await page.getByRole("button", { name: "Yes, pay now" }).click();
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "payment");
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "pay");
-  await page.getByRole("button", { name: "Insert the card at the kiosk" }).click();
+  // The phone half only says what to do: no button there pays. The stand-in is drawn under the kiosk (15-judge-fixes:2).
+  await expect(phoneScreen(page).getByRole("heading", { name: "Insert your card into the kiosk" })).toBeVisible();
+  await expect(phoneScreen(page).getByRole("button", { name: /card|kiosk|pay/i })).toHaveCount(0);
+  await page.locator("[data-card-reader]").getByRole("button", { name: "Kiosk: insert card (demo)" }).click();
   await expect(page.getByText("승인 중…")).toBeVisible();
 
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "done");

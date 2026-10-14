@@ -11,9 +11,11 @@ import { DEMO_ENVIRONMENTS, demoHref } from "./environments";
 // Three equal place cards pick the kiosk; the choice lives in the URL (`/demo?k=airport_rail`) so it can be linked,
 // and [Start] opens the selected one.
 
-// The split (kiosk left, phone right) needs 900px; below that the steps cannot point left or right (14-final:1).
+// The split (kiosk left, phone beside it) needs 900px; below that the steps cannot point left or right (14-final:1).
+// The phone is the middle column once the scenario guide opens beside it, so step 1 names it, not its side
+// (15-judge-fixes:2).
 const STEPS = [
-  { wide: "Talk or type on the right.", narrow: "Talk or type to the phone." },
+  { wide: "Talk or type to the phone next to the kiosk.", narrow: "Talk or type to the phone." },
   { wide: "Watch the kiosk on the left move by itself.", narrow: "Watch the kiosk move by itself." },
   { wide: "Confirm, then pay on the kiosk.", narrow: "Confirm, then pay on the kiosk." },
 ];

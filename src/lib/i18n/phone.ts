@@ -67,7 +67,11 @@ const PHONE_TEXT = {
   pickMore: { ko: "더 고를게요", en: "Pick more" },
   sayYes: { ko: "\"네\"라고 말해도 돼요.", en: "You can also say yes." },
   typeButton: { ko: "글자 입력", en: "Type" },
-  closeTyping: { ko: "닫기", en: "Close" },
+  // It only hides the text field and the on-screen keyboard; the order stays (15-judge-fixes:2). The accessible name;
+  // the short word is what shows under the keyboard icon, where a 320px dock has no room for two words.
+  closeTyping: { ko: "키보드 닫기", en: "Hide keyboard" },
+  closeTypingShort: { ko: "닫기", en: "Hide" },
+  close: { ko: "닫기", en: "Close" },
   // Learned kiosk (KIBO Learn): the kiosk page is driven by the bridge, and the user pays on the kiosk itself
   bridgePending: { ko: "키오스크에 입력하고 있어요…", en: "The kiosk is entering it…" },
   bridgeSlow: { ko: "키오스크 화면을 확인해 주세요.", en: "Please check the kiosk screen." },
@@ -77,7 +81,6 @@ const PHONE_TEXT = {
   },
   // Pay
   payTitle: { ko: "키오스크에 카드를 넣어 주세요", en: "Insert your card into the kiosk" },
-  cardStandIn: { ko: "키오스크에 카드 넣기", en: "Insert the card at the kiosk" },
   // Done
   orderNumber: { ko: "주문 번호", en: "Order number" },
   pickup: { ko: "카운터에서 번호를 부르면 받아 가세요.", en: "We'll call your number at the counter." },
@@ -206,6 +209,9 @@ const PHONE_TEXT = {
   settings: { ko: "설정", en: "Settings" },
   language: { ko: "언어", en: "Language" },
   largeText: { ko: "큰 글씨", en: "Larger text" },
+  // The app bar's sheet (15-judge-fixes:2): text size on every phone screen, not only at the bottom of /app.
+  languageAndText: { ko: "언어와 글씨 크기", en: "Language and text size" },
+  textSize: { ko: "글씨 크기", en: "Text size" },
   settingOn: { ko: "켜짐", en: "On" },
   settingOff: { ko: "꺼짐", en: "Off" },
   // /app pairing code (12-phone-app:3), the short way in: the kiosk shows "<host>/app" and 6 digits

@@ -35,13 +35,17 @@ test("settings on /app reach /assistant, and Continue my order lasts until the o
   await page.getByRole("button", { name: "한국어" }).click();
   await expect(page.getByRole("heading", { name: "KIBO QR이 있는 키오스크라면 말로 주문할 수 있어요." })).toBeVisible();
   await page.getByRole("switch", { name: "AI 목소리" }).click();
-  await page.getByRole("switch", { name: "큰 글씨" }).click();
+  // Larger text is at the top of the page and in the settings card; both are one setting (15-judge-fixes:2).
+  const largeText = page.getByRole("switch", { name: "큰 글씨" });
+  await expect(largeText).toHaveCount(2);
+  await largeText.first().click();
+  await expect(largeText.last()).toHaveAttribute("aria-checked", "true");
   await expect(page.getByRole("switch", { name: "AI 목소리" })).toHaveAttribute("aria-checked", "false");
   await expect(page.locator("html")).toHaveAttribute("style", /font-size: 115%/);
 
   // They persist across a reload.
   await page.reload();
-  await expect(page.getByRole("switch", { name: "큰 글씨" })).toHaveAttribute("aria-checked", "true");
+  await expect(page.getByRole("switch", { name: "큰 글씨" }).first()).toHaveAttribute("aria-checked", "true");
   await expect(page.getByRole("button", { name: "한국어" })).toHaveAttribute("aria-pressed", "true");
 
   // A kiosk order mid-way (dine option chosen), then the phone scans its QR: Korean, AI voice off, larger text.

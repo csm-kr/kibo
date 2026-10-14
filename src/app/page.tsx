@@ -580,7 +580,8 @@ function Architecture() {
           <path d="M0 0L10 5L0 10z" fill="#15171C" />
         </marker>
       </defs>
-      {box(24, 40, 184, 96, "Phone", ["/assistant"])}
+      {/* /app: the address people type or scan to; the order then runs on /assistant behind it. */}
+      {box(24, 40, 184, 96, "Phone", ["/app"])}
       {box(24, 296, 184, 96, "Kiosk", ["/kiosk"])}
       {box(360, 104, 200, 256, "Cloud Run", ["Next.js app + API", "asia-northeast3"], true)}
       {box(800, 24, 176, 72, "Gemini Live", [], true)}

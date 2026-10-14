@@ -94,6 +94,17 @@ test("D1 to D3", async ({ page, request }, info) => {
     await expect(page.locator("[data-kiosk-subtitle]")).toContainText("AI added: Cheeseburger set");
   });
 
+  // Larger text from the phone's app bar, as on a real phone (15-judge-fixes:2): only the phone half grows.
+  await page.getByRole("button", { name: "Language and text size: English" }).click();
+  await page.getByRole("dialog", { name: "Language and text size" }).getByRole("switch", { name: "Larger text" }).click();
+  await page.getByRole("dialog", { name: "Language and text size" }).getByRole("button", { name: "Close" }).click();
+  await expect(phoneScreen(page)).toHaveAttribute("data-large-text", "true");
+  await check(page, info, "D2-large-text", undefined, [VIEWPORTS[0]]);
+  await page.getByRole("button", { name: "Language and text size: English" }).click();
+  await page.getByRole("dialog", { name: "Language and text size" }).getByRole("switch", { name: "Larger text" }).click();
+  await page.getByRole("dialog", { name: "Language and text size" }).getByRole("button", { name: "Close" }).click();
+  await expect(phoneScreen(page)).not.toHaveAttribute("data-large-text", "true");
+
   await ai("requestCheckout", {}, seq++);
   await expect(page.getByRole("heading", { name: "Please check your order" })).toBeVisible();
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "review");
@@ -103,9 +114,13 @@ test("D1 to D3", async ({ page, request }, info) => {
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "payment");
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "pay");
   await expect(page.locator("[data-kiosk-step]")).toContainText("Kiosk: payment. Tap 카드 (Card)");
-  await check(page, info, "D2-payment");
+  // The card stand-in sits under the kiosk half; the phone half has no button that pays (15-judge-fixes:2).
+  await check(page, info, "D2-payment", async () => {
+    await expect(page.locator("[data-card-reader]").getByRole("button", { name: "Kiosk: insert card (demo)" })).toBeInViewport({ ratio: 1 });
+    await expect(phoneScreen(page).getByRole("button", { name: /card/i })).toHaveCount(0);
+  });
 
-  await page.getByRole("button", { name: "Insert the card at the kiosk" }).click();
+  await page.getByRole("button", { name: "Kiosk: insert card (demo)" }).click();
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "done");
   await page.getByRole("button", { name: "출력 안 함" }).click();
   await expect(page.locator("[data-demo-end]")).toBeVisible();
@@ -157,7 +172,7 @@ test.describe(() => {
     await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "pay");
     await check(page, info, "D2-rail-payment");
 
-    await page.getByRole("button", { name: "Insert the card at the kiosk" }).click();
+    await page.getByRole("button", { name: "Kiosk: insert card (demo)" }).click();
     await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "done");
     await page.getByRole("button", { name: "출력 안 함" }).click();
     await expect(page.locator("[data-demo-end]")).toBeVisible();
@@ -272,7 +287,7 @@ test.describe(() => {
     // While paying only the card is left (I-242, 14-final:10; R-003).
     await expect(yourTurn).toHaveText("Your turn: insert the card at the kiosk.");
     await check(page, info, "D2-scenario-paying-guide", () => yourTurn.scrollIntoViewIfNeeded(), VIEWPORTS, DEMO_GUIDE);
-    await page.getByRole("button", { name: "Insert the card at the kiosk" }).click();
+    await page.getByRole("button", { name: "Kiosk: insert card (demo)" }).click();
     await expect(yourTurn).toHaveText("Paid. Choose another scenario to try more.");
     await check(page, info, "D3-scenario-paid-guide", () => yourTurn.scrollIntoViewIfNeeded(), VIEWPORTS, DEMO_GUIDE);
   });

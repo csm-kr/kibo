@@ -219,9 +219,10 @@ export async function textSpacing(page: Page, p: Profile): Promise<Findings> {
       const cs = getComputedStyle(el);
       const text = (el.textContent ?? "").trim();
       if (!text || !el.checkVisibility()) continue;
-      // Screen-reader-only text (a 1px clipped box) is hidden on purpose; the other checks skip it too.
+      // Screen-reader-only text (a 1px clipped box) is hidden on purpose; the other checks skip it too. Its computed
+      // size too: a zoomed panel (/demo's larger text, 15-judge-fixes:2) draws the 1px box 1.15px wide.
       const box = el.getBoundingClientRect();
-      if (box.width <= 1 || box.height <= 1) continue;
+      if (box.width <= 1 || box.height <= 1 || parseFloat(cs.width) <= 1 || parseFloat(cs.height) <= 1) continue;
       const hideX = cs.overflowX === "hidden" || cs.overflowX === "clip";
       const hideY = cs.overflowY === "hidden" || cs.overflowY === "clip";
       // 1px absorbs subpixel rounding.

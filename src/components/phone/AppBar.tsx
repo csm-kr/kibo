@@ -1,13 +1,14 @@
 "use client";
 
-import { Bell, Check, Globe, X } from "lucide-react";
+import { ALargeSmall, Bell, Check, Globe, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useId, useRef, useState } from "react";
 import { useInertBackground } from "@/hooks/useInertBackground";
 import { aiOnly, LANGUAGES, SPEECH_LANGUAGES, type SpeechLanguage } from "@/lib/i18n/languages";
 import { pt } from "@/lib/i18n/phone";
 import type { Locale } from "@/types/menu";
-import { COMPACT, FOCUS, ICON, PRESS, QUIET } from "./ui";
+import { SettingSwitch } from "./SettingSwitch";
+import { CARD, COMPACT, FOCUS, ICON, PRESS, QUIET } from "./ui";
 
 // The phone app bar (docs/UI_GUIDE.md "Phone design"): one 64px row on every phone screen. The connection state is a
 // dot and a word, so color is never the only signal; each control's visible word is part of its accessible name.
@@ -26,6 +27,14 @@ export function AppBar(props: {
    */
   language?: SpeechLanguage;
   onLanguageChange?: (next: SpeechLanguage) => void;
+  /**
+   * Larger text in the same sheet (15-judge-fixes:2), so it is reachable from every phone screen; the button then
+   * shows "Aa" beside the globe. With `voice` the AI voice switch sits there too (it leaves the dock on a small phone
+   * with larger text, where the app bar has no room for another button).
+   */
+  largeText?: boolean;
+  onLargeText?: (on: boolean) => void;
+  voice?: { on: boolean; onChange(on: boolean): void };
   /** Left out once the order has ended (P7). */
   onStaff?: () => void;
   staffDisabled?: boolean;
@@ -57,11 +66,14 @@ export function AppBar(props: {
           <button
             type="button"
             aria-haspopup="dialog"
-            aria-label={`${pt("language", locale)}: ${LANGUAGES[language].native}`}
+            aria-label={`${pt(props.onLargeText ? "languageAndText" : "language", locale)}: ${LANGUAGES[language].native}`}
             onClick={() => setPicking(true)}
             className={`${COMPACT} max-w-32 text-ink active:bg-kibo-tint`}
           >
-            <Globe {...ICON} />
+            <span className="flex items-center gap-1">
+              <Globe {...ICON} />
+              {props.onLargeText && <ALargeSmall {...ICON} />}
+            </span>
             <span lang={language} className="truncate">
               {LANGUAGES[language].native}
             </span>
@@ -91,6 +103,8 @@ export function AppBar(props: {
         <LanguagePicker
           locale={locale}
           language={language}
+          largeText={props.onLargeText ? { on: props.largeText ?? false, onChange: props.onLargeText } : undefined}
+          voice={props.voice}
           onPick={(next) => {
             setPicking(false);
             if (next !== language) onLanguageChange(next);
@@ -103,12 +117,20 @@ export function AppBar(props: {
 }
 
 /**
- * Every AI language, each in its own words with its English name under it. Korean and English change the screens too;
- * the others only what the AI speaks and writes (docs/UX.md P-lang). A layer over the phone: the rest is inert,
- * Escape and [Close] close it, and focus starts on the language in use.
+ * Larger text first (with the AI voice switch when the dock has no room for it), then every AI language, each in its
+ * own words with its English name under it. Korean and English change the screens too; the others only what the AI
+ * speaks and writes (docs/UX.md P-lang). A layer over the phone: the rest is inert, Escape and [Close] close it, and
+ * focus starts on the language in use.
  */
-function LanguagePicker(props: { locale: Locale; language: SpeechLanguage; onPick(l: SpeechLanguage): void; onClose(): void }) {
-  const { locale, language } = props;
+function LanguagePicker(props: {
+  locale: Locale;
+  language: SpeechLanguage;
+  largeText?: { on: boolean; onChange(on: boolean): void };
+  voice?: { on: boolean; onChange(on: boolean): void };
+  onPick(l: SpeechLanguage): void;
+  onClose(): void;
+}) {
+  const { locale, language, largeText, voice } = props;
   const ref = useRef<HTMLDivElement>(null);
   const current = useRef<HTMLButtonElement>(null);
   const titleId = useId();
@@ -151,14 +173,27 @@ function LanguagePicker(props: { locale: Locale; language: SpeechLanguage; onPic
     >
       <div className="flex min-h-16 flex-none items-center justify-between gap-2 bg-white px-4 py-1 shadow-card">
         <h2 id={titleId} className="text-2xl font-bold">
-          {pt("language", locale)}
+          {pt(largeText ? "languageAndText" : "language", locale)}
         </h2>
-        <button type="button" onClick={props.onClose} className={QUIET}>
+        <button type="button" onClick={props.onClose} className={`${QUIET} flex-none`}>
           <X {...ICON} />
-          {pt("closeTyping", locale)}
+          {pt("close", locale)}
         </button>
       </div>
       <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto p-4">
+        {largeText && (
+          <section className="flex flex-col gap-2">
+            <h3 className="text-base font-semibold text-muted">{pt("textSize", locale)}</h3>
+            <div className={`${CARD} py-2`}>
+              <SettingSwitch label={pt("largeText", locale)} on={largeText.on} locale={locale} onChange={largeText.onChange} />
+            </div>
+          </section>
+        )}
+        {voice && (
+          <div className={`${CARD} py-2`}>
+            <SettingSwitch label={pt("aiVoice", locale)} on={voice.on} locale={locale} onChange={voice.onChange} />
+          </div>
+        )}
         <section className="flex flex-col gap-2">
           <h3 className="text-base font-semibold text-muted">{pt("langScreens", locale)}</h3>
           <ul className="flex flex-col gap-2">{SPEECH_LANGUAGES.filter((l) => !aiOnly(l)).map(option)}</ul>

@@ -1,9 +1,9 @@
 "use client";
 
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CreditCard } from "lucide-react";
 import { useCallback, useRef, useState, useSyncExternalStore } from "react";
 import { AssistantPanel, type SayFn } from "@/components/assistant/AssistantPanel";
-import { ICON, QUIET, SECONDARY } from "@/components/phone/ui";
+import { ICON, PRESS, QUIET, SECONDARY } from "@/components/phone/ui";
 import { KioskCanvas } from "@/components/kiosk/KioskCanvas";
 import { KioskScreen } from "@/components/kiosk/KioskScreen";
 import { LearnedKioskHost } from "@/components/learned/LearnedKioskHost";
@@ -37,6 +37,8 @@ const DEMO_CHAT_LIMIT = 30;
 const MAX_ACTIONS = 50;
 /** The judge laptop (docs/UI_QA.md 1440×900) and wider: room for a third column. */
 const WIDE = "(min-width: 1440px)";
+/** On the kiosk's dark frame an ink ring would not show; white keeps the focus visible (WCAG 2.4.7). */
+const FOCUS_ON_DARK = "focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-white";
 
 /**
  * This demo order's own counts for the D3 comparison card (docs/PRD.md "Demo scenario" step 8), from [Start] or
@@ -64,8 +66,10 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
   // The phone half's AI language (14-final:4); its screens are Korean or English.
   const [language, setLanguage] = useState<SpeechLanguage>("en");
   const locale: Locale = uiLocale(language);
-  // The card stand-in on the phone half sends "tap" here; the kiosk's K7 inserts the card when it hears it.
+  // The card stand-in under the kiosk half sends "tap" here; the kiosk's K7 inserts the card when it hears it.
   const [cardTap] = useState(() => new EventTarget());
+  // The phone half's larger text, for this page only (the judge's laptop is not the user's phone).
+  const [largeText, setLargeText] = useState(false);
   // The phone half's own send, for the scenario guide's sentences.
   const sayRef = useRef<SayFn | null>(null);
   const onSay = useCallback((say: SayFn | null) => {
@@ -211,6 +215,22 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
               </KioskCanvas>
             )}
           </div>
+          {/* The card reader stands in under the kiosk, drawn as part of its frame: only the kiosk takes payment, so
+              the phone half has no button that pays (15-judge-fixes:2). It counts as a kiosk tap. With the judge's own
+              phone, the kiosk's own K7 buttons are used, as before. */}
+          {!ownPhone && !learned && session?.status === "paying" && (
+            <div data-card-reader className="flex flex-none rounded-tile bg-[#141210] p-2" onPointerDownCapture={countTap("kioskTaps")}>
+              <button
+                type="button"
+                onClick={() => cardTap.dispatchEvent(new Event("tap"))}
+                style={{ backgroundColor: kiosk.theme.accent }}
+                className={`flex min-h-14 w-full items-center justify-center gap-2 rounded-tile px-4 text-xl font-bold text-[#1E1B18] ${PRESS} ${FOCUS_ON_DARK}`}
+              >
+                <CreditCard {...ICON} />
+                Kiosk: insert card (demo)
+              </button>
+            </div>
+          )}
         </section>
         {ownPhone ? (
           // A slim status column: the QR and code are on the kiosk half's own screen (14-final:1).
@@ -252,7 +272,8 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
                 onLanguageChange={setLanguage}
                 mode="demo"
                 examples={examplesFor(kiosk.kioskId, locale, "demo")}
-                onCardStandIn={() => cardTap.dispatchEvent(new Event("tap"))}
+                largeText={largeText}
+                onLargeTextChange={setLargeText}
                 streamState={demo.streamState}
                 clockOffset={demo.clockOffset}
                 chatLimit={DEMO_CHAT_LIMIT}
