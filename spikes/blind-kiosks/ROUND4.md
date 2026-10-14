@@ -43,3 +43,10 @@ Two new kiosks, built by independent agents under the Builder rules of `PROTOCOL
 - No informed result yet shows that the fixes raise bk7's or bk8's orders; the evidence so far is the tests and the new audit's verdicts on the round-3 skills.
 - The hard-click check has blind spots (I-304): popups without prices, yes/no answers, look-alikes drawn differently, and taps that happen only after a non-first option.
 - `charges` are per order, so bk7's 200원 cup fee per drink cannot be predicted for take-out orders with several drinks (the grader uses the kiosk's own total).
+
+### Rules fixed before the fresh runs (orchestrator, 10-14 13:40 KST)
+Committed before either fresh kiosk is learned. The orchestrator read only the two answer keys' order-level fields to write them.
+- **Kiosks:** `bk9-bunsik` (Korean snack bar) and `bk10-chicken` (fried-chicken shop, eat-in or pickup), both portrait kiosks, so the learner's default 1080×1600 browser (no `KIOSK_VIEWPORT`). Built 10-14 by two independent agents from short briefs; kept outside the repo until the commit after this one.
+- **Order of runs:** the Mac is on battery, so the two fresh runs go first (bk9, then bk10, one at a time), and the informed runs (bk7 attempt 2, Doughhouse, bk8) after them. The learner is frozen at `a9522a4`, so the order changes nothing about either set.
+- **Grading:** grader at this commit with the round-3 rules and the `declines` rule above. Both keys name the dine choice with `dine` (the kiosk's own label). bk10's `pickupTime` (a pickup slot with no price effect) is not graded: the grader checks the kiosk total and cart lines, and the slot shows in neither; recorded as a limit. A key `note` describes how a customer might reach the order, not part of it.
+- One learning run per kiosk (`gemini-3.8-flash`, 2M input-token cap, 30 min kill, `TRACE_DIR`), no rerun except once after a crash; both reported whatever the result.
