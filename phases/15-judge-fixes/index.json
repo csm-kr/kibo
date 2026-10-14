@@ -56,7 +56,7 @@
       "status": "completed",
       "started_at": "2026-10-15T02:36:49+0900",
       "summary": "QA pass on every screen this phase changed: phases/15-judge-fixes/qa/REPORT.md (angles A-I pass, 0 H in qa:ui; judge items table: UX 1-5 and impact 5 fixed, tech 2-5 and UX 6-7 partly, tech 1 and impact 1-4 need a person; person to-do list). Fresh-eyes re-walk screenshots in qa/fresh-eyes/. Eval once on backend auto (production setting): 73/77, API key answered all 186 calls, no Vertex fallback, cases sequential, five back-to-back batches (10 min shell limit) summarized in evals/results/2026-10-15-full.md; new headline in NUMBERS, landing, README, DECK_FACTS, SUBMISSION, TESTING. test:e2e:live once: 14 passed, 3 scenario players UPSTREAM (I-268). New issues I-268 (model failure after a refusal ends in the error line), I-269 (Spanish reply detected as English), I-270 (last choice half under the dock with the text field open). lint, build, test (1149), test:e2e (51, 17 @live skipped), qa:ui (48/48), scan:repo (0 findings) pass. evidence/*.json rewritten by E2E left uncommitted (I-099).",
-      "completed_at": "2026-10-15T03:55:00+0900"
+      "completed_at": "2026-10-15T03:46:57+0900"
     }
   ],
   "created_at": "2026-10-14T23:31:04+0900"
