@@ -19,7 +19,7 @@ import { getKiosk } from "@/lib/adapters/catalog";
 import { MemoryStore } from "@/lib/store/memory";
 import type { Locale } from "@/types/menu";
 import type { CartLine, Session, SessionStatus } from "@/types/session";
-import { checkGrounding, offersToPay, type GroundingResult } from "./grounding";
+import { checkGrounding, internalWords, offersToPay, type GroundingResult } from "./grounding";
 
 interface ExpectedLine {
   itemId: string;
@@ -197,6 +197,8 @@ async function runCase(c: Case) {
   let chat = initialChat;
   let before: CartLine[] = [];
   let lastReply: string | null = null;
+  // Every reply of the case, not only the last: "please wait" or "confirm card" can come mid-order.
+  const internal = new Set<string>();
   const allCalls: ToolCall[] = [];
   const requests: RequestLog[] = [];
 
@@ -239,6 +241,7 @@ async function runCase(c: Case) {
       }
       chat = chatReducer(chat, { type: "reply", text: reply });
       lastReply = reply;
+      for (const w of internalWords(reply, { replaying: Boolean(getKiosk(kioskId).learned) })) internal.add(w);
     } catch (e) {
       if (!(e instanceof CommandError)) throw e;
       log.error = e.code;
@@ -260,7 +263,7 @@ async function runCase(c: Case) {
   const payOffer = lastReply !== null && offersToPay(lastReply);
   const failure = requests.find((r) => r.error)
     ? `request error ${requests.find((r) => r.error)!.error}`
-    : judge(c, final, before, allCalls, grounding, payOffer);
+    : (judge(c, final, before, allCalls, grounding, payOffer) ?? (internal.size > 0 ? `internal words: ${[...internal].join(",")}` : null));
   return {
     id: c.id,
     kioskId,
@@ -273,6 +276,8 @@ async function runCase(c: Case) {
     pendingChoice: final.pendingChoice,
     staffCalled: final.staffCalled ? final.staffCalled.reasonCode : null,
     ...(grounding ? { grounding } : {}),
+    // The matched words only, never the reply.
+    ...(internal.size > 0 ? { internalWords: [...internal] } : {}),
     requests,
   };
 }

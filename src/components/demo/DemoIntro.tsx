@@ -11,10 +11,11 @@ import { DEMO_ENVIRONMENTS, demoHref } from "./environments";
 // Three equal place cards pick the kiosk; the choice lives in the URL (`/demo?k=airport_rail`) so it can be linked,
 // and [Start] opens the selected one.
 
+// The split (kiosk left, phone right) needs 900px; below that the steps cannot point left or right (14-final:1).
 const STEPS = [
-  "Talk or type on the right.",
-  "Watch the kiosk on the left move by itself.",
-  "Confirm, then pay on the kiosk.",
+  { wide: "Talk or type on the right.", narrow: "Talk or type to the phone." },
+  { wide: "Watch the kiosk on the left move by itself.", narrow: "Watch the kiosk move by itself." },
+  { wide: "Confirm, then pay on the kiosk.", narrow: "Confirm, then pay on the kiosk." },
 ];
 
 export function DemoIntro(props: {
@@ -30,6 +31,14 @@ export function DemoIntro(props: {
       <div data-demo-check className="m-auto grid w-full max-w-6xl items-start gap-12 lg:grid-cols-[2fr_3fr]">
         <div className="flex flex-col gap-6">
           <Image src="/kibo-logo.svg" alt="KIBO" width={177} height={48} preload />
+          {/* Said before anything else on a phone, not after [Start] (I-074). */}
+          <div role="note" data-demo-narrow-note className="flex flex-col gap-3 rounded-[18px] bg-[#FFF1CC] p-4 text-[#7A2E0E] min-[900px]:hidden">
+            <p className="text-xl font-bold">Open this on a laptop to see the kiosk and the phone side by side.</p>
+            <p className="text-base">On this phone, try the real two-device mode: open the kiosk on a computer and scan its QR.</p>
+            <a href={`/kiosk?k=${props.kioskId}`} className={SECONDARY}>
+              Open the kiosk
+            </a>
+          </div>
           <h1 className="font-display text-5xl leading-tight font-bold">
             <span className="block">Don&apos;t learn the kiosk.</span> <span className="block">Just talk.</span>
           </h1>
@@ -39,11 +48,12 @@ export function DemoIntro(props: {
           </p>
           <ol className="flex flex-col gap-4 rounded-[26px] border border-[#E2DACB] bg-white p-6">
             {STEPS.map((step, i) => (
-              <li key={step} className="flex items-center gap-4 text-xl">
+              <li key={step.wide} className="flex items-center gap-4 text-xl">
                 <span aria-hidden className="flex size-10 flex-none items-center justify-center rounded-full bg-[#3446D4] text-xl font-bold text-white">
                   {i + 1}
                 </span>
-                {step}
+                <span className="max-[899px]:hidden">{step.wide}</span>
+                <span className="min-[900px]:hidden">{step.narrow}</span>
               </li>
             ))}
           </ol>

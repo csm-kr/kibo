@@ -27,6 +27,7 @@ export function toPublicSession(s: Session): Session {
     paidAt: s.paidAt,
     phoneConnectedAt: s.phoneConnectedAt,
     phoneSeenAt: s.phoneSeenAt,
+    phoneWorkingAt: s.phoneWorkingAt ?? null,
     pendingBridgeCommand: s.pendingBridgeCommand,
     bridgeStatus: s.bridgeStatus,
     createdAt: s.createdAt,

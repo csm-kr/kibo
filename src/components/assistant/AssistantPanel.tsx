@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Link2, Mic, Smartphone } from "lucide-react";
+import { Bell, ChevronRight, Link2, Mic, Smartphone } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { ModalLayer } from "@/components/kiosk/ModalLayer";
@@ -22,7 +22,8 @@ import type { ChoiceRef } from "@/lib/commands/errors";
 import type { CommandType } from "@/lib/commands/schemas";
 import type { SendResult } from "@/lib/demo/player";
 import { learnedUndoLine } from "@/lib/commands/undo";
-import { cartAnnouncement, learnedPayHint, phoneSecondsLeft, pt, voiceSecondsLeft } from "@/lib/i18n/phone";
+import { cartAnnouncement, itemCount, learnedPayHint, phoneSecondsLeft, pt, voiceSecondsLeft } from "@/lib/i18n/phone";
+import { formatWon } from "@/lib/kiosk/menu";
 import { idleWarning, staffBannerVisible } from "@/lib/kiosk/timers";
 import { bridgeNotice, phoneScreen, type BridgeNotice, type PhoneLocal } from "@/lib/phone/screen";
 import type { KioskData, Locale, LocalizedName } from "@/types/menu";
@@ -233,12 +234,43 @@ export function AssistantPanel(props: Props) {
     else say(label);
   }
 
+  // [No thanks] on an offer: the AI hears it, and the buttons go away at once, because a "no" changes nothing on
+  // the server that would clear them. Keyed by the offer, so a later one shows again.
+  const pendingKey = session?.pendingChoice ? `${session.cartVersion}:${JSON.stringify(session.pendingChoice)}` : null;
+  const [declined, setDeclined] = useState<string | null>(null);
+  function decline(label: string) {
+    setDeclined(pendingKey);
+    say(label);
+  }
+
+  // P3: when the cart card is out of view (a small phone, larger text), a one-line summary above the dock shows the
+  // count and total; a tap scrolls to the card's total.
+  const cartEnd = useRef<HTMLSpanElement>(null);
+  const [cartInView, setCartInView] = useState(true);
+  useEffect(() => {
+    const el = cartEnd.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => setCartInView(entry.isIntersecting));
+    io.observe(el);
+    return () => io.disconnect();
+  }, [screen]);
+
   // Screens other than talk show only replies that came after they opened, so an old error never lingers there.
   const [opened, setOpened] = useState({ screen, count: chat.messages.length });
   if (opened.screen !== screen) setOpened({ screen, count: chat.messages.length });
   const fresh = chat.messages.slice(opened.screen === screen ? opened.count : chat.messages.length);
 
-  const working = chat.busy && chat.sentAt > 0 && now - chat.sentAt >= 1000;
+  // At once on every send: a gap without feedback reads as broken (14-final:1).
+  const working = chat.busy;
+  // The kiosk says "KIBO is working…" too, from the session: the phone tells the server when a typed or spoken turn
+  // goes to the AI and when it is answered.
+  const aiWorking = chat.busy || voice.state === "thinking";
+  const sessionId = session?.sessionId ?? null;
+  useEffect(() => {
+    if (!sessionId || !deviceToken) return;
+    // A send is the user's own activity, so it extends the session; the "done" ping is not.
+    ping({ sessionId, token: deviceToken, active: aiWorking, working: aiWorking }).catch(() => {});
+  }, [aiWorking, sessionId, deviceToken]);
   const notice = learned && session ? bridgeNotice(session, now, clockOffset) : null;
   // The mismatch line already says staff is on the way.
   const staffVisible = session !== null && notice !== "mismatch" && staffBannerVisible(session, now, clockOffset);
@@ -247,6 +279,7 @@ export function AssistantPanel(props: Props) {
   // The server refused the stream (too many screens on one network) and it reconnects after a wait (I-033).
   const retrying = props.streamState === "retrying";
   const ended = screen === "ended" || screen === "taken";
+  const itemsInCart = session ? session.cart.reduce((n, l) => n + l.qty, 0) : 0;
 
   const bridgeLine = notice && (
     <BridgeLine notice={notice} locale={locale} onCallStaff={() => void command("callStaff", { reasonCode: "user_request" })} />
@@ -285,6 +318,7 @@ export function AssistantPanel(props: Props) {
       note={voiceNote}
       limit={limitNotice || undefined}
       inputElement={inputElement}
+      compactWhileTyping={mode === "phone"}
       status={
         <>
           {retrying && <StatusChip text={pt("streamRetrying", locale)} tone="warn" />}
@@ -398,20 +432,47 @@ export function AssistantPanel(props: Props) {
           <Scroll>
             <h1 className="sr-only">{pt("cartTitle", locale, kiosk.domain)}</h1>
             <Messages messages={chat.messages} locale={locale} working={working} />
-            {session.pendingChoice && (
-              <Choices kiosk={kiosk} pending={session.pendingChoice} locale={locale} disabled={busy} onPick={pickChoice} />
+            {session.pendingChoice && pendingKey !== declined && (
+              <Choices
+                kiosk={kiosk}
+                pending={session.pendingChoice}
+                locale={locale}
+                disabled={busy}
+                onPick={pickChoice}
+                onDecline={decline}
+              />
             )}
-            <OrderCard
-              kiosk={kiosk}
-              cart={session.cart}
-              total={session.total}
-              locale={locale}
-              canUndo={!busy && !waiting && undoable}
-              onUndo={learned && !undoable ? undefined : () => void command("undoLastChange", {})}
-              status={bridgeLine}
-            />
+            <div className="flex flex-col">
+              <OrderCard
+                kiosk={kiosk}
+                cart={session.cart}
+                total={session.total}
+                locale={locale}
+                canUndo={!busy && !waiting && undoable}
+                onUndo={learned && !undoable ? undefined : () => void command("undoLastChange", {})}
+                status={bridgeLine}
+              />
+              <span ref={cartEnd} aria-hidden className="block h-px scroll-mb-4" />
+            </div>
             {!limited && <Suggestions examples={props.examples ?? []} locale={locale} disabled={busy} onPick={say} />}
           </Scroll>
+          {/* The phone only: /demo's laptop column has room for the card, and a summary appearing there as keyboard
+              focus scrolls the card away would shrink the area under the focused control. */}
+          {mode === "phone" && itemsInCart > 0 && !cartInView && (
+            <div className="flex-none px-4 pt-2 pb-2">
+              <button
+                type="button"
+                data-cart-summary
+                onClick={() => cartEnd.current?.scrollIntoView({ block: "end" })}
+                className={`flex min-h-14 w-full items-center justify-between gap-2 rounded-full bg-white px-4 text-xl font-semibold text-kibo-deep shadow-card ${PRESS} ${FOCUS}`}
+              >
+                <span className="min-w-0 text-left">
+                  {pt("cartTitle", locale, kiosk.domain)} {itemCount(itemsInCart, locale)} · {formatWon(session.total, locale)}
+                </span>
+                <ChevronRight {...ICON} />
+              </button>
+            </div>
+          )}
           {dock}
         </>
       );
@@ -438,7 +499,9 @@ export function AssistantPanel(props: Props) {
             total={session.total}
             locale={locale}
             onPay={() => void confirmByTap(session.cartVersion)}
-            payDisabled={busy}
+            // Taken as soon as the card shows, even while the AI is still finishing its reply: the server checks the
+            // tap against cartVersion, and only a spoken "yes" waits (docs/ARCHITECTURE.md "Commands and actors").
+            payDisabled={sending || !deviceToken}
             voice={voice.state}
             micDisabled={!deviceToken}
             onMic={toggleVoice}
@@ -553,7 +616,7 @@ export function AssistantPanel(props: Props) {
       {body}
       {/* Cart changes for screen readers (docs/UI_GUIDE.md "Accessibility"); silent while the AI voice speaks. */}
       <p aria-live={voiceOutput && voice.state === "speaking" ? "off" : "polite"} className="sr-only">
-        {session && session.cart.length > 0 ? cartAnnouncement(session.cart.reduce((n, l) => n + l.qty, 0), session.total, locale) : ""}
+        {session && itemsInCart > 0 ? cartAnnouncement(itemsInCart, session.total, locale) : ""}
       </p>
       {!ended && idle.show && session && deviceToken && (
         <ModalLayer className="absolute inset-0 z-20 flex items-end bg-ink/60 p-4">

@@ -17,6 +17,10 @@ const KIBO_SOURCE: Words = {
   ko: "이 브라우저에서 이번 주문만 셌어요. [시작]부터 주문 번호까지.",
   en: "Counted in this browser for this order, from Start to the order number.",
 };
+const KIBO_SOURCE_COUNTS: Words = {
+  ko: "이 브라우저에서 이번 주문만 셌어요.",
+  en: "Counted in this browser for this order.",
+};
 const SENTENCES: Words = { ko: "AI에게 보낸 말 (말하기, 입력, 선택 포함)", en: "Messages to the AI (spoken, typed or picked)" };
 const PHONE_TAPS: Words = { ko: "휴대폰 터치", en: "Taps on the phone" };
 const KIOSK_TAPS: Words = { ko: "키오스크 터치", en: "Taps on the kiosk" };
@@ -44,7 +48,8 @@ export function CompareCard({ kiosk, comparison, locale }: { kiosk: KioskData; c
           <Row label={SENTENCES[locale]} value={live.sentences} name="sentences" />
           <Row label={PHONE_TAPS[locale]} value={live.phoneTaps} name="phone-taps" />
           <Row label={KIOSK_TAPS[locale]} value={live.kioskTaps} name="kiosk-taps" />
-          <Row label={TIME[locale]} value={seconds(live.seconds, locale)} name="seconds" />
+          {/* Seconds alone, with no touch time beside them, read as slow (14-final:1); shown only next to people's. */}
+          {touch?.source === "human" && <Row label={TIME[locale]} value={seconds(live.seconds, locale)} name="seconds" />}
         </Column>
         {touch && (
           <Column title={(touch.sameOrder ? SAME_TITLE : REFERENCE_TITLE)[locale]} data="touch">
@@ -60,7 +65,7 @@ export function CompareCard({ kiosk, comparison, locale }: { kiosk: KioskData; c
           </Column>
         )}
       </div>
-      <p className="text-base text-[#4B463F]">{KIBO_SOURCE[locale]}</p>
+      <p className="text-base text-[#4B463F]">{(touch?.source === "human" ? KIBO_SOURCE : KIBO_SOURCE_COUNTS)[locale]}</p>
       {touch && (
         <p data-compare-source className="text-base text-[#4B463F]">
           {touch.source === "human"

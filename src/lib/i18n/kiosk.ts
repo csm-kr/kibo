@@ -31,6 +31,8 @@ export const KIOSK_TEXT = {
   dineChip: { ko: "매장", en: "Eat here" },
   takeOutChip: { ko: "포장", en: "Take out" },
   phoneConnectedShort: { ko: "휴대폰 연결됨", en: "Phone connected" },
+  // KIBO's own line in the toolbar row while the phone waits for the AI (14-final:1).
+  kiboWorking: { ko: "처리하고 있어요", en: "Working…" },
   connectOtherPhone: { ko: "다른 휴대폰 연결", en: "Connect another phone" },
   openQr: { ko: "휴대폰으로 말해서 주문", en: "Order by talking" },
   qrSheetTitle: { ko: "휴대폰 카메라로 QR을 찍으세요", en: "Scan the QR with your phone camera" },

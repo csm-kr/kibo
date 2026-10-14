@@ -96,3 +96,24 @@ const PAY_OFFERS = [
 export function offersToPay(reply: string): boolean {
   return PAY_OFFERS.some((re) => re.test(reply));
 }
+
+/**
+ * The app's own words for its screens, and "I am adding" about a change the tool already made (14-final:1). "Please
+ * wait" alone is not here: after a staff call "잠시만 기다려 주세요" is the right reply (the first eval run flagged it).
+ */
+const INTERNAL: [string, RegExp][] = [
+  ["confirm card", /\bconfirm(ation)? card\b/i],
+  ["확인 카드", /확인 ?카드/],
+  ["I am adding", /\bI(?:'m| am) adding\b/i],
+  ["담는 중", /(담|추가하)고 있(어요|습니다)|(담|추가하)는 중/],
+];
+
+const IN_PROGRESS = new Set(["I am adding", "담는 중"]);
+
+/**
+ * Internal words found in a reply; the user sees "your order", never the name of a screen part. `replaying`: a learned
+ * kiosk, whose changes are still being entered on its page when the AI answers, so "adding" is true there.
+ */
+export function internalWords(reply: string, opts: { replaying?: boolean } = {}): string[] {
+  return INTERNAL.filter(([word, re]) => !(opts.replaying && IN_PROGRESS.has(word)) && re.test(reply)).map(([word]) => word);
+}

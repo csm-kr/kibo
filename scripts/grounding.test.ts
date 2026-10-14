@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getKiosk } from "@/lib/adapters/catalog";
-import { checkGrounding, offersToPay } from "./grounding";
+import { checkGrounding, internalWords, offersToPay } from "./grounding";
 
 const k = getKiosk("malo");
 
@@ -64,5 +64,25 @@ describe("offersToPay (I-100: a learned kiosk's AI must not offer to pay)", () =
   it("passes telling the user to pay on the kiosk", () => {
     expect(offersToPay("Please tap 주문하기 (Order) on the kiosk and pay there.")).toBe(false);
     expect(offersToPay("키오스크에서 주문하기를 누르고 결제해 주세요.")).toBe(false);
+  });
+});
+
+describe("internalWords (14-final:1: replies never use the app's internal words)", () => {
+  it("catches the words judges saw in replies", () => {
+    expect(internalWords("Please check the confirm card.")).toEqual(["confirm card"]);
+    expect(internalWords("주문 내역 확인 카드가 화면에 나왔습니다.")).toEqual(["확인 카드"]);
+    expect(internalWords("I am adding a large pepperoni. Please wait a moment.")).toEqual(["I am adding"]);
+    expect(internalWords("페퍼로니 라지를 담고 있어요.")).toEqual(["담는 중"]);
+  });
+
+  it("passes plain replies, the card the user pays with, and waiting for staff", () => {
+    expect(internalWords("직원을 불렀어요. 잠시만 기다려 주세요.")).toEqual([]);
+    expect(internalWords("I've called staff. Please wait a moment.")).toEqual([]);
+    // A learned kiosk is still entering the change on its own page when the AI answers.
+    expect(internalWords("키오스크에 담고 있어요.", { replaying: true })).toEqual([]);
+    expect(internalWords("Please check the confirm card.", { replaying: true })).toEqual(["confirm card"]);
+    expect(internalWords("Added two cheeseburger sets. Please check your order on the screen.")).toEqual([]);
+    expect(internalWords("Insert your card into the kiosk to pay.")).toEqual([]);
+    expect(internalWords("주문 내역을 확인해 주세요.")).toEqual([]);
   });
 });

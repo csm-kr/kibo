@@ -43,7 +43,8 @@ const PHONE_TEXT = {
   undo: { ko: "되돌리기", en: "Undo" },
   examples: { ko: "이렇게 말해 보세요", en: "Try saying" },
   inputLabel: { ko: "주문을 글자로 입력", en: "Type your order" },
-  inputPlaceholder: { ko: "예: 치즈버거 세트 하나", en: "e.g. One cheeseburger set" },
+  // Short enough for the field beside [Send] at 360px with larger text (I-133).
+  inputPlaceholder: { ko: "예: 치즈버거 세트", en: "e.g. Cheeseburger set" },
   learnedPlaceholder: { ko: "예: 페퍼로니 라지 하나", en: "e.g. One large pepperoni" },
   ticketPlaceholder: { ko: "예: 시티센터 어른 두 장", en: "e.g. Two adults to City Center" },
   send: { ko: "보내기", en: "Send" },
@@ -200,6 +201,8 @@ const PHONE_TEXT = {
   pairLabel: { ko: "키오스크 화면에 있는 6자리 번호를 넣으세요", en: "Enter the 6-digit code shown on the kiosk" },
   pairConnect: { ko: "연결하기", en: "Connect" },
   pairDigits: { ko: "6자리를 모두 넣어 주세요.", en: "Please enter all 6 digits." },
+  // Words, not "000000", which looked like a code already typed in.
+  pairPlaceholder: { ko: "숫자 6자리", en: "6 digits" },
   pairWrong: {
     ko: "번호가 맞는 키오스크가 없어요. 키오스크 화면의 번호를 확인해 주세요.",
     en: "That code doesn't match a kiosk. Check the number on the kiosk screen.",

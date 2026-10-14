@@ -344,7 +344,7 @@ export async function runCommand(
 
 export async function ping(
   store: SessionStore,
-  input: { sessionId: string; bearer: string | null; active: boolean },
+  input: { sessionId: string; bearer: string | null; active: boolean; working?: boolean },
   now: number,
 ): Promise<{ status: SessionStatus; expiresAt: number; serverTime: number }> {
   const out = await store.transact<
@@ -360,6 +360,8 @@ export async function ping(
       lastSeenAt: now,
       expiresAt,
       ...(actor === "phone" ? { phoneSeenAt: now } : {}),
+      // Only the phone knows it is waiting for the AI; a heartbeat (no flag) leaves it as it is.
+      ...(actor === "phone" && input.working !== undefined ? { phoneWorkingAt: input.working ? now : null } : {}),
     };
     return {
       session,

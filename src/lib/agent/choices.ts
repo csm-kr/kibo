@@ -1,5 +1,6 @@
 import { findItem } from "@/lib/adapters/catalog";
 import type { ChoiceRef, TemplateId } from "@/lib/commands/errors";
+import { formatWon, tilePrice } from "@/lib/kiosk/menu";
 import type { KioskData, Locale, Variant } from "@/types/menu";
 
 // Labels and questions for choice buttons (pendingChoice). They come from menu data and fixed words,
@@ -67,6 +68,34 @@ export function choiceLabel(k: KioskData, choice: ChoiceRef, locale: Locale): st
     case "yesno":
       return Object.hasOwn(YES_NO, choice.id) ? YES_NO[choice.id][locale] : "";
   }
+}
+
+/**
+ * The price beside a choice button, from menu data: an item's tile price, or what an option adds. Null where the
+ * button cannot know it (a variant or a fare discount belongs to an item the choice does not name) or it adds nothing.
+ */
+export function choicePrice(k: KioskData, choice: ChoiceRef, locale: Locale): string | null {
+  if (choice.kind === "item") {
+    const item = findItem(k, choice.id);
+    return item ? formatWon(tilePrice(item), locale) : null;
+  }
+  if (choice.kind !== "option") return null;
+  for (const item of k.items) {
+    for (const group of item.optionGroups) {
+      const option = group.options.find((o) => o.optionId === choice.id);
+      if (option) return option.priceDelta > 0 ? `+${formatWon(option.priceDelta, locale)}` : null;
+    }
+  }
+  return null;
+}
+
+const DECLINE: Partial<Record<TemplateId, Record<Locale, string>>> = {
+  upsell: { ko: "괜찮아요", en: "No thanks" },
+};
+
+/** An offer the user may simply turn down gets its own decline button (heuristic 3); a question needs an answer. */
+export function declineLabel(templateId: TemplateId, locale: Locale): string | null {
+  return DECLINE[templateId]?.[locale] ?? null;
 }
 
 export function choiceQuestion(

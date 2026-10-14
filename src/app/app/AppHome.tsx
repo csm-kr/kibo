@@ -127,7 +127,7 @@ function PairForm({ locale }: { locale: Locale }) {
         inputMode="numeric"
         autoComplete="one-time-code"
         pattern="[0-9]*"
-        placeholder="000000"
+        placeholder={pt("pairPlaceholder", locale)}
         value={code}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? "pair-error" : undefined}
@@ -136,7 +136,7 @@ function PairForm({ locale }: { locale: Locale }) {
           setCode(e.target.value.replace(/\D/g, "").slice(0, 6));
           setError(null);
         }}
-        className={`min-h-18 w-full rounded-tile border border-field bg-white px-4 text-center font-[family-name:var(--font-grotesk)] text-[2rem] font-bold tracking-[0.3em] tabular-nums placeholder:font-normal placeholder:text-[#6B655C] ${FOCUS}`}
+        className={`min-h-18 w-full rounded-tile border border-field bg-white px-4 text-center font-[family-name:var(--font-grotesk)] text-[2rem] font-bold tracking-[0.3em] tabular-nums placeholder:text-xl placeholder:font-normal placeholder:tracking-normal placeholder:text-[#6B655C] ${FOCUS}`}
       />
       {error && (
         <p id="pair-error" role="alert" className="text-xl text-staff-ink">

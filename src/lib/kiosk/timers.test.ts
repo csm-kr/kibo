@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Session, SessionStatus } from "@/types/session";
-import { doneCountdown, idleWarning, phonePaused, staffBannerVisible } from "./timers";
+import { doneCountdown, idleWarning, kiboWorking, phonePaused, staffBannerVisible } from "./timers";
 
 const T = 1_000_000_000_000;
 
@@ -130,5 +130,28 @@ describe("doneCountdown", () => {
 
   it("never shows more than 10 s when the clock offset runs behind the server", () => {
     expect(doneCountdown(T + 600, T, 0)).toBe(10);
+  });
+});
+
+describe("kiboWorking", () => {
+  it("is false until the phone says it is working", () => {
+    expect(kiboWorking(session("ordering"), T, 0)).toBe(false);
+  });
+
+  it("shows while the phone's flag is under 20 s old in server time", () => {
+    expect(kiboWorking(session("ordering", { phoneWorkingAt: T - 1000 }), T, 0)).toBe(true);
+    expect(kiboWorking(session("ordering", { phoneWorkingAt: T - 20_000 }), T, 0)).toBe(true);
+    // A phone that went away mid-request never leaves it on.
+    expect(kiboWorking(session("ordering", { phoneWorkingAt: T - 20_001 }), T, 0)).toBe(false);
+    expect(kiboWorking(session("ordering", { phoneWorkingAt: T - 10_000 }), T, 15_000)).toBe(false);
+  });
+
+  it("only while there is an order the AI can change", () => {
+    for (const status of ["connected", "ordering", "confirming"] as const) {
+      expect(kiboWorking(session(status, { phoneWorkingAt: T }), T, 0)).toBe(true);
+    }
+    for (const status of ["idle", "paying", "paid", "expired"] as const) {
+      expect(kiboWorking(session(status, { phoneWorkingAt: T }), T, 0)).toBe(false);
+    }
   });
 });

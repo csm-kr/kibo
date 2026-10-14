@@ -147,6 +147,23 @@ test("phone path: AI highlight on K3 and the staff banner", async ({ page, reque
   await check(page, info, "KX-staff");
 });
 
+test("phone path: KIBO is working on K3 while the phone waits for the AI (14-final:1)", async ({ page, request }, info) => {
+  await page.goto("/kiosk?k=malo");
+  const root = kioskRoot(page);
+  const { sessionId, claimToken } = await readClaim(page);
+  const { deviceToken } = await (await claim(request, sessionId, claimToken)).json();
+  await command(request, deviceToken, { sessionId, type: "setDineOption", args: { option: "eat_in" }, source: "button" });
+  await expect(root).toHaveAttribute("data-screen", "menu");
+  // What the phone sends when a typed or spoken turn goes to the AI.
+  const ping = await request.post("/api/ping", {
+    data: { sessionId, active: true, working: true },
+    headers: { Authorization: `Bearer ${deviceToken}` },
+  });
+  expect(ping.status()).toBe(200);
+  await expect(root.locator("[data-kibo-working]")).toHaveText("KIBO처리하고 있어요 · Working…");
+  await check(page, info, "K3-kibo-working");
+});
+
 test("idle warning one minute before expiry", async ({ page }, info) => {
   await page.clock.install();
   await page.goto("/kiosk?k=malo");

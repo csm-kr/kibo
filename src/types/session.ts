@@ -34,6 +34,11 @@ export interface Session {
   paidAt: number | null;
   phoneConnectedAt: number | null;
   phoneSeenAt: number | null;
+  /**
+   * When the phone said it is waiting for the AI (a typed or spoken turn on its way), so the kiosk can say "KIBO is
+   * working…" before anything moves; null once the phone says it is done. Absent on sessions stored before it existed.
+   */
+  phoneWorkingAt?: number | null;
   /** Learned kiosks: the one cart change waiting for the bridge to replay it; always null on a direct kiosk. */
   pendingBridgeCommand: PendingBridgeCommand | null;
   /** Learned kiosks: the bridge's last result, for the phone's "Please check the kiosk screen". */

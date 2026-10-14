@@ -1,9 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
 import { claim, command, kioskRoot, readClaim, storedKioskSession } from "./helpers";
 
-// A laptop as the kiosk and a real phone (12-phone-app:4): on a landscape screen /kiosk shows KIBO's pairing panel
-// beside the portrait canvas, and /demo "Use my phone instead" shows the same panel instead of the phone half. The
-// "phone" here is plain HTTP with the device token.
+// A laptop as the kiosk and a real phone (12-phone-app:4): on a landscape screen /kiosk shows KIBO's status column
+// beside the tall portrait canvas, and /demo "Use my phone instead" shows the same column instead of the phone half.
+// The QR and code are only on the kiosk's own screen (14-final:1). The "phone" here is plain HTTP with the device token.
 
 test.use({
   viewport: { width: 1440, height: 900 },
@@ -20,39 +20,46 @@ async function expectNoToken(page: Page, claimToken: string) {
   expect(await panel.evaluate((el) => el.outerHTML)).not.toContain(claimToken);
 }
 
-test("/kiosk on a landscape screen: QR and code, then the phone's status; a new QR replaces the old one", async ({ page, request }) => {
+/** One QR and one code, on the kiosk's own screen; KIBO's column only says where to find them (14-final:1). */
+async function expectOneQr(page: Page, pairCode: string) {
+  const panel = page.locator("[data-pairing-panel]");
+  await expect(page.locator("img[data-claim-url]")).toHaveCount(1);
+  await expect(panel.locator("img")).toHaveCount(1); // the KIBO mark only
+  expect(await panel.innerText()).not.toContain(pairCode.slice(0, 3) + " " + pairCode.slice(3));
+  expect(await panel.innerText()).not.toContain(pairCode);
+}
+
+test("/kiosk on a landscape screen: the tall kiosk holds the QR and code, the panel the phone's status", async ({ page, request }) => {
   await page.goto("/kiosk?k=malo");
   const panel = page.locator("[data-pairing-panel]");
   const { sessionId, claimToken } = await readClaim(page);
   const stored = await storedKioskSession(page);
   await expect(panel.getByText("Waiting for a phone")).toBeVisible();
-  const qr = panel.locator("img[data-panel-qr]");
-  await expect(qr).toBeVisible();
-  expect((await qr.boundingBox())?.width).toBeGreaterThanOrEqual(320);
-  const code = panel.locator("[data-panel-pair-code]");
-  const firstCode = (await code.getAttribute("data-panel-pair-code")) ?? "";
+  await expect(panel).toContainText("Scan the QR on the kiosk, or open");
+  // The kiosk canvas is the hero: as tall as the screen.
+  expect((await kioskRoot(page).boundingBox())?.height).toBeGreaterThanOrEqual(850);
+  const code = kioskRoot(page).locator("[data-pair-code]");
+  const firstCode = (await code.getAttribute("data-pair-code")) ?? "";
   expect(firstCode).toMatch(/^\d{6}$/);
-  await expect(code).toHaveText(`${firstCode.slice(0, 3)} ${firstCode.slice(3)}`);
+  await expectOneQr(page, firstCode);
   await expectNoToken(page, claimToken);
-  const firstQr = await qr.getAttribute("src");
 
   const claimed = await claim(request, sessionId, claimToken);
   expect(claimed.status()).toBe(200);
   const { deviceToken } = await claimed.json();
   await expect(panel.getByText(/^Phone connected at \d\d:\d\d$/)).toBeVisible();
-  await expect(qr).toBeHidden();
   await command(request, deviceToken, { sessionId, type: "addToCart", args: ITEM, source: "voice", utteranceSeq: 1 });
   await expect(panel.locator("[data-panel-order]")).toHaveText(/^Ordering · 1 item · ₩[\d,]+$/);
   await expect(panel.getByText("Last change: by the AI")).toBeVisible();
 
-  // [Connect another phone] on the kiosk: the panel waits again, with the new QR and code at once.
+  // [Connect another phone] on the kiosk: the panel waits again, and the kiosk's QR sheet holds the new code.
   await kioskRoot(page).getByRole("button", { name: "다른 휴대폰 연결" }).click();
   await expect(panel.getByText("Waiting for a phone")).toBeVisible();
-  await expect(code).not.toHaveAttribute("data-panel-pair-code", firstCode);
-  await expect(qr).not.toHaveAttribute("src", firstQr ?? "");
   const reissued = await storedKioskSession(page);
   expect(reissued.claimUrl).not.toBe(stored.claimUrl);
-  expect(await code.getAttribute("data-panel-pair-code")).toBe(reissued.pairCode);
+  await expect(kioskRoot(page).locator("[data-pair-code]")).toHaveAttribute("data-pair-code", reissued.pairCode ?? "");
+  expect(reissued.pairCode).not.toBe(firstCode);
+  await expectOneQr(page, reissued.pairCode ?? "");
   await expectNoToken(page, new URL(reissued.claimUrl).hash.replace(/^#t=/, ""));
 });
 
@@ -75,7 +82,8 @@ test("/demo Use my phone instead: the judge's phone claims a demo session; [Try 
   await expect(page.locator("[data-phone-screen]")).toHaveCount(0);
   const { sessionId, claimToken } = await readClaim(page);
   await expectNoToken(page, claimToken);
-  const firstCode = await panel.locator("[data-panel-pair-code]").getAttribute("data-panel-pair-code");
+  const firstCode = (await kioskRoot(page).locator("[data-pair-code]").getAttribute("data-pair-code")) ?? "";
+  await expectOneQr(page, firstCode);
 
   const claimed = await claim(request, sessionId, claimToken);
   const { deviceToken } = await claimed.json();
@@ -113,7 +121,7 @@ test("/demo Use my phone instead: the judge's phone claims a demo session; [Try 
   await panel.getByRole("button", { name: "Try again" }).click();
   await expect(panel.getByText("Waiting for a phone")).toBeVisible();
   await expect(page.locator("main[data-demo-own-phone]")).toBeVisible();
-  await expect(panel.locator("[data-panel-pair-code]")).not.toHaveAttribute("data-panel-pair-code", firstCode ?? "");
+  await expect(kioskRoot(page).locator("[data-pair-code]")).not.toHaveAttribute("data-pair-code", firstCode);
   const fresh = await readClaim(page);
   expect(fresh.sessionId).not.toBe(sessionId);
 });

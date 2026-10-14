@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useMemo, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { useNow } from "@/hooks/useNow";
 import { useQrSrc } from "@/hooks/useQrSrc";
 import { ApiError, sendCommand, type CommandReply } from "@/lib/client/api";
 import type { ErrorDetail } from "@/lib/commands/errors";
@@ -9,6 +10,7 @@ import type { CommandType } from "@/lib/commands/schemas";
 import { errorCopy, type ScreenErrorCode } from "@/lib/i18n/errors";
 import { kt, languageName } from "@/lib/i18n/kiosk";
 import { kioskScreen, startOverStep } from "@/lib/kiosk/screen";
+import { kiboWorking } from "@/lib/kiosk/timers";
 import type { KioskData, Locale } from "@/types/menu";
 import type { DineOption, Session } from "@/types/session";
 import { DemoCounter } from "./DemoCounter";
@@ -84,6 +86,9 @@ export function KioskScreen(props: Props) {
 
   const touchStarted = touch.forId === sessionId && touch.started;
   const screen = kioskScreen(session, { touchStarted }, kiosk);
+  // "KIBO is working…" in the toolbar row while the phone waits for the AI, before anything moves (14-final:1).
+  const now = useNow();
+  const working = session !== null && kiboWorking(session, now, clockOffset);
   const startOverAt = props.onStartOver ? startOverStep(screen, session) : null;
   const startOver = startOverAt && props.onStartOver && (
     <StartOver key={sessionId} kiosk={kiosk} step={startOverAt} onStartOver={props.onStartOver} />
@@ -167,9 +172,19 @@ export function KioskScreen(props: Props) {
           send={send}
           onClaimUrl={onClaimUrl}
           startOver={startOver}
+          working={working}
         />
       ) : screen === "review" && session ? (
-        <ReviewScreen kiosk={kiosk} session={session} claimUrl={claimUrl} pairCode={props.pairCode} pairUrl={props.pairUrl} send={send} onClaimUrl={onClaimUrl} />
+        <ReviewScreen
+          kiosk={kiosk}
+          session={session}
+          claimUrl={claimUrl}
+          pairCode={props.pairCode}
+          pairUrl={props.pairUrl}
+          send={send}
+          onClaimUrl={onClaimUrl}
+          working={working}
+        />
       ) : screen === "payment" && session ? (
         <PaymentScreen
           kiosk={kiosk}
@@ -192,7 +207,18 @@ export function KioskScreen(props: Props) {
         <>
           <Header kiosk={kiosk} />
           {/* The small QR on K2 too: a touch order can switch to the phone from every screen (Flow B, I-048). */}
-          {session && <KioskToolbar kiosk={kiosk} session={session} claimUrl={claimUrl} pairCode={props.pairCode} pairUrl={props.pairUrl} send={send} onClaimUrl={onClaimUrl} />}
+          {session && (
+            <KioskToolbar
+              kiosk={kiosk}
+              session={session}
+              claimUrl={claimUrl}
+              pairCode={props.pairCode}
+              pairUrl={props.pairUrl}
+              send={send}
+              onClaimUrl={onClaimUrl}
+              working={working}
+            />
+          )}
           <Dine
             kiosk={kiosk}
             phoneConnected={session?.phoneConnectedAt != null}

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { getKiosk } from "@/lib/adapters/catalog";
 import type { ChoiceRef, TemplateId } from "@/lib/commands/errors";
-import { choiceLabel, choiceQuestion } from "./choices";
+import { choiceLabel, choicePrice, choiceQuestion, declineLabel } from "./choices";
 
 const k = getKiosk("malo");
 const rail = getKiosk("airport_rail");
@@ -75,5 +75,40 @@ describe("choiceQuestion", () => {
       ko: "얼마를 충전할까요?",
       en: "How much would you like to top up?",
     });
+  });
+});
+
+describe("choicePrice", () => {
+  it("gives an item the price its kiosk tile shows, in the kiosk's format", () => {
+    expect(choicePrice(k, { kind: "item", id: "bulgogi_burger" }, "ko")).toBe("5,200원");
+    expect(choicePrice(k, { kind: "item", id: "soft_cone" }, "en")).toBe("₩1,000");
+  });
+
+  it("gives an option only what it adds", () => {
+    expect(choicePrice(k, { kind: "option", id: "extra_patty" }, "ko")).toBe("+1,500원");
+    expect(choicePrice(k, { kind: "option", id: "fries_l" }, "en")).toBe("+₩500");
+    expect(choicePrice(k, { kind: "option", id: "zero_cola" }, "en")).toBeNull();
+    // A child fare is a discount on a ticket whose price the button does not know.
+    expect(choicePrice(rail, { kind: "option", id: "child" }, "en")).toBeNull();
+  });
+
+  it("has no price for variants, dine options, yes/no or unknown ids", () => {
+    expect(choicePrice(k, { kind: "variant", id: "set" }, "en")).toBeNull();
+    expect(choicePrice(k, { kind: "dine", id: "eat_in" }, "en")).toBeNull();
+    expect(choicePrice(k, { kind: "yesno", id: "no" }, "en")).toBeNull();
+    expect(choicePrice(k, { kind: "item", id: "halal_burger" }, "en")).toBeNull();
+  });
+});
+
+describe("declineLabel", () => {
+  it("lets every upsell be declined with one tap", () => {
+    expect(declineLabel("upsell", "ko")).toBe("괜찮아요");
+    expect(declineLabel("upsell", "en")).toBe("No thanks");
+  });
+
+  it("other questions need an answer, so they have none", () => {
+    for (const t of ["pick_item", "pick_variant", "pick_option", "pick_dine", "yes_no", "alternatives"] as const) {
+      expect(declineLabel(t, "en")).toBeNull();
+    }
   });
 });

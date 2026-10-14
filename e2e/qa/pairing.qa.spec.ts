@@ -2,9 +2,10 @@ import { expect, test, type Page, type TestInfo } from "@playwright/test";
 import { claim, command, kioskRoot, readClaim, textLines } from "../helpers";
 import { PAIRING, qaState, type Findings } from "./checks";
 
-// UI QA of KIBO's pairing panel (12-phone-app:4): /kiosk on a landscape screen (a laptop as the kiosk) and /demo
-// "Use my phone instead", each waiting for a phone and with one connected (claimed through the API). The checks
-// measure the panel; the scaled kiosk canvas beside it is checked at full size by kiosk.qa.spec.ts.
+// UI QA of KIBO's pairing panel (12-phone-app:4; a slim status column since 14-final:1, the QR and code only on the
+// kiosk): /kiosk on a landscape screen (a laptop as the kiosk) and /demo "Use my phone instead", each waiting for a
+// phone and with one connected (claimed through the API). The checks measure the panel; the scaled kiosk canvas
+// beside it is checked at full size by kiosk.qa.spec.ts.
 
 const STRICT = process.env.QA_ALL === "1";
 const ITEM = { itemId: "cheese_burger", variant: "set", qty: 1, selections: { drink: ["zero_cola"] } };
@@ -31,7 +32,9 @@ for (const vp of [
     await page.goto("/kiosk?k=malo");
     const panel = page.locator("[data-pairing-panel]");
     const { url, sessionId, claimToken } = await readClaim(page);
-    await expect(panel.locator("img[data-panel-qr]")).toBeVisible();
+    // One QR, on the kiosk's own screen; the panel only says where to find it (14-final:1).
+    await expect(page.locator("img[data-claim-url]")).toHaveCount(1);
+    await expect(panel.getByText("Waiting for a phone")).toBeVisible();
     // SHORT_APP_URL is set on the QA server: the short host on one line (I-167); the claim URL keeps this server.
     await expect(panel.locator("[data-panel-pair-url]")).toHaveText("kibo-2026.web.app");
     expect(await textLines(panel.locator("[data-panel-pair-url]"))).toBe(1);
@@ -59,7 +62,7 @@ test("/demo Use my phone instead 1440x900: waiting, then connected", async ({ pa
   await page.getByRole("button", { name: "Use my phone instead" }).click();
   const panel = page.locator("[data-pairing-panel]");
   const { sessionId, claimToken } = await readClaim(page);
-  await expect(panel.locator("img[data-panel-qr]")).toBeVisible();
+  await expect(panel.getByText("Waiting for a phone")).toBeVisible();
   await check(page, info, "demo-D2-own-phone-waiting");
 
   const { deviceToken } = await (await claim(request, sessionId, claimToken)).json();

@@ -25,6 +25,7 @@ export function newSession(p: { sessionId: string; kioskId: string; demo: boolea
     paidAt: null,
     phoneConnectedAt: null,
     phoneSeenAt: null,
+    phoneWorkingAt: null,
     pendingBridgeCommand: null,
     bridgeStatus: null,
     createdAt: p.now,

@@ -182,6 +182,17 @@ describe("buildInstructions", () => {
     expect(learned).not.toContain("confirmCheckout");
     expect(learned).not.toContain("[Yes, pay now]");
   });
+
+  // 14-final:1: judges heard "the order confirm card has appeared" and "Please wait a moment" after an item was added.
+  it("the checkout talks about the user's order, never a card on the screen, and replies never say please wait", () => {
+    for (const id of ["malo", "airport_rail", "doughhouse"]) {
+      const text = buildInstructions(getKiosk(id), { locale: "ko" });
+      const checkout = text.slice(text.indexOf("## Checkout"), text.indexOf("## Current order"));
+      expect(checkout, id).not.toMatch(/confirm card|the card appeared|check the card/);
+      expect(text, id).toContain("Never name parts of the screen such as \"confirm card\" (확인 카드)");
+      expect(text, id).toContain("never say \"please wait\" or \"I am adding\" about a change that is already made");
+    }
+  });
 });
 
 // I-152: learned names come from third-party page text, and the brand is written outside the data block, so a name

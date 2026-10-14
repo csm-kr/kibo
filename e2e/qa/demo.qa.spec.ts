@@ -46,6 +46,13 @@ const payInView = (page: Page) => async () => {
   await expect(page.getByRole("button", { name: "Yes, pay now" })).toBeInViewport({ ratio: 1 });
 };
 
+test("D1 on a phone: the laptop note comes first (14-final:1)", async ({ page }, info) => {
+  await page.goto("/demo");
+  await check(page, info, "D1-intro-phone", async () => {
+    await expect(page.locator("[data-demo-narrow-note]")).toBeInViewport();
+  }, [{ width: 390, height: 844 }]);
+});
+
 test("D1 to D3", async ({ page, request }, info) => {
   await page.goto("/demo");
   await expect(page.getByRole("heading", { name: "Don't learn the kiosk. Just talk." })).toBeVisible({ timeout: 60_000 });

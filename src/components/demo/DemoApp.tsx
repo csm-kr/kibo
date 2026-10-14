@@ -209,10 +209,11 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
           </div>
         </section>
         {ownPhone ? (
-          <section aria-labelledby="demo-phone-caption" className="flex h-full max-w-[720px] min-w-[400px] flex-1 flex-col gap-2">
+          // A slim status column: the QR and code are on the kiosk half's own screen (14-final:1).
+          <section aria-labelledby="demo-phone-caption" className="flex h-full w-[clamp(320px,26vw,440px)] flex-none flex-col gap-2">
             <Caption id="demo-phone-caption" text="Your own phone (KIBO)" />
             <div className="min-h-0 flex-1 overflow-hidden rounded-sheet shadow-card">
-              <PairingPanel kiosk={kiosk} session={session} claimUrl={tokens.claimUrl} pairCode={tokens.pairCode} pairUrl={tokens.pairUrl} clockOffset={demo.clockOffset}>
+              <PairingPanel kiosk={kiosk} session={session} claimUrl={tokens.claimUrl} pairUrl={tokens.pairUrl} clockOffset={demo.clockOffset}>
                 {ended ? (
                   endCard
                 ) : (

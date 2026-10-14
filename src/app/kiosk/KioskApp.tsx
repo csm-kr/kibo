@@ -19,12 +19,13 @@ function subscribeLandscape(cb: () => void) {
 /** Standalone /kiosk: owns its session (stored per kiosk); /demo passes its own session to KioskScreen. */
 export function KioskApp({ kiosk, demo }: { kiosk: KioskData; demo: boolean }) {
   const ks = useKioskSession(kiosk.kioskId);
-  // On a landscape screen the portrait canvas leaves room at the side, so KIBO's pairing panel takes it; portrait
-  // screens keep the canvas alone. Rendered only when landscape, so a portrait kiosk has no hidden copy of the code.
+  // On a landscape screen the portrait canvas leaves room at the side, so KIBO's slim status column takes some of it
+  // and the two sit centred, the kiosk as tall as the screen; portrait screens keep the canvas alone. The QR and code
+  // are only on the kiosk's own screen (14-final:1).
   const landscape = useSyncExternalStore(subscribeLandscape, () => window.matchMedia(LANDSCAPE).matches, () => false);
   // The canvas keeps its place in the tree either way, so turning the screen never remounts the kiosk.
   return (
-    <div className="flex h-full w-full">
+    <div className={`flex h-full w-full ${landscape ? "justify-center bg-cream" : ""}`}>
       <div className={landscape ? "h-full w-[calc(100dvh*9/16)] flex-none" : "h-full w-full"}>
         <KioskCanvas theme={kiosk.theme} locale={kiosk.locale}>
           <KioskScreen
@@ -44,8 +45,8 @@ export function KioskApp({ kiosk, demo }: { kiosk: KioskData; demo: boolean }) {
         </KioskCanvas>
       </div>
       {landscape && (
-        <div className="min-w-0 flex-1">
-          <PairingPanel kiosk={kiosk} session={ks.session} claimUrl={ks.claimUrl} pairCode={ks.pairCode} pairUrl={ks.pairUrl} clockOffset={ks.clockOffset} />
+        <div className="w-[clamp(320px,26vw,440px)] min-w-0 flex-none">
+          <PairingPanel kiosk={kiosk} session={ks.session} claimUrl={ks.claimUrl} pairUrl={ks.pairUrl} clockOffset={ks.clockOffset} />
         </div>
       )}
     </div>

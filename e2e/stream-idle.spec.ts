@@ -40,10 +40,10 @@ test("/demo Use my phone instead is the kiosk, so it never pauses either (I-172)
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/demo?k=malo");
   await page.getByRole("button", { name: "Use my phone instead" }).click();
-  await expect(page.locator("[data-panel-qr]")).toBeVisible();
+  await expect(page.locator("img[data-claim-url]")).toBeVisible();
   await page.waitForTimeout(IDLE_MS * 2);
   await expect(page.locator("[data-stream-paused]")).toHaveCount(0);
-  await expect(page.locator("[data-panel-qr]")).toBeVisible();
+  await expect(page.locator("img[data-claim-url]")).toBeVisible();
 });
 
 test("an idle phone pauses mid-order and resumes with the cart; a paid order keeps its number in view", async ({ page, request }) => {

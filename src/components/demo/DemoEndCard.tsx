@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { CARD, FOCUS, PRIMARY, SECONDARY } from "@/components/phone/ui";
 import { pt } from "@/lib/i18n/phone";
 import type { Locale } from "@/types/menu";
@@ -20,8 +20,14 @@ export function DemoEndCard(props: {
   onIntro(): void;
 }) {
   const { locale } = props;
+  // The phone column is short on a laptop, so the next steps are brought into view when the card appears; a judge
+  // should never have to hunt for them (14-final:1). "nearest" moves nothing when they already show.
+  const othersRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    othersRef.current?.scrollIntoView({ block: "nearest" });
+  }, []);
   const others = (
-    <nav aria-labelledby="demo-other-places" className="flex flex-col gap-2">
+    <nav ref={othersRef} aria-labelledby="demo-other-places" className="flex scroll-mb-4 flex-col gap-2">
       <h2 id="demo-other-places" className="text-xl font-bold">
         {pt("tryAnotherPlace", locale)}
       </h2>
@@ -46,14 +52,17 @@ export function DemoEndCard(props: {
       </section>
     );
   }
+  // [Try again] and the other places come right under the order number; the touch-vs-talk card and the rest follow.
   return (
     <>
-      {props.compare}
       <section data-demo-end className={`${CARD} flex flex-col gap-4`}>
         <button type="button" onClick={props.onTryAgain} className={PRIMARY}>
           {pt("tryAgain", locale)}
         </button>
         {others}
+      </section>
+      {props.compare}
+      <section className={`${CARD} flex flex-col gap-4`}>
         <p className="text-base text-muted">{pt("twoDeviceHint", locale)}</p>
         <Link href={`/kiosk?k=${props.kioskId}`} className={SECONDARY}>
           {pt("twoDeviceOpen", locale)}

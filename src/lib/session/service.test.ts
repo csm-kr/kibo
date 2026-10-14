@@ -316,6 +316,19 @@ describe("ping", () => {
     expect((await store.get(sessionId))).toMatchObject({ phoneSeenAt: T0 + 30_000, lastSeenAt: T0 + 60_000 });
   });
 
+  it("the phone's working flag sets and clears phoneWorkingAt; a heartbeat and the kiosk leave it alone", async () => {
+    const { store, sessionId, claimToken, kioskToken } = await setup();
+    const { deviceToken } = await claimSession(store, { sessionId, claimToken }, T0);
+    expect((await store.get(sessionId))?.phoneWorkingAt ?? null).toBeNull();
+    await ping(store, { sessionId, bearer: deviceToken, active: true, working: true }, T0 + 1000);
+    expect((await store.get(sessionId))?.phoneWorkingAt).toBe(T0 + 1000);
+    await ping(store, { sessionId, bearer: deviceToken, active: false }, T0 + 2000);
+    await ping(store, { sessionId, bearer: kioskToken, active: true, working: false }, T0 + 3000);
+    expect((await store.get(sessionId))?.phoneWorkingAt).toBe(T0 + 1000);
+    await ping(store, { sessionId, bearer: deviceToken, active: true, working: false }, T0 + 4000);
+    expect((await store.get(sessionId))?.phoneWorkingAt).toBeNull();
+  });
+
   it("needs an actor token", async () => {
     const { store, sessionId } = await setup();
     expect(await code(ping(store, { sessionId, bearer: null, active: true }, T0))).toBe("UNAUTHORIZED");

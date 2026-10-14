@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useState } from "react";
+import { useReducer } from "react";
 import type { AgentAction } from "@/lib/agent/actions";
 import { ApiError, chat } from "@/lib/client/api";
 import { errorCopy } from "@/lib/i18n/errors";
@@ -28,8 +28,6 @@ export function useChat(opts: {
   onSend?: () => void;
 }) {
   const [state, dispatch] = useReducer(chatReducer, initialChat);
-  // When the current request started, for the "Working…" line after 1 s.
-  const [sentAt, setSentAt] = useState(0);
 
   /** True when the agent answered; false when nothing was sent or the request failed (the notice says why). */
   async function send(text: string, cartVersion?: number): Promise<boolean> {
@@ -39,7 +37,6 @@ export function useChat(opts: {
     const utteranceSeq = opts.nextSeq ? opts.nextSeq() : state.utteranceSeq + 1;
     dispatch({ type: "send", text: message });
     opts.onSend?.();
-    setSentAt(Date.now());
     try {
       const r = await chat({
         sessionId: opts.sessionId,
@@ -64,7 +61,6 @@ export function useChat(opts: {
     busy: state.busy,
     /** Messages sent so far; never goes back, like the server's per-session count. */
     sent: state.utteranceSeq,
-    sentAt,
     send,
     notice: (text: string) => dispatch({ type: "notice", text }),
     /** What voice heard or said, into the same conversation. */

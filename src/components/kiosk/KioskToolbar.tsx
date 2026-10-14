@@ -30,6 +30,8 @@ export function KioskToolbar(props: {
    * blue, and it gets its own row under this one (R-006): the kiosk screen moves down while it shows.
    */
   subtitle?: string | null;
+  /** The phone is waiting for the AI: "KIBO is working…" takes the row until something moves (14-final:1). */
+  working?: boolean;
 }) {
   const { kiosk, session, onClaimUrl } = props;
   const [qrOpen, setQrOpen] = useState(false);
@@ -45,13 +47,15 @@ export function KioskToolbar(props: {
   }
 
   const status = props.status ?? null;
+  // The AI's own change line wins: it says what moved.
+  const working = !status && Boolean(props.working);
   return (
     <>
       <div className="flex h-28 flex-none items-center bg-(--k-panel) px-12">
         {/* Positioned here, not on the row: the QR sheet must cover the screen root, not this row. */}
         <div className="relative flex h-full min-w-0 flex-1 items-center">
           {/* While the status shows, the row's own controls are hidden (not focusable) rather than covered. */}
-          <div className={`flex min-w-0 flex-1 items-center justify-between gap-6 ${status ? "invisible" : ""}`}>
+          <div className={`flex min-w-0 flex-1 items-center justify-between gap-6 ${status || working ? "invisible" : ""}`}>
             <ToolbarItems
               kiosk={kiosk}
               session={session}
@@ -65,6 +69,17 @@ export function KioskToolbar(props: {
             {status && (
               <p className="k-text-40 w-full truncate rounded-full bg-(--k-primary-dark) px-12 py-3 text-center font-bold text-white">
                 {status}
+              </p>
+            )}
+            {/* KIBO's line, not the kiosk's: KIBO blue with its tag, like the English subtitle row; a Korean screen
+                says it in English too. */}
+            {working && (
+              <p data-kibo-working className="k-text-40 flex w-full items-center justify-center gap-6 rounded-full bg-[#3446D4] px-12 py-3 font-bold text-white">
+                <span className="flex-none rounded-full bg-white px-4 font-display text-[#3446D4]">KIBO</span>
+                <span>
+                  {kt("kiboWorking", kiosk.locale)}
+                  {kiosk.locale === "ko" && <span lang="en"> · Working…</span>}
+                </span>
               </p>
             )}
           </div>

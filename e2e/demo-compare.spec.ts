@@ -62,8 +62,12 @@ test("the hero order by text: this session's counts next to the efficient touch 
   await expect(value(page, "sentences")).toHaveText("2");
   await expect(value(page, "phone-taps")).toHaveText("5");
   await expect(value(page, "kiosk-taps")).toHaveText("0");
-  await expect(value(page, "seconds")).toHaveText(/^\d+ s$/);
+  // No touch time to set it against (an automated run), so this order's seconds are not shown either (14-final:1).
+  await expect(value(page, "seconds")).toHaveCount(0);
   await expect(card(page)).toContainText("Counted in this browser for this order");
+  // The next steps sit right under the order number, in view without scrolling the phone column.
+  await expect(page.getByRole("button", { name: "Try again" })).toBeInViewport({ ratio: 1 });
+  await expect(page.getByRole("navigation", { name: "Try another place" })).toBeInViewport({ ratio: 1 });
 
   // The same cart as the evidence run, so its taps are shown as the same order, labelled as automated.
   await expect(card(page).getByRole("heading", { name: "The same order by touch" })).toBeVisible();

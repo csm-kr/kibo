@@ -61,10 +61,17 @@ export function Dock(props: {
   limit?: ReactNode;
   /** Receives the text field, so the panel can focus it when voice gives way to text. */
   inputElement?: (el: HTMLInputElement | null) => void;
+  /**
+   * The phone: while the text field has focus (the on-screen keyboard is up), the 88px mic shrinks to 56px without
+   * its label, so a small screen keeps room for the conversation. /demo runs on a laptop, where no keyboard covers it.
+   */
+  compactWhileTyping?: boolean;
 }) {
   const { state, locale } = props;
   const typing = props.typing && !props.limit;
   const active = voiceActive(state);
+  const [inputFocused, setInputFocused] = useState(false);
+  const compact = Boolean(props.compactWhileTyping) && typing && inputFocused && !active;
   const statusKey = STATUS[state];
   const noteId = useId();
   // One filled primary per screen (I-142): while the text field is open, [Send] is the primary and the mic steps back.
@@ -96,13 +103,19 @@ export function Dock(props: {
             describedBy={props.note ? noteId : undefined}
             onSend={props.onSend}
             inputElement={props.inputElement}
+            onFocusChange={setInputFocused}
           />
         )}
-        <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-4">
+        <div className={`grid grid-cols-[1fr_auto_1fr] gap-4 ${compact ? "items-center" : "items-start"}`}>
           {props.limit ? (
             <span />
           ) : (
-            <button type="button" aria-expanded={typing} onClick={() => props.onTyping(!typing)} className={`${SIDE} mt-4 justify-self-start`}>
+            <button
+              type="button"
+              aria-expanded={typing}
+              onClick={() => props.onTyping(!typing)}
+              className={`${SIDE} ${compact ? "" : "mt-4"} justify-self-start`}
+            >
               {typing ? <X {...ICON} /> : <Keyboard {...ICON} />}
               <span>{pt(typing ? "closeTyping" : "typeButton", locale)}</span>
             </button>
@@ -110,15 +123,17 @@ export function Dock(props: {
           <button
             type="button"
             data-voice-state={state}
+            data-compact={compact || undefined}
             disabled={props.disabled}
             onClick={props.onMic}
             // gap-3: the listening pulse grows 12px past the circle and must not touch the label.
-            className={`flex flex-col items-center gap-3 rounded-tile disabled:opacity-60 ${PRESS} ${FOCUS}`}
+            className={`flex flex-col items-center rounded-tile disabled:opacity-60 ${compact ? "" : "gap-3"} ${PRESS} ${FOCUS}`}
           >
-            <span className={`flex size-22 items-center justify-center rounded-full ${micLook}`}>
-              <Mic size={32} strokeWidth={2} aria-hidden />
+            {/* While the keyboard is up, a 56px circle; its words stay for screen readers. */}
+            <span className={`flex items-center justify-center rounded-full ${compact ? "size-14" : "size-22"} ${micLook}`}>
+              <Mic size={compact ? 24 : 32} strokeWidth={2} aria-hidden />
             </span>
-            <span className="text-base leading-normal font-semibold text-ink">
+            <span className={compact ? "sr-only" : "text-base leading-normal font-semibold text-ink"}>
               <MicState state={state} locale={locale} />
               {pt(micAction(state), locale)}
             </span>
@@ -128,7 +143,7 @@ export function Dock(props: {
             role="switch"
             aria-checked={props.voiceOutput}
             onClick={() => props.onVoiceOutput(!props.voiceOutput)}
-            className={`${SIDE} mt-4 justify-self-end`}
+            className={`${SIDE} ${compact ? "" : "mt-4"} justify-self-end`}
           >
             {props.voiceOutput ? <Volume2 {...ICON} /> : <VolumeX {...ICON} />}
             <span className="sr-only">{pt("aiVoice", locale)}</span>
@@ -152,9 +167,14 @@ export function TypingSheet(props: {
   describedBy?: string;
   onSend(text: string): void;
   inputElement?: (el: HTMLInputElement | null) => void;
+  /**
+   * The field gained or lost focus. Losing it is reported a moment later and only if focus did not come back, so a
+   * tap on [Send] lands before the dock changes height under the finger.
+   */
+  onFocusChange?: (focused: boolean) => void;
 }) {
   // Destructured: the lint reads any prop next to a ref callback as a ref.
-  const { locale, disabled, placeholder, quiet, describedBy, onSend, inputElement } = props;
+  const { locale, disabled, placeholder, quiet, describedBy, onSend, inputElement, onFocusChange } = props;
   const [text, setText] = useState("");
   const inputId = useId();
   function submit(e: FormEvent) {
@@ -177,6 +197,13 @@ export function TypingSheet(props: {
         enterKeyHint="send"
         autoComplete="off"
         aria-describedby={describedBy}
+        onFocus={() => onFocusChange?.(true)}
+        onBlur={(e) => {
+          const field = e.currentTarget;
+          setTimeout(() => {
+            if (document.activeElement !== field) onFocusChange?.(false);
+          }, 300);
+        }}
         placeholder={placeholder ?? pt("inputPlaceholder", locale)}
         className={`min-h-14 min-w-0 flex-1 rounded-tile border border-field bg-white px-4 text-xl placeholder:text-[#6B655C] ${FOCUS}`}
       />

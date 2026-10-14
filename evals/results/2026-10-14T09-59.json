@@ -1,0 +1,255 @@
+{
+  "date": "2026-10-14T00:59:55.953Z",
+  "model": "gemini-3.8-flash",
+  "backend": "vertex",
+  "modelCallsByBackend": {
+    "api": 0,
+    "vertex": 20
+  },
+  "thinkingLevel": "low",
+  "evalClock": "14:00 KST",
+  "subset": [
+    "t8-ko-origin",
+    "lg-ko-pay-on-kiosk",
+    "lg-en-pay-on-kiosk",
+    "co-ko-yes-after-card"
+  ],
+  "cases": 4,
+  "passed": 3,
+  "passRate": 0.75,
+  "byKiosk": {
+    "malo": {
+      "pass": 2,
+      "total": 2
+    },
+    "doughhouse": {
+      "pass": 1,
+      "total": 2
+    }
+  },
+  "byType": {
+    "8-not-in-data": {
+      "pass": 1,
+      "total": 1
+    },
+    "grounded-reply": {
+      "pass": 1,
+      "total": 2
+    },
+    "checkout": {
+      "pass": 1,
+      "total": 1
+    }
+  },
+  "latency": {
+    "requests": 10,
+    "totalMedianMs": 5720,
+    "totalP90Ms": 12471,
+    "firstToolRequests": 10,
+    "firstToolMedianMs": 1703,
+    "firstToolP90Ms": 7030
+  },
+  "notCovered": [
+    {
+      "type": "7-count-limits",
+      "reason": "Count limits (max 3 toppings) need the learned Doughhouse kiosk, which has no LearnedAdapter yet."
+    }
+  ],
+  "results": [
+    {
+      "id": "t8-ko-origin",
+      "kioskId": "malo",
+      "type": "8-not-in-data",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": "unknown_info",
+      "requests": [
+        {
+          "ms": 38331,
+          "firstToolMs": 7030,
+          "tools": [
+            {
+              "name": "callStaff",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lg-en-pay-on-kiosk",
+      "kioskId": "doughhouse",
+      "type": "grounded-reply",
+      "locale": "en",
+      "pass": true,
+      "status": "confirming",
+      "cart": [
+        {
+          "itemId": "cheese_oven_spaghetti",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": []
+      },
+      "requests": [
+        {
+          "ms": 6216,
+          "firstToolMs": 4748,
+          "tools": [
+            {
+              "name": "setDineOption",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 9162,
+          "firstToolMs": 1589,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 3119,
+          "firstToolMs": 1622,
+          "tools": [
+            {
+              "name": "requestCheckout",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lg-ko-pay-on-kiosk",
+      "kioskId": "doughhouse",
+      "type": "grounded-reply",
+      "locale": "ko",
+      "pass": false,
+      "reason": "internal words: 담는 중",
+      "status": "confirming",
+      "cart": [
+        {
+          "itemId": "cheese_oven_spaghetti",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": []
+      },
+      "internalWords": [
+        "담는 중"
+      ],
+      "requests": [
+        {
+          "ms": 7421,
+          "firstToolMs": 5850,
+          "tools": [
+            {
+              "name": "setDineOption",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 4059,
+          "firstToolMs": 1684,
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 3593,
+          "firstToolMs": 1703,
+          "tools": [
+            {
+              "name": "requestCheckout",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "co-ko-yes-after-card",
+      "kioskId": "malo",
+      "type": "checkout",
+      "locale": "ko",
+      "pass": true,
+      "status": "paying",
+      "cart": [
+        {
+          "itemId": "cola",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "size": [
+              "m"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 5720,
+          "firstToolMs": 3859,
+          "tools": [
+            {
+              "name": "setDineOption",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 12471,
+          "firstToolMs": 10460,
+          "tools": [
+            {
+              "name": "requestCheckout",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 3492,
+          "firstToolMs": 1568,
+          "tools": [
+            {
+              "name": "confirmCheckout",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

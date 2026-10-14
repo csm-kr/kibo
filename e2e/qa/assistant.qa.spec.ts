@@ -91,6 +91,11 @@ test("phone path: start to order number", async ({ page, request }, info) => {
   await expect(page.getByRole("heading", { name: "Which one would you like?" })).toBeVisible();
   await check(page, info, "P3-choices");
 
+  // The dessert offer: prices from menu data and a [No thanks] (14-final:1).
+  await s.phone("offerChoices", { templateId: "upsell", choices: [{ kind: "item", id: "soft_cone" }, { kind: "item", id: "apple_pie" }] });
+  await expect(page.getByRole("button", { name: "No thanks" })).toBeVisible();
+  await check(page, info, "P3-upsell");
+
   // /api/chat answers with its real rate-limit reply here, so the check never reaches the model.
   await page.route("**/api/chat", (route) =>
     route.fulfill({
@@ -337,6 +342,46 @@ test("P1 in an in-app browser: copy the link or order here by typing", async ({ 
   await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "dine");
   await expect(page.getByRole("note")).toHaveText(/Microphones often don't work in this app/);
   await check(page, info, "P2-in-app-banner", [VIEWPORTS[0], VIEWPORTS[3]]);
+  await ctx.close();
+});
+
+test("P3 in Korean with larger text: the dock while typing, and the cart summary when the card is out of view (14-final:1)", async ({
+  browser,
+  request,
+}, info) => {
+  const ctx = await browser.newContext({ viewport: VIEWPORTS[1], locale: "ko-KR", isMobile: true, hasTouch: true });
+  const page = await ctx.newPage();
+  await page.addInitScript(() => localStorage.setItem("kibo.phone.largeText", "on"));
+  const res = await request.post("/api/session", { data: { kioskId: "malo" } });
+  const created = (await res.json()) as { sessionId: string; claimUrl: string };
+  await page.goto(created.claimUrl);
+  const key = `kibo.phone.${created.sessionId}`;
+  await expect.poll(() => page.evaluate((k) => localStorage.getItem(k), key)).not.toBeNull();
+  const deviceToken = (await page.evaluate((k) => localStorage.getItem(k), key)) ?? "";
+  const phone = (type: string, args: object) =>
+    command(request, deviceToken, { sessionId: created.sessionId, type, args, source: "voice", utteranceSeq: 1 });
+  await page.getByRole("button", { name: "시작하기" }).click();
+  await page.getByRole("button", { name: "글자로 입력할게요" }).click();
+  await page.getByRole("button", { name: "매장에서 먹기" }).click();
+  await expect(page.locator("[data-phone-screen]")).toHaveAttribute("data-phone-screen", "talk");
+  await phone("addToCart", { itemId: "bulgogi_burger", variant: "set", qty: 1, selections: { drink: ["zero_cola"] } });
+
+  // The keyboard is up: the mic is 56px; the screenshot keeps the field's focus on purpose.
+  const input = page.getByRole("textbox", { name: "주문을 글자로 입력" });
+  await input.focus();
+  await expect(page.locator("[data-voice-state]")).toHaveAttribute("data-compact", "true");
+  await check(page, info, "P3-typing-ko-large", [VIEWPORTS[1], VIEWPORTS[3]], () => input.focus());
+
+  // Six photo choices push the cart card down; the one-line summary above the dock keeps the total in view.
+  await phone("offerChoices", {
+    templateId: "pick_item",
+    choices: ["cheese_burger", "double_cheese_burger", "classic_burger", "bacon_cheese_burger", "shrimp_burger", "spicy_chicken_burger"].map(
+      (id) => ({ kind: "item", id }),
+    ),
+  });
+  await page.locator("[data-phone-screen]").getByRole("heading", { name: "어떤 메뉴로 드릴까요?" }).scrollIntoViewIfNeeded();
+  await expect(page.locator("[data-cart-summary]")).toBeVisible();
+  await check(page, info, "P3-cart-summary-ko-large", [VIEWPORTS[1], VIEWPORTS[3]]);
   await ctx.close();
 });
 

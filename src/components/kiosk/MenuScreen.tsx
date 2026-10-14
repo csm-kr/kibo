@@ -66,6 +66,8 @@ export function MenuScreen(props: {
   onClaimUrl?(claimUrl: string, pairCode?: string): void;
   /** Standalone /kiosk: [처음으로], bottom left of the cart bar. */
   startOver?: ReactNode;
+  /** The phone is waiting for the AI (KioskToolbar). */
+  working?: boolean;
 }) {
   const { kiosk, session, send } = props;
   const { locale, domain } = kiosk;
@@ -167,6 +169,7 @@ export function MenuScreen(props: {
         onClaimUrl={props.onClaimUrl}
         status={flash?.status ?? null}
         subtitle={subtitle?.text ?? null}
+        working={props.working}
       />
 
       <div className="relative flex min-h-0 flex-1">

@@ -94,8 +94,8 @@ export function sendCommand(input: {
   return post("/api/command", { ...rest, commandId: commandId ?? crypto.randomUUID() }, token);
 }
 
-export function ping(input: { sessionId: string; token: string; active: boolean }): Promise<PingReply> {
-  return post("/api/ping", { sessionId: input.sessionId, active: input.active }, input.token);
+export function ping(input: { sessionId: string; token: string; active: boolean; working?: boolean }): Promise<PingReply> {
+  return post("/api/ping", { sessionId: input.sessionId, active: input.active, working: input.working }, input.token);
 }
 
 export function claim(input: { sessionId: string; claimToken: string }): Promise<{ deviceToken: string; status: SessionStatus }> {

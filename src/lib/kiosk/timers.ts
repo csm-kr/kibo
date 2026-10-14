@@ -7,9 +7,12 @@ const WARN_MS = 60_000;
 const PAUSED_MS = 60_000;
 const STAFF_MS = 60_000;
 const DONE_MS = 10_000;
+const WORKING_MS = 20_000;
 
 /** Someone is ordering; on the attract screen (idle) nobody needs a warning. */
 const ORDERING: ReadonlySet<SessionStatus> = new Set(["connected", "ordering", "confirming", "paying"]);
+/** Before payment: the states in which the AI's tools can still change the order. */
+const AI_CAN_CHANGE: ReadonlySet<SessionStatus> = new Set(["connected", "ordering", "confirming"]);
 
 /** "Still ordering?" during the last 60 s before expiry. */
 export function idleWarning(session: Session, now: number, clockOffset: number): { show: boolean; secondsLeft: number } {
@@ -29,6 +32,16 @@ export function phonePaused(session: Session, now: number, clockOffset: number):
 export function staffBannerVisible(session: Session, now: number, clockOffset: number): boolean {
   if (!session.staffCalled) return false;
   return now + clockOffset - session.staffCalled.at <= STAFF_MS;
+}
+
+/**
+ * The phone is waiting for the AI on an order it can still change, and said so within 20 s; the age limit keeps a
+ * phone that went away mid-request from leaving "KIBO is working…" on the kiosk.
+ */
+export function kiboWorking(session: Session, now: number, clockOffset: number): boolean {
+  const at = session.phoneWorkingAt ?? null;
+  if (at === null || !AI_CAN_CHANGE.has(session.status)) return false;
+  return now + clockOffset - at <= WORKING_MS;
 }
 
 /** Seconds left of the 10 s before the kiosk returns to the attract screen. */
