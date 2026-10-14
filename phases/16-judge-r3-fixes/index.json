@@ -1,0 +1,10 @@
+{
+  "project": "KIBO",
+  "phase": "16-judge-r3-fixes",
+  "steps": [
+    { "step": 0, "name": "reply-language", "status": "pending" },
+    { "step": 1, "name": "order-care", "status": "pending" },
+    { "step": 2, "name": "evidence-guard", "status": "pending" },
+    { "step": 3, "name": "qa", "status": "pending" }
+  ]
+}
