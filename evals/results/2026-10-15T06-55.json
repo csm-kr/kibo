@@ -1,0 +1,124 @@
+{
+  "date": "2026-10-14T21:55:15.918Z",
+  "model": "gemini-3.8-flash",
+  "backend": "vertex",
+  "modelCallsByBackend": {
+    "api": 0,
+    "vertex": 3
+  },
+  "thinkingLevel": "low",
+  "evalClock": "14:00 KST",
+  "subset": [
+    "l-es-order"
+  ],
+  "cases": 1,
+  "passed": 1,
+  "passRate": 1,
+  "byGroup": {
+    "language": {
+      "pass": 1,
+      "total": 1
+    }
+  },
+  "byKiosk": {
+    "malo": {
+      "pass": 1,
+      "total": 1
+    }
+  },
+  "byType": {
+    "11-any-language": {
+      "pass": 1,
+      "total": 1
+    }
+  },
+  "latency": {
+    "requests": 1,
+    "totalMedianMs": 11201,
+    "totalP90Ms": 11201,
+    "firstToolRequests": 1,
+    "firstToolMedianMs": 7027,
+    "firstToolP90Ms": 7027,
+    "modelCalls": 3,
+    "roundMedianMs": 2088,
+    "roundP90Ms": 7018,
+    "callsPerRequest": {
+      "3": 1
+    },
+    "oneCallWithTools": 0
+  },
+  "notCovered": [
+    {
+      "type": "7-count-limits",
+      "reason": "Count limits (max 3 toppings) need the learned Doughhouse kiosk, which has no LearnedAdapter yet."
+    }
+  ],
+  "results": [
+    {
+      "id": "l-es-order",
+      "kioskId": "malo",
+      "type": "11-any-language",
+      "group": "language",
+      "locale": "en",
+      "language": "es",
+      "replyLanguages": [
+        "es"
+      ],
+      "replySources": [
+        "model"
+      ],
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 2,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "cola"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 11201,
+          "firstToolMs": 7027,
+          "rounds": [
+            7018,
+            2088,
+            2034
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

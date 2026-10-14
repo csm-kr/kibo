@@ -241,6 +241,8 @@ async function runCase(c: Case) {
   const internal = new Set<string>();
   // The detected language of each reply (codes only), for cases with `replyIn`.
   const languages: (string | null)[] = [];
+  // Who wrote each reply (I-269): a wrong language from the model and from the server's summary need different fixes.
+  const sources: string[] = [];
   const allCalls: ToolCall[] = [];
   const requests: RequestLog[] = [];
   // Replies that were the generic "say that again" (15-judge-fixes:0): a user repeats the order and gets it twice.
@@ -306,6 +308,7 @@ async function runCase(c: Case) {
       lastReply = reply;
       if (reply === FALLBACK) genericRetries++;
       languages.push(replyLanguage(reply, getKiosk(kioskId)));
+      sources.push(out.replySource);
       for (const w of internalWords(reply, { replaying: Boolean(getKiosk(kioskId).learned) })) internal.add(w);
     } catch (e) {
       if (!(e instanceof CommandError)) throw e;
@@ -344,7 +347,7 @@ async function runCase(c: Case) {
     group: c.group ?? "original",
     locale: c.locale,
     ...(c.language ? { language: c.language } : {}),
-    ...(c.replyIn ? { replyLanguages: languages } : {}),
+    ...(c.replyIn ? { replyLanguages: languages, replySources: sources } : {}),
     pass: failure === null,
     ...(failure ? { reason: failure } : {}),
     status: final.status,

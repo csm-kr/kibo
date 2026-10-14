@@ -56,6 +56,8 @@ export interface ChatResponse {
    * buttons: after the user's tap the phone sends the same message again, so the order is not lost (15-judge-fixes:1).
    */
   heldForDine: boolean;
+  /** Who wrote the reply: the model, the first round's template (quickReply.ts) or the server's summary (I-269). */
+  replySource: "model" | "template" | "summary";
 }
 
 const MAX_ROUNDS = 5;
@@ -208,6 +210,7 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
   const allDone: DoneCall[] = [];
   let lastRound: DoneCall[] = [];
   let reply = "";
+  let replySource: ChatResponse["replySource"] = "model";
   let stoppedEarly = false;
   for (let round = 0; round < MAX_ROUNDS; round++) {
     let out: Awaited<ReturnType<ModelClient["generate"]>>;
@@ -244,6 +247,7 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
     const quick = round === 0 && templated && !out.text ? quickReply(kiosk, input.locale, done) : null;
     if (quick) {
       reply = quick;
+      replySource = "template";
       break;
     }
     if (budgeted && now() - startedAt > REPLY_BUDGET_MS && allDone.some((d) => d.outcome.ok)) {
@@ -252,7 +256,10 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
     }
   }
 
-  if (stoppedEarly || !reply) reply = await serverReply();
+  if (stoppedEarly || !reply) {
+    reply = await serverReply();
+    replySource = "summary";
+  }
 
   let latest = await store.get(input.sessionId);
   if (!latest) throw new CommandError("NOT_FOUND", "This order could not be found.");
@@ -279,5 +286,6 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
     cartVersion: latest.cartVersion,
     actions,
     heldForDine,
+    replySource,
   };
 }

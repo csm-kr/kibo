@@ -277,6 +277,15 @@ describe("runChat", () => {
     expect(removed.reply).toBe("콜라 뺐어요. 모두 0원이에요.");
   });
 
+  it("says who wrote the reply: the model, the first round's template, or the server's summary (I-269)", async () => {
+    const byModel = await runChat(deps(script(HERO, "Added two cheeseburger sets.").model), input(await demo()));
+    expect(byModel.replySource).toBe("model");
+    const byTemplate = await runChat(deps(script([{ name: "addToCart", args: { itemId: "cola" } }], "x").model), input(await demo(), { message: "One cola, please." }));
+    expect(byTemplate.replySource).toBe("template");
+    const bySummary = await runChat(deps(script([{ name: "addToCart", args: { itemId: "cola" } }], "").model), input(await demo(), { message: "A cola?" }));
+    expect(bySummary.replySource).toBe("summary");
+  });
+
   it("the model still writes the reply after a failure, a question, another language, its own text, or an upsell", async () => {
     const cases: { first: Call[] | string; extra?: Partial<ChatInput>; text?: string }[] = [
       { first: [{ name: "addToCart", args: { itemId: "cheese_burger", variant: "set" } }] },
