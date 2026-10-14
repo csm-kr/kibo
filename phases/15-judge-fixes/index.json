@@ -37,7 +37,10 @@
     {
       "step": 4,
       "name": "bridge-parity",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-15T02:09:38+0900",
+      "summary": "Product bridge replays rounds 3-4 skills like the offline runner (tests first): skillSchema (learned.ts) gains optional interrupts [{text,dismiss}], declines [{choice,offer,name}], per-item recipe, group appliesWhen {groupId,optionId}, chooseOptions groups (group ids), with refines (interrupt answer/decline never forbidden or an item/category/option label; known recipe; condition on the item; known groups); LearnedKiosk carries itemRecipes, interrupts, declines, groupSteps.appliesWhen. recipe.ts planSteps ports plan.mjs claimedGroups/applies (named groups run where they stand, unused conditional group skipped with its after steps); runPlan answers interrupts before each step and at the end, retries a not-found step once after answering one, never a refused step. bridge.ts: item's own recipe, groups with groupId/optionIds/appliesWhen, a line naming a declined offer refused before any tap (BridgeError), interrupts passed to runPlan. Instructions name declined offers by schema-checked names only. scripts/skill-import.ts (npm run skill:import -- <path> <kioskId> [checkout]) converts a learner skill to a draft (ids, en = ko label, reviewed 0000-00-00, order button added to forbiddenLabels, review/charges dropped with notes, openReview refused), printed only; scripts/skill-import.test.ts proves the bridge plans the offline orderPlan clicks exactly for bk9 holdout h1, h3, h4 (h2 needs a count option, I-190). openReview not ported by decision (KIBO_LEARN Runtime). Docs: KIBO_LEARN, ARCHITECTURE, SECURITY, ISSUE I-234. lint, build, test (1139), test:e2e (51 passed, 17 @live skipped; learned.spec unchanged) pass. evidence/bridge-replay.json and touch-hero.json rewritten by E2E (I-099), left uncommitted.",
+      "completed_at": "2026-10-15T02:24:00+0900"
     },
     {
       "step": 5,

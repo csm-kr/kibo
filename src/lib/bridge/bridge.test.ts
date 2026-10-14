@@ -154,10 +154,39 @@ describe("changeVars", () => {
     expect(
       changeVars(chooser, { type: "addToCart", args: { itemId: "pepperoni", selections: { toppings: ["olive"], size: ["large"] } } }).vars.groups,
     ).toEqual([
-      { options: ["라지"], after: [{ op: "click", label: "다음" }] },
-      { options: [] },
-      { options: ["올리브"], select: [{ op: "click", label: "+", within: "{option}" }] },
+      { groupId: "size", options: ["라지"], optionIds: ["large"], after: [{ op: "click", label: "다음" }] },
+      { groupId: "dough", options: [], optionIds: [] },
+      { groupId: "toppings", options: ["올리브"], optionIds: ["olive"], select: [{ op: "click", label: "+", within: "{option}" }] },
     ]);
+  });
+
+  it("uses the item's own recipe, and carries a group's condition (round 4, I-234)", () => {
+    const raw = structuredClone(doughhouseRaw) as unknown as {
+      recipes: Record<string, unknown[]>;
+      catalog: { itemId: string; recipe?: string; optionGroups: { groupId: string; appliesWhen?: unknown }[] }[];
+    };
+    raw.recipes.addSetToCart = [{ op: "click", label: "{item}" }, { op: "chooseOptions", groups: ["toppings"], steps: [{ op: "click", label: "{option}" }] }];
+    const pepperoni = raw.catalog.find((i) => i.itemId === "pepperoni")!;
+    pepperoni.recipe = "addSetToCart";
+    for (const g of raw.catalog.flatMap((i) => i.optionGroups)) {
+      if (g.groupId === "toppings") g.appliesWhen = { groupId: "size", optionId: "large" };
+    }
+    const k = learnedToKiosk(skillSchema.parse(raw));
+    const out = changeVars(k, { type: "addToCart", args: { itemId: "pepperoni", selections: { size: ["regular"] } } });
+    expect(out.recipe).toBe("addSetToCart");
+    expect((out.vars.groups as { groupId: string; appliesWhen?: unknown }[]).find((g) => g.groupId === "toppings")?.appliesWhen).toEqual({
+      groupId: "size",
+      optionId: "large",
+    });
+    expect(changeVars(k, { type: "addToCart", args: { itemId: "cola", selections: { volume: ["ml_500"] } } }).recipe).toBe("addToCart");
+  });
+
+  it("refuses, before any click, a line that names an offer the skill always declines (round 4, I-234)", () => {
+    const raw = structuredClone(doughhouseRaw) as Record<string, unknown>;
+    raw.declines = [{ choice: "아니요, 괜찮아요", offer: "콜라", name: { ko: "콜라 추가", en: "Add a cola" } }];
+    const k = learnedToKiosk(skillSchema.parse(raw));
+    expect(() => changeVars(k, { type: "addToCart", args: { itemId: "cola", selections: { volume: ["ml_500"] } } })).toThrow(/always declines/);
+    expect(() => changeVars(k, { type: "addToCart", args: { itemId: "pepperoni", selections: { size: ["large"] } } })).not.toThrow();
   });
 
   it("refuses a direct kiosk", () => {

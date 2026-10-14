@@ -153,6 +153,120 @@ describe("planSteps: chooseOptions and within (13-blind-kiosks:4)", () => {
   });
 });
 
+describe("planSteps: chooseOptions groups and conditional groups (round 4, I-234)", () => {
+  const click = (label: string) => ({ op: "click" as const, label });
+  // A set offer after the add button: the size runs on the item screen, the set popup's groups after 담기.
+  const recipe = [
+    click("{item}"),
+    { op: "chooseOptions" as const, steps: [click("{option}")] },
+    click("담기"),
+    { op: "chooseOptions" as const, groups: ["set", "side"], steps: [click("{option}")] },
+  ];
+  const groups = [
+    { groupId: "size", options: ["라지"], optionIds: ["large"] },
+    { groupId: "set", options: ["세트로"], optionIds: ["set_yes"], after: [click("다음")] },
+    { groupId: "side", options: ["감자튀김"], optionIds: ["fries"], appliesWhen: { groupId: "set", optionId: "set_yes" }, after: [click("완료")] },
+  ];
+
+  it("runs named groups only where their chooseOptions stands, the rest at the one without groups", () => {
+    expect(planSteps(recipe, { item: "버거", groups }, forbidden).map((s) => s.label)).toEqual([
+      "버거", "라지", "담기", "세트로", "다음", "감자튀김", "완료",
+    ]);
+  });
+
+  it("skips a conditional group the line did not use, with its after steps, when its condition was not chosen", () => {
+    const single = [groups[0], { ...groups[1], options: ["단품"], optionIds: ["set_no"] }, { ...groups[2], options: [], optionIds: [] }];
+    expect(planSteps(recipe, { item: "버거", groups: single }, forbidden).map((s) => s.label)).toEqual([
+      "버거", "라지", "담기", "단품", "다음",
+    ]);
+  });
+
+  it("keeps a conditional group's after steps when its condition was chosen, even with no pick, as the learner does", () => {
+    const noSide = [groups[0], groups[1], { ...groups[2], options: [], optionIds: [] }];
+    expect(planSteps(recipe, { item: "버거", groups: noSide }, forbidden).map((s) => s.label)).toEqual([
+      "버거", "라지", "담기", "세트로", "다음", "완료",
+    ]);
+  });
+});
+
+describe("runPlan answers the skill's interrupts (round 3, I-194, I-234)", () => {
+  /** Buttons that come and go with a timeout modal; `modalText` is what the page shows while the modal is up. */
+  function modalPage(opts: { modalUp: () => boolean; hideWhileUp: string[]; log: string[]; onDismiss: () => void }) {
+    const button = (text: string) => ({
+      tagName: "BUTTON",
+      onclick: null,
+      parentElement: null,
+      innerText: text,
+      getAttribute: () => null,
+      getBoundingClientRect: () => ({ x: 0, y: 0, width: 80, height: 40 }),
+      click: vi.fn(() => {
+        opts.log.push(`click ${text}`);
+        if (text === "계속 주문하기") opts.onDismiss();
+      }),
+    });
+    const all = ["피자", "라지", "계속 주문하기"].map(button);
+    const shown = () =>
+      all.filter((b) => (b.innerText === "계속 주문하기" ? opts.modalUp() : !(opts.modalUp() && opts.hideWhileUp.includes(b.innerText))));
+    const doc = {
+      defaultView: {
+        getComputedStyle: () => ({ visibility: "visible", cursor: "pointer" }),
+        requestAnimationFrame: (cb: () => void) => setTimeout(cb, 0),
+        MutationObserver: class {
+          observe() {}
+          disconnect() {}
+        },
+      },
+      documentElement: {},
+      body: {
+        querySelectorAll: () => shown(),
+        get innerText() {
+          return opts.modalUp() ? "계속 주문하시겠어요?\n계속 주문하기" : "피자\n라지";
+        },
+      },
+      querySelectorAll: () => [],
+      createTreeWalker: () => ({ nextNode: () => null }),
+    } as unknown as Document;
+    return doc;
+  }
+  const interrupts = [{ text: "계속 주문하시겠어요?", dismiss: { op: "click" as const, label: "계속 주문하기" } }];
+
+  it("answers a modal on screen before the next step, and once more at the end", async () => {
+    const log: string[] = [];
+    let up = true;
+    const doc = modalPage({ modalUp: () => up, hideWhileUp: [], log, onDismiss: () => (up = false) });
+    const onTap = vi.fn();
+    await runPlan(doc, [{ op: "click", label: "피자" }], { forbiddenLabels: forbidden, interrupts, onTap });
+    expect(log).toEqual(["click 계속 주문하기", "click 피자"]);
+    // The answer is a real click, so the host shows it too.
+    expect(onTap.mock.calls.map(([t]) => t.label)).toEqual(["계속 주문하기", "피자"]);
+  });
+
+  it("when a step cannot find its target under a modal that came up meanwhile, answers it and retries that step once", async () => {
+    const log: string[] = [];
+    let up = false;
+    let reads = 0;
+    // The modal comes up while 라지 is being looked for: the check before the step does not see it yet.
+    const doc = modalPage({
+      modalUp: () => up || ++reads > 2,
+      hideWhileUp: ["라지"],
+      log,
+      onDismiss: () => {
+        up = false;
+        reads = -1e9;
+      },
+    });
+    await runPlan(doc, [{ op: "click", label: "라지" }], { forbiddenLabels: forbidden, interrupts });
+    expect(log).toEqual(["click 계속 주문하기", "click 라지"]);
+  }, 10_000);
+
+  it("never retries a refused step, and plans without interrupts as before", async () => {
+    const log: string[] = [];
+    const doc = modalPage({ modalUp: () => false, hideWhileUp: [], log, onDismiss: () => {} });
+    await expect(runPlan(doc, [{ op: "click", label: "피자" }], { forbiddenLabels: ["피자"], interrupts })).rejects.toThrow(/Refused/);
+    expect(log).toEqual([]);
+  });
+});
+
 describe("nearestWithin", () => {
   // Stand-ins for DOM elements: only parentElement and innerText are read.
   const node = (innerText: string, parentElement: unknown = null) => ({ innerText, parentElement }) as unknown as HTMLElement;

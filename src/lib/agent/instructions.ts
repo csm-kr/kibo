@@ -180,6 +180,13 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
           "The dine option must be set before the first addToCart; this kiosk cannot change it later.",
           "If the user said eat here or take out, call setDineOption first, then addToCart in the same response.",
           "If not, call offerChoices with pick_dine (eat_in, take_out) and ask eat here or take out; add nothing yet.",
+          // Round 4 (I-234): the recipes tap the kiosk's own "no thanks" on these popups, so they cannot be ordered here.
+          // Only the schema-checked names, never the kiosk's offer text (I-152).
+          ...(kiosk.learned?.declines.length
+            ? [
+                `Offers KIBO always declines on this kiosk: ${kiosk.learned.declines.map((d) => `${d.name.ko} (${d.name.en})`).join(", ")}. If the user asks for one, say it cannot be added from the phone and they can choose it on the kiosk itself.`,
+              ]
+            : []),
           "",
         ]
       : []),

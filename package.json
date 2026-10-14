@@ -20,6 +20,7 @@
     "check:shared-address": "tsx scripts/shared-address.ts",
     "check:attacks": "tsx scripts/attack-check.ts",
     "scan:repo": "tsx scripts/scan-repo.ts",
+    "skill:import": "tsx scripts/skill-import.ts",
     "lighthouse": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/lighthouse.ts",
     "pwa:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/pwa-check.ts",
     "fixtures:voice": "tsx --env-file=.env scripts/make-voice-fixtures.ts",

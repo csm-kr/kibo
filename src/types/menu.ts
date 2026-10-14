@@ -83,6 +83,14 @@ export interface RecipeStep {
   as?: string;
   times?: number | string;
   steps?: RecipeStep[];
+  /** chooseOptions only: the group ids it runs where it stands (a set popup after the add button, round 4). */
+  groups?: string[];
+}
+
+/** A group shown only after another choice: skipped, with its after steps, when the line did not make it. */
+export interface GroupCondition {
+  groupId: string;
+  optionId: string;
 }
 
 /** What the bridge needs to drive a learned kiosk page (skills/*.json). */
@@ -97,8 +105,14 @@ export interface LearnedKiosk {
   checkout: { label: string; name: LocalizedName };
   cartTotalPattern: string;
   cartLinePattern: string;
-  /** By group id: the group's own steps for chooseOptions (a stepper's +, a wizard's 다음). */
-  groupSteps: Record<string, { select?: RecipeStep[]; after?: RecipeStep[] }>;
+  /** By group id: the group's own steps for chooseOptions (a stepper's +, a wizard's 다음) and its condition. */
+  groupSteps: Record<string, { select?: RecipeStep[]; after?: RecipeStep[]; appliesWhen?: GroupCondition }>;
+  /** By item id, when it is not addToCart (a set with its own popup steps). */
+  itemRecipes: Record<string, string>;
+  /** Popups that can come up between any two steps (a timeout modal), answered before each step (round 3, I-194). */
+  interrupts: { text: string; dismiss: RecipeStep }[];
+  /** Popup offers the recipes always decline; `name` is the checked text the AI may say, never `offer` (I-152). */
+  declines: { choice: string; offer: string; name: LocalizedName }[];
   labels: {
     items: Record<string, string>;
     categories: Record<string, string>;

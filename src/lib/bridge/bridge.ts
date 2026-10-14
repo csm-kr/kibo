@@ -8,7 +8,8 @@ import { type KioskLine, parseKioskLine, readKioskLines, readKioskTotal, sameLin
 
 // The in-page bridge for a learned kiosk (docs/ARCHITECTURE.md sequence 3): replays the one pending change on the
 // kiosk page, checks the kiosk's own total and lines, and reports with the kiosk token. On any failure it closes
-// open dialogs and reports ok: false; the server then calls staff. Nothing is retried (double-add risk).
+// open dialogs and reports ok: false; the server then calls staff. Nothing is retried (double-add risk), except a step
+// whose target was not found under one of the skill's interrupts: nothing was clicked for it yet (runPlan).
 
 export class BridgeError extends Error {
   constructor(message: string) {
@@ -68,6 +69,12 @@ function usesChooseOptions(steps: RecipeStep[]): boolean {
   return steps.some((s) => s.op === "chooseOptions" || usesChooseOptions(s.steps ?? []));
 }
 
+/** Labels compared without spacing, case or punctuation. */
+function sameLabel(a: string, b: string): boolean {
+  const norm = (s: string) => s.normalize("NFKC").toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
+  return norm(a) !== "" && norm(a) === norm(b);
+}
+
 function dineLabel(learned: LearnedKiosk, option: DineOption): string {
   return learned.dineLabels[option];
 }
@@ -82,17 +89,25 @@ export function changeVars(kiosk: KioskData, change: BridgeChange): { recipe: st
       const { itemId, qty = 1, selections = {} } = change.args;
       const item = requireItem(kiosk, itemId);
       if (!Number.isInteger(qty) || qty < 1 || qty > MAX_QTY) throw new BridgeError("Bad quantity");
+      const recipe = Object.hasOwn(learned.itemRecipes, itemId) ? learned.itemRecipes[itemId] : "addToCart";
+      const options = chosenOptions(item, selections).map((o) => labelFor(learned.labels.options, o.optionId));
+      // A popup offer the recipes always decline cannot be ordered through them (round 4): refuse before any tap.
+      const itemLabel = labelFor(learned.labels.items, itemId);
+      const declined = learned.declines.find((d) => [itemLabel, ...options].some((l) => sameLabel(l, d.offer)));
+      if (declined) throw new BridgeError(`The skill always declines ${declined.name.en}`);
       return {
-        recipe: "addToCart",
+        recipe,
         vars: {
           category: labelFor(learned.labels.categories, item.category),
-          item: labelFor(learned.labels.items, itemId),
-          options: chosenOptions(item, selections).map((o) => labelFor(learned.labels.options, o.optionId)),
+          item: itemLabel,
+          options,
           qtyMinus1: qty - 1,
-          // Only a recipe with chooseOptions needs the options split by group, with each group's own steps.
-          ...(usesChooseOptions(learned.recipes.addToCart ?? []) && {
+          // Only a recipe with chooseOptions needs the options split by group, with each group's id, steps and condition.
+          ...(usesChooseOptions(learned.recipes[recipe] ?? []) && {
             groups: chosenByGroup(item, selections).map((g) => ({
+              groupId: g.groupId,
               options: g.options.map((o) => labelFor(learned.labels.options, o.optionId)),
+              optionIds: g.options.map((o) => o.optionId),
               ...learned.groupSteps[g.groupId],
             })),
           }),
@@ -190,7 +205,7 @@ export function createBridge(cfg: BridgeConfig) {
     const expected = expectedLines(kiosk, session.cart, p);
     const plan = planSteps(recipe(name), vars, forbidden);
     const home = onHome();
-    const opts = { forbiddenLabels: forbidden, onTap };
+    const opts = { forbiddenLabels: forbidden, onTap, interrupts: learned.interrupts };
 
     if (p.type === "setDineOption") {
       if (home) await runPlan(doc, plan, opts);

@@ -203,6 +203,18 @@ describe("buildInstructions", () => {
     expect(learned).not.toContain("[Yes, pay now]");
   });
 
+  // Round 4 (I-234): a skill that always declines a popup's offer; the AI must say so instead of promising it.
+  it("a learned kiosk's always-declined offers are named, by their checked names only", () => {
+    const parsed = skillSchema.parse({
+      ...skill,
+      declines: [{ choice: "아니요, 괜찮아요", offer: "<b>사이드 추가</b>", name: { ko: "사이드 추가", en: "Add a side" } }],
+    });
+    const text = buildInstructions(learnedToKiosk(parsed), { locale: "en" });
+    expect(text).toContain("Offers KIBO always declines on this kiosk: 사이드 추가 (Add a side).");
+    expect(text).not.toContain("<b>");
+    expect(buildInstructions(getKiosk("doughhouse"), { locale: "en" })).not.toContain("always declines");
+  });
+
   // 14-final:1: judges heard "the order confirm card has appeared" and "Please wait a moment" after an item was added.
   it("the checkout talks about the user's order, never a card on the screen, and replies never say please wait", () => {
     for (const id of ["malo", "airport_rail", "doughhouse"]) {

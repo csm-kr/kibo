@@ -28,8 +28,19 @@ const recipeStep: z.ZodType<RecipeStep> = z.lazy(() =>
     as: varName.optional(),
     times: z.union([z.number().int().min(0), text]).optional(),
     steps: z.array(recipeStep).optional(),
+    // chooseOptions only: run these group ids where this step stands (round 4).
+    groups: z.array(id).max(20).optional(),
   }),
 );
+
+/** Every label, name and text a step (or its sub-steps) targets. */
+function stepTargets(s: RecipeStep): string[] {
+  return [s.label, s.name, s.text].filter((t): t is string => t !== undefined).concat((s.steps ?? []).flatMap(stepTargets));
+}
+
+function stepGroups(s: RecipeStep): string[] {
+  return [...(s.groups ?? []), ...(s.steps ?? []).flatMap(stepGroups)];
+}
 
 export const skillSchema = z
   .strictObject({
@@ -54,6 +65,8 @@ export const skillSchema = z
         category: id,
         price: won.min(0),
         soldOut: z.boolean(),
+        // The recipe that adds this item, when it is not addToCart (a set with its own popup, round 4).
+        recipe: varName.optional(),
         optionGroups: z.array(
           z.strictObject({
             groupId: id,
@@ -67,6 +80,8 @@ export const skillSchema = z
             // chooseOptions: how this group picks one option (a stepper's +) and what follows it (a wizard's 다음).
             select: z.array(recipeStep).optional(),
             after: z.array(recipeStep).optional(),
+            // Shown only after another group's choice; skipped with its after steps when the line did not make it.
+            appliesWhen: z.strictObject({ groupId: id, optionId: id }).optional(),
           }),
         ),
       }),
@@ -78,11 +93,53 @@ export const skillSchema = z
     recipes: z.record(varName, z.array(recipeStep)),
     cartTotalPattern: z.string().max(200),
     cartLinePattern: z.string().max(200),
+    // Popups that can come up between any two steps (a timeout modal): the text that shows one and the step that
+    // answers it (round 3, I-194).
+    interrupts: z.array(z.strictObject({ text: text.min(4), dismiss: recipeStep })).max(5).optional(),
+    // Popup offers the recipes always decline (round 4): the declining button, the offer as shown, and the name the
+    // AI may say. An order that asks for the offer is refused before any tap.
+    declines: z.array(z.strictObject({ choice: text, offer: text, name })).max(5).optional(),
   })
   .refine((s) => isForbiddenLabel(s.checkout.label, s.forbiddenLabels), {
     message: "checkout.label must be a forbidden label",
     path: ["checkout", "label"],
-  });
+  })
+  // An interrupt's answer and a decline's button are controls: never a payment control, and never an item, category
+  // or option, which would change the order on its own.
+  .refine(
+    (s) => {
+      const order = new Set([
+        ...s.catalog.map((i) => i.label),
+        ...s.categories.map((c) => c.label),
+        ...s.catalog.flatMap((i) => i.optionGroups.flatMap((g) => g.options.map((o) => o.label))),
+      ]);
+      const targets = [...(s.interrupts ?? []).flatMap((i) => stepTargets(i.dismiss)), ...(s.declines ?? []).map((d) => d.choice)];
+      return targets.every((t) => !order.has(t) && !isForbiddenLabel(t, s.forbiddenLabels));
+    },
+    { message: "an interrupt's answer or a decline must be a plain control", path: ["interrupts"] },
+  )
+  .refine((s) => s.catalog.every((i) => i.recipe === undefined || Object.hasOwn(s.recipes, i.recipe)), {
+    message: "an item names a recipe the skill does not have",
+    path: ["catalog"],
+  })
+  .refine(
+    (s) =>
+      s.catalog.every((i) =>
+        i.optionGroups.every((g) => {
+          if (!g.appliesWhen) return true;
+          const other = i.optionGroups.find((o) => o.groupId === g.appliesWhen!.groupId && o !== g);
+          return !!other && other.options.some((o) => o.optionId === g.appliesWhen!.optionId);
+        }),
+      ),
+    { message: "appliesWhen must name another group of the item and one of its options", path: ["catalog"] },
+  )
+  .refine(
+    (s) => {
+      const ids = new Set(s.catalog.flatMap((i) => i.optionGroups.map((g) => g.groupId)));
+      return Object.values(s.recipes).flat().flatMap(stepGroups).every((g) => ids.has(g));
+    },
+    { message: "chooseOptions names a group the skill does not have", path: ["recipes"] },
+  );
 
 export type Skill = z.infer<typeof skillSchema>;
 
@@ -123,12 +180,16 @@ export function learnedToKiosk(skill: Skill): KioskData {
   for (const item of skill.catalog) {
     for (const g of item.optionGroups) {
       // Like option ids, one group id (size on every pizza) must always mean the same steps.
-      const steps = { ...(g.select && { select: g.select }), ...(g.after && { after: g.after }) };
+      const steps = {
+        ...(g.select && { select: g.select }),
+        ...(g.after && { after: g.after }),
+        ...(g.appliesWhen && { appliesWhen: g.appliesWhen }),
+      };
       if (Object.hasOwn(stepsSeen, g.groupId) && stepsSeen[g.groupId] !== JSON.stringify(steps)) {
         throw new Error(`Group id ${g.groupId} has two sets of steps`);
       }
       stepsSeen[g.groupId] = JSON.stringify(steps);
-      if (g.select || g.after) groupSteps[g.groupId] = steps;
+      if (g.select || g.after || g.appliesWhen) groupSteps[g.groupId] = steps;
       for (const o of g.options) {
         // The bridge looks options up by id alone, so one id must always mean one kiosk label.
         if (options[o.optionId] !== undefined && options[o.optionId] !== o.label) {
@@ -149,6 +210,9 @@ export function learnedToKiosk(skill: Skill): KioskData {
     cartTotalPattern: skill.cartTotalPattern,
     cartLinePattern: skill.cartLinePattern,
     groupSteps,
+    itemRecipes: Object.fromEntries(skill.catalog.flatMap((i) => (i.recipe && i.recipe !== "addToCart" ? [[i.itemId, i.recipe]] : []))),
+    interrupts: skill.interrupts ?? [],
+    declines: skill.declines ?? [],
     labels: {
       items: Object.fromEntries(skill.catalog.map((i) => [i.itemId, i.label])),
       categories: Object.fromEntries(skill.categories.map((c) => [c.categoryId, c.label])),

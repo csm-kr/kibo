@@ -49,6 +49,44 @@ describe("skills/doughhouse.json", () => {
     expect(() => learnedToKiosk(twice)).toThrow(/two sets of steps/);
   });
 
+  it("accepts round 3–4 fields (interrupts, declines, a per-item recipe, chooseOptions groups, a group's condition) and passes them to the bridge (I-234)", () => {
+    const item = {
+      ...skill.catalog[1],
+      recipe: "addSetToCart",
+      optionGroups: skill.catalog[1].optionGroups.map((g) => (g.groupId === "toppings" ? { ...g, appliesWhen: { groupId: "size", optionId: "large" } } : g)),
+    };
+    const interrupts = [{ text: "계속 주문하시겠어요?", dismiss: { op: "click" as const, label: "계속 주문하기" } }];
+    const declines = [{ choice: "아니요, 괜찮아요", offer: "사이드 추가", name: { ko: "사이드 추가", en: "Add a side" } }];
+    const recipes = { ...skill.recipes, addSetToCart: [{ op: "chooseOptions" as const, groups: ["toppings"], steps: [{ op: "click" as const, label: "{option}" }] }] };
+    // One group id means one condition, so the other item here has no toppings group.
+    const side = skill.catalog.find((i) => i.optionGroups.length === 0)!;
+    const parsed = skillSchema.parse({ ...skill, catalog: [side, item], interrupts, declines, recipes });
+    const learned = learnedToKiosk(parsed).learned!;
+    expect(learned.interrupts).toEqual(interrupts);
+    expect(learned.declines).toEqual(declines);
+    expect(learned.itemRecipes).toEqual({ pepperoni: "addSetToCart" });
+    expect(learned.groupSteps.toppings).toEqual({ appliesWhen: { groupId: "size", optionId: "large" } });
+    // Older skills carry none of them.
+    expect(learnedToKiosk(skill).learned).toMatchObject({ interrupts: [], declines: [], itemRecipes: {} });
+  });
+
+  it("refuses an interrupt answer or a decline that is a payment control or an item, category or option, and an unknown recipe or condition", () => {
+    const dismiss = (label: string) => ({ ...skill, interrupts: [{ text: "계속 주문하시겠어요?", dismiss: { op: "click", label } }] });
+    expect(skillSchema.safeParse(dismiss("계속 주문하기")).success).toBe(true);
+    for (const label of ["주문하기", "결제하기", "페퍼로니", "피자", "라지"]) expect(skillSchema.safeParse(dismiss(label)).success, label).toBe(false);
+    const decline = (choice: string) => ({ ...skill, declines: [{ choice, offer: "사이드 추가", name: { ko: "사이드", en: "Side" } }] });
+    expect(skillSchema.safeParse(decline("아니요, 괜찮아요")).success).toBe(true);
+    for (const choice of ["주문하기", "콜라", "씬"]) expect(skillSchema.safeParse(decline(choice)).success, choice).toBe(false);
+    expect(skillSchema.safeParse({ ...skill, catalog: [{ ...skill.catalog[0], recipe: "nope" }] }).success).toBe(false);
+    const cond = (appliesWhen: object) => ({
+      ...skill,
+      catalog: [{ ...skill.catalog[0], optionGroups: skill.catalog[0].optionGroups.map((g) => (g.groupId === "toppings" ? { ...g, appliesWhen } : g)) }],
+    });
+    expect(skillSchema.safeParse(cond({ groupId: "size", optionId: "large" })).success).toBe(true);
+    expect(skillSchema.safeParse(cond({ groupId: "size", optionId: "huge" })).success).toBe(false);
+    expect(skillSchema.safeParse(cond({ groupId: "toppings", optionId: "olive" })).success).toBe(false);
+  });
+
   it("uses only known labels in recipes: placeholders, uiLabels, category or dine labels", () => {
     const known = new Set([
       ...skill.uiLabels,

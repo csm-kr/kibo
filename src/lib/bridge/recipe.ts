@@ -1,15 +1,18 @@
 import { isForbiddenLabel } from "@/lib/adapters/learned";
-import type { RecipeStep } from "@/types/menu";
+import type { GroupCondition, RecipeStep } from "@/types/menu";
 import { clickables, findByLabel } from "./labels";
 
 // Replays a skill recipe on the kiosk page without AI (ADR-007). planSteps is pure: placeholders, loops and the
 // forbidden-label check all happen before the first click. runPlan clicks one located target per step.
 
-/** One option group of the line's item for chooseOptions: the chosen kiosk labels and the group's own steps. */
+/** One option group of the line's item for chooseOptions: the chosen kiosk labels and ids, and the group's own steps. */
 export interface PlanGroup {
+  groupId?: string;
   options: string[];
+  optionIds?: string[];
   select?: RecipeStep[];
   after?: RecipeStep[];
+  appliesWhen?: GroupCondition;
 }
 
 export type Vars = Record<string, string | number | string[] | PlanGroup[]>;
@@ -53,16 +56,46 @@ function count(v: number | string | undefined, vars: Vars): number {
   return n;
 }
 
-/** Expands forEach, repeat, chooseOptions and {placeholders}; refuses any step aimed at a forbidden (payment) label. */
+/** The group ids the recipe's chooseOptions steps name in "groups": the others run at a chooseOptions without them. */
+function claimedGroups(steps: RecipeStep[], out = new Set<string>()): Set<string> {
+  for (const s of steps) {
+    if (s.op === "chooseOptions") for (const g of s.groups ?? []) out.add(g);
+    claimedGroups(s.steps ?? [], out);
+  }
+  return out;
+}
+
+/** A group shown only after another choice applies when that group is not on the item or the line chose it. */
+function applies(group: PlanGroup, groups: PlanGroup[]): boolean {
+  const when = group.appliesWhen;
+  if (!when) return true;
+  const other = groups.find((g) => g.groupId === when.groupId);
+  return !other || (other.optionIds ?? []).includes(when.optionId);
+}
+
+/**
+ * Expands forEach, repeat, chooseOptions and {placeholders}; refuses any step aimed at a forbidden (payment) label.
+ * chooseOptions runs, per group of the line's item, its select steps (or the op's steps) for each chosen option, then
+ * its after steps. Since round 4 a chooseOptions may name "groups" and runs only those, where it stands; one without
+ * runs the groups no other chooseOptions names; a conditional group the line made no pick in is skipped, with its
+ * after steps, when its condition was not chosen. The learner's rules (spikes/kibo-learn/plan.mjs), ported.
+ */
 export function planSteps(steps: RecipeStep[], vars: Vars, forbidden: string[]): PlainStep[] {
+  return expand(steps, vars, forbidden, claimedGroups(steps));
+}
+
+function expand(steps: RecipeStep[], vars: Vars, forbidden: string[], claimed: Set<string>): PlainStep[] {
   const out: PlainStep[] = [];
   for (const s of steps) {
     if (s.op === "chooseOptions") {
       const groups = vars.groups;
       if (!Array.isArray(groups) || !s.steps) throw new RecipeError("Bad chooseOptions step");
       for (const g of groups as PlanGroup[]) {
-        for (const option of g.options) out.push(...planSteps(g.select ?? s.steps, { ...vars, option }, forbidden));
-        out.push(...planSteps(g.after ?? [], vars, forbidden));
+        const id = g.groupId;
+        const mine = s.groups ? id !== undefined && s.groups.includes(id) : id === undefined || !claimed.has(id);
+        if (!mine || (!g.options.length && !applies(g, groups as PlanGroup[]))) continue;
+        for (const option of g.options) out.push(...expand(g.select ?? s.steps, { ...vars, option }, forbidden, claimed));
+        out.push(...expand(g.after ?? [], vars, forbidden, claimed));
       }
       continue;
     }
@@ -70,13 +103,13 @@ export function planSteps(steps: RecipeStep[], vars: Vars, forbidden: string[]):
       const list = s.over ? vars[s.over] : undefined;
       // A list of labels; the groups of chooseOptions are not something to loop over.
       if (!Array.isArray(list) || list.some((v) => typeof v !== "string") || !s.as || !s.steps) throw new RecipeError("Bad forEach step");
-      for (const v of list as string[]) out.push(...planSteps(s.steps, { ...vars, [s.as]: v }, forbidden));
+      for (const v of list as string[]) out.push(...expand(s.steps, { ...vars, [s.as]: v }, forbidden, claimed));
       continue;
     }
     if (s.op === "repeat") {
       if (!s.steps) throw new RecipeError("Bad repeat step");
       const n = count(s.times, vars);
-      for (let i = 0; i < n; i++) out.push(...planSteps(s.steps, vars, forbidden));
+      for (let i = 0; i < n; i++) out.push(...expand(s.steps, vars, forbidden, claimed));
       continue;
     }
     const step: PlainStep = { op: s.op };
@@ -223,25 +256,64 @@ export interface TapEvent {
   h: number;
 }
 
-/**
- * Clicks each step's target in order. Throws RecipeError on the first step that cannot be done; never retries.
- * `onTap` hears each click right before it happens (only clicks that happen) and is awaited, so a host can show it.
- */
-export async function runPlan(
-  doc: Document,
-  plan: PlainStep[],
-  opts: { forbiddenLabels: string[]; onTap?: (tap: TapEvent) => void | Promise<void> },
-): Promise<void> {
-  for (const step of plan) {
-    const target = await locate(doc, step);
-    if (!target) continue;
-    if (isForbiddenTarget(target, opts.forbiddenLabels)) throw new RecipeError("Refused a payment control");
-    if (step.op === "check" && (target.el as HTMLInputElement).checked) continue;
-    if (opts.onTap) {
-      const r = target.el.getBoundingClientRect();
-      await opts.onTap({ label: target.label, x: r.x, y: r.y, w: r.width, h: r.height });
-    }
-    target.el.click();
-    await settle(doc);
+/** A popup the skill answers whenever it shows (a timeout modal): its text and the step that dismisses it. */
+export interface Interrupt {
+  text: string;
+  dismiss: RecipeStep;
+}
+
+interface RunOpts {
+  forbiddenLabels: string[];
+  onTap?: (tap: TapEvent) => void | Promise<void>;
+  interrupts?: Interrupt[];
+}
+
+/** Clicks one located target, unless it is a payment control or an already checked box; the host hears it first. */
+async function clickTarget(doc: Document, step: PlainStep, target: Target, opts: RunOpts): Promise<void> {
+  if (isForbiddenTarget(target, opts.forbiddenLabels)) throw new RecipeError("Refused a payment control");
+  if (step.op === "check" && (target.el as HTMLInputElement).checked) return;
+  if (opts.onTap) {
+    const r = target.el.getBoundingClientRect();
+    await opts.onTap({ label: target.label, x: r.x, y: r.y, w: r.width, h: r.height });
   }
+  target.el.click();
+  await settle(doc);
+}
+
+/** Answers each interrupt whose text the page shows now; returns how many it answered. */
+async function answerInterrupts(doc: Document, opts: RunOpts): Promise<number> {
+  let answered = 0;
+  for (const it of opts.interrupts ?? []) {
+    if (!(doc.body?.innerText ?? "").includes(it.text)) continue;
+    // Checked at load (skillSchema) and planned again here like any step, so a payment control is still refused.
+    for (const step of planSteps([it.dismiss], {}, opts.forbiddenLabels)) {
+      const target = await locate(doc, step);
+      if (target) await clickTarget(doc, step, target, opts);
+    }
+    answered++;
+  }
+  return answered;
+}
+
+/**
+ * Clicks each step's target in order. Throws RecipeError on the first step that cannot be done.
+ * `onTap` hears each click right before it happens (only clicks that happen) and is awaited, so a host can show it.
+ * With interrupts (round 3, I-194): they are answered before each step and once at the end, and a step whose target
+ * was not found is retried once after answering one that came up meanwhile. Nothing was clicked for that step yet,
+ * so the retry cannot add twice; a refused step is never retried.
+ */
+export async function runPlan(doc: Document, plan: PlainStep[], opts: RunOpts): Promise<void> {
+  const answering = !!opts.interrupts?.length;
+  for (const step of plan) {
+    if (answering) await answerInterrupts(doc, opts);
+    let target: Target | null;
+    try {
+      target = await locate(doc, step);
+    } catch (e) {
+      if (!answering || !(e instanceof RecipeError) || !(await answerInterrupts(doc, opts))) throw e;
+      target = await locate(doc, step);
+    }
+    if (target) await clickTarget(doc, step, target, opts);
+  }
+  if (answering) await answerInterrupts(doc, opts);
 }
