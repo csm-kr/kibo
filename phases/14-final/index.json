@@ -77,7 +77,10 @@
     {
       "step": 9,
       "name": "repo-ready",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-14T21:15:59+0900",
+      "summary": "README rewritten for judges: one-line pitch, live /demo and kibo-2026.web.app, 60-second try (one laptop; phone + laptop), Gemini jobs table with exact model ids and regions (gemini-3.8-live direct on the Gemini API or via kibo-voice to Vertex AI Live us-central1; gemini-3.8-flash with explicit cache and Vertex global fallback; learner on Vertex global), Google Cloud services table (Cloud Run kibo and kibo-voice, Firestore, Firebase Hosting, Secret Manager, Cloud Build/Artifact Registry, Cloud Monitoring target), mermaid architecture matching the code (bridge, kibo-voice, Vertex AI, Firebase Hosting), server rules, Where-to-check table with file links, KIBO Learn and how it gets onto a kiosk, results only from NUMBERS.md (70 relative links and every number checked), known limits, run-in-5-minutes, development timeline (10-11 spikes, 10-12 first commit with what its 25,892 lines are, phases 1-14), credits, MIT. New: LICENSE (MIT, Sungmin Cho and Ye Seul Ahn), .env.example (+ !.env.example in .gitignore), scripts/scan-repo.ts + test (npm run scan:repo: git log -p --all, all blobs, publishable worktree; 295 commits, 0 findings; prints commit/path/pattern only), phases/14-final/REPO.md (remove motion-demo-video skill and 3 worktree gitlinks; check hooks origin and contest start date; nothing removed). SUBMISSION description now names Firebase Hosting (1,021 chars, test requires Firebase). spikes/README marks first-run numbers retired. Issues I-089, I-092, I-205 fixed; I-246, I-247 logged. ACs: lint, build, test 1085, scan:repo.",
+      "completed_at": "2026-10-14T21:25:54+0900"
     },
     {
       "step": 10,

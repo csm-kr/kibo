@@ -10,7 +10,7 @@ The learner can run on Gemini (default, through Vertex AI) or on OpenAI (`PROVID
 
 OpenAI runs (development only): `kibo-learn/results/openai/`, `blind-kiosk/results/blind-sol/`, `blind-kiosk/results/blind-sol2/`.
 
-Published numbers come from Gemini runs (`docs/TESTING.md`, evidence ledger):
+The first Gemini runs (in the first commit, 10-12), kept as history. They are **retired**: never quote them; current numbers and the later blind kiosk test (`blind-kiosks/`) are in `docs/plan/NUMBERS.md`.
 
 | Claim | Value | Evidence |
 |---|---|---|
@@ -20,4 +20,4 @@ Published numbers come from Gemini runs (`docs/TESTING.md`, evidence ledger):
 | Blind cafe catalog accuracy | items 40/40; options 22/29 and 21/29 | `blind-kiosk/results/v3run{1,2}/grade.txt`, `grade_fair.txt` |
 | Blind cafe example orders | 2/5 and 3/5 pass; rest refused before execution | `blind-kiosk/results/holdout.log` |
 
-These Gemini runs were made before the learner required ≥ 3 passing self-tests and the coverage audit to finish (`docs/KIBO_LEARN.md`); a Gemini re-run with both is planned.
+These Gemini runs were made before the learner required ≥ 3 passing self-tests and the coverage audit to finish (`docs/KIBO_LEARN.md`). Later runs with both: `kibo-learn/results/run3/` and `blind-kiosks/`.

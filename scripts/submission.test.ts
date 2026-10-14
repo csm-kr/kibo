@@ -19,7 +19,8 @@ describe("docs/plan/SUBMISSION.md solution description", () => {
     expect(section).toContain(`**${length.toLocaleString("en-US")} / 1,024 characters**`);
   });
 
-  it("names Firestore, Cloud Run and Gemini", () => {
-    for (const name of ["Firestore", "Cloud Run", "Gemini"]) expect(text).toContain(name);
+  // The form asks how Firebase, Firestore, Cloud Run and Gemini are used.
+  it("names Firebase, Firestore, Cloud Run and Gemini", () => {
+    for (const name of ["Firebase", "Firestore", "Cloud Run", "Gemini"]) expect(text).toContain(name);
   });
 });

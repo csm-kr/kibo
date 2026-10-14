@@ -1,237 +1,230 @@
 # KIBO: Kiosk Intelligence Bridge & Operator
 
-**Don't learn the kiosk. Just talk.** Say your order to your own phone, and the self-order kiosk already on the counter fills the cart by itself. Built for the Google Cloud AI Builder Cup 2026.
+**Say your order to your own phone, and the self-order kiosk already on the counter fills its own cart.** Built for the Google Cloud AI Builder Cup 2026 (Sustainability & Social Impact).
+
+- **Try it on a laptop:** https://kibo-407514467119.asia-northeast3.run.app/demo
+- **On a phone:** open **kibo-2026.web.app** and type the 6-digit code a KIBO kiosk shows
+- Video and deck: linked from the submission
 
 ![The live demo: on the left the Korean kiosk with two cheeseburger sets the AI just added, highlighted; on the right the phone with the same order and total](public/landing/demo.webp)
 
-- Live demo: https://kibo-407514467119.asia-northeast3.run.app/demo
-- Video: coming with the submission
-- Deck: coming with the submission
+## Try it in 60 seconds
 
-## Try it in one minute
-1. Open [`/demo`](https://kibo-407514467119.asia-northeast3.run.app/demo) on a laptop and press **Start**.
-2. Tap an example sentence, or say it (allow the microphone), or type your own.
-3. Watch the kiosk on the left: the lines the AI added light up for 2 seconds.
-4. Say "I'll pay", then confirm on the card ("Yes, pay now").
-5. Tap the card stand-in on the kiosk side to "pay" and get an order number. No real payment happens.
+**One laptop (`/demo`):**
+1. Open [`/demo`](https://kibo-407514467119.asia-northeast3.run.app/demo), pick a place (burger shop, airport rail, pizza shop) and press **Start**.
+2. Tap an example sentence, say it (allow the microphone) or type your own, e.g. "Two cheeseburger sets, one without pickles".
+3. Watch the kiosk on the left: what the AI changed lights up, with an English subtitle under the Korean screen. "What the AI did" lists every Gemini tool call and the server's answer.
+4. Say "I'll pay". The AI can only open the review; tap **Yes, pay now** yourself, then the card stand-in on the kiosk side. No real payment happens.
 
-**Two-device demo:** a laptop is the kiosk, your phone is the assistant.
-1. Open [`/kiosk`](https://kibo-407514467119.asia-northeast3.run.app/kiosk) on a laptop, full screen. Beside the kiosk, a panel shows a QR code and a 6-digit code.
-2. On the phone, scan the QR with the camera app, or open `/app` and tap **Scan a kiosk** or type the code.
-3. Allow the camera and the microphone when asked; the panel says "Phone connected".
-4. Tap **Start** and **Turn on the microphone**, choose eat here or take out, and say your order. Confirm on the phone, then tap 카드 and 카드 넣기 on the laptop.
-5. In KakaoTalk, NAVER or another in-app browser, the microphone and camera often do not work: open the link in Safari or Chrome.
+**Phone + laptop:**
+1. Open [`/kiosk`](https://kibo-407514467119.asia-northeast3.run.app/kiosk) on a laptop. The kiosk shows a QR and a 6-digit code.
+2. On the phone, scan the QR, or open **kibo-2026.web.app** and type the code.
+3. Allow the microphone, choose eat here or take out, and talk. Confirm on the phone, then tap 카드 (Card) and 카드 넣기 (Insert card) on the laptop; the column beside the kiosk says each step in English.
+4. In KakaoTalk, NAVER or another in-app browser the microphone often fails: open the link in Safari or Chrome.
 
-## What it does
-- **QR connect, no install.** The kiosk start screen offers "order by talking (QR)" and "order by touch".
-- **Voice ordering with Gemini.** Natural sentences, including complex ones ("two cheeseburger sets, one without pickles"), become real cart changes through tool calls.
-- **Live mirror.** Every change shows on the kiosk with a 2-second highlight; the phone always shows the full cart and total.
-- **Confirm before pay.** The AI can only open a confirm card; payment needs the user's own "yes" or tap, then a card action on the kiosk.
-- **Safe fallbacks.** Undo, choice buttons for ambiguous orders, sold-out alternatives, a staff call for questions the menu data cannot answer, and text input when there is no microphone.
-- **KIBO Learn.** For kiosks with no integration, Gemini explores the kiosk's web UI once and writes a skill; orders are then replayed without AI (offline experiments so far, see "Known limits").
-- **Judge mode `/demo`.** Kiosk and assistant side by side on one screen.
+## What Gemini does, and where
 
-## Who it is for
-- **Older adults** who give up at kiosks under queue pressure: large text, one task per screen, plain words, undo, a staff button that is always visible.
-- **Visitors who cannot read Korean:** the kiosk stays Korean, the phone speaks and shows English.
-- **People with low vision:** voice replies, high contrast, screen-reader labels, system font size respected.
-- **People who cannot speak easily, or a noisy store:** everything also works with text and large choice buttons.
+| Job | Model and service | Code |
+|---|---|---|
+| Voice ordering with function calling | `gemini-3.8-live`. **Direct:** the phone talks to the Gemini API with a one-use ephemeral token whose model, instructions and tools are pinned (`liveConnectConstraints`). **Relay:** when the API key cannot pay, the phone's audio goes through `kibo-voice` (Cloud Run) to **Vertex AI Live in `us-central1`** | [`src/lib/agent/live.ts`](src/lib/agent/live.ts), [`src/lib/agent/liveBackend.ts`](src/lib/agent/liveBackend.ts), [`voice-relay/relay.ts`](voice-relay/relay.ts) |
+| Text agent (typing, `/demo`, the fallback when there is no microphone) | `gemini-3.8-flash`, thinking `low`, on the Gemini API with an **explicit context cache** for the rules and menu; one retry per call on **Vertex AI (`global`)** on 402, 429 or 5xx | [`src/lib/agent/chat.ts`](src/lib/agent/chat.ts), [`src/lib/agent/model.ts`](src/lib/agent/model.ts), [`src/lib/agent/cache.ts`](src/lib/agent/cache.ts) |
+| One agent definition for both | 9 tools (`setDineOption`, `addToCart`, `updateCart`, `removeFromCart`, `undoLastChange`, `offerChoices`, `callStaff`, `requestCheckout`, `confirmCheckout`) and instructions built from the kiosk's menu data | [`src/lib/agent/tools.ts`](src/lib/agent/tools.ts), [`src/lib/agent/instructions.ts`](src/lib/agent/instructions.ts) |
+| KIBO Learn: learn a kiosk that has no integration | `gemini-3.8-flash` on **Vertex AI (`global`)**, offline, driving the kiosk's web page with Playwright; orders are then replayed **without AI** | [`spikes/kibo-learn/learner.mjs`](spikes/kibo-learn/learner.mjs), [`src/lib/bridge/`](src/lib/bridge/) |
 
-The user only looks at and talks to their phone. The kiosk is a mirror that confirms what changed, and the place to pay.
+The AI speaks and writes Korean, English, Japanese, Chinese (Simplified), Spanish, Vietnamese, French, Thai and Indonesian; the phone's screens are Korean or English.
 
-## How it works
+## Google Cloud services
 
-### Deployment
+| Service | What it does here |
+|---|---|
+| **Cloud Run** `kibo` (`asia-northeast3`) | The Next.js app: kiosk, phone and demo screens, and every API route. Min 1, max 3 instances ([`scripts/deploy.sh`](scripts/deploy.sh)) |
+| **Cloud Run** `kibo-voice` (`asia-northeast3`) | The voice relay: a WebSocket that runs the same token checks and budgets, then passes Live messages to Vertex AI Live in `us-central1` ([`voice-relay/`](voice-relay/), [`scripts/deploy-voice.sh`](scripts/deploy-voice.sh)) |
+| **Firestore** (`asia-northeast3`) | One session document per order, every write in a transaction; server-only secrets, pairing codes and usage counters; TTL deletes expired sessions. Browsers never touch it: the rules deny every client read and write ([`firestore.rules`](firestore.rules), [`src/lib/store/firestore.ts`](src/lib/store/firestore.ts)) |
+| **Firebase Hosting** | `kibo-2026.web.app`, a short address people type on a phone; it only redirects to the Cloud Run app ([`firebase.json`](firebase.json)) |
+| **Gemini API** and **Vertex AI** | The models above |
+| **Secret Manager** | The Gemini API key, read by Cloud Run at start; never in the repo or the browser |
+| **Cloud Build**, **Artifact Registry** | Build the two services' images on deploy |
+| **Cloud Monitoring** | Uptime check target: `/api/health?deep=1` checks the store, both model ids, a 1-token generation through the text backend and one on the API key, an ephemeral token and the relay ([`src/app/api/health/route.ts`](src/app/api/health/route.ts); setup in [`docs/plan/OPERATIONS.md`](docs/plan/OPERATIONS.md)) |
+
+## Architecture
+
 ```mermaid
 flowchart TB
-  subgraph Client["Clients: web only, no install"]
-    PH["Phone browser /assistant"]
-    KI["Kiosk browser /kiosk"]
-    DE["Judge laptop /demo"]
-    LK["Learned kiosk web app + bridge"]
+  subgraph Clients["Browsers: web only, no install"]
+    PH["Phone<br/>/app, /assistant"]
+    KI["Kiosk<br/>/kiosk, or /learned/&lt;kiosk&gt; with the bridge"]
+    DE["Judge laptop<br/>/demo"]
   end
+  FH["Firebase Hosting<br/>kibo-2026.web.app (redirect only)"]
   subgraph GCP["Google Cloud: asia-northeast3"]
-    CR["Cloud Run: Next.js app + API"]
-    FS[("Firestore: sessions, sessionSecrets, usage")]
-    SM["Secret Manager"]
+    CR["Cloud Run: kibo<br/>Next.js app + API"]
+    VR["Cloud Run: kibo-voice<br/>voice relay (WebSocket)"]
+    FS[("Firestore<br/>sessions, sessionSecrets, pairCodes, usage")]
+    SM["Secret Manager<br/>Gemini API key"]
   end
-  LIVE["Gemini Live"]
-  FLASH["Gemini Flash"]
-  PH -- "voice, ephemeral token" --> LIVE
-  PH -- "command, live-token, chat" --> CR
-  KI -- "cart changes, card action" --> CR
+  subgraph GAPI["Gemini API"]
+    GL["Gemini Live<br/>gemini-3.8-live"]
+    GF["Gemini Flash<br/>gemini-3.8-flash + context cache"]
+  end
+  subgraph VX["Vertex AI"]
+    VL["Gemini Live, us-central1"]
+    VF["Gemini Flash, global<br/>text fallback, KIBO Learn"]
+  end
+  PH -. "short address" .-> FH
+  FH -. "302" .-> CR
+  PH -- "voice, one-use token" --> GL
+  PH -- "voice when the key cannot pay" --> VR
+  VR --> VL
+  PH -- "commands, chat, live-token" --> CR
+  KI -- "touch, card, bridge reports" --> CR
   DE --> CR
-  LK -- "session, recipe results" --> CR
-  CR --> FS
-  FS -. "onSnapshot (Admin SDK)" .-> CR
-  CR -. "SSE /api/session/{id}/events" .-> PH
+  CR -. "SSE: the public session" .-> PH
   CR -. SSE .-> KI
-  CR -. SSE .-> LK
+  CR -- "transactions" --> FS
+  FS -. "onSnapshot (Admin SDK)" .-> CR
+  VR -- "same checks and budgets" --> FS
+  CR -- "token with pinned model, instructions, tools" --> GL
+  CR -- "text agent" --> GF
+  CR -- "fallback per call" --> VF
   CR --> SM
-  CR -- "text agent" --> FLASH
-  CR -- "token, pinned model and tools" --> LIVE
-```
-The learned-kiosk bridge (`LK`) is the planned in-app form of KIBO Learn; today KIBO Learn runs as offline experiments in `spikes/`.
-
-### Voice order
-`FS-->>K: onSnapshot` is shorthand: the server's Firestore listener pushes the new session to each screen over its SSE stream.
-```mermaid
-sequenceDiagram
-  autonumber
-  actor U as User
-  participant K as Kiosk /kiosk
-  participant P as Phone /assistant
-  participant API as Cloud Run API
-  participant FS as Firestore
-  participant L as Gemini Live
-  K->>API: POST /api/session
-  API->>FS: create session (idle), store secrets
-  API-->>K: sessionId, QR, kioskToken
-  U->>P: scan QR
-  P->>API: POST /api/session/claim (QR token)
-  API->>FS: status=connected, deviceToken hash
-  API-->>P: deviceToken
-  FS-->>K: onSnapshot, phone connected
-  P->>API: POST /api/live-token (deviceToken)
-  API-->>P: ephemeral token (one use, model and tools pinned)
-  P->>L: connect + audio stream
-  U->>P: two cheeseburger sets, one without pickles
-  L-->>P: function call addToCart twice
-  P->>API: POST /api/command (commandId, deviceToken)
-  API->>API: zod validation, option rules, recentCommandIds
-  API->>FS: transaction: cart, lastChange, screen
-  API-->>P: updated cart
-  P->>L: toolResponse
-  L-->>P: voice reply
-  FS-->>K: onSnapshot, menu + 2 s highlight
-  FS-->>P: onSnapshot, cart card
-  U->>P: I'll pay
-  L-->>P: function call requestCheckout
-  P->>API: command requestCheckout
-  API->>FS: status=confirming
-  U->>P: Yes, pay now
-  P->>API: confirmCheckout (cartVersion)
-  API->>FS: status=paying
-  FS-->>K: payment screen
-  U->>K: insert card
-  K->>API: card action (kioskToken)
-  API->>FS: status=paid, order number
-  FS-->>K: order number
-  FS-->>P: order number
 ```
 
-### Session state machine
+Every state change is one `POST /api/command`; screens only read the session through a Server-Sent Events stream (one long HTTP response that pushes each change). More diagrams (voice sequence, learned kiosk, state machine) are in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+## What the server enforces
+
+Tool arguments come from the browser, so the server is the only place that can be trusted.
+- **One door for every change.** `POST /api/command` with a `commandId`, an actor token and zod-validated arguments, applied in a Firestore transaction. Names, prices and options come only from menu data, never from arguments.
+- **Actor tokens.** The one-use QR claim (or the 6-digit code) gives the phone a `deviceToken`; the kiosk holds a `kioskToken`. Only SHA-256 hashes are stored. Each actor may send only its own commands.
+- **The AI cannot pay.** `confirmCheckout` is accepted only in `confirming`, with a matching `cartVersion`, and either a tap on the review or, from the AI, a new user utterance at least 1.5 s after the review opened. If the kiosk opened or reopened the review, only a tap confirms. `paid` comes only from the kiosk's card action.
+- **Tested by attack.** 37 of 37 forged commands (wrong or missing token, an AI confirm without a tap or new "yes", a stale cart version, payment from the phone, bad arguments, a replayed command) were refused with the documented status, and 5 of 5 legitimate controls accepted ([`evidence/forged-commands.json`](evidence/forged-commands.json), [`scripts/attacks.ts`](scripts/attacks.ts)).
+
 ```mermaid
 stateDiagram-v2
   [*] --> idle
-  idle --> connected: QR claim
+  idle --> connected: QR claim or code
   idle --> ordering: touch start
-  connected --> ordering: dine option
-  ordering --> ordering: QR claim mid-order keeps state
+  connected --> ordering: dine option or first item
   ordering --> confirming: requestCheckout
   confirming --> ordering: more, or cart changed
-  confirming --> paying: confirmCheckout with new utterance and cartVersion
-  paying --> confirming: edit order (back to the review)
+  confirming --> paying: confirmCheckout (tap, or a new "yes" after 1.5 s)
+  paying --> confirming: edit order
   paying --> paid: card action with kioskToken
-  paid --> [*]: new session after 10 s
-  idle --> expired: 10 min, kiosk opens a new session and QR
-  connected --> expired: 10 min idle
   ordering --> expired: 10 min idle
-  confirming --> expired: 10 min idle
-  paying --> expired: 10 min idle
 ```
 
-### Why the AI cannot pay
-Tool arguments come from the browser, so the server is the only place that can be trusted (ADR-005, ADR-006 in `docs/ADR.md`).
-- **One door for every change.** Every state change is a `POST /api/command` with a `commandId`, an actor token and zod-validated arguments, applied in a Firestore transaction. Names, prices and options come only from menu data, never from arguments.
-- **Actor tokens.** The one-use QR claim token becomes a `deviceToken` for the phone; the kiosk holds a `kioskToken`. Only SHA-256 hashes are stored, in a server-only collection. Each actor may send only its own commands.
-- **Confirm rule.** `confirmCheckout` is accepted only in `confirming`, with a matching `cartVersion`, and either a tap on the confirm card or, from the AI, a new user utterance at least 1.5 s after the card appeared. If the kiosk opened or reopened the review, only a tap confirms.
-- **Payment is the kiosk's.** `paid` comes only from the kiosk's card action with the `kioskToken`. The phone's token cannot send it.
+### Where to check each claim
 
-More controls (rate limits, idempotency, no free text in public documents) are in `docs/SECURITY.md`.
+| Claim | Where it lives |
+|---|---|
+| Confirm rule and payment states | `isConfirmed` and the `confirmCheckout` / `cardAction` cases in [`src/lib/commands/machine.ts`](src/lib/commands/machine.ts#L119); tests in [`machine.test.ts`](src/lib/commands/machine.test.ts) |
+| Who may send what | `ACTOR_COMMANDS`, `ACTOR_SOURCES` in [`src/lib/commands/actors.ts`](src/lib/commands/actors.ts) |
+| The command endpoint and its order of checks | [`src/app/api/command/route.ts`](src/app/api/command/route.ts), `runCommand` in [`src/lib/session/service.ts`](src/lib/session/service.ts#L240), schemas in [`src/lib/commands/schemas.ts`](src/lib/commands/schemas.ts) |
+| Prices only from menu data | [`src/lib/commands/cart.ts`](src/lib/commands/cart.ts), menus in [`data/kiosks/`](data/kiosks/) |
+| Firestore transactions and the SSE stream | [`src/lib/store/firestore.ts`](src/lib/store/firestore.ts#L73), [`src/app/api/session/[id]/events/route.ts`](src/app/api/session/%5Bid%5D/events/route.ts) |
+| Gemini tool declarations | `toolDeclarations` in [`src/lib/agent/tools.ts`](src/lib/agent/tools.ts#L19) |
+| Pinned Live token | `geminiTokenIssuer` in [`src/lib/agent/live.ts`](src/lib/agent/live.ts#L92) |
+| Voice path choice and relay | `startLiveVoice` in [`src/lib/agent/liveBackend.ts`](src/lib/agent/liveBackend.ts#L126); only `realtimeInput`, `clientContent` and `toolResponse` pass the relay ([`voice-relay/relay.ts`](voice-relay/relay.ts#L54)) |
+| Text fallback to Vertex AI and the prompt cache | [`src/lib/agent/model.ts`](src/lib/agent/model.ts), [`src/lib/agent/cache.ts`](src/lib/agent/cache.ts) |
+| Rate limits and daily budgets | [`src/lib/limits/ip.ts`](src/lib/limits/ip.ts), [`src/lib/agent/live.ts`](src/lib/agent/live.ts#L136) |
+| KIBO Learn finish gate (≥ 3 passing self-tests, every option group used, coverage audit, lint) | [`spikes/kibo-learn/learner.mjs`](spikes/kibo-learn/learner.mjs#L209), [`spikes/kibo-learn/audit.mjs`](spikes/kibo-learn/audit.mjs) |
+| Replay on a learned kiosk, checked against the kiosk's own total | `createBridge` in [`src/lib/bridge/bridge.ts`](src/lib/bridge/bridge.ts#L160), [`src/lib/bridge/verify.ts`](src/lib/bridge/verify.ts), `bridgeReport` in [`machine.ts`](src/lib/commands/machine.ts) |
+| Every number below | [`docs/plan/NUMBERS.md`](docs/plan/NUMBERS.md), then the evidence file named next to it |
 
-## Google Cloud and Gemini
-- **Gemini Live (`gemini-3.8-live`)** for voice. The phone connects directly with a one-use ephemeral token that the server issues only to a valid `deviceToken`; the model, instructions (with the whole menu and the current cart) and tools are pinned in the token with `liveConnectConstraints`, so a browser cannot change them.
-- **Gemini Flash (`gemini-3.8-flash`)** with function calling for the text agent (`/api/chat`), the fallback when there is no microphone. Voice and text share one agent definition in `src/lib/agent`.
-- **9 tools:** `setDineOption`, `addToCart`, `updateCart`, `removeFromCart`, `undoLastChange`, `offerChoices`, `callStaff`, `requestCheckout`, `confirmCheckout`. Mutating tools return the updated cart.
-- **Firestore** is the single source of truth: one session document per order, every write in a transaction. The server listens with the Admin SDK `onSnapshot` and streams the public session to each screen over Server-Sent Events (SSE, one long HTTP response that pushes updates). Browsers never touch Firestore; the security rules deny every client read and write.
-- **Cloud Run** in `asia-northeast3`, min 1 and max 3 instances, one Next.js app for the screens and the API.
-- **Secret Manager** holds the Gemini API key.
-- **KIBO Learn** runs Gemini on Vertex AI offline, during learning only (`spikes/`).
+## KIBO Learn
 
-## Evidence
-Measured rows from the evidence ledger in `docs/TESTING.md`. Each number comes from the file next to it.
+For kiosks with no integration, Gemini explores the kiosk's web screen once (Playwright, accessibility tree and the tappable labels), writes a **skill** (catalog plus click recipes), and may finish only after the skill passes its own AI-free self-tests and a coverage audit. Every order after that is a deterministic replay with no AI; the in-page bridge checks the kiosk's own total, and on a mismatch nothing is added and staff is called.
+- **See it:** [`/learn`](https://kibo-407514467119.asia-northeast3.run.app/learn) replays recorded learning runs turn by turn; [`/demo`](https://kibo-407514467119.asia-northeast3.run.app/demo) "Pizza shop" orders on a learned kiosk and marks every tap KIBO replays.
+- **Getting onto a real kiosk:** kiosks that share menu data use a direct adapter (`data/kiosks/*.json`). On a web kiosk the bridge is one script in the page, added by the vendor or store (script tag, kiosk-browser extension or WebView injection). Native kiosk apps are roadmap. There are no vendor or store partnerships yet.
+- Details: [`docs/KIBO_LEARN.md`](docs/KIBO_LEARN.md), [`spikes/blind-kiosks/`](spikes/blind-kiosks/).
+
+## Results
+
+Every value comes from [`docs/plan/NUMBERS.md`](docs/plan/NUMBERS.md) and the evidence file next to it.
 
 | Claim | Value | Evidence |
 |---|---|---|
-| Agent evaluation (text agent, `/api/chat` path) | 68/70 cases passed (Korean, English and 7 more languages typed), `gemini-3.8-flash` on Vertex AI, 10-14, cases written by the KIBO team (not an external benchmark); per request median 5.7 s, p90 11.9 s; until the first command is applied median 3.4 s | `evals/results/2026-10-14T20-26.md` |
-| Typed hero order on the deployed service | 6 typed turns to `/api/chat`, one after another, from a laptop in Seoul: median 4.8 s per turn (1.9–6.7 s), one run | `evidence/prod-latency.json` |
-| Voice hero order on `/demo` (Gemini Live) | 2/2 runs passed on the current fixtures (English, Korean); end of speech → kiosk highlight median 1,833 ms; → first AI audio median 2,708 ms (target ≤ 2 s, missed). Through the Vertex AI relay: 2/2, 1,641 ms and 2,611 ms. All attempts on record, both paths and both fixture versions: 24, 17 passed, 6 failed upstream (the API key's credits ran out, I-104), 1 failed in the model (an add-and-undo loop, I-115). Synthetic TTS voice on a laptop, not a real phone | `evidence/voice-e2e.json`, `evidence/voice-e2e-relay.json` |
-| Forged commands against a local production build | 37 of 37 refused with the documented status (wrong or missing token, AI confirm without a tap or new "yes", stale cart version, payment from the phone, bad arguments, replayed command); 5 of 5 legitimate controls accepted | `evidence/forged-commands.json` |
-| Touch hero order on `/kiosk` | 24 taps, options picked while adding (automated Playwright run, taps only, not a human timing). Changing an option after adding needs delete and re-add on this kiosk: 41 taps (`evidence/touch-hero.json`) | `evidence/touch-hero-efficient.json` |
-| Lighthouse 13.5.0 (automated, local production build, not the deployed URL; median of 3 loads) | Accessibility, Best Practices and SEO 100 on `/` (desktop and mobile), `/demo` (desktop), `/assistant` (mobile) and `/kiosk` (desktop); Performance 100, 98, 100, 88 and 99 | `evidence/lighthouse.json` |
-| KIBO Learn, round 4: 2 kiosks built by separate AI agents, never seen before their run, learner frozen first | both learned (9.6, 14.2 min), items 62/62; 20 unseen orders without AI: **18 correct, 2 refused safely, 0 unsafe**; the skill's own total differed from the kiosk's in 2 of the 18 orders that reached one (I-197); learning cost $0.79 for both | `spikes/blind-kiosks/ROUND4.md`, `spikes/blind-kiosks/results/bk{9-bunsik,10-chicken}/final/grade-v2.json`, `evidence/learn-cost.json` |
-| KIBO Learn, every never-seen kiosk so far (rounds 2–4, 6 kiosks, each new to that round's learner) | 60 orders: 32 correct, 15 refused safely, **3 unsafe** (round 2's take-out orders, I-195), 10 not learned (one kiosk never finished); skill total differed in 6 of the 35 orders that reached a kiosk total | `spikes/blind-kiosks/ROUND4.md`, `spikes/blind-kiosks/RESULTS.md`, `spikes/blind-kiosks/ROUND3.md` |
-| KIBO Learn, 4 test kiosks, learner before → after its improvements | finished 2 → 4 of 4; items 57 → 134 of 134; 40 unseen orders correct 5 → 31, **unsafe 5 → 5**; in the final, the skill's own total differed from the kiosk's in 3 of the 31 orders that reached one (I-197). The learner was improved from these kiosks' baseline failures (dev set only), so the final is not a clean blind result | `spikes/blind-kiosks/RESULTS.md`, `spikes/blind-kiosks/results/bk*/{baseline,final}/grade-v2.json` |
-| KIBO Learn on our pizza kiosk (the learner's development kiosk, not blind) | newest run: learned in 5.2 min, 35 turns; 4/4 unseen orders replayed without AI (1.6–2.2 s each, offline runner), plus 1 planted rule break caught | `spikes/blind-kiosks/results/dev/gemini-doughhouse-round3/` |
-| Bridge replay inside the app (`/learned/doughhouse`) | 4 commands replayed and verified, 71–525 ms each; a cart edited by hand on the kiosk was caught (one automated run, 10-13) | `evidence/bridge-replay.json` |
+| Text agent evaluation | 68 of 70 cases (Korean, English and 7 more languages typed), `gemini-3.8-flash` on Vertex AI, 10-14; per request median 5.7 s, p90 11.9 s; until the first command median 3.4 s. Cases written by the KIBO team, not an external benchmark | [`evals/results/2026-10-14T20-26.md`](evals/results/2026-10-14T20-26.md) |
+| Typed order on the deployed service | median 4.8 s per turn (6 typed turns, 1.9–6.7 s), one run from a laptop in Seoul | [`evidence/prod-latency.json`](evidence/prod-latency.json) |
+| Voice order on `/demo` | 2/2 runs passed direct (English, Korean): end of speech → kiosk highlight median 1,833 ms, → first AI audio 2,708 ms (target ≤ 2 s, missed). Through the Vertex AI relay 2/2: 1,641 ms and 2,611 ms. All attempts on record: 24, 17 passed, 6 failed upstream (the API key's credits ran out), 1 failed in the model. Synthetic voice on a laptop, not a real phone | [`evidence/voice-e2e.json`](evidence/voice-e2e.json), [`evidence/voice-e2e-relay.json`](evidence/voice-e2e-relay.json) |
+| Cost per hero order | text $0.0080, voice $0.0885 (median of 3; Gemini API list prices) | [`evidence/cost-per-order.json`](evidence/cost-per-order.json) |
+| Forged commands | 37 of 37 refused; 5 of 5 legitimate controls accepted | [`evidence/forged-commands.json`](evidence/forged-commands.json) |
+| Touch hero order on `/kiosk` | 24 taps (automated run, taps only) | [`evidence/touch-hero-efficient.json`](evidence/touch-hero-efficient.json) |
+| Lighthouse 13.5.0 (local production build) | Accessibility, Best Practices and SEO 100 on every page; Performance 100, 98, 100, 88 and 99 | [`evidence/lighthouse.json`](evidence/lighthouse.json) |
+| KIBO Learn, 2 kiosks never seen before their run (latest learner, frozen first) | items 62/62; 20 orders without AI: **18 correct, 2 refused safely, 0 unsafe**; the skill's own total differed from the kiosk's in 2 of 18; learning $0.79 for both | [`spikes/blind-kiosks/ROUND4.md`](spikes/blind-kiosks/ROUND4.md), [`evidence/learn-cost.json`](evidence/learn-cost.json) |
+| KIBO Learn, every never-seen kiosk so far (6 kiosks, rounds 2–4) | 60 orders: 32 correct, 15 refused safely, **3 unsafe**, 10 not learned (one kiosk never finished); skill total differed in 6 of the 35 that reached a kiosk total | [`ROUND4.md`](spikes/blind-kiosks/ROUND4.md), [`ROUND3.md`](spikes/blind-kiosks/ROUND3.md), [`RESULTS.md`](spikes/blind-kiosks/RESULTS.md) |
+| KIBO Learn, 4 test kiosks, before → after the learner's improvements | finished 2 → 4 of 4; items 57 → 134 of 134; orders correct 5 → 31 of 40, **unsafe 5 → 5**; skill total differed in 3 of 31. Not a blind result: the learner was improved from these kiosks' baseline failures | [`RESULTS.md`](spikes/blind-kiosks/RESULTS.md) |
+| Bridge replay inside the app (`/learned/doughhouse`) | 4 commands replayed and verified, 71–525 ms each; a cart edited by hand on the kiosk was caught (one automated run) | [`evidence/bridge-replay.json`](evidence/bridge-replay.json) |
 
-All blind kiosks are synthetic web kiosks, one run each; every learning run used the finish gate (≥ 3 passing self-tests and a coverage audit). The groups above are never added together. OpenAI runs in `spikes/` were development aids only and are not quoted (`spikes/README.md`). Every published number and where it appears: `docs/plan/NUMBERS.md`.
+All test kiosks are synthetic web kiosks built by separate AI agents, one run each; the groups above are never added together. OpenAI runs in `spikes/` were development aids only and are never quoted ([`spikes/README.md`](spikes/README.md)).
 
-### Known limits
-- **KIBO Learn covers web and webview kiosks only**, and runs as offline experiments; in-app replay on a learned kiosk is not built yet. Native kiosk apps are roadmap.
-- **Learned kiosks will support fewer edits:** no line edits (remove + add instead), undo only of the last add; quantity options and conditional option groups are still weak (`docs/KIBO_LEARN.md`).
-- **Screens in Korean and English.** The AI also answers in Japanese, Chinese (Simplified), Spanish, Vietnamese, French, Thai and Indonesian, tested by typing only (`evidence/live-languages.json`); speaking them is not tested. The kiosk UI starts in Korean.
+## Known limits
+- **KIBO Learn covers web and webview kiosks.** Learning runs offline; replay runs in the app. Native kiosk apps are roadmap.
+- **Learned kiosks support fewer edits:** no line edits (remove and add instead), undo only of the last add, payment on the kiosk itself; per-person prices and count options are still weak ([`docs/KIBO_LEARN.md`](docs/KIBO_LEARN.md)).
+- **Languages:** the seven AI-only languages were tested by typing; speaking them is not tested ([`evidence/live-languages.json`](evidence/live-languages.json)).
 - **Virtual payment.** No real payment, POS, coupons or memberships.
-- **Numbers from automated runs are labelled as such.** Voice latency was measured with a synthetic voice on a laptop; real-phone and touch-vs-voice measurements are still planned.
+- **Automated measurements.** Voice latency used a synthetic voice on a laptop; real-phone and human touch-vs-voice timings are not measured yet.
+- Open issues are logged in [`docs/ISSUE.md`](docs/ISSUE.md).
 
-## Run locally
+## Run it yourself in 5 minutes
 Needs Node 24.
 ```bash
+git clone <this repo> kibo && cd kibo
+cp .env.example .env        # optional: add GEMINI_API_KEY; never commit .env
 npm ci
-echo "GEMINI_API_KEY=<your key>" > .env   # git-ignored; never commit it; used for voice and the text agent
-gcloud auth application-default login      # the text agent's Vertex AI fallback (project kibo-2026)
-npm run dev                                # http://localhost:3000, in-memory store by default
+npm run dev                 # http://localhost:3000, in-memory store, no Google Cloud needed for the screens
 ```
-Without a key voice answers with an error and the text agent falls back to Vertex AI. `GEMINI_TEXT_BACKEND=api` or `vertex` in `.env` pins the text agent to one backend.
+Open http://localhost:3000/demo. Touch ordering on `/kiosk` works without any key. Typing needs `GEMINI_API_KEY`, or `gcloud auth application-default login` for the Vertex AI fallback; voice needs `GEMINI_API_KEY`.
 
 Tests:
 ```bash
 npm test                # unit tests (Vitest)
 npm run test:e2e        # Playwright E2E, in-memory store, no model calls
-npm run test:e2e:live   # @live tests against real Gemini (needs GEMINI_API_KEY)
+npm run test:e2e:live   # @live tests against real Gemini (needs a key)
 npm run qa:ui           # UI checks: axe, sizes, reflow, screenshots
-npm run eval:agent      # agent evaluation against real Gemini on Vertex AI (gcloud ADC)
+npm run eval:agent      # agent evaluation against real Gemini
+npm run check:attacks   # forged commands against a local production build
+npm run scan:repo       # secrets and large files in history and the working tree
 ```
 
-Deploy (needs gcloud and access to the project; the API key comes from Secret Manager):
-```bash
-sh scripts/deploy.sh
-```
+Deploy (needs gcloud access to the project; the key comes from Secret Manager): `sh scripts/deploy-voice.sh`, then `VOICE_RELAY_URL=wss://<kibo-voice host>/ws SHORT_APP_URL=kibo-2026.web.app sh scripts/deploy.sh` ([`docs/plan/OPERATIONS.md`](docs/plan/OPERATIONS.md)).
+
+## Development timeline
+All dates are 2026, KST. Submissions close 2026-10-19 03:29; judging runs 10-19 to 11-06.
+
+| Date | What happened |
+|---|---|
+| 10-11 | Google Cloud project created. KIBO Learn experiments: learner, driver, audit and AI-free runner, our pizza kiosk (Doughhouse), and a café kiosk built blind by a separate agent (`spikes/kibo-learn/`, `spikes/blind-kiosk/`). |
+| 10-12 15:06 | First commit (`ebd4703`): the 10-11 experiments and their results, the UI prototype (`design/prototype/`), generated menu photos, the first docs and an empty Next.js app. Most of its 25,892 lines are `package-lock.json` (6,865) and recorded learning results (skills, logs, answer key). |
+| 10-12 to 10-13 | Phases 1–5 (`phases/`): menu data, cart engine, state machine, Firestore store, API routes; the kiosk; the phone assistant and text agent; Gemini Live voice; deploy, landing page and README. |
+| 10-13 | Phases 6–12: in-app learned kiosk and bridge; Gemini on Vertex AI and the airport rail ticket machine; `/demo` scenarios and "What the AI did"; polish; footage; security audit, prompt cache, load and Lighthouse checks; the phone app, 6-digit pairing, Firebase Hosting short address and the `kibo-voice` relay. |
+| 10-13 to 10-14 | Phase 13: six blind test kiosks built by separate agents, a grader, baseline and final learning runs. |
+| 10-14 | KIBO Learn rounds 3 and 4 on side branches, each measured on two fresh kiosks, merged during phase 14. Phase 14: English subtitles on the kiosk, flow fixes, kiosk polish, visible replay, nine AI languages, faster replies, sourced impact content, one source of truth for numbers, final pictures, this README. |
+
+Each phase is a list of small steps run one at a time (`phases/<phase>/step*.md`); every step ends with its tests and is committed as `feat(<phase>): step N — <name>`, so the history shows the build in order. The harness that ran the steps is a local tool and is not part of the submission.
 
 ## Repository map
 | Folder | What is in it |
 |---|---|
-| `src/` | Next.js app: screens (`/kiosk`, `/assistant`, `/demo`), API routes, agent, commands, store |
-| `data/` | Menu data for the MALO BURGER kiosk (`data/kiosks/malo.json`) |
-| `public/` | Static files: logo, menu photos, landing captures, the microphone audio worklet |
-| `e2e/` | Playwright E2E tests, UI QA specs (`e2e/qa/`) and voice fixtures |
-| `evals/` | Agent evaluation cases and results |
-| `evidence/` | Saved measurements cited above |
-| `scripts/` | Deploy, agent evaluation, landing captures, voice fixtures, agent-session hooks |
-| `spikes/` | KIBO Learn development experiments (see `spikes/README.md`) |
-| `design/` | Brand logo, generated menu photos, the UI prototype |
-| `docs/` | Product, UX, architecture, decisions, security, testing, issue log |
-| `phases/` | Step-by-step build plan and QA reports |
+| `src/` | Next.js app: screens, API routes, agent, commands, store, bridge |
+| `voice-relay/` | The `kibo-voice` Cloud Run service |
+| `data/`, `skills/` | Menu data for the direct kiosks; the reviewed learned skill |
+| `public/` | Static files: menu photos, landing captures, the learned kiosk page, recorded learning runs (`public/learn/`) |
+| `e2e/` | Playwright E2E tests, UI QA specs (`e2e/qa/`), voice fixtures |
+| `evals/`, `evidence/` | Agent evaluation cases and results; saved measurements |
+| `scripts/` | Deploy, evaluation, measurements, captures, checks |
+| `spikes/` | KIBO Learn: learner, blind test kiosks and graders |
+| `design/` | Logo, generated menu photos, the UI prototype (reference only) |
+| `docs/` | Product, UX, architecture, decisions, security, testing, issues |
+| `phases/` | The step-by-step build plan and QA reports |
 
 ## Credits
 - **Ideas, reimplemented, no code copied:** browser-harness (browser-use): save what an agent learns as reusable skills; jev-browser: turn clickable elements into a candidate list; dev-browser and Aside: read the accessibility tree, act, verify.
 - **Fonts:** IBM Plex Sans KR and Space Grotesk, SIL Open Font License.
-- **Menu photos** were generated offline with image generation tools (Codex image generation; earlier ones with Gemini image generation). They are design assets, not product AI.
-- **Brands:** MALO BURGER, Doughhouse and Gureum Darak Coffee are fictional. No real brands, logos, menu photos or store screens.
-- Harness tooling used during development is local and not part of the submission.
+- **Menu photos** were generated offline with image generation tools (Codex image generation; earlier ones with Gemini image generation). They are design assets, not product AI. Voice test fixtures are Gemini TTS; no real person's voice.
+- **Brands:** MALO BURGER, SKYLINE AIRPORT RAIL, Doughhouse and every test kiosk are fictional. No real brands, logos, menu photos or store screens.
 
 Team malo: Sungmin Cho, Ye Seul Ahn.
 
 ## License
-All rights reserved, for now. The team will choose a license before the repository goes public.
+MIT, see [`LICENSE`](LICENSE).
