@@ -1,36 +1,36 @@
 {
-  "date": "2026-10-14T15:50:01.307Z",
+  "date": "2026-10-14T16:33:46.460Z",
   "kiosk": "doughhouse",
   "note": "automated Playwright run (e2e/learned.spec.ts) on a laptop, dev server, memory store, no AI. replayMs: bridge replay and check of the kiosk page, before the report. endToEndMs: phone command sent until the bridge's report was accepted",
   "commands": [
     {
       "command": "setDineOption eat_in",
-      "replayMs": 194,
-      "endToEndMs": 1326,
+      "replayMs": 196,
+      "endToEndMs": 1374,
       "ok": true
     },
     {
       "command": "addToCart pepperoni large thin bacon olive",
-      "replayMs": 636,
-      "endToEndMs": 3835,
+      "replayMs": 633,
+      "endToEndMs": 3852,
       "ok": true
     },
     {
       "command": "addToCart cola 1.25L",
-      "replayMs": 321,
-      "endToEndMs": 1820,
+      "replayMs": 323,
+      "endToEndMs": 1826,
       "ok": true
     },
     {
       "command": "removeFromCart cola",
-      "replayMs": 85,
-      "endToEndMs": 807,
+      "replayMs": 73,
+      "endToEndMs": 805,
       "ok": true
     },
     {
       "command": "addToCart garlic dip (kiosk cart edited by hand)",
-      "replayMs": 242,
-      "endToEndMs": 1815,
+      "replayMs": 245,
+      "endToEndMs": 1812,
       "ok": false
     }
   ]
