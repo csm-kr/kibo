@@ -50,3 +50,11 @@ qa-output/
 # Playwright outputs
 test-results/
 playwright-report/
+
+# Local-only (14-final:9 repo audit, orchestrator 10-14): agent worktrees, a private tool
+# written for other products, and internal planning/hand-off notes.
+.claude/worktrees/
+.claude/skills/motion-demo-video/
+phases/HANDOFF.md
+docs/plan/STRATEGY.md
+docs/plan/WIN_PLAN.md
