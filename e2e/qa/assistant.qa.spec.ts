@@ -443,10 +443,14 @@ test("P3 at 360×800 with larger text: the AI's reply and its choices stay above
       command(request, deviceToken, { sessionId: created.sessionId, type, args, source: "text", utteranceSeq: 1 });
     await ai("addToCart", { itemId: "bulgogi_burger", variant: "set", qty: 1, selections: { side: ["fries_l"], drink: ["cider"] } });
     await ai("offerChoices", { templateId: "upsell", choices: [{ kind: "item", id: "soft_cone" }, { kind: "item", id: "apple_pie" }] });
+    // As with the real model, the choices reach the phone before the reply (I-270).
+    await new Promise((r) => setTimeout(r, 500));
     await route.fulfill({
       json: {
         ok: true,
-        reply: "Added Bulgogi burger set with Fries (L) and Cider. Would you like a dessert too?",
+        // One word longer than before, so the reply and its choices no longer fit together at 360×800 with larger
+        // text: the last choice was left half under the dock (I-270).
+        reply: "Added one Bulgogi burger set with Fries (L) and Cider. Would you like a dessert too?",
         status: "ordering",
         cart: [],
         total: 0,

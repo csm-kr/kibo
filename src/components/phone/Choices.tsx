@@ -44,7 +44,7 @@ export function Choices(props: {
   const decline = props.onDecline ? declineLabel(pending.templateId, locale) : null;
   if (choices.length === 0) return null;
   return (
-    <section aria-labelledby={titleId} className="flex flex-col gap-3">
+    <section data-choices aria-labelledby={titleId} className="flex flex-col gap-3">
       <h2 id={titleId} className="text-xl font-bold">
         {choiceQuestion(kiosk, pending, locale)}
       </h2>

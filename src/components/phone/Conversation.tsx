@@ -70,16 +70,19 @@ export function LastMessage({ messages, locale }: { messages: ChatMessage[]; loc
 
 /**
  * Scrolls the phone's scroll area so everything from the top of `from` to the bottom of `to` is in view, with
- * `reserve` px kept free at the bottom (for the cart summary that may appear there). When it does not fit, its top
- * goes to the top, so the start of a reply is never cut. Instant, so reduced motion needs nothing more.
+ * `reserve` px kept free at the bottom (for the cart summary that may appear there). When it does not fit, it starts
+ * at `orFrom` instead (the choices, which repeat the reply's question: their last button was half under the dock with
+ * larger text, I-270); when that does not fit either, its top goes to the top, so the start is never cut. Instant, so
+ * reduced motion needs nothing more.
  */
-export function keepInView(from: Element | null, to: Element | null, reserve = 0) {
+export function keepInView(from: Element | null, to: Element | null, reserve = 0, orFrom: Element | null = null) {
   const area = from?.closest("[data-phone-scroll]");
   if (!from || !to || !area) return;
   const box = area.getBoundingClientRect();
   const gap = 16;
   const top = from.getBoundingClientRect().top - gap;
   const bottom = to.getBoundingClientRect().bottom + gap + reserve;
+  if (bottom - top > box.height && orFrom) return keepInView(orFrom, to, reserve);
   if (top < box.top || bottom - top > box.height) area.scrollTop += top - box.top;
   else if (bottom > box.bottom) area.scrollTop += bottom - box.bottom;
 }

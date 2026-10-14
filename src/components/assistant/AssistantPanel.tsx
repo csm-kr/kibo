@@ -355,7 +355,7 @@ export function AssistantPanel(props: Props) {
     // Room for the cart summary, which appears once the card below scrolls out of view.
     const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
     const reserve = mode === "phone" && itemsInCart > 0 && !choicesShown && !summaryShown ? SUMMARY_REM * rootPx : 0;
-    keepInView(bubbles[bubbles.length - 1] ?? turn, turn, reserve);
+    keepInView(bubbles[bubbles.length - 1] ?? turn, turn, reserve, turn.querySelector("[data-choices]"));
   });
   useEffect(() => showTurn(), [lastId, working, choicesShown, pendingKey]);
 
