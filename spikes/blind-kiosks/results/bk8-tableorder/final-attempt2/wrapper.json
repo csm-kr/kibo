@@ -1,0 +1,9 @@
+{
+  "kioskId": "bk8-tableorder",
+  "code": 0,
+  "signal": null,
+  "killedAt30min": false,
+  "startedAt": "2026-10-14T03:20:38.589Z",
+  "endedAt": "2026-10-14T03:42:40.315Z",
+  "minutes": 22
+}

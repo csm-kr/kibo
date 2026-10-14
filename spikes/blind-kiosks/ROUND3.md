@@ -74,6 +74,16 @@ Written and committed before either fresh kiosk was learned. The orchestrator re
 - **Staff calls (bk8 h5):** not order lines; the order total excludes them, as the key does.
 - **Everything else:** grader v2 with round 3's review totals and interrupts, at this commit; one learning run per kiosk (`gemini-3.8-flash`, 2M input-token cap, 30 min kill, `TRACE_DIR`), no rerun except once after a crash; both reported whatever the result.
 
+### Fresh results (round 3, learner `abb8495`/`f45f071` = learning logic of `ea28477`; graded with the pre-registered rules)
+| Kiosk | Attempt | Learning | Items / prices | Orders correct / safe refusal / unsafe / not learned |
+|---|---|---|---|---|
+| `bk7-bubbletea` | 1 (in parallel with bk8) | finished, 76 turns, 27.3 min, 1,694,030 input tokens | 31/31, 31/31 | **0 / 10 / 0 / 0** |
+| `bk8-tableorder` | 1 (in parallel with bk7, Vertex HTTP 429s) | killed at the 30 min cap, turn ~87, last self-test passing | — | 0 / 0 / 0 / 10 |
+| `bk8-tableorder` | 2 (alone, after the kill; the protocol's one rerun) | stopped at the 2M input-token cap, 99 turns, 22.0 min, 5 self-tests (1 passed; 4 option groups never covered) | — | 0 / 0 / 0 / 10 |
+- bk7: every order was refused before the first tap because the skill has no sweetness group: the learner hard-clicked `50%` in `addToCart` and noted that the % options conflicted with the lint (`skill.json` notes); it also always declines the set modal. The audit and the coverage gate did not catch a required choice left out of the skill (dropping the group made coverage easier). Nothing was ordered wrong.
+- bk8: the stricter gate (every option group covered by a passing self-test, I-214) was not met within the caps; no skill, so nothing was ordered.
+- Both attempts of bk8 are reported; the first was a parallel run on a throttled Vertex, the second ran alone. Round 4 (`ROUND4.md`, branch `learn-r4`) treats bk7 and bk8 as informed from here on.
+
 ## Limits
 - One run per kiosk; run-to-run spread is unknown. The test kiosks are synthetic, built by AI agents from briefs.
 - The bk2, bk5 and bk6 reruns are informed and must never be quoted as unseen-kiosk results.

@@ -1,0 +1,35 @@
+{
+  "n": 20,
+  "at": "2026-10-14T03:22:17.356Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "고기"
+      }
+    ]
+  },
+  "resultSummary": "tapped 고기",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "고기"
+          }
+        ]
+      },
+      "resultSummary": "tapped 고기"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 6423,
+  "outputTokens": 23
+}

@@ -1,0 +1,43 @@
+{
+  "n": 57,
+  "at": "2026-10-14T03:25:50.849Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "라면사리"
+      },
+      {
+        "op": "click",
+        "label": "주문 담기"
+      }
+    ]
+  },
+  "resultSummary": "tapped 라면사리 → 주문 담기",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "라면사리"
+          },
+          {
+            "op": "click",
+            "label": "주문 담기"
+          }
+        ]
+      },
+      "resultSummary": "tapped 라면사리 → 주문 담기"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 12898,
+  "outputTokens": 40
+}

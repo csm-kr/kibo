@@ -1,0 +1,39 @@
+{
+  "n": 36,
+  "at": "2026-10-14T03:01:34.786Z",
+  "tool": "record",
+  "args": {
+    "kind": "item",
+    "names": [
+      "된장찌개",
+      "김치찌개",
+      "순두부찌개",
+      "부대찌개 (2인분)",
+      "갈비탕"
+    ]
+  },
+  "resultSummary": "recorded item 된장찌개, 김치찌개, 순두부찌개, 부대찌개 (2인분), 갈비탕",
+  "calls": [
+    {
+      "tool": "record",
+      "args": {
+        "kind": "item",
+        "names": [
+          "된장찌개",
+          "김치찌개",
+          "순두부찌개",
+          "부대찌개 (2인분)",
+          "갈비탕"
+        ]
+      },
+      "resultSummary": "recorded item 된장찌개, 김치찌개, 순두부찌개, 부대찌개 (2인분), 갈비탕"
+    }
+  ],
+  "discoveries": {
+    "items": 19,
+    "optionGroups": 13,
+    "categories": 3
+  },
+  "inputTokens": 8733,
+  "outputTokens": 1306
+}

@@ -1,0 +1,2600 @@
+{
+  "kiosk": "펄린당",
+  "categories": [
+    "밀크티",
+    "과일티",
+    "치즈폼",
+    "커피",
+    "스낵",
+    "겨울 시즌"
+  ],
+  "uiLabels": [
+    "전체삭제",
+    "취소",
+    "+",
+    "−",
+    "삭제",
+    "품절",
+    "음료만 주문할게요",
+    "스낵 세트로 변경",
+    "적립 안 함",
+    "휴대폰 번호로 적립",
+    "✕"
+  ],
+  "forbiddenLabels": [
+    "결제하기",
+    "⌂ 처음으로"
+  ],
+  "dineOptions": {
+    "eat_in": "매장에서 먹고 갈게요",
+    "take_out": "포장해 갈게요"
+  },
+  "recipes": {
+    "startOrder": [
+      {
+        "op": "click",
+        "label": "펄린당"
+      },
+      {
+        "op": "click",
+        "label": "{dineOption}"
+      }
+    ],
+    "addToCart": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "chooseOptions",
+        "steps": [
+          {
+            "op": "click",
+            "label": "{option}"
+          }
+        ]
+      },
+      {
+        "op": "clickIfVisible",
+        "label": "50%"
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "label": "+",
+            "within": "수량"
+          }
+        ]
+      },
+      {
+        "op": "click",
+        "role": "button",
+        "name": "담기"
+      },
+      {
+        "op": "clickIfVisible",
+        "label": "음료만 주문할게요"
+      }
+    ]
+  },
+  "cartTotalPattern": "합계\\s*([0-9,]+)원",
+  "interrupts": [
+    {
+      "text": "펄린당 스탬프 적립",
+      "dismiss": {
+        "op": "click",
+        "label": "적립 안 함"
+      }
+    }
+  ],
+  "review": {
+    "open": [
+      {
+        "op": "openReview",
+        "label": "주문하기"
+      }
+    ],
+    "totalPattern": "총 결제 금액\\s*([0-9,]+)원",
+    "close": [
+      {
+        "op": "click",
+        "label": "‹ 메뉴 추가"
+      }
+    ]
+  },
+  "notes": [
+    "당도 옵션(0%, 30%, 50%, 70%, 100%)은 가격 변동(0원)이 없고 린트 규칙과 충돌하여 기본값 50%로 자동 선택 처리함",
+    "포장 시 음료당 일회용컵 200원 추가되나 매장 식사는 추가 없음",
+    "알로에 및 그라스젤리는 품절 상태"
+  ],
+  "catalog": [
+    {
+      "name": "클래식 밀크티",
+      "category": "밀크티",
+      "price": 4300,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "온도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "ICE",
+              "priceDelta": 0
+            },
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도=ICE",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "select": [
+            {
+              "op": "click",
+              "label": "{option}",
+              "within": "토핑"
+            }
+          ],
+          "options": [
+            {
+              "name": "타피오카 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "화이트 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "코코넛 젤리",
+              "priceDelta": 500
+            },
+            {
+              "name": "푸딩",
+              "priceDelta": 700
+            },
+            {
+              "name": "팥",
+              "priceDelta": 600
+            },
+            {
+              "name": "밀크폼",
+              "priceDelta": 800
+            },
+            {
+              "name": "치즈폼",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "흑당 펄 밀크티",
+      "category": "밀크티",
+      "price": 5200,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "select": [
+            {
+              "op": "click",
+              "label": "{option}",
+              "within": "토핑"
+            }
+          ],
+          "options": [
+            {
+              "name": "타피오카 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "화이트 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "코코넛 젤리",
+              "priceDelta": 500
+            },
+            {
+              "name": "푸딩",
+              "priceDelta": 700
+            },
+            {
+              "name": "팥",
+              "priceDelta": 600
+            },
+            {
+              "name": "밀크폼",
+              "priceDelta": 800
+            },
+            {
+              "name": "치즈폼",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "얼그레이 밀크티",
+      "category": "밀크티",
+      "price": 4500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "온도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "ICE",
+              "priceDelta": 0
+            },
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도=ICE",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "select": [
+            {
+              "op": "click",
+              "label": "{option}",
+              "within": "토핑"
+            }
+          ],
+          "options": [
+            {
+              "name": "타피오카 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "화이트 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "코코넛 젤리",
+              "priceDelta": 500
+            },
+            {
+              "name": "푸딩",
+              "priceDelta": 700
+            },
+            {
+              "name": "팥",
+              "priceDelta": 600
+            },
+            {
+              "name": "밀크폼",
+              "priceDelta": 800
+            },
+            {
+              "name": "치즈폼",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "타로 밀크티",
+      "category": "밀크티",
+      "price": 4800,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "온도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "ICE",
+              "priceDelta": 0
+            },
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도=ICE",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "select": [
+            {
+              "op": "click",
+              "label": "{option}",
+              "within": "토핑"
+            }
+          ],
+          "options": [
+            {
+              "name": "타피오카 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "화이트 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "코코넛 젤리",
+              "priceDelta": 500
+            },
+            {
+              "name": "푸딩",
+              "priceDelta": 700
+            },
+            {
+              "name": "팥",
+              "priceDelta": 600
+            },
+            {
+              "name": "밀크폼",
+              "priceDelta": 800
+            },
+            {
+              "name": "치즈폼",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "우롱 밀크티",
+      "category": "밀크티",
+      "price": 4500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "온도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "ICE",
+              "priceDelta": 0
+            },
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도=ICE",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "select": [
+            {
+              "op": "click",
+              "label": "{option}",
+              "within": "토핑"
+            }
+          ],
+          "options": [
+            {
+              "name": "타피오카 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "화이트 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "코코넛 젤리",
+              "priceDelta": 500
+            },
+            {
+              "name": "푸딩",
+              "priceDelta": 700
+            },
+            {
+              "name": "팥",
+              "priceDelta": 600
+            },
+            {
+              "name": "밀크폼",
+              "priceDelta": 800
+            },
+            {
+              "name": "치즈폼",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "말차 밀크티",
+      "category": "밀크티",
+      "price": 4900,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "온도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "ICE",
+              "priceDelta": 0
+            },
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도=ICE",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "select": [
+            {
+              "op": "click",
+              "label": "{option}",
+              "within": "토핑"
+            }
+          ],
+          "options": [
+            {
+              "name": "타피오카 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "화이트 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "코코넛 젤리",
+              "priceDelta": 500
+            },
+            {
+              "name": "푸딩",
+              "priceDelta": 700
+            },
+            {
+              "name": "팥",
+              "priceDelta": 600
+            },
+            {
+              "name": "밀크폼",
+              "priceDelta": 800
+            },
+            {
+              "name": "치즈폼",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "자스민 밀크티",
+      "category": "밀크티",
+      "price": 4500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "온도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "ICE",
+              "priceDelta": 0
+            },
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도=ICE",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "select": [
+            {
+              "op": "click",
+              "label": "{option}",
+              "within": "토핑"
+            }
+          ],
+          "options": [
+            {
+              "name": "타피오카 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "화이트 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "코코넛 젤리",
+              "priceDelta": 500
+            },
+            {
+              "name": "푸딩",
+              "priceDelta": 700
+            },
+            {
+              "name": "팥",
+              "priceDelta": 600
+            },
+            {
+              "name": "밀크폼",
+              "priceDelta": 800
+            },
+            {
+              "name": "치즈폼",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "패션후르츠 그린티",
+      "category": "과일티",
+      "price": 4800,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "select": [
+            {
+              "op": "click",
+              "label": "{option}",
+              "within": "토핑"
+            }
+          ],
+          "options": [
+            {
+              "name": "타피오카 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "화이트 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "코코넛 젤리",
+              "priceDelta": 500
+            },
+            {
+              "name": "푸딩",
+              "priceDelta": 700
+            },
+            {
+              "name": "팥",
+              "priceDelta": 600
+            },
+            {
+              "name": "밀크폼",
+              "priceDelta": 800
+            },
+            {
+              "name": "치즈폼",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "망고 우롱티",
+      "category": "과일티",
+      "price": 5000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "select": [
+            {
+              "op": "click",
+              "label": "{option}",
+              "within": "토핑"
+            }
+          ],
+          "options": [
+            {
+              "name": "타피오카 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "화이트 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "코코넛 젤리",
+              "priceDelta": 500
+            },
+            {
+              "name": "푸딩",
+              "priceDelta": 700
+            },
+            {
+              "name": "팥",
+              "priceDelta": 600
+            },
+            {
+              "name": "밀크폼",
+              "priceDelta": 800
+            },
+            {
+              "name": "치즈폼",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "자몽 그린티",
+      "category": "과일티",
+      "price": 4800,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "온도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "ICE",
+              "priceDelta": 0
+            },
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도=ICE",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "select": [
+            {
+              "op": "click",
+              "label": "{option}",
+              "within": "토핑"
+            }
+          ],
+          "options": [
+            {
+              "name": "타피오카 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "화이트 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "코코넛 젤리",
+              "priceDelta": 500
+            },
+            {
+              "name": "푸딩",
+              "priceDelta": 700
+            },
+            {
+              "name": "팥",
+              "priceDelta": 600
+            },
+            {
+              "name": "밀크폼",
+              "priceDelta": 800
+            },
+            {
+              "name": "치즈폼",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "리치 자스민티",
+      "category": "과일티",
+      "price": 4900,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "select": [
+            {
+              "op": "click",
+              "label": "{option}",
+              "within": "토핑"
+            }
+          ],
+          "options": [
+            {
+              "name": "타피오카 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "화이트 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "코코넛 젤리",
+              "priceDelta": 500
+            },
+            {
+              "name": "푸딩",
+              "priceDelta": 700
+            },
+            {
+              "name": "팥",
+              "priceDelta": 600
+            },
+            {
+              "name": "밀크폼",
+              "priceDelta": 800
+            },
+            {
+              "name": "치즈폼",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "복숭아 우롱티",
+      "category": "과일티",
+      "price": 4900,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "select": [
+            {
+              "op": "click",
+              "label": "{option}",
+              "within": "토핑"
+            }
+          ],
+          "options": [
+            {
+              "name": "타피오카 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "화이트 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "코코넛 젤리",
+              "priceDelta": 500
+            },
+            {
+              "name": "푸딩",
+              "priceDelta": 700
+            },
+            {
+              "name": "팥",
+              "priceDelta": 600
+            },
+            {
+              "name": "밀크폼",
+              "priceDelta": 800
+            },
+            {
+              "name": "치즈폼",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "레몬 홍차",
+      "category": "과일티",
+      "price": 4300,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "온도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "ICE",
+              "priceDelta": 0
+            },
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도=ICE",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "select": [
+            {
+              "op": "click",
+              "label": "{option}",
+              "within": "토핑"
+            }
+          ],
+          "options": [
+            {
+              "name": "타피오카 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "화이트 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "코코넛 젤리",
+              "priceDelta": 500
+            },
+            {
+              "name": "푸딩",
+              "priceDelta": 700
+            },
+            {
+              "name": "팥",
+              "priceDelta": 600
+            },
+            {
+              "name": "밀크폼",
+              "priceDelta": 800
+            },
+            {
+              "name": "치즈폼",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "치즈폼 우롱티",
+      "category": "치즈폼",
+      "price": 5300,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "select": [
+            {
+              "op": "click",
+              "label": "{option}",
+              "within": "토핑"
+            }
+          ],
+          "options": [
+            {
+              "name": "타피오카 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "화이트 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "코코넛 젤리",
+              "priceDelta": 500
+            },
+            {
+              "name": "푸딩",
+              "priceDelta": 700
+            },
+            {
+              "name": "팥",
+              "priceDelta": 600
+            },
+            {
+              "name": "밀크폼",
+              "priceDelta": 800
+            },
+            {
+              "name": "치즈폼",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "치즈폼 홍차",
+      "category": "치즈폼",
+      "price": 5300,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "select": [
+            {
+              "op": "click",
+              "label": "{option}",
+              "within": "토핑"
+            }
+          ],
+          "options": [
+            {
+              "name": "타피오카 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "화이트 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "코코넛 젤리",
+              "priceDelta": 500
+            },
+            {
+              "name": "푸딩",
+              "priceDelta": 700
+            },
+            {
+              "name": "팥",
+              "priceDelta": 600
+            },
+            {
+              "name": "밀크폼",
+              "priceDelta": 800
+            },
+            {
+              "name": "치즈폼",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "치즈폼 딸기 그린티",
+      "category": "치즈폼",
+      "price": 5800,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "select": [
+            {
+              "op": "click",
+              "label": "{option}",
+              "within": "토핑"
+            }
+          ],
+          "options": [
+            {
+              "name": "타피오카 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "화이트 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "코코넛 젤리",
+              "priceDelta": 500
+            },
+            {
+              "name": "푸딩",
+              "priceDelta": 700
+            },
+            {
+              "name": "팥",
+              "priceDelta": 600
+            },
+            {
+              "name": "밀크폼",
+              "priceDelta": 800
+            },
+            {
+              "name": "치즈폼",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "치즈폼 말차 라떼",
+      "category": "치즈폼",
+      "price": 5800,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "select": [
+            {
+              "op": "click",
+              "label": "{option}",
+              "within": "토핑"
+            }
+          ],
+          "options": [
+            {
+              "name": "타피오카 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "화이트 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "코코넛 젤리",
+              "priceDelta": 500
+            },
+            {
+              "name": "푸딩",
+              "priceDelta": 700
+            },
+            {
+              "name": "팥",
+              "priceDelta": 600
+            },
+            {
+              "name": "밀크폼",
+              "priceDelta": 800
+            },
+            {
+              "name": "치즈폼",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "치즈폼 흑당 밀크티",
+      "category": "치즈폼",
+      "price": 5900,
+      "soldOut": true
+    },
+    {
+      "name": "아메리카노",
+      "category": "커피",
+      "price": 3000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 500
+            }
+          ]
+        },
+        {
+          "name": "온도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "ICE",
+              "priceDelta": 0
+            },
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도=ICE",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "샷 추가",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "에스프레소 샷"
+            }
+          ],
+          "options": [
+            {
+              "name": "에스프레소 샷",
+              "priceDelta": 500,
+              "maxQty": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "카페라떼",
+      "category": "커피",
+      "price": 3800,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 500
+            }
+          ]
+        },
+        {
+          "name": "온도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "ICE",
+              "priceDelta": 0
+            },
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도=ICE",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "샷 추가",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "에스프레소 샷"
+            }
+          ],
+          "options": [
+            {
+              "name": "에스프레소 샷",
+              "priceDelta": 500,
+              "maxQty": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "바닐라 라떼",
+      "category": "커피",
+      "price": 4200,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 500
+            }
+          ]
+        },
+        {
+          "name": "온도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "ICE",
+              "priceDelta": 0
+            },
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도=ICE",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "샷 추가",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "에스프레소 샷"
+            }
+          ],
+          "options": [
+            {
+              "name": "에스프레소 샷",
+              "priceDelta": 500,
+              "maxQty": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "흑당 카페라떼",
+      "category": "커피",
+      "price": 4500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 500
+            }
+          ]
+        },
+        {
+          "name": "온도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "ICE",
+              "priceDelta": 0
+            },
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도=ICE",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "샷 추가",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "에스프레소 샷"
+            }
+          ],
+          "options": [
+            {
+              "name": "에스프레소 샷",
+              "priceDelta": 500,
+              "maxQty": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "원앙 커피 밀크티",
+      "category": "커피",
+      "price": 4800,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 500
+            }
+          ]
+        },
+        {
+          "name": "온도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "ICE",
+              "priceDelta": 0
+            },
+            {
+              "name": "HOT",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "appliesWhen": "온도=ICE",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "샷 추가",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "quantity",
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "에스프레소 샷"
+            }
+          ],
+          "options": [
+            {
+              "name": "에스프레소 샷",
+              "priceDelta": 500,
+              "maxQty": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "펑리수",
+      "category": "스낵",
+      "price": 2500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "누가크래커",
+      "category": "스낵",
+      "price": 3500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "에그타르트",
+      "category": "스낵",
+      "price": 2800,
+      "soldOut": true
+    },
+    {
+      "name": "대만 카스테라",
+      "category": "스낵",
+      "price": 3800,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "name": "지파이",
+      "category": "스낵",
+      "price": 5900,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "맛 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "오리지널",
+              "priceDelta": 0
+            },
+            {
+              "name": "매콤",
+              "priceDelta": 0
+            },
+            {
+              "name": "치즈 시즈닝",
+              "priceDelta": 500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "군고구마 밀크티",
+      "category": "겨울 시즌",
+      "price": 5500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "토핑",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "select": [
+            {
+              "op": "click",
+              "label": "{option}",
+              "within": "토핑"
+            }
+          ],
+          "options": [
+            {
+              "name": "타피오카 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "화이트 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "코코넛 젤리",
+              "priceDelta": 500
+            },
+            {
+              "name": "푸딩",
+              "priceDelta": 700
+            },
+            {
+              "name": "팥",
+              "priceDelta": 600
+            },
+            {
+              "name": "밀크폼",
+              "priceDelta": 800
+            },
+            {
+              "name": "치즈폼",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "생강 흑당 밀크티",
+      "category": "겨울 시즌",
+      "price": 5300,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "토핑",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "select": [
+            {
+              "op": "click",
+              "label": "{option}",
+              "within": "토핑"
+            }
+          ],
+          "options": [
+            {
+              "name": "타피오카 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "화이트 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "코코넛 젤리",
+              "priceDelta": 500
+            },
+            {
+              "name": "푸딩",
+              "priceDelta": 700
+            },
+            {
+              "name": "팥",
+              "priceDelta": 600
+            },
+            {
+              "name": "밀크폼",
+              "priceDelta": 800
+            },
+            {
+              "name": "치즈폼",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "딸기 펄 우유",
+      "category": "겨울 시즌",
+      "price": 5800,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "M",
+              "priceDelta": 0
+            },
+            {
+              "name": "L",
+              "priceDelta": 700
+            }
+          ]
+        },
+        {
+          "name": "얼음량",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "type": "single",
+          "options": [
+            {
+              "name": "얼음 없음",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 적게",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 보통",
+              "priceDelta": 0
+            },
+            {
+              "name": "얼음 많이",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "토핑",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "type": "multi",
+          "select": [
+            {
+              "op": "click",
+              "label": "{option}",
+              "within": "토핑"
+            }
+          ],
+          "options": [
+            {
+              "name": "타피오카 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "화이트 펄",
+              "priceDelta": 500
+            },
+            {
+              "name": "코코넛 젤리",
+              "priceDelta": 500
+            },
+            {
+              "name": "푸딩",
+              "priceDelta": 700
+            },
+            {
+              "name": "팥",
+              "priceDelta": 600
+            },
+            {
+              "name": "밀크폼",
+              "priceDelta": 800
+            },
+            {
+              "name": "치즈폼",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

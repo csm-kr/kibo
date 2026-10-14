@@ -1,0 +1,18 @@
+{
+  "kioskId": "bk8-tableorder",
+  "provider": "gemini",
+  "model": "gemini-3.8-flash",
+  "startedAt": "2026-10-14T03:20:40.812Z",
+  "endedAt": "2026-10-14T03:42:40.284Z",
+  "gate": {
+    "tests": 5,
+    "testsPassedForFinish": false,
+    "audits": 5,
+    "auditOk": false,
+    "finished": false
+  },
+  "turns": 99,
+  "inputTokens": 2008512,
+  "cachedInputTokens": 1498107,
+  "outputTokens": 46224
+}

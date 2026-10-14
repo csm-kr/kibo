@@ -1,0 +1,714 @@
+{
+  "kiosk": "달무리화로",
+  "categories": [
+    "고기",
+    "식사·면",
+    "찌개",
+    "사이드",
+    "주류·음료",
+    "디저트"
+  ],
+  "uiLabels": [
+    "전체 삭제",
+    "✕",
+    "−",
+    "+",
+    "취소",
+    "주문 담기",
+    "돌아가기",
+    "예",
+    "아니오",
+    "삭제",
+    "품절"
+  ],
+  "forbiddenLabels": [
+    "결제하기",
+    "카드결제",
+    "🧾 주문 내역 0원",
+    "주문 내역",
+    "직원 호출",
+    "한국어"
+  ],
+  "dineOptions": {
+    "eat_in": "주문 시작"
+  },
+  "catalog": [
+    {
+      "name": "생삼겹살",
+      "category": "고기",
+      "price": 16000,
+      "soldOut": false,
+      "recipe": "meatRecipe"
+    },
+    {
+      "name": "숙성 목살",
+      "category": "고기",
+      "price": 16000,
+      "soldOut": false,
+      "recipe": "meatRecipe"
+    },
+    {
+      "name": "항정살",
+      "category": "고기",
+      "price": 18000,
+      "soldOut": false,
+      "recipe": "meatRecipe"
+    },
+    {
+      "name": "양념 돼지갈비",
+      "category": "고기",
+      "price": 15000,
+      "soldOut": false,
+      "recipe": "meatRecipe"
+    },
+    {
+      "name": "소갈비살",
+      "category": "고기",
+      "price": 24000,
+      "soldOut": false,
+      "recipe": "meatRecipe"
+    },
+    {
+      "name": "차돌박이",
+      "category": "고기",
+      "price": 19000,
+      "soldOut": true
+    },
+    {
+      "name": "우삼겹",
+      "category": "고기",
+      "price": 17000,
+      "soldOut": false,
+      "recipe": "meatRecipe"
+    },
+    {
+      "name": "냉면",
+      "category": "식사·면",
+      "price": 9000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "물/비빔 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "물",
+              "priceDelta": 0
+            },
+            {
+              "name": "비빔",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "사이즈 선택",
+          "required": false,
+          "min": 0,
+          "max": 1,
+          "select": [
+            {
+              "op": "click",
+              "label": "곱빼기"
+            }
+          ],
+          "options": [
+            {
+              "name": "곱배기",
+              "priceDelta": 2000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "막국수",
+      "category": "식사·면",
+      "price": 9000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "물/비빔 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "물",
+              "priceDelta": 0
+            },
+            {
+              "name": "비빔",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "사이즈 선택",
+          "required": false,
+          "min": 0,
+          "max": 1,
+          "select": [
+            {
+              "op": "click",
+              "label": "곱빼기"
+            }
+          ],
+          "options": [
+            {
+              "name": "곱배기",
+              "priceDelta": 2000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "후식 냉면",
+      "category": "식사·면",
+      "price": 5000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "물/비빔 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "물",
+              "priceDelta": 0
+            },
+            {
+              "name": "비빔",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "잔치국수",
+      "category": "식사·면",
+      "price": 7000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "사이즈 선택",
+          "required": false,
+          "min": 0,
+          "max": 1,
+          "select": [
+            {
+              "op": "click",
+              "label": "곱빼기"
+            }
+          ],
+          "options": [
+            {
+              "name": "곱배기",
+              "priceDelta": 2000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "공기밥",
+      "category": "식사·면",
+      "price": 1000,
+      "soldOut": false,
+      "recipe": "directRecipe"
+    },
+    {
+      "name": "철판 볶음밥",
+      "category": "식사·면",
+      "price": 4000,
+      "soldOut": false,
+      "recipe": "directRecipe"
+    },
+    {
+      "name": "열무 비빔밥",
+      "category": "식사·면",
+      "price": 8000,
+      "soldOut": false,
+      "recipe": "directRecipe"
+    },
+    {
+      "name": "된장찌개",
+      "category": "찌개",
+      "price": 8000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "추가 재료 선택",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "multi",
+          "options": [
+            {
+              "name": "라면사리",
+              "priceDelta": 1500
+            },
+            {
+              "name": "치즈",
+              "priceDelta": 2000
+            },
+            {
+              "name": "계란",
+              "priceDelta": 1000
+            },
+            {
+              "name": "두부 추가",
+              "priceDelta": 1500
+            },
+            {
+              "name": "우삼겹 추가",
+              "priceDelta": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "김치찌개",
+      "category": "찌개",
+      "price": 9000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "맵기 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "순한맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "매운맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "아주 매운맛",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "추가 재료 선택",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "multi",
+          "options": [
+            {
+              "name": "라면사리",
+              "priceDelta": 1500
+            },
+            {
+              "name": "치즈",
+              "priceDelta": 2000
+            },
+            {
+              "name": "계란",
+              "priceDelta": 1000
+            },
+            {
+              "name": "두부 추가",
+              "priceDelta": 1500
+            },
+            {
+              "name": "우삼겹 추가",
+              "priceDelta": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "순두부찌개",
+      "category": "찌개",
+      "price": 9000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "맵기 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "순한맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "매운맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "아주 매운맛",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "추가 재료 선택",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "multi",
+          "options": [
+            {
+              "name": "라면사리",
+              "priceDelta": 1500
+            },
+            {
+              "name": "치즈",
+              "priceDelta": 2000
+            },
+            {
+              "name": "계란",
+              "priceDelta": 1000
+            },
+            {
+              "name": "두부 추가",
+              "priceDelta": 1500
+            },
+            {
+              "name": "우삼겹 추가",
+              "priceDelta": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "부대찌개 (2인분)",
+      "category": "찌개",
+      "price": 19000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "name": "맵기 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "options": [
+            {
+              "name": "순한맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "보통맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "매운맛",
+              "priceDelta": 0
+            },
+            {
+              "name": "아주 매운맛",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "name": "추가 재료 선택",
+          "required": false,
+          "min": 0,
+          "max": 2,
+          "type": "multi",
+          "options": [
+            {
+              "name": "라면사리",
+              "priceDelta": 1500
+            },
+            {
+              "name": "치즈",
+              "priceDelta": 2000
+            },
+            {
+              "name": "계란",
+              "priceDelta": 1000
+            },
+            {
+              "name": "두부 추가",
+              "priceDelta": 1500
+            },
+            {
+              "name": "우삼겹 추가",
+              "priceDelta": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "갈비탕",
+      "category": "찌개",
+      "price": 13000,
+      "soldOut": false,
+      "recipe": "directRecipe"
+    },
+    {
+      "name": "계란찜",
+      "category": "사이드",
+      "price": 5000,
+      "soldOut": false,
+      "recipe": "directRecipe"
+    },
+    {
+      "name": "해물파전",
+      "category": "사이드",
+      "price": 15000,
+      "soldOut": false,
+      "recipe": "directRecipe"
+    },
+    {
+      "name": "김치전",
+      "category": "사이드",
+      "price": 11000,
+      "soldOut": false,
+      "recipe": "directRecipe"
+    },
+    {
+      "name": "도토리묵 무침",
+      "category": "사이드",
+      "price": 10000,
+      "soldOut": false,
+      "recipe": "directRecipe"
+    },
+    {
+      "name": "쌈채소 추가",
+      "category": "사이드",
+      "price": 3000,
+      "soldOut": false,
+      "recipe": "directRecipe"
+    },
+    {
+      "name": "계란말이",
+      "category": "사이드",
+      "price": 9000,
+      "soldOut": false,
+      "recipe": "directRecipe"
+    },
+    {
+      "name": "소주",
+      "category": "주류·음료",
+      "price": 5000,
+      "soldOut": false,
+      "recipe": "directRecipe"
+    },
+    {
+      "name": "맥주 (병)",
+      "category": "주류·음료",
+      "price": 5000,
+      "soldOut": false,
+      "recipe": "directRecipe"
+    },
+    {
+      "name": "생맥주 500cc",
+      "category": "주류·음료",
+      "price": 5500,
+      "soldOut": false,
+      "recipe": "directRecipe"
+    },
+    {
+      "name": "막걸리",
+      "category": "주류·음료",
+      "price": 6000,
+      "soldOut": false,
+      "recipe": "directRecipe"
+    },
+    {
+      "name": "복분자주",
+      "category": "주류·음료",
+      "price": 12000,
+      "soldOut": false,
+      "recipe": "directRecipe"
+    },
+    {
+      "name": "콜라",
+      "category": "주류·음료",
+      "price": 2500,
+      "soldOut": false,
+      "recipe": "directRecipe"
+    },
+    {
+      "name": "사이다",
+      "category": "주류·음료",
+      "price": 2500,
+      "soldOut": false,
+      "recipe": "directRecipe"
+    },
+    {
+      "name": "제로 콜라",
+      "category": "주류·음료",
+      "price": 2500,
+      "soldOut": false,
+      "recipe": "directRecipe"
+    },
+    {
+      "name": "식혜",
+      "category": "디저트",
+      "price": 3000,
+      "soldOut": false,
+      "recipe": "directRecipe"
+    },
+    {
+      "name": "수정과",
+      "category": "디저트",
+      "price": 3000,
+      "soldOut": true
+    },
+    {
+      "name": "바닐라 아이스크림",
+      "category": "디저트",
+      "price": 2500,
+      "soldOut": false,
+      "recipe": "directRecipe"
+    },
+    {
+      "name": "인절미 빙수",
+      "category": "디저트",
+      "price": 9000,
+      "soldOut": false,
+      "recipe": "directRecipe"
+    }
+  ],
+  "recipes": {
+    "startOrder": [
+      {
+        "op": "click",
+        "text": "{dineOption}"
+      }
+    ],
+    "addToCart": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "chooseOptions",
+        "steps": [
+          {
+            "op": "click",
+            "label": "{option}"
+          }
+        ]
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "label": "+",
+            "within": "수량"
+          }
+        ]
+      },
+      {
+        "op": "click",
+        "label": "주문 담기"
+      }
+    ],
+    "meatRecipe": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "label": "+",
+            "within": "인분"
+          }
+        ]
+      },
+      {
+        "op": "click",
+        "label": "주문 담기"
+      }
+    ],
+    "directRecipe": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "clickIfVisible",
+        "label": "예"
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "label": "+",
+            "within": "{item}"
+          }
+        ]
+      }
+    ]
+  },
+  "cartTotalPattern": "주문 금액[\\s\\S]*?strong: ([0-9,]+)원",
+  "review": {
+    "open": [
+      {
+        "op": "openReview",
+        "label": "주문하기"
+      }
+    ],
+    "totalPattern": "주문 금액[\\s\\S]*?strong: ([0-9,]+)원",
+    "close": [
+      {
+        "op": "click",
+        "label": "돌아가기"
+      }
+    ]
+  },
+  "interrupts": [
+    {
+      "text": "만 19세 이상이십니까?",
+      "dismiss": {
+        "op": "click",
+        "label": "예"
+      }
+    }
+  ],
+  "notes": [
+    "테이블 오더 키오스크로 결제는 카운터에서 진행됨",
+    "고기류는 첫 주문 시 2인분 이상 주문 필수",
+    "주류 주문 시 만 19세 이상 확인 팝업 발생"
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "n": 16,
+  "at": "2026-10-14T02:57:18.103Z",
+  "tool": "record",
+  "args": {
+    "kind": "item",
+    "names": [
+      "생삼겹살",
+      "숙성 목살",
+      "항정살",
+      "양념 돼지갈비",
+      "소갈비살",
+      "차돌박이",
+      "우삼겹"
+    ]
+  },
+  "resultSummary": "recorded item 생삼겹살, 숙성 목살, 항정살, 양념 돼지갈비, 소갈비살, 차돌박이, 우삼겹",
+  "calls": [
+    {
+      "tool": "record",
+      "args": {
+        "kind": "item",
+        "names": [
+          "생삼겹살",
+          "숙성 목살",
+          "항정살",
+          "양념 돼지갈비",
+          "소갈비살",
+          "차돌박이",
+          "우삼겹"
+        ]
+      },
+      "resultSummary": "recorded item 생삼겹살, 숙성 목살, 항정살, 양념 돼지갈비, 소갈비살, 차돌박이, 우삼겹"
+    }
+  ],
+  "discoveries": {
+    "items": 7,
+    "optionGroups": 0,
+    "categories": 1
+  },
+  "inputTokens": 6057,
+  "outputTokens": 252
+}

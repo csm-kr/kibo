@@ -1,0 +1,2211 @@
+{
+  "kioskId": "bk7-bubbletea",
+  "label": "final",
+  "grader": 2,
+  "gradedAt": "2026-10-14T03:18:16.588Z",
+  "skill": "present",
+  "files": {
+    "skill": "spikes/blind-kiosks/results/bk7-bubbletea/final/skill.json",
+    "key": "spikes/blind-kiosks/bk7-bubbletea/answer-key.json",
+    "app": "spikes/blind-kiosks/bk7-bubbletea/app/index.html"
+  },
+  "summary": "bk7-bubbletea/final: learning finished, 27.3 min, 76 turns, 1694030 input tokens; items 31/31 (precision 1), price 31/31, options exact 1/27 (openable 1/26); orders correct 0, safe refusal 10, unsafe 0 of 10 (cart lines read in 0; kiosk total from the order review; menu cart total only: 0 / 10 / 0)",
+  "learning": {
+    "provider": "gemini",
+    "model": "gemini-3.8-flash",
+    "learner": {
+      "commit": "abb849586575a2cf637aec04d297cdf76c4cd3c7",
+      "dirty": false
+    },
+    "cachedInputTokens": 972703,
+    "finished": true,
+    "turns": 76,
+    "acts": 91,
+    "tests": 4,
+    "inputTokens": 1694030,
+    "outputTokens": 83357,
+    "minutes": "27.3"
+  },
+  "catalog": {
+    "items": {
+      "key": 31,
+      "skill": 31,
+      "matched": 31,
+      "recall": 1,
+      "precision": 1,
+      "missing": [],
+      "extra": []
+    },
+    "price": {
+      "correct": 31,
+      "of": 31
+    },
+    "category": {
+      "correct": 31,
+      "of": 31
+    },
+    "soldOut": {
+      "correct": 31,
+      "of": 31
+    },
+    "options": {
+      "itemsExact": 1,
+      "items": 27,
+      "openableExact": 1,
+      "openable": 26,
+      "groups": 163,
+      "groupsFound": 87,
+      "groupLabelsExact": 67,
+      "groupRulesCorrect": 87,
+      "quantityGroups": 5,
+      "quantityRecognized": 5,
+      "conditionalGroups": 39,
+      "conditionalFound": 13
+    },
+    "perItem": [
+      {
+        "name": "클래식 밀크티",
+        "skillName": "클래식 밀크티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "0% 0",
+            "30% 0",
+            "50% 0",
+            "70% 0",
+            "100% 0",
+            "알로에 600",
+            "그라스젤리 600",
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "흑당 펄 밀크티",
+        "skillName": "흑당 펄 밀크티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "0% 0",
+            "30% 0",
+            "50% 0",
+            "70% 0",
+            "100% 0",
+            "알로에 600",
+            "그라스젤리 600",
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "얼그레이 밀크티",
+        "skillName": "얼그레이 밀크티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "0% 0",
+            "30% 0",
+            "50% 0",
+            "70% 0",
+            "100% 0",
+            "알로에 600",
+            "그라스젤리 600",
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "타로 밀크티",
+        "skillName": "타로 밀크티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "0% 0",
+            "30% 0",
+            "50% 0",
+            "70% 0",
+            "100% 0",
+            "알로에 600",
+            "그라스젤리 600",
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "우롱 밀크티",
+        "skillName": "우롱 밀크티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "0% 0",
+            "30% 0",
+            "50% 0",
+            "70% 0",
+            "100% 0",
+            "알로에 600",
+            "그라스젤리 600",
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "말차 밀크티",
+        "skillName": "말차 밀크티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "0% 0",
+            "30% 0",
+            "50% 0",
+            "70% 0",
+            "100% 0",
+            "알로에 600",
+            "그라스젤리 600",
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "자스민 밀크티",
+        "skillName": "자스민 밀크티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "0% 0",
+            "30% 0",
+            "50% 0",
+            "70% 0",
+            "100% 0",
+            "알로에 600",
+            "그라스젤리 600",
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "패션후르츠 그린티",
+        "skillName": "패션후르츠 그린티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "0% 0",
+            "30% 0",
+            "50% 0",
+            "70% 0",
+            "100% 0",
+            "알로에 600",
+            "그라스젤리 600",
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "망고 우롱티",
+        "skillName": "망고 우롱티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "0% 0",
+            "30% 0",
+            "50% 0",
+            "70% 0",
+            "100% 0",
+            "알로에 600",
+            "그라스젤리 600",
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "자몽 그린티",
+        "skillName": "자몽 그린티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "0% 0",
+            "30% 0",
+            "50% 0",
+            "70% 0",
+            "100% 0",
+            "알로에 600",
+            "그라스젤리 600",
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "리치 자스민티",
+        "skillName": "리치 자스민티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "0% 0",
+            "30% 0",
+            "50% 0",
+            "70% 0",
+            "100% 0",
+            "알로에 600",
+            "그라스젤리 600",
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "복숭아 우롱티",
+        "skillName": "복숭아 우롱티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "0% 0",
+            "30% 0",
+            "50% 0",
+            "70% 0",
+            "100% 0",
+            "알로에 600",
+            "그라스젤리 600",
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "레몬 홍차",
+        "skillName": "레몬 홍차",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "0% 0",
+            "30% 0",
+            "50% 0",
+            "70% 0",
+            "100% 0",
+            "알로에 600",
+            "그라스젤리 600",
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "치즈폼 우롱티",
+        "skillName": "치즈폼 우롱티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "0% 0",
+            "30% 0",
+            "50% 0",
+            "70% 0",
+            "100% 0",
+            "알로에 600",
+            "그라스젤리 600",
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "치즈폼 홍차",
+        "skillName": "치즈폼 홍차",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "0% 0",
+            "30% 0",
+            "50% 0",
+            "70% 0",
+            "100% 0",
+            "알로에 600",
+            "그라스젤리 600",
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "치즈폼 딸기 그린티",
+        "skillName": "치즈폼 딸기 그린티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "0% 0",
+            "30% 0",
+            "50% 0",
+            "70% 0",
+            "100% 0",
+            "알로에 600",
+            "그라스젤리 600",
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "치즈폼 말차 라떼",
+        "skillName": "치즈폼 말차 라떼",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "0% 0",
+            "30% 0",
+            "50% 0",
+            "70% 0",
+            "100% 0",
+            "알로에 600",
+            "그라스젤리 600",
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "치즈폼 흑당 밀크티",
+        "skillName": "치즈폼 흑당 밀크티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "M 0",
+            "L 700",
+            "얼음 없음 0",
+            "얼음 적게 0",
+            "얼음 보통 0",
+            "얼음 많이 0",
+            "0% 0",
+            "30% 0",
+            "50% 0",
+            "70% 0",
+            "100% 0",
+            "타피오카 펄 500",
+            "화이트 펄 500",
+            "코코넛 젤리 500",
+            "알로에 600",
+            "푸딩 700",
+            "팥 600",
+            "그라스젤리 600",
+            "밀크폼 800",
+            "치즈폼 1000",
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": []
+        }
+      },
+      {
+        "name": "아메리카노",
+        "skillName": "아메리카노",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "카페라떼",
+        "skillName": "카페라떼",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "바닐라 라떼",
+        "skillName": "바닐라 라떼",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "흑당 카페라떼",
+        "skillName": "흑당 카페라떼",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "원앙 커피 밀크티",
+        "skillName": "원앙 커피 밀크티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "펑리수",
+        "skillName": "펑리수",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "누가크래커",
+        "skillName": "누가크래커",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "에그타르트",
+        "skillName": "에그타르트",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "대만 카스테라",
+        "skillName": "대만 카스테라",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "지파이",
+        "skillName": "지파이",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "군고구마 밀크티",
+        "skillName": "군고구마 밀크티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "0% 0",
+            "30% 0",
+            "50% 0",
+            "70% 0",
+            "100% 0",
+            "알로에 600",
+            "그라스젤리 600",
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "생강 흑당 밀크티",
+        "skillName": "생강 흑당 밀크티",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "0% 0",
+            "30% 0",
+            "50% 0",
+            "70% 0",
+            "100% 0",
+            "알로에 600",
+            "그라스젤리 600",
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "딸기 펄 우유",
+        "skillName": "딸기 펄 우유",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "0% 0",
+            "30% 0",
+            "50% 0",
+            "70% 0",
+            "100% 0",
+            "알로에 600",
+            "그라스젤리 600",
+            "음료만 주문할게요 0",
+            "스낵 세트로 변경 -800",
+            "펑리수 2500",
+            "누가크래커 3500",
+            "에그타르트 2800",
+            "대만 카스테라 3800"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      }
+    ],
+    "perGroup": [
+      {
+        "item": "클래식 밀크티",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "클래식 밀크티",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "클래식 밀크티",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true,
+        "conditional": true
+      },
+      {
+        "item": "클래식 밀크티",
+        "group": "sweet",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "클래식 밀크티",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "토핑",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "클래식 밀크티",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "클래식 밀크티",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "흑당 펄 밀크티",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "흑당 펄 밀크티",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "흑당 펄 밀크티",
+        "group": "sweet",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "흑당 펄 밀크티",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "토핑",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "흑당 펄 밀크티",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "흑당 펄 밀크티",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "얼그레이 밀크티",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "얼그레이 밀크티",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "얼그레이 밀크티",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true,
+        "conditional": true
+      },
+      {
+        "item": "얼그레이 밀크티",
+        "group": "sweet",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "얼그레이 밀크티",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "토핑",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "얼그레이 밀크티",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "얼그레이 밀크티",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "타로 밀크티",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "타로 밀크티",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "타로 밀크티",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true,
+        "conditional": true
+      },
+      {
+        "item": "타로 밀크티",
+        "group": "sweet",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "타로 밀크티",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "토핑",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "타로 밀크티",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "타로 밀크티",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "우롱 밀크티",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "우롱 밀크티",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "우롱 밀크티",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true,
+        "conditional": true
+      },
+      {
+        "item": "우롱 밀크티",
+        "group": "sweet",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "우롱 밀크티",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "토핑",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "우롱 밀크티",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "우롱 밀크티",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "말차 밀크티",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "말차 밀크티",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "말차 밀크티",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true,
+        "conditional": true
+      },
+      {
+        "item": "말차 밀크티",
+        "group": "sweet",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "말차 밀크티",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "토핑",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "말차 밀크티",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "말차 밀크티",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "자스민 밀크티",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "자스민 밀크티",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "자스민 밀크티",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true,
+        "conditional": true
+      },
+      {
+        "item": "자스민 밀크티",
+        "group": "sweet",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "자스민 밀크티",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "토핑",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "자스민 밀크티",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "자스민 밀크티",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "패션후르츠 그린티",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "패션후르츠 그린티",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "패션후르츠 그린티",
+        "group": "sweet",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "패션후르츠 그린티",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "토핑",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "패션후르츠 그린티",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "패션후르츠 그린티",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "망고 우롱티",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "망고 우롱티",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "망고 우롱티",
+        "group": "sweet",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "망고 우롱티",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "토핑",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "망고 우롱티",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "망고 우롱티",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "자몽 그린티",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "자몽 그린티",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "자몽 그린티",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true,
+        "conditional": true
+      },
+      {
+        "item": "자몽 그린티",
+        "group": "sweet",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "자몽 그린티",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "토핑",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "자몽 그린티",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "자몽 그린티",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "리치 자스민티",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "리치 자스민티",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "리치 자스민티",
+        "group": "sweet",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "리치 자스민티",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "토핑",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "리치 자스민티",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "리치 자스민티",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "복숭아 우롱티",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "복숭아 우롱티",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "복숭아 우롱티",
+        "group": "sweet",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "복숭아 우롱티",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "토핑",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "복숭아 우롱티",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "복숭아 우롱티",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "레몬 홍차",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "레몬 홍차",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "레몬 홍차",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true,
+        "conditional": true
+      },
+      {
+        "item": "레몬 홍차",
+        "group": "sweet",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "레몬 홍차",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "토핑",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "레몬 홍차",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "레몬 홍차",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "치즈폼 우롱티",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "치즈폼 우롱티",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "치즈폼 우롱티",
+        "group": "sweet",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "치즈폼 우롱티",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "토핑",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "치즈폼 우롱티",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "치즈폼 우롱티",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "치즈폼 홍차",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "치즈폼 홍차",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "치즈폼 홍차",
+        "group": "sweet",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "치즈폼 홍차",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "토핑",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "치즈폼 홍차",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "치즈폼 홍차",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "치즈폼 딸기 그린티",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "치즈폼 딸기 그린티",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "치즈폼 딸기 그린티",
+        "group": "sweet",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "치즈폼 딸기 그린티",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "토핑",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "치즈폼 딸기 그린티",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "치즈폼 딸기 그린티",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "치즈폼 말차 라떼",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "치즈폼 말차 라떼",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "치즈폼 말차 라떼",
+        "group": "sweet",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "치즈폼 말차 라떼",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "토핑",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "치즈폼 말차 라떼",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "치즈폼 말차 라떼",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "치즈폼 흑당 밀크티",
+        "group": "size",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "치즈폼 흑당 밀크티",
+        "group": "ice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "치즈폼 흑당 밀크티",
+        "group": "sweet",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "치즈폼 흑당 밀크티",
+        "group": "topping",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "치즈폼 흑당 밀크티",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "치즈폼 흑당 밀크티",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "아메리카노",
+        "group": "sizeCoffee",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "아메리카노",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "아메리카노",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true,
+        "conditional": true
+      },
+      {
+        "item": "아메리카노",
+        "group": "shot",
+        "found": true,
+        "skillGroup": "샷 추가",
+        "labelsExact": true,
+        "rules": true,
+        "quantity": true
+      },
+      {
+        "item": "아메리카노",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "아메리카노",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "카페라떼",
+        "group": "sizeCoffee",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카페라떼",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "카페라떼",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true,
+        "conditional": true
+      },
+      {
+        "item": "카페라떼",
+        "group": "shot",
+        "found": true,
+        "skillGroup": "샷 추가",
+        "labelsExact": true,
+        "rules": true,
+        "quantity": true
+      },
+      {
+        "item": "카페라떼",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "카페라떼",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "바닐라 라떼",
+        "group": "sizeCoffee",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "바닐라 라떼",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "바닐라 라떼",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true,
+        "conditional": true
+      },
+      {
+        "item": "바닐라 라떼",
+        "group": "shot",
+        "found": true,
+        "skillGroup": "샷 추가",
+        "labelsExact": true,
+        "rules": true,
+        "quantity": true
+      },
+      {
+        "item": "바닐라 라떼",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "바닐라 라떼",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "흑당 카페라떼",
+        "group": "sizeCoffee",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "흑당 카페라떼",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "흑당 카페라떼",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true,
+        "conditional": true
+      },
+      {
+        "item": "흑당 카페라떼",
+        "group": "shot",
+        "found": true,
+        "skillGroup": "샷 추가",
+        "labelsExact": true,
+        "rules": true,
+        "quantity": true
+      },
+      {
+        "item": "흑당 카페라떼",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "흑당 카페라떼",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "원앙 커피 밀크티",
+        "group": "sizeCoffee",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "원앙 커피 밀크티",
+        "group": "temp",
+        "found": true,
+        "skillGroup": "온도",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "원앙 커피 밀크티",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true,
+        "conditional": true
+      },
+      {
+        "item": "원앙 커피 밀크티",
+        "group": "shot",
+        "found": true,
+        "skillGroup": "샷 추가",
+        "labelsExact": true,
+        "rules": true,
+        "quantity": true
+      },
+      {
+        "item": "원앙 커피 밀크티",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "원앙 커피 밀크티",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "지파이",
+        "group": "seasoning",
+        "found": true,
+        "skillGroup": "맛 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "군고구마 밀크티",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "군고구마 밀크티",
+        "group": "sweet",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "군고구마 밀크티",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "토핑",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "군고구마 밀크티",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "군고구마 밀크티",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "생강 흑당 밀크티",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "생강 흑당 밀크티",
+        "group": "sweet",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "생강 흑당 밀크티",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "토핑",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "생강 흑당 밀크티",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "생강 흑당 밀크티",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      },
+      {
+        "item": "딸기 펄 우유",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "딸기 펄 우유",
+        "group": "ice",
+        "found": true,
+        "skillGroup": "얼음량",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "딸기 펄 우유",
+        "group": "sweet",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "딸기 펄 우유",
+        "group": "topping",
+        "found": true,
+        "skillGroup": "토핑",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "딸기 펄 우유",
+        "group": "setChoice",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "딸기 펄 우유",
+        "group": "setSnack",
+        "found": false,
+        "skillGroup": null,
+        "conditional": false
+      }
+    ]
+  },
+  "orders": {
+    "total": 10,
+    "correct": 0,
+    "safeRefusal": 10,
+    "unsafe": 0,
+    "cartOnly": {
+      "correct": 0,
+      "safeRefusal": 10,
+      "unsafe": 0
+    },
+    "linesChecked": 0,
+    "results": [
+      {
+        "id": "h1",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 타로 밀크티 › 30%",
+        "linesChecked": null,
+        "cartSource": null,
+        "cartOnlyOutcome": "safeRefusal",
+        "totalSource": null,
+        "expectedTotal": 6000,
+        "kioskTotal": null,
+        "cartTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "타로 밀크티 › ICE",
+          "타로 밀크티 › 얼음 적게",
+          "타로 밀크티 › 30%",
+          "타로 밀크티 › 타피오카 펄"
+        ],
+        "order": null
+      },
+      {
+        "id": "h2",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 자몽 그린티 › 50%",
+        "linesChecked": null,
+        "cartSource": null,
+        "cartOnlyOutcome": "safeRefusal",
+        "totalSource": null,
+        "expectedTotal": 10000,
+        "kioskTotal": null,
+        "cartTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "자몽 그린티 › HOT",
+          "자몽 그린티 › 50%"
+        ],
+        "order": null
+      },
+      {
+        "id": "h3",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 얼그레이 밀크티 › 70%",
+        "linesChecked": null,
+        "cartSource": null,
+        "cartOnlyOutcome": "safeRefusal",
+        "totalSource": null,
+        "expectedTotal": 7400,
+        "kioskTotal": null,
+        "cartTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "얼그레이 밀크티 › ICE",
+          "얼그레이 밀크티 › 얼음 보통",
+          "얼그레이 밀크티 › 70%",
+          "얼그레이 밀크티 › 코코넛 젤리"
+        ],
+        "order": null
+      },
+      {
+        "id": "h4",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 흑당 펄 밀크티 › 100%",
+        "linesChecked": null,
+        "cartSource": null,
+        "cartOnlyOutcome": "safeRefusal",
+        "totalSource": null,
+        "expectedTotal": 6900,
+        "kioskTotal": null,
+        "cartTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "흑당 펄 밀크티 › 얼음 적게",
+          "흑당 펄 밀크티 › 100%"
+        ],
+        "order": null
+      },
+      {
+        "id": "h5",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 카페라떼 › 스낵 세트로 변경",
+        "linesChecked": null,
+        "cartSource": null,
+        "cartOnlyOutcome": "safeRefusal",
+        "totalSource": null,
+        "expectedTotal": 8500,
+        "kioskTotal": null,
+        "cartTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "카페라떼 › HOT"
+        ],
+        "order": null
+      },
+      {
+        "id": "h6",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 망고 우롱티 › 0%",
+        "linesChecked": null,
+        "cartSource": null,
+        "cartOnlyOutcome": "safeRefusal",
+        "totalSource": null,
+        "expectedTotal": 12700,
+        "kioskTotal": null,
+        "cartTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "망고 우롱티 › 얼음 없음",
+          "망고 우롱티 › 0%",
+          "망고 우롱티 › 화이트 펄",
+          "망고 우롱티 › 팥",
+          "지파이 › 매콤"
+        ],
+        "order": null
+      },
+      {
+        "id": "h7",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 아메리카노 › 음료만 주문할게요",
+        "linesChecked": null,
+        "cartSource": null,
+        "cartOnlyOutcome": "safeRefusal",
+        "totalSource": null,
+        "expectedTotal": 10900,
+        "kioskTotal": null,
+        "cartTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "아메리카노 › ICE",
+          "아메리카노 › 얼음 많이"
+        ],
+        "order": null
+      },
+      {
+        "id": "h8",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 군고구마 밀크티 › 70%",
+        "linesChecked": null,
+        "cartSource": null,
+        "cartOnlyOutcome": "safeRefusal",
+        "totalSource": null,
+        "expectedTotal": 12600,
+        "kioskTotal": null,
+        "cartTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "군고구마 밀크티 › 70%",
+          "군고구마 밀크티 › 팥",
+          "치즈폼 딸기 그린티 › 얼음 보통",
+          "치즈폼 딸기 그린티 › 50%"
+        ],
+        "order": null
+      },
+      {
+        "id": "h9",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 패션후르츠 그린티 › 30%",
+        "linesChecked": null,
+        "cartSource": null,
+        "cartOnlyOutcome": "safeRefusal",
+        "totalSource": null,
+        "expectedTotal": 16400,
+        "kioskTotal": null,
+        "cartTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "패션후르츠 그린티 › 얼음 적게",
+          "패션후르츠 그린티 › 30%",
+          "패션후르츠 그린티 › 코코넛 젤리"
+        ],
+        "order": null
+      },
+      {
+        "id": "h10",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 치즈폼 우롱티 › 50%",
+        "linesChecked": null,
+        "cartSource": null,
+        "cartOnlyOutcome": "safeRefusal",
+        "totalSource": null,
+        "expectedTotal": 16700,
+        "kioskTotal": null,
+        "cartTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "치즈폼 우롱티 › 얼음 보통",
+          "치즈폼 우롱티 › 50%",
+          "치즈폼 우롱티 › 타피오카 펄",
+          "원앙 커피 밀크티 › HOT"
+        ],
+        "order": null
+      }
+    ]
+  }
+}

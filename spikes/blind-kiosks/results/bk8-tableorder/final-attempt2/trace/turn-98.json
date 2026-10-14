@@ -1,0 +1,61 @@
+{
+  "n": 98,
+  "at": "2026-10-14T03:42:37.328Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "생삼겹살"
+      },
+      {
+        "op": "click",
+        "label": "+",
+        "within": "인분"
+      },
+      {
+        "op": "click",
+        "label": "주문 담기"
+      },
+      {
+        "op": "openReview",
+        "label": "주문하기"
+      }
+    ]
+  },
+  "resultSummary": "tapped 생삼겹살 → + → 주문 담기 → 주문하기",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "생삼겹살"
+          },
+          {
+            "op": "click",
+            "label": "+",
+            "within": "인분"
+          },
+          {
+            "op": "click",
+            "label": "주문 담기"
+          },
+          {
+            "op": "openReview",
+            "label": "주문하기"
+          }
+        ]
+      },
+      "resultSummary": "tapped 생삼겹살 → + → 주문 담기 → 주문하기"
+    }
+  ],
+  "discoveries": {
+    "items": 37,
+    "optionGroups": 13,
+    "categories": 6
+  },
+  "inputTokens": 106342,
+  "outputTokens": 75
+}

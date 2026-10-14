@@ -1,0 +1,35 @@
+{
+  "n": 78,
+  "at": "2026-10-14T03:11:56.099Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "주문 내역"
+      }
+    ]
+  },
+  "resultSummary": "tapped 주문 내역",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "주문 내역"
+          }
+        ]
+      },
+      "resultSummary": "tapped 주문 내역"
+    }
+  ],
+  "discoveries": {
+    "items": 37,
+    "optionGroups": 13,
+    "categories": 6
+  },
+  "inputTokens": 29893,
+  "outputTokens": 25
+}
