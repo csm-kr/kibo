@@ -87,3 +87,8 @@ When an issue class in `docs/ISSUE.md` is seen for the **3rd time**, it becomes 
 - From: `unexercised-option-group` — I-192 (seen 10-13/13-blind-kiosks:4), I-197 (10-14/13-blind-kiosks:8, 10-14/13-blind-kiosks:10)
 - Why: three skills passed the finish gate with 3 of 3 self-tests, then failed or mispriced orders whose option groups no self-test had used (Doughhouse toppings, bk6 discounts, bk1 and bk2 prices), and the order counts alone hid it.
 - Check: each blind-kiosk results table (`spikes/blind-kiosks/RESULTS.md`, `/learn` cards) shows the "skill total wrong" count from `skillPredicts` vs `kioskTotal` in `grade-v2.json`; a learner change to the gate on the dev set has a test with an option group the self-tests skip.
+
+### R-015 (proposed): A rule that refuses kiosk labels matches whole labels or whole words, and its tests include real choices that contain the refused text
+- From: `label-rule-false-positive` — I-300 (seen 10-14/13-blind-kiosks:8 on bk5, 10-14/session on bk7 and on bk8, round 3)
+- Why: the option-name lint refused real customer choices (`0%`–`100%` for having no letter; `곱빼기` for ending in the stepper word `빼기`), and each time the learner worked around it by renaming the option (`곱배기`), dropping it, or tapping one choice in its recipe for every customer; the same kind of substring match refused `계속 주문하기` as a payment button (I-193).
+- Check: a change to `isControlLabel`, `isForbidden` or any label word list in `spikes/kibo-learn/` adds test cases where the refused word sits inside a real choice or control (`곱빼기`, `계속 주문하기`, digits-only names such as `0%`, `2`) next to the cases it must still refuse; `node --test spikes/kibo-learn/patterns.test.mjs` passes.

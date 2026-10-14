@@ -1,0 +1,85 @@
+#1 act {"op":"click","label":"펄린당"}
+#2 act {"label":"매장에서 먹고 갈게요","op":"click"}
+#3 record 
+#4 act {"op":"click","label":"클래식 밀크티"}
+#5 act {"label":"HOT","op":"click"}
+#6 act {"op":"click","label":"4,300원 담기"}
+#7 act {"label":"50%","op":"click"}
+#8 act {"label":"4,300원 담기","op":"click"}
+#9 act {"op":"click","label":"스낵 세트로 변경"}
+#10 act [{"op":"click","label":"펑리수"},{"label":"다음","op":"click"}]
+#11 act [{"label":"‹ 이전","op":"click"},{"op":"click","label":"‹ 이전"}]
+#12 act {"label":"음료만 주문할게요","op":"click"}
+#13 act {"label":"적립 안 함","op":"click"}
+#14 act {"op":"openReview","label":"주문하기"}
+#15 act {"op":"click","label":"‹ 메뉴 추가"}
+#16 reload 
+#17 act [{"label":"펄린당","op":"click"},{"op":"click","label":"포장해 갈게요"}]
+#18 act [{"op":"click","label":"클래식 밀크티"},{"op":"click","label":"50%"},{"op":"click","label":"4,300원 담기"},{"label":"음료만 주문할게요","op":"click"}]
+#19 act [{"label":"얼음 보통","op":"click"},{"label":"4,300원 담기","op":"click"}]
+#20 act {"op":"click","label":"음료만 주문할게요"}
+#21 act {"op":"click","label":"적립 안 함"}
+#22 act {"op":"openReview","label":"주문하기"}
+#23 act [{"op":"click","label":"‹ 메뉴 추가"},{"op":"click","label":"+"}]
+#24 act {"label":"스낵","op":"click"}
+#25 act {"op":"click","label":"지파이"}
+#26 act [{"op":"click","label":"오리지널"},{"op":"click","label":"5,900원 담기"}]
+#27 act {"label":"주문하기","op":"openReview"}
+#28 reload 
+#29 act [{"label":"펄린당","op":"click"},{"label":"매장에서 먹고 갈게요","op":"click"}]
+#30 act {"label":"클래식 밀크티","op":"click"}
+#31 act [{"label":"타피오카 펄","op":"click"},{"op":"click","label":"화이트 펄"}]
+#32 act [{"label":"얼음 보통","op":"click"},{"label":"50%","op":"click"},{"op":"click","label":"5,300원 담기"}]
+#33 act {"op":"click","label":"스낵 세트로 변경"}
+#34 act [{"op":"click","label":"대만 카스테라"},{"op":"click","label":"다음"}]
+#35 act {"op":"click","label":"장바구니 담기"}
+#36 act {"label":"적립 안 함","op":"click"}
+#37 act {"label":"전체삭제","op":"click"}
+#38 act {"within":"취소","label":"삭제","op":"click"}
+#39 act {"label":"흑당 펄 밀크티","op":"click"}
+#40 act [{"label":"취소","op":"click"},{"label":"얼그레이 밀크티","op":"click"}]
+#41 act [{"label":"취소","op":"click"},{"label":"타로 밀크티","op":"click"}]
+#42 act [{"label":"취소","op":"click"},{"label":"우롱 밀크티","op":"click"}]
+#43 act [{"label":"취소","op":"click"},{"label":"말차 밀크티","op":"click"}]
+#44 act [{"label":"취소","op":"click"},{"op":"click","label":"자스민 밀크티"}]
+#45 act [{"op":"click","label":"취소"},{"label":"과일티","op":"click"}]
+#46 act {"op":"click","label":"패션후르츠 그린티"}
+#47 act [{"label":"취소","op":"click"},{"label":"자몽 그린티","op":"click"}]
+#48 act [{"label":"취소","op":"click"},{"op":"click","label":"레몬 홍차"}]
+#49 act [{"op":"click","label":"취소"},{"op":"click","within":"밀크티","label":"치즈폼"}]
+#50 act {"label":"치즈폼 우롱티","op":"click"}
+#51 act [{"op":"click","label":"취소"},{"label":"커피","op":"click"}]
+#52 act {"op":"click","label":"아메리카노"}
+#53 act [{"op":"click","label":"얼음 보통"},{"label":"3,000원 담기","op":"click"}]
+#54 act [{"op":"click","label":"‹ 이전"},{"op":"click","label":"취소"}]
+#55 act {"op":"click","label":"카페라떼"}
+#56 act [{"op":"click","label":"취소"},{"op":"click","label":"원앙 커피 밀크티"}]
+#57 act [{"op":"click","label":"취소"},{"label":"스낵","op":"click"}]
+#58 act {"label":"펑리수","op":"click"}
+#59 act [{"label":"취소","op":"click"},{"op":"click","label":"누가크래커"}]
+#60 act [{"label":"취소","op":"click"},{"label":"대만 카스테라","op":"click"}]
+#61 act [{"op":"click","label":"취소"},{"op":"click","label":"지파이"}]
+#62 act [{"label":"취소","op":"click"},{"label":"겨울 시즌","op":"click"}]
+#63 act {"label":"군고구마 밀크티","op":"click"}
+#64 act [{"label":"취소","op":"click"},{"op":"click","label":"생강 흑당 밀크티"}]
+#65 act [{"label":"취소","op":"click"},{"op":"click","label":"딸기 펄 우유"}]
+#66 act {"op":"click","label":"취소"}
+#67 act [{"label":"스낵","op":"click"},{"label":"펑리수","op":"click"},{"op":"click","label":"2,500원 담기"}]
+#68 act {"op":"click","label":"삭제"}
+#69 act {"within":"취소","op":"click","label":"삭제"}
+#70 act [{"op":"click","label":"과일티"},{"op":"click","label":"패션후르츠 그린티"},{"label":"얼음 보통","op":"click"},{"label":"50%","op":"click"},{"op":"click","label":"4,800원 담기"}]
+#71 act {"label":"‹ 이전","op":"click"}
+#72 act {"label":"취소","op":"click"}
+#73 act [{"op":"click","label":"치즈폼"},{"label":"치즈폼 우롱티","op":"click"},{"op":"click","label":"얼음 보통"},{"op":"click","label":"50%"},{"label":"5,300원 담기","op":"click"}]
+#74 act [{"label":"‹ 이전","op":"click"},{"op":"click","label":"취소"}]
+#75 act [{"label":"겨울 시즌","op":"click"},{"label":"군고구마 밀크티","op":"click"},{"op":"click","label":"50%"},{"label":"5,500원 담기","op":"click"}]
+#76 act [{"label":"‹ 이전","op":"click"},{"label":"취소","op":"click"}]
+#77 act [{"op":"click","label":"커피"},{"op":"click","label":"원앙 커피 밀크티"}]
+#78 act {"op":"click","label":"취소"}
+#79 act {"op":"click","label":"과일티"}
+#80 act {"label":"치즈폼","op":"click"}
+#81 records 
+#82 testSkill 
+  test #1: FAIL uncovered=10
+    order 1: no "타피오카 펄" near "토핑 선택"
+#83 audit 
