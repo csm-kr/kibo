@@ -338,8 +338,8 @@ export default function Home() {
               sides and drinks, removable ingredients and sold-out items.
             </p>
             <Fact
-              value="68 of 70 test orders passed"
-              detail="text agent on gemini-3.8-flash (Vertex AI), typed in Korean, English and 7 more languages; cases written by the KIBO team"
+              value="73 of 77 test orders passed"
+              detail="text agent on gemini-3.8-flash (Gemini API, as in production), typed in Korean, English and 7 more languages; cases written by the KIBO team"
             />
             <Fact
               value="1.8 s median from end of speech to the kiosk highlight"
@@ -402,7 +402,7 @@ export default function Home() {
         </article>
         <Sources
           paths={[
-            "evals/results/2026-10-14T20-26.md",
+            "evals/results/2026-10-15-full.md",
             "evidence/voice-e2e.json",
             "evidence/voice-e2e-relay.json",
             "spikes/blind-kiosks/ROUND4.md",
