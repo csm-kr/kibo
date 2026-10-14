@@ -45,7 +45,10 @@
     {
       "step": 5,
       "name": "fast-feel",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-14T12:40:06+0900",
+      "summary": "Text agent skips the second model call when it adds nothing: new src/lib/agent/quickReply.ts builds the reply from fixed ko/en sentences over the tool results and menu data (lineLabel names, formatWon, phone payNow label; ticket wording) when every first-round call succeeded and is setDineOption/addToCart/updateCart/removeFromCart/undoLastChange/requestCheckout/confirmCheckout, no upsell, direct kiosk, no model text beside the calls, and plainRequest says the message is in the screens' language (ko Hangul; en ASCII with English words) with no question; otherwise the model writes the reply (failure, choice, staff, upsell, learned kiosk, question, AI-only language). runChat wires it (round 0 only). Payment rule unchanged. Tests first: quickReply.test.ts (7), chat.test.ts (2 new, round-cap test given a question). Eval records per-model-call ms (rounds, callsPerRequest, oneCallWithTools) and fills codes of templated calls from actions. Vertex, 70 cases: before 70/70, 206 calls, median 7.6 s p90 19.3 s (12-42); after 69/70, 172 calls, 23 requests with one call, median 7.1 s p90 26.9 s (12-59, tail from 20-31 s Vertex single calls); templated turns paired 7.4 s -> 3.2 s (subset rerun 2.7 s, 13-18). Failure l-es-ambiguous-picker-en not on the template path, flaky 2/4 (I-228). Streaming not built. evidence/fast-feel.json, TESTING row, ARCHITECTURE /api/chat. Cost per order not re-measured. ACs: lint, build, unit 1038, eval.",
+      "completed_at": "2026-10-14T13:26:38+0900"
     },
     {
       "step": 6,
