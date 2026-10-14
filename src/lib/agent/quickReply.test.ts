@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { getKiosk } from "@/lib/adapters/catalog";
 import type { CommandResponse } from "@/lib/session/service";
 import type { CartLine } from "@/types/session";
-import { plainRequest, quickReply, type DoneCall } from "./quickReply";
+import { inScreensLanguage, introOffer, plainRequest, quickReply, summaryReply, type DoneCall } from "./quickReply";
 
 const malo = getKiosk("malo");
 const rail = getKiosk("airport_rail");
@@ -83,6 +83,65 @@ describe("quickReply", () => {
     expect(quickReply(malo, "en", [])).toBeNull();
     // A line the server did not return cannot be named from data, so the model says it.
     expect(quickReply(malo, "en", [call("addToCart", {}, ok([SET_ZERO], { result: { lineId: "zz" } }))])).toBeNull();
+  });
+});
+
+describe("summaryReply (15-judge-fixes:0)", () => {
+  const failed: DoneCall = { name: "addToCart", args: {}, outcome: { ok: false, error: { code: "NEEDS_CHOICE", message: "x" } }, cartBefore: [] };
+
+  it("names only the applied changes, skips failures, and ends with the open question", () => {
+    const added = call("addToCart", {}, ok([SET_ZERO], { result: { lineId: "a1" } }));
+    const offered = call("offerChoices", {}, ok([SET_ZERO]));
+    expect(summaryReply(malo, "en", [added, failed, offered], "Which one would you like?")).toBe(
+      "Added 1 × Cheeseburger set (Fries (M) · Zero cola · No pickles). Total ₩6,900. Which one would you like?",
+    );
+    // An upsell the model never offered is left out rather than invented.
+    const upsold = call("addToCart", {}, ok([SET_ZERO], { result: { lineId: "a1", upsell: { offerItemIds: ["soft_cone"] } } }));
+    expect(summaryReply(malo, "ko", [upsold], null)).toBe("치즈버거 세트 (감자튀김 M · 제로콜라 · 피클 빼기) 1개 담았어요. 모두 6,900원이에요.");
+  });
+
+  it("a staff call, a replay still running, and a learned review get their own fixed sentences", () => {
+    expect(summaryReply(malo, "en", [call("callStaff", {}, ok([]))], null)).toBe("I've called staff. Someone will come to help you.");
+    const pending = call("addToCart", {}, ok([], { pending: true }));
+    expect(summaryReply(pizza, "en", [pending], null)).toBe("The kiosk is entering it now.");
+    const review = call("requestCheckout", {}, ok([], { status: "confirming" }));
+    const reply = summaryReply(pizza, "en", [review], null)!;
+    expect(reply).toContain(`tap ${pizza.learned!.checkout.name.ko} (${pizza.learned!.checkout.name.en}) on the kiosk`);
+    expect(reply).not.toMatch(/yes, pay now/i);
+  });
+
+  it("null when nothing was applied and nothing is asked", () => {
+    expect(summaryReply(malo, "en", [failed], null)).toBeNull();
+    expect(summaryReply(malo, "en", [], null)).toBeNull();
+  });
+});
+
+describe("introOffer", () => {
+  it("what the kiosk sells from its categories, and up to 3 items that can be ordered now", () => {
+    const en = introOffer(malo, "en");
+    expect(en.line).toBe("Here you can order Burgers, Chicken, Sides, Drinks, Coffee, Desserts and Breakfast.");
+    expect(en.choices).toEqual([
+      { kind: "item", id: "cheese_burger" },
+      { kind: "item", id: "soft_cone" },
+      { kind: "item", id: "chicken_nuggets" },
+    ]);
+    expect(introOffer(malo, "ko").line).toBe("여기서는 버거, 치킨, 사이드, 음료, 커피, 디저트, 아침 메뉴를 주문할 수 있어요.");
+    for (const c of introOffer(rail, "en").choices) {
+      const item = rail.items.find((i) => i.itemId === c.id)!;
+      expect(item.soldOut).toBe(false);
+      expect(item.availableHours).toBeNull();
+    }
+    expect(introOffer(rail, "en").line).toBe("This machine sells Express, All-stop and Cards and passes.");
+  });
+});
+
+describe("inScreensLanguage", () => {
+  it("questions too, but only in the screens' language", () => {
+    expect(inScreensLanguage("Add a cola. Is it halal?", "en")).toBe(true);
+    expect(inScreensLanguage("콜라 하나 주시고 칼로리는 얼마예요", "ko")).toBe(true);
+    expect(inScreensLanguage("Un coca, s'il vous plaît.", "en")).toBe(false);
+    expect(inScreensLanguage("一杯可乐", "en")).toBe(false);
+    expect(inScreensLanguage("One cola, please.", "ko")).toBe(false);
   });
 });
 

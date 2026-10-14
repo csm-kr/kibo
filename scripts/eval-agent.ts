@@ -20,7 +20,8 @@ import { MemoryStore } from "@/lib/store/memory";
 import type { SpeechLanguage } from "@/lib/i18n/languages";
 import type { Locale } from "@/types/menu";
 import type { CartLine, Session, SessionStatus } from "@/types/session";
-import { checkGrounding, internalWords, offersToPay, replyLanguage, type GroundingResult } from "./grounding";
+import { FALLBACK } from "@/lib/agent/chat";
+import { checkGrounding, internalWords, offersToPay, replyLanguage, saysCannot, type GroundingResult } from "./grounding";
 
 interface ExpectedLine {
   itemId: string;
@@ -34,7 +35,8 @@ type ChoicesExpect = { templateId: string; ids: string[]; excludes?: string[] };
 
 type Expect =
   // With `choices`: one sentence that adds a line and asks about another ("a coffee for me, something not spicy for him").
-  | { cart: ExpectedLine[]; choices?: ChoicesExpect }
+  // With `saysCannot` (15-judge-fixes:0): the last reply names one of these words and says it cannot be done.
+  | { cart: ExpectedLine[]; choices?: ChoicesExpect; saysCannot?: string[] }
   | { choices: ChoicesExpect }
   // A question back instead of a staff call (14-final:4): cart unchanged, no staff, choice buttons or a question mark,
   // and a grounded reply; `mentionsAny`: the reply or the buttons name one of these items.
@@ -173,6 +175,7 @@ function judge(
   }
   if ("cart" in e) {
     if (normalize(final.cart) !== normalize(e.cart)) return "final cart differs";
+    if (e.saysCannot && !saysCannot(lastReply ?? "", e.saysCannot)) return "unsupported change not said";
     return e.choices ? choiceMiss(final, e.choices) : null;
   }
   if ("status" in e) return final.status === e.status ? null : `status ${final.status}`;
@@ -239,6 +242,8 @@ async function runCase(c: Case) {
   const languages: (string | null)[] = [];
   const allCalls: ToolCall[] = [];
   const requests: RequestLog[] = [];
+  // Replies that were the generic "say that again" (15-judge-fixes:0): a user repeats the order and gets it twice.
+  let genericRetries = 0;
 
   for (const message of c.turns) {
     const session = (await store.get(sessionId))!;
@@ -285,6 +290,7 @@ async function runCase(c: Case) {
       if (unsent.length > 0) out.actions.slice(-unsent.length).forEach((a, i) => (unsent[i].code = a.code));
       chat = chatReducer(chat, { type: "reply", text: reply });
       lastReply = reply;
+      if (reply === FALLBACK) genericRetries++;
       languages.push(replyLanguage(reply, getKiosk(kioskId)));
       for (const w of internalWords(reply, { replaying: Boolean(getKiosk(kioskId).learned) })) internal.add(w);
     } catch (e) {
@@ -314,6 +320,7 @@ async function runCase(c: Case) {
   const failure = requests.find((r) => r.error)
     ? `request error ${requests.find((r) => r.error)!.error}`
     : (judge(c, final, before, allCalls, grounding, payOffer, lastReply) ??
+      (genericRetries > 0 ? "generic retry reply" : null) ??
       languageMiss ??
       (internal.size > 0 ? `internal words: ${[...internal].join(",")}` : null));
   return {
@@ -333,6 +340,7 @@ async function runCase(c: Case) {
     ...(grounding ? { grounding } : {}),
     // The matched words only, never the reply.
     ...(internal.size > 0 ? { internalWords: [...internal] } : {}),
+    ...(genericRetries > 0 ? { genericRetries } : {}),
     requests,
   };
 }

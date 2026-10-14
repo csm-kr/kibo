@@ -306,6 +306,20 @@ describe("chatInstructions (static system for the prompt cache, the order per re
     expect(chatInstructions(k, empty).currentOrder).toContain("Cart: empty");
   });
 
+  it("an open choice goes in the current order with its question and names from menu data (15-judge-fixes:0)", () => {
+    const pendingChoice = { templateId: "pick_option" as const, choices: [{ kind: "option" as const, id: "cola" }, { kind: "option" as const, id: "cider" }] };
+    const { currentOrder, system } = chatInstructions(k, { ...empty, pendingChoice });
+    expect(currentOrder).toContain('Open question on the phone, not answered yet: {"question":"Which one would you like?","choices":["Cola","Cider"]}');
+    expect(chatInstructions(k, empty).currentOrder).not.toContain("Open question");
+    expect(system).toBe(chatInstructions(k, empty).system);
+  });
+
+  it("read-backs include the open question, and an unsupported change is said, not dropped (15-judge-fixes:0)", () => {
+    const { system } = chatInstructions(k, empty);
+    expect(system).toMatch(/read back the order.*question that is still open/i);
+    expect(system).toMatch(/no option for.*say in one sentence that this kiosk cannot do it/i);
+  });
+
   it("voice keeps one text with the same rules, order and menu (the Live token pins it)", () => {
     const text = buildInstructions(k, full);
     const { system, currentOrder } = chatInstructions(k, full);

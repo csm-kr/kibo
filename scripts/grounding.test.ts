@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getKiosk } from "@/lib/adapters/catalog";
-import { checkGrounding, internalWords, offersToPay, replyLanguage } from "./grounding";
+import { checkGrounding, internalWords, offersToPay, replyLanguage, saysCannot } from "./grounding";
 
 const k = getKiosk("malo");
 
@@ -44,6 +44,15 @@ describe("checkGrounding", () => {
 
   it("does not flag an off-menu word that the kiosk's own item names use", () => {
     expect(checkGrounding("Your pizza is on the kiosk.", getKiosk("doughhouse")).pass).toBe(true);
+  });
+});
+
+describe("saysCannot (15-judge-fixes:0: an unsupported change is said, not dropped)", () => {
+  it("needs the asked-for word and a plain no", () => {
+    expect(saysCannot("Added 1 × Spicy chicken burger. This kiosk can't leave out the sauce.", ["sauce"])).toBe(true);
+    expect(saysCannot("매콤 치킨버거를 담았어요. 소스 빼기는 이 키오스크에서 할 수 없어요.", ["sauce", "소스"])).toBe(true);
+    expect(saysCannot("Added 1 × Spicy chicken burger, no sauce. Total ₩5,600.", ["sauce"])).toBe(false);
+    expect(saysCannot("Added 1 × Spicy chicken burger. Total ₩5,600.", ["sauce"])).toBe(false);
   });
 });
 

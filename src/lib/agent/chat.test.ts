@@ -200,7 +200,8 @@ describe("runChat", () => {
     const req = input(s, { message: "A cola?" });
     const out = await runChat(deps(model), req);
     expect(requests).toHaveLength(5);
-    expect(out.reply).toBe("Sorry, could you say that again?");
+    // Five colas went in, so the reply says so instead of asking the user to repeat (15-judge-fixes:0).
+    expect(out.reply).toMatch(/^Added 1 × Cola.* and 1 × Cola.*\. Total ₩9,000\.$/);
     const ids = (await store.get(s.sessionId))!.recentCommandIds;
     expect(ids).toContain(`${req.chatRequestId}:4`);
     expect(ids).not.toContain(`${req.chatRequestId}:5`);
@@ -295,6 +296,129 @@ describe("runChat", () => {
       expect(requests).toHaveLength(2);
       expect(out.reply).toBe("Model reply.");
     }
+  });
+
+  describe("no reply text from the model (15-judge-fixes:0)", () => {
+    it("after an applied change the reply names the change, never the generic retry", async () => {
+      const s = await demo();
+      const { model, requests } = script([{ name: "addToCart", args: { itemId: "cola" } }], "");
+      const out = await runChat(deps(model), input(s, { message: "A cola?" }));
+      expect(requests).toHaveLength(2);
+      expect(out.reply).toMatch(/^Added 1 × Cola.*\. Total ₩1,800\.$/);
+      expect(out.reply).not.toContain("say that again");
+    });
+
+    it("an open choice from this request ends the reply with its question", async () => {
+      const s = await demo();
+      const { model } = script(
+        [{ name: "addToCart", args: { itemId: "cola" } }, { name: "addToCart", args: { itemId: "cheese_burger", variant: "set" } }],
+        [{ name: "offerChoices", args: { templateId: "pick_option", choices: [{ kind: "option", id: "cola" }, { kind: "option", id: "cider" }] } }],
+        "",
+      );
+      const out = await runChat(deps(model), input(s, { message: "A cola and a cheeseburger set?" }));
+      expect(out.reply).toMatch(/^Added 1 × Cola.*\. Total ₩1,800\. Which one would you like\?$/);
+    });
+
+    it("nothing applied and nothing asked: says what the kiosk sells and offers real items as buttons", async () => {
+      const s = await demo();
+      const req = input(s, { message: "Two tickets to the airport" });
+      const out = await runChat(deps(script("").model), req);
+      expect(out.reply).toBe("Here you can order Burgers, Chicken, Sides, Drinks, Coffee, Desserts and Breakfast. Which one would you like?");
+      const session = (await store.get(s.sessionId))!;
+      expect(session.pendingChoice).toEqual({
+        templateId: "pick_item",
+        choices: [{ kind: "item", id: "cheese_burger" }, { kind: "item", id: "soft_cone" }, { kind: "item", id: "chicken_nuggets" }],
+      });
+      expect(session.recentCommandIds).toEqual([`${req.chatRequestId}:0`]);
+      expect(out.actions.map((a) => [a.tool, a.code])).toEqual([["offerChoices", "ok"]]);
+      expect(out.cart).toEqual([]);
+    });
+
+    it("nothing applied after a refused add: offers the choices the server named", async () => {
+      const s = await demo();
+      const { model } = script([{ name: "addToCart", args: { itemId: "cheese_burger", variant: "set" } }], "");
+      const out = await runChat(deps(model), input(s, { message: "A cheeseburger set?" }));
+      const pending = (await store.get(s.sessionId))!.pendingChoice!;
+      expect(pending.templateId).toBe("pick_option");
+      expect(pending.choices).toEqual(expect.arrayContaining([{ kind: "option", id: "cola" }, { kind: "option", id: "cider" }]));
+      expect(out.reply).toBe("Which one would you like?");
+    });
+
+    it("during the review, nothing to offer: the generic retry stays for that failure path only", async () => {
+      const s = await demo();
+      await runChat(deps(script([{ name: "addToCart", args: { itemId: "cola" } }, { name: "setDineOption", args: { option: "eat_in" } }], "ok").model), input(s));
+      await runChat(deps(script([{ name: "requestCheckout" }], "ok").model), input(s, { utteranceSeq: 2 }));
+      const out = await runChat(deps(script("").model), input(s, { message: "hmm", utteranceSeq: 3 }));
+      expect(out.reply).toBe("Sorry, could you say that again?");
+      expect((await store.get(s.sessionId))!.pendingChoice).toBeNull();
+    });
+  });
+
+  it("after 12 s with a change applied, stops calling the model and replies from the results", async () => {
+    const s = await demo();
+    const { model: inner, requests } = script([{ name: "addToCart", args: { itemId: "cola" } }]);
+    // Each model call takes 7 s on the fake clock: 7 s after round 1, 14 s after round 2.
+    const slow: ModelClient = {
+      async generate(req) {
+        now += 7000;
+        return inner.generate(req);
+      },
+    };
+    const out = await runChat(deps(slow), input(s, { message: "One cola, is it cold?" }));
+    expect(requests).toHaveLength(2);
+    expect(out.total).toBe(3600);
+    expect(out.reply).toMatch(/^Added 1 × Cola.* and 1 × Cola.*\. Total ₩3,600\.$/);
+  });
+
+  it("the time budget leaves another language to the model: server sentences exist only in Korean and English", async () => {
+    const cases: Partial<ChatInput>[] = [
+      { message: "A cola?", language: "fr" },
+      { message: "Un coca, s'il vous plaît." },
+      { message: "コーラを一つ" },
+    ];
+    for (const extra of cases) {
+      const s = await demo();
+      const { model: inner, requests } = script([{ name: "addToCart", args: { itemId: "cola" } }], [{ name: "addToCart", args: { itemId: "cola" } }], "Réponse du modèle.");
+      const slow: ModelClient = {
+        async generate(req) {
+          now += 7000;
+          return inner.generate(req);
+        },
+      };
+      const out = await runChat(deps(slow), input(s, extra));
+      expect(requests).toHaveLength(3);
+      expect(out.reply).toBe("Réponse du modèle.");
+    }
+  });
+
+  it("a model error after a change was applied is answered from the results, not as an error", async () => {
+    const s = await demo();
+    const { model: inner } = script([{ name: "addToCart", args: { itemId: "cola" } }]);
+    let calls = 0;
+    const failsLater: ModelClient = {
+      async generate(req) {
+        if (++calls === 2) throw new CommandError("UPSTREAM", "Please try again in a moment.");
+        return inner.generate(req);
+      },
+    };
+    const out = await runChat(deps(failsLater), input(s, { message: "A cola?" }));
+    expect(calls).toBe(2);
+    expect(out.reply).toMatch(/^Added 1 × Cola.*\. Total ₩1,800\.$/);
+    expect(out.total).toBe(1800);
+  });
+
+  it("the time budget never cuts a request that has applied nothing", async () => {
+    const s = await demo();
+    const { model: inner, requests } = script([{ name: "addToCart", args: { itemId: "no_such_item" } }], "We do not have that.");
+    const slow: ModelClient = {
+      async generate(req) {
+        now += 7000;
+        return inner.generate(req);
+      },
+    };
+    const out = await runChat(deps(slow), input(s, { message: "A milkshake?" }));
+    expect(requests).toHaveLength(2);
+    expect(out.reply).toBe("We do not have that.");
   });
 
   it("never logs the message, history or reply", async () => {

@@ -138,6 +138,21 @@ export function offersToPay(reply: string): boolean {
   return PAY_OFFERS.some((re) => re.test(reply));
 }
 
+// A plain "no": "no sauce" itself must not count, so a bare "no" is not here.
+const CANNOT = [
+  /\b(can't|cannot|can not|isn't|is not|aren't|are not|doesn't|does not|don't|do not|unable|not available|not possible)\b/i,
+  /없|안 ?돼|안 ?됩|못 |못해|불가|어려/,
+];
+
+/**
+ * True when a reply names the change the user asked for and says it cannot be done (15-judge-fixes:0): "no sauce" on
+ * an item with no such option must be said, not silently dropped. Only the verdict is kept, never the reply.
+ */
+export function saysCannot(reply: string, words: string[]): boolean {
+  const lower = reply.toLowerCase();
+  return words.some((w) => lower.includes(w.toLowerCase())) && CANNOT.some((re) => re.test(reply));
+}
+
 /**
  * The app's own words for its screens, and "I am adding" about a change the tool already made (14-final:1). "Please
  * wait" alone is not here: after a staff call "잠시만 기다려 주세요" is the right reply (the first eval run flagged it).

@@ -1,7 +1,8 @@
 import { LANGUAGES, type SpeechLanguage } from "@/lib/i18n/languages";
 import { PHONE_NOTE } from "@/lib/voice/dineNote";
 import type { KioskData, Locale } from "@/types/menu";
-import type { CartLine, DineOption, SessionStatus } from "@/types/session";
+import type { CartLine, DineOption, Session, SessionStatus } from "@/types/session";
+import { choiceLabel, choiceQuestion } from "./choices";
 import { cartForModel } from "./mapping";
 import { menuForModel } from "./menu";
 
@@ -17,6 +18,7 @@ type OrderOptions = {
   cart?: CartLine[];
   status?: SessionStatus;
   dineOption?: DineOption | null;
+  pendingChoice?: Session["pendingChoice"];
   locale?: Locale;
   language?: SpeechLanguage;
 };
@@ -95,6 +97,8 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
     "When one request orders several lines, call addToCart for every line in the same response, before you say anything.",
     "Never say you will add something later: add it now, or ask what is missing.",
     "After a change, read back briefly what changed, using the names in the tool result.",
+    "When the user asks you to read back the order, also say any question that is still open (Open question in Current order), for example a drink still to choose for a set.",
+    "If the user asks to leave out or change something the item has no option for (for example \"no sauce\"), do what you can and, in the same response as your tool calls, say in one sentence that this kiosk cannot do it.",
     "Speak after your tool calls returned and say what was done (\"Added …\"); never say \"please wait\" or \"I am adding\" about a change that is already made.",
     ticket
       ? "To change existing lines (\"make that three tickets\", \"a window seat\"), call updateCart on the matching lineIds from the latest cart; never add duplicates."
@@ -175,6 +179,15 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
     cart.length === 0
       ? "Cart: empty"
       : `Cart lines, already applied; do not add these again:\n${dataJson(cartForModel(kiosk, cart, locale))}`,
+    // The choice buttons still on the phone, so a read-back can say what is left to choose (15-judge-fixes:0).
+    ...(opts.pendingChoice
+      ? [
+          `Open question on the phone, not answered yet: ${dataJson({
+            question: choiceQuestion(kiosk, opts.pendingChoice, locale),
+            choices: opts.pendingChoice.choices.map((c) => choiceLabel(kiosk, c, locale)),
+          })}`,
+        ]
+      : []),
   ];
   const menu = ["", "<menu_data>", dataJson(menuForModel(kiosk)), "</menu_data>"];
   return { rules, order, menu };

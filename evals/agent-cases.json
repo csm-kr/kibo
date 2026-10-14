@@ -1,5 +1,5 @@
 {
-  "about": "Text-agent evaluation set for the MALO BURGER kiosk and, for cases with kioskId \"airport_rail\", the SKYLINE AIRPORT RAIL ticket machine, and for kioskId \"doughhouse\", the learned Doughhouse pizza kiosk with a stand-in bridge that reports every replay as done (docs/TESTING.md \"Agent evaluation set\"). Written by the KIBO team, not an external benchmark. Each case starts on a fresh /demo session of its kioskId (default malo; status connected, empty cart) at 14:00 KST. Types follow TESTING 1-6, 8, 9; \"checkout\" checks the confirm rule; \"grounded-reply\" checks that the reply describes items only with menu data (scripts/grounding.ts, I-072). A cart expectation merges identical lines and counts defaults (set side fries_m, drink size m). Added in 14-final:4 and reported apart (`group`): \"colloquial\" (type 10), vague and spoken-style requests in Korean and English, also team-written, not real older users' speech; \"ask\" means a question or choice buttons instead of a staff call, and `excludes` lists choices that must not appear. \"language\" (type 11): two cases per AI-only language, one with the phone's picker set to it (`language`) and one with the picker on English, where the reply must still follow the user's language (`replyIn`, checked without AI by scripts/grounding.ts replyLanguage).",
+  "about": "Text-agent evaluation set for the MALO BURGER kiosk and, for cases with kioskId \"airport_rail\", the SKYLINE AIRPORT RAIL ticket machine, and for kioskId \"doughhouse\", the learned Doughhouse pizza kiosk with a stand-in bridge that reports every replay as done (docs/TESTING.md \"Agent evaluation set\"). Written by the KIBO team, not an external benchmark. Each case starts on a fresh /demo session of its kioskId (default malo; status connected, empty cart) at 14:00 KST. Types follow TESTING 1-6, 8, 9; \"checkout\" checks the confirm rule; \"grounded-reply\" checks that the reply describes items only with menu data (scripts/grounding.ts, I-072). A cart expectation merges identical lines and counts defaults (set side fries_m, drink size m). Added in 14-final:4 and reported apart (`group`): \"colloquial\" (type 10), vague and spoken-style requests in Korean and English, also team-written, not real older users' speech; \"ask\" means a question or choice buttons instead of a staff call, and `excludes` lists choices that must not appear. \"language\" (type 11): two cases per AI-only language, one with the phone's picker set to it (`language`) and one with the picker on English, where the reply must still follow the user's language (`replyIn`, checked without AI by scripts/grounding.ts replyLanguage). Added in 15-judge-fixes:0 (`group` \"recovery\", type 12) from the round-2 judges' sessions: an applied order, a read-back while a choice is open (the reply must name the item still waiting), a change the item has no option for (`saysCannot`: the reply names it and says it cannot be done) and a request this kiosk cannot serve. Every case fails when any reply is the generic \"Sorry, could you say that again?\".",
   "notCovered": [
     { "type": "7-count-limits", "reason": "Count limits (max 3 toppings) need the learned Doughhouse kiosk, which has no LearnedAdapter yet." }
   ],
@@ -615,6 +615,46 @@
       "replyIn": "id",
       "turns": ["Satu burger, ya."],
       "expect": { "choices": { "templateId": "pick_item", "ids": ["cheese_burger"] } }
+    },
+    {
+      "id": "r-ko-applied-never-generic",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "ko",
+      "turns": ["불고기버거 세트 두 개, 음료는 둘 다 사이다로 하고 애플파이 하나 주세요."],
+      "expect": {
+        "cart": [
+          { "itemId": "bulgogi_burger", "variant": "set", "qty": 2, "selections": { "side": ["fries_m"], "drink": ["cider"] } },
+          { "itemId": "apple_pie", "variant": "single", "qty": 1, "selections": {} }
+        ]
+      }
+    },
+    {
+      "id": "r-en-readback-pending",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "en",
+      "turns": ["One spicy chicken burger set, please.", "I can't see the screen well. Read back my whole order and the total."],
+      "expect": { "reply": { "mentionsAny": ["spicy_chicken_burger"] } }
+    },
+    {
+      "id": "r-en-unsupported-modifier",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "en",
+      "turns": ["One spicy chicken burger, just the burger, no sauce."],
+      "expect": {
+        "cart": [{ "itemId": "spicy_chicken_burger", "variant": "single", "qty": 1, "selections": {} }],
+        "saysCannot": ["sauce"]
+      }
+    },
+    {
+      "id": "r-en-out-of-domain",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "en",
+      "turns": ["Two tickets to the airport, please."],
+      "expect": { "ask": {} }
     }
   ]
 }

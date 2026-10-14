@@ -58,6 +58,7 @@ Full runs, oldest first. The headline is the newest; the others stay listed with
 | 10-14 12-42 | 70/70 | Vertex | — (before `quickReply`) |
 | 10-14 12-59 | 69/70 | Vertex | `l-es-ambiguous-picker-en` reply language undetected (flaky, I-228) |
 | **10-14 20-26** | **68/70** | Vertex | **headline.** `co-en-pay-in-one-message` (the review was not opened), `c-ko-for-the-kids` (staff called instead of choices) (I-239) |
+| 10-14 23-41 | 51/74 | Vertex | 15-judge-fixes:0, 4 new `recovery` cases (2/4). Not the headline: run before that step's last fix (the 12 s budget answered other languages in English, I-256: 5 cases `reply language en`), so not on the final code. 17 cases got `UPSTREAM` when a Vertex call passed the 40 s deadline (I-250, I-157; one model call median 5.2 s, p90 17.1 s, against 1.9–3.4 s on 10-13); 1 staff call (`c-ko-for-the-kids`, I-239). No reply was the generic "say that again" |
 
 Partial runs (subsets after a change; never headlines): 10-13 02-36, 05-47, 06-50, 13-18, 13-19, 14-19; 10-14 09-59, 10-02, 11-54, 12-36, 13-18, 13-22, 13-23.
 
