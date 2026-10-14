@@ -1,0 +1,59 @@
+{
+  "n": 89,
+  "at": "2026-10-14T02:21:55.346Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "애플 시나몬 티"
+      },
+      {
+        "op": "click",
+        "label": "HOT"
+      },
+      {
+        "op": "click",
+        "label": "장바구니 담기"
+      },
+      {
+        "op": "openReview",
+        "label": "주문하기"
+      }
+    ]
+  },
+  "resultSummary": "tapped 애플 시나몬 티 → HOT → 장바구니 담기 → 주문하기",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "애플 시나몬 티"
+          },
+          {
+            "op": "click",
+            "label": "HOT"
+          },
+          {
+            "op": "click",
+            "label": "장바구니 담기"
+          },
+          {
+            "op": "openReview",
+            "label": "주문하기"
+          }
+        ]
+      },
+      "resultSummary": "tapped 애플 시나몬 티 → HOT → 장바구니 담기 → 주문하기"
+    }
+  ],
+  "discoveries": {
+    "items": 5,
+    "optionGroups": 25,
+    "categories": 2
+  },
+  "inputTokens": 16287,
+  "outputTokens": 72
+}

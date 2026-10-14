@@ -1,0 +1,43 @@
+{
+  "n": 43,
+  "at": "2026-10-14T02:04:36.506Z",
+  "tool": "record",
+  "args": {
+    "kind": "item",
+    "names": [
+      "가락우동",
+      "얼큰우동",
+      "해물짬뽕",
+      "비빔국수",
+      "잔치국수",
+      "라면",
+      "물냉면"
+    ]
+  },
+  "resultSummary": "recorded item 가락우동, 얼큰우동, 해물짬뽕, 비빔국수, 잔치국수, 라면, 물냉면",
+  "calls": [
+    {
+      "tool": "record",
+      "args": {
+        "kind": "item",
+        "names": [
+          "가락우동",
+          "얼큰우동",
+          "해물짬뽕",
+          "비빔국수",
+          "잔치국수",
+          "라면",
+          "물냉면"
+        ]
+      },
+      "resultSummary": "recorded item 가락우동, 얼큰우동, 해물짬뽕, 비빔국수, 잔치국수, 라면, 물냉면"
+    }
+  ],
+  "discoveries": {
+    "items": 21,
+    "optionGroups": 9,
+    "categories": 3
+  },
+  "inputTokens": 8449,
+  "outputTokens": 1202
+}

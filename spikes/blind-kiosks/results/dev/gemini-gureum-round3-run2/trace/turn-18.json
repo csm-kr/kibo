@@ -1,0 +1,31 @@
+{
+  "n": 18,
+  "at": "2026-10-14T02:17:05.432Z",
+  "tool": "record",
+  "args": {
+    "kind": "item",
+    "names": [
+      "애플 시나몬 티"
+    ]
+  },
+  "resultSummary": "recorded item 애플 시나몬 티",
+  "calls": [
+    {
+      "tool": "record",
+      "args": {
+        "kind": "item",
+        "names": [
+          "애플 시나몬 티"
+        ]
+      },
+      "resultSummary": "recorded item 애플 시나몬 티"
+    }
+  ],
+  "discoveries": {
+    "items": 3,
+    "optionGroups": 12,
+    "categories": 1
+  },
+  "inputTokens": 7065,
+  "outputTokens": 258
+}

@@ -1,0 +1,31 @@
+{
+  "n": 25,
+  "at": "2026-10-14T02:17:32.056Z",
+  "tool": "record",
+  "args": {
+    "kind": "item",
+    "names": [
+      "아메리카노"
+    ]
+  },
+  "resultSummary": "recorded item 아메리카노",
+  "calls": [
+    {
+      "tool": "record",
+      "args": {
+        "kind": "item",
+        "names": [
+          "아메리카노"
+        ]
+      },
+      "resultSummary": "recorded item 아메리카노"
+    }
+  ],
+  "discoveries": {
+    "items": 4,
+    "optionGroups": 18,
+    "categories": 2
+  },
+  "inputTokens": 8873,
+  "outputTokens": 562
+}

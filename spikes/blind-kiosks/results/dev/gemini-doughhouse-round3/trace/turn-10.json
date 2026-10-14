@@ -1,0 +1,43 @@
+{
+  "n": 10,
+  "at": "2026-10-14T01:28:03.792Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "닫기"
+      },
+      {
+        "op": "click",
+        "label": "버팔로 윙 6조각"
+      }
+    ]
+  },
+  "resultSummary": "tapped 닫기 → 버팔로 윙 6조각",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "닫기"
+          },
+          {
+            "op": "click",
+            "label": "버팔로 윙 6조각"
+          }
+        ]
+      },
+      "resultSummary": "tapped 닫기 → 버팔로 윙 6조각"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 4704,
+  "outputTokens": 44
+}

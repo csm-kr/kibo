@@ -1,0 +1,51 @@
+{
+  "n": 20,
+  "at": "2026-10-14T01:28:38.555Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "레귤러"
+      },
+      {
+        "op": "click",
+        "label": "오리지널"
+      },
+      {
+        "op": "click",
+        "label": "장바구니 담기"
+      }
+    ]
+  },
+  "resultSummary": "tapped 레귤러 → 오리지널 → 장바구니 담기",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "레귤러"
+          },
+          {
+            "op": "click",
+            "label": "오리지널"
+          },
+          {
+            "op": "click",
+            "label": "장바구니 담기"
+          }
+        ]
+      },
+      "resultSummary": "tapped 레귤러 → 오리지널 → 장바구니 담기"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 5212,
+  "outputTokens": 56
+}

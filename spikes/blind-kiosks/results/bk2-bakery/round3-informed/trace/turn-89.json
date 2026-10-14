@@ -1,0 +1,35 @@
+{
+  "n": 89,
+  "at": "2026-10-14T02:20:35.969Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "샌드위치"
+      }
+    ]
+  },
+  "resultSummary": "tapped 샌드위치",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "샌드위치"
+          }
+        ]
+      },
+      "resultSummary": "tapped 샌드위치"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 11771,
+  "outputTokens": 25
+}

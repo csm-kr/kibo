@@ -1,0 +1,51 @@
+{
+  "n": 106,
+  "at": "2026-10-14T02:30:09.705Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "커피"
+      },
+      {
+        "op": "click",
+        "label": "›"
+      },
+      {
+        "op": "click",
+        "label": "헤이즐넛 아메리카노"
+      }
+    ]
+  },
+  "resultSummary": "tapped 커피 → › → 헤이즐넛 아메리카노",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "커피"
+          },
+          {
+            "op": "click",
+            "label": "›"
+          },
+          {
+            "op": "click",
+            "label": "헤이즐넛 아메리카노"
+          }
+        ]
+      },
+      "resultSummary": "tapped 커피 → › → 헤이즐넛 아메리카노"
+    }
+  ],
+  "discoveries": {
+    "items": 5,
+    "optionGroups": 25,
+    "categories": 2
+  },
+  "inputTokens": 85142,
+  "outputTokens": 55
+}

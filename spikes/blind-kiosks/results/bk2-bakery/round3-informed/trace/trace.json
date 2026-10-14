@@ -1,0 +1,18 @@
+{
+  "kioskId": "bk2-bakery",
+  "provider": "gemini",
+  "model": "gemini-3.8-flash",
+  "startedAt": "2026-10-14T02:15:04.951Z",
+  "endedAt": "2026-10-14T02:30:42.629Z",
+  "gate": {
+    "tests": 4,
+    "testsPassedForFinish": true,
+    "audits": 2,
+    "auditOk": true,
+    "finished": true
+  },
+  "turns": 97,
+  "inputTokens": 1063159,
+  "cachedInputTokens": 569865,
+  "outputTokens": 62486
+}

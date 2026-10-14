@@ -1,0 +1,25 @@
+{
+  "n": 26,
+  "at": "2026-10-14T01:30:41.474Z",
+  "tool": "testSkill",
+  "args": {
+    "orders": 3
+  },
+  "resultSummary": "testSkill 1/3 passed",
+  "calls": [
+    {
+      "tool": "testSkill",
+      "args": {
+        "orders": 3
+      },
+      "resultSummary": "testSkill 1/3 passed"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 15973,
+  "outputTokens": 3057
+}

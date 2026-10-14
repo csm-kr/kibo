@@ -1,0 +1,121 @@
+#1 act {"label":"구름다락 커피","op":"click"}
+#2 act {"op":"click","label":"매장"}
+#3 record 
+#4 act {"label":"밤 크림 라떼","op":"click"}
+#5 act {"label":"ICED","op":"click"}
+#6 act {"label":"HOT","op":"click"}
+#7 record 
+#8 act [{"op":"click","label":"취소"},{"label":"홍시 스무디","op":"click"}]
+#9 act {"op":"click","label":"HOT"}
+#10 act {"op":"click","label":"ICED"}
+#11 act [{"label":"레귤러","op":"click"},{"op":"click","label":"장바구니 담기"}]
+#12 act [{"op":"click","label":"전체 취소"},{"label":"홍시 스무디","op":"click"}]
+#13 act {"label":"삭제","op":"click"}
+#14 act {"op":"click","label":"홍시 스무디"}
+#15 record 
+#16 act [{"op":"click","label":"취소"},{"op":"click","label":"애플 시나몬 티"}]
+#17 act {"op":"click","label":"ICED"}
+#18 record 
+#19 act [{"op":"click","label":"취소"},{"label":"커피","op":"click"}]
+#20 act {"label":"›","op":"click"}
+#21 act {"label":"‹","op":"click"}
+#22 act {"op":"click","label":"아메리카노"}
+#23 act {"op":"click","label":"ICED"}
+#24 act [{"op":"click","label":"바닐라 시럽"},{"label":"헤이즐넛 시럽","op":"click"}]
+#25 record 
+#26 act [{"label":"취소","op":"click"},{"label":"카페라떼","op":"click"}]
+#27 act {"label":"ICED","op":"click"}
+#28 record 
+#29 act [{"label":"취소","op":"click"},{"label":"바닐라라떼","op":"click"}]
+#30 act {"label":"ICED","op":"click"}
+#31 act [{"label":"취소","op":"click"},{"label":"카라멜 마키아토","op":"click"}]
+#32 act {"op":"click","label":"ICED"}
+#33 act [{"op":"click","label":"취소"},{"op":"click","label":"카푸치노"}]
+#34 act {"label":"ICED","op":"click"}
+#35 act [{"op":"click","label":"취소"},{"op":"click","label":"콜드브루"}]
+#36 act [{"op":"click","label":"취소"},{"label":"콜드브루 라떼","op":"click"}]
+#37 act [{"op":"click","label":"취소"},{"label":"SOLD OUT","op":"click"}]
+#38 act {"label":"›","op":"click"}
+#39 act {"op":"click","label":"카페모카"}
+#40 act {"op":"click","label":"ICED"}
+#41 act [{"label":"취소","op":"click"},{"op":"click","label":"에스프레소"}]
+#42 act {"label":"ICED","op":"click"}
+#43 act [{"op":"click","label":"취소"},{"label":"연유라떼","op":"click"}]
+#44 act {"op":"click","label":"ICED"}
+#45 act [{"op":"click","label":"취소"},{"op":"click","label":"헤이즐넛 아메리카노"}]
+#46 act {"label":"ICED","op":"click"}
+#47 act [{"label":"취소","op":"click"},{"label":"논커피","op":"click"}]
+#48 act {"label":"초코라떼","op":"click"}
+#49 act {"op":"click","label":"ICED"}
+#50 act [{"op":"click","label":"취소"},{"label":"녹차라떼","op":"click"}]
+#51 act {"op":"click","label":"ICED"}
+#52 act [{"op":"click","label":"취소"},{"label":"딸기우유","op":"click"}]
+#53 act [{"op":"click","label":"취소"},{"label":"티","op":"click"}]
+#54 act {"label":"얼그레이 티","op":"click"}
+#55 act {"label":"ICED","op":"click"}
+#56 act [{"op":"click","label":"취소"},{"op":"click","label":"유자차"}]
+#57 act [{"op":"click","label":"취소"},{"label":"에이드·스무디","op":"click"}]
+#58 act {"label":"레몬에이드","op":"click"}
+#59 act [{"label":"취소","op":"click"},{"op":"click","label":"딸기 요거트 스무디"}]
+#60 act [{"label":"취소","op":"click"},{"op":"click","label":"망고 스무디"}]
+#61 act [{"label":"취소","op":"click"},{"label":"베이커리·디저트","op":"click"}]
+#62 act {"op":"click","label":"버터 크루아상"}
+#63 act [{"label":"취소","op":"click"},{"op":"click","label":"플레인 베이글"}]
+#64 act [{"op":"click","label":"취소"},{"label":"초코 머핀","op":"click"}]
+#65 act [{"op":"click","label":"취소"},{"label":"뉴욕 치즈케이크","op":"click"}]
+#66 act {"op":"click","label":"티라미수"}
+#67 act {"op":"click","label":"마카롱 (3개입)"}
+#68 act {"label":"초코칩 쿠키","op":"click"}
+#69 act {"op":"openReview","label":"주문하기"}
+#70 act {"op":"click","label":"이전"}
+#71 act [{"op":"click","label":"전체 취소"},{"label":"삭제","op":"click"},{"label":"세트","op":"click"}]
+#72 act {"label":"준비중","op":"click"}
+#73 act {"label":"확인","op":"click"}
+#74 act {"op":"click","label":"브런치 세트"}
+#75 act [{"label":"카페라떼","op":"click"},{"op":"click","label":"다음"}]
+#76 act {"op":"click","label":"ICED"}
+#77 act {"op":"click","label":"다음"}
+#78 act {"label":"버터 크루아상","op":"click"}
+#79 act {"op":"click","label":"플레인 베이글"}
+#80 act [{"label":"✕","op":"click"},{"label":"케이크 세트","op":"click"}]
+#81 records 
+#82 act {"label":"✕","op":"click"}
+#83 act [{"label":"커피","op":"click"},{"label":"아메리카노","op":"click"},{"label":"HOT","op":"click"},{"label":"레귤러","op":"click"},{"label":"다락 블렌드","op":"click"},{"op":"click","label":"장바구니 담기"}]
+#84 act {"op":"openReview","label":"주문하기"}
+#85 act {"op":"click","label":"괜찮아요"}
+#86 act {"label":"이전","op":"click"}
+#87 reload 
+#88 act [{"label":"구름다락 커피","op":"click"},{"label":"포장","op":"click"}]
+#89 act [{"op":"click","label":"애플 시나몬 티"},{"label":"HOT","op":"click"},{"op":"click","label":"장바구니 담기"},{"label":"주문하기","op":"openReview"}]
+#90 act {"op":"click","label":"괜찮아요"}
+#91 records 
+#92 testSkill 
+  test #1: PASS PASS PASS
+#93 audit 
+  audit #1: GAPS missing=35 unknown=0 hidden=0 itemsMissingOptions=0
+#94 act [{"label":"이전","op":"click"},{"label":"세트","op":"click"},{"label":"케이크 세트","op":"click"}]
+#95 act {"label":"아메리카노","op":"click"}
+#96 act [{"label":"HOT","op":"click"},{"label":"다음","op":"click"}]
+#97 act [{"within":"케이크 세트","op":"click","label":"✕"},{"label":"투게더 세트","op":"click"}]
+#98 act [{"label":"아메리카노","op":"click"},{"op":"click","label":"HOT"},{"label":"다음","op":"click"}]
+#99 act [{"label":"아메리카노","op":"click"},{"label":"ICED","op":"click"},{"op":"click","label":"다음"}]
+#100 act {"op":"click","within":"투게더 세트","label":"✕"}
+#101 audit 
+  audit #2: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=0
+#102 act [{"label":"베이커리·디저트","op":"click"},{"op":"click","label":"뉴욕 치즈케이크"},{"op":"click","label":"뉴욕 치즈케이크"}]
+#103 act {"op":"click","label":"계속 주문하기"}
+#104 act [{"op":"click","label":"베이커리·디저트"},{"op":"click","label":"뉴욕 치즈케이크"},{"op":"click","label":"뉴욕 치즈케이크"}]
+#105 testSkill 
+  test #2: FAIL FAIL FAIL uncovered=23
+    order 1: no tappable label "카라멜 시럽" on this screen
+    order 2: no tappable label "바닐라 시럽" on this screen
+    order 3: no tappable label "많이 올려주세요" on this screen
+#106 act [{"op":"click","label":"커피"},{"op":"click","label":"›"},{"op":"click","label":"헤이즐넛 아메리카노"}]
+#107 act {"label":"ICED","op":"click"}
+#108 act {"label":"취소","op":"click"}
+#109 act [{"op":"click","label":"에이드·스무디"},{"label":"망고 스무디","op":"click"}]
+#110 act {"label":"취소","op":"click"}
+#111 audit 
+  audit #3: OK missing=0 unknown=0 hidden=0 itemsMissingOptions=0
+{"provider":"gemini","model":"gemini-3.8-flash","learner":{"commit":"ea28477d5a6c74946577f12bb66bc8103a8341be","dirty":false},"cachedInputTokens":1418391,"finished":false,"turns":111,"acts":151,"tests":2,"inputTokens":2009976,"outputTokens":62945,"minutes":"17.4"}
+last skill written to last-skill.json
