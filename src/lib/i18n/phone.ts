@@ -135,6 +135,8 @@ const PHONE_TEXT = {
   yourTurnPre: { ko: "이제 직접 해 보세요: 휴대폰에서 ", en: "Your turn: tap " },
   yourTurnPost: { ko: "를 누르고, 키오스크에서 카드를 대세요.", en: " on the phone, then the card on the kiosk." },
   yourTurnLearned: { ko: "이제 키오스크에서 직접 주문을 마치고 결제해요.", en: "Your turn: finish and pay on the kiosk itself." },
+  // From paying on, only the card is left (I-242).
+  yourTurnCard: { ko: "이제 키오스크에서 카드를 넣으세요.", en: "Your turn: insert the card at the kiosk." },
   scenarioPaid: { ko: "결제를 마쳤어요. 다른 시나리오도 해 보세요.", en: "Paid. Choose another scenario to try more." },
   tagOrdering: { ko: "주문", en: "Ordering" },
   tagSafety: { ko: "안전", en: "Safety" },

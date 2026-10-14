@@ -102,3 +102,13 @@ When an issue class in `docs/ISSUE.md` is seen for the **3rd time**, it becomes 
 - From: `unchecked-upstream-shape` — I-058 (seen 10-13/3-assistant:2), I-124 (10-13/8-scenarios:0), I-237 (10-14/14-final:7)
 - Why: Gemini replies changed shape under us three times (a candidate with no `parts`, TTS audio in a WAV header, a `C2PA` chunk after the audio), and each time code that read the reply as the shape it once had produced a 500 or a click and a noise burst, and the committed fixtures kept the fault after the parser was fixed.
 - Check: code that reads a Gemini reply (`src/lib/agent/model.ts`, `scripts/wav.ts`) has a test with the reply's current shape (missing fields, header, trailing chunk); artifacts made from replies have a check on the artifact itself (`npx vitest run scripts/fixtures.test.ts` for `e2e/fixtures/*.wav`), and a parser fix in the same change regenerates them.
+
+### R-018 (proposed): Keyboard focus inside a scroll area stays fully visible while anything beside it appears, goes or changes size; prove a fix with a repeated run
+- From: `flaky-qa-state` — I-220 (seen 10-14/14-final:2, 10-14/14-final:4, 10-14/14-final:10)
+- Why: the phone's cart summary pill and dock take height from the scroll area, and three times a QA state failed "focus obscured" in some runs only, so each pass looked like a flake while a keyboard user really saw the focused control covered.
+- Check: a change to anything placed beside `[data-phone-scroll]` (summary, dock, banners) keeps the `Scroll` focus rule in `src/components/assistant/AssistantPanel.tsx`, and the QA state that shows it passes `npx playwright test -c playwright.qa.config.ts <spec> -g <test> --repeat-each 6`; a "focus obscured" H that passes on rerun is a bug, never a flake.
+
+### R-019 (proposed): A hint or one-line label on the phone fits at 320 px wide in Korean with larger text, or is shortened
+- From: `truncated-copy` — I-133 (seen 10-13/8-scenarios:4, 10-13/9-polish:6, 10-14/14-final:10)
+- Why: the text-field hint was cut three times ("…City Cent", "e.g. One cheesebu", "예: 치즈버거 세"), each fix checked one width or one language, and a cut hint reads as broken to the older users the phone is for.
+- Check: for each placeholder or one-line label a step adds or changes on the phone, look at its `*-320x700.png` QA screenshot in Korean with larger text (`P3-typing-ko-large`) and in English; `e2e/flow-polish.spec.ts` measures the hint's width against its field (extend it to 320×700 when the hint changes).

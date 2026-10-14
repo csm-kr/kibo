@@ -27,7 +27,7 @@ const REASON: Record<string, Words> = {
   NETWORK: { ko: "연결이 끊겼어요", en: "no answer from the server" },
 };
 const REFUSED: Words = { ko: "서버가 거절했어요", en: "the server refused it" };
-const CONFIRM_CARD: Words = { ko: "확인 카드가 필요해요", en: "the confirm card is required" };
+const CONFIRM_CARD: Words = { ko: "직접 확인해야 해요", en: "you must confirm it yourself" };
 const AN_ITEM: Words = { ko: "항목", en: "an item" };
 
 /** What was tried, for a refusal: "Tried to add X". */
@@ -39,7 +39,7 @@ const TRIED: Record<string, (x: string, l: Locale) => string> = {
   undoLastChange: (_, l) => (l === "ko" ? "되돌리려고 했어요" : "Tried to undo"),
   offerChoices: (_, l) => (l === "ko" ? "선택지를 보여 주려고 했어요" : "Tried to show choices"),
   callStaff: (_, l) => (l === "ko" ? "직원을 부르려고 했어요" : "Tried to call staff"),
-  requestCheckout: (_, l) => (l === "ko" ? "확인 카드를 열려고 했어요" : "Tried to open the confirm card"),
+  requestCheckout: (_, l) => (l === "ko" ? "주문 내역을 띄우려고 했어요" : "Tried to open your order review"),
   confirmCheckout: (_, l) => (l === "ko" ? "결제하려고 했어요" : "Tried to pay"),
 };
 const TRIED_UNKNOWN: Words = { ko: "이 키오스크에 없는 동작을 시도했어요", en: "Tried something this kiosk does not have" };
@@ -116,7 +116,7 @@ function okText(k: KioskData, a: AgentAction, locale: Locale): string {
     case "callStaff":
       return ko ? "직원을 호출했어요" : "Called staff";
     case "requestCheckout":
-      return ko ? "확인 카드를 열었어요" : "Opened the confirm card";
+      return ko ? "주문 내역을 띄웠어요" : "Opened your order review";
     // Only the user can confirm: a tap on the confirm card, or a new "yes" after it appeared (server rule).
     case "confirmCheckout":
       if (a.tap) return ko ? "'네, 결제할게요'를 눌러 확인했어요" : "You tapped Yes, pay now";

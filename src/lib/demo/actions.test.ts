@@ -18,8 +18,8 @@ describe("actionRow", () => {
     const need = act("addToCart", { itemId: "cheese_burger", variant: "set" }, "NEEDS_CHOICE");
     expect(actionRow(malo, need, "en")).toEqual({ text: "Tried to add Cheeseburger set → a choice is needed first", tech: "addToCart refused (NEEDS_CHOICE)" });
     const pay = act("confirmCheckout", {}, "CONFLICT");
-    expect(actionRow(malo, pay, "en")).toEqual({ text: "Tried to pay → the confirm card is required", tech: "confirmCheckout refused (CONFLICT)" });
-    expect(actionRow(malo, pay, "ko").text).toBe("결제하려고 했어요 → 확인 카드가 필요해요");
+    expect(actionRow(malo, pay, "en")).toEqual({ text: "Tried to pay → you must confirm it yourself", tech: "confirmCheckout refused (CONFLICT)" });
+    expect(actionRow(malo, pay, "ko").text).toBe("결제하려고 했어요 → 직접 확인해야 해요");
     expect(actionRow(malo, act("addToCart", { itemId: "shrimp_burger" }, "SOLD_OUT"), "en").text).toMatch(/→ sold out$/);
   });
 
@@ -42,7 +42,7 @@ describe("actionRow", () => {
       "Undid the last change",
       "Asked which one: Cola, Cider",
       "Called staff",
-      "Opened the confirm card",
+      "Opened your order review",
       "You confirmed by saying yes",
       "Tried something this kiosk does not have → the server refused it",
     ]);

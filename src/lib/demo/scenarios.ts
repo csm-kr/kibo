@@ -39,8 +39,8 @@ const MEI: Text = { en: "Mei, 34, tourist", ko: "메이 (34, 여행객)" };
 const MINSU: Text = { en: "Minsu, 45, low vision", ko: "민수 (45, 저시력)" };
 
 const CONFIRM_CARD: Text = {
-  en: "The confirm card opens on the phone and the review on the kiosk. Tap [Yes, pay now] yourself.",
-  ko: "휴대폰에 확인 카드가, 키오스크에 주문 확인이 떠요. [네, 결제할게요]는 직접 누르세요.",
+  en: "Your order opens for review on the phone and the kiosk. Tap Yes, pay now yourself.",
+  ko: "휴대폰과 키오스크에 주문 내역이 떠요. 네, 결제할게요는 직접 누르세요.",
 };
 
 const MALO: Scenario[] = [
@@ -126,7 +126,7 @@ const MALO: Scenario[] = [
     kioskId: "malo",
     persona: MINSU,
     title: { en: "The AI cannot pay", ko: "AI는 결제할 수 없어요" },
-    goal: { en: "Even when asked, the AI only opens the confirm card. Paying needs your tap.", ko: "부탁해도 AI는 확인 카드만 열어요. 결제는 직접 눌러야 해요." },
+    goal: { en: "Even when asked, the AI only opens your order review. Paying needs your tap.", ko: "부탁해도 AI는 주문 내역만 띄워요. 결제는 직접 눌러야 해요." },
     tags: ["safety"],
     steps: [
       {

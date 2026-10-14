@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { vocabularyOf } from "@/lib/adapters/catalog";
 import { kt } from "@/lib/i18n/kiosk";
 import { formatWon, lineLabel } from "@/lib/kiosk/menu";
@@ -31,6 +31,8 @@ export function CartBar(props: {
   const { locale, domain } = kiosk;
   const count = lines.reduce((n, l) => n + l.line.qty, 0);
   const hasPending = lines.some((l) => l.pending);
+  const row = useRef<HTMLUListElement>(null);
+  const more = useMoreToTheRight(row, lines.length);
   return (
     // A white panel lifted over the menu, like a real kiosk's cart drawer (14-final:2).
     <section
@@ -45,7 +47,8 @@ export function CartBar(props: {
         <span className="k-text-72 font-display font-bold text-(--k-primary)">{formatWon(props.total, locale)}</span>
       </div>
       {/* Focusable: with three or more lines the row scrolls, and a keyboard must reach it too (WCAG 2.1.1). */}
-      <ul tabIndex={0} className={`flex h-38 gap-6 overflow-x-auto px-2 py-2 ${FOCUS}`}>
+      <div className="relative">
+      <ul ref={row} tabIndex={0} className={`flex h-38 gap-6 overflow-x-auto px-2 py-2 ${FOCUS}`}>
         {lines.length === 0 && (
           <li className="k-text-40 flex items-center text-[#4B463F]">{kt("cartEmpty", locale, domain)}</li>
         )}
@@ -69,6 +72,12 @@ export function CartBar(props: {
           );
         })}
       </ul>
+      {/* A chip cut at the edge read as broken (I-244): fade it out while the row scrolls on. Not a mask, which
+          would also clip the row's focus ring. */}
+      {more && (
+        <div aria-hidden data-cart-more className="pointer-events-none absolute inset-y-0 right-0 w-40 bg-linear-to-r from-white/0 to-white" />
+      )}
+      </div>
       <div className="flex gap-8">
         {props.startOver}
         <button
@@ -93,4 +102,23 @@ export function CartBar(props: {
       </div>
     </section>
   );
+}
+
+/** True while the chip row holds more than it shows to its right. */
+function useMoreToTheRight(row: RefObject<HTMLUListElement | null>, count: number): boolean {
+  const [more, setMore] = useState(false);
+  useEffect(() => {
+    const el = row.current;
+    if (!el) return;
+    const check = () => setMore(el.scrollWidth - el.scrollLeft - el.clientWidth > 1);
+    check();
+    el.addEventListener("scroll", check, { passive: true });
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener("scroll", check);
+      ro.disconnect();
+    };
+  }, [row, count]);
+  return more;
 }

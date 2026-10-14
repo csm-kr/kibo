@@ -89,9 +89,26 @@ export type Skill = z.infer<typeof skillSchema>;
 /** A neutral stroke icon: KIBO never copies a learned kiosk's photos. */
 export const LEARNED_PLACEHOLDER = "/learned-kiosks/item.svg";
 
-/** True when the bridge must not click this label (it contains a forbidden word or label). */
+// Spacing, case, punctuation and emoji never hide a payment word ("주문 하기", "💳 신용/체크카드").
+const norm = (s: string) => s.normalize("NFKC").toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
+// Payment words the bridge refuses on every kiosk, on top of the skill's own list.
+const PAYMENT = ["결제", "카드", "pay", "card", "checkout"];
+// A line that starts with one of these keeps the order going (a timeout modal's 계속 주문하기, I-193, I-234), so the
+// skill's order words alone do not refuse it; a payment word still does ("Continue to checkout", 결제 취소).
+const KEEP_ORDERING = ["계속", "더담기", "continue", "cancel"];
+
+/**
+ * True when the bridge must not click this label. Each line of it is checked: a line refuses when it is one of the
+ * skill's forbidden labels, holds a payment word, or holds a forbidden label without starting with a keep-ordering
+ * word. Stricter than the learner's whole-label rule (spikes/kibo-learn/plan.mjs `isForbidden`): when in doubt, refuse.
+ */
 export function isForbiddenLabel(label: string, forbidden: string[]): boolean {
-  return forbidden.some((f) => label.includes(f));
+  const own = forbidden.map(norm).filter(Boolean);
+  return label.split("\n").map(norm).filter(Boolean).some((line) => {
+    if (own.includes(line) || PAYMENT.some((w) => line.includes(w))) return true;
+    if (KEEP_ORDERING.some((w) => line.startsWith(w))) return false;
+    return own.some((f) => line.includes(f));
+  });
 }
 
 function both(key: "dineChip" | "takeOutChip"): LocalizedName {

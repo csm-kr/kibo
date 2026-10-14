@@ -85,7 +85,10 @@
     {
       "step": 10,
       "name": "qa",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-10-14T21:26:54+0900",
+      "completed_at": "2026-10-14T22:55:00+0900",
+      "summary": "Phase QA pass: phases/14-final/qa/REPORT.md (angles A-I, 17 JUDGE_QA rows re-walked by a fresh-eyes agent: 10 fixed, 7 partly, with screenshot paths; ready-to-submit list for a person). Fixed: bridge isForbiddenLabel checks each line, refuses forbidden labels and payment words, lets keep-ordering labels like 계속 주문하기 through (I-234, test first, learned E2E passes; payment rule unchanged); D1 language line now 'Screens in English and Korean; the AI talks in 9 languages (tested by typing)'; I-241 order-review wording, I-242 paying turn line, I-244 cart chip fade, I-245 'By option' on /learn; I-220 focus in the phone scroll area (R-018 proposed), R-019 proposed for cut hints; SUBMISSION states the skill-total count (R-014). New issues I-248..I-252 (I-250 P1: no timeout on hung model calls). ACs this session: lint, build, unit 1086 passed, e2e 47 passed, prototype 42/42, qa:ui 47/47 with 0 H (one earlier full run had 2 flakes, I-252), scan:repo 0 findings; test:e2e:live once (15/17, I-250, I-251)."
     }
   ],
   "created_at": "2026-10-14T08:35:09+0900"

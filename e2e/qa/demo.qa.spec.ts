@@ -269,6 +269,9 @@ test.describe(() => {
 
     // After payment the "Your turn" line points on (I-144, added in 11-hardening:1; R-003).
     await page.getByRole("button", { name: "Yes, pay now" }).click();
+    // While paying only the card is left (I-242, 14-final:10; R-003).
+    await expect(yourTurn).toHaveText("Your turn: insert the card at the kiosk.");
+    await check(page, info, "D2-scenario-paying-guide", () => yourTurn.scrollIntoViewIfNeeded(), VIEWPORTS, DEMO_GUIDE);
     await page.getByRole("button", { name: "Insert the card at the kiosk" }).click();
     await expect(yourTurn).toHaveText("Paid. Choose another scenario to try more.");
     await check(page, info, "D3-scenario-paid-guide", () => yourTurn.scrollIntoViewIfNeeded(), VIEWPORTS, DEMO_GUIDE);

@@ -681,6 +681,14 @@ function Scroll({ children }: { children: ReactNode }) {
     <div
       data-phone-scroll
       tabIndex={0}
+      // A control that takes keyboard focus half under the area's bottom edge stays covered by the cart summary or
+      // the dock (WCAG 2.4.11, I-220 seen again on P3-upsell at 320×700); bring it fully into view. Keyboard focus
+      // only, so a tap never makes the list jump.
+      onFocus={(e) => {
+        const el = e.target;
+        if (el !== e.currentTarget && el instanceof HTMLElement && el.matches(":focus-visible"))
+          el.scrollIntoView({ block: "nearest" });
+      }}
       className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-6 focus-visible:outline-[3px] focus-visible:-outline-offset-[3px] focus-visible:outline-ink"
     >
       {children}

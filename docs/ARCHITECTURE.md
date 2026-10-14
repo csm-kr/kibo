@@ -383,7 +383,7 @@ categories[{categoryId, name{ko,en}, label}],
 catalog[{itemId, name{ko,en}, label, category, price, soldOut,
          optionGroups[{groupId, name{ko,en}, label, required, min, max, defaultOptionIds[], options[{optionId, name{ko,en}, label, priceDelta}],
                        select?[steps] (how chooseOptions picks one option, e.g. the + in its row), after?[steps] (e.g. a wizard's 다음)}]}],
-uiLabels[], forbiddenLabels[] (a label containing any entry is never clicked: payment, card, checkout),
+uiLabels[], forbiddenLabels[] (never clicked: a label line that is an entry, holds a payment word (결제, 카드, pay, card, checkout), or holds an entry without starting with a keep-ordering word (계속, 더 담기, continue, cancel), so a timeout modal's 계속 주문하기 stays tappable; `isForbiddenLabel`, 14-final:10),
 checkout{label, name{ko,en}} (the kiosk's own button that ends the order, one of the forbidden labels; the phone's review says "tap 주문하기 on the kiosk and pay there"),
 recipes{startOrder, addToCart, removeLine, ...}, cartTotalPattern, cartLinePattern
 ```

@@ -249,6 +249,8 @@ function Checklist(props: Props & { scenario: Scenario }) {
           {/* After payment the "tap Yes, pay now" step is done, so the line points on instead (I-144). */}
           {live?.status === "paid" ? (
             pt("scenarioPaid", locale)
+          ) : live?.status === "paying" ? (
+            pt("yourTurnCard", locale)
           ) : learned ? (
             pt("yourTurnLearned", locale)
           ) : (

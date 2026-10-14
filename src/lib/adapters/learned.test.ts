@@ -71,6 +71,23 @@ describe("skills/doughhouse.json", () => {
     }
   });
 
+  it("I-234: keeps refusing payment controls but lets keep-ordering labels through", () => {
+    const f = skill.forbiddenLabels;
+    // Real payment and checkout controls stay refused, also with spacing, case or a price beside them.
+    for (const label of ["주문하기", "주문 하기", "결제하기", "카드 결제", "💳 신용/체크카드", "Pay", "Pay now", "Checkout",
+      "계속 결제하기", "Continue to checkout", "Continue to payment", "결제 취소", "주문하기 23,400원"]) {
+      expect(isForbiddenLabel(label, f), label).toBe(true);
+    }
+    // A control that keeps the order going, or a real choice, is not a payment control.
+    for (const label of ["계속 주문하기", "계속 주문", "더 담기", "Continue ordering", "Cancel", "곱빼기", "라지", "삭제"]) {
+      expect(isForbiddenLabel(label, f), label).toBe(false);
+    }
+    // A target whose text holds a payment line is refused even when another line keeps ordering.
+    expect(isForbiddenLabel("더 담기\n주문하기", f)).toBe(true);
+    // A keep-ordering word only frees a label it starts: "주문하기 계속" is still the order button.
+    expect(isForbiddenLabel("주문하기 계속", f)).toBe(true);
+  });
+
   it("removes a line with the kiosk's own delete button", () => {
     expect(skill.recipes.removeLine).toEqual([{ op: "clickNth", label: "삭제", index: "{lineIndex}" }]);
   });

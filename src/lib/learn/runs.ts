@@ -75,7 +75,7 @@ export const LEARN_RUNS: LearnRun[] = [
     title: "Doughhouse pizza kiosk",
     phrase: "Doughhouse pizza kiosk",
     provenance:
-      "Built by the KIBO team, and the learner was developed on it, so this is not a blind test. It is the learned kiosk in the live demo. Recorded on 10-13, before the kiosk's look was restyled on 10-14, so the pictures show the plain page it learned; its labels did not change.",
+      "Built by the KIBO team, and the learner was developed on it, so this is not a blind test. It is the learned kiosk in the live demo. Recorded on 10-13, before the kiosk's look was restyled on 10-14, so the pictures show the plain page it learned; its labels did not change. This is the traced run of an earlier learner; the newest run on this kiosk (5.2 min) kept no trace.",
     demoKioskId: "doughhouse",
     cover: {
       n: 13,

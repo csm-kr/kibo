@@ -118,7 +118,7 @@ const ALTERNATIVES: { title: string; what: string; kibo: string; source?: { labe
 const SESSION_MINUTES = SESSION_TTL_MS / 60_000;
 
 const SAFETY = [
-  "You approve every payment: by tapping the confirm card, or with a new “yes” after it appears.",
+  "You approve every payment: by tapping Yes, pay now, or with a new “yes” after your order shows.",
   "Card payment happens only on the kiosk itself.",
   "The server checks every AI action: the item, its options, the quantity and the order state.",
   "Names and prices come only from the kiosk’s own menu data, never from the AI.",

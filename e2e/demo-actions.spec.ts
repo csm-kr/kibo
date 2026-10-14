@@ -48,7 +48,7 @@ test("open at 1440 wide: each action in plain words with its tool and code, newe
   await expect(rows).toHaveCount(MIXED_ACTIONS.length);
   await expect(rows.first()).toContainText("Called staff");
   await expect(rows.first()).toContainText("callStaff ✓ 30 ms");
-  await expect(strip(page).locator('[data-action-code="CONFLICT"]')).toContainText("Tried to pay → the confirm card is required");
+  await expect(strip(page).locator('[data-action-code="CONFLICT"]')).toContainText("Tried to pay → you must confirm it yourself");
   await expect(strip(page).locator('[data-action-code="CONFLICT"]')).toContainText("confirmCheckout refused (CONFLICT)");
   await expect(strip(page).locator('[data-action-code="NEEDS_CHOICE"]')).toContainText("Tried to add Cheeseburger set → a choice is needed first");
   await expect(strip(page)).toContainText("Added 1 × Cheeseburger set (Zero cola · No pickles)");

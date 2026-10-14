@@ -84,7 +84,8 @@ test("scenario guide: open by default at 1440 wide, a chosen scenario starts fre
   await command(request, s.deviceToken, { sessionId: s.sessionId, type: "addToCart", args: { itemId: "cola" }, source: "text", utteranceSeq: 2 });
   const review = await command(request, s.deviceToken, { sessionId: s.sessionId, type: "requestCheckout", args: {}, source: "text", utteranceSeq: 3 });
   await command(request, s.deviceToken, { sessionId: s.sessionId, type: "confirmCheckout", args: {}, source: "button", cartVersion: review.cartVersion });
-  await expect(guide(page).locator("[data-scenario-your-turn]")).toContainText("Yes, pay now");
+  // While paying, only the card is left (I-242).
+  await expect(guide(page).locator("[data-scenario-your-turn]")).toHaveText("Your turn: insert the card at the kiosk.");
   await command(request, kiosk.kioskToken, { sessionId: s.sessionId, type: "cardAction", args: {}, source: "touch" });
   await expect(guide(page).locator("[data-scenario-your-turn]")).toHaveText("Paid. Choose another scenario to try more.");
 

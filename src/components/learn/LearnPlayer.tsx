@@ -292,7 +292,10 @@ function SkillSummary({ run }: { run: LearnRun }) {
                     {item.soldOut && <span className="font-normal text-muted"> (sold out)</span>}
                   </th>
                   <td className="py-2 pr-4">{item.category}</td>
-                  <td className="py-2 pr-4 text-right tabular-nums">{formatWon(item.price, "en")}</td>
+                  {/* A ticket priced 0 takes its fare from an option (passenger type); ₩0 read as a bug (I-245). */}
+                  <td className="py-2 pr-4 text-right tabular-nums">
+                    {item.price === 0 && item.groups.length ? "By option" : formatWon(item.price, "en")}
+                  </td>
                   <td className="py-2">
                     {item.groups.length
                       ? item.groups.map((g) => `${g.name}: ${g.options.join(", ")}`).join(" · ")

@@ -127,7 +127,7 @@ export function DemoIntro(props: {
               </button>
             </div>
             <p className="text-base text-[#4B463F]">
-              Works in English and Korean. No microphone? Type instead. With your own phone, scan the kiosk&apos;s QR and
+              Screens in English and Korean; the AI talks in 9 languages (tested by typing). No microphone? Type instead. With your own phone, scan the kiosk&apos;s QR and
               talk to it.
             </p>
           </div>
