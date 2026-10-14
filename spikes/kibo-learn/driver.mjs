@@ -159,6 +159,48 @@ async function locate(page, step) {
 
 const describe = (s) => [s.label, s.name, s.text].find(Boolean);
 
+// The tappable elements that look like the target and sit next to it: same tag, role and first class, under the
+// nearest of its 4 closest ancestors that holds one. A chip among other chips or one of a popup's two offers has
+// them; a lone add or close button does not (round 4: tells a customer choice from a control). Text is for prices.
+const LOOK_ALIKES = (el) => {
+  const target = el.closest('[data-kibo-label]') ?? el;
+  const shape = (e) => `${e.tagName}|${e.getAttribute('role') ?? ''}|${e.classList[0] ?? ''}`;
+  const text = (e) => (e.innerText || '').replace(/\s+/g, ' ').trim();
+  let alts = [];
+  for (let a = target.parentElement, d = 0; a && d < 4 && !alts.length; a = a.parentElement, d++) {
+    alts = [...a.querySelectorAll('[data-kibo-label]')].filter((x) => x !== target && !x.contains(target) && !target.contains(x) && shape(x) === shape(target));
+  }
+  return { label: target.getAttribute('data-kibo-label') ?? text(target), text: text(target),
+    alternatives: alts.map((x) => ({ label: x.getAttribute('data-kibo-label'), text: text(x) })) };
+};
+export async function lookAlikes(page, loc) {
+  await page.evaluate(MARK_CLICKABLES);
+  return loc.evaluate(LOOK_ALIKES);
+}
+// For a screen just opened: each tappable label that was not in `before`, with the labels of its look-alikes among
+// those new ones (the other chips of its row), whether it is a radio, checkbox or "+n원" choice, and disabled (sold out).
+const NEW_TAPPABLES = (before) => {
+  const shape = (e) => `${e.tagName}|${e.getAttribute('role') ?? ''}|${e.classList[0] ?? ''}`;
+  const fresh = [...document.querySelectorAll('[data-kibo-label]')].filter((e) => !before.includes(e.getAttribute('data-kibo-label')));
+  return fresh.map((e) => {
+    let peers = [];
+    for (let a = e.parentElement, d = 0; a && d < 4 && !peers.length; a = a.parentElement, d++) {
+      peers = fresh.filter((x) => x !== e && a.contains(x) && !x.contains(e) && !e.contains(x) && shape(x) === shape(e));
+    }
+    return {
+      label: e.getAttribute('data-kibo-label'),
+      peers: peers.map((x) => x.getAttribute('data-kibo-label')),
+      disabled: !!(e.disabled || e.getAttribute('aria-disabled') === 'true' || e.querySelector('input:disabled')),
+      choice: !!(e.matches('input[type=radio],input[type=checkbox]') || e.querySelector('input[type=radio],input[type=checkbox]')
+        || ['radio', 'checkbox', 'option', 'switch'].includes(e.getAttribute('role'))) || /[+＋]\s*[\d,]+\s*원/.test(e.innerText || ''),
+    };
+  });
+};
+export async function newTappables(page, before) {
+  await page.evaluate(MARK_CLICKABLES);
+  return page.evaluate(NEW_TAPPABLES, [...before]);
+}
+
 // One primitive step. Ops: click, check, clickIfVisible, openReview. Target by label (preferred), role+name, or text,
 // optionally narrowed by "within". A payment or checkout control is never clicked (isForbidden in plan.mjs, plus
 // opts.forbidden). openReview is the one exception: it taps only the kiosk's order button (isReviewOpener).
@@ -179,6 +221,8 @@ export async function act(page, step, opts = {}) {
   if (loc.missing) throw new Error(loc.missing);
   const text = await loc.evaluate((el) => `${el.getAttribute('data-kibo-label') ?? ''}\n${el.innerText ?? ''}`);
   if (!allowed(text)) throw refuse(text.trim().split('\n')[0]);
+  // The audit looks at what a step is about to tap (round 4); opts.kind says whether it answers an interrupt.
+  if (opts.inspect) await opts.inspect(page, loc, step, opts.kind ?? 'step');
   if (step.op === 'clickIfVisible') return loc.click({ timeout: 2000 });
   if (step.op === 'check') return loc.check({ timeout: 3000 });
   return loc.click({ timeout: 3000 });
@@ -192,7 +236,7 @@ export async function answerInterrupts(page, interrupts, opts = {}) {
     if (!it?.text || !it.dismiss) continue;
     const shown = await page.getByText(String(it.text)).filter({ visible: true }).count().catch(() => 0);
     if (!shown) continue;
-    await act(page, { ...it.dismiss, op: it.dismiss.op === 'clickIfVisible' ? 'clickIfVisible' : 'click' }, opts);
+    await act(page, { ...it.dismiss, op: it.dismiss.op === 'clickIfVisible' ? 'clickIfVisible' : 'click' }, { ...opts, kind: 'interrupt' });
     await page.waitForTimeout(150);
     answered.push(it.text);
   }

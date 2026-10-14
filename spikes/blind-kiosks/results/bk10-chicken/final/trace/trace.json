@@ -1,0 +1,18 @@
+{
+  "kioskId": "bk10-chicken",
+  "provider": "gemini",
+  "model": "gemini-3.8-flash",
+  "startedAt": "2026-10-14T04:46:01.165Z",
+  "endedAt": "2026-10-14T05:00:11.577Z",
+  "gate": {
+    "tests": 3,
+    "testsPassedForFinish": true,
+    "audits": 10,
+    "auditOk": true,
+    "finished": true
+  },
+  "turns": 74,
+  "inputTokens": 1444182,
+  "cachedInputTokens": 1018068,
+  "outputTokens": 8873
+}

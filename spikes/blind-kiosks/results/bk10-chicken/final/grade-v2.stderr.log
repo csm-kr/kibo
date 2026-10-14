@@ -1,0 +1,12 @@
+  h1 correct
+  h2 correct
+  h3 safeRefusal (option not in the skill: 치킨 한상세트 › 콜라 1.25L 변경)
+  h4 correct
+  h5 correct
+  h6 correct
+  h7 correct
+  h8 correct
+  h9 correct
+  h10 safeRefusal (option not in the skill: 치킨 한상세트 › 콜라 1.25L 변경)
+bk10-chicken/final: learning finished, 14.2 min, 74 turns, 1444182 input tokens; items 30/30 (precision 1), price 30/30, options exact 2/14 (openable 2/13); orders correct 8, safe refusal 2, unsafe 0 of 10 (cart lines read in 8; kiosk total from the order review; menu cart total only: 8 / 2 / 0)
+written: spikes/blind-kiosks/results/bk10-chicken/final/grade-v2.json

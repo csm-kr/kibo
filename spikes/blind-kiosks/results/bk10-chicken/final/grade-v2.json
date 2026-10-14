@@ -1,0 +1,1157 @@
+{
+  "kioskId": "bk10-chicken",
+  "label": "final",
+  "grader": 2,
+  "gradedAt": "2026-10-14T05:00:45.484Z",
+  "skill": "present",
+  "files": {
+    "skill": "spikes/blind-kiosks/results/bk10-chicken/final/skill.json",
+    "key": "spikes/blind-kiosks/bk10-chicken/answer-key.json",
+    "app": "spikes/blind-kiosks/bk10-chicken/app/index.html"
+  },
+  "summary": "bk10-chicken/final: learning finished, 14.2 min, 74 turns, 1444182 input tokens; items 30/30 (precision 1), price 30/30, options exact 2/14 (openable 2/13); orders correct 8, safe refusal 2, unsafe 0 of 10 (cart lines read in 8; kiosk total from the order review; menu cart total only: 8 / 2 / 0)",
+  "learning": {
+    "provider": "gemini",
+    "model": "gemini-3.8-flash",
+    "learner": {
+      "commit": "34532bc27a5e1938f6a60a2dbf65acc880e8a3e5",
+      "dirty": false
+    },
+    "cachedInputTokens": 1018068,
+    "finished": true,
+    "turns": 74,
+    "acts": 120,
+    "tests": 3,
+    "inputTokens": 1444182,
+    "outputTokens": 8873,
+    "minutes": "14.2"
+  },
+  "catalog": {
+    "items": {
+      "key": 30,
+      "skill": 30,
+      "matched": 30,
+      "recall": 1,
+      "precision": 1,
+      "missing": [],
+      "extra": []
+    },
+    "price": {
+      "correct": 30,
+      "of": 30
+    },
+    "category": {
+      "correct": 30,
+      "of": 30
+    },
+    "soldOut": {
+      "correct": 30,
+      "of": 30
+    },
+    "options": {
+      "itemsExact": 2,
+      "items": 14,
+      "openableExact": 2,
+      "openable": 13,
+      "groups": 39,
+      "groupsFound": 34,
+      "groupLabelsExact": 21,
+      "groupRulesCorrect": 30,
+      "quantityGroups": 0,
+      "quantityRecognized": 0,
+      "conditionalGroups": 0,
+      "conditionalFound": 0
+    },
+    "perItem": [
+      {
+        "name": "바삭 후라이드",
+        "skillName": "바삭 후라이드",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "양념소스 500",
+            "허니머스타드 500",
+            "갈릭마요 500",
+            "매운디핑소스 500"
+          ],
+          "extra": [
+            "양념소스 0",
+            "허니머스타드 0",
+            "갈릭마요 0",
+            "매운디핑소스 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "달빛 양념치킨",
+        "skillName": "달빛 양념치킨",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "양념소스 500",
+            "허니머스타드 500",
+            "갈릭마요 500",
+            "매운디핑소스 500"
+          ],
+          "extra": [
+            "양념소스 0",
+            "허니머스타드 0",
+            "갈릭마요 0",
+            "매운디핑소스 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "간장마늘치킨",
+        "skillName": "간장마늘치킨",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "양념소스 500",
+            "허니머스타드 500",
+            "갈릭마요 500",
+            "매운디핑소스 500"
+          ],
+          "extra": [
+            "양념소스 0",
+            "허니머스타드 0",
+            "갈릭마요 0",
+            "매운디핑소스 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "매운불꽃치킨",
+        "skillName": "매운불꽃치킨",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "양념소스 500",
+            "허니머스타드 500",
+            "갈릭마요 500",
+            "매운디핑소스 500"
+          ],
+          "extra": [
+            "양념소스 0",
+            "허니머스타드 0",
+            "갈릭마요 0",
+            "매운디핑소스 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "허니버터치킨",
+        "skillName": "허니버터치킨",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "양념소스 500",
+            "허니머스타드 500",
+            "갈릭마요 500",
+            "매운디핑소스 500"
+          ],
+          "extra": [
+            "양념소스 0",
+            "허니머스타드 0",
+            "갈릭마요 0",
+            "매운디핑소스 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "치즈시즈닝치킨",
+        "skillName": "치즈시즈닝치킨",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "양념소스 500",
+            "허니머스타드 500",
+            "갈릭마요 500",
+            "매운디핑소스 500"
+          ],
+          "extra": [
+            "양념소스 0",
+            "허니머스타드 0",
+            "갈릭마요 0",
+            "매운디핑소스 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "파닭치킨",
+        "skillName": "파닭치킨",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "한 마리 0",
+            "반 마리 -7000",
+            "뼈 0",
+            "순살 2000",
+            "양념소스 500",
+            "허니머스타드 500",
+            "갈릭마요 500",
+            "매운디핑소스 500"
+          ],
+          "extra": []
+        }
+      },
+      {
+        "name": "반반치킨",
+        "skillName": "반반치킨",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "파닭 1000",
+            "양념소스 500",
+            "허니머스타드 500",
+            "갈릭마요 500",
+            "매운디핑소스 500"
+          ],
+          "extra": [
+            "파닭 0",
+            "양념소스 0",
+            "허니머스타드 0",
+            "갈릭마요 0",
+            "매운디핑소스 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "반반치즈볼",
+        "skillName": "반반치즈볼",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "파닭 1000",
+            "양념소스 500",
+            "허니머스타드 500",
+            "갈릭마요 500",
+            "매운디핑소스 500"
+          ],
+          "extra": [
+            "파닭 0",
+            "양념소스 0",
+            "허니머스타드 0",
+            "갈릭마요 0",
+            "매운디핑소스 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "반반똥집",
+        "skillName": "반반똥집",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "파닭 1000",
+            "양념소스 500",
+            "허니머스타드 500",
+            "갈릭마요 500",
+            "매운디핑소스 500"
+          ],
+          "extra": [
+            "파닭 0",
+            "양념소스 0",
+            "허니머스타드 0",
+            "갈릭마요 0",
+            "매운디핑소스 0"
+          ],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "감자튀김",
+        "skillName": "감자튀김",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "치즈볼",
+        "skillName": "치즈볼",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "똥집튀김",
+        "skillName": "똥집튀김",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "콘샐러드",
+        "skillName": "콘샐러드",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "떡볶이",
+        "skillName": "떡볶이",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "치킨무 추가",
+        "skillName": "치킨무 추가",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "양념소스",
+        "skillName": "양념소스",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "허니머스타드",
+        "skillName": "허니머스타드",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "갈릭마요",
+        "skillName": "갈릭마요",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "매운디핑소스",
+        "skillName": "매운디핑소스",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "치즈디핑소스",
+        "skillName": "치즈디핑소스",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "콜라 500ml",
+        "skillName": "콜라 500ml",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "제로콜라 500ml",
+        "skillName": "제로콜라 500ml",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "사이다 500ml",
+        "skillName": "사이다 500ml",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "콜라 1.25L",
+        "skillName": "콜라 1.25L",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "생맥주 500cc",
+        "skillName": "생맥주 500cc",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "달빛 하이볼",
+        "skillName": "달빛 하이볼",
+        "price": true,
+        "category": true,
+        "soldOut": true
+      },
+      {
+        "name": "혼닭세트",
+        "skillName": "혼닭세트",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": true,
+          "missing": [],
+          "extra": [],
+          "openableExact": true
+        }
+      },
+      {
+        "name": "치킨 한상세트",
+        "skillName": "치킨 한상세트",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "콜라 1.25L 변경 1000"
+          ],
+          "extra": [],
+          "openableExact": false
+        }
+      },
+      {
+        "name": "반반 한상세트",
+        "skillName": "반반 한상세트",
+        "price": true,
+        "category": true,
+        "soldOut": true,
+        "options": {
+          "exact": false,
+          "missing": [
+            "파닭 1000",
+            "콜라 1.25L 변경 1000"
+          ],
+          "extra": [
+            "파닭 0"
+          ],
+          "openableExact": false
+        }
+      }
+    ],
+    "perGroup": [
+      {
+        "item": "바삭 후라이드",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "바삭 후라이드",
+        "group": "bone",
+        "found": true,
+        "skillGroup": "뼈/순살 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "바삭 후라이드",
+        "group": "sauce",
+        "found": true,
+        "skillGroup": "소스 추가 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "달빛 양념치킨",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "달빛 양념치킨",
+        "group": "bone",
+        "found": true,
+        "skillGroup": "뼈/순살 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "달빛 양념치킨",
+        "group": "sauce",
+        "found": true,
+        "skillGroup": "소스 추가 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "간장마늘치킨",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "간장마늘치킨",
+        "group": "bone",
+        "found": true,
+        "skillGroup": "뼈/순살 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "간장마늘치킨",
+        "group": "sauce",
+        "found": true,
+        "skillGroup": "소스 추가 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "매운불꽃치킨",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "매운불꽃치킨",
+        "group": "bone",
+        "found": true,
+        "skillGroup": "뼈/순살 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "매운불꽃치킨",
+        "group": "sauce",
+        "found": true,
+        "skillGroup": "소스 추가 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "허니버터치킨",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "허니버터치킨",
+        "group": "bone",
+        "found": true,
+        "skillGroup": "뼈/순살 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "허니버터치킨",
+        "group": "sauce",
+        "found": true,
+        "skillGroup": "소스 추가 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "치즈시즈닝치킨",
+        "group": "size",
+        "found": true,
+        "skillGroup": "사이즈 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "치즈시즈닝치킨",
+        "group": "bone",
+        "found": true,
+        "skillGroup": "뼈/순살 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "치즈시즈닝치킨",
+        "group": "sauce",
+        "found": true,
+        "skillGroup": "소스 추가 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "파닭치킨",
+        "group": "size",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "파닭치킨",
+        "group": "bone",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "파닭치킨",
+        "group": "sauce",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "반반치킨",
+        "group": "flavor2",
+        "found": true,
+        "skillGroup": "반반 두 번째 맛",
+        "labelsExact": false,
+        "rules": false
+      },
+      {
+        "item": "반반치킨",
+        "group": "bone",
+        "found": true,
+        "skillGroup": "뼈/순살 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "반반치킨",
+        "group": "sauce",
+        "found": true,
+        "skillGroup": "소스 추가 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "반반치즈볼",
+        "group": "flavor2",
+        "found": true,
+        "skillGroup": "반반 두 번째 맛",
+        "labelsExact": false,
+        "rules": false
+      },
+      {
+        "item": "반반치즈볼",
+        "group": "bone",
+        "found": true,
+        "skillGroup": "뼈/순살 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "반반치즈볼",
+        "group": "sauce",
+        "found": true,
+        "skillGroup": "소스 추가 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "반반똥집",
+        "group": "flavor2",
+        "found": true,
+        "skillGroup": "반반 두 번째 맛",
+        "labelsExact": false,
+        "rules": false
+      },
+      {
+        "item": "반반똥집",
+        "group": "bone",
+        "found": true,
+        "skillGroup": "뼈/순살 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "반반똥집",
+        "group": "sauce",
+        "found": true,
+        "skillGroup": "소스 추가 선택",
+        "labelsExact": false,
+        "rules": true
+      },
+      {
+        "item": "떡볶이",
+        "group": "spicy",
+        "found": true,
+        "skillGroup": "맵기 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "혼닭세트",
+        "group": "setFlavor",
+        "found": true,
+        "skillGroup": "치킨 맛 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "혼닭세트",
+        "group": "bone",
+        "found": true,
+        "skillGroup": "뼈/순살 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "치킨 한상세트",
+        "group": "setFlavor",
+        "found": true,
+        "skillGroup": "치킨 맛 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "치킨 한상세트",
+        "group": "bone",
+        "found": true,
+        "skillGroup": "뼈/순살 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "치킨 한상세트",
+        "group": "colaUpsize",
+        "found": false,
+        "skillGroup": null
+      },
+      {
+        "item": "반반 한상세트",
+        "group": "flavor2",
+        "found": true,
+        "skillGroup": "반반 두 번째 맛",
+        "labelsExact": false,
+        "rules": false
+      },
+      {
+        "item": "반반 한상세트",
+        "group": "bone",
+        "found": true,
+        "skillGroup": "뼈/순살 선택",
+        "labelsExact": true,
+        "rules": true
+      },
+      {
+        "item": "반반 한상세트",
+        "group": "colaUpsize",
+        "found": false,
+        "skillGroup": null
+      }
+    ]
+  },
+  "orders": {
+    "total": 10,
+    "correct": 8,
+    "safeRefusal": 2,
+    "unsafe": 0,
+    "cartOnly": {
+      "correct": 8,
+      "safeRefusal": 2,
+      "unsafe": 0
+    },
+    "linesChecked": 8,
+    "results": [
+      {
+        "id": "h1",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "cartOnlyOutcome": "correct",
+        "totalSource": "review",
+        "expectedTotal": 22500,
+        "kioskTotal": 22500,
+        "cartTotal": 22500,
+        "skillPredicts": 22000,
+        "ms": 871,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "바삭 후라이드 › 양념소스",
+          "바삭 후라이드 › 허니머스타드"
+        ],
+        "order": {
+          "dineOption": "매장 식사",
+          "lines": [
+            {
+              "category": "치킨",
+              "item": "바삭 후라이드",
+              "options": [
+                "한 마리",
+                "순살",
+                "양념소스",
+                "허니머스타드"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "음료/주류",
+              "item": "콜라 500ml",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h2",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "cartOnlyOutcome": "correct",
+        "totalSource": "review",
+        "expectedTotal": 24500,
+        "kioskTotal": 24500,
+        "cartTotal": 24500,
+        "skillPredicts": 24500,
+        "ms": 930,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "반반치킨 › 양념"
+        ],
+        "order": {
+          "dineOption": "포장 주문",
+          "lines": [
+            {
+              "category": "반반",
+              "item": "반반치킨",
+              "options": [
+                "양념",
+                "치즈시즈닝",
+                "뼈"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "사이드",
+              "item": "감자튀김",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h3",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 치킨 한상세트 › 콜라 1.25L 변경",
+        "linesChecked": null,
+        "cartSource": null,
+        "cartOnlyOutcome": "safeRefusal",
+        "totalSource": null,
+        "expectedTotal": 36000,
+        "kioskTotal": null,
+        "cartTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [],
+        "order": null
+      },
+      {
+        "id": "h4",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "cartOnlyOutcome": "correct",
+        "totalSource": "review",
+        "expectedTotal": 26800,
+        "kioskTotal": 26800,
+        "cartTotal": 26800,
+        "skillPredicts": 26800,
+        "ms": 941,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "간장마늘치킨 › 갈릭마요"
+        ],
+        "order": {
+          "dineOption": "포장 주문",
+          "lines": [
+            {
+              "category": "치킨",
+              "item": "간장마늘치킨",
+              "options": [
+                "반 마리",
+                "뼈",
+                "갈릭마요"
+              ],
+              "qty": 2
+            },
+            {
+              "category": "소스",
+              "item": "치즈디핑소스",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h5",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "cartOnlyOutcome": "correct",
+        "totalSource": "review",
+        "expectedTotal": 34000,
+        "kioskTotal": 34000,
+        "cartTotal": 34000,
+        "skillPredicts": 34000,
+        "ms": 900,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "반반 한상세트 › 후라이드",
+          "반반 한상세트 › 매운불꽃"
+        ],
+        "order": {
+          "dineOption": "매장 식사",
+          "lines": [
+            {
+              "category": "세트",
+              "item": "반반 한상세트",
+              "options": [
+                "후라이드",
+                "매운불꽃",
+                "순살"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "음료/주류",
+              "item": "달빛 하이볼",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h6",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "cartOnlyOutcome": "correct",
+        "totalSource": "review",
+        "expectedTotal": 63000,
+        "kioskTotal": 63000,
+        "cartTotal": 63000,
+        "skillPredicts": 60000,
+        "ms": 934,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "허니버터치킨 › 양념소스",
+          "허니버터치킨 › 갈릭마요",
+          "허니버터치킨 › 매운디핑소스"
+        ],
+        "order": {
+          "dineOption": "매장 식사",
+          "lines": [
+            {
+              "category": "치킨",
+              "item": "허니버터치킨",
+              "options": [
+                "한 마리",
+                "뼈",
+                "양념소스",
+                "갈릭마요",
+                "매운디핑소스"
+              ],
+              "qty": 3
+            }
+          ]
+        }
+      },
+      {
+        "id": "h7",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "cartOnlyOutcome": "correct",
+        "totalSource": "review",
+        "expectedTotal": 22000,
+        "kioskTotal": 22000,
+        "cartTotal": 22000,
+        "skillPredicts": 22000,
+        "ms": 1092,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "혼닭세트 › 양념",
+          "떡볶이 › 매운맛"
+        ],
+        "order": {
+          "dineOption": "포장 주문",
+          "lines": [
+            {
+              "category": "세트",
+              "item": "혼닭세트",
+              "options": [
+                "양념",
+                "뼈"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "사이드",
+              "item": "떡볶이",
+              "options": [
+                "매운맛"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "음료/주류",
+              "item": "사이다 500ml",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h8",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "cartOnlyOutcome": "correct",
+        "totalSource": "review",
+        "expectedTotal": 31500,
+        "kioskTotal": 31500,
+        "cartTotal": 31500,
+        "skillPredicts": 31500,
+        "ms": 901,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "반반똥집 › 간장마늘",
+          "반반똥집 › 허니버터",
+          "반반똥집 › 허니머스타드"
+        ],
+        "order": {
+          "dineOption": "매장 식사",
+          "lines": [
+            {
+              "category": "반반",
+              "item": "반반똥집",
+              "options": [
+                "간장마늘",
+                "허니버터",
+                "순살",
+                "허니머스타드"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "음료/주류",
+              "item": "생맥주 500cc",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h9",
+        "outcome": "correct",
+        "reason": null,
+        "linesChecked": true,
+        "cartSource": "visible",
+        "cartOnlyOutcome": "correct",
+        "totalSource": "review",
+        "expectedTotal": 39000,
+        "kioskTotal": 39000,
+        "cartTotal": 39000,
+        "skillPredicts": 39000,
+        "ms": 1151,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [],
+        "order": {
+          "dineOption": "포장 주문",
+          "lines": [
+            {
+              "category": "치킨",
+              "item": "매운불꽃치킨",
+              "options": [
+                "반 마리",
+                "순살"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "치킨",
+              "item": "치즈시즈닝치킨",
+              "options": [
+                "한 마리",
+                "뼈"
+              ],
+              "qty": 1
+            },
+            {
+              "category": "음료/주류",
+              "item": "콜라 1.25L",
+              "options": [],
+              "qty": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "h10",
+        "outcome": "safeRefusal",
+        "reason": "option not in the skill: 치킨 한상세트 › 콜라 1.25L 변경",
+        "linesChecked": null,
+        "cartSource": null,
+        "cartOnlyOutcome": "safeRefusal",
+        "totalSource": null,
+        "expectedTotal": 53000,
+        "kioskTotal": null,
+        "cartTotal": null,
+        "skillPredicts": null,
+        "ms": null,
+        "interruptsAnswered": 0,
+        "totalCannotSee": [
+          "치킨 한상세트 › 후라이드"
+        ],
+        "order": null
+      }
+    ]
+  }
+}

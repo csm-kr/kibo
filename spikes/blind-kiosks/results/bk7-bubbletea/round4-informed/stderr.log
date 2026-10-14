@@ -1,0 +1,6 @@
+Warning: Detected unsettled top-level await at file:///Users/sungmincho_mac/Desktop/sm/apps/kibo/.claude/worktrees/learn-r4/spikes/kibo-learn/learner.mjs:382
+      const response = await call(fc.name, fc.args ?? {});
+                       ^
+
+
+

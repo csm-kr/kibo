@@ -1,0 +1,9 @@
+{
+  "kioskId": "bk10-chicken",
+  "code": 0,
+  "signal": null,
+  "killedAt30min": false,
+  "startedAt": "2026-10-14T04:45:59.240Z",
+  "endedAt": "2026-10-14T05:00:11.586Z",
+  "minutes": 14.2
+}

@@ -1,0 +1,141 @@
+<!doctype html>
+<!-- Synthetic fixture for learner regression tests (spikes/kibo-learn/patterns.test.mjs), round 4: an item sheet whose
+     choices are plain buttons with no role and no price (a required "단맛" group with numeric labels and no default,
+     which the kiosk will not add without), a size group with a default, an optional priced group, and a popup after
+     the add button that changes what is ordered (a snack set: "음료만" or "간식 세트", then the snack and 다음 / 세트 담기).
+     A points popup without prices comes up once, after the first add. A header button shows the running total
+     ("🧾 주문 내역 0원" on a fresh order) and opens the order history. -->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>패턴: 선택</title>
+<style>
+  body { font-family: sans-serif; margin: 0; padding: 8px; }
+  .tab, .tile, .setc, .snk, .qb, .btn { cursor: pointer; border: 1px solid #999; padding: 10px; margin: 4px; display: inline-block; }
+  .tab.on, .chip.on, .snk.on { background: #333; color: #fff; }
+  .chip { margin: 4px; padding: 10px; }
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); }
+  .sheet { background: #fff; margin: 40px auto; width: 80%; padding: 12px; }
+  .err { color: #c00; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<section id="home"><h1>모의 찻집</h1><button id="start">주문 시작</button></section>
+<section id="menu" class="hidden">
+  <button id="hist">🧾 주문 내역 <b id="hist-total">0원</b></button>
+  <div class="tabs"><div class="tab on" data-cat="음료">음료</div><div class="tab" data-cat="간식">간식</div></div>
+  <div id="grid"></div>
+  <div id="cart"><h2>장바구니</h2><ul id="lines"></ul><div id="total">합계 0원</div><button id="checkout">주문하기</button></div>
+</section>
+<div id="modal"></div>
+<section id="pay" class="hidden"><h2>결제</h2><button>카드 결제</button></section>
+<script>
+  const $ = (s) => document.querySelector(s);
+  const won = (n) => n.toLocaleString('en-US') + '원';
+  const ITEMS = [
+    { name: '녹차라떼', cat: '음료', price: 4000, drink: true },
+    { name: '아이스티', cat: '음료', price: 3500, drink: true },
+    { name: '쿠키', cat: '간식', price: 2000 },
+    { name: '머핀', cat: '간식', price: 2500 },
+  ];
+  const GROUPS = [
+    { id: 'size', title: '크기', opts: [['R', 0], ['L', 500]], def: 'R' },
+    { id: 'sweet', title: '단맛', opts: [['0%', 0], ['50%', 0], ['100%', 0]], required: true },
+    { id: 'extra', title: '추가', opts: [['펄', 500], ['젤리', 500]], multi: true },
+  ];
+  const SET_OFF = 300;
+  const lines = [];
+  let cat = '음료', pointsAsked = false, m = null;
+  $('#start').onclick = () => { $('#home').classList.add('hidden'); $('#menu').classList.remove('hidden'); drawMenu(); };
+  document.querySelectorAll('.tab').forEach((t) => { t.onclick = () => { cat = t.dataset.cat; drawMenu(); }; });
+  function drawMenu() {
+    document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('on', t.dataset.cat === cat));
+    $('#grid').innerHTML = '';
+    ITEMS.filter((it) => it.cat === cat).forEach((it) => {
+      const d = document.createElement('div');
+      d.className = 'tile';
+      d.innerHTML = `<b>${it.name}</b><div>${won(it.price)}</div>`;
+      d.onclick = () => { m = { it, sel: { size: 'R', sweet: null, extra: [] }, qty: 1, err: null, step: 0 }; drawModal(); };
+      $('#grid').append(d);
+    });
+    $('#lines').innerHTML = lines.map((l) => `<li>${l.name} × ${l.qty} ${won(l.unit * l.qty)}</li>`).join('');
+    $('#total').textContent = '합계 ' + won(lines.reduce((a, l) => a + l.unit * l.qty, 0));
+    $('#hist-total').textContent = won(lines.reduce((a, l) => a + l.unit * l.qty, 0));
+  }
+  $('#hist').onclick = () => {
+    $('#modal').replaceChildren(el(`<div class="overlay"><div class="sheet"><h3>주문 내역</h3><p>${lines.length ? lines.map((l) => l.name).join(', ') : '아직 없음'}</p>
+      <button id="close">닫기</button></div></div>`, { '#close': () => { $('#modal').innerHTML = ''; } }));
+  };
+  const unit = () => m.it.price + (m.it.drink ? GROUPS.reduce((a, g) => a + g.opts.filter(([o]) => (g.multi ? m.sel[g.id].includes(o) : m.sel[g.id] === o)).reduce((x, [, p]) => x + p, 0), 0) : 0);
+  function el(html, on = {}) {
+    const d = document.createElement('div');
+    d.innerHTML = html;
+    for (const [sel, fn] of Object.entries(on)) d.querySelectorAll(sel).forEach((x) => { x.onclick = () => fn(x); });
+    return d;
+  }
+  function add(line) {
+    const same = lines.find((l) => l.name === line.name && l.unit === line.unit);
+    if (same) same.qty += line.qty; else lines.push(line);
+    m = null;
+    $('#modal').innerHTML = '';
+    drawMenu();
+    if (!pointsAsked) { pointsAsked = true; points(); }
+  }
+  function points() {
+    $('#modal').replaceChildren(el(`<div class="overlay"><div class="sheet"><h3>포인트를 적립할까요?</h3>
+      <div class="btn" id="skip">건너뛰기</div> <button id="save">적립하기</button></div></div>`,
+      { '#skip': () => { $('#modal').innerHTML = ''; }, '#save': () => { $('#modal').innerHTML = ''; } }));
+  }
+  function drawModal() {
+    if (m.step === 0) return drawSheet();
+    const off = '세트 할인 -' + won(SET_OFF);
+    if (m.step === 1) {
+      $('#modal').replaceChildren(el(`<div class="overlay"><div class="sheet"><h3>간식 세트로 바꿀까요?</h3>
+        <div class="choices"><div class="setc" id="no"><b>음료만</b><div>${won(unit() * m.qty)}</div></div>
+        <div class="setc" id="yes"><b>간식 세트</b><div>${off}</div></div></div></div></div>`,
+        { '#no': () => add({ name: m.it.name, unit: unit(), qty: m.qty }), '#yes': () => { m.step = 2; drawModal(); } }));
+      return;
+    }
+    const snacks = ITEMS.filter((it) => !it.drink);
+    $('#modal').replaceChildren(el(`<div class="overlay"><div class="sheet"><h3>${m.step === 2 ? '간식을 골라 주세요' : '세트 확인'}</h3>
+      ${m.step === 2 ? `<div class="snacks">${snacks.map((s) => `<div class="snk${m.snack === s.name ? ' on' : ''}" data-s="${s.name}"><b>${s.name}</b><div>+${won(s.price)}</div></div>`).join('')}</div>`
+        : `<p>세트 가격 ${won((unit() + snacks.find((s) => s.name === m.snack).price - SET_OFF) * m.qty)}</p>`}
+      ${m.err ? `<p class="err" role="alert">${m.err}</p>` : ''}
+      <button id="go">${m.step === 2 ? '다음' : '세트 담기'}</button></div></div>`,
+      { '.snk': (x) => { m.snack = x.dataset.s; m.err = null; drawModal(); },
+        '#go': () => {
+          if (m.step === 2) { if (!m.snack) { m.err = '간식을 골라 주세요.'; } else m.step = 3; drawModal(); return; }
+          const s = snacks.find((x) => x.name === m.snack);
+          add({ name: m.it.name + ' 세트', unit: unit() + s.price - SET_OFF, qty: m.qty });
+        } }));
+  }
+  function drawSheet() {
+    const groups = m.it.drink ? GROUPS : [];
+    const body = groups.map((g) => `<div class="og"><h4>${g.title}</h4><div class="chips">${g.opts.map(([o, p]) => {
+      const on = g.multi ? m.sel[g.id].includes(o) : m.sel[g.id] === o;
+      return `<button class="chip${on ? ' on' : ''}" data-g="${g.id}" data-o="${o}">${o}${p ? ` <small>+${won(p)}</small>` : ''}</button>`;
+    }).join('')}</div></div>`).join('');
+    $('#modal').replaceChildren(el(`<div class="overlay"><div class="sheet"><h3>${m.it.name}</h3>${body}
+      <div class="og"><span>수량</span> <div class="qb" id="minus">−</div> <span>${m.qty}</span> <div class="qb" id="plus">+</div></div>
+      ${m.err ? `<p class="err" role="alert">${m.err}</p>` : ''}
+      <div class="foot"><button class="ghost" id="cancel">취소</button> <button class="primary" id="add">${won(unit() * m.qty)} 담기</button></div></div></div>`,
+      { '.chip': (x) => {
+          const g = GROUPS.find((y) => y.id === x.dataset.g);
+          if (g.multi) { const a = m.sel[g.id]; const i = a.indexOf(x.dataset.o); if (i >= 0) a.splice(i, 1); else a.push(x.dataset.o); } else m.sel[g.id] = x.dataset.o;
+          m.err = null; drawSheet();
+        },
+        '#minus': () => { if (m.qty > 1) m.qty--; drawSheet(); },
+        '#plus': () => { m.qty++; drawSheet(); },
+        '#cancel': () => { m = null; $('#modal').innerHTML = ''; },
+        '#add': () => {
+          const missing = groups.find((g) => g.required && !m.sel[g.id]);
+          if (missing) { m.err = '필수 옵션을 선택해 주세요: ' + missing.title; drawSheet(); return; }
+          if (!m.it.drink) return add({ name: m.it.name, unit: unit(), qty: m.qty });
+          m.step = 1; drawModal();
+        } }));
+  }
+  $('#checkout').onclick = () => { $('#menu').classList.add('hidden'); $('#pay').classList.remove('hidden'); };
+</script>
+</body>
+</html>

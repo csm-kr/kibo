@@ -92,3 +92,8 @@ When an issue class in `docs/ISSUE.md` is seen for the **3rd time**, it becomes 
 - From: `third-party-brand` — I-009 (seen 10-12/session), I-107 (10-13/7-environments:2), I-217 (10-14/14-final:2)
 - Why: real names slipped into docs and data twice, then a logo shape (a capital M on a gold tile beside burgers) recalled a real chain; third-party IP disqualifies the entry, and the name tests in `catalog.test.ts` cannot see a shape or a colour.
 - Check: names and taglines pass the real-brand list in `src/lib/adapters/catalog.test.ts`; for each new or changed mark, logo, hero or menu picture, the step's QA report says what it shows and that it uses no single capital letter on a coloured tile, no real product shape or packaging and no real store screen (UI_QA "Kiosk mark").
+
+### R-016 (proposed): A rule that refuses kiosk labels matches whole labels or whole words, and its tests include real choices that contain the refused text
+- From: `label-rule-false-positive` — I-300 (seen 10-14/13-blind-kiosks:8 on bk5, 10-14/session on bk7 and on bk8, round 3)
+- Why: the option-name lint refused real customer choices (`0%`–`100%` for having no letter; `곱빼기` for ending in the stepper word `빼기`), and each time the learner worked around it by renaming the option (`곱배기`), dropping it, or tapping one choice in its recipe for every customer; the same kind of substring match refused `계속 주문하기` as a payment button (I-193).
+- Check: a change to `isControlLabel`, `isForbidden` or any label word list in `spikes/kibo-learn/` adds test cases where the refused word sits inside a real choice or control (`곱빼기`, `계속 주문하기`, digits-only names such as `0%`, `2`) next to the cases it must still refuse; `node --test spikes/kibo-learn/patterns.test.mjs` passes.

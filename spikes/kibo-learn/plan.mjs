@@ -51,6 +51,24 @@ export const isReviewOpener = (text, extra = []) => {
   return !NOT_A_REVIEW.some((w) => all.includes(w));
 };
 
+// Navigation and stepper controls and bare symbols: never a customer choice (the lint for option names, the audit for
+// taps). Digits are not symbols: "0%", "50%", "2" are choices. Until round 4 an option name needed a letter, so a
+// sweetness group 0%–100% was 100 lint errors on bk7-bubbletea and the learner fixed 50% in its recipe instead; and a
+// stepper word matched inside a word, so 곱빼기 (a large portion) was a lint error on bk8-tableorder and the learner
+// renamed the option 곱배기. Stepper and end words now count only as whole words ("수량 빼기", "콜라 더하기").
+const NAV_EXACT = ['다음', '이전', '확인', '취소', '닫기', '담기', '완료', '선택', '뒤로', '처음으로', 'next', 'prev', 'previous', 'back', 'ok',
+  'cancel', 'close', 'done', 'add', 'addtocart', 'addtoorder', 'addtobag'];
+const NAV_END = ['담기', '다음', '이전', '닫기', '취소', '완료'];
+const STEPPER_END = ['더하기', '빼기', '증가', '감소'];
+export function isControlLabel(label) {
+  const raw = String(label ?? '').normalize('NFKC').trim();
+  if (!/[\p{L}\p{N}]/u.test(raw)) return true;
+  const words = raw.toLowerCase().replace(/[+\-]?\d[\d,.]*\s*(원|won|개)/g, ' ').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  const joined = words.replace(/ /g, '');
+  if (!joined) return false;
+  return NAV_EXACT.includes(joined) || [...NAV_END, ...STEPPER_END].some((w) => words === w || words.endsWith(` ${w}`));
+}
+
 // Splits an order line's option names over the item's groups, in the skill's group order. A name repeated n times
 // is chosen n times (a quantity option). Each name goes to the first group at or after the previous one that has it.
 export function optionPlan(groups = [], options = []) {
@@ -67,10 +85,37 @@ export function optionPlan(groups = [], options = []) {
   return plan;
 }
 
+// Steps whose target is written in the recipe itself (no placeholder in label, name or text). The audit checks that
+// none of them taps a customer choice for the customer (round 4). A tag, not a field: plans stay plain step objects.
+const FIXED = new WeakSet();
+export const isFixedStep = (s) => FIXED.has(s);
+const hasPlaceholder = (s) => [s.label, s.name, s.text].some((t) => typeof t === 'string' && /\{\w+\}/.test(t));
+
+// The group names a recipe's chooseOptions steps name in "groups" (round 4): the others go to a chooseOptions without them.
+function claimedGroups(steps, out = new Set()) {
+  for (const s of steps ?? []) {
+    if (s.op === 'chooseOptions') for (const g of s.groups ?? []) out.add(g);
+    claimedGroups(s.steps, out);
+  }
+  return out;
+}
+
+// A group shown only after another choice ("appliesWhen": "<group>=<option>") is left out, with its after steps, when
+// the line made no pick in it and did not make that choice (round 4: a set's snack step after "drink only").
+function applies(group, plan) {
+  if (group?.appliesWhen == null) return true;
+  const [gName, oName] = String(group.appliesWhen).split('=').map((x) => x.trim());
+  const other = plan.find((p) => p.name === gName);
+  return !other || other.picked.includes(oName);
+}
+
 // Ops: click, check, clickIfVisible (one target each); forEach (over an array var), repeat (times),
 // chooseOptions (per option group of the line's item: the group's own "select" steps for each picked option,
-// or the op's steps; then the group's "after" steps, e.g. a wizard's "다음").
+// or the op's steps; then the group's "after" steps, e.g. a wizard's "다음"). Since round 4 a chooseOptions may name
+// "groups": it runs only those, where it stands (a set offer after the add button); one without "groups" runs the
+// groups no other chooseOptions of the recipe names, so a single chooseOptions still runs them all.
 export function planSteps(steps, vars, out = []) {
+  if (!vars.claimed) vars = { ...vars, claimed: claimedGroups(steps) };
   for (const s of steps ?? []) {
     if (s.op === 'forEach') {
       for (const v of vars[s.over] ?? []) planSteps(s.steps, { ...vars, [s.as]: v }, out);
@@ -78,12 +123,18 @@ export function planSteps(steps, vars, out = []) {
       const n = Math.min(Number(fill(String(s.times), vars)) || 0, 50);
       for (let i = 0; i < n; i++) planSteps(s.steps, vars, out);
     } else if (s.op === 'chooseOptions') {
-      for (const g of optionPlan(vars.groups, vars.options)) {
+      const groups = vars.groups ?? [];
+      const plan = optionPlan(groups, vars.options);
+      plan.forEach((g, j) => {
+        const mine = Array.isArray(s.groups) ? s.groups.includes(g.name) : !vars.claimed.has(g.name);
+        if (!mine || (!g.picked.length && !applies(groups[j], plan))) return;
         for (const option of g.picked) planSteps(g.select ?? s.steps, { ...vars, option }, out);
         planSteps(g.after, vars, out);
-      }
+      });
     } else {
-      out.push(fillStep(s, vars));
+      const step = fillStep(s, vars);
+      if (!hasPlaceholder(s)) FIXED.add(step);
+      out.push(step);
     }
   }
   return out;

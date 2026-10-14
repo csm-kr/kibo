@@ -1,0 +1,12 @@
+  h1 correct
+  h2 correct
+  h3 correct
+  h4 correct
+  h5 correct
+  h6 correct
+  h7 correct
+  h8 correct
+  h9 correct
+  h10 correct
+bk9-bunsik/final: learning finished, 9.6 min, 85 turns, 1369557 input tokens; items 32/32 (precision 1), price 31/32, options exact 16/19 (openable 16/18); orders correct 10, safe refusal 0, unsafe 0 of 10 (cart lines read in 10)
+written: spikes/blind-kiosks/results/bk9-bunsik/final/grade-v2.json

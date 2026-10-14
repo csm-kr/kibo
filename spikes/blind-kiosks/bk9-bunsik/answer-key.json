@@ -1,0 +1,281 @@
+{
+  "kiosk": { "name": "보리별 분식", "nameEn": "Boribyeol Bunsik", "domain": "Korean snack bar (분식집) self-order kiosk, portrait 720x1280" },
+  "flow": [
+    "시작 화면: 화면 아무 곳이나 터치 ('화면을 터치하여 주문을 시작하세요')",
+    "식사 방법 선택: '매장에서 먹어요' 또는 '포장해 갈게요' (가격 차이 없음)",
+    "메뉴 화면: 상단 '오늘의 할인' 배너, 카테고리 탭 6개, 메뉴 카드 그리드, 하단 장바구니(수량 −/+, ✕ 삭제는 확인 팝업, '전체 삭제'), '주문 확인하기' 버튼",
+    "옵션 팝업: 필수/선택 옵션 선택, 수량 −/+, 'N원 담기' 버튼 (보리별 세트는 단계형 팝업: 1 떡볶이 → 2 김밥 → 3 음료, '다음'/'이전', 마지막에 '세트 담기 N원')",
+    "주문 내역 확인 화면: 식사 방법, 주문 목록, 주문 금액 / 할인 금액 / 총 결제 금액, '이전으로' / '주문하기'",
+    "포인트 팝업: '포인트 적립하시겠어요?' → '적립 안 할게요' 또는 '적립할게요'(휴대폰 번호 010 뒤 8자리 입력 후 '확인')",
+    "결제 수단 선택 화면: '결제하실 금액' 표시, 신용/체크카드 · 간편결제 · 모바일 상품권 (선택 시 안내 문구만 표시, 실제 결제 없음)"
+  ],
+  "categories": [
+    { "label": "떡볶이", "itemCount": 6 },
+    { "label": "김밥", "itemCount": 6 },
+    { "label": "라면/우동", "itemCount": 6 },
+    { "label": "튀김/순대", "itemCount": 6 },
+    { "label": "세트", "itemCount": 3 },
+    { "label": "음료", "itemCount": 5 }
+  ],
+  "optionGroups": {
+    "spice": {
+      "title": "맵기 선택", "type": "single", "required": true, "min": 1, "max": 1, "default": null,
+      "appliesWhen": null,
+      "options": [
+        { "id": "lv1", "label": "1단계 순한맛", "priceDelta": 0, "maxQty": 1 },
+        { "id": "lv2", "label": "2단계 덜매운맛", "priceDelta": 0, "maxQty": 1 },
+        { "id": "lv3", "label": "3단계 보통맛", "priceDelta": 0, "maxQty": 1 },
+        { "id": "lv4", "label": "4단계 매운맛", "priceDelta": 0, "maxQty": 1 },
+        { "id": "lv5", "label": "5단계 아주매운맛", "priceDelta": 0, "maxQty": 1 }
+      ]
+    },
+    "tteok_topping": {
+      "title": "토핑 추가", "type": "multi", "required": false, "min": 0, "max": 3, "default": null,
+      "appliesWhen": null,
+      "options": [
+        { "id": "egg", "label": "삶은 계란", "priceDelta": 500, "maxQty": 1 },
+        { "id": "odeng", "label": "어묵 추가", "priceDelta": 1000, "maxQty": 1 },
+        { "id": "dangmyeon", "label": "당면 사리", "priceDelta": 1000, "maxQty": 1 },
+        { "id": "mandu", "label": "만두 사리", "priceDelta": 1000, "maxQty": 1 },
+        { "id": "ramen", "label": "라면 사리", "priceDelta": 1500, "maxQty": 1 },
+        { "id": "cheese", "label": "모짜렐라 치즈", "priceDelta": 1500, "maxQty": 1 },
+        { "id": "sausage", "label": "비엔나 소시지", "priceDelta": 1500, "maxQty": 1 }
+      ]
+    },
+    "gimbap_cut": {
+      "title": "김밥 커팅", "type": "single", "required": true, "min": 1, "max": 1, "default": null,
+      "appliesWhen": null,
+      "options": [
+        { "id": "cut", "label": "썰어서", "priceDelta": 0, "maxQty": 1 },
+        { "id": "whole", "label": "통으로", "priceDelta": 0, "maxQty": 1 }
+      ]
+    },
+    "gimbap_extra": {
+      "title": "김밥 추가", "type": "quantity", "required": false, "min": 0, "max": 3, "default": null,
+      "appliesWhen": null,
+      "options": [
+        { "id": "extra_roll", "label": "김밥 추가 1줄", "priceDelta": 3000, "maxQty": 3 }
+      ]
+    },
+    "ramen_addin": {
+      "title": "추가 재료", "type": "multi", "required": false, "min": 0, "max": 3, "default": null,
+      "appliesWhen": null,
+      "options": [
+        { "id": "egg", "label": "계란", "priceDelta": 500, "maxQty": 1 },
+        { "id": "cheese", "label": "치즈", "priceDelta": 700, "maxQty": 1 },
+        { "id": "tteok", "label": "떡 사리", "priceDelta": 1000, "maxQty": 1 }
+      ]
+    },
+    "noodle_firm": {
+      "title": "면 익힘 정도", "type": "single", "required": true, "min": 1, "max": 1, "default": null,
+      "appliesWhen": "보리별 라면에만 있음 (다른 라면/우동에는 없음)",
+      "options": [
+        { "id": "firm", "label": "꼬들하게", "priceDelta": 0, "maxQty": 1 },
+        { "id": "normal", "label": "보통", "priceDelta": 0, "maxQty": 1 },
+        { "id": "soft", "label": "푹 익혀서", "priceDelta": 0, "maxQty": 1 }
+      ]
+    },
+    "soondae_style": {
+      "title": "순대 구성", "type": "single", "required": true, "min": 1, "max": 1, "default": null,
+      "appliesWhen": null,
+      "options": [
+        { "id": "plain", "label": "순대만", "priceDelta": 0, "maxQty": 1 },
+        { "id": "mixed", "label": "내장 섞어서", "priceDelta": 0, "maxQty": 1 }
+      ]
+    },
+    "set_tteok": {
+      "title": "떡볶이 선택", "type": "single", "required": true, "min": 1, "max": 1, "default": null,
+      "appliesWhen": "보리별 세트 1단계",
+      "options": [
+        { "id": "basic", "label": "보리별 떡볶이", "priceDelta": 0, "maxQty": 1 },
+        { "id": "cheese", "label": "치즈 떡볶이", "priceDelta": 1000, "maxQty": 1 },
+        { "id": "rose", "label": "로제 떡볶이", "priceDelta": 1500, "maxQty": 1 }
+      ]
+    },
+    "set_gimbap": {
+      "title": "김밥 선택", "type": "single", "required": true, "min": 1, "max": 1, "default": null,
+      "appliesWhen": "보리별 세트 2단계",
+      "options": [
+        { "id": "basic", "label": "보리별 김밥", "priceDelta": 0, "maxQty": 1 },
+        { "id": "kimchi", "label": "김치 김밥", "priceDelta": 0, "maxQty": 1 },
+        { "id": "tuna", "label": "참치 김밥", "priceDelta": 500, "maxQty": 1 },
+        { "id": "katsu", "label": "돈까스 김밥", "priceDelta": 1000, "maxQty": 1 }
+      ]
+    },
+    "set_drink": {
+      "title": "음료 선택", "type": "single", "required": true, "min": 1, "max": 1, "default": null,
+      "appliesWhen": "보리별 세트 3단계",
+      "options": [
+        { "id": "cola", "label": "콜라", "priceDelta": 0, "maxQty": 1 },
+        { "id": "cider", "label": "사이다", "priceDelta": 0, "maxQty": 1 },
+        { "id": "orange", "label": "오렌지 주스", "priceDelta": 500, "maxQty": 1 },
+        { "id": "sikhye", "label": "식혜", "priceDelta": 500, "maxQty": 1 }
+      ]
+    }
+  },
+  "items": [
+    { "name": "보리별 떡볶이", "category": "떡볶이", "basePrice": 4500, "soldOut": false, "timeLimited": null, "optionGroups": ["spice", "tteok_topping"] },
+    { "name": "치즈 떡볶이", "category": "떡볶이", "basePrice": 5500, "soldOut": false, "timeLimited": null, "optionGroups": ["spice", "tteok_topping"] },
+    { "name": "로제 떡볶이", "category": "떡볶이", "basePrice": 6500, "soldOut": false, "timeLimited": null, "optionGroups": ["spice", "tteok_topping"] },
+    { "name": "짜장 떡볶이", "category": "떡볶이", "basePrice": 5500, "soldOut": false, "timeLimited": null, "optionGroups": ["spice", "tteok_topping"] },
+    { "name": "궁중 떡볶이", "category": "떡볶이", "basePrice": 6000, "soldOut": false, "timeLimited": null, "optionGroups": ["tteok_topping"] },
+    { "name": "점심 쫄볶이", "category": "떡볶이", "basePrice": 5000, "soldOut": false, "timeLimited": { "label": "점심 한정", "from": "11:00", "to": "14:00", "fakeClock": "12:30", "availableNow": true }, "optionGroups": ["spice", "tteok_topping"] },
+
+    { "name": "보리별 김밥", "category": "김밥", "basePrice": 3500, "soldOut": false, "timeLimited": null, "optionGroups": ["gimbap_cut", "gimbap_extra"] },
+    { "name": "김치 김밥", "category": "김밥", "basePrice": 4000, "soldOut": false, "timeLimited": null, "optionGroups": ["gimbap_cut", "gimbap_extra"] },
+    { "name": "참치 김밥", "category": "김밥", "basePrice": 4500, "soldOut": false, "timeLimited": null, "optionGroups": ["gimbap_cut", "gimbap_extra"] },
+    { "name": "치즈 김밥", "category": "김밥", "basePrice": 4500, "soldOut": false, "timeLimited": null, "optionGroups": ["gimbap_cut", "gimbap_extra"] },
+    { "name": "돈까스 김밥", "category": "김밥", "basePrice": 5000, "soldOut": false, "timeLimited": null, "optionGroups": ["gimbap_cut", "gimbap_extra"] },
+    { "name": "멸치 김밥", "category": "김밥", "basePrice": 4500, "soldOut": true, "timeLimited": null, "optionGroups": ["gimbap_cut", "gimbap_extra"] },
+
+    { "name": "보리별 라면", "category": "라면/우동", "basePrice": 4000, "soldOut": false, "timeLimited": null, "optionGroups": ["noodle_firm", "ramen_addin"] },
+    { "name": "해물 라면", "category": "라면/우동", "basePrice": 5500, "soldOut": false, "timeLimited": null, "optionGroups": ["ramen_addin"] },
+    { "name": "만두 라면", "category": "라면/우동", "basePrice": 5000, "soldOut": false, "timeLimited": null, "optionGroups": ["ramen_addin"] },
+    { "name": "짬뽕 라면", "category": "라면/우동", "basePrice": 5500, "soldOut": false, "timeLimited": null, "optionGroups": ["ramen_addin"] },
+    { "name": "어묵 우동", "category": "라면/우동", "basePrice": 5500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "김치 우동", "category": "라면/우동", "basePrice": 6000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+
+    { "name": "모둠 튀김", "category": "튀김/순대", "basePrice": 5000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "김말이 튀김", "category": "튀김/순대", "basePrice": 2500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "고추 튀김", "category": "튀김/순대", "basePrice": 3000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "오징어 튀김", "category": "튀김/순대", "basePrice": 3500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "찹쌀 순대", "category": "튀김/순대", "basePrice": 4500, "soldOut": false, "timeLimited": null, "optionGroups": ["soondae_style"] },
+    { "name": "군만두", "category": "튀김/순대", "basePrice": 3500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+
+    { "name": "보리별 세트", "category": "세트", "basePrice": 9900, "soldOut": false, "timeLimited": null, "optionGroups": ["set_tteok", "spice", "set_gimbap", "gimbap_cut", "set_drink"] },
+    { "name": "떡튀순 세트", "category": "세트", "basePrice": 12000, "soldOut": false, "timeLimited": null, "optionGroups": ["spice"] },
+    { "name": "튀순 세트", "category": "세트", "basePrice": 8500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+
+    { "name": "콜라", "category": "음료", "basePrice": 2000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "사이다", "category": "음료", "basePrice": 2000, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "오렌지 주스", "category": "음료", "basePrice": 2500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "식혜", "category": "음료", "basePrice": 2500, "soldOut": false, "timeLimited": null, "optionGroups": [] },
+    { "name": "생수", "category": "음료", "basePrice": 1000, "soldOut": false, "timeLimited": null, "optionGroups": [] }
+  ],
+  "promotions": [
+    {
+      "rule": "오늘의 할인: 로제 떡볶이 단품 (메뉴 화면 상단 배너, 시작 화면, 메뉴 카드의 '할인' 배지)",
+      "effect": "로제 떡볶이 6,500원 → 5,500원 (개당 1,000원 할인). 토핑 가격은 그대로 더해짐. 보리별 세트에서 로제 떡볶이를 고를 때(+1,500원)는 할인 없음. 주문 내역 확인 화면에서 '주문 금액'은 정가 기준, '할인 금액'에 -1,000원 × 수량, '총 결제 금액'은 할인 반영"
+    },
+    {
+      "rule": "점심 한정: 점심 쫄볶이는 11:00~14:00에만 판매 (키오스크 시계는 10.14 (수) 12:30으로 고정)",
+      "effect": "고정 시계 12:30 기준 판매 중이므로 정상 주문 가능, 가격 변화 없음 (5,000원). 판매 시간 밖이면 카드에 '판매 시간 아님'이 표시되고 담을 수 없음"
+    }
+  ],
+  "holdoutOrders": [
+    {
+      "id": "h1", "dine": "매장에서 먹어요",
+      "lines": [
+        { "item": "보리별 떡볶이", "options": { "spice": ["lv3"], "tteok_topping": ["egg", "odeng"] }, "qty": 1 },
+        { "item": "콜라", "options": {}, "qty": 1 }
+      ],
+      "expectedTotal": 8000,
+      "patterns": ["dine-eat-in", "tteokbokki-spice-required", "tteokbokki-toppings-multi", "points-popup-accept"]
+    },
+    {
+      "id": "h2", "dine": "포장해 갈게요",
+      "lines": [
+        { "item": "참치 김밥", "options": { "gimbap_cut": ["whole"], "gimbap_extra": ["extra_roll", "extra_roll"] }, "qty": 1 },
+        { "item": "김치 김밥", "options": { "gimbap_cut": ["cut"] }, "qty": 2 }
+      ],
+      "expectedTotal": 18500,
+      "patterns": ["dine-take-out", "gimbap-cut-required", "gimbap-extra-roll-stepper", "item-qty", "points-popup-decline"]
+    },
+    {
+      "id": "h3", "dine": "매장에서 먹어요",
+      "lines": [
+        { "item": "보리별 라면", "options": { "noodle_firm": ["firm"], "ramen_addin": ["egg", "cheese"] }, "qty": 1 },
+        { "item": "해물 라면", "options": { "ramen_addin": ["tteok"] }, "qty": 1 }
+      ],
+      "expectedTotal": 11700,
+      "patterns": ["noodle-firmness-required", "ramen-addins", "ramen-without-firmness", "cart-delete-confirm", "points-popup-decline"]
+    },
+    {
+      "id": "h4", "dine": "매장에서 먹어요",
+      "lines": [
+        { "item": "보리별 세트", "options": { "set_tteok": ["rose"], "spice": ["lv4"], "set_gimbap": ["tuna"], "gimbap_cut": ["cut"], "set_drink": ["sikhye"] }, "qty": 1 },
+        { "item": "김말이 튀김", "options": {}, "qty": 1 }
+      ],
+      "expectedTotal": 14900,
+      "patterns": ["set-step-modal", "set-upgrade-price", "discount-not-in-set", "points-popup-accept", "phone-number-error"]
+    },
+    {
+      "id": "h5", "dine": "포장해 갈게요",
+      "lines": [
+        { "item": "로제 떡볶이", "options": { "spice": ["lv2"], "tteok_topping": ["ramen", "cheese", "sausage"] }, "qty": 2 }
+      ],
+      "expectedTotal": 20000,
+      "patterns": ["today-discount", "tteokbokki-toppings-max-3", "topping-over-max-error", "cart-qty-edit", "dine-take-out", "points-popup-decline"]
+    },
+    {
+      "id": "h6", "dine": "매장에서 먹어요",
+      "lines": [
+        { "item": "점심 쫄볶이", "options": { "spice": ["lv1"] }, "qty": 1 },
+        { "item": "찹쌀 순대", "options": { "soondae_style": ["mixed"] }, "qty": 1 },
+        { "item": "사이다", "options": {}, "qty": 1 }
+      ],
+      "expectedTotal": 11500,
+      "patterns": ["time-limited-item", "required-option-error", "tteokbokki-spice-required", "points-popup-decline"]
+    },
+    {
+      "id": "h7", "dine": "포장해 갈게요",
+      "lines": [
+        { "item": "보리별 세트", "options": { "set_tteok": ["basic"], "spice": ["lv5"], "set_gimbap": ["basic"], "gimbap_cut": ["whole"], "set_drink": ["cola"] }, "qty": 2 },
+        { "item": "군만두", "options": {}, "qty": 1 }
+      ],
+      "expectedTotal": 23300,
+      "patterns": ["set-step-modal", "cart-qty-edit", "dine-take-out", "points-popup-accept"]
+    },
+    {
+      "id": "h8", "dine": "매장에서 먹어요",
+      "lines": [
+        { "item": "떡튀순 세트", "options": { "spice": ["lv3"] }, "qty": 1 },
+        { "item": "궁중 떡볶이", "options": { "tteok_topping": ["dangmyeon"] }, "qty": 1 },
+        { "item": "생수", "options": {}, "qty": 2 }
+      ],
+      "expectedTotal": 21000,
+      "patterns": ["fixed-set-with-spice", "tteokbokki-without-spice", "tteokbokki-toppings-multi", "item-qty", "points-popup-decline"]
+    },
+    {
+      "id": "h9", "dine": "포장해 갈게요",
+      "lines": [
+        { "item": "치즈 김밥", "options": { "gimbap_cut": ["cut"], "gimbap_extra": ["extra_roll"] }, "qty": 1 },
+        { "item": "만두 라면", "options": { "ramen_addin": ["egg", "cheese", "tteok"] }, "qty": 1 },
+        { "item": "오렌지 주스", "options": {}, "qty": 1 }
+      ],
+      "expectedTotal": 17200,
+      "patterns": ["gimbap-cut-required", "gimbap-extra-roll-stepper", "ramen-addins", "dine-take-out", "points-popup-decline"]
+    },
+    {
+      "id": "h10", "dine": "매장에서 먹어요",
+      "lines": [
+        { "item": "보리별 라면", "options": { "noodle_firm": ["soft"] }, "qty": 3 },
+        { "item": "짜장 떡볶이", "options": { "spice": ["lv2"], "tteok_topping": ["mandu"] }, "qty": 1 },
+        { "item": "튀순 세트", "options": {}, "qty": 1 }
+      ],
+      "expectedTotal": 27000,
+      "patterns": ["noodle-firmness-required", "same-line-merge", "cart-qty-edit", "cart-clear-confirm", "points-popup-decline"]
+    }
+  ],
+  "quirks": [
+    "Store clock is fixed at '10.14 (수) 12:30' (shown in every header); it never reads the device clock. 점심 쫄볶이 (11:00~14:00) is therefore always on sale.",
+    "Quantity-type option (gimbap_extra) is written in holdout lines by repeating the optionId once per unit: two extra rolls = [\"extra_roll\", \"extra_roll\"].",
+    "'김밥 추가 1줄' is always a plain 기본 김밥 roll at +3,000원 per roll, regardless of which 김밥 it is added to; it is per unit, so it multiplies with the line quantity. Max 3 per item ('김밥은 최대 3줄까지 추가할 수 있어요.').",
+    "Option prices are per unit: line total = (unit price incl. options) × qty.",
+    "로제 떡볶이 card shows '6,500원' struck through followed by '5,500원' in the same element (DOM text reads '6,500원5,500원'). The discount is not applied when 로제 떡볶이 is picked inside 보리별 세트 (+1,500원 upgrade).",
+    "Review screen shows '주문 금액' at list price, '할인 금액' as a negative number, and '총 결제 금액'; the payment-method screen labels the same number '결제하실 금액'. Cart line prices already include the discount.",
+    "궁중 떡볶이 is the only 떡볶이 without '맵기 선택'. 떡튀순 세트 asks only '맵기 선택' (no toppings). 튀순 세트 has no options.",
+    "'면 익힘 정도' exists only on 보리별 라면; 해물/만두/짬뽕 라면 offer only '추가 재료'; 어묵 우동 and 김치 우동 have no options.",
+    "Required groups have no default; tapping the add button with a missing required group shows '필수 옵션을 선택해 주세요. (<group title>)' and nothing is added. A 4th topping shows '토핑은 최대 3개까지 선택할 수 있어요.' and is not selected.",
+    "보리별 세트 has its own 3-step popup with no quantity control; its quantity can only be changed in the cart. Other items have a quantity stepper (max 9) in the option popup.",
+    "Adding an item with exactly the same options as an existing cart line merges into that line (quantity adds up) instead of creating a new line.",
+    "Cart '−' is disabled at quantity 1; removing a line needs the ✕ and the '선택한 메뉴를 삭제할까요?' confirmation ('삭제'). '전체 삭제' asks '장바구니를 모두 비울까요?' ('모두 삭제').",
+    "멸치 김밥 is sold out: the card shows '품절' and tapping it only shows a toast.",
+    "Tapping '주문 확인하기' with an empty cart shows a popup '장바구니가 비어 있어요'.",
+    "Points popup appears after '주문하기' every time. '적립할게요' opens a keypad for the 8 digits after 010; fewer than 8 digits shows '휴대폰 번호 11자리를 정확히 입력해 주세요.' Points (1%, shown as '적립 예정 NP') never change the amount.",
+    "Eat-in vs take-out never changes any price; the menu header shows '매장 식사' or '포장 주문' instead of the button label.",
+    "'처음으로' on the menu screen and '주문 취소' on the payment screen ask for confirmation when the cart is not empty and then clear the order.",
+    "Tapping the 오늘의 할인 banner switches to the 떡볶이 tab and opens the 로제 떡볶이 option popup.",
+    "Payment-method screen is the end: choosing a method only shows an instruction plus '본 키오스크는 시연용으로 실제 결제는 진행되지 않습니다.'"
+  ]
+}

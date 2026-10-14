@@ -1,0 +1,17 @@
+{
+  "kioskId": "bk7-bubbletea",
+  "provider": "gemini",
+  "model": "gemini-3.8-flash",
+  "startedAt": "2026-10-14T04:21:48.763Z",
+  "gate": {
+    "tests": 0,
+    "testsPassedForFinish": false,
+    "audits": 0,
+    "auditOk": null,
+    "finished": false
+  },
+  "turns": 0,
+  "inputTokens": 0,
+  "cachedInputTokens": 0,
+  "outputTokens": 0
+}

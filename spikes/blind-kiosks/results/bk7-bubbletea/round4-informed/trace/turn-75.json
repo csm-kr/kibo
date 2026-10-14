@@ -1,0 +1,59 @@
+{
+  "n": 75,
+  "at": "2026-10-14T04:27:01.506Z",
+  "tool": "act",
+  "args": {
+    "steps": [
+      {
+        "op": "click",
+        "label": "겨울 시즌"
+      },
+      {
+        "op": "click",
+        "label": "군고구마 밀크티"
+      },
+      {
+        "op": "click",
+        "label": "50%"
+      },
+      {
+        "op": "click",
+        "label": "5,500원 담기"
+      }
+    ]
+  },
+  "resultSummary": "tapped 겨울 시즌 → 군고구마 밀크티 → 50% → 5,500원 담기",
+  "calls": [
+    {
+      "tool": "act",
+      "args": {
+        "steps": [
+          {
+            "op": "click",
+            "label": "겨울 시즌"
+          },
+          {
+            "op": "click",
+            "label": "군고구마 밀크티"
+          },
+          {
+            "op": "click",
+            "label": "50%"
+          },
+          {
+            "op": "click",
+            "label": "5,500원 담기"
+          }
+        ]
+      },
+      "resultSummary": "tapped 겨울 시즌 → 군고구마 밀크티 → 50% → 5,500원 담기"
+    }
+  ],
+  "discoveries": {
+    "items": 0,
+    "optionGroups": 0,
+    "categories": 0
+  },
+  "inputTokens": 18096,
+  "outputTokens": 76
+}

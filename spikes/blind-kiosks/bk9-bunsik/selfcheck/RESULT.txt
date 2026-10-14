@@ -1,0 +1,263 @@
+bk9-bunsik self-check
+app: app/index.html (file://, 720x1280, headless Chromium via Playwright)
+store clock (fixed): 10.14 (수) 12:30
+
+HOLDOUT ORDERS: 10/10 totals match on review and payment screens
+h1   expected   8,000원  review   8,000원  payment   8,000원  OK
+h2   expected  18,500원  review  18,500원  payment  18,500원  OK
+h3   expected  11,700원  review  11,700원  payment  11,700원  OK
+h4   expected  14,900원  review  14,900원  payment  14,900원  OK
+h5   expected  20,000원  review  20,000원  payment  20,000원  OK
+h6   expected  11,500원  review  11,500원  payment  11,500원  OK
+h7   expected  23,300원  review  23,300원  payment  23,300원  OK
+h8   expected  21,000원  review  21,000원  payment  21,000원  OK
+h9   expected  17,200원  review  17,200원  payment  17,200원  OK
+h10  expected  27,000원  review  27,000원  payment  27,000원  OK
+
+CHECKS: 244 passed, 0 failed
+PASS catalog: category tabs 떡볶이, 김밥, 라면/우동, 튀김/순대, 세트, 음료
+PASS catalog: 떡볶이 has 6 items (key 6)
+PASS catalog: 떡볶이 #1 "보리별 떡볶이" 4,500원
+PASS catalog: 보리별 떡볶이 popup groups [맵기 선택, 토핑 추가]
+PASS catalog: 떡볶이 #2 "치즈 떡볶이" 5,500원
+PASS catalog: 치즈 떡볶이 popup groups [맵기 선택, 토핑 추가]
+PASS catalog: 떡볶이 #3 "로제 떡볶이" 6,500원5,500원
+PASS catalog: 로제 떡볶이 popup groups [맵기 선택, 토핑 추가]
+PASS catalog: 떡볶이 #4 "짜장 떡볶이" 5,500원
+PASS catalog: 짜장 떡볶이 popup groups [맵기 선택, 토핑 추가]
+PASS catalog: 떡볶이 #5 "궁중 떡볶이" 6,000원
+PASS catalog: 궁중 떡볶이 popup groups [토핑 추가]
+PASS catalog: 떡볶이 #6 "점심 쫄볶이" 5,000원
+PASS catalog: 점심 쫄볶이 popup groups [맵기 선택, 토핑 추가]
+PASS catalog: 김밥 has 6 items (key 6)
+PASS catalog: 김밥 #1 "보리별 김밥" 3,500원
+PASS catalog: 보리별 김밥 popup groups [김밥 커팅, 김밥 추가]
+PASS catalog: 김밥 #2 "김치 김밥" 4,000원
+PASS catalog: 김치 김밥 popup groups [김밥 커팅, 김밥 추가]
+PASS catalog: 김밥 #3 "참치 김밥" 4,500원
+PASS catalog: 참치 김밥 popup groups [김밥 커팅, 김밥 추가]
+PASS catalog: 김밥 #4 "치즈 김밥" 4,500원
+PASS catalog: 치즈 김밥 popup groups [김밥 커팅, 김밥 추가]
+PASS catalog: 김밥 #5 "돈까스 김밥" 5,000원
+PASS catalog: 돈까스 김밥 popup groups [김밥 커팅, 김밥 추가]
+PASS catalog: 김밥 #6 "멸치 김밥" 4,500원 [품절]
+PASS catalog: 라면/우동 has 6 items (key 6)
+PASS catalog: 라면/우동 #1 "보리별 라면" 4,000원
+PASS catalog: 보리별 라면 popup groups [면 익힘 정도, 추가 재료]
+PASS catalog: 라면/우동 #2 "해물 라면" 5,500원
+PASS catalog: 해물 라면 popup groups [추가 재료]
+PASS catalog: 라면/우동 #3 "만두 라면" 5,000원
+PASS catalog: 만두 라면 popup groups [추가 재료]
+PASS catalog: 라면/우동 #4 "짬뽕 라면" 5,500원
+PASS catalog: 짬뽕 라면 popup groups [추가 재료]
+PASS catalog: 라면/우동 #5 "어묵 우동" 5,500원
+PASS catalog: 어묵 우동 popup groups []
+PASS catalog: 라면/우동 #6 "김치 우동" 6,000원
+PASS catalog: 김치 우동 popup groups []
+PASS catalog: 튀김/순대 has 6 items (key 6)
+PASS catalog: 튀김/순대 #1 "모둠 튀김" 5,000원
+PASS catalog: 모둠 튀김 popup groups []
+PASS catalog: 튀김/순대 #2 "김말이 튀김" 2,500원
+PASS catalog: 김말이 튀김 popup groups []
+PASS catalog: 튀김/순대 #3 "고추 튀김" 3,000원
+PASS catalog: 고추 튀김 popup groups []
+PASS catalog: 튀김/순대 #4 "오징어 튀김" 3,500원
+PASS catalog: 오징어 튀김 popup groups []
+PASS catalog: 튀김/순대 #5 "찹쌀 순대" 4,500원
+PASS catalog: 찹쌀 순대 popup groups [순대 구성]
+PASS catalog: 튀김/순대 #6 "군만두" 3,500원
+PASS catalog: 군만두 popup groups []
+PASS catalog: 세트 has 3 items (key 3)
+PASS catalog: 세트 #1 "보리별 세트" 9,900원
+PASS catalog: 보리별 세트 step popup groups [떡볶이 선택 → 맵기 선택 → 김밥 선택 → 김밥 커팅 → 음료 선택]
+PASS catalog: 세트 #2 "떡튀순 세트" 12,000원
+PASS catalog: 떡튀순 세트 popup groups [맵기 선택]
+PASS catalog: 세트 #3 "튀순 세트" 8,500원
+PASS catalog: 튀순 세트 popup groups []
+PASS catalog: 음료 has 5 items (key 5)
+PASS catalog: 음료 #1 "콜라" 2,000원
+PASS catalog: 콜라 popup groups []
+PASS catalog: 음료 #2 "사이다" 2,000원
+PASS catalog: 사이다 popup groups []
+PASS catalog: 음료 #3 "오렌지 주스" 2,500원
+PASS catalog: 오렌지 주스 popup groups []
+PASS catalog: 음료 #4 "식혜" 2,500원
+PASS catalog: 식혜 popup groups []
+PASS catalog: 음료 #5 "생수" 1,000원
+PASS catalog: 생수 popup groups []
+PASS ui: sold-out card does not open ("품절된 메뉴예요. 다른 메뉴를 골라 주세요.")
+PASS ui: empty cart error popup ("장바구니가 비어 있어요")
+PASS ui: 오늘의 할인 banner opens "로제 떡볶이"
+PASS h1: dine "매장에서 먹어요" -> header "매장 식사"
+PASS h1: 보리별 떡볶이 add button "6,000원 담기" == 6,000원
+PASS h1: 보리별 떡볶이 cart qty 1
+PASS h1: 보리별 떡볶이 cart line 6,000원 == 6,000원
+PASS h1: 콜라 add button "2,000원 담기" == 2,000원
+PASS h1: 콜라 cart qty 1
+PASS h1: 콜라 cart line 2,000원 == 2,000원
+PASS h1: key prices recompute to 8,000원 == expectedTotal 8,000원
+PASS h1: cart total 8,000원
+PASS h1: review 총 결제 금액 8,000원 == 8,000원
+PASS h1: points popup after 주문하기 ("포인트 적립하시겠어요?")
+PASS h1: reached payment-method screen
+PASS h1: payment screen 결제하실 금액 8,000원 == expectedTotal 8,000원
+PASS h1: points note "적립 예정 80P · 010-****-5678"
+PASS h1: payment stops at method screen (no charge)
+PASS h1: 주문 취소 -> confirmation -> attract screen
+PASS h2: dine "포장해 갈게요" -> header "포장 주문"
+PASS h2: 참치 김밥 add button "10,500원 담기" == 10,500원
+PASS h2: 참치 김밥 cart qty 1
+PASS h2: 참치 김밥 cart line 10,500원 == 10,500원
+PASS h2: 김치 김밥 add button "8,000원 담기" == 8,000원
+PASS h2: 김치 김밥 cart qty 2
+PASS h2: 김치 김밥 cart line 8,000원 == 8,000원
+PASS h2: key prices recompute to 18,500원 == expectedTotal 18,500원
+PASS h2: cart total 18,500원
+PASS h2: review 총 결제 금액 18,500원 == 18,500원
+PASS h2: points popup after 주문하기 ("포인트 적립하시겠어요?")
+PASS h2: reached payment-method screen
+PASS h2: payment screen 결제하실 금액 18,500원 == expectedTotal 18,500원
+PASS h2: payment stops at method screen (no charge)
+PASS h2: 주문 취소 -> confirmation -> attract screen
+PASS h3: dine "매장에서 먹어요" -> header "매장 식사"
+PASS h3: delete asks "선택한 메뉴를 삭제할까요?", 취소 keeps line, 삭제 removes it
+PASS h3: 보리별 라면 add button "5,200원 담기" == 5,200원
+PASS h3: 보리별 라면 cart qty 1
+PASS h3: 보리별 라면 cart line 5,200원 == 5,200원
+PASS h3: 해물 라면 add button "6,500원 담기" == 6,500원
+PASS h3: 해물 라면 cart qty 1
+PASS h3: 해물 라면 cart line 6,500원 == 6,500원
+PASS h3: key prices recompute to 11,700원 == expectedTotal 11,700원
+PASS h3: cart total 11,700원
+PASS h3: review 총 결제 금액 11,700원 == 11,700원
+PASS h3: points popup after 주문하기 ("포인트 적립하시겠어요?")
+PASS h3: reached payment-method screen
+PASS h3: payment screen 결제하실 금액 11,700원 == expectedTotal 11,700원
+PASS h3: payment stops at method screen (no charge)
+PASS h3: 주문 취소 -> confirmation -> attract screen
+PASS h4: dine "매장에서 먹어요" -> header "매장 식사"
+PASS h4: 보리별 세트 add button "세트 담기 12,400원" == 12,400원
+PASS h4: 보리별 세트 cart qty 1
+PASS h4: 보리별 세트 cart line 12,400원 == 12,400원
+PASS h4: 김말이 튀김 add button "2,500원 담기" == 2,500원
+PASS h4: 김말이 튀김 cart qty 1
+PASS h4: 김말이 튀김 cart line 2,500원 == 2,500원
+PASS h4: key prices recompute to 14,900원 == expectedTotal 14,900원
+PASS h4: cart total 14,900원
+PASS h4: review 총 결제 금액 14,900원 == 14,900원
+PASS h4: points popup after 주문하기 ("포인트 적립하시겠어요?")
+PASS h4: short phone number rejected ("휴대폰 번호 11자리를 정확히 입력해 주세요.")
+PASS h4: reached payment-method screen
+PASS h4: payment screen 결제하실 금액 14,900원 == expectedTotal 14,900원
+PASS h4: points note "적립 예정 149P · 010-****-4321"
+PASS h4: payment stops at method screen (no charge)
+PASS h4: 주문 취소 -> confirmation -> attract screen
+PASS h5: dine "포장해 갈게요" -> header "포장 주문"
+PASS h5: 4th topping rejected ("토핑은 최대 3개까지 선택할 수 있어요.", selected=3)
+PASS h5: 로제 떡볶이 add button "10,000원 담기" == 10,000원
+PASS h5: 로제 떡볶이 cart qty 2
+PASS h5: 로제 떡볶이 cart line 20,000원 == 20,000원
+PASS h5: key prices recompute to 20,000원 == expectedTotal 20,000원
+PASS h5: cart total 20,000원
+PASS h5: review 총 결제 금액 20,000원 == 20,000원
+PASS h5: review 할인 금액 "-2,000원"
+PASS h5: points popup after 주문하기 ("포인트 적립하시겠어요?")
+PASS h5: reached payment-method screen
+PASS h5: payment screen 결제하실 금액 20,000원 == expectedTotal 20,000원
+PASS h5: payment stops at method screen (no charge)
+PASS h5: 주문 취소 -> confirmation -> attract screen
+PASS h6: dine "매장에서 먹어요" -> header "매장 식사"
+PASS h6: missing required option blocks add -> "필수 옵션을 선택해 주세요. (맵기 선택)"
+PASS h6: 점심 쫄볶이 add button "5,000원 담기" == 5,000원
+PASS h6: 점심 쫄볶이 cart qty 1
+PASS h6: 점심 쫄볶이 cart line 5,000원 == 5,000원
+PASS h6: 찹쌀 순대 add button "4,500원 담기" == 4,500원
+PASS h6: 찹쌀 순대 cart qty 1
+PASS h6: 찹쌀 순대 cart line 4,500원 == 4,500원
+PASS h6: 사이다 add button "2,000원 담기" == 2,000원
+PASS h6: 사이다 cart qty 1
+PASS h6: 사이다 cart line 2,000원 == 2,000원
+PASS h6: key prices recompute to 11,500원 == expectedTotal 11,500원
+PASS h6: cart total 11,500원
+PASS h6: review 총 결제 금액 11,500원 == 11,500원
+PASS h6: points popup after 주문하기 ("포인트 적립하시겠어요?")
+PASS h6: reached payment-method screen
+PASS h6: payment screen 결제하실 금액 11,500원 == expectedTotal 11,500원
+PASS h6: payment stops at method screen (no charge)
+PASS h6: 주문 취소 -> confirmation -> attract screen
+PASS h7: dine "포장해 갈게요" -> header "포장 주문"
+PASS h7: 보리별 세트 add button "세트 담기 9,900원" == 9,900원
+PASS h7: 보리별 세트 cart qty 2
+PASS h7: 보리별 세트 cart line 19,800원 == 19,800원
+PASS h7: 군만두 add button "3,500원 담기" == 3,500원
+PASS h7: 군만두 cart qty 1
+PASS h7: 군만두 cart line 3,500원 == 3,500원
+PASS h7: key prices recompute to 23,300원 == expectedTotal 23,300원
+PASS h7: cart total 23,300원
+PASS h7: review 총 결제 금액 23,300원 == 23,300원
+PASS h7: points popup after 주문하기 ("포인트 적립하시겠어요?")
+PASS h7: reached payment-method screen
+PASS h7: payment screen 결제하실 금액 23,300원 == expectedTotal 23,300원
+PASS h7: points note "적립 예정 233P · 010-****-6666"
+PASS h7: payment stops at method screen (no charge)
+PASS h7: 주문 취소 -> confirmation -> attract screen
+PASS h8: dine "매장에서 먹어요" -> header "매장 식사"
+PASS h8: 떡튀순 세트 add button "12,000원 담기" == 12,000원
+PASS h8: 떡튀순 세트 cart qty 1
+PASS h8: 떡튀순 세트 cart line 12,000원 == 12,000원
+PASS h8: 궁중 떡볶이 add button "7,000원 담기" == 7,000원
+PASS h8: 궁중 떡볶이 cart qty 1
+PASS h8: 궁중 떡볶이 cart line 7,000원 == 7,000원
+PASS h8: 생수 add button "2,000원 담기" == 2,000원
+PASS h8: 생수 cart qty 2
+PASS h8: 생수 cart line 2,000원 == 2,000원
+PASS h8: key prices recompute to 21,000원 == expectedTotal 21,000원
+PASS h8: cart total 21,000원
+PASS h8: review 총 결제 금액 21,000원 == 21,000원
+PASS h8: points popup after 주문하기 ("포인트 적립하시겠어요?")
+PASS h8: reached payment-method screen
+PASS h8: payment screen 결제하실 금액 21,000원 == expectedTotal 21,000원
+PASS h8: payment stops at method screen (no charge)
+PASS h8: 주문 취소 -> confirmation -> attract screen
+PASS h9: dine "포장해 갈게요" -> header "포장 주문"
+PASS h9: 치즈 김밥 add button "7,500원 담기" == 7,500원
+PASS h9: 치즈 김밥 cart qty 1
+PASS h9: 치즈 김밥 cart line 7,500원 == 7,500원
+PASS h9: 만두 라면 add button "7,200원 담기" == 7,200원
+PASS h9: 만두 라면 cart qty 1
+PASS h9: 만두 라면 cart line 7,200원 == 7,200원
+PASS h9: 오렌지 주스 add button "2,500원 담기" == 2,500원
+PASS h9: 오렌지 주스 cart qty 1
+PASS h9: 오렌지 주스 cart line 2,500원 == 2,500원
+PASS h9: key prices recompute to 17,200원 == expectedTotal 17,200원
+PASS h9: cart total 17,200원
+PASS h9: review 총 결제 금액 17,200원 == 17,200원
+PASS h9: points popup after 주문하기 ("포인트 적립하시겠어요?")
+PASS h9: reached payment-method screen
+PASS h9: payment screen 결제하실 금액 17,200원 == expectedTotal 17,200원
+PASS h9: payment stops at method screen (no charge)
+PASS h9: 주문 취소 -> confirmation -> attract screen
+PASS h10: dine "매장에서 먹어요" -> header "매장 식사"
+PASS h10: 전체 삭제 with confirmation empties cart
+PASS h10: 보리별 라면 add button "4,000원 담기" == 4,000원
+PASS h10: 보리별 라면 add button "4,000원 담기" == 4,000원
+PASS h10: same options added twice merged into one line (qty 2)
+PASS h10: 보리별 라면 cart qty 3
+PASS h10: 보리별 라면 cart line 12,000원 == 12,000원
+PASS h10: 짜장 떡볶이 add button "6,500원 담기" == 6,500원
+PASS h10: 짜장 떡볶이 cart qty 1
+PASS h10: 짜장 떡볶이 cart line 6,500원 == 6,500원
+PASS h10: 튀순 세트 add button "8,500원 담기" == 8,500원
+PASS h10: 튀순 세트 cart qty 1
+PASS h10: 튀순 세트 cart line 8,500원 == 8,500원
+PASS h10: key prices recompute to 27,000원 == expectedTotal 27,000원
+PASS h10: cart total 27,000원
+PASS h10: review 총 결제 금액 27,000원 == 27,000원
+PASS h10: points popup after 주문하기 ("포인트 적립하시겠어요?")
+PASS h10: reached payment-method screen
+PASS h10: payment screen 결제하실 금액 27,000원 == expectedTotal 27,000원
+PASS h10: payment stops at method screen (no charge)
+PASS h10: 주문 취소 -> confirmation -> attract screen
+PASS no page errors
+
+RESULT: PASS
