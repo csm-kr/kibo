@@ -4,7 +4,7 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { AssistantPanel } from "@/components/assistant/AssistantPanel";
 import { ServiceWorker } from "@/components/app/ServiceWorker";
 import { PausedLayer } from "@/components/PausedLayer";
-import { setPhoneSettings, usePhoneSettings } from "@/hooks/usePhoneSettings";
+import { setPhoneLanguage, setPhoneSettings, usePhoneSettings } from "@/hooks/usePhoneSettings";
 import { usePhoneSession } from "@/hooks/usePhoneSession";
 import { examplesFor } from "@/lib/agent/examples";
 import { pt } from "@/lib/i18n/phone";
@@ -42,6 +42,8 @@ export function AssistantApp({ sessionId, kiosks }: { sessionId: string | null; 
         deviceToken={ps.deviceToken}
         locale={settings.locale}
         onLocaleChange={setLocale}
+        language={settings.language}
+        onLanguageChange={setPhoneLanguage}
         voiceOutput={settings.aiVoice}
         onVoiceOutputChange={setAiVoice}
         mode="phone"

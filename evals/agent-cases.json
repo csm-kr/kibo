@@ -1,5 +1,5 @@
 {
-  "about": "Text-agent evaluation set for the MALO BURGER kiosk and, for cases with kioskId \"airport_rail\", the SKYLINE AIRPORT RAIL ticket machine, and for kioskId \"doughhouse\", the learned Doughhouse pizza kiosk with a stand-in bridge that reports every replay as done (docs/TESTING.md \"Agent evaluation set\"). Written by the KIBO team, not an external benchmark. Each case starts on a fresh /demo session of its kioskId (default malo; status connected, empty cart) at 14:00 KST. Types follow TESTING 1-6, 8, 9; \"checkout\" checks the confirm rule; \"grounded-reply\" checks that the reply describes items only with menu data (scripts/grounding.ts, I-072). A cart expectation merges identical lines and counts defaults (set side fries_m, drink size m).",
+  "about": "Text-agent evaluation set for the MALO BURGER kiosk and, for cases with kioskId \"airport_rail\", the SKYLINE AIRPORT RAIL ticket machine, and for kioskId \"doughhouse\", the learned Doughhouse pizza kiosk with a stand-in bridge that reports every replay as done (docs/TESTING.md \"Agent evaluation set\"). Written by the KIBO team, not an external benchmark. Each case starts on a fresh /demo session of its kioskId (default malo; status connected, empty cart) at 14:00 KST. Types follow TESTING 1-6, 8, 9; \"checkout\" checks the confirm rule; \"grounded-reply\" checks that the reply describes items only with menu data (scripts/grounding.ts, I-072). A cart expectation merges identical lines and counts defaults (set side fries_m, drink size m). Added in 14-final:4 and reported apart (`group`): \"colloquial\" (type 10), vague and spoken-style requests in Korean and English, also team-written, not real older users' speech; \"ask\" means a question or choice buttons instead of a staff call, and `excludes` lists choices that must not appear. \"language\" (type 11): two cases per AI-only language, one with the phone's picker set to it (`language`) and one with the picker on English, where the reply must still follow the user's language (`replyIn`, checked without AI by scripts/grounding.ts replyLanguage).",
   "notCovered": [
     { "type": "7-count-limits", "reason": "Count limits (max 3 toppings) need the learned Doughhouse kiosk, which has no LearnedAdapter yet." }
   ],
@@ -378,6 +378,243 @@
       "locale": "en",
       "turns": ["Two adult tickets to Riverside on the all-stop train.", "That's all. I'll pay."],
       "expect": { "status": "confirming" }
+    },
+    {
+      "id": "c-en-grandson-not-spicy",
+      "group": "colloquial",
+      "type": "10-colloquial",
+      "locale": "en",
+      "turns": ["Also something not spicy for my grandson, he is 6, and a hot coffee for me."],
+      "expect": {
+        "cart": [{ "itemId": "hot_coffee", "variant": "single", "qty": 1, "selections": {} }],
+        "choices": { "templateId": "pick_item", "ids": [], "excludes": ["spicy_chicken_burger", "spicy_wings"] }
+      }
+    },
+    {
+      "id": "c-ko-not-spicy-burger",
+      "group": "colloquial",
+      "type": "10-colloquial",
+      "locale": "ko",
+      "turns": ["매운 거 말고 순한 버거 하나 줘요."],
+      "expect": { "choices": { "templateId": "pick_item", "ids": [], "excludes": ["spicy_chicken_burger"] } }
+    },
+    {
+      "id": "c-en-usual-burger",
+      "group": "colloquial",
+      "type": "10-colloquial",
+      "locale": "en",
+      "turns": ["Just the usual burger with a drink, please."],
+      "expect": { "ask": {} }
+    },
+    {
+      "id": "c-ko-for-the-kids",
+      "group": "colloquial",
+      "type": "10-colloquial",
+      "locale": "ko",
+      "turns": ["애들 먹을 거 하나 줘요."],
+      "expect": { "ask": {} }
+    },
+    {
+      "id": "c-ko-best-seller",
+      "group": "colloquial",
+      "type": "10-colloquial",
+      "locale": "ko",
+      "turns": ["제일 많이 팔리는 거 하나 주세요."],
+      "expect": { "ask": { "mentionsAny": ["cheese_burger", "soft_cone"] } }
+    },
+    {
+      "id": "c-mixed-ko-en",
+      "group": "colloquial",
+      "type": "10-colloquial",
+      "locale": "ko",
+      "turns": ["치즈버거 set 하나, drink는 cola로 please."],
+      "expect": { "cart": [{ "itemId": "cheese_burger", "variant": "set", "qty": 1, "selections": { "side": ["fries_m"], "drink": ["cola"] } }] }
+    },
+    {
+      "id": "c-ko-misheard",
+      "group": "colloquial",
+      "type": "10-colloquial",
+      "locale": "ko",
+      "turns": ["치즈버고 새트 하나, 음료는 콜라요."],
+      "expect": { "cart": [{ "itemId": "cheese_burger", "variant": "set", "qty": 1, "selections": { "side": ["fries_m"], "drink": ["cola"] } }] }
+    },
+    {
+      "id": "c-en-cheapest-burger",
+      "group": "colloquial",
+      "type": "10-colloquial",
+      "locale": "en",
+      "turns": ["Which burger is the cheapest? I'll have that one."],
+      "expect": { "choices": { "templateId": "pick_variant", "ids": ["single", "set"] } }
+    },
+    {
+      "id": "c-ko-low-calorie-drink",
+      "group": "colloquial",
+      "type": "10-colloquial",
+      "locale": "ko",
+      "turns": ["살 안 찌는 음료 뭐 있어요?"],
+      "expect": { "ask": { "mentionsAny": ["zero_cola"] } }
+    },
+    {
+      "id": "c-en-small-cold-drink",
+      "group": "colloquial",
+      "type": "10-colloquial",
+      "locale": "en",
+      "turns": ["Something cold to drink, a small one, not too much."],
+      "expect": { "ask": {} }
+    },
+    {
+      "id": "c-ko-one-more-of-that",
+      "group": "colloquial",
+      "type": "10-colloquial",
+      "locale": "ko",
+      "turns": ["불고기버거 단품 하나요.", "아까 그거 하나 더요."],
+      "expect": { "cart": [{ "itemId": "bulgogi_burger", "variant": "single", "qty": 2, "selections": {} }] }
+    },
+    {
+      "id": "c-en-same-again",
+      "group": "colloquial",
+      "type": "10-colloquial",
+      "locale": "en",
+      "turns": ["One chicken snack wrap.", "Same again, and a coke for me."],
+      "expect": {
+        "cart": [
+          { "itemId": "chicken_wrap", "variant": "single", "qty": 2, "selections": {} },
+          { "itemId": "cola", "variant": "single", "qty": 1, "selections": { "size": ["m"] } }
+        ]
+      }
+    },
+    {
+      "id": "l-ja-order",
+      "group": "language",
+      "type": "11-any-language",
+      "locale": "en",
+      "language": "ja",
+      "replyIn": "ja",
+      "turns": ["チーズバーガーのセットを2つ、飲み物はコーラでお願いします。"],
+      "expect": { "cart": [{ "itemId": "cheese_burger", "variant": "set", "qty": 2, "selections": { "side": ["fries_m"], "drink": ["cola"] } }] }
+    },
+    {
+      "id": "l-ja-ambiguous-picker-en",
+      "group": "language",
+      "type": "11-any-language",
+      "locale": "en",
+      "replyIn": "ja",
+      "turns": ["ハンバーガーを1つください。"],
+      "expect": { "choices": { "templateId": "pick_item", "ids": ["cheese_burger"] } }
+    },
+    {
+      "id": "l-zh-order",
+      "group": "language",
+      "type": "11-any-language",
+      "locale": "en",
+      "language": "zh",
+      "replyIn": "zh",
+      "turns": ["两份芝士汉堡套餐，饮料都要可乐。"],
+      "expect": { "cart": [{ "itemId": "cheese_burger", "variant": "set", "qty": 2, "selections": { "side": ["fries_m"], "drink": ["cola"] } }] }
+    },
+    {
+      "id": "l-zh-ambiguous-picker-en",
+      "group": "language",
+      "type": "11-any-language",
+      "locale": "en",
+      "replyIn": "zh",
+      "turns": ["我要一个汉堡。"],
+      "expect": { "choices": { "templateId": "pick_item", "ids": ["cheese_burger"] } }
+    },
+    {
+      "id": "l-es-order",
+      "group": "language",
+      "type": "11-any-language",
+      "locale": "en",
+      "language": "es",
+      "replyIn": "es",
+      "turns": ["Dos menús de hamburguesa con queso, los dos con cola, por favor."],
+      "expect": { "cart": [{ "itemId": "cheese_burger", "variant": "set", "qty": 2, "selections": { "side": ["fries_m"], "drink": ["cola"] } }] }
+    },
+    {
+      "id": "l-es-ambiguous-picker-en",
+      "group": "language",
+      "type": "11-any-language",
+      "locale": "en",
+      "replyIn": "es",
+      "turns": ["Una hamburguesa, por favor."],
+      "expect": { "choices": { "templateId": "pick_item", "ids": ["cheese_burger"] } }
+    },
+    {
+      "id": "l-vi-order",
+      "group": "language",
+      "type": "11-any-language",
+      "locale": "en",
+      "language": "vi",
+      "replyIn": "vi",
+      "turns": ["Cho tôi hai phần combo burger phô mai, nước uống là cola."],
+      "expect": { "cart": [{ "itemId": "cheese_burger", "variant": "set", "qty": 2, "selections": { "side": ["fries_m"], "drink": ["cola"] } }] }
+    },
+    {
+      "id": "l-vi-ambiguous-picker-en",
+      "group": "language",
+      "type": "11-any-language",
+      "locale": "en",
+      "replyIn": "vi",
+      "turns": ["Cho tôi một cái burger."],
+      "expect": { "choices": { "templateId": "pick_item", "ids": ["cheese_burger"] } }
+    },
+    {
+      "id": "l-fr-order",
+      "group": "language",
+      "type": "11-any-language",
+      "locale": "en",
+      "language": "fr",
+      "replyIn": "fr",
+      "turns": ["Deux menus cheeseburger, avec un cola pour chacun, s'il vous plaît."],
+      "expect": { "cart": [{ "itemId": "cheese_burger", "variant": "set", "qty": 2, "selections": { "side": ["fries_m"], "drink": ["cola"] } }] }
+    },
+    {
+      "id": "l-fr-ambiguous-picker-en",
+      "group": "language",
+      "type": "11-any-language",
+      "locale": "en",
+      "replyIn": "fr",
+      "turns": ["Un burger, s'il vous plaît."],
+      "expect": { "choices": { "templateId": "pick_item", "ids": ["cheese_burger"] } }
+    },
+    {
+      "id": "l-th-order",
+      "group": "language",
+      "type": "11-any-language",
+      "locale": "en",
+      "language": "th",
+      "replyIn": "th",
+      "turns": ["ขอชุดชีสเบอร์เกอร์สองชุด เครื่องดื่มเป็นโคล่าทั้งสองชุดค่ะ"],
+      "expect": { "cart": [{ "itemId": "cheese_burger", "variant": "set", "qty": 2, "selections": { "side": ["fries_m"], "drink": ["cola"] } }] }
+    },
+    {
+      "id": "l-th-ambiguous-picker-en",
+      "group": "language",
+      "type": "11-any-language",
+      "locale": "en",
+      "replyIn": "th",
+      "turns": ["ขอเบอร์เกอร์หนึ่งอันค่ะ"],
+      "expect": { "choices": { "templateId": "pick_item", "ids": ["cheese_burger"] } }
+    },
+    {
+      "id": "l-id-order",
+      "group": "language",
+      "type": "11-any-language",
+      "locale": "en",
+      "language": "id",
+      "replyIn": "id",
+      "turns": ["Dua paket cheeseburger, minumannya cola semua."],
+      "expect": { "cart": [{ "itemId": "cheese_burger", "variant": "set", "qty": 2, "selections": { "side": ["fries_m"], "drink": ["cola"] } }] }
+    },
+    {
+      "id": "l-id-ambiguous-picker-en",
+      "group": "language",
+      "type": "11-any-language",
+      "locale": "en",
+      "replyIn": "id",
+      "turns": ["Satu burger, ya."],
+      "expect": { "choices": { "templateId": "pick_item", "ids": ["cheese_burger"] } }
     }
   ]
 }

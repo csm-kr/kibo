@@ -130,10 +130,10 @@ export function relayConnection(client: ClientSocket, deps: RelayDeps): { onMess
       const hello = relayHello.safeParse(parse(text));
       if (!hello.success) throw new CommandError("BAD_REQUEST", "That request could not be understood.");
       checkIpLimit(deps.ip, "api", deps.now());
-      const { sessionId, deviceToken, locale } = hello.data;
+      const { sessionId, deviceToken, locale, language } = hello.data;
       const out = await issueLiveToken(
         { store: deps.store, usage: deps.usage, issuer, now: deps.now },
-        { sessionId, bearer: deviceToken, locale, ip: deps.ip },
+        { sessionId, bearer: deviceToken, locale, language, ip: deps.ip },
       );
       if (state !== "opening") {
         // The browser left while Vertex was opening.

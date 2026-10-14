@@ -137,6 +137,38 @@ test("phone path: start to order number", async ({ page, request }, info) => {
   await check(page, info, "P6-done");
 });
 
+test("P-lang: the language picker, then the phone with the AI in Japanese (14-final:4)", async ({ page, request }, info) => {
+  const s = await openPhone(page, request);
+  await page.getByRole("button", { name: "Start" }).click();
+  await page.getByRole("button", { name: "Type instead" }).click();
+  await page.getByRole("button", { name: "Eat here" }).click();
+  await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
+
+  await page.getByRole("button", { name: "Language: English" }).click();
+  const picker = page.getByRole("dialog", { name: "Language" });
+  await expect(picker.getByRole("button", { name: /^English/ })).toBeFocused();
+  await check(page, info, "P-lang-picker");
+
+  await picker.getByRole("button", { name: /^日本語/ }).click();
+  await expect(picker).toHaveCount(0);
+  await expect(page.locator("[data-ai-language]")).toHaveAttribute("data-ai-language", "ja");
+  // The screens stay English; the cart shows the kiosk's Korean name with the English one under it.
+  await s.phone("addToCart", cheeseSet("zero_cola"), { utteranceSeq: 1 });
+  const order = page.getByRole("region", { name: "Your order" });
+  await expect(order.getByText("치즈버거 세트", { exact: true })).toBeVisible();
+  await expect(order.getByText("Cheeseburger set", { exact: true })).toBeVisible();
+  await check(page, info, "P3-ja", [VIEWPORTS[0], VIEWPORTS[3]]);
+
+  await s.phone("requestCheckout", {}, { utteranceSeq: 2 });
+  await page.getByRole("button", { name: "Close", exact: true }).click();
+  await check(page, info, "P4-confirm-ja", [VIEWPORTS[0], VIEWPORTS[3]], async () => {
+    await expect(page.getByRole("button", { name: "はい、支払います" })).toBeInViewport({ ratio: 1 });
+  });
+  await page.getByRole("button", { name: "はい、支払います" }).click();
+  await expect(page.getByRole("heading", { name: "キオスクにカードを入れてください" })).toBeVisible();
+  await check(page, info, "P5-pay-ja", [VIEWPORTS[0]]);
+});
+
 /**
  * Stands in for Gemini Live with no network: the token route answers, and the socket answers the setup message
  * with setupComplete, which is all "Listening…" needs. Returns a function that releases the held token reply.

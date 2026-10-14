@@ -1,3 +1,5 @@
+import { LANGUAGES, type SpeechLanguage } from "@/lib/i18n/languages";
+import { PHONE_NOTE } from "@/lib/voice/dineNote";
 import type { KioskData, Locale } from "@/types/menu";
 import type { CartLine, DineOption, SessionStatus } from "@/types/session";
 import { cartForModel } from "./mapping";
@@ -7,12 +9,17 @@ import { menuForModel } from "./menu";
 // the model only needs the menu and the current order. Food lines (dine option, dessert upsell) appear only on
 // kiosks whose data has them; a ticket machine (domain "ticket") gets its own section instead.
 
-const LANGUAGE: Record<Locale, string> = { ko: "Korean", en: "English" };
-
 /** JSON with `<` and `>` escaped, so no name can end the <menu_data> block (I-152); the model reads it the same. */
 const dataJson = (value: unknown) => JSON.stringify(value).replace(/</g, "\\u003c").replace(/>/g, "\\u003e");
 
-type OrderOptions = { cart?: CartLine[]; status?: SessionStatus; dineOption?: DineOption | null; locale?: Locale };
+/** `locale`: the screens' language, for names in the order block. `language`: what the AI speaks (default: `locale`). */
+type OrderOptions = {
+  cart?: CartLine[];
+  status?: SessionStatus;
+  dineOption?: DineOption | null;
+  locale?: Locale;
+  language?: SpeechLanguage;
+};
 
 /** Gemini Live: one text, pinned in the ephemeral token with the order as it was when the token was issued. */
 export function buildInstructions(kiosk: KioskData, opts: OrderOptions): string {
@@ -39,6 +46,7 @@ export function chatInstructions(kiosk: KioskData, opts: OrderOptions): { system
 
 function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: string[]; menu: string[] } {
   const locale = opts.locale ?? "en";
+  const language = opts.language ?? locale;
   const cart = opts.cart ?? [];
   const brand = kiosk.brand.name.en;
   const ticket = kiosk.domain === "ticket";
@@ -52,9 +60,9 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
     "Never name parts of the screen such as \"confirm card\" (확인 카드); say \"your order\" (주문 내역) instead.",
     "",
     "## Language",
-    `The user's phone is set to ${LANGUAGE[locale]}; start in that language.`,
-    "Reply in the user's language when it is Korean or English; otherwise reply in English.",
-    "Item names: use name.ko for Korean speakers and name.en for everyone else. Prices are in Korean won.",
+    `The user chose ${LANGUAGES[language].english} on the phone; speak and write in ${LANGUAGES[language].english}.`,
+    "If the user speaks or writes in another language, reply in the language the user speaks or writes.",
+    "Item names: use name.ko for Korean speakers and name.en for everyone else; never translate or invent item names. Prices are in Korean won.",
     ...(vocabulary
       ? [
           `On this machine an item is a "${vocabulary.item.en}" (${vocabulary.item.ko}) and the chosen items are "${vocabulary.cart.en}" (${vocabulary.cart.ko}).`,
@@ -75,7 +83,7 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
           "say the machine does not have that information, call callStaff with unknown_info, and say staff is coming.",
         ]
       : [
-          "If the user asks for information that is not in it (halal, vegan, origin, spice level, ingredients beyond the listed options):",
+          "If the user asks for information that is not in it (halal, vegan, origin, ingredients beyond the listed options):",
           "say this kiosk does not have that information, call callStaff with unknown_info, and say staff is coming.",
           "For anything else about an item (taste, temperature, freshness), say the kiosk does not have that information;",
           "call staff only when the user needs it to decide.",
@@ -92,13 +100,23 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
       ? "To change existing lines (\"make that three tickets\", \"a window seat\"), call updateCart on the matching lineIds from the latest cart; never add duplicates."
       : "To change existing lines (\"make the fries large\"), call updateCart on the matching lineIds from the latest cart; never add duplicates.",
     "\"No, cancel that\" or \"undo\": call undoLastChange.",
-    ...(kiosk.dineOptions ? ["If the order needs a dine option, ask \"Eat here or take out?\" and call setDineOption."] : []),
+    ...(kiosk.dineOptions
+      ? [
+          // The phone often sets it by a tap after voice connected, so the pinned Current order can be out of date.
+          "Every tool result has dineOption, the dine option now; it replaces the one in Current order.",
+          "If the latest dineOption is eat_in or take_out, the user already chose it on the phone: never ask again.",
+          `A message that starts with "${PHONE_NOTE}" comes from the phone, not the user: take it as the order now and do not answer it.`,
+          "Ask \"Eat here or take out?\" only when dineOption is null and the order needs it, then call setDineOption.",
+        ]
+      : []),
     "When the user taps a choice button, their message is the button's label.",
     "",
     "## Choices",
     "NEEDS_CHOICE: call offerChoices with the templateId and choices from the result, then ask one short question.",
     "SOLD_OUT or UNAVAILABLE: say so plainly and offer the alternatives with offerChoices (alternatives).",
     `Ambiguous requests (${ticket ? "\"one ticket\"" : "\"one burger\""}): offer the matching items with offerChoices (pick_item), at most 6.`,
+    "When the menu data can narrow a vague request (words in item names, categories, variants, kcal, allergens or badges), offer the matching items with offerChoices (pick_item) and ask one short question.",
+    "Say plainly what the data shows (for example which names say spicy), never more; call staff only when the data has nothing to go on.",
     ...(kiosk.upsellRules.length > 0
       ? [
           "Upsell: when a tool result has upsell, offer it once (\"Would you like a dessert too?\") with offerChoices (upsell). Accept no without asking again.",

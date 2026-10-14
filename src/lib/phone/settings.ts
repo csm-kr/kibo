@@ -1,4 +1,5 @@
 import { SESSION_ID } from "@/lib/commands/schemas";
+import { aiOnly, isSpeechLanguage, uiLocale, type SpeechLanguage } from "@/lib/i18n/languages";
 import type { Locale } from "@/types/menu";
 import type { Session, SessionStatus } from "@/types/session";
 import { phoneLocale } from "./locale";
@@ -9,6 +10,8 @@ import { phoneLocale } from "./locale";
 export const LOCALE_KEY = "kibo.phone.locale";
 export const AI_VOICE_KEY = "kibo.phone.aiVoice";
 export const LARGE_TEXT_KEY = "kibo.phone.largeText";
+/** An AI language other than Korean or English (the screens are then English); empty when none. */
+export const AI_LANGUAGE_KEY = "kibo.phone.aiLang";
 /** The last order this phone opened, so /app can offer [Continue my order]. */
 export const LAST_ORDER_KEY = "kibo.phone.lastOrder";
 
@@ -34,8 +37,24 @@ export function readSettings(store: Pick<Storage, "getItem">, navigatorLanguage:
   };
 }
 
+/** The AI's language, read like the screen language; an AI-only language is kept under its own key (14-final:4). */
+export function readLanguage(store: Pick<Storage, "getItem">, navigatorLanguage: string | undefined): SpeechLanguage {
+  const ai = store.getItem(AI_LANGUAGE_KEY);
+  return isSpeechLanguage(ai) && aiOnly(ai) ? ai : readSettings(store, navigatorLanguage).locale;
+}
+
+/** Korean or English set both; any other language sets English screens and the AI's language. */
+export function writeLanguage(store: Pick<Storage, "setItem">, language: SpeechLanguage): void {
+  store.setItem(LOCALE_KEY, uiLocale(language));
+  store.setItem(AI_LANGUAGE_KEY, aiOnly(language) ? language : "");
+}
+
 export function writeSettings(store: Pick<Storage, "setItem">, next: Partial<PhoneSettings>): void {
-  if (next.locale) store.setItem(LOCALE_KEY, next.locale);
+  // A screen language chosen on /app ends an AI-only language chosen on the phone before.
+  if (next.locale) {
+    store.setItem(LOCALE_KEY, next.locale);
+    store.setItem(AI_LANGUAGE_KEY, "");
+  }
   if (next.aiVoice !== undefined) store.setItem(AI_VOICE_KEY, next.aiVoice ? "on" : "off");
   if (next.largeText !== undefined) store.setItem(LARGE_TEXT_KEY, next.largeText ? "on" : "off");
 }

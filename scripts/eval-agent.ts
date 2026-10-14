@@ -17,9 +17,10 @@ import { chatReducer, historyFor, initialChat } from "@/lib/phone/chat";
 import { createSession, runCommand } from "@/lib/session/service";
 import { getKiosk } from "@/lib/adapters/catalog";
 import { MemoryStore } from "@/lib/store/memory";
+import type { SpeechLanguage } from "@/lib/i18n/languages";
 import type { Locale } from "@/types/menu";
 import type { CartLine, Session, SessionStatus } from "@/types/session";
-import { checkGrounding, internalWords, offersToPay, type GroundingResult } from "./grounding";
+import { checkGrounding, internalWords, offersToPay, replyLanguage, type GroundingResult } from "./grounding";
 
 interface ExpectedLine {
   itemId: string;
@@ -28,9 +29,16 @@ interface ExpectedLine {
   selections: Record<string, string[]>;
 }
 
+/** `excludes`: ids that must not be among the buttons ("not spicy" must not offer a Spicy item). */
+type ChoicesExpect = { templateId: string; ids: string[]; excludes?: string[] };
+
 type Expect =
-  | { cart: ExpectedLine[] }
-  | { choices: { templateId: string; ids: string[] } }
+  // With `choices`: one sentence that adds a line and asks about another ("a coffee for me, something not spicy for him").
+  | { cart: ExpectedLine[]; choices?: ChoicesExpect }
+  | { choices: ChoicesExpect }
+  // A question back instead of a staff call (14-final:4): cart unchanged, no staff, choice buttons or a question mark,
+  // and a grounded reply; `mentionsAny`: the reply or the buttons name one of these items.
+  | { ask: { mentionsAny?: string[] } }
   | { staff: true }
   | { refuse: true }
   | { status: SessionStatus }
@@ -43,7 +51,13 @@ interface Case {
   /** Kiosk the case runs on; default "malo". */
   kioskId?: string;
   type: string;
+  /** Cases added in 14-final:4 are reported apart from the earlier set: "colloquial" or "language". */
+  group?: string;
   locale: Locale;
+  /** The phone's AI language from the picker, when it is not `locale`. */
+  language?: SpeechLanguage;
+  /** Every reply must be in this language (replyLanguage, no AI); only the detected codes are kept. */
+  replyIn?: string;
   turns: string[];
   expect: Expect;
 }
@@ -127,9 +141,20 @@ function judge(
   calls: ToolCall[],
   grounding: GroundingResult | null,
   payOffer: boolean,
+  lastReply: string | null,
 ): string | null {
   const unchanged = normalize(final.cart) === normalize(before);
   const e = c.expect;
+  if ("ask" in e) {
+    if (!unchanged) return "cart changed";
+    if (final.staffCalled) return "staff called";
+    if (!grounding) return "no reply";
+    if (!grounding.pass) return `ungrounded: ${grounding.matched.join(",")}`;
+    if (!final.pendingChoice && !/[?？]/.test(lastReply ?? "")) return "no question and no choice buttons";
+    const ids = e.ask.mentionsAny;
+    const named = [...grounding.mentioned, ...(final.pendingChoice?.choices.map((ch) => ch.id) ?? [])];
+    return !ids || ids.some((id) => named.includes(id)) ? null : "names none of the expected items";
+  }
   if ("reply" in e) {
     if (!unchanged) return "cart changed";
     if (!grounding) return "no reply";
@@ -142,18 +167,25 @@ function judge(
     const ids = e.reply.mentionsAny;
     return !ids || ids.some((id) => grounding.mentioned.includes(id)) ? null : "names none of the expected items";
   }
-  if ("cart" in e) return normalize(final.cart) === normalize(e.cart) ? null : "final cart differs";
+  if ("cart" in e) {
+    if (normalize(final.cart) !== normalize(e.cart)) return "final cart differs";
+    return e.choices ? choiceMiss(final, e.choices) : null;
+  }
   if ("status" in e) return final.status === e.status ? null : `status ${final.status}`;
   if (!unchanged) return "cart changed";
-  if ("choices" in e) {
-    const p = final.pendingChoice;
-    if (!p) return "no choice buttons";
-    if (p.templateId !== e.choices.templateId) return `choice template ${p.templateId}`;
-    const missing = e.choices.ids.filter((id) => !p.choices.some((ch) => ch.id === id));
-    return missing.length === 0 ? null : `choices miss ${missing.join(",")}`;
-  }
+  if ("choices" in e) return choiceMiss(final, e.choices);
   if ("staff" in e) return final.staffCalled?.reasonCode === "unknown_info" ? null : "staff not called";
   return calls.some((t) => t.code === "BAD_REQUEST") ? "a tool call failed with BAD_REQUEST" : null;
+}
+
+function choiceMiss(final: Session, want: ChoicesExpect): string | null {
+  const p = final.pendingChoice;
+  if (!p) return "no choice buttons";
+  if (p.templateId !== want.templateId) return `choice template ${p.templateId}`;
+  const missing = want.ids.filter((id) => !p.choices.some((ch) => ch.id === id));
+  if (missing.length > 0) return `choices miss ${missing.join(",")}`;
+  const unwanted = (want.excludes ?? []).filter((id) => p.choices.some((ch) => ch.id === id));
+  return unwanted.length === 0 ? null : `choices include ${unwanted.join(",")}`;
 }
 
 /**
@@ -199,6 +231,8 @@ async function runCase(c: Case) {
   let lastReply: string | null = null;
   // Every reply of the case, not only the last: "please wait" or "confirm card" can come mid-order.
   const internal = new Set<string>();
+  // The detected language of each reply (codes only), for cases with `replyIn`.
+  const languages: (string | null)[] = [];
   const allCalls: ToolCall[] = [];
   const requests: RequestLog[] = [];
 
@@ -216,6 +250,7 @@ async function runCase(c: Case) {
       utteranceSeq: chat.utteranceSeq,
       cartVersion: session.status === "confirming" ? session.cartVersion : undefined,
       locale: c.locale,
+      ...(c.language ? { language: c.language } : {}),
       bearer: deviceToken!,
     };
 
@@ -241,6 +276,7 @@ async function runCase(c: Case) {
       }
       chat = chatReducer(chat, { type: "reply", text: reply });
       lastReply = reply;
+      languages.push(replyLanguage(reply, getKiosk(kioskId)));
       for (const w of internalWords(reply, { replaying: Boolean(getKiosk(kioskId).learned) })) internal.add(w);
     } catch (e) {
       if (!(e instanceof CommandError)) throw e;
@@ -258,17 +294,27 @@ async function runCase(c: Case) {
 
   const final = (await store.get(sessionId))!;
   stopBridge();
-  const grounding = "reply" in c.expect && lastReply !== null ? checkGrounding(lastReply, getKiosk(kioskId)) : null;
+  const grounding = ("reply" in c.expect || "ask" in c.expect) && lastReply !== null ? checkGrounding(lastReply, getKiosk(kioskId)) : null;
+  // Every reply in the expected language; one nothing decides (a bare name and price) passes unless it is the last.
+  const languageMiss =
+    c.replyIn && (languages.some((l) => l !== null && l !== c.replyIn) || languages.at(-1) !== c.replyIn)
+      ? `reply language ${languages.map((l) => l ?? "?").join(",")}`
+      : null;
   // Only the verdict is kept, never the reply.
   const payOffer = lastReply !== null && offersToPay(lastReply);
   const failure = requests.find((r) => r.error)
     ? `request error ${requests.find((r) => r.error)!.error}`
-    : (judge(c, final, before, allCalls, grounding, payOffer) ?? (internal.size > 0 ? `internal words: ${[...internal].join(",")}` : null));
+    : (judge(c, final, before, allCalls, grounding, payOffer, lastReply) ??
+      languageMiss ??
+      (internal.size > 0 ? `internal words: ${[...internal].join(",")}` : null));
   return {
     id: c.id,
     kioskId,
     type: c.type,
+    group: c.group ?? "original",
     locale: c.locale,
+    ...(c.language ? { language: c.language } : {}),
+    ...(c.replyIn ? { replyLanguages: languages } : {}),
     pass: failure === null,
     ...(failure ? { reason: failure } : {}),
     status: final.status,
@@ -330,6 +376,14 @@ async function main() {
     if (r.pass) t.pass++;
     byKiosk.set(r.kioskId, t);
   }
+  // The earlier set and the 14-final:4 additions apart, so a regression on the old cases shows on its own.
+  const byGroup = new Map<string, { pass: number; total: number }>();
+  for (const r of results) {
+    const t = byGroup.get(r.group) ?? { pass: 0, total: 0 };
+    t.total++;
+    if (r.pass) t.pass++;
+    byGroup.set(r.group, t);
+  }
   const reqs = results.flatMap((r) => r.requests).filter((q) => !q.error);
   const totals = reqs.map((q) => q.ms);
   const firsts = reqs.flatMap((q) => (q.firstToolMs === null ? [] : [q.firstToolMs]));
@@ -360,6 +414,7 @@ async function main() {
     cases: results.length,
     passed,
     passRate: results.length ? passed / results.length : 0,
+    byGroup: Object.fromEntries(byGroup),
     byKiosk: Object.fromEntries(byKiosk),
     byType: Object.fromEntries(byType),
     latency,
@@ -377,6 +432,10 @@ async function main() {
     `- Overall: **${passed}/${results.length} (${pct(passed, results.length || 1)})**`,
     `- Latency per request (${latency.requests} requests): median ${latency.totalMedianMs} ms, p90 ${latency.totalP90Ms} ms`,
     `- Until the first command is applied (${latency.firstToolRequests} requests): median ${latency.firstToolMedianMs} ms, p90 ${latency.firstToolP90Ms} ms`,
+    "",
+    "| Group | Pass |",
+    "|---|---|",
+    ...[...byGroup].map(([g, v]) => `| ${g} | ${v.pass}/${v.total} |`),
     "",
     "| Kiosk | Pass |",
     "|---|---|",

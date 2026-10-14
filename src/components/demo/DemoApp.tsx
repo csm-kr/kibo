@@ -16,6 +16,7 @@ import { buildComparison, HERO_KIOSK } from "@/lib/demo/compare";
 import { EDIT_PATH_TAPS, HUMAN_RUNS, TOUCH_RUN } from "@/lib/demo/evidence";
 import { scenariosFor } from "@/lib/demo/scenarios";
 import { kioskStep } from "@/lib/kiosk/pairing";
+import { uiLocale, type SpeechLanguage } from "@/lib/i18n/languages";
 import { pt } from "@/lib/i18n/phone";
 import type { KioskData, Locale } from "@/types/menu";
 import { ActionStrip } from "./ActionStrip";
@@ -60,7 +61,9 @@ function subscribeWide(cb: () => void) {
 
 export function DemoApp({ kiosk }: { kiosk: KioskData }) {
   const demo = useDemoSession(kiosk.kioskId);
-  const [locale, setLocale] = useState<Locale>("en");
+  // The phone half's AI language (14-final:4); its screens are Korean or English.
+  const [language, setLanguage] = useState<SpeechLanguage>("en");
+  const locale: Locale = uiLocale(language);
   // The card stand-in on the phone half sends "tap" here; the kiosk's K7 inserts the card when it hears it.
   const [cardTap] = useState(() => new EventTarget());
   // The phone half's own send, for the scenario guide's sentences.
@@ -244,7 +247,9 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
                 session={session}
                 deviceToken={tokens.deviceToken ?? null}
                 locale={locale}
-                onLocaleChange={setLocale}
+                onLocaleChange={setLanguage}
+                language={language}
+                onLanguageChange={setLanguage}
                 mode="demo"
                 examples={examplesFor(kiosk.kioskId, locale, "demo")}
                 onCardStandIn={() => cardTap.dispatchEvent(new Event("tap"))}

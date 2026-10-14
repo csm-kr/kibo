@@ -4,6 +4,7 @@ import { useReducer } from "react";
 import type { AgentAction } from "@/lib/agent/actions";
 import { ApiError, chat } from "@/lib/client/api";
 import { errorCopy } from "@/lib/i18n/errors";
+import type { SpeechLanguage } from "@/lib/i18n/languages";
 import { pt } from "@/lib/i18n/phone";
 import { chatReducer, historyFor, initialChat } from "@/lib/phone/chat";
 import type { Locale } from "@/types/menu";
@@ -20,6 +21,8 @@ export function useChat(opts: {
   sessionId: string | null;
   token: string | null;
   locale: Locale;
+  /** What the AI speaks, when the user chose a language the screens do not have (14-final:4). */
+  language?: SpeechLanguage;
   /** Takes the next utteranceSeq from the counter shared with voice (I-079); without it the chat counts on its own. */
   nextSeq?: () => number;
   /** /demo: what the AI did for each answered message. */
@@ -46,6 +49,7 @@ export function useChat(opts: {
         utteranceSeq,
         cartVersion,
         locale: opts.locale,
+        language: opts.language,
       });
       dispatch({ type: "reply", text: r.reply });
       if (r.actions?.length) opts.onActions?.(r.actions);

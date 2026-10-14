@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  AI_LANGUAGE_KEY,
   AI_VOICE_KEY,
+  readLanguage,
+  writeLanguage,
   LARGE_TEXT_KEY,
   LAST_ORDER_KEY,
   LOCALE_KEY,
@@ -18,6 +21,35 @@ function memory(init: Record<string, string> = {}) {
     setItem: (k: string, v: string) => void data.set(k, v),
   };
 }
+
+describe("the AI language (14-final:4)", () => {
+  it("is the screen language until an AI-only language is chosen", () => {
+    expect(readLanguage(memory(), "ko-KR")).toBe("ko");
+    expect(readLanguage(memory({ [LOCALE_KEY]: "en" }), "ko-KR")).toBe("en");
+  });
+
+  it("choosing Japanese keeps English screens and remembers Japanese for the AI", () => {
+    const store = memory({ [LOCALE_KEY]: "ko" });
+    writeLanguage(store, "ja");
+    expect(readSettings(store, "ko").locale).toBe("en");
+    expect(readLanguage(store, "ko")).toBe("ja");
+  });
+
+  it("choosing Korean or English, here or on /app, ends the AI-only language", () => {
+    const store = memory();
+    writeLanguage(store, "th");
+    writeLanguage(store, "ko");
+    expect(readLanguage(store, "en")).toBe("ko");
+    writeLanguage(store, "vi");
+    writeSettings(store, { locale: "en" });
+    expect(readLanguage(store, "ko")).toBe("en");
+  });
+
+  it("ignores a stored value that is not on the list, and its key cannot clash with a device token", () => {
+    expect(readLanguage(memory({ [LOCALE_KEY]: "en", [AI_LANGUAGE_KEY]: "de" }), "en")).toBe("en");
+    expect(AI_LANGUAGE_KEY.slice("kibo.phone.".length).length).toBeLessThan(16);
+  });
+});
 
 describe("readSettings", () => {
   it("defaults: browser language, AI voice on, normal text", () => {

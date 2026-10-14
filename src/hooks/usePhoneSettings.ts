@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useSyncExternalStore } from "react";
-import { LARGE_TEXT_SCALE, readSettings, writeSettings, type PhoneSettings } from "@/lib/phone/settings";
+import type { SpeechLanguage } from "@/lib/i18n/languages";
+import { LARGE_TEXT_SCALE, readLanguage, readSettings, writeLanguage, writeSettings, type PhoneSettings } from "@/lib/phone/settings";
 
 // The phone settings from localStorage (src/lib/phone/settings.ts), shared by /app and /assistant. `storage` events
 // cover other tabs, `notify` this one. Each value is its own snapshot: a primitive, so React sees a stable value.
@@ -23,8 +24,15 @@ export function setPhoneSettings(next: Partial<PhoneSettings>) {
   listeners.forEach((cb) => cb());
 }
 
-export function usePhoneSettings(): PhoneSettings {
+/** The AI language from the phone's picker (14-final:4); Korean or English also set the screens. */
+export function setPhoneLanguage(language: SpeechLanguage) {
+  writeLanguage(localStorage, language);
+  listeners.forEach((cb) => cb());
+}
+
+export function usePhoneSettings(): PhoneSettings & { language: SpeechLanguage } {
   const locale = useSyncExternalStore(subscribe, () => read().locale, () => "en" as const);
+  const language = useSyncExternalStore(subscribe, () => readLanguage(localStorage, navigator.language), () => "en" as const);
   const aiVoice = useSyncExternalStore(subscribe, () => read().aiVoice, () => true);
   const largeText = useSyncExternalStore(subscribe, () => read().largeText, () => false);
 
@@ -41,5 +49,5 @@ export function usePhoneSettings(): PhoneSettings {
     };
   }, [largeText]);
 
-  return { locale, aiVoice, largeText };
+  return { locale, aiVoice, largeText, language };
 }

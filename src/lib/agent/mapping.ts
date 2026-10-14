@@ -103,13 +103,15 @@ export function toolResult(k: KioskData, locale: Locale, outcome: Outcome): obje
       }),
     };
   }
-  const { status, total, cart, result, pending } = outcome.response;
+  const { status, total, cart, result, pending, dineOption } = outcome.response;
   const upsell = result?.upsell?.offerItemIds;
   return {
     ok: true,
     // Learned kiosks: the cart below is from before the change, which the kiosk is still replaying.
     ...(pending && { pending: true, message: "The kiosk is doing it now; say you are adding it and wait." }),
     status,
+    // A tap on the phone may have set it after the voice model's instructions were pinned (14-final:4).
+    ...(k.dineOptions && dineOption !== undefined && { dineOption }),
     total,
     cart: cartForModel(k, cart, locale),
     ...(upsell && upsell.length > 0 && {

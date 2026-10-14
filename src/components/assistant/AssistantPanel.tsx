@@ -9,6 +9,7 @@ import { ConfirmBar, ConfirmCard, DoneCard, PayCard } from "@/components/phone/C
 import { Choices } from "@/components/phone/Choices";
 import { LastMessage, Messages, StatusChip } from "@/components/phone/Conversation";
 import { Dock, TypingSheet, voiceActive } from "@/components/phone/Dock";
+import { AiLanguageProvider } from "@/components/phone/language";
 import { OrderCard } from "@/components/phone/OrderCard";
 import { Suggestions } from "@/components/phone/Suggestions";
 import { CARD, FOCUS, ICON, PRESS, PRIMARY, SECONDARY } from "@/components/phone/ui";
@@ -23,6 +24,7 @@ import type { CommandType } from "@/lib/commands/schemas";
 import type { SendResult } from "@/lib/demo/player";
 import { learnedUndoLine } from "@/lib/commands/undo";
 import { cartAnnouncement, itemCount, learnedPayHint, phoneSecondsLeft, pt, voiceSecondsLeft } from "@/lib/i18n/phone";
+import type { SpeechLanguage } from "@/lib/i18n/languages";
 import { formatWon } from "@/lib/kiosk/menu";
 import { idleWarning, staffBannerVisible } from "@/lib/kiosk/timers";
 import { bridgeNotice, phoneScreen, type BridgeNotice, type PhoneLocal } from "@/lib/phone/screen";
@@ -45,6 +47,9 @@ interface Props {
   deviceToken: string | null;
   locale: Locale;
   onLocaleChange(locale: Locale): void;
+  /** What the AI speaks (14-final:4); default `locale`. With `onLanguageChange` the app bar offers every AI language. */
+  language?: SpeechLanguage;
+  onLanguageChange?: (language: SpeechLanguage) => void;
   mode: "phone" | "demo";
   examples?: string[];
   /** /demo only: stands in for the card action on the kiosk (Flow C4). */
@@ -77,6 +82,7 @@ export type SayFn = (text: string) => Promise<SendResult>;
 /** The parent keys this by session id, so local flags never carry over to a new session. */
 export function AssistantPanel(props: Props) {
   const { kiosk, session, deviceToken, locale, mode } = props;
+  const language = props.language ?? locale;
   const clockOffset = props.clockOffset ?? 0;
   // /demo explains the three steps before it starts, so its phone skips the start screen.
   const [startSeen, setStartSeen] = useState(mode === "demo");
@@ -88,6 +94,7 @@ export function AssistantPanel(props: Props) {
     sessionId: session?.sessionId ?? null,
     token: deviceToken,
     locale,
+    language,
     nextSeq: () => ++utterances.current,
     onActions: props.onActions,
     onSend: props.onUserTurn,
@@ -150,6 +157,7 @@ export function AssistantPanel(props: Props) {
     deviceToken,
     kiosk,
     locale,
+    language,
     status: session?.status ?? null,
     getCartVersion: () => session?.cartVersion ?? 0,
     onUserText: (text) => {
@@ -591,14 +599,22 @@ export function AssistantPanel(props: Props) {
       break;
   }
 
-  return (
-    <div lang={locale} data-phone-screen={screen} data-mode={mode} className="relative flex h-full min-h-0 flex-col bg-cream text-ink">
+  const panel = (
+    <div
+      lang={locale}
+      data-phone-screen={screen}
+      data-mode={mode}
+      data-ai-language={language}
+      className="relative flex h-full min-h-0 flex-col bg-cream text-ink"
+    >
       <AppBar
         brand={kiosk.brand.name[locale]}
         locale={locale}
         // The stream's state; nothing to say before there is a session, or after it ended.
         connection={session === null || ended ? undefined : reconnecting ? "reconnecting" : "connected"}
         onLocaleChange={props.onLocaleChange}
+        language={language}
+        onLanguageChange={props.onLanguageChange}
         onStaff={ended ? undefined : () => void command("callStaff", { reasonCode: "user_request" })}
         staffDisabled={!session || !deviceToken}
       />
@@ -645,6 +661,8 @@ export function AssistantPanel(props: Props) {
       )}
     </div>
   );
+  // The few strings a first-time user must read follow an AI-only language (src/components/phone/language.tsx).
+  return <AiLanguageProvider value={language}>{panel}</AiLanguageProvider>;
 }
 
 function Scroll({ children }: { children: ReactNode }) {

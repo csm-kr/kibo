@@ -14,6 +14,7 @@
     "qa:ui": "playwright test -c playwright.qa.config.ts",
     "eval:agent": "tsx --env-file=.env scripts/eval-agent.ts",
     "measure:cost": "tsx --env-file=.env scripts/measure-cost.ts",
+    "voice:languages": "tsx --env-file=.env scripts/live-languages.ts",
     "load:check": "tsx --env-file=.env scripts/load-check.ts",
     "lighthouse": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/lighthouse.ts",
     "pwa:check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/pwa-check.ts",

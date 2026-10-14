@@ -8,6 +8,13 @@ const PHONE_TEXT = {
   // Header
   langKo: { ko: "한국어", en: "한국어" },
   langEn: { ko: "English", en: "English" },
+  // Language picker (14-final:4): Korean and English change the screens too; the others only what the AI speaks.
+  langScreens: { ko: "화면과 AI", en: "Screens and AI" },
+  langAiOnly: { ko: "AI만 이 언어로 말해요 · 화면은 영어", en: "The AI talks and writes in it · screens in English" },
+  langAiNote: {
+    ko: "글자 주문으로 확인했어요. 이 언어로 말하는 음성 주문은 아직 확인하지 않았어요.",
+    en: "Checked by typing. Speaking these languages is not tested yet.",
+  },
   callStaff: { ko: "직원 호출", en: "Call staff" },
   // Phone design app bar (docs/UI_GUIDE.md "Phone design"): short visible labels; the full name is the accessible one
   staffShort: { ko: "직원", en: "Staff" },

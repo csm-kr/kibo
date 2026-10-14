@@ -227,6 +227,19 @@ test.describe("other kiosk data", () => {
     );
   });
 
+  test("airport rail in English: K3 tickets and the transit card category, no word split (14-final:4)", async ({ page }, info) => {
+    await page.goto("/kiosk?k=airport_rail");
+    const root = kioskRoot(page);
+    await readClaim(page);
+    await page.getByRole("button", { name: "English" }).click();
+    await page.getByRole("button", { name: /Buy by touch/ }).click();
+    await expect(root).toHaveAttribute("data-screen", "menu");
+    await check(page, info, "K3-rail-menu-en");
+    await page.getByRole("button", { name: "Cards and passes", exact: true }).click();
+    await expect(buttonWithText(page, "Rechargeable transit card")).toBeVisible();
+    await check(page, info, "K3-rail-cards-en");
+  });
+
   test("MALO in English: K1 to K8", async ({ page }, info) => {
     await page.clock.install();
     await page.goto("/kiosk?k=malo");

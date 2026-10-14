@@ -5,6 +5,7 @@ import type {
   LiveServerMessage,
 } from "@google/genai";
 import type { ErrorCode } from "@/lib/commands/errors";
+import type { SpeechLanguage } from "@/lib/i18n/languages";
 import type { Locale } from "@/types/menu";
 
 // The phone's side of the Vertex Live relay (kibo-voice, voice-relay/relay.ts; ADR-012). The relay speaks Live's
@@ -42,7 +43,7 @@ const OPEN = 1;
  *  rejects: a refusal or a drop, before or after, arrives as onclose with the relay's code. */
 export function connectRelay(
   url: string,
-  hello: { sessionId: string; deviceToken: string; locale: Locale },
+  hello: { sessionId: string; deviceToken: string; locale: Locale; language?: SpeechLanguage },
   cb: { onready(info: RelayInfo): void; onmessage(m: LiveServerMessage): void; onclose(code: number): void },
   Socket: new (url: string) => SocketLike = WebSocket as unknown as new (url: string) => SocketLike,
 ): Promise<LiveLink> {

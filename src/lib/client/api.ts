@@ -3,8 +3,9 @@ import { HTTP_STATUS, type ErrorDetail } from "@/lib/commands/errors";
 import type { CommandResult } from "@/lib/commands/machine";
 import type { CommandType } from "@/lib/commands/schemas";
 import type { ScreenErrorCode } from "@/lib/i18n/errors";
+import type { SpeechLanguage } from "@/lib/i18n/languages";
 import type { Locale } from "@/types/menu";
-import type { CartLine, SessionStatus, Source } from "@/types/session";
+import type { CartLine, DineOption, SessionStatus, Source } from "@/types/session";
 
 // Browser side of the API (docs/ARCHITECTURE.md "API"). Screens show errorCopy(code), never `message`.
 
@@ -36,6 +37,7 @@ export interface CommandReply {
   cart: CartLine[];
   total: number;
   cartVersion: number;
+  dineOption?: DineOption | null;
   result?: CommandResult;
   duplicate?: boolean;
   claimUrl?: string;
@@ -113,8 +115,13 @@ export type LiveTokenReply =
   | { mode: "relay"; url: string };
 
 /** How voice starts; model, instructions and tools are pinned in the token or held by the relay, never sent here. */
-export function liveToken(input: { sessionId: string; token: string; locale: Locale }): Promise<LiveTokenReply> {
-  return post("/api/live-token", { sessionId: input.sessionId, locale: input.locale }, input.token);
+/** `language` goes along only when it is not the screens' locale (an AI-only language, 14-final:4). */
+export function liveToken(input: { sessionId: string; token: string; locale: Locale; language?: SpeechLanguage }): Promise<LiveTokenReply> {
+  return post("/api/live-token", { sessionId: input.sessionId, locale: input.locale, ...aiLanguageField(input) }, input.token);
+}
+
+export function aiLanguageField(input: { locale: Locale; language?: SpeechLanguage }): { language?: SpeechLanguage } {
+  return input.language && input.language !== input.locale ? { language: input.language } : {};
 }
 
 export interface ChatReply {
@@ -136,7 +143,8 @@ export function chat(input: {
   utteranceSeq: number;
   cartVersion?: number;
   locale: Locale;
+  language?: SpeechLanguage;
 }): Promise<ChatReply> {
-  const { token, ...rest } = input;
-  return post("/api/chat", { ...rest, chatRequestId: crypto.randomUUID() }, token);
+  const { token, language, ...rest } = input;
+  return post("/api/chat", { ...rest, ...aiLanguageField({ locale: rest.locale, language }), chatRequestId: crypto.randomUUID() }, token);
 }

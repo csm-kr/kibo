@@ -3,6 +3,7 @@ import skill from "../../../skills/doughhouse.json";
 import { getKiosk } from "@/lib/adapters/catalog";
 import { learnedToKiosk, skillSchema } from "@/lib/adapters/learned";
 import type { CartLine } from "@/types/session";
+import { dineNote } from "@/lib/voice/dineNote";
 import { buildInstructions, chatInstructions } from "./instructions";
 import { menuForModel } from "./menu";
 
@@ -94,7 +95,7 @@ describe("buildInstructions", () => {
 
   it("keeps the food-only lines for MALO", () => {
     expect(text).toContain("Speak like counter staff");
-    expect(text).toContain("If the order needs a dine option, ask \"Eat here or take out?\" and call setDineOption.");
+    expect(text).toMatch(/"Eat here or take out\?".*call setDineOption/);
     expect(text).toContain("Would you like a dessert too?");
     expect(text).not.toContain("## Tickets");
   });
@@ -222,6 +223,59 @@ describe("buildInstructions with untrusted learned text (I-152)", () => {
     const text = buildInstructions(tampered, { locale: "en", cart: [{ ...cart[0], itemId: tampered.items[0].itemId }] });
     expect(text.split("</menu_data>").length - 1).toBe(1);
     expect(text).toContain("\\u003c/menu_data\\u003e x");
+  });
+});
+
+describe("language and the dine option (14-final:4)", () => {
+  it("speaks the language the user chose, and the user's own language over it", () => {
+    const ja = buildInstructions(k, { locale: "en", language: "ja" });
+    expect(ja).toMatch(/user chose Japanese on the phone; speak and write in Japanese/);
+    expect(ja).toMatch(/reply in the language the user speaks or writes/i);
+    expect(ja).not.toMatch(/otherwise reply in English/);
+    // Without a language, the phone's locale is the language, as before.
+    expect(buildInstructions(k, { locale: "ko" })).toMatch(/user chose Korean on the phone/);
+  });
+
+  it("never translates or invents item names, whatever the language", () => {
+    const zh = buildInstructions(k, { locale: "en", language: "zh" });
+    expect(zh).toMatch(/never translate or invent item names/i);
+    expect(zh).toMatch(/name\.en/);
+  });
+
+  it("the chat system text differs per language, so each language gets its own cache", () => {
+    const en = chatInstructions(k, { locale: "en" }).system;
+    expect(chatInstructions(k, { locale: "en", language: "fr" }).system).not.toBe(en);
+    expect(chatInstructions(k, { locale: "en", language: "en" }).system).toBe(en);
+  });
+
+  it("never asks the dine option once it is chosen: the latest tool result's dineOption wins over the token's order", () => {
+    // The Live instructions are pinned when voice connects, often before the user taps eat-in on the phone (P1 → P2).
+    const voice = buildInstructions(k, { status: "connected", dineOption: null, locale: "en" });
+    expect(voice).toContain("Dine option: not chosen");
+    expect(voice).toMatch(/Every tool result has dineOption, the dine option now; it replaces the one in Current order/);
+    expect(voice).toMatch(/Ask "Eat here or take out\?" only when dineOption is null/);
+    const chosen = buildInstructions(k, { status: "ordering", dineOption: "eat_in", locale: "en" });
+    expect(chosen).toContain("Dine option: eat_in");
+  });
+
+  it("a note the phone sends when a tap sets the dine option is named in the instructions as not the user's words", () => {
+    const note = dineNote("eat_in");
+    expect(note).toMatch(/^Note from the phone: .*Dine option: eat_in/);
+    const voice = buildInstructions(k, { locale: "en" });
+    expect(voice).toContain('A message that starts with "Note from the phone:" comes from the phone, not the user');
+  });
+
+  it("has no dine lines on a kiosk without dine options", () => {
+    expect(buildInstructions(getKiosk("airport_rail"), { locale: "en" })).not.toMatch(/dineOption/);
+  });
+
+  it("offers choices from the data before calling staff for a vague request (C7)", () => {
+    const text = buildInstructions(k, { locale: "en" });
+    expect(text).toMatch(/When the menu data can narrow a vague request/);
+    expect(text).toMatch(/offerChoices \(pick_item\)/);
+    expect(text).toMatch(/call staff only when the data has nothing to go on/i);
+    // Spice level is no longer a staff question by itself: item names say "Spicy".
+    expect(text).not.toMatch(/\(halal, vegan, origin, spice level/);
   });
 });
 

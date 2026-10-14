@@ -14,7 +14,7 @@ import type {
   TransactResult,
 } from "@/lib/store/types";
 import { hashToken, newSessionId, newToken, tokenMatches } from "@/lib/tokens";
-import type { Actor, CartLine, Session, SessionStatus } from "@/types/session";
+import type { Actor, CartLine, DineOption, Session, SessionStatus } from "@/types/session";
 
 // Store + state machine. Randomness and the clock are read outside the transaction functions,
 // because Firestore may run them several times and a retry must not change ids or tokens.
@@ -37,6 +37,8 @@ export interface CommandResponse {
   cart: CartLine[];
   total: number;
   cartVersion: number;
+  /** The dine option now; the voice model's pinned order may predate a tap that set it (14-final:4). */
+  dineOption?: DineOption | null;
   result?: CommandResult & { claimToken?: string; pairCode?: string };
   duplicate?: boolean;
 }
@@ -281,6 +283,7 @@ export async function runCommand(
           cart: session.cart,
           total: session.total,
           cartVersion: session.cartVersion,
+          dineOption: session.dineOption,
           result,
         };
         // [Connect another phone]: the old phone's token stops working and a new QR can be claimed.

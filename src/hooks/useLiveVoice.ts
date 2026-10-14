@@ -3,7 +3,8 @@
 import type { FunctionCall, FunctionResponse, LiveServerMessage } from "@google/genai";
 import { useEffect, useState } from "react";
 import type { AgentAction } from "@/lib/agent/actions";
-import { ApiError, liveToken, sendCommand } from "@/lib/client/api";
+import { aiLanguageField, ApiError, liveToken, sendCommand } from "@/lib/client/api";
+import type { SpeechLanguage } from "@/lib/i18n/languages";
 import { errorCopy } from "@/lib/i18n/errors";
 import { pt } from "@/lib/i18n/phone";
 import { e2eFrame, e2eMarks, e2eOutput, frameRms } from "@/lib/voice/e2eMarks";
@@ -12,7 +13,8 @@ import { connectRelay, relayCloseOutcome, type LiveLink } from "@/lib/voice/rela
 import { runToolCalls } from "@/lib/voice/toolRunner";
 import { initialTurns, noiseStep, raiseSeq, turnEvents, turnsReducer, type TurnEvent } from "@/lib/voice/turns";
 import type { KioskData, Locale } from "@/types/menu";
-import type { CartLine, Session, SessionStatus } from "@/types/session";
+import type { CartLine, DineOption, Session, SessionStatus } from "@/types/session";
+import { dineNote } from "@/lib/voice/dineNote";
 
 // The phone's Gemini Live connection (ADR-003, docs/ARCHITECTURE.md "Voice"): audio goes straight to Gemini with a
 // one-use token, or through the Vertex relay when /api/live-token says so (ADR-012; the same Live messages, so one
@@ -26,6 +28,8 @@ export interface LiveVoiceOptions {
   deviceToken: string | null;
   kiosk: KioskData;
   locale: Locale;
+  /** What the AI speaks and hears, when the user chose a language the screens do not have (14-final:4). */
+  language?: SpeechLanguage;
   /** Voice stops when the order is paid or expired. */
   status: SessionStatus | null;
   /** The cartVersion on the confirm card the user is looking at. */
@@ -83,6 +87,8 @@ interface Run {
   respHeard: boolean;
   respTools: boolean;
   misses: number;
+  /** The dine option the open session knows: pinned with its token, or told since. */
+  toldDine: DineOption | null;
 }
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -311,7 +317,11 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
   async function connect(r: Run) {
     const { sessionId, deviceToken, locale } = o;
     if (!sessionId || !deviceToken) throw new Error("no session");
-    const t = await liveToken({ sessionId, token: deviceToken, locale });
+    // Only an AI-only language goes along, so a ko/en phone sends what the deployed relay already accepts.
+    const aiLang = aiLanguageField({ locale, language: o.language });
+    // The token pins the order as it is now; a dine option tapped after this is told to the session (tellDine).
+    const dineAtToken = o.getSession?.()?.dineOption ?? null;
+    const t = await liveToken({ sessionId, token: deviceToken, locale, ...aiLang });
     if (r.stopped) return;
     // The countdown runs from the first token of this start (the relay's arrives when it is ready); reconnects keep it.
     if (t.mode === "direct" && r.deadline === 0) startClock(r, t.voiceSeconds);
@@ -328,14 +338,16 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     };
     const opened = (live: LiveLink) => {
       clearTimeout(setupTimer);
-      if (r.liveSessionId === id) r.live = live;
-      else live.close();
+      if (r.liveSessionId !== id) return live.close();
+      r.live = live;
+      r.toldDine = dineAtToken;
+      tellDine(r);
     };
 
     if (t.mode === "relay") {
       // The relay holds the instructions (with the current cart, marked applied) and tools; the device token goes
       // in its first message.
-      void connectRelay(t.url, { sessionId, deviceToken, locale }, {
+      void connectRelay(t.url, { sessionId, deviceToken, locale, ...aiLang }, {
         onready: (info) => {
           if (r.liveSessionId === id && r.deadline === 0) startClock(r, info.voiceSeconds);
         },
@@ -430,6 +442,7 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
       respHeard: false,
       respTools: false,
       misses: 0,
+      toldDine: null,
     };
     run = r;
     setState("connecting");
@@ -463,6 +476,21 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     }
   }
 
+  /**
+   * A dine option set by a tap after the token was issued (P1's mic, then P2's eat-in) goes to the open session as
+   * context, without ending a turn, so the model never asks it again (14-final:4). Not a user turn: no utteranceSeq.
+   */
+  function tellDine(r: Run) {
+    const dine = o.getSession?.()?.dineOption ?? null;
+    if (!r.live || r.stopped || dine === null || dine === r.toldDine) return;
+    try {
+      r.live.sendClientContent({ turns: [{ role: "user", parts: [{ text: dineNote(dine) }] }], turnComplete: false });
+      r.toldDine = dine;
+    } catch {
+      // A closing socket: the next connection's token carries the dine option.
+    }
+  }
+
   /** A tapped answer (a choice button) as one user turn on the open connection; false when there is none. */
   function sendText(text: string): boolean {
     const r = run;
@@ -487,6 +515,7 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     update(next: LiveVoiceOptions) {
       if (o.voiceOutput && !next.voiceOutput && run) stopPlayback(run);
       o = next;
+      if (run) tellDine(run);
     },
   };
 }

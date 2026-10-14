@@ -239,6 +239,33 @@ export async function textSpacing(page: Page, p: Profile): Promise<Findings> {
   return { h: capped(clipped), t: [] };
 }
 
+/**
+ * No Latin word is broken across two lines ("Cheeseburge / r", 14-final:4) (H). Kiosk canvas only: Korean wraps by
+ * its own rule there, and text that asks for `break-all` (a long host) is left out on purpose.
+ */
+export async function splitWords(page: Page, p: Profile): Promise<Findings> {
+  const split = await page.evaluate((rootSel) => {
+    const out: string[] = [];
+    const root = document.querySelector(rootSel);
+    if (!root) return out;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      const el = node.parentElement;
+      if (!el || !el.checkVisibility() || getComputedStyle(el).wordBreak === "break-all") continue;
+      // A break after a hyphen ("late- / night") is a normal break point, so each part counts as its own word.
+      for (const m of (node.textContent ?? "").matchAll(/[A-Za-z][A-Za-z'’]{2,}/g)) {
+        const range = document.createRange();
+        range.setStart(node, m.index);
+        range.setEnd(node, m.index + m[0].length);
+        const tops = new Set([...range.getClientRects()].filter((r) => r.width > 0).map((r) => Math.round(r.top)));
+        if (tops.size > 1) out.push(`word split across lines: "${m[0]}"`);
+      }
+    }
+    return out;
+  }, p.root);
+  return { h: capped(split), t: [] };
+}
+
 /** Tab through the controls: each focused one shows a ≥ 2px ring and is not hidden under other content (H). */
 export async function focus(page: Page, p: Profile): Promise<Findings> {
   const h: string[] = [];
@@ -411,6 +438,7 @@ export async function qaState(
     await tokens(page, p),
     await reducedMotion(page),
     ...(opts.reflow ? [await reflow(page)] : []),
+    ...(p.canvasWidth ? [await splitWords(page, p)] : []),
     // Last: tabbing moves focus and may scroll.
     await focus(page, p),
   ];

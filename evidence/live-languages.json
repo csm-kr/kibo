@@ -1,0 +1,159 @@
+{
+  "date": "2026-10-14T03:14:45.304Z",
+  "model": "gemini-3.8-live",
+  "paths": {
+    "api": "Gemini API key (direct path)",
+    "vertex": "Vertex AI us-central1 (relay path)"
+  },
+  "method": "One Live session per language with inputAudioTranscription.languageCodes set; one typed turn; the reply transcript's language detected by scripts/grounding.ts replyLanguage. Spoken input not tested.",
+  "results": {
+    "api": [
+      {
+        "language": "ko",
+        "code": "ko-KR",
+        "setup": true,
+        "replied": true,
+        "replyLanguage": "ko",
+        "ms": 7152
+      },
+      {
+        "language": "en",
+        "code": "en-US",
+        "setup": true,
+        "replied": true,
+        "replyLanguage": "en",
+        "ms": 4850
+      },
+      {
+        "language": "ja",
+        "code": "ja-JP",
+        "setup": true,
+        "replied": true,
+        "replyLanguage": "ja",
+        "ms": 4037
+      },
+      {
+        "language": "zh",
+        "code": "cmn-CN",
+        "setup": true,
+        "replied": true,
+        "replyLanguage": "zh",
+        "ms": 6832
+      },
+      {
+        "language": "es",
+        "code": "es-ES",
+        "setup": true,
+        "replied": true,
+        "replyLanguage": "es",
+        "ms": 5844
+      },
+      {
+        "language": "vi",
+        "code": "vi-VN",
+        "setup": true,
+        "replied": true,
+        "replyLanguage": "vi",
+        "ms": 3137
+      },
+      {
+        "language": "fr",
+        "code": "fr-FR",
+        "setup": true,
+        "replied": true,
+        "replyLanguage": "fr",
+        "ms": 4014
+      },
+      {
+        "language": "th",
+        "code": "th-TH",
+        "setup": true,
+        "replied": true,
+        "replyLanguage": "th",
+        "ms": 4316
+      },
+      {
+        "language": "id",
+        "code": "id-ID",
+        "setup": true,
+        "replied": true,
+        "replyLanguage": "id",
+        "ms": 4731
+      }
+    ],
+    "vertex": [
+      {
+        "language": "ko",
+        "code": "ko-KR",
+        "setup": true,
+        "replied": true,
+        "replyLanguage": "ko",
+        "ms": 4610
+      },
+      {
+        "language": "en",
+        "code": "en-US",
+        "setup": true,
+        "replied": true,
+        "replyLanguage": "en",
+        "ms": 6321
+      },
+      {
+        "language": "ja",
+        "code": "ja-JP",
+        "setup": true,
+        "replied": true,
+        "replyLanguage": "ja",
+        "ms": 4674
+      },
+      {
+        "language": "zh",
+        "code": "cmn-CN",
+        "setup": true,
+        "replied": true,
+        "replyLanguage": "zh",
+        "ms": 5465
+      },
+      {
+        "language": "es",
+        "code": "es-ES",
+        "setup": true,
+        "replied": true,
+        "replyLanguage": "es",
+        "ms": 5783
+      },
+      {
+        "language": "vi",
+        "code": "vi-VN",
+        "setup": true,
+        "replied": true,
+        "replyLanguage": "vi",
+        "ms": 4413
+      },
+      {
+        "language": "fr",
+        "code": "fr-FR",
+        "setup": true,
+        "replied": true,
+        "replyLanguage": "fr",
+        "ms": 4527
+      },
+      {
+        "language": "th",
+        "code": "th-TH",
+        "setup": true,
+        "replied": true,
+        "replyLanguage": "th",
+        "ms": 4456
+      },
+      {
+        "language": "id",
+        "code": "id-ID",
+        "setup": true,
+        "replied": true,
+        "replyLanguage": "id",
+        "ms": 5622
+      }
+    ]
+  }
+}

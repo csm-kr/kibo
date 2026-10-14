@@ -2,6 +2,7 @@ import { z } from "zod";
 import { getKiosk } from "@/lib/adapters/catalog";
 import { CommandError } from "@/lib/commands/errors";
 import { sessionId } from "@/lib/commands/schemas";
+import { SPEECH_LANGUAGES } from "@/lib/i18n/languages";
 import { kstDay, type UsageStore } from "@/lib/limits/usage";
 import { bumpSessionCounter, runCommand } from "@/lib/session/service";
 import type { SessionStore } from "@/lib/store/types";
@@ -25,6 +26,8 @@ export const chatRequest = z.strictObject({
   utteranceSeq: z.number().int().min(0),
   cartVersion: z.number().int().min(0).optional(),
   locale: z.enum(["ko", "en"]),
+  // What the AI speaks when it is not the screens' locale (14-final:4); the reply follows the user's own language.
+  language: z.enum(SPEECH_LANGUAGES).optional(),
 });
 
 export type ChatInput = z.infer<typeof chatRequest> & { bearer: string | null };
@@ -78,6 +81,7 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
     status: session.status,
     dineOption: session.dineOption,
     locale: input.locale,
+    language: input.language,
   });
   const declarations = toolDeclarations(kiosk);
   const tools = [{ functionDeclarations: declarations }];

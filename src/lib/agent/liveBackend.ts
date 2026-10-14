@@ -2,7 +2,6 @@ import { GoogleGenAI } from "@google/genai";
 import { CommandError } from "@/lib/commands/errors";
 import { BEFORE_PAYING } from "@/lib/commands/machine";
 import { bumpSessionCounter } from "@/lib/session/service";
-import type { Locale } from "@/types/menu";
 import { BUSY, issueLiveToken, KeyUnavailableError, liveTokenLimit, VOICE_UNAVAILABLE, type LiveTokenDeps } from "./live";
 
 // Which way the phone's voice goes (ADR-012). GEMINI_LIVE_BACKEND=auto (default): a one-use token for Gemini Live
@@ -126,7 +125,7 @@ export interface LiveStartDeps extends LiveTokenDeps {
 
 export async function startLiveVoice(
   deps: LiveStartDeps,
-  input: { sessionId: string; bearer: string | null; locale: Locale; ip: string },
+  input: Parameters<typeof issueLiveToken>[1],
 ): Promise<LiveStart> {
   const { backend, relayUrl } = deps;
 

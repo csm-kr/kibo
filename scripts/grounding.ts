@@ -78,6 +78,47 @@ export function checkGrounding(reply: string, kiosk: KioskData): GroundingResult
   return { pass: matched.length === 0, matched, mentioned: [...mentioned].sort() };
 }
 
+/** Every item and option name on the kiosk, longest first, so the language check skips names (they stay ko or en). */
+function allNames(kiosk: KioskData): string[] {
+  const names = kiosk.items.flatMap((i) => [i.name.ko, i.name.en, ...i.optionGroups.flatMap((g) => g.options.flatMap((o) => [o.name.ko, o.name.en]))]);
+  return [...new Set(names)].sort((a, b) => b.length - a.length);
+}
+
+// Letters only Vietnamese uses (not the â, ê, ô French also has), and short function words per Latin-script language.
+const VIETNAMESE = /[ăđơưạảặẳậẩẹẻẽệểễịỉĩọỏộổỗợởỡụủựửữũỳỵỷỹằầềồờừắấếốớứ]/gu;
+const WORDS: Record<"en" | "es" | "fr" | "id", string[]> = {
+  // No "a": Spanish and French use it too.
+  en: ["the", "and", "with", "you", "your", "would", "like", "added", "is", "are", "anything", "else", "two", "i", "to", "for", "it", "can", "help"],
+  es: [
+    "el", "los", "las", "del", "y", "o", "con", "por", "para", "usted", "quiere", "desea", "algo", "más", "añadido", "añadí", "dos",
+    "su", "sí", "está", "he", "tu", "te", "lo", "una", "como", "puedo", "ayudar", "ayudarte", "ayudarle",
+  ],
+  fr: ["le", "les", "des", "du", "et", "avec", "pour", "vous", "voulez", "souhaitez", "votre", "ajouté", "deux", "autre", "chose", "ai", "est", "je", "oui"],
+  id: ["dan", "dengan", "yang", "untuk", "anda", "ingin", "sudah", "saya", "silakan", "apakah", "ada", "lain", "dua", "pesanan", "ini", "itu", "menambahkan"],
+};
+
+/**
+ * The language a reply is written in, without AI (14-final:4): by script for ko, ja, zh and th, by Vietnamese-only
+ * letters, else by counting short function words. Menu names are removed first, because they stay Korean or English.
+ * Null when nothing decides it. Only the code is kept in the eval result, never the reply.
+ */
+export function replyLanguage(reply: string, kiosk: KioskData): string | null {
+  let rest = reply;
+  for (const n of allNames(kiosk)) rest = rest.replace(pattern(n), " ");
+  const count = (re: RegExp) => rest.match(re)?.length ?? 0;
+  if (count(/[฀-๿]/g) >= 3) return "th";
+  if (count(/[぀-ヿ]/g) >= 2) return "ja";
+  if (count(/[一-鿿]/g) >= 2) return "zh";
+  if (count(/[가-힣]/g) >= 2) return "ko";
+  if (count(VIETNAMESE) >= 2) return "vi";
+  const words = rest.toLowerCase().split(/[^\p{L}]+/u).filter(Boolean);
+  const scores = Object.entries(WORDS).map(([lang, list]) => [lang, words.filter((w) => list.includes(w)).length + (lang === "es" ? count(/[¿¡]/g) : 0)] as const);
+  const best = Math.max(...scores.map(([, n]) => n));
+  if (best === 0) return null;
+  const top = scores.filter(([, n]) => n === best);
+  return top.length === 1 ? top[0][0] : null;
+}
+
 const PAY_OFFERS = [
   /\b(would|do) you (like|want) to pay\b/i,
   /\b(shall|should|can) i (pay|complete|proceed)\b/i,

@@ -8,17 +8,22 @@ import { itemCount, pt, qtyText } from "@/lib/i18n/phone";
 import { formatWon, lineLabel } from "@/lib/kiosk/menu";
 import type { KioskData, Locale } from "@/types/menu";
 import type { CartLine } from "@/types/session";
+import { useAiText } from "./language";
 import { CARD, ICON, QUIET } from "./ui";
 
 // The cart in the phone design (docs/UI_GUIDE.md "Phone design"). Every line comes from session state and menu data,
 // never from model text (docs/ARCHITECTURE.md "Agent tools"). Prices use the kiosk's format (I-137).
 
 export function OrderLines({ kiosk, cart, locale }: { kiosk: KioskData; cart: CartLine[]; locale: Locale }) {
+  // An AI-only language (14-final:4): the name as the kiosk shows it, in Korean, with the English name under it, so a
+  // visitor can match the kiosk screen; the AI never translates names.
+  const both = useAiText().ai !== null;
   return (
     <ul className="flex flex-col divide-y divide-line">
       {cart.map((line) => {
         const item = findItem(kiosk, line.itemId);
         const { title, detail } = lineLabel(kiosk, line, locale);
+        const korean = both ? lineLabel(kiosk, line, "ko").title : null;
         return (
           // The name never shrinks below its longest word; when the row cannot also hold the price (320px wide), the
           // price wraps to its own row on the right instead of running into the name.
@@ -28,7 +33,12 @@ export function OrderLines({ kiosk, cart, locale }: { kiosk: KioskData; cart: Ca
               <Image src={item.image} alt="" width={48} height={48} className="size-12 flex-none rounded-[12px] bg-cream object-cover" />
             )}
             <div className="flex-1">
-              <p className="text-xl leading-snug font-semibold">{title}</p>
+              {korean && (
+                <p lang="ko" className="text-xl leading-snug font-semibold">
+                  {korean}
+                </p>
+              )}
+              <p className={korean ? "text-base text-muted" : "text-xl leading-snug font-semibold"}>{title}</p>
               {detail && <p className="text-base text-muted">{detail}</p>}
             </div>
             <div className="ml-auto flex flex-none flex-col items-end gap-1">

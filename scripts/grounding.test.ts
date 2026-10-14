@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getKiosk } from "@/lib/adapters/catalog";
-import { checkGrounding, internalWords, offersToPay } from "./grounding";
+import { checkGrounding, internalWords, offersToPay, replyLanguage } from "./grounding";
 
 const k = getKiosk("malo");
 
@@ -84,5 +84,34 @@ describe("internalWords (14-final:1: replies never use the app's internal words)
     expect(internalWords("Added two cheeseburger sets. Please check your order on the screen.")).toEqual([]);
     expect(internalWords("Insert your card into the kiosk to pay.")).toEqual([]);
     expect(internalWords("주문 내역을 확인해 주세요.")).toEqual([]);
+  });
+});
+
+describe("replyLanguage (14-final:4, no AI)", () => {
+  it("tells each picker language from a typical reply, with menu names left in English or Korean", () => {
+    const cases: [string, string][] = [
+      ["치즈버거 세트 두 개를 담았어요. 더 필요하신 게 있나요?", "ko"],
+      ["I added two Cheeseburger sets. Anything else?", "en"],
+      ["Cheeseburger setを2つ追加しました。ほかにご注文はありますか？", "ja"],
+      ["已为您添加两份 Cheeseburger set。还需要别的吗？", "zh"],
+      ["He añadido dos Cheeseburger set con Cola. ¿Quiere algo más?", "es"],
+      ["Tôi đã thêm hai phần Cheeseburger set. Bạn có muốn gọi thêm gì không?", "vi"],
+      ["J'ai ajouté deux Cheeseburger set avec un Cola. Voulez-vous autre chose ?", "fr"],
+      ["เพิ่ม Cheeseburger set สองชุดแล้วค่ะ ต้องการอะไรเพิ่มไหมคะ", "th"],
+      ["Saya sudah menambahkan dua Cheeseburger set. Apakah ada yang lain?", "id"],
+      // A Live reply the first word list missed (evidence/live-languages.json, 10-14).
+      ["Puedo responder preguntas, ayudarte a escribir textos o resolver dudas.", "es"],
+      ["I can help answer questions and give information.", "en"],
+    ];
+    for (const [text, lang] of cases) expect([text, replyLanguage(text, k)]).toEqual([text, lang]);
+  });
+
+  it("does not count menu names: an English reply full of Korean names is still English", () => {
+    expect(replyLanguage("Your 치즈버거 and 제로콜라 are added.", k)).toBe("en");
+  });
+
+  it("says null when it cannot tell", () => {
+    expect(replyLanguage("Cheeseburger, 6,900.", k)).toBeNull();
+    expect(replyLanguage("", k)).toBeNull();
   });
 });

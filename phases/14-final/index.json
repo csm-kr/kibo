@@ -37,7 +37,10 @@
     {
       "step": 4,
       "name": "any-language",
-      "status": "pending"
+      "status": "completed",
+      "summary": "Phone AI speaks any of 9 languages; screens stay ko/en. src/lib/i18n/languages.ts: SPEECH_LANGUAGES ko en ja zh es vi fr th id with Live codes (cmn-CN for zh), uiLocale, aiOnly, lt() translating only mic label, say-yes line, [Yes, pay now], [Pick more], insert-card title, order/reference number (AiLanguageProvider/useAiText in src/components/phone/language.tsx). AppBar language button opens a picker dialog (Screens and AI: 한국어/English; AI only: the 7 others, each in its own words with the English name); choice saved in phone settings, sent as optional `language` to /api/live-token, /api/chat and the relay hello (strict schemas, so both services must be redeployed together, I-227). Instructions: speak the chosen language, reply in the language the user writes; item names never translated (grounding unchanged); vague requests the data can narrow (names, categories, kcal, badges) get offerChoices instead of a staff call, 'spice level' removed from the staff list. Dine bug I-224: command replies carry dineOption, tool results pass it, instructions say the latest one wins, and the phone tells an open Live session via a PHONE_NOTE clientContent turn when a tap sets it (src/lib/voice/dineNote.ts, tellDine in useLiveVoice). Tile word-split I-225: latinFit in MenuScreen sizes long English names to fit, new H check splitWords on kiosk canvases, QA states K3-rail-menu-en, K3-rail-cards-en, P-lang-picker. Evals: 12 colloquial + 14 language cases (replyLanguage check in scripts/grounding.ts, no AI); full run 69/70 on Vertex (earlier set 44/44, colloquial 11/12 then the one case's expectation fixed and re-run 1/1, language 14/14), evals/results/2026-10-14T12-19, 12-36. npm run voice:languages: 18/18 setups replied in-language on API key and Vertex us-central1, typed turn only (evidence/live-languages.json). Vertex language page not read (no web access), logged I-226; SOURCES G1b, TESTING, DECK_FACTS, ARCHITECTURE, UX, UI_GUIDE, UI_QA, PRD updated. ACs: lint, build, unit 1029, eval (run 12:19 on the final instructions), e2e/any-language.spec.ts, qa:ui 0 H.",
+      "started_at": "2026-10-14T11:36:36+0900",
+      "completed_at": "2026-10-14T12:45:00+0900"
     },
     {
       "step": 5,

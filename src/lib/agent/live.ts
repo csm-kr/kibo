@@ -4,6 +4,7 @@ import { getKiosk } from "@/lib/adapters/catalog";
 import { CommandError } from "@/lib/commands/errors";
 import { BEFORE_PAYING } from "@/lib/commands/machine";
 import { sessionId } from "@/lib/commands/schemas";
+import { LANGUAGES, SPEECH_LANGUAGES, type SpeechLanguage } from "@/lib/i18n/languages";
 import { giveBackDailyBudget, takeDailyBudget } from "@/lib/limits/ip";
 import { kstDay, type UsageStore } from "@/lib/limits/usage";
 import { bumpSessionCounter, refundSessionCounter } from "@/lib/session/service";
@@ -16,7 +17,8 @@ import { toolDeclarations } from "./tools";
 // Ephemeral Gemini Live tokens (ADR-003). The phone connects to Gemini directly; the token pins the model,
 // instructions and tools, so the browser never sees GEMINI_API_KEY or the instructions.
 
-export const liveTokenRequest = z.strictObject({ sessionId, locale: z.enum(["ko", "en"]) });
+/** `language`: an AI language other than the screens' locale (14-final:4); the relay's hello takes the same fields. */
+export const liveTokenRequest = z.strictObject({ sessionId, locale: z.enum(["ko", "en"]), language: z.enum(SPEECH_LANGUAGES).optional() });
 
 export interface LiveTokenIssuer {
   create(input: {
@@ -47,7 +49,6 @@ const DEMO_VOICE_SECONDS = 180;
 const NEW_SESSION_MS = 60_000;
 export const BUSY = "Voice is busy right now. Please type instead.";
 export const VOICE_UNAVAILABLE = "Voice is not available right now. Please type instead.";
-const LANGUAGE_CODES: Record<Locale, string> = { ko: "ko-KR", en: "en-US" };
 /** End of speech after 700 ms of silence: short answers ("네") sometimes waited 3.5–8.9 s with the default
  *  (spikes/voice-compare/RESULTS.md); not shorter, so slow speakers' pauses do not end their turn. */
 const SILENCE_MS = 700;
@@ -121,20 +122,20 @@ export function geminiTokenIssuer(ai?: Pick<GoogleGenAI, "authTokens">): LiveTok
 
 export function liveConfig(
   kiosk: KioskData,
-  opts: { cart: CartLine[]; status: SessionStatus; dineOption: DineOption | null; locale: Locale },
+  opts: { cart: CartLine[]; status: SessionStatus; dineOption: DineOption | null; locale: Locale; language?: SpeechLanguage },
 ): { model: string; system: string; tools: object[]; languageCode: string } {
   return {
     model: process.env.GEMINI_LIVE_MODEL ?? "gemini-3.8-live",
     // The current cart is in the instructions, marked already applied, so a reconnect does not add it again.
     system: buildInstructions(kiosk, opts),
     tools: [{ functionDeclarations: toolDeclarations(kiosk) }],
-    languageCode: LANGUAGE_CODES[opts.locale],
+    languageCode: LANGUAGES[opts.language ?? opts.locale].liveCode,
   };
 }
 
 export async function issueLiveToken(
   deps: LiveTokenDeps,
-  input: { sessionId: string; bearer: string | null; locale: Locale; ip: string },
+  input: { sessionId: string; bearer: string | null; locale: Locale; language?: SpeechLanguage; ip: string },
 ): Promise<{ token: string; model: string; expiresAt: number; voiceSeconds: number }> {
   const { store, usage, issuer, now } = deps;
   const known = await store.get(input.sessionId);
@@ -171,6 +172,7 @@ export async function issueLiveToken(
       status: session.status,
       dineOption: session.dineOption,
       locale: input.locale,
+      language: input.language,
     });
     const { name } = await issuer.create({
       ...config,

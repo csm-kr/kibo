@@ -6,6 +6,7 @@ import type { VoiceState } from "@/hooks/useLiveVoice";
 import { pt, type PhoneTextKey } from "@/lib/i18n/phone";
 import type { Locale } from "@/types/menu";
 import { StatusChip } from "./Conversation";
+import { useAiText } from "./language";
 import { COMPACT, FOCUS, ICON, PRESS, PRIMARY_SMALL, SECONDARY_SMALL } from "./ui";
 
 // The bottom dock (docs/UI_GUIDE.md "Phone design"): one 88px round mic in the middle, [Type] on the left, the AI
@@ -68,6 +69,7 @@ export function Dock(props: {
   compactWhileTyping?: boolean;
 }) {
   const { state, locale } = props;
+  const ai = useAiText();
   const typing = props.typing && !props.limit;
   const active = voiceActive(state);
   const [inputFocused, setInputFocused] = useState(false);
@@ -135,7 +137,7 @@ export function Dock(props: {
             </span>
             <span className={compact ? "sr-only" : "text-base leading-normal font-semibold text-ink"}>
               <MicState state={state} locale={locale} />
-              {pt(micAction(state), locale)}
+              <span lang={ai.lang}>{ai.t(micAction(state), locale)}</span>
             </span>
           </button>
           <button

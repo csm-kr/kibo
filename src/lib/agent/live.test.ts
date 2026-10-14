@@ -6,7 +6,7 @@ import { resetLimits } from "@/lib/limits/ip";
 import { MemoryUsageStore, type UsageStore } from "@/lib/limits/usage";
 import { claimSession, createSession, runCommand } from "@/lib/session/service";
 import { MemoryStore } from "@/lib/store/memory";
-import { geminiTokenIssuer, issueLiveToken, liveConfig, type LiveTokenIssuer } from "./live";
+import { geminiTokenIssuer, issueLiveToken, liveConfig, liveTokenRequest, type LiveTokenIssuer } from "./live";
 
 /** 2026-10-13 12:00 KST */
 const T0 = Date.UTC(2026, 9, 13, 3, 0);
@@ -204,8 +204,31 @@ describe("liveConfig", () => {
   it("builds the instructions in the requested language", () => {
     const k = getKiosk("malo");
     const ko = liveConfig(k, { cart: [], status: "connected", dineOption: null, locale: "ko" });
-    expect(ko.system).toContain("The user's phone is set to Korean");
+    expect(ko.system).toContain("The user chose Korean on the phone");
     expect(ko.system).toContain("Cart: empty");
+  });
+
+  it("an AI language other than Korean or English sets the recognizer and the instructions; names stay English", () => {
+    const k = getKiosk("malo");
+    const opts = { cart: [], status: "connected" as const, dineOption: null, locale: "en" as const };
+    const ja = liveConfig(k, { ...opts, language: "ja" });
+    expect(ja.languageCode).toBe("ja-JP");
+    expect(ja.system).toContain("The user chose Japanese on the phone");
+    expect(liveConfig(k, { ...opts, language: "zh" }).languageCode).toBe("cmn-CN");
+    expect(liveConfig(k, { ...opts, language: "th" }).languageCode).toBe("th-TH");
+  });
+
+  it("the token request takes an optional language from the picker's list only", () => {
+    expect(liveTokenRequest.safeParse({ sessionId: "a".repeat(22), locale: "en", language: "vi" }).success).toBe(true);
+    expect(liveTokenRequest.safeParse({ sessionId: "a".repeat(22), locale: "en" }).success).toBe(true);
+    expect(liveTokenRequest.safeParse({ sessionId: "a".repeat(22), locale: "en", language: "de" }).success).toBe(false);
+  });
+
+  it("issueLiveToken passes the chosen language's code to the issuer", async () => {
+    const s = await demo();
+    await issueLiveToken(deps(), { sessionId: s.sessionId, bearer: s.deviceToken, locale: "en", language: "fr", ip: "192.0.2.1" });
+    expect(issued[0].languageCode).toBe("fr-FR");
+    expect(issued[0].system).toContain("The user chose French on the phone");
   });
 
   it("the speech recognizer's language follows the phone locale: ko-KR or en-US", () => {

@@ -8,6 +8,7 @@ import { formatWon } from "@/lib/kiosk/menu";
 import type { KioskData, Locale } from "@/types/menu";
 import type { CartLine } from "@/types/session";
 import { micAction, MicState, voiceActive } from "./Dock";
+import { useAiText } from "./language";
 import { OrderLines, OrderTotal } from "./OrderCard";
 import { CARD, COMPACT, FOCUS, ICON, PRESS, PRIMARY, SECONDARY } from "./ui";
 
@@ -31,6 +32,7 @@ export function ConfirmCard(props: {
   autoFocus?: boolean;
 }) {
   const { kiosk, locale, autoFocus } = props;
+  const ai = useAiText();
   const titleRef = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
     if (autoFocus) titleRef.current?.focus();
@@ -50,8 +52,8 @@ export function ConfirmCard(props: {
         )}
       </section>
       {props.after}
-      <button type="button" disabled={props.pickMoreDisabled} onClick={props.onPickMore} className={SECONDARY}>
-        {pt("pickMore", locale)}
+      <button type="button" disabled={props.pickMoreDisabled} onClick={props.onPickMore} lang={ai.lang} className={SECONDARY}>
+        {ai.t("pickMore", locale)}
       </button>
     </div>
   );
@@ -77,13 +79,14 @@ export function ConfirmBar(props: {
   limit?: ReactNode;
 }) {
   const { locale } = props;
+  const ai = useAiText();
   const active = voiceActive(props.voice);
   const typing = props.typing && !props.limit;
   return (
     <div className="flex flex-none flex-col gap-3 rounded-t-sheet bg-white px-4 pt-3 pb-3 shadow-dock">
       <OrderTotal total={props.total} locale={locale} />
-      <button type="button" onClick={props.onPay} disabled={props.payDisabled} className={`${PRIMARY} min-h-22`}>
-        {pt("payNow", locale)}
+      <button type="button" onClick={props.onPay} disabled={props.payDisabled} lang={ai.lang} className={`${PRIMARY} min-h-22`}>
+        {ai.t("payNow", locale)}
       </button>
       {props.note && <p className="rounded-tile bg-staff-tint px-4 py-2 text-base text-staff-ink">{props.note}</p>}
       {props.limit}
@@ -117,9 +120,11 @@ export function ConfirmBar(props: {
           <span className="flex min-w-0 flex-col">
             <span className="text-xl font-semibold">
               <MicState state={props.voice} locale={locale} />
-              {pt(micAction(props.voice), locale)}
+              <span lang={ai.lang}>{ai.t(micAction(props.voice), locale)}</span>
             </span>
-            <span className="text-base">{pt("sayYes", locale)}</span>
+            <span lang={ai.lang} className="text-base">
+              {ai.t("sayYes", locale)}
+            </span>
           </span>
         </button>
       </div>
@@ -130,11 +135,14 @@ export function ConfirmBar(props: {
 /** P5: the card goes into the kiosk. The picture points right, toward a kiosk beside the phone; `/demo` mirrors it. */
 export function PayCard(props: { total: number; locale: Locale; mirrored?: boolean }) {
   const { locale } = props;
+  const ai = useAiText();
   const hint = payMethodHint(locale);
   return (
     <section className={`${CARD} flex flex-col items-center gap-4 text-center`}>
       <CardIntoKiosk mirrored={props.mirrored} />
-      <h1 className="text-2xl font-bold">{pt("payTitle", locale)}</h1>
+      <h1 lang={ai.lang} className="text-2xl font-bold">
+        {ai.t("payTitle", locale)}
+      </h1>
       <p className="text-xl">
         {hint.pre}
         <strong lang="ko" className="font-bold">
@@ -154,11 +162,14 @@ export function PayCard(props: { total: number; locale: Locale; mirrored?: boole
 /** P6: the order number, kept until the user closes it. Without `onDone` (/demo), the end card follows instead. */
 export function DoneCard(props: { orderNumber: number; locale: Locale; domain?: KioskData["domain"]; onDone?: () => void }) {
   const { locale } = props;
+  const ai = useAiText();
   const ticket = props.domain === "ticket";
   return (
     <div className="flex flex-col gap-4">
       <section className={`${CARD} flex flex-col items-center gap-2 py-8 text-center`}>
-        <h1 className="text-xl font-semibold text-muted">{pt(ticket ? "referenceNumber" : "orderNumber", locale)}</h1>
+        <h1 lang={ai.lang} className="text-xl font-semibold text-muted">
+          {ai.t(ticket ? "referenceNumber" : "orderNumber", locale)}
+        </h1>
         {/* Proportional figures: the tabular "1" of Space Grotesk has a foot that reads oddly at this size. A little
             tracking keeps a 7 and a 1 from touching. */}
         <p className="font-display text-[7.5rem] leading-none font-bold tracking-[0.04em] text-kibo proportional-nums">{props.orderNumber}</p>

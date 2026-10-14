@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
 import type { CommandReply } from "@/lib/client/api";
 import { findItem, isAvailableNow } from "@/lib/adapters/catalog";
 import type { CommandType } from "@/lib/commands/schemas";
 import { aiSubtitle, kt, type KioskTextKey } from "@/lib/i18n/kiosk";
 import { formatWon, lineLabel, tilePrice } from "@/lib/kiosk/menu";
-import type { KioskData, MenuItem } from "@/types/menu";
+import type { KioskData, Locale, MenuItem } from "@/types/menu";
 import type { CartLine, ChangeKind, LineInput, Session } from "@/types/session";
 import { CartBar } from "./CartBar";
 import { Header } from "./KioskScreen";
@@ -263,6 +263,18 @@ export function MenuScreen(props: {
   );
 }
 
+/**
+ * An English name whose longest word would not fit the tile at 48px ("Cheeseburger", "Rechargeable") gets a smaller
+ * size, so it wraps only between words (14-final:4): the canvas's lang="ko" rule lets a word that does not fit break
+ * anywhere ("Cheeseburge / r"), which stays as the last resort under WCAG 1.4.12 spacing. About 0.6em per bold
+ * Latin letter; at the tile's ~300px a 12-letter word gets ~42px, above the 40px kiosk minimum.
+ */
+function latinFit(name: string, locale: Locale): CSSProperties | undefined {
+  if (locale === "ko") return undefined;
+  const longest = Math.max(...name.split(/\s+/).map((w) => w.length));
+  return longest > 10 ? { fontSize: `min(calc(48px * var(--k-fs, 1)), calc(100cqi / ${(longest * 0.6).toFixed(1)}))` } : undefined;
+}
+
 function ProductTile(props: { kiosk: KioskData; item: MenuItem; available: boolean; ring: boolean; onOpen(): void }) {
   const { item } = props;
   const { locale, domain } = props.kiosk;
@@ -294,8 +306,10 @@ function ProductTile(props: { kiosk: KioskData; item: MenuItem; available: boole
         </span>
       )}
       {/* Name, then a large price; kcal sits quietly beside the price (14-final:2). */}
-      <span className="flex flex-1 flex-col px-7 pt-5 pb-7">
-        <span className="k-text-48 font-bold">{item.name[locale]}</span>
+      <span className="flex flex-1 flex-col px-7 pt-5 pb-7 [container-type:inline-size]">
+        <span className="k-text-48 font-bold" style={latinFit(item.name[locale], locale)}>
+          {item.name[locale]}
+        </span>
         {item.subtitle && <span className="k-text-40 text-[#4B463F]">{item.subtitle[locale]}</span>}
         <span className="mt-auto flex flex-wrap items-baseline justify-between gap-x-4 pt-3">
           <span className="k-text-56 font-display font-bold text-(--k-primary)">{formatWon(tilePrice(item), locale)}</span>

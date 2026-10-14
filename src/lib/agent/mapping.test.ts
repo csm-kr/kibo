@@ -157,6 +157,14 @@ describe("toolResult", () => {
     expect(json).not.toContain("cartVersion");
   });
 
+  it("tells the model the dine option now, chosen or not, so voice never asks for one the phone already set (14-final:4)", () => {
+    expect(toolResult(k, "en", { ok: true, response: { ...response, dineOption: "eat_in" } })).toMatchObject({ dineOption: "eat_in" });
+    expect(toolResult(k, "en", { ok: true, response: { ...response, dineOption: null } })).toMatchObject({ dineOption: null });
+    // A ticket machine has no dine option to tell.
+    const rail = getKiosk("airport_rail");
+    expect(toolResult(rail, "en", { ok: true, response: { ...response, cart: [], dineOption: null } })).not.toHaveProperty("dineOption");
+  });
+
   it("leaves upsell out when there is none", () => {
     expect(toolResult(k, "en", { ok: true, response: { ...response, result: {} } })).not.toHaveProperty("upsell");
     expect(toolResult(k, "en", { ok: true, response: { ...response, result: {} } })).not.toHaveProperty("pending");

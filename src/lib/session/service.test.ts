@@ -156,6 +156,14 @@ describe("runCommand", () => {
     expect(s?.paidAt).toBe(T0 + 2);
   });
 
+  it("every reply carries the dine option now, so the voice model learns a choice made by a tap (14-final:4)", async () => {
+    const { store, sessionId, kioskToken } = await setup();
+    const run = (type: string, args: object = {}) => runCommand(store, { body: body(sessionId, type, args), bearer: kioskToken }, T0 + 1);
+    expect((await run("startTouch")).dineOption).toBeNull();
+    await run("setDineOption", { option: "take_out" });
+    expect((await run("addToCart", SET_ORDER)).dineOption).toBe("take_out");
+  });
+
   it("two concurrent addToCart both apply", async () => {
     const { store, sessionId, kioskToken } = await setup();
     await runCommand(store, { body: body(sessionId, "startTouch"), bearer: kioskToken }, T0);
@@ -389,7 +397,7 @@ describe("learned kiosk commands", () => {
     const { store, sessionId, kioskToken, deviceToken } = await learned();
     const add = body(sessionId, "addToCart", PIZZA, { source: "voice", utteranceSeq: 1 });
     const res = await runCommand(store, { body: add, bearer: deviceToken }, T0 + 1);
-    expect(res).toEqual({ ok: true, pending: true, status: "connected", cart: [], total: 0, cartVersion: 0, result: { pending: true } });
+    expect(res).toEqual({ ok: true, pending: true, status: "connected", cart: [], total: 0, cartVersion: 0, dineOption: null, result: { pending: true } });
 
     // A retry of the same command is answered pending again and applies nothing.
     const again = await runCommand(store, { body: add, bearer: deviceToken }, T0 + 2);

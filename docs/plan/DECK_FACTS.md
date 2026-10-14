@@ -29,7 +29,7 @@ Pictures: real captures in `docs/assets/deck/` (`npm run shots:deck`, `scripts/d
 ## 5 Features
 | Fact | Source | Status |
 |---|---|---|
-| QR connect, voice (Gemini Live) or text (Gemini Flash), Korean and English | `docs/ARCHITECTURE.md` "Voice"; `src/lib/agent/` | design |
+| QR connect, voice (Gemini Live) or text (Gemini Flash); screens Korean and English; the AI also in Japanese, Chinese (Simplified), Spanish, Vietnamese, French, Thai and Indonesian, tested by typing only (14-final:4) | `docs/ARCHITECTURE.md` "Voice"; `src/lib/agent/`; `evidence/live-languages.json`; `docs/plan/SOURCES.md` G1b | design; spoken input in the seven unverified |
 | 9 agent tools; the whole menu is in the instructions, so one tool call per sentence | ADR-004; `src/lib/agent/tools.ts` | design |
 | Live mirror: every change shows on the kiosk with a 2 s highlight and "Added by AI" | `docs/UX.md` A6; `docs/UI_GUIDE.md` "Components" | design |
 | Confirm before pay: the AI can open the confirm card but cannot pay; payment needs the user's tap or a new "yes", then the card at the kiosk | ADR-005; `src/lib/commands/machine.ts` (unit-tested in `machine.test.ts`) | design |
