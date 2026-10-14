@@ -10,7 +10,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { openKiosk, snapshot, act, compactTree } from './driver.mjs';
 import { runOrder } from './runner.mjs';
-import { audit } from './audit.mjs';
+import { audit, resetAuditMemo } from './audit.mjs';
 import { lintSkill } from './lint.mjs';
 import { orderPlan, isForbidden, isReviewOpener, uncoveredGroups } from './plan.mjs';
 import { expectedTotal } from './runner.mjs';
@@ -396,4 +396,143 @@ test('I-197: coverage lists option groups no passing order used; a 0원 pick doe
   sized.catalog.push({ name: '라떼', category: '메뉴', price: 3500, soldOut: true, optionGroups: [{ name: '샷', options: [{ name: '샷 추가', priceDelta: 500 }] }] },
     { name: '티', category: '메뉴', price: 2500, soldOut: false, optionGroups: [structuredClone(sized.catalog[0].optionGroups[0])] });
   assert.deepEqual(uncoveredGroups(sized, [o(line('티', ['라지']))]), []);
+});
+
+// ---------- round 4: customer choices are option groups, never fixed in a recipe; popups that change the order ----------
+// Fixture: fixtures/patterns/choice.html (a required 단맛 group with numeric labels, no price and no default; a snack
+// set offered after the add button; a points popup without prices). No test kiosk is opened here.
+
+const choiceSkill = () => skillOf('choice.skill.json');
+const drink = (item, options, qty = 1) => ({ category: '음료', item, options, qty });
+const snack = (item, qty = 1) => ({ category: '간식', item, options: [], qty });
+const without = (skill, drop) => { for (const it of skill.catalog) it.optionGroups = it.optionGroups.filter((g) => !drop(g)); return skill; };
+
+test('round 4: an option named with digits (0%, 50%, 2) is a customer choice; bare symbols and navigation are still controls', () => {
+  const skill = choiceSkill();
+  assert.deepEqual(lintSkill(skill), []);
+  skill.catalog[2].optionGroups = [{ name: '개수', required: true, min: 1, max: 1, options: [{ name: '2', priceDelta: 0 }, { name: '4', priceDelta: 1500 }] }];
+  assert.deepEqual(lintSkill(skill), []);
+  skill.catalog[0].optionGroups[1].options.push({ name: '+', priceDelta: 0 }, { name: '›', priceDelta: 0 }, { name: '다음', priceDelta: 0 }, { name: '단맛 더하기', priceDelta: 0 });
+  const errors = lintSkill(skill);
+  assert.equal(errors.length, 4, errors.join('\n'));
+  assert.ok(errors.every((e) => /녹차라떼 › 단맛: option "(\+|›|다음|단맛 더하기)" is a control/.test(e)), errors.join('\n'));
+});
+
+test('round 4: the lint refuses a recipe step that taps a customer choice on every order', () => {
+  const skill = choiceSkill();
+  skill.recipes.addToCart.splice(3, 0, { op: 'clickIfVisible', label: '50%' });
+  assert.match(lintSkill(skill).join('\n'), /recipe "addToCart" taps "50%" on every order.*단맛/);
+  const select = choiceSkill();
+  select.catalog[0].optionGroups[4].after = [{ op: 'click', label: 'L' }, { op: 'click', label: '다음' }];
+  assert.match(lintSkill(select).join('\n'), /녹차라떼 › 세트 간식 taps "L" on every order, a choice of 녹차라떼 › 크기/);
+});
+
+test('round 4: chooseOptions with "groups" picks those groups where it stands, and a group whose appliesWhen does not hold is skipped with its after steps', () => {
+  const skill = choiceSkill();
+  const labels = (...lines) => orderPlan(skill, { lines }).map((s) => s.label ?? s.name);
+  assert.deepEqual(labels(drink('녹차라떼', ['L', '50%', '펄', '간식 세트', '머핀'])),
+    ['주문 시작', '음료', '녹차라떼', 'L', '50%', '펄', '담기', '간식 세트', '머핀', '다음', '세트 담기']);
+  assert.deepEqual(labels(drink('아이스티', ['0%', '음료만']), snack('쿠키')),
+    ['주문 시작', '음료', '아이스티', '0%', '담기', '음료만', '간식', '쿠키', '담기']);
+  // One chooseOptions without "groups" still runs every group of the item, as in older skills.
+  const one = choiceSkill();
+  one.recipes.addToCart = one.recipes.addToCart.filter((s) => !s.groups);
+  assert.deepEqual(orderPlan(one, { lines: [drink('녹차라떼', ['R', '0%', '음료만'])] }).map((s) => s.label ?? s.name),
+    ['주문 시작', '음료', '녹차라떼', 'R', '0%', '음료만', '담기']);
+  const unknown = choiceSkill();
+  unknown.recipes.addToCart.at(-1).groups = ['세트', '셋트 간식'];
+  assert.match(lintSkill(unknown).join('\n'), /chooseOptions names group "셋트 간식", which no item has/);
+});
+
+test('round 4: a set offered after the add button replays as option groups, and its total matches the kiosk', async () => {
+  useKiosk('choice.html');
+  const r = await runOrder(choiceSkill(), { lines: [drink('녹차라떼', ['L', '50%', '펄', '간식 세트', '머핀'], 2), drink('아이스티', ['0%', '음료만']), snack('쿠키')] });
+  assert.equal(r.error, undefined);
+  assert.equal(r.kioskTotal, (4000 + 500 + 500 - 300 + 2500) * 2 + 3500 + 2000);
+  assert.ok(r.ok);
+  assert.deepEqual(r.interruptsAnswered.map((a) => a.text), ['포인트를 적립할까요?']);
+});
+
+test('round 4: the audit passes the modelled skill: no tapped choice, no unmodelled required choice, nothing missing', async () => {
+  useKiosk('choice.html');
+  const r = await audit(choiceSkill());
+  assert.deepEqual([r.hardClicks, r.requiredChoices, r.missingOptions], [[], {}, {}]);
+  assert.ok(r.ok, JSON.stringify(r));
+});
+
+test('round 4: the audit fails a recipe that taps one of several choices on the item screen for the customer', async () => {
+  useKiosk('choice.html');
+  const skill = without(choiceSkill(), (g) => g.name === '단맛');
+  skill.recipes.addToCart.splice(3, 0, { op: 'clickIfVisible', label: '50%' });
+  const r = await audit(skill);
+  assert.equal(r.ok, false);
+  assert.deepEqual(r.hardClicks.map((h) => [h.label, h.where, h.alternatives]), [['50%', 'item screen', ['0%', '100%']]]);
+  assert.deepEqual(r.missingOptions, { 녹차라떼: ['0%', '50%', '100%'], 아이스티: ['0%', '50%', '100%'] });
+});
+
+test('round 4: the audit fails a skill that leaves out a choice the kiosk will not add an item without', async () => {
+  useKiosk('choice.html');
+  const r = await audit(without(choiceSkill(), (g) => g.name === '단맛'));
+  assert.equal(r.ok, false);
+  assert.deepEqual(r.hardClicks, []);
+  assert.deepEqual(Object.keys(r.requiredChoices), ['녹차라떼', '아이스티']);
+  assert.deepEqual(r.requiredChoices['녹차라떼'].choices, ['0%', '50%', '100%']);
+  // A left-out choice the kiosk adds without (a size with a default) stays informational.
+  const sized = await audit(without(choiceSkill(), (g) => g.name === '크기'));
+  assert.deepEqual([sized.ok, sized.requiredChoices, sized.missingOptions.녹차라떼], [true, {}, ['R', 'L']]);
+});
+
+test('round 4: always declining a popup that changes the order fails the audit unless the skill declares it; a declaration never covers an item-screen choice', async () => {
+  useKiosk('choice.html');
+  const skill = without(choiceSkill(), (g) => g.name.startsWith('세트'));
+  skill.recipes.addToCart.splice(-1, 1, { op: 'clickIfVisible', label: '음료만' });
+  const r = await audit(skill);
+  assert.equal(r.ok, false);
+  assert.deepEqual(r.hardClicks.map((h) => [h.label, h.where]), [['음료만', 'popup']]);
+  skill.declines = [{ choice: '음료만', offer: '간식 세트 (세트 할인 -300원)' }];
+  assert.deepEqual(lintSkill(skill), []);
+  const declared = await audit(skill);
+  assert.ok(declared.ok, JSON.stringify(declared));
+  without(skill, (g) => g.name === '단맛');
+  skill.recipes.addToCart.splice(3, 0, { op: 'clickIfVisible', label: '50%' });
+  skill.declines.push({ choice: '50%', offer: '단맛' });
+  const sheet = await audit(skill);
+  assert.deepEqual(sheet.hardClicks.map((h) => [h.label, h.where]), [['50%', 'item screen']]);
+  const bad = choiceSkill();
+  bad.declines = [{ choice: '음료만' }, { choice: '카드 결제', offer: 'x' }];
+  assert.match(lintSkill(bad).join('\n'), /declines "음료만": .*option/);
+  assert.match(lintSkill(bad).join('\n'), /declines "카드 결제": .*payment/);
+});
+
+test('round 4 speed: a second audit of an unchanged skill reuses what it saw; a changed recipe replays lines but not item screens', async () => {
+  useKiosk('choice.html');
+  resetAuditMemo();
+  const skill = choiceSkill();
+  const first = await audit(skill);
+  assert.ok(first.work.itemScreens > 0 && first.work.lineProbes > 0, JSON.stringify(first.work));
+  const again = await audit(skill);
+  assert.deepEqual(again.work, { itemScreens: 0, lineProbes: 0 });
+  assert.deepEqual({ ...again, work: null }, { ...first, work: null });
+  skill.recipes.addToCart.push({ op: 'clickIfVisible', label: '닫기' });
+  const changed = await audit(skill);
+  assert.equal(changed.work.itemScreens, 0);
+  assert.ok(changed.work.lineProbes > 0);
+});
+
+test('round 4 (bk8): a button showing a running total (0원 on a fresh order) is a control, not an item missing from the catalog', async () => {
+  useKiosk('choice.html');
+  const r = await audit(choiceSkill());
+  assert.deepEqual([r.missingItems, r.unknownLabels, r.hiddenUnder], [[], [], {}]);
+  assert.ok(r.ok, JSON.stringify(r));
+  const fewer = choiceSkill();
+  fewer.catalog = fewer.catalog.filter((c) => c.name !== '머핀');
+  assert.deepEqual((await audit(fewer)).missingItems, ['머핀 2,500원'], 'a priced tile is still an item');
+});
+
+test('round 4: a one-word choice that ends like a stepper word (곱빼기, a large portion) is a choice; "수량 빼기" is still a control', () => {
+  const skill = choiceSkill();
+  skill.catalog[2].optionGroups = [{ name: '양', required: false, min: 0, max: 1, options: [{ name: '곱빼기', priceDelta: 2000 }] }];
+  assert.deepEqual(lintSkill(skill), []);
+  skill.catalog[2].optionGroups[0].options.push({ name: '수량 빼기', priceDelta: 0 }, { name: '빼기', priceDelta: 0 });
+  assert.equal(lintSkill(skill).length, 2, lintSkill(skill).join('\n'));
 });

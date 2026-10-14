@@ -30,11 +30,13 @@ function runLearner({ maxTurns, fail, calls, defaultCall, maxInputTokens, kiosk 
   const stats = fs.existsSync(statsPath) ? JSON.parse(fs.readFileSync(statsPath, 'utf8')) : null;
   const lastSkillPath = path.join(dir, 'last-skill.json');
   const lastSkill = fs.existsSync(lastSkillPath) ? JSON.parse(fs.readFileSync(lastSkillPath, 'utf8')) : null;
+  const skillPath = path.join(dir, 'skill.json');
+  const skill = fs.existsSync(skillPath) ? JSON.parse(fs.readFileSync(skillPath, 'utf8')) : null;
   const gcloudCalls = fs.existsSync(gcloudLog) ? fs.readFileSync(gcloudLog, 'utf8').trim().split('\n').length : 0;
   const traceFiles = fs.existsSync(traceDir)
     ? Object.fromEntries(fs.readdirSync(traceDir).map((f) => [f, fs.readFileSync(path.join(traceDir, f))])) : null;
   fs.rmSync(dir, { recursive: true, force: true });
-  return { r, requests, stats, gcloudCalls, traceFiles, lastSkill };
+  return { r, requests, stats, gcloudCalls, traceFiles, lastSkill, skill };
 }
 
 // Width of a baseline or progressive JPEG, from its SOF0/SOF2 segment.
@@ -259,4 +261,56 @@ test('diagnostics: a failed self-test order is explained in the log, and an unfi
     calls: { 1: testCall(noCharge, [order([['쿠키', []]], '포장해요')]) } });
   assert.match(r.stdout, /test #1: FAIL[^\n]*\n {4}order 1: the skill's total 1,500원 differs from the kiosk's 1,600원/);
   assert.deepEqual(lastSkill, noCharge);
+});
+
+// Round 4 speed: on bk7-bubbletea (round 3) 7 of 76 turns re-sent the whole ~13k-token skill to fix a few fields, about
+// 78k of the run's 83k output tokens and a minute of generation each; every copy then stayed in the context.
+test('round 4 speed: testSkill, audit and finish take a skillPatch on the last skill, so a fix is not a full resend', () => {
+  const wrong = structuredClone(stepperSkill);
+  wrong.catalog[1].price = 3100;
+  const orders = [order([['스콘', []]]), order([['라떼', ['HOT', '바닐라 시럽']]]), order([['라떼', ['ICED', '적게', '에스프레소 샷']]])];
+  const patch = { catalog: [{ name: '스콘', price: 3000 }], notes: null };
+  const { r, stats, skill, requests } = runLearner({ maxTurns: 3, kiosk: 'fixtures/patterns/stepper.html', calls: {
+    1: testCall(wrong, orders),
+    2: { name: 'testSkill', args: { skillPatch: JSON.stringify(patch), ordersJson: JSON.stringify(orders) } },
+    3: { name: 'finish', args: {} },
+  } });
+  assert.equal(r.status, 0, r.stderr);
+  assert.match(r.stdout, /test #1: FAIL PASS PASS[^\n]*\n {4}order 1:/);
+  assert.match(r.stdout, /test #2: PASS PASS PASS\n/);
+  assert.equal(stats.finished, true, r.stdout);
+  const { notes, ...want } = stepperSkill;
+  assert.deepEqual(skill, want, 'skill.json is the patched skill');
+  assert.ok(requests[2].length - requests[1].length < requests[1].length - requests[0].length, 'the patch call added less to the context than the full skill');
+});
+
+test('round 4 speed: option groups shared by several items are written once in sharedGroups; skill.json has them expanded', () => {
+  const { 0: latte } = stepperSkill.catalog;
+  const compact = { ...structuredClone(stepperSkill), sharedGroups: Object.fromEntries(latte.optionGroups.map((g) => [g.name, g])) };
+  compact.catalog[0] = { ...latte, optionGroups: latte.optionGroups.map((g) => g.name) };
+  compact.catalog.push({ name: '모카', category: '메뉴', price: 4500, soldOut: true, optionGroups: ['온도'] });
+  const orders = [order([['스콘', []]]), order([['라떼', ['HOT', '바닐라 시럽']]]), order([['라떼', ['ICED', '적게', '에스프레소 샷']]])];
+  const { r, stats, skill } = runLearner({ maxTurns: 2, kiosk: 'fixtures/patterns/stepper.html', calls: { 1: testCall(compact, orders), 2: { name: 'finish', args: {} } } });
+  assert.equal(r.status, 0, r.stderr);
+  assert.match(r.stdout, /test #1: PASS PASS PASS\n/);
+  assert.equal(stats.finished, true, r.stdout);
+  assert.equal(skill.sharedGroups, undefined);
+  assert.deepEqual(skill.catalog[0], latte);
+  assert.deepEqual(skill.catalog[2].optionGroups, [latte.optionGroups[0]]);
+});
+
+// bk8-tableorder (round 3, attempt 2): self-test #4 passed 3 of 3 but the gate asked for "review"; with review every
+// order failed as reviewUnsafe (the order button leads to sending, not to payment). The gate could not be met.
+test('round 4 (bk8): once a review was flagged as sending the order, the gate stops asking for it, and finish is accepted', () => {
+  const { review, charges, ...noReview } = reviewSkill;
+  const withReview = { ...noReview, review };
+  const orders = [order([['커피', ['라지']]], '먹고 가요'), order([['쿠키', []]], '먹고 가요'), order([['커피', ['레귤러']], ['쿠키', []]], '먹고 가요')];
+  const { r, stats } = runLearner({ maxTurns: 4, kiosk: 'fixtures/patterns/review.html',
+    env: { KIOSK_URL: `${pathToFileURL(path.join(here, 'fixtures/patterns/review.html')).href}?send=1` },
+    calls: { 1: testCall(noReview, orders), 2: testCall(withReview, orders), 3: testCall(noReview, orders), 4: { name: 'finish', args: {} } } });
+  assert.equal(r.status, 0, r.stderr);
+  assert.match(r.stdout, /test #1: PASS PASS PASS review=주문하기\n/);
+  assert.match(r.stdout, /test #2: FAIL FAIL FAIL[^\n]*\n {4}order 1: review: no payment step/);
+  assert.match(r.stdout, /test #3: PASS PASS PASS\n/);
+  assert.equal(stats.finished, true, r.stdout);
 });

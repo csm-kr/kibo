@@ -9,6 +9,7 @@ import { runOrder } from './runner.mjs';
 import { audit } from './audit.mjs';
 import { lintSkill } from './lint.mjs';
 import { uncoveredGroups } from './plan.mjs';
+import { applySkillPatch, resolveSkill } from './skill.mjs';
 
 // Flash-Lite by default: learning is many short tool turns, so input tokens dominate the cost.
 // PROVIDER=openai runs the same loop on OpenAI Chat Completions (dev-time tuning only; deck numbers come from Gemini).
@@ -58,16 +59,19 @@ record() takes a JSON array too: record several items in one call. Never open an
 act() takes "steps" (a list) to do several steps in one call, e.g. close a sheet and open the next item; it returns the screen after the last one.
 
 Work like this:
-1. Explore: use snapshot/act to walk the whole flow (start, dine option, every category, open EVERY menu item to read its option groups, cart). Note popups that interrupt the flow (upsell, alerts) and sold-out items. Use reload to start over.
+1. Explore: use snapshot/act to walk the whole flow (start, dine option, every category, open EVERY menu item to read its option groups, add one, cart). Note popups that interrupt the flow (upsell, alerts) and sold-out items. Use reload to start over.
+   Every choice an item's screen offers is an option group, and so is a popup after its add button that changes what is ordered (make it a set, size up, add a side): open it and record what it offers.
    A popup that can come up at any moment, between any two taps (a "still there?" timeout warning, an ad), goes in "interrupts".
    Never tap payment controls (pay, card, coupon): act refuses them and a skill never needs them. Put them in forbiddenLabels.
    One exception: the kiosk's order button (주문하기 / Order) opens its order review, where the kiosk shows the total it will charge
    (take-out or other charges included). With something in the cart, open it once with {"op":"openReview","label":"<that button>"},
    read the total and anything added to it, then tap only a back button there. Declare it in "review", and do not list the order button in forbiddenLabels.
-2. As soon as the catalog draft has every category, call audit with the skill. It walks every category without AI and lists priced tiles missing from your catalog and tappable labels you have not explained. Fix them (explore and record the items, or add real controls to uiLabels) until audit says ok. It also opens every item and lists, in missingOptions, choices on the item's screen that its option groups lack: add them.
+   If testSkill says no payment step came after the order button, the kiosk sends orders with it (pay later at a counter): leave "review" out; orders are then checked on the cart total.
+2. As soon as the catalog draft has every category, call audit with the skill. It walks every category without AI and lists priced tiles missing from your catalog and tappable labels you have not explained. Fix them (explore and record the items, or add real controls to uiLabels) until audit says ok. It also opens every item and lists, in missingOptions, choices on the item's screen that its option groups lack: add them. It fails when a recipe step taps one of several choices for the customer (hardClicks) or when the kiosk will not add an item without a choice the skill leaves out (requiredChoices): model those as option groups.
 3. Call testSkill with at least 3 different orders that together use EVERY option group of every orderable item (a priced option of each group that has prices), qty>1, items from several categories, and a popup. An order passes only when the skill's own total equals the kiosk's total (on the order review when "review" is declared): the kiosk's total is what the customer pays. testSkill lists the option groups no passing order has used yet. When totals differ, fix prices, option deltas or "charges"; if you cannot make an option's price match, remove that option from the skill (orders with it are then refused) and say why in notes. Orders may be split over several calls, but they count only for the exact same skill and only while none failed; any change to the skill starts the count again. Fix and retest until the gate says ok.
-   testSkill, audit and finish reuse the last skill you sent when you leave out skillJson: send the skill again only when you changed it.
-4. Call finish with the final skill. finish is accepted only if this exact skill passed testSkill (>= 3 orders, every option group used, "review" declared when the kiosk shows an order button), audit and the skill lint.
+   testSkill, audit and finish reuse the last skill you sent when you leave out skillJson. Send the whole skill once; after that send only the changes as skillPatch (see below).
+4. Call finish with the final skill. finish is accepted only if this exact skill passed testSkill (>= 3 orders, every option group used, "review" declared when the kiosk shows an order button that leads to payment), audit and the skill lint.
+skillPatch (testSkill, audit, finish): a JSON object merged into the last skill instead of resending it: objects merge key by key, null deletes a key, a list replaces the old list, and "catalog" entries merge by "name" ({"name":"…","price":5000} changes one item, {"name":"…","remove":true} drops it, a new name adds it). Example: {"recipes":{"addToCart":[…]},"catalog":[{"name":"라떼","optionGroups":["사이즈","당도"]}]}.
 
 Step format for act and recipes: {"op":"click"|"check"|"clickIfVisible"|"openReview", "label"?: string, "role"?: aria role, "name"?: accessible name, "exact"?: boolean, "text"?: visible text, "within"?: text}.
 Targeting, in order of preference:
@@ -77,6 +81,7 @@ Targeting, in order of preference:
 - "within": when a label appears more than once (REPEATED LABELS lists them with the text near each), add the text near the one you mean: {"op":"click","label":"+","within":"에스프레소 샷"}. An error tells you when a label is ambiguous or missing and which labels contain it.
 Recipe control ops: {"op":"forEach","over":"options","as":"option","steps":[...]}, {"op":"repeat","times":"{qtyMinus1}","steps":[...]},
 and {"op":"chooseOptions","steps":[...]}: for each option group of the line's item, in catalog order, it runs the group's own "select" steps (or these steps) once per chosen option of that group, then the group's "after" steps.
+{"op":"chooseOptions","groups":["<group name>",...],"steps":[...]} runs only those groups, where it stands (e.g. after the add button, for a set popup); a chooseOptions without "groups" runs the groups no other chooseOptions of the recipe names.
 Placeholders: {dineOption}, {category}, {item}, {option}, {qty}, {qtyMinus1}.
 
 Skill schema:
@@ -86,7 +91,8 @@ Skill schema:
  "uiLabels": [tappable labels on the menu screens that are controls, not items or categories, e.g. close/cancel buttons],
  "forbiddenLabels": [the kiosk's payment buttons; never clicked],
  "dineOptions": {"<our value: eat_in|take_out>": "<label to click>"},
- "catalog": [{"name","category","price":number,"soldOut":bool,"recipe"?: string,"optionGroups":[{"name","required":bool,"min":number,"max":number,
+ "sharedGroups"?: {"<group name>": <option group>} (a group several items share, written once; an item lists its name as a string in optionGroups),
+ "catalog": [{"name","category","price":number,"soldOut":bool,"recipe"?: string,"optionGroups":[<group name in sharedGroups> | {"name","required":bool,"min":number,"max":number,
     "type"?: "single"|"multi"|"quantity", "appliesWhen"?: "<other group name>=<option name>", "select"?: [steps], "after"?: [steps],
     "options":[{"name","priceDelta":number,"maxQty"?: number}]}]}],
  "recipes": {"startOrder":[steps using {dineOption} = the label], "addToCart":[steps using {category},{item},{option},{qtyMinus1}], "<otherName>": [...] },
@@ -95,10 +101,13 @@ Skill schema:
  "interrupts"?: [{"text": "<a phrase shown only on the popup>", "dismiss": <one step that closes it and keeps the order; never one that orders, pays, adds or starts over>}] (the runner answers them before each step and after a step times out),
  "review"?: {"open": [steps from the menu with a full cart to the order review, including one {"op":"openReview","label":"<order button>"}], "totalPattern": "JS regex, group 1 = the total on the review", "close"?: [steps back to the menu, e.g. a back button]},
  "charges"?: [{"name","amount":number,"dineOption"?: "<dine label>"}] (amounts the review adds once per order, e.g. a take-out container; only for that dine choice when dineOption is given),
+ "declines"?: [{"choice": "<the popup button that declines>", "offer": "<what the popup offers, as shown>"}] (only for a popup after adding whose offer you could not record; the recipe taps that button whenever it comes up, and orders that want the offer are refused),
  "notes": [strings: popups, rules, quirks]
 }
 Option groups:
-- Option names are customer choices exactly as chooseOptions/forEach will click them (e.g. "라지", priceDelta 4000). Never record navigation (다음, 이전, 확인, 담기) or stepper buttons ("+", "−", "… 더하기") as options; testSkill and finish run a lint that rejects them.
+- Option names are customer choices exactly as chooseOptions/forEach will click them (e.g. "라지", priceDelta 4000; numbers are names too: "2", "500ml", "0%"). Never record navigation (다음, 이전, 확인, 담기) or stepper buttons ("+", "−", "… 더하기") as options; testSkill and finish run a lint that rejects them.
+- Every choice the customer makes is an option group: also one with no price change, one with a default, and a required one with no default. Never tap a choice in a recipe for the customer (no {"op":"clickIfVisible","label":"<one of the choices>"}): the lint and the audit refuse it.
+- A popup after the add button that changes what is ordered (a set: "drink only" or "make it a set", then the side): groups too, chosen by a second {"op":"chooseOptions","groups":[...]} after the add step; the later step is a group with "appliesWhen" (skipped, with its "after" steps, when that choice was not made) and "after" steps (다음, the popup's own add button). Prices are the deltas the kiosk shows (e.g. a set's discount on the set choice, each side's own price).
 - A "− n +" count (extra shot, topping count, drink count) is a group with "type":"quantity"; each option has "maxQty" (the largest count) and the group has "select": the steps that add one, usually {"op":"click","label":"+","within":"{option}"}. An order repeats the option name once per count.
 - A multi-step dialog (set or combo with 다음): one group per step, each with "after": [{"op":"click","label":"다음"}], and the item's recipe uses chooseOptions.
 - A group that appears only after another choice (ice amount only for iced) gets "appliesWhen": "<that group's name>=<that option's name>".
@@ -107,8 +116,10 @@ Never invent data; only record what the UI shows.
 Test order format: {"dineOption":"<label>","lines":[{"category","item","options":[names],"qty"}]}.`;
 
 // Each skill sent stays in the context for the rest of the run (about 13k tokens for a 40-item kiosk), so a skill is
-// sent once per change: testSkill, audit and finish reuse the last skill sent when skillJson is left out.
-const SAME_SKILL = 'The skill as JSON. Leave it out to reuse the last skill you sent (to testSkill, audit or finish); send it only when it changed.';
+// sent once: testSkill, audit and finish reuse the last skill sent when skillJson is left out, and take only the
+// changes as skillPatch (round 4, skill.mjs).
+const SAME_SKILL = 'The whole skill as JSON. Leave it out to reuse the last skill you sent (to testSkill, audit or finish); send it once, then use skillPatch.';
+const PATCH = 'Changes to the last skill, as a JSON object merged into it (objects merge, null deletes, lists replace, catalog entries merge by name, {"name":…,"remove":true} drops one). Use it instead of resending the skill.';
 const stepSchema = { type: 'object', properties: { op: { type: 'string' }, label: { type: 'string' }, role: { type: 'string' }, name: { type: 'string' }, text: { type: 'string' }, exact: { type: 'boolean' }, within: { type: 'string' } }, required: ['op'] };
 const tools = [{ functionDeclarations: [
   { name: 'snapshot', description: 'Accessibility tree of the current kiosk screen (plus any alert text).', parameters: { type: 'object', properties: {} } },
@@ -116,9 +127,9 @@ const tools = [{ functionDeclarations: [
   { name: 'reload', description: 'Reload the kiosk to its initial screen.', parameters: { type: 'object', properties: {} } },
   { name: 'record', description: 'Save findings so they survive memory pruning. kind: item | flow. data: JSON string of one entry or an array of entries.', parameters: { type: 'object', properties: { kind: { type: 'string' }, data: { type: 'string' } }, required: ['kind', 'data'] } },
   { name: 'records', description: 'List everything recorded so far.', parameters: { type: 'object', properties: {} } },
-  { name: 'testSkill', description: 'Run the skill with the AI-free runner on a fresh kiosk for each order; returns pass/fail with the kiosk total vs the skill total, the skill lint and the finish gate.', parameters: { type: 'object', properties: { skillJson: { type: 'string', description: SAME_SKILL }, ordersJson: { type: 'string', description: 'JSON array of orders' } }, required: ['ordersJson'] } },
-  { name: 'audit', description: 'AI-free coverage check of the skill against the live kiosk.', parameters: { type: 'object', properties: { skillJson: { type: 'string', description: SAME_SKILL } } } },
-  { name: 'finish', description: 'Submit the final skill.', parameters: { type: 'object', properties: { skillJson: { type: 'string', description: SAME_SKILL } } } },
+  { name: 'testSkill', description: 'Run the skill with the AI-free runner on a fresh kiosk for each order; returns pass/fail with the kiosk total vs the skill total, the skill lint and the finish gate.', parameters: { type: 'object', properties: { skillJson: { type: 'string', description: SAME_SKILL }, skillPatch: { type: 'string', description: PATCH }, ordersJson: { type: 'string', description: 'JSON array of orders' } }, required: ['ordersJson'] } },
+  { name: 'audit', description: 'AI-free coverage check of the skill against the live kiosk.', parameters: { type: 'object', properties: { skillJson: { type: 'string', description: SAME_SKILL }, skillPatch: { type: 'string', description: PATCH } } } },
+  { name: 'finish', description: 'Submit the final skill.', parameters: { type: 'object', properties: { skillJson: { type: 'string', description: SAME_SKILL }, skillPatch: { type: 'string', description: PATCH } } } },
 ] }];
 
 const { browser, page, alerts } = await openKiosk();
@@ -136,13 +147,22 @@ let lastAudit = null;
 const optionWarned = new Set();
 stats.audits = 0;
 
-// The last skill sent to testSkill, audit or finish, as sent, and the last test results (for the run's files).
-let lastSkillJson = null;
+// The last skill sent to testSkill, audit or finish, as the model wrote it (sharedGroups kept) with any patches
+// applied; the tools get it resolved (skill.mjs).
+let lastSkill = null;
 const skillArg = (args) => {
-  if (typeof args.skillJson === 'string' && args.skillJson.trim()) lastSkillJson = args.skillJson;
-  if (!lastSkillJson) throw new Error('no skill yet: send skillJson');
-  return lastSkillJson;
+  if (typeof args.skillJson === 'string' && args.skillJson.trim()) lastSkill = JSON.parse(args.skillJson);
+  else if (typeof args.skillPatch === 'string' && args.skillPatch.trim()) {
+    if (!lastSkill) throw new Error('no skill yet: send skillJson once');
+    lastSkill = applySkillPatch(lastSkill, JSON.parse(args.skillPatch));
+  }
+  if (!lastSkill) throw new Error('no skill yet: send skillJson');
+  return resolveSkill(lastSkill);
 };
+// Order buttons that sent the order in a self-test (no payment step after them, runner reviewUnsafe): a pay-later
+// device. The gate stops asking for "review" for them (round 4: on bk8-tableorder it could never be met).
+const sendsOrder = new Set();
+const bare = (t) => String(t ?? '').normalize('NFKC').replace(/[^\p{L}\p{N}]/gu, '');
 
 async function call(name, args) {
   try {
@@ -171,18 +191,21 @@ async function call(name, args) {
     }
     if (name === 'testSkill') {
       stats.tests++; lastTestTurn = stats.turns;
-      const skill = JSON.parse(skillArg(args)); const orders = JSON.parse(args.ordersJson);
+      const skill = skillArg(args); const orders = JSON.parse(args.ordersJson);
       const lint = lintSkill(skill);
       const results = [];
       for (const o of orders) results.push(await runOrder(skill, o));
       const key = JSON.stringify(skill);
       if (gate.key !== key) gate = { key, passed: new Map(), failed: false, reviewOpener: null };
+      const opener = (skill.review?.open ?? []).find((st) => st?.op === 'openReview');
       results.forEach((r, i) => {
         if (r.ok) gate.passed.set(JSON.stringify(orders[i]), orders[i]); else gate.failed = true;
         if (r.reviewOpener) gate.reviewOpener = r.reviewOpener;
+        if (r.reviewUnsafe && opener) sendsOrder.add(bare(opener.label ?? opener.name ?? opener.text));
       });
       const uncovered = uncoveredGroups(skill, [...gate.passed.values()]);
-      const needReview = !skill.review && gate.reviewOpener;
+      const needReview = !skill.review && gate.reviewOpener && !sendsOrder.has(bare(gate.reviewOpener));
+      const dropReview = skill.review && opener && sendsOrder.has(bare(opener.label ?? opener.name ?? opener.text));
       const ok = !lint.length && !gate.failed && gate.passed.size >= 3 && !uncovered.length && !needReview;
       lastPassedSkill = ok ? key : null;
       console.log(`  test #${stats.tests}: ${results.map((r) => (r.ok ? 'PASS' : 'FAIL')).join(' ')}${lint.length ? ` lint=${lint.length}` : ''}`
@@ -194,6 +217,7 @@ async function call(name, args) {
         ...(lint.length ? ['no lint errors'] : []),
         ...(uncovered.length ? [`passing orders that use these option groups (a priced option where the group has prices): ${uncovered.slice(0, 20).map((g) => `"${g.group}" (e.g. on ${g.item})`).join(', ')}${uncovered.length > 20 ? ` and ${uncovered.length - 20} more` : ''}`] : []),
         ...(needReview ? [`"review": the kiosk shows its order button ${JSON.stringify(gate.reviewOpener)}; open it with {"op":"openReview","label":${JSON.stringify(gate.reviewOpener)}}, read the total there with totalPattern, and do not list it in forbiddenLabels`] : []),
+        ...(dropReview ? ['no "review": no payment step came after this kiosk\'s order button, so it sends orders (pay later); leave "review" out (skillPatch {"review":null}) and the cart total is checked'] : []),
       ];
       return {
         results: results.map(({ shownTotal, expectedTotal, ...r }) => r), ...(lint.length ? { lint } : {}),
@@ -202,21 +226,22 @@ async function call(name, args) {
     }
     if (name === 'audit') {
       stats.audits++;
-      const r = await audit(JSON.parse(skillArg(args)));
+      const { work, ...r } = await audit(skillArg(args));
       lastAudit = r.ok;
-      console.log(`  audit #${stats.audits}: ${r.ok ? 'OK' : 'GAPS'} missing=${r.missingItems.length} unknown=${r.unknownLabels.length} hidden=${Object.keys(r.hiddenUnder).length} itemsMissingOptions=${Object.keys(r.missingOptions).length}`);
+      console.log(`  audit #${stats.audits}: ${r.ok ? 'OK' : 'GAPS'} missing=${r.missingItems.length} unknown=${r.unknownLabels.length} hidden=${Object.keys(r.hiddenUnder).length} itemsMissingOptions=${Object.keys(r.missingOptions).length}`
+        + ` hardClicks=${r.hardClicks.length} requiredChoices=${Object.keys(r.requiredChoices).length} (opened ${work.itemScreens} item screens, replayed ${work.lineProbes} lines)`);
       return r;
     }
     if (name === 'finish') {
-      const skillJson = skillArg(args);
-      const sk = JSON.parse(skillJson);
+      const sk = skillArg(args);
+      const skillJson = JSON.stringify(sk);
       const lint = lintSkill(sk);
       if (lint.length) return { ok: false, error: 'Rejected by the skill lint.', lint };
       if (JSON.stringify(sk) !== lastPassedSkill) return { ok: false, error: 'Rejected: this exact skill must pass the testSkill gate first: at least 3 different orders (none failing), every option group used by a passing order, and "review" when the kiosk shows an order button.' };
-      const cov = await audit(sk);
+      const { work, ...cov } = await audit(sk);
       lastAudit = cov.ok;
       console.log(`  finish audit: ${cov.ok ? 'OK' : 'GAPS'}`);
-      if (!cov.ok) return { ok: false, error: 'Rejected by coverage audit. Explore and record what is missing, then test and audit again.', audit: cov };
+      if (!cov.ok) return { ok: false, error: 'Rejected by coverage audit. Explore and record what is missing (items, categories, choices a recipe taps or leaves out), then test and audit again.', audit: cov };
       // Choices on an item's screen that its option groups lack: refused once per skill, so a false alarm cannot block finishing.
       if (Object.keys(cov.missingOptions ?? {}).length && !optionWarned.has(skillJson)) {
         optionWarned.add(skillJson);
@@ -297,7 +322,7 @@ function summary(name, args, r) {
   if (name === 'record') { const n = traceArgs(name, args).names; return n?.length ? `recorded item ${n.join(', ')}` : `recorded a ${args.kind} fact`; }
   if (name === 'records') return `listed ${notes.item.length} items, ${notes.flow.length} facts`;
   if (name === 'testSkill') return `testSkill ${r.results.filter((x) => x.ok).length}/${r.results.length} passed${r.lint ? `, lint ${r.lint.length}` : ''}`;
-  if (name === 'audit') return r.ok ? 'audit ok' : `audit: ${r.missingItems.length} missing, ${r.unknownLabels.length} unknown, ${Object.keys(r.hiddenUnder).length} hidden`;
+  if (name === 'audit') return r.ok ? 'audit ok' : `audit: ${r.missingItems.length} missing, ${r.unknownLabels.length} unknown, ${Object.keys(r.hiddenUnder).length} hidden, ${r.hardClicks.length} tapped choices, ${Object.keys(r.requiredChoices).length} items missing a required choice`;
   if (name === 'finish') return r.ok ? 'finish accepted' : 'finish rejected';
   return name;
 }
@@ -410,8 +435,8 @@ const result = { provider: PROVIDER, model: MODEL, learner: LEARNER, cachedInput
 console.log(JSON.stringify(result));
 if (finalSkill) fs.writeFileSync('skill.json', JSON.stringify(finalSkill, null, 2));
 // An unfinished run keeps the last skill it sent, so its notes can say what it had (never graded as a learned skill).
-else if (lastSkillJson) {
-  try { fs.writeFileSync('last-skill.json', JSON.stringify(JSON.parse(lastSkillJson), null, 2)); console.log('last skill written to last-skill.json'); } catch { /* not JSON */ }
+else if (lastSkill) {
+  try { fs.writeFileSync('last-skill.json', JSON.stringify(resolveSkill(lastSkill), null, 2)); console.log('last skill written to last-skill.json'); } catch { /* cannot be resolved */ }
 }
 fs.writeFileSync('learn-stats.json', JSON.stringify(result, null, 2));
 traceHeader({ endedAt: new Date().toISOString(), ...(crash ? { error: result.error } : {}) });

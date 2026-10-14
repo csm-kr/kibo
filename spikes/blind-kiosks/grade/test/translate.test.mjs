@@ -102,3 +102,18 @@ test('round-3 fresh set (pre-registered 10-14): an order with its own orderTotal
   assert.equal(gradedTotal({ orderTotal: 32500, expectedTotal: 68000 }), 32500);
   assert.equal(gradedTotal({ expectedTotal: 6000 }), 6000);
 });
+
+test('round 4 (pre-registered): a popup choice the skill declares it always takes ("declines") is left to its recipe; the offer itself is refused', () => {
+  const k = structuredClone(key);
+  k.optionGroups.setChoice = { title: '세트로 변경할까요?', type: 'single', required: true, min: 1, max: 1, default: null, appliesWhen: 'popup after 담기',
+    options: [{ id: 'single', label: '단품으로 주문', priceDelta: 0 }, { id: 'set', label: '세트로 변경', priceDelta: -500 }] };
+  k.items[0].optionGroups.push('setChoice');
+  const s = skill();
+  const line = (pick) => order([{ item: '아메리카노', options: { temp: ['hot'], setChoice: [pick] }, qty: 1 }]);
+  assert.match(translateOrder(k, s, line('single')).reason, /option not in the skill: .* › 단품으로 주문/);
+  s.declines = [{ choice: '단품으로 주문', offer: '세트로 변경 (-500원)' }];
+  const t = translateOrder(k, s, line('single'));
+  assert.ok(t.ok, t.reason);
+  assert.deepEqual(t.order.lines[0].options, ['HOT']);
+  assert.match(translateOrder(k, s, line('set')).reason, /option not in the skill: .* › 세트로 변경/);
+});

@@ -267,6 +267,9 @@ function translateLine(key, skill, line) {
       if (!so) {
         // The kiosk preselects its default, so a skill that never lists it still gets it.
         if (kg.default === oid && n === 1) continue;
+        // Round 4: a popup choice the skill declares it always takes (declines[].choice, e.g. "drink only" on a set
+        // offer) is what its recipe taps on every order; any other option of that popup stays refused below.
+        if (n === 1 && (skill.declines ?? []).some((d) => anySame(optionLabels(ko), [d?.choice ?? '']))) continue;
         return refuse(`option not in the skill: ${s.name} › ${ko.label}`);
       }
       if (n > 1) {
