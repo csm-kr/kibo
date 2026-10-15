@@ -142,7 +142,9 @@ PLAYED.forEach((p, i) => {
       await play.click();
       const yourTurn = guide(page).locator("[data-scenario-your-turn]");
       const failed = guide(page).getByText(/didn't go as expected|Demo limit reached/);
-      await expect(yourTurn.or(failed)).toBeVisible({ timeout: 200_000 });
+      // Attached, not visible: the first tool call switches the third column to "What the AI did" (#1 E).
+      await expect(yourTurn.or(failed)).toHaveCount(1, { timeout: 200_000 });
+      await openScenarios(page);
       await expect(yourTurn, "the player failed a step").toBeVisible();
       // Nothing in a scenario pays: the phone is never on the card or order-number screen.
       await page.waitForTimeout(2_000);
