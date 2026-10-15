@@ -576,7 +576,6 @@ const HINT_KEYS = ["inputPlaceholder", "ticketPlaceholder", "learnedPlaceholder"
 
 test("P3: every kiosk's input hint fits beside [Send] with larger text, in English and Korean (#1 8, I-133, R-019)", async ({
   browser,
-  request,
 }, info) => {
   const ctx = await browser.newContext({
     viewport: VIEWPORTS[1],
@@ -587,7 +586,8 @@ test("P3: every kiosk's input hint fits beside [Send] with larger text, in Engli
   });
   const page = await ctx.newPage();
   await page.addInitScript(() => localStorage.setItem("kibo.phone.largeText", "on"));
-  await openPhone(page, request);
+  // The context's own address: the file's shared one runs out of sessions per minute by this test (I-068).
+  await openPhone(page, ctx.request);
   await page.getByRole("button", { name: "Start" }).click();
   await page.getByRole("button", { name: "Type instead" }).click();
   await page.getByRole("button", { name: "Eat here" }).click();
