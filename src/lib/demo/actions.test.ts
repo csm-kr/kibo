@@ -48,6 +48,12 @@ describe("actionRow", () => {
     ]);
   });
 
+  it("an offer to call staff reads as an offer, not a menu question (I-279)", () => {
+    const offer = act("offerChoices", { templateId: "ask_staff", choices: [{ kind: "staff", id: "staff" }] });
+    expect(actionRow(malo, offer, "en").text).toBe("Offered to call staff");
+    expect(actionRow(malo, offer, "ko").text).toBe("직원 호출을 제안했어요");
+  });
+
   it("a confirm is always the user's own: a tap on the card or a new yes, never the AI alone", () => {
     expect(actionRow(malo, act("confirmCheckout", {}, "ok", 120), "en")).toEqual({
       text: "You confirmed by saying yes",

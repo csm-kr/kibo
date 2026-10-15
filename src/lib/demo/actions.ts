@@ -108,6 +108,8 @@ function okText(k: KioskData, a: AgentAction, locale: Locale): string {
     case "undoLastChange":
       return ko ? "마지막 변경을 되돌렸어요" : "Undid the last change";
     case "offerChoices": {
+      // The allergy answer's staff offer is not a menu question (I-279).
+      if (args.templateId === "ask_staff") return ko ? "직원 호출을 제안했어요" : "Offered to call staff";
       const choices = Array.isArray(args.choices) ? (args.choices as ChoiceRef[]) : [];
       const labels = choices.map((c) => choiceLabel(k, c, locale)).filter(Boolean);
       const shown = labels.length > 4 ? [...labels.slice(0, 4), "…"] : labels;

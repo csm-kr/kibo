@@ -48,9 +48,11 @@ const COPY: Record<ScreenErrorCode, Record<Locale, string>> = {
     ko: "요청이 많아요. 잠시 후 다시 해 주세요.",
     en: "Too many requests. Please try again in a moment.",
   },
+  // A typed request also ends here, so the copy must not tell a typing user to type (I-278); voice failures have their
+  // own lines in phone.ts.
   UPSTREAM: {
-    ko: "음성 도우미가 잠시 응답하지 않아요. 글자로 입력해 주세요.",
-    en: "The assistant isn't answering right now. Please type instead.",
+    ko: "도우미가 지금 응답이 늦어요. 잠시 후 다시 보내 주시거나 직원을 불러 주세요.",
+    en: "The assistant is slow to answer right now. Please send it again in a moment, or call staff.",
   },
   INTERNAL: {
     ko: "문제가 생겼어요. 다시 해 보시고, 계속되면 직원을 불러 주세요.",
