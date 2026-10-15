@@ -2,10 +2,11 @@
 // learner"), shown on the landing page and /learn. The README and the form text in docs/plan/SUBMISSION.md copy the
 // same sentence; change all of them together. Grader terms: 18 correct, 2 refused, 0 unsafe of 20; in 2 of the 18
 // (bk10 h1, h6) the skill's own total differed from the kiosk's, and the product's bridge stops such an order and
-// calls staff (bridgeReport total check), so 16 finish hands-free (spikes/blind-kiosks/ROUND4.md).
+// calls staff (bridgeReport total check), so 16 finish hands-free and 4 stop safely (spikes/blind-kiosks/ROUND4.md).
+// Led with safety since 10-15 (same results; the old "16 of 20 … hands-free" read as failure, NUMBERS.md "Retired").
 
 export const LEARN_HEADLINE =
-  "On two kiosks it had never seen, KIBO finished 16 of 20 orders hands-free, handed 2 to staff and refused 2; none was wrong (round 4, synthetic kiosks).";
+  "On two kiosks it had never seen, KIBO handled all 20 test orders safely: 16 finished hands-free, 4 stopped safely (2 handed to staff, 2 refused), and none was wrong (round 4, synthetic kiosks).";
 
 /** Why 2 went to staff, for the line under the headline (R-014). */
 export const LEARN_HEADLINE_DETAIL =

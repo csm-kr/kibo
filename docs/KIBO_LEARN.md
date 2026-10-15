@@ -85,6 +85,17 @@ A skill depends on the kiosk's labels, roles and cart text, not its look. The Do
 | bk7, bk8 (bubble tea, table order): round 3 fresh | round 3 (`ea28477`) | 1 of 2 (bk8 not learned in 2 attempts) | 31/68 | 0 / 10 / 0 of 20, 10 not learned | $1.60 | `spikes/blind-kiosks/ROUND3.md`; `results/bk7-bubbletea/final/`, `results/bk8-tableorder/final-attempt2/` |
 | bk9, bk10 (snack bar, chicken shop): round 4 fresh | round 4 (`a9522a4`, frozen) | 2 of 2 | 62/62 | **18 / 2 / 0** of 20 | $0.79 | `spikes/blind-kiosks/ROUND4.md`; `results/bk{9-bunsik,10-chicken}/final/grade-v2.json` |
 
+**Exception tests (round 4): 4 of 4 stopped safely.** 2 caught a hidden ₩500–3,000 charge by checking the kiosk's own total, and 2 refused an option the skill did not know, before touching the kiosk. The 16 other round 4 orders finished hands-free; none of the 20 was wrong (`results/bk10-chicken/final/grade-v2.json`, orders h1, h6, h3, h10; the answer key in `spikes/blind-kiosks/bk10-chicken/answer-key.json`).
+
+| Order (bk10 chicken kiosk) | What happened | What KIBO does | Why it is right |
+|---|---|---|---|
+| h1: fried chicken (boneless) with 2 sauces, cola 500ml | Cart lines right. Kiosk total ₩22,500; the skill predicted ₩22,000: the ₩500 for the second sauce (the first is free) was not visible while learning (`totalCannotSee`) | The app's bridge compares the skill's total with the kiosk's own and stops; staff is called | The phone must never show a price the kiosk will not charge |
+| h6: honey butter chicken ×3 with 3 sauces each | Cart lines right. ₩63,000 vs ₩60,000: the two paid sauces (₩500 each) on each of the 3 were not visible while learning | Stops, and staff is called | Same reason |
+| h3: chicken set with "콜라 1.25L 변경" (the 1.25L cola upgrade), 2 draft beers | The upgrade is not in the skill | Refused before the first tap; nothing touched the kiosk | Guessing an unknown option could order the wrong thing |
+| h10: 2 chicken sets with the same upgrade, cheese balls, 2 pickled radish | Same as h3 | Refused before the first tap | Same reason |
+
+The grader counts h1 and h6 correct, because their cart lines and the kiosk's total match the answer key; the stop is the app's bridge (`bridgeReport` total check, `src/lib/commands/machine.ts`), so they are the 2 handed to staff, not hands-free (R-014).
+
 The groups are never added into one total, except the never-seen kiosks (each new to that round's learner): 32 correct / 15 refused / 3 unsafe / 10 not learned of 60 orders over 6 kiosks. The unsafe orders: on the four test kiosks' final, 5 on the bakery, where the kiosk's own timeout modal blocked the replay (I-193; fixed in round 3, I-194); on the never-seen kiosks, 3 on the food court, the three take-out orders, 100원 below the answer key (an optional bag on the order review that the grader did not ask for, I-195, I-229). The skill's own total (what the phone would quote) differed from the kiosk's in 3 of the 31 four-kiosk final orders that reached a kiosk total, and in 6 of the 35 never-seen-kiosk orders that did (I-197). Learning cost per run: `evidence/learn-cost.json`. The first four kiosks are not a clean blind test of the final learner: it was improved from their baseline failure patterns, on the dev set only. Cost is tokens × the Gemini API price for `gemini-3.8-flash` (`evidence/cost-per-order.json`); the learner ran on Vertex AI, whose price was not read (unverified).
 
 Earlier runs:
