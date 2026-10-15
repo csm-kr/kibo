@@ -15,7 +15,7 @@ import { KioskToolbar } from "./KioskToolbar";
 import { ModalLayer } from "./ModalLayer";
 import { ProductSheet } from "./ProductSheet";
 import { UpsellPopup } from "./UpsellPopup";
-import { CARD_SHADOW, FOCUS, SCRIM } from "./styles";
+import { CARD_SHADOW, FOCUS, FOCUS_INSIDE, SCRIM } from "./styles";
 
 // K3 menu with K4 sheet, K5 upsell and the AI-change highlight (docs/UX.md Flow A6–A7, Flow B). Canvas px.
 
@@ -177,7 +177,8 @@ export function MenuScreen(props: {
       />
 
       <div className="relative flex min-h-0 flex-1">
-        <nav ref={rail} aria-label={kt("categories", locale, domain)} className="flex w-65 flex-none flex-col gap-2 overflow-y-auto bg-(--k-panel) py-4">
+        {/* Keyboard focus scrolls a control clear of the fade below and its own ring clear of the edges (#1 22). */}
+        <nav ref={rail} aria-label={kt("categories", locale, domain)} className="flex w-65 flex-none scroll-pb-24 flex-col gap-2 overflow-y-auto bg-(--k-panel) py-4">
           {kiosk.categories.map((c) => {
             const current = c.categoryId === category;
             return (
@@ -188,7 +189,7 @@ export function MenuScreen(props: {
                 onClick={() => setCategory(c.categoryId)}
                 className={`flex flex-none flex-col items-center gap-2 border-l-8 px-4 py-4 ${
                   current ? "border-(--k-primary) bg-white font-bold text-(--k-primary-dark)" : "border-transparent text-[#33302B]"
-                } ${FOCUS}`}
+                } ${FOCUS_INSIDE}`}
               >
                 <span className={`relative size-20 overflow-hidden rounded-full bg-white ${current ? "ring-4 ring-(--k-primary)" : ""}`}>
                   <KioskImage src={c.icon} sizes={ICON_SIZES} inset="p-3" />
@@ -199,7 +200,7 @@ export function MenuScreen(props: {
           })}
         </nav>
 
-        <div ref={grid} className="min-h-0 flex-1 overflow-y-auto p-8">
+        <div ref={grid} className="min-h-0 flex-1 scroll-pt-4 scroll-pb-28 overflow-y-auto p-8">
           <div className="grid grid-cols-2 gap-8">
             {items.map((item) => {
               const ring = flash?.itemId === item.itemId;

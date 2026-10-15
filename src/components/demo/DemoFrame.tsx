@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CircleHelp } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { FOCUS, PRIMARY, SECONDARY } from "@/components/phone/ui";
+import { FOCUS_INSIDE, PRIMARY, SECONDARY } from "@/components/phone/ui";
 import { DEMO_ENVIRONMENTS, demoHref, type DemoEnvironment } from "./environments";
 
 // The /demo frame around D1, D2 and D3 (docs/UI_GUIDE.md "/demo frame", issue #1 batch E): a light neutral canvas and
@@ -63,7 +63,7 @@ function TopBar({ kioskId, askBeforeLeaving }: { kioskId: string; askBeforeLeavi
                     e.preventDefault();
                     setLeaving(env);
                   }}
-                  className={`group flex h-14 items-center rounded-full ${FOCUS}`}
+                  className={`group flex h-14 items-center rounded-full ${FOCUS_INSIDE}`}
                 >
                   {/* Selected: a white pill with a shadow and bold ink text, never color alone. */}
                   <span
@@ -81,7 +81,7 @@ function TopBar({ kioskId, askBeforeLeaving }: { kioskId: string; askBeforeLeavi
       </nav>
       <Link
         href="/#how"
-        className={`flex min-h-14 items-center gap-2 justify-self-end rounded-full px-2 text-base font-semibold whitespace-nowrap text-kibo ${FOCUS}`}
+        className={`flex min-h-14 items-center gap-2 justify-self-end rounded-full px-2 text-base font-semibold whitespace-nowrap text-kibo ${FOCUS_INSIDE}`}
       >
         <CircleHelp size={20} strokeWidth={2} aria-hidden />
         How it works

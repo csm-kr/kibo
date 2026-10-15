@@ -13,7 +13,7 @@ export const COLUMN = "flex h-full min-h-0 flex-col overflow-hidden rounded-shee
 export const COLUMN_HEAD = "flex min-h-14 flex-none items-center gap-3 px-4 shadow-[inset_0_-1px_0_var(--color-line)]";
 
 /** The phone's 3px ink focus ring, drawn inside: the card clips what lies outside its edge. */
-export const FOCUS_INSIDE = "focus-visible:outline-[3px] focus-visible:-outline-offset-3 focus-visible:outline-ink";
+export { FOCUS_INSIDE } from "@/components/phone/ui";
 
 /** The column's number: the order to look in. Not read out; the caption names the column. */
 export function ColumnNumber({ n }: { n: number }) {

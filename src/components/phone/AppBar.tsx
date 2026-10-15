@@ -8,7 +8,7 @@ import { aiOnly, LANGUAGES, SPEECH_LANGUAGES, type SpeechLanguage } from "@/lib/
 import { pt } from "@/lib/i18n/phone";
 import type { Locale } from "@/types/menu";
 import { SettingSwitch } from "./SettingSwitch";
-import { CARD, COMPACT, FOCUS, ICON, PRESS, QUIET } from "./ui";
+import { CARD, COMPACT_BAR, FOCUS, ICON, PRESS, QUIET } from "./ui";
 
 // The phone app bar (docs/UI_GUIDE.md "Phone design"): one 64px row on every phone screen. The connection state is a
 // dot and a word, so color is never the only signal; each control's visible word is part of its accessible name.
@@ -68,7 +68,7 @@ export function AppBar(props: {
             aria-haspopup="dialog"
             aria-label={`${pt(props.onLargeText ? "languageAndText" : "language", locale)}: ${LANGUAGES[language].native}`}
             onClick={() => setPicking(true)}
-            className={`${COMPACT} max-w-32 text-ink active:bg-kibo-tint`}
+            className={`${COMPACT_BAR} max-w-32 text-ink active:bg-kibo-tint`}
           >
             <span className="flex items-center gap-1">
               <Globe {...ICON} />
@@ -81,7 +81,7 @@ export function AppBar(props: {
         ) : (
           // Named in the other language, so a reader of either can find it. The full name is shown, not "EN": a short
           // code that is not a word of the accessible name fails WCAG 2.5.3 (label in name).
-          <button type="button" lang={other} onClick={() => props.onLocaleChange(other)} className={`${COMPACT} text-ink active:bg-kibo-tint`}>
+          <button type="button" lang={other} onClick={() => props.onLocaleChange(other)} className={`${COMPACT_BAR} text-ink active:bg-kibo-tint`}>
             <Globe {...ICON} />
             <span>{pt(other === "ko" ? "langKo" : "langEn", locale)}</span>
           </button>
@@ -92,7 +92,7 @@ export function AppBar(props: {
             aria-label={pt("callStaff", locale)}
             disabled={props.staffDisabled}
             onClick={props.onStaff}
-            className={`${COMPACT} bg-staff-tint text-staff-ink active:bg-staff-tint-pressed disabled:opacity-60`}
+            className={`${COMPACT_BAR} bg-staff-tint text-staff-ink active:bg-staff-tint-pressed disabled:opacity-60`}
           >
             <Bell {...ICON} />
             <span>{pt("staffShort", locale)}</span>

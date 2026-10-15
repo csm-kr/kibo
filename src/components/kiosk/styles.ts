@@ -2,6 +2,9 @@
 
 export const FOCUS = "focus-visible:outline-[6px] focus-visible:outline-offset-4 focus-visible:outline-[#1E1B18]";
 
+/** The same ring drawn inside, for a control as wide as the scroll area that clips it (the category rail, #1 22). */
+export const FOCUS_INSIDE = "focus-visible:outline-[6px] focus-visible:-outline-offset-6 focus-visible:outline-[#1E1B18]";
+
 /** Full-canvas scrim for sheets and pop-ups. */
 export const SCRIM = "absolute inset-0 z-20 bg-[#1E1B18]/60";
 
