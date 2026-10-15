@@ -14,12 +14,12 @@ import type { AgentAction } from "@/lib/agent/actions";
 import { examplesFor } from "@/lib/agent/examples";
 import { buildComparison, HERO_KIOSK } from "@/lib/demo/compare";
 import { EDIT_PATH_TAPS, HUMAN_RUNS, TOUCH_RUN } from "@/lib/demo/evidence";
-import { demoKioskStep, PAYMENT_STEP } from "@/lib/kiosk/pairing";
+import { demoKioskStep } from "@/lib/kiosk/pairing";
 import { uiLocale, type SpeechLanguage } from "@/lib/i18n/languages";
 import { pt } from "@/lib/i18n/phone";
 import type { KioskData, Locale } from "@/types/menu";
 import { ActionStrip } from "./ActionStrip";
-import { Caption, COLUMN, COLUMN_HEAD } from "./column";
+import { Caption, COLUMN, COLUMN_HEAD, FOCUS_INSIDE } from "./column";
 import { CompareCard } from "./CompareCard";
 import { DemoEndCard } from "./DemoEndCard";
 import { DemoFrame } from "./DemoFrame";
@@ -36,15 +36,11 @@ import { ScenarioGuide, type SideTab } from "./ScenarioGuide";
 const DEMO_CHAT_LIMIT = 30;
 /** Rows kept in "What the AI did". */
 const MAX_ACTIONS = 50;
-/** On the kiosk's dark frame an ink ring would not show; white keeps the focus visible (WCAG 2.4.7). */
-const FOCUS_ON_DARK = "focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-white";
 /**
- * KIBO's English line for the kiosk's step (break-keep: it quotes Korean button labels, which would otherwise split
- * mid-word, I-044), and the card reader drawn as part of the kiosk's dark frame.
+ * The guided kiosk's height: the screen less the top bar (64), the caption row (56), the page's bottom padding (16) and
+ * the card stand-in's place under the kiosk (60), so its width, 9:16 of that, is known to the card stand-in too.
  */
-const STEP_LINE = "rounded-tile bg-white px-3 py-2 text-base/normal font-semibold break-keep text-kibo-deep shadow-card";
-const READER = "flex rounded-tile bg-[#141210] p-2";
-const READER_BUTTON = "flex min-h-14 w-full items-center justify-center gap-2 rounded-tile px-4 text-xl font-bold text-[#1E1B18]";
+const KIOSK_W = "w-[calc((100dvh-196px)*9/16)]";
 
 /**
  * This demo order's own counts for the D3 comparison card (docs/PRD.md "Demo scenario" step 8), from [Start] or
@@ -142,8 +138,8 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
       />
     ) : undefined;
   const numberShown = session !== null && numberFor === session.sessionId;
-  // The step area under the kiosk: not with the judge's own phone (the pairing panel says the step, and the kiosk's
-  // own K7 takes the card) nor on a learned kiosk (its page has its own strip).
+  // The kiosk's step in English and the card stand-in under it: not with the judge's own phone (the pairing panel says
+  // the step, and the kiosk's own K7 takes the card) nor on a learned kiosk (its page has its own strip).
   const guided = !ownPhone && !learned;
   const step = guided && session ? demoKioskStep(kiosk, session, numberShown) : null;
   const actionList = actions.sessionId === tokens.sessionId ? actions.list : [];
@@ -175,10 +171,18 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
             aria-labelledby="demo-kiosk-caption"
             className={`${COLUMN} ${learned ? "w-[calc((100dvh-136px)*27/40)] flex-none" : "min-w-0 flex-1"}`}
           >
-            <div className={COLUMN_HEAD}>
+            <div className={`${COLUMN_HEAD} justify-between`}>
               <Caption id="demo-kiosk-caption" n={1} {...environmentOf(kiosk.kioskId).caption} />
+              {/* The kiosk stays Korean; KIBO says its step in English beside the caption, in two lines at most, so the
+                  kiosk under the row keeps one size and place from D2 to D3 (#1 E, #1 item 19). break-keep: it quotes
+                  Korean button labels, which would otherwise split mid-word (I-044). */}
+              {step && (
+                <p data-kiosk-step aria-live="polite" className="min-w-0 text-right text-base/5 font-semibold text-balance break-keep text-kibo-deep">
+                  {step}
+                </p>
+              )}
             </div>
-            <div className="flex min-h-0 flex-1 flex-col items-center gap-2">
+            <div className="flex min-h-0 flex-1 flex-col items-center">
               <div
                 className={`min-h-0 flex-1 overflow-hidden ${learned ? "w-full" : "aspect-[9/16] max-w-full"}`}
                 onPointerDownCapture={countTap("kioskTaps")}
@@ -220,40 +224,30 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
                   </KioskCanvas>
                 )}
               </div>
-              {/* A fixed area under the kiosk from D2 to D3 (#1 item 19): the payment step's content, drawn invisibly in
-                  the same grid cell, keeps it at that height on every step, so the kiosk above never resizes or moves. */}
+              {/* The card stand-in's place under the kiosk, kept at every step so the kiosk never moves (#1 item 19). At
+                  payment it is the kiosk's card slot: the kiosk's dark frame with a button in its accent colour, as wide
+                  as the kiosk and no taller than a target. Only the kiosk takes payment, so the phone half has no button
+                  that pays (15-judge-fixes:2). It counts as a kiosk tap. With the judge's own phone, the kiosk's own K7
+                  buttons are used, as before. */}
               {guided && (
-                <div className="grid w-full flex-none px-4 pb-4">
-                  <div aria-hidden className="invisible col-start-1 row-start-1 flex flex-col gap-2">
-                    <p className={STEP_LINE}>{PAYMENT_STEP}</p>
-                    <div className={READER}>
-                      <div className={READER_BUTTON}>Kiosk: insert card (demo)</div>
+                <div className={`flex h-15 max-w-full flex-none ${KIOSK_W}`}>
+                  {session?.status === "paying" && (
+                    <div
+                      data-card-reader
+                      className="flex w-full rounded-b-tile bg-[#141210] px-1 pb-1"
+                      onPointerDownCapture={countTap("kioskTaps")}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => cardTap.dispatchEvent(new Event("tap"))}
+                        style={{ backgroundColor: kiosk.theme.accent }}
+                        className={`flex h-14 w-full items-center justify-center gap-2 rounded-tile px-3 text-base font-bold text-[#1E1B18] ${PRESS} ${FOCUS_INSIDE}`}
+                      >
+                        <CreditCard {...ICON} />
+                        Kiosk: insert card (demo)
+                      </button>
                     </div>
-                  </div>
-                  <div className="col-start-1 row-start-1 flex flex-col gap-2">
-                    {/* The kiosk stays Korean; KIBO says its step in English (with the judge's own phone the pairing panel does). */}
-                    {step && (
-                      <p data-kiosk-step aria-live="polite" className={STEP_LINE}>
-                        {step}
-                      </p>
-                    )}
-                    {/* The card reader stands in under the kiosk, drawn as part of its frame: only the kiosk takes payment,
-                        so the phone half has no button that pays (15-judge-fixes:2). It counts as a kiosk tap. With the
-                        judge's own phone, the kiosk's own K7 buttons are used, as before. */}
-                    {session?.status === "paying" && (
-                      <div data-card-reader className={READER} onPointerDownCapture={countTap("kioskTaps")}>
-                        <button
-                          type="button"
-                          onClick={() => cardTap.dispatchEvent(new Event("tap"))}
-                          style={{ backgroundColor: kiosk.theme.accent }}
-                          className={`${READER_BUTTON} ${PRESS} ${FOCUS_ON_DARK}`}
-                        >
-                          <CreditCard {...ICON} />
-                          Kiosk: insert card (demo)
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                  )}
                 </div>
               )}
             </div>
