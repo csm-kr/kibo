@@ -29,10 +29,10 @@ export function DemoIntro(props: {
   onStartPhone(): void;
 }) {
   return (
-    <main data-demo="intro" className="flex h-dvh w-full overflow-y-auto bg-[#FBF7EF] px-6 py-8 text-[#15171C]">
+    // Inside the /demo frame, whose top bar carries the KIBO mark and the place tabs.
+    <main data-demo="intro" className="flex min-h-0 w-full flex-1 overflow-y-auto px-6 py-8 text-[#15171C]">
       <div data-demo-check className="m-auto grid w-full max-w-6xl items-start gap-12 lg:grid-cols-[2fr_3fr]">
         <div className="flex flex-col gap-6">
-          <Image src="/kibo-logo.svg" alt="KIBO" width={177} height={48} preload />
           {/* Said before anything else on a phone, not after [Start] (I-074). */}
           <div role="note" data-demo-narrow-note className="flex flex-col gap-3 rounded-[18px] bg-[#FFF1CC] p-4 text-[#7A2E0E] min-[900px]:hidden">
             <p className="text-xl font-bold">Open this on a laptop to see the kiosk and the phone side by side.</p>

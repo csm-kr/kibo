@@ -22,6 +22,7 @@ import type { KioskData, Locale } from "@/types/menu";
 import { ActionStrip } from "./ActionStrip";
 import { CompareCard } from "./CompareCard";
 import { DemoEndCard } from "./DemoEndCard";
+import { DemoFrame } from "./DemoFrame";
 import { DemoIntro } from "./DemoIntro";
 import { environmentOf } from "./environments";
 import { ScenarioGuide } from "./ScenarioGuide";
@@ -109,13 +110,15 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
 
   if (!demo.tokens) {
     return (
-      <DemoIntro
-        kioskId={kiosk.kioskId}
-        starting={demo.starting}
-        error={demo.error}
-        onStart={() => startOrder(false)}
-        onStartPhone={() => startOrder(true)}
-      />
+      <DemoFrame kioskId={kiosk.kioskId} askBeforeLeaving={false}>
+        <DemoIntro
+          kioskId={kiosk.kioskId}
+          starting={demo.starting}
+          error={demo.error}
+          onStart={() => startOrder(false)}
+          onStartPhone={() => startOrder(true)}
+        />
+      </DemoFrame>
     );
   }
 
@@ -169,191 +172,195 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
   // Own phone: the pairing panel shows the end card when the phone half would (paid, ended, a learned kiosk's review).
   const ended =
     session !== null && (session.status === "paid" || session.status === "expired" || (learned && session.status === "confirming"));
+  // A place tab would clear an order that has lines and is not paid yet, so it asks first (N5).
+  const openOrder = session !== null && session.cart.length > 0 && session.status !== "paid" && session.status !== "expired";
 
   return (
     <>
       <NarrowNotice kioskId={kiosk.kioskId} />
-      <main
-        data-demo="split"
-        data-demo-kiosk={kiosk.kioskId}
-        data-demo-own-phone={ownPhone || undefined}
-        className="flex h-dvh w-full justify-center gap-6 overflow-hidden bg-[#F3EEE4] p-4 text-[#15171C] max-[899px]:hidden"
-      >
-        {/* 72px = page padding 32 + caption 32 + gap 8, so the canvas (9:16, or the learned page's 1080:1600) fills the
-            height. With the step area under the kiosk, 224px: its usual 144 (two lines of the payment step and the card
-            reader) and its gap 8. The column is at least 320px, so the card reader's label stays on one line; where the
-            area is taller or the column wider (1280×720), the kiosk's frame keeps 9:16 and centres, so the page shows
-            beside it, never a dark band (#1 items 10, 19). */}
-        <section
-          aria-labelledby="demo-kiosk-caption"
-          className={`flex h-full flex-none flex-col gap-2 ${
-            learned
-              ? "w-[calc((100dvh-72px)*27/40)]"
-              : guided
-                ? "w-[max(320px,calc((100dvh-224px)*9/16))]"
-                : "w-[calc((100dvh-72px)*9/16)]"
-          }`}
+      <DemoFrame kioskId={kiosk.kioskId} askBeforeLeaving={openOrder} className="max-[899px]:hidden">
+        <main
+          data-demo="split"
+          data-demo-kiosk={kiosk.kioskId}
+          data-demo-own-phone={ownPhone || undefined}
+          className="mx-auto flex min-h-0 w-full max-w-[1600px] flex-1 justify-center gap-6 px-4 pb-4"
         >
-          <Caption id="demo-kiosk-caption" text={environmentOf(kiosk.kioskId).caption} />
-          <div
-            className={`min-h-0 flex-1 overflow-hidden rounded-[18px] ${guided ? "aspect-[9/16] max-w-full self-center" : ""}`}
-            onPointerDownCapture={countTap("kioskTaps")}
+          {/* 120px = the top bar 64 + bottom padding 16 + caption 32 + gap 8, so the canvas (9:16, or the learned page's
+              1080:1600) fills the height. With the step area under the kiosk, 272px: its usual 144 (two lines of the
+              payment step and the card reader) and its gap 8. The column is at least 320px, so the card reader's label
+              stays on one line; where the area is taller or the column wider (1280×720), the kiosk's frame keeps 9:16 and
+              centres, so the page shows beside it, never a dark band (#1 items 10, 19). */}
+          <section
+            aria-labelledby="demo-kiosk-caption"
+            className={`flex h-full flex-none flex-col gap-2 ${
+              learned
+                ? "w-[calc((100dvh-120px)*27/40)]"
+                : guided
+                  ? "w-[max(320px,calc((100dvh-272px)*9/16))]"
+                  : "w-[calc((100dvh-120px)*9/16)]"
+            }`}
           >
-            {learned ? (
-              // Keyed by session: [Try again] reloads the kiosk page, so the new order never starts on the old cart.
-              <LearnedKioskHost
-                key={tokens.sessionId}
-                kiosk={kiosk}
-                session={session}
-                kioskToken={tokens.kioskToken}
-                claimUrl={tokens.claimUrl}
-                clockOffset={demo.clockOffset}
-                strip
-              />
-            ) : (
-              <KioskCanvas theme={kiosk.theme} locale={kiosk.locale}>
-                <KioskScreen
+            <Caption id="demo-kiosk-caption" text={environmentOf(kiosk.kioskId).caption} />
+            <div
+              className={`min-h-0 flex-1 overflow-hidden rounded-[18px] ${guided ? "aspect-[9/16] max-w-full self-center" : ""}`}
+              onPointerDownCapture={countTap("kioskTaps")}
+            >
+              {learned ? (
+                // Keyed by session: [Try again] reloads the kiosk page, so the new order never starts on the old cart.
+                <LearnedKioskHost
+                  key={tokens.sessionId}
                   kiosk={kiosk}
                   session={session}
                   kioskToken={tokens.kioskToken}
                   claimUrl={tokens.claimUrl}
-                  pairCode={tokens.pairCode}
-                  pairUrl={tokens.pairUrl}
-                  // No `demo` (the &demo=1 tap counter) and no onStartOver ([처음으로]): a new session would drop
-                  // the judge's order (I-135, I-048). onClaimUrl ([Connect another phone]) only with the judge's own
-                  // phone; with the phone half a new QR would void this page's own phone (I-066).
-                  onClaimUrl={ownPhone ? demo.setClaimUrl : undefined}
                   clockOffset={demo.clockOffset}
-                  // A send found the session gone or expired: start over. A paid order stays for the end card.
-                  onNewSession={() => {
-                    if (session?.status !== "paid") tryAgain();
-                  }}
-                  cardTap={cardTap}
-                  keepOrderNumber
-                  onOrderNumber={setNumberFor}
-                  retrying={demo.streamState === "retrying"}
+                  strip
                 />
-              </KioskCanvas>
-            )}
-          </div>
-          {/* A fixed area under the kiosk from D2 to D3 (#1 item 19): the payment step's content, drawn invisibly in the
-              same grid cell, keeps it at that height on every step, so the kiosk above never resizes or moves. */}
-          {guided && (
-            <div className="grid flex-none">
-              <div aria-hidden className="invisible col-start-1 row-start-1 flex flex-col gap-2">
-                <p className={STEP_LINE}>{PAYMENT_STEP}</p>
-                <div className={READER}>
-                  <div className={READER_BUTTON}>Kiosk: insert card (demo)</div>
+              ) : (
+                <KioskCanvas theme={kiosk.theme} locale={kiosk.locale}>
+                  <KioskScreen
+                    kiosk={kiosk}
+                    session={session}
+                    kioskToken={tokens.kioskToken}
+                    claimUrl={tokens.claimUrl}
+                    pairCode={tokens.pairCode}
+                    pairUrl={tokens.pairUrl}
+                    // No `demo` (the &demo=1 tap counter) and no onStartOver ([처음으로]): a new session would drop
+                    // the judge's order (I-135, I-048). onClaimUrl ([Connect another phone]) only with the judge's own
+                    // phone; with the phone half a new QR would void this page's own phone (I-066).
+                    onClaimUrl={ownPhone ? demo.setClaimUrl : undefined}
+                    clockOffset={demo.clockOffset}
+                    // A send found the session gone or expired: start over. A paid order stays for the end card.
+                    onNewSession={() => {
+                      if (session?.status !== "paid") tryAgain();
+                    }}
+                    cardTap={cardTap}
+                    keepOrderNumber
+                    onOrderNumber={setNumberFor}
+                    retrying={demo.streamState === "retrying"}
+                  />
+                </KioskCanvas>
+              )}
+            </div>
+            {/* A fixed area under the kiosk from D2 to D3 (#1 item 19): the payment step's content, drawn invisibly in the
+                same grid cell, keeps it at that height on every step, so the kiosk above never resizes or moves. */}
+            {guided && (
+              <div className="grid flex-none">
+                <div aria-hidden className="invisible col-start-1 row-start-1 flex flex-col gap-2">
+                  <p className={STEP_LINE}>{PAYMENT_STEP}</p>
+                  <div className={READER}>
+                    <div className={READER_BUTTON}>Kiosk: insert card (demo)</div>
+                  </div>
+                </div>
+                <div className="col-start-1 row-start-1 flex flex-col gap-2">
+                  {/* The kiosk stays Korean; KIBO says its step in English (with the judge's own phone the pairing panel does). */}
+                  {step && (
+                    <p data-kiosk-step aria-live="polite" className={STEP_LINE}>
+                      {step}
+                    </p>
+                  )}
+                  {/* The card reader stands in under the kiosk, drawn as part of its frame: only the kiosk takes payment,
+                      so the phone half has no button that pays (15-judge-fixes:2). It counts as a kiosk tap. With the
+                      judge's own phone, the kiosk's own K7 buttons are used, as before. */}
+                  {session?.status === "paying" && (
+                    <div data-card-reader className={READER} onPointerDownCapture={countTap("kioskTaps")}>
+                      <button
+                        type="button"
+                        onClick={() => cardTap.dispatchEvent(new Event("tap"))}
+                        style={{ backgroundColor: kiosk.theme.accent }}
+                        className={`${READER_BUTTON} ${PRESS} ${FOCUS_ON_DARK}`}
+                      >
+                        <CreditCard {...ICON} />
+                        Kiosk: insert card (demo)
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="col-start-1 row-start-1 flex flex-col gap-2">
-                {/* The kiosk stays Korean; KIBO says its step in English (with the judge's own phone the pairing panel does). */}
-                {step && (
-                  <p data-kiosk-step aria-live="polite" className={STEP_LINE}>
-                    {step}
-                  </p>
-                )}
-                {/* The card reader stands in under the kiosk, drawn as part of its frame: only the kiosk takes payment,
-                    so the phone half has no button that pays (15-judge-fixes:2). It counts as a kiosk tap. With the
-                    judge's own phone, the kiosk's own K7 buttons are used, as before. */}
-                {session?.status === "paying" && (
-                  <div data-card-reader className={READER} onPointerDownCapture={countTap("kioskTaps")}>
-                    <button
-                      type="button"
-                      onClick={() => cardTap.dispatchEvent(new Event("tap"))}
-                      style={{ backgroundColor: kiosk.theme.accent }}
-                      className={`${READER_BUTTON} ${PRESS} ${FOCUS_ON_DARK}`}
-                    >
-                      <CreditCard {...ICON} />
-                      Kiosk: insert card (demo)
+            )}
+          </section>
+          {ownPhone ? (
+            // A slim status column: the QR and code are on the kiosk half's own screen (14-final:1).
+            <section aria-labelledby="demo-phone-caption" className="flex h-full w-[clamp(320px,26vw,440px)] flex-none flex-col gap-2">
+              <Caption id="demo-phone-caption" text="Your own phone (KIBO)" />
+              <div className="min-h-0 flex-1 overflow-hidden rounded-sheet shadow-card">
+                <PairingPanel
+                  kiosk={kiosk}
+                  session={session}
+                  claimUrl={tokens.claimUrl}
+                  pairUrl={tokens.pairUrl}
+                  clockOffset={demo.clockOffset}
+                  numberShown={numberShown}
+                >
+                  {ended ? (
+                    endCard
+                  ) : (
+                    <button type="button" onClick={demo.stop} className={`${QUIET} self-start`}>
+                      <ArrowLeft {...ICON} />
+                      Back to the start
                     </button>
-                  </div>
-                )}
+                  )}
+                </PairingPanel>
               </div>
-            </div>
-          )}
-        </section>
-        {ownPhone ? (
-          // A slim status column: the QR and code are on the kiosk half's own screen (14-final:1).
-          <section aria-labelledby="demo-phone-caption" className="flex h-full w-[clamp(320px,26vw,440px)] flex-none flex-col gap-2">
-            <Caption id="demo-phone-caption" text="Your own phone (KIBO)" />
-            <div className="min-h-0 flex-1 overflow-hidden rounded-sheet shadow-card">
-              <PairingPanel
-                kiosk={kiosk}
-                session={session}
-                claimUrl={tokens.claimUrl}
-                pairUrl={tokens.pairUrl}
-                clockOffset={demo.clockOffset}
-                numberShown={numberShown}
-              >
-                {ended ? (
-                  endCard
-                ) : (
-                  <button type="button" onClick={demo.stop} className={`${QUIET} self-start`}>
-                    <ArrowLeft {...ICON} />
-                    Back to the start
-                  </button>
-                )}
-              </PairingPanel>
-            </div>
-          </section>
-        ) : (
-          <section
-            data-demo-check
-            aria-labelledby="demo-phone-caption"
-            className="flex h-full w-[clamp(400px,32vw,480px)] flex-none flex-col gap-2"
-          >
-            <Caption id="demo-phone-caption" text="Your phone (KIBO)" />
-            {/* 480px: the phone header at 200% text needs about 450 (WCAG 1.4.4), so the action strip under it gives way first. */}
-            <div
-              className="min-h-[480px] flex-1 overflow-hidden rounded-sheet shadow-card"
-              onPointerDownCapture={countTap("phoneTaps")}
+            </section>
+          ) : (
+            <section
+              data-demo-check
+              aria-labelledby="demo-phone-caption"
+              className="flex h-full w-[clamp(400px,32vw,480px)] flex-none flex-col gap-2"
             >
-              <AssistantPanel
-                key={tokens.sessionId}
-                kiosk={kiosk}
-                session={session}
-                deviceToken={tokens.deviceToken ?? null}
-                locale={locale}
-                onLocaleChange={setLanguage}
-                language={language}
-                onLanguageChange={setLanguage}
-                mode="demo"
-                examples={examplesFor(kiosk.kioskId, locale, "demo")}
-                largeText={largeText}
-                onLargeTextChange={setLargeText}
-                streamState={demo.streamState}
-                clockOffset={demo.clockOffset}
-                chatLimit={DEMO_CHAT_LIMIT}
-                onTryAgain={tryAgain}
-                endCard={endCard}
-                onSay={onSay}
-                onUserTurn={() => count("sentences")}
-                onActions={(list) =>
-                  setActions((prev) => ({
-                    sessionId: tokens.sessionId,
-                    list: [...(prev.sessionId === tokens.sessionId ? prev.list : []), ...list].slice(-MAX_ACTIONS),
-                  }))
-                }
-              />
-            </div>
-            {!beside && actionStrip}
-          </section>
-        )}
-        <ScenarioGuide
-          kiosk={kiosk}
-          session={session}
-          sessionId={tokens.sessionId}
-          locale={locale}
-          // The judge's own phone: the sentences are to say there, so nothing here sends or plays.
-          send={ownPhone ? undefined : send}
-          starting={demo.starting}
-          startFailed={demo.error !== null}
-          onFresh={tryAgain}
-          wide={wide}
-          aside={beside ? actionStrip : undefined}
-        />
-      </main>
+              <Caption id="demo-phone-caption" text="Your phone (KIBO)" />
+              {/* 480px: the phone header at 200% text needs about 450 (WCAG 1.4.4), so the action strip under it gives way first. */}
+              <div
+                className="min-h-[480px] flex-1 overflow-hidden rounded-sheet shadow-card"
+                onPointerDownCapture={countTap("phoneTaps")}
+              >
+                <AssistantPanel
+                  key={tokens.sessionId}
+                  kiosk={kiosk}
+                  session={session}
+                  deviceToken={tokens.deviceToken ?? null}
+                  locale={locale}
+                  onLocaleChange={setLanguage}
+                  language={language}
+                  onLanguageChange={setLanguage}
+                  mode="demo"
+                  examples={examplesFor(kiosk.kioskId, locale, "demo")}
+                  largeText={largeText}
+                  onLargeTextChange={setLargeText}
+                  streamState={demo.streamState}
+                  clockOffset={demo.clockOffset}
+                  chatLimit={DEMO_CHAT_LIMIT}
+                  onTryAgain={tryAgain}
+                  endCard={endCard}
+                  onSay={onSay}
+                  onUserTurn={() => count("sentences")}
+                  onActions={(list) =>
+                    setActions((prev) => ({
+                      sessionId: tokens.sessionId,
+                      list: [...(prev.sessionId === tokens.sessionId ? prev.list : []), ...list].slice(-MAX_ACTIONS),
+                    }))
+                  }
+                />
+              </div>
+              {!beside && actionStrip}
+            </section>
+          )}
+          <ScenarioGuide
+            kiosk={kiosk}
+            session={session}
+            sessionId={tokens.sessionId}
+            locale={locale}
+            // The judge's own phone: the sentences are to say there, so nothing here sends or plays.
+            send={ownPhone ? undefined : send}
+            starting={demo.starting}
+            startFailed={demo.error !== null}
+            onFresh={tryAgain}
+            wide={wide}
+            aside={beside ? actionStrip : undefined}
+          />
+        </main>
+      </DemoFrame>
       {/* Outside the counted columns, so the tap that resumes is no kiosk or phone tap. A paid order keeps its end card. */}
       {demo.paused && session?.status !== "paid" && <PausedLayer lines={[pt("streamPaused", locale)]} onResume={demo.resume} />}
     </>
