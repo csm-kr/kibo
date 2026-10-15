@@ -21,6 +21,21 @@ export function textLines(el: Locator): Promise<number> {
   });
 }
 
+/**
+ * The hints that would be cut in this text field: each is measured in the field's own font against the room beside
+ * [Send] (I-133, R-019). The web font's Korean slices load only for text on screen, so the ones the hints need load first.
+ */
+export function hintsCut(field: Locator, hints: string[]): Promise<string[]> {
+  return field.evaluate(async (el: HTMLInputElement, hints) => {
+    const cs = getComputedStyle(el);
+    const ctx = document.createElement("canvas").getContext("2d")!;
+    ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+    await document.fonts.load(ctx.font, hints.join(""));
+    const room = el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    return hints.filter((h) => ctx.measureText(h).width > room);
+  }, hints);
+}
+
 export function kioskRoot(page: Page): Locator {
   return page.locator("[data-screen]").first();
 }

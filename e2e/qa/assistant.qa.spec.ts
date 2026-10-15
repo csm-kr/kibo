@@ -1,5 +1,6 @@
 import { expect, test, type APIRequestContext, type Page, type TestInfo } from "@playwright/test";
-import { claim, command, warmPhone } from "../helpers";
+import { pt } from "@/lib/i18n/phone";
+import { claim, command, hintsCut, warmPhone } from "../helpers";
 import { PHONE, qaState, type Findings } from "./checks";
 
 // UI QA of the phone screens (docs/UX.md screen map P2–P7, PX) at the phone viewports in docs/UI_QA.md, each with
@@ -562,6 +563,45 @@ test("P3 at 360×800 and 320×700 with larger text: the cart summary is one line
     expect(await summaryLook(page), `${vp.width}x${vp.height}`).toEqual({ text, lines: 1 });
     await expect(summary).toHaveAccessibleName("Your order 2 items · ₩13,800");
   }
+  await ctx.close();
+});
+
+// Every kiosk's text-field hint (MALO, the airport rail ticket machine, the learned pizza kiosk), in both languages.
+const HINT_KEYS = ["inputPlaceholder", "ticketPlaceholder", "learnedPlaceholder"] as const;
+
+test("P3: every kiosk's input hint fits beside [Send] with larger text, in English and Korean (#1 8, I-133, R-019)", async ({
+  browser,
+  request,
+}, info) => {
+  const ctx = await browser.newContext({
+    viewport: VIEWPORTS[1],
+    locale: "en-US",
+    isMobile: true,
+    hasTouch: true,
+    extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.87" },
+  });
+  const page = await ctx.newPage();
+  await page.addInitScript(() => localStorage.setItem("kibo.phone.largeText", "on"));
+  await openPhone(page, request);
+  await page.getByRole("button", { name: "Start" }).click();
+  await page.getByRole("button", { name: "Type instead" }).click();
+  await page.getByRole("button", { name: "Eat here" }).click();
+  await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
+
+  // English at 360×800 ("e.g. Cheeseburger" with "set" cut, 15-judge-fixes:6), Korean down to 320×700 (R-019).
+  const en = page.getByRole("textbox", { name: "Type your order" });
+  await expect(en).toHaveAttribute("placeholder", pt("inputPlaceholder", "en"));
+  expect(await hintsCut(en, HINT_KEYS.map((k) => pt(k, "en"))), "English at 360×800").toEqual([]);
+  await check(page, info, "P3-hint-large", [VIEWPORTS[1]]);
+
+  await page.getByRole("button", { name: "Language and text size: English" }).click();
+  await page.getByRole("dialog", { name: "Language and text size" }).getByRole("button", { name: /^한국어/ }).click();
+  const ko = page.getByRole("textbox", { name: "주문을 글자로 입력" });
+  for (const vp of [VIEWPORTS[1], VIEWPORTS[3]]) {
+    await page.setViewportSize(vp);
+    expect(await hintsCut(ko, HINT_KEYS.map((k) => pt(k, "ko"))), `Korean at ${vp.width}x${vp.height}`).toEqual([]);
+  }
+  await check(page, info, "P3-hint-ko-large", [VIEWPORTS[3]]);
   await ctx.close();
 });
 

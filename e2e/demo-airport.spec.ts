@@ -38,7 +38,7 @@ test("airport rail on /demo: tickets on both halves, confirm, card stand-in, ref
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "talk");
   await expect(page.getByText("Eat here or take out?")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Two adult tickets to City Center on the express, please." })).toBeVisible();
-  await expect(page.getByRole("textbox", { name: "Type your order" })).toHaveAttribute("placeholder", "e.g. Two adults to City Center");
+  await expect(page.getByRole("textbox", { name: "Type your order" })).toHaveAttribute("placeholder", "e.g. 2 adults");
 
   let seq = 0;
   const ai = (type: string, args: object = {}) =>

@@ -52,10 +52,11 @@ const PHONE_TEXT = {
   undo: { ko: "되돌리기", en: "Undo" },
   examples: { ko: "이렇게 말해 보세요", en: "Try saying" },
   inputLabel: { ko: "주문을 글자로 입력", en: "Type your order" },
-  // Short enough for the field beside [Send] at 360px with larger text (I-133).
-  inputPlaceholder: { ko: "예: 치즈버거 세트", en: "e.g. Cheeseburger set" },
-  learnedPlaceholder: { ko: "예: 페퍼로니 라지 하나", en: "e.g. One large pepperoni" },
-  ticketPlaceholder: { ko: "예: 시티센터 어른 두 장", en: "e.g. Two adults to City Center" },
+  // Short enough for the field beside [Send]: English at 360px and Korean at 320px with larger text, and /demo at
+  // 1280px (I-133, R-019, #1 8; measured in e2e/qa/assistant.qa.spec.ts and demo.qa.spec.ts).
+  inputPlaceholder: { ko: "예: 버거 세트", en: "e.g. Burger set" },
+  learnedPlaceholder: { ko: "예: 페퍼로니", en: "e.g. Pepperoni" },
+  ticketPlaceholder: { ko: "예: 어른 2장", en: "e.g. 2 adults" },
   send: { ko: "보내기", en: "Send" },
   useButtons: {
     ko: "여기 버튼을 누르거나 키오스크 화면에서 주문할 수 있어요.",

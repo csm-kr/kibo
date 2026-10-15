@@ -1,5 +1,6 @@
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
-import { command, kioskRoot, openScenarios } from "../helpers";
+import { pt } from "@/lib/i18n/phone";
+import { command, hintsCut, kioskRoot, openScenarios } from "../helpers";
 import { HERO_ACTIONS, RAIL_ACTIONS } from "../recordedActions";
 import { DEMO, DEMO_GUIDE, qaState, type Findings } from "./checks";
 
@@ -359,6 +360,33 @@ test.describe(() => {
       }, [vp]);
       await page.unroute("**/api/chat");
     }
+  });
+});
+
+test.describe(() => {
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.88" } });
+
+  // #1 8 (I-133): the rail hint read "e.g. Two adults to City Cente" at 1280×720. Every kiosk's hint (MALO, the rail
+  // ticket machine, the learned pizza kiosk) at the narrowest judge size, with normal and larger text, in both languages.
+  test("D2 at 1280×720: every kiosk's input hint fits beside [Send], English and Korean, normal and larger text", async ({ page }, info) => {
+    const keys = ["inputPlaceholder", "ticketPlaceholder", "learnedPlaceholder"] as const;
+    await page.setViewportSize(VIEWPORTS[1]);
+    await startTalk(page);
+    const en = page.getByRole("textbox", { name: "Type your order" });
+    expect(await hintsCut(en, keys.map((k) => pt(k, "en"))), "English").toEqual([]);
+
+    await page.getByRole("button", { name: "Language and text size: English" }).click();
+    const sheet = page.getByRole("dialog", { name: "Language and text size" });
+    await sheet.getByRole("switch", { name: "Larger text" }).click();
+    await sheet.getByRole("button", { name: "Close" }).click();
+    await expect(phoneScreen(page)).toHaveAttribute("data-large-text", "true");
+    expect(await hintsCut(en, keys.map((k) => pt(k, "en"))), "English, larger text").toEqual([]);
+
+    await page.getByRole("button", { name: "Language and text size: English" }).click();
+    await page.getByRole("dialog", { name: "Language and text size" }).getByRole("button", { name: /^한국어/ }).click();
+    const ko = page.getByRole("textbox", { name: "주문을 글자로 입력" });
+    expect(await hintsCut(ko, keys.map((k) => pt(k, "ko"))), "Korean, larger text").toEqual([]);
+    await check(page, info, "D2-hint-ko-large", undefined, [VIEWPORTS[1]]);
   });
 });
 
