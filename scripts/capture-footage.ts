@@ -297,8 +297,9 @@ function scenarioClip(name: string, kioskId: string, scenarioId: string, dine: b
       await page.getByRole("button", { name: "Start", exact: true }).waitFor({ timeout: 120_000 });
       await rec.mark("intro");
       await newDemoSession(page, () => page.getByRole("button", { name: "Start", exact: true }).click());
-      const toggle = page.locator("[data-scenario-guide]").getByRole("button", { name: "Scenarios", exact: true });
-      if ((await toggle.getAttribute("aria-expanded")) === "false") await toggle.click();
+      // The third column's "Scenarios" tab (#1 E), unless it is selected already.
+      const tab = page.locator("[data-scenario-guide]").getByRole("tab", { name: "Scenarios" });
+      if ((await tab.count()) > 0 && (await tab.getAttribute("aria-selected")) !== "true") await tab.click();
       const s = await newDemoSession(page, () => page.locator(`[data-scenario="${scenarioId}"]`).click());
       const watch = watchSession(s.sessionId, xff(clip));
       try {

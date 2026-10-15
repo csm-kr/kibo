@@ -95,12 +95,11 @@ test("open at 1440 wide: each action in plain words with its tool and code, newe
 test.describe(() => {
   test.use({ viewport: { width: 1280, height: 720 } });
 
-  test("collapsed by default below 1440 wide, under the phone", async ({ page }) => {
+  test("at 1280 wide too it sits in the third column beside the phone, never under it (#1 E)", async ({ page }) => {
     await start(page);
-    await expect(page.locator("[data-demo-check] [data-action-strip]")).toHaveCount(1);
-    await expect(toggle(page)).toHaveAttribute("aria-expanded", "false");
-    await expect(strip(page).locator("[data-action-count]")).toHaveCount(0);
-    await toggle(page).click();
+    await expect(page.locator("[data-scenario-guide] [data-action-strip]")).toHaveCount(1);
+    await expect(page.locator("[data-demo-check] [data-action-strip]")).toHaveCount(0);
+    await expect(toggle(page)).toHaveAttribute("aria-expanded", "true");
     await expect(strip(page)).toContainText("Nothing yet.");
   });
 });

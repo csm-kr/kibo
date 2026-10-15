@@ -142,3 +142,57 @@ test.describe(() => {
     await expect(page).toHaveURL(/\/demo\?k=doughhouse$/);
   });
 });
+
+/** The column cards (kiosk, phone, scenarios and AI): box, look and the centre of each caption row's caption. */
+function columns(page: Page) {
+  return page.evaluate(() =>
+    [...document.querySelectorAll("[data-demo-column]")].map((el) => {
+      const r = el.getBoundingClientRect();
+      const c = el.querySelector("[data-column-caption]")?.getBoundingClientRect();
+      const cs = getComputedStyle(el);
+      return {
+        left: r.left,
+        top: r.top,
+        bottom: r.bottom,
+        caption: c ? c.top + c.height / 2 : null,
+        background: cs.backgroundColor,
+        radius: cs.borderTopLeftRadius,
+        shadow: cs.boxShadow,
+      };
+    }),
+  );
+}
+
+test.describe(() => {
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.92" } });
+
+  test("three white column cards start on one line, their numbered captions on one line, at every judge size (#1 E, R-022)", async ({ page, request }) => {
+    const s = await start(page);
+    await command(request, s.deviceToken, { sessionId: s.sessionId, type: "setDineOption", args: { option: "eat_in" }, source: "button" });
+    await expect(page.getByRole("heading", { name: "Kiosk · unchanged" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Your phone" })).toBeVisible();
+    for (const vp of SIZES) {
+      await page.setViewportSize(vp);
+      const at = `${vp.width}x${vp.height}`;
+      const cols = await columns(page);
+      expect(cols, `${at}: three columns, beside the phone at every size`).toHaveLength(3);
+      expect(cols[0].left < cols[1].left && cols[1].left < cols[2].left, `${at}: kiosk, phone, then the third column`).toBe(true);
+      for (const [i, c] of cols.entries()) {
+        expect(Math.abs(c.top - cols[0].top), `${at}: column ${i + 1} top`).toBeLessThanOrEqual(1);
+        expect(Math.abs(c.bottom - cols[0].bottom), `${at}: column ${i + 1} bottom`).toBeLessThanOrEqual(1);
+        expect(c.caption, `${at}: column ${i + 1} caption`).not.toBeNull();
+        expect(Math.abs(c.caption! - cols[0].caption!), `${at}: column ${i + 1} caption centre`).toBeLessThanOrEqual(1);
+        expect(c.background, `${at}: column ${i + 1} is white`).toBe("rgb(255, 255, 255)");
+        expect(c.radius, `${at}: column ${i + 1} radius (rounded-sheet)`).toBe("26px");
+        expect(c.shadow, `${at}: column ${i + 1} shadow (shadow-card)`).toContain("rgba(21, 23, 28, 0.06)");
+      }
+      // The numbers say the order to look in: the kiosk, the phone, then what to try and what the AI did.
+      await expect(page.locator("[data-demo-column] [data-column-number]")).toHaveText(["1", "2", "3"]);
+      const scroll = await page.evaluate(() => [
+        document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        document.documentElement.scrollHeight - document.documentElement.clientHeight,
+      ]);
+      expect(scroll, `${at}: page scroll`).toEqual([0, 0]);
+    }
+  });
+});

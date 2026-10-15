@@ -7,7 +7,6 @@ import type { AgentAction } from "@/lib/agent/actions";
 import { actionRow } from "@/lib/demo/actions";
 import { pt } from "@/lib/i18n/phone";
 import type { KioskData, Locale } from "@/types/menu";
-import type { SessionStatus } from "@/types/session";
 import { ScrollFade } from "./ScrollFade";
 
 // D2 "What the AI did" (/demo only): each tool call Gemini made and what the KIBO server answered, in plain words
@@ -18,19 +17,12 @@ interface Props {
   kiosk: KioskData;
   actions: AgentAction[];
   locale: Locale;
-  status: SessionStatus | null;
-  /** In the scenario column beside the phone (from 1440px wide), so it never takes the phone's height (I-084). */
-  beside: boolean;
 }
 
-export function ActionStrip({ kiosk, actions, locale, status, beside }: Props) {
-  const [open, setOpen] = useState(beside);
+/** In the third column beside the phone at every judge size (#1 E), so it never takes the phone's height (I-084). */
+export function ActionStrip({ kiosk, actions, locale }: Props) {
+  const [open, setOpen] = useState(true);
   const newestFirst = [...actions].reverse();
-
-  // Under the phone, the confirm card needs the phone's full height: even folded, the strip pushed [Yes, pay now]
-  // below the fold (I-129, R-009). It steps aside until the order leaves the review, then comes back as it was.
-  // The end card after payment needs it too: [Try again] and the other places (design QA 10-15, #1 14).
-  if ((status === "confirming" || status === "paid") && !beside) return null;
 
   return (
     <section
@@ -66,8 +58,7 @@ export function ActionStrip({ kiosk, actions, locale, status, beside }: Props) {
           tabIndex={0}
           className={`flex min-h-0 flex-1 scroll-pb-8 flex-col gap-2 overflow-y-auto rounded-tile px-3 pb-2 ${FOCUS}`}
         >
-          {/* Under the phone the strip has about 80px open (1280x720): the rows come first there (design QA 10-15, #1 15). */}
-          {beside && <p className="text-base text-muted">{pt("aiActionsLegend", locale)}</p>}
+          <p className="text-base text-muted">{pt("aiActionsLegend", locale)}</p>
           {actions.length === 0 ? (
             <p className="text-base text-[#33302B]">{pt("aiActionsEmpty", locale)}</p>
           ) : (

@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowLeft, CreditCard } from "lucide-react";
-import { useCallback, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useRef, useState } from "react";
 import { AssistantPanel, type SayFn } from "@/components/assistant/AssistantPanel";
 import { ICON, PRESS, QUIET, SECONDARY } from "@/components/phone/ui";
 import { KioskCanvas } from "@/components/kiosk/KioskCanvas";
@@ -14,12 +14,12 @@ import type { AgentAction } from "@/lib/agent/actions";
 import { examplesFor } from "@/lib/agent/examples";
 import { buildComparison, HERO_KIOSK } from "@/lib/demo/compare";
 import { EDIT_PATH_TAPS, HUMAN_RUNS, TOUCH_RUN } from "@/lib/demo/evidence";
-import { scenariosFor } from "@/lib/demo/scenarios";
 import { demoKioskStep, PAYMENT_STEP } from "@/lib/kiosk/pairing";
 import { uiLocale, type SpeechLanguage } from "@/lib/i18n/languages";
 import { pt } from "@/lib/i18n/phone";
 import type { KioskData, Locale } from "@/types/menu";
 import { ActionStrip } from "./ActionStrip";
+import { Caption, COLUMN, COLUMN_HEAD } from "./column";
 import { CompareCard } from "./CompareCard";
 import { DemoEndCard } from "./DemoEndCard";
 import { DemoFrame } from "./DemoFrame";
@@ -36,8 +36,6 @@ import { ScenarioGuide } from "./ScenarioGuide";
 const DEMO_CHAT_LIMIT = 30;
 /** Rows kept in "What the AI did". */
 const MAX_ACTIONS = 50;
-/** The judge laptop (docs/UI_QA.md 1440×900) and wider: room for a third column. */
-const WIDE = "(min-width: 1440px)";
 /** On the kiosk's dark frame an ink ring would not show; white keeps the focus visible (WCAG 2.4.7). */
 const FOCUS_ON_DARK = "focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-white";
 /**
@@ -63,12 +61,6 @@ interface Run {
 }
 type Counted = "sentences" | "phoneTaps" | "kioskTaps";
 
-function subscribeWide(cb: () => void) {
-  const mq = window.matchMedia(WIDE);
-  mq.addEventListener("change", cb);
-  return () => mq.removeEventListener("change", cb);
-}
-
 export function DemoApp({ kiosk }: { kiosk: KioskData }) {
   const demo = useDemoSession(kiosk.kioskId);
   // The phone half's AI language (14-final:4); its screens are Korean or English.
@@ -87,9 +79,6 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
   const learned = kiosk.kind === "learned";
   // What the AI did in this demo order; another session id means [Try again] started a new one.
   const [actions, setActions] = useState<{ sessionId: string; list: AgentAction[] }>({ sessionId: "", list: [] });
-
-  // From 1440px wide the scenario column opens beside the phone and holds "What the AI did" (I-132, I-084).
-  const wide = useSyncExternalStore(subscribeWide, () => window.matchMedia(WIDE).matches, () => false);
 
   const [run, setRun] = useState<Run | null>(null);
   // The session whose order number the kiosk shows (past its receipt question), for the English step line.
@@ -149,22 +138,13 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
         })}
       />
     ) : undefined;
-  const beside = !ownPhone && wide && scenariosFor(kiosk.kioskId).length > 0;
   const numberShown = session !== null && numberFor === session.sessionId;
   // The step area under the kiosk: not with the judge's own phone (the pairing panel says the step, and the kiosk's
   // own K7 takes the card) nor on a learned kiosk (its page has its own strip).
   const guided = !ownPhone && !learned;
   const step = guided && session ? demoKioskStep(kiosk, session, numberShown) : null;
   const actionStrip = (
-    <ActionStrip
-      // Moving between the columns remounts it, so it opens or folds for where it now is.
-      key={beside ? "beside" : "under"}
-      kiosk={kiosk}
-      actions={actions.sessionId === tokens.sessionId ? actions.list : []}
-      locale={locale}
-      status={session?.status ?? null}
-      beside={beside}
-    />
+    <ActionStrip kiosk={kiosk} actions={actions.sessionId === tokens.sessionId ? actions.list : []} locale={locale} />
   );
   const endCard = (
     <DemoEndCard kioskId={kiosk.kioskId} locale={locale} learned={learned} compare={compare} onTryAgain={tryAgain} onIntro={demo.stop} />
@@ -179,111 +159,111 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
     <>
       <NarrowNotice kioskId={kiosk.kioskId} />
       <DemoFrame kioskId={kiosk.kioskId} askBeforeLeaving={openOrder} className="max-[899px]:hidden">
+        {/* Three white column cards on one top line under the top bar (#1 E). The kiosk column takes the width the
+            phone and the third column leave, so the row spans the bar; the kiosk inside it is as tall as the column
+            allows and keeps 9:16. The learned page has its own width (1080:1600 and its strip) and the third column
+            takes the rest. */}
         <main
           data-demo="split"
           data-demo-kiosk={kiosk.kioskId}
           data-demo-own-phone={ownPhone || undefined}
-          className="mx-auto flex min-h-0 w-full max-w-[1600px] flex-1 justify-center gap-6 px-4 pb-4"
+          className="mx-auto flex min-h-0 w-full max-w-[1600px] flex-1 gap-4 px-6 pb-4 min-[1440px]:gap-5"
         >
-          {/* 120px = the top bar 64 + bottom padding 16 + caption 32 + gap 8, so the canvas (9:16, or the learned page's
-              1080:1600) fills the height. With the step area under the kiosk, 272px: its usual 144 (two lines of the
-              payment step and the card reader) and its gap 8. The column is at least 320px, so the card reader's label
-              stays on one line; where the area is taller or the column wider (1280×720), the kiosk's frame keeps 9:16 and
-              centres, so the page shows beside it, never a dark band (#1 items 10, 19). */}
           <section
+            data-demo-column
             aria-labelledby="demo-kiosk-caption"
-            className={`flex h-full flex-none flex-col gap-2 ${
-              learned
-                ? "w-[calc((100dvh-120px)*27/40)]"
-                : guided
-                  ? "w-[max(320px,calc((100dvh-272px)*9/16))]"
-                  : "w-[calc((100dvh-120px)*9/16)]"
-            }`}
+            className={`${COLUMN} ${learned ? "w-[calc((100dvh-136px)*27/40)] flex-none" : "min-w-0 flex-1"}`}
           >
-            <Caption id="demo-kiosk-caption" text={environmentOf(kiosk.kioskId).caption} />
-            <div
-              className={`min-h-0 flex-1 overflow-hidden rounded-[18px] ${guided ? "aspect-[9/16] max-w-full self-center" : ""}`}
-              onPointerDownCapture={countTap("kioskTaps")}
-            >
-              {learned ? (
-                // Keyed by session: [Try again] reloads the kiosk page, so the new order never starts on the old cart.
-                <LearnedKioskHost
-                  key={tokens.sessionId}
-                  kiosk={kiosk}
-                  session={session}
-                  kioskToken={tokens.kioskToken}
-                  claimUrl={tokens.claimUrl}
-                  clockOffset={demo.clockOffset}
-                  strip
-                />
-              ) : (
-                <KioskCanvas theme={kiosk.theme} locale={kiosk.locale}>
-                  <KioskScreen
+            <div className={COLUMN_HEAD}>
+              <Caption id="demo-kiosk-caption" n={1} {...environmentOf(kiosk.kioskId).caption} />
+            </div>
+            <div className="flex min-h-0 flex-1 flex-col items-center gap-2">
+              <div
+                className={`min-h-0 flex-1 overflow-hidden ${learned ? "w-full" : "aspect-[9/16] max-w-full"}`}
+                onPointerDownCapture={countTap("kioskTaps")}
+              >
+                {learned ? (
+                  // Keyed by session: [Try again] reloads the kiosk page, so the new order never starts on the old cart.
+                  <LearnedKioskHost
+                    key={tokens.sessionId}
                     kiosk={kiosk}
                     session={session}
                     kioskToken={tokens.kioskToken}
                     claimUrl={tokens.claimUrl}
-                    pairCode={tokens.pairCode}
-                    pairUrl={tokens.pairUrl}
-                    // No `demo` (the &demo=1 tap counter) and no onStartOver ([처음으로]): a new session would drop
-                    // the judge's order (I-135, I-048). onClaimUrl ([Connect another phone]) only with the judge's own
-                    // phone; with the phone half a new QR would void this page's own phone (I-066).
-                    onClaimUrl={ownPhone ? demo.setClaimUrl : undefined}
                     clockOffset={demo.clockOffset}
-                    // A send found the session gone or expired: start over. A paid order stays for the end card.
-                    onNewSession={() => {
-                      if (session?.status !== "paid") tryAgain();
-                    }}
-                    cardTap={cardTap}
-                    keepOrderNumber
-                    onOrderNumber={setNumberFor}
-                    retrying={demo.streamState === "retrying"}
+                    strip
                   />
-                </KioskCanvas>
-              )}
-            </div>
-            {/* A fixed area under the kiosk from D2 to D3 (#1 item 19): the payment step's content, drawn invisibly in the
-                same grid cell, keeps it at that height on every step, so the kiosk above never resizes or moves. */}
-            {guided && (
-              <div className="grid flex-none">
-                <div aria-hidden className="invisible col-start-1 row-start-1 flex flex-col gap-2">
-                  <p className={STEP_LINE}>{PAYMENT_STEP}</p>
-                  <div className={READER}>
-                    <div className={READER_BUTTON}>Kiosk: insert card (demo)</div>
+                ) : (
+                  <KioskCanvas theme={kiosk.theme} locale={kiosk.locale}>
+                    <KioskScreen
+                      kiosk={kiosk}
+                      session={session}
+                      kioskToken={tokens.kioskToken}
+                      claimUrl={tokens.claimUrl}
+                      pairCode={tokens.pairCode}
+                      pairUrl={tokens.pairUrl}
+                      // No `demo` (the &demo=1 tap counter) and no onStartOver ([처음으로]): a new session would drop
+                      // the judge's order (I-135, I-048). onClaimUrl ([Connect another phone]) only with the judge's own
+                      // phone; with the phone half a new QR would void this page's own phone (I-066).
+                      onClaimUrl={ownPhone ? demo.setClaimUrl : undefined}
+                      clockOffset={demo.clockOffset}
+                      // A send found the session gone or expired: start over. A paid order stays for the end card.
+                      onNewSession={() => {
+                        if (session?.status !== "paid") tryAgain();
+                      }}
+                      cardTap={cardTap}
+                      keepOrderNumber
+                      onOrderNumber={setNumberFor}
+                      retrying={demo.streamState === "retrying"}
+                    />
+                  </KioskCanvas>
+                )}
+              </div>
+              {/* A fixed area under the kiosk from D2 to D3 (#1 item 19): the payment step's content, drawn invisibly in
+                  the same grid cell, keeps it at that height on every step, so the kiosk above never resizes or moves. */}
+              {guided && (
+                <div className="grid w-full flex-none px-4 pb-4">
+                  <div aria-hidden className="invisible col-start-1 row-start-1 flex flex-col gap-2">
+                    <p className={STEP_LINE}>{PAYMENT_STEP}</p>
+                    <div className={READER}>
+                      <div className={READER_BUTTON}>Kiosk: insert card (demo)</div>
+                    </div>
+                  </div>
+                  <div className="col-start-1 row-start-1 flex flex-col gap-2">
+                    {/* The kiosk stays Korean; KIBO says its step in English (with the judge's own phone the pairing panel does). */}
+                    {step && (
+                      <p data-kiosk-step aria-live="polite" className={STEP_LINE}>
+                        {step}
+                      </p>
+                    )}
+                    {/* The card reader stands in under the kiosk, drawn as part of its frame: only the kiosk takes payment,
+                        so the phone half has no button that pays (15-judge-fixes:2). It counts as a kiosk tap. With the
+                        judge's own phone, the kiosk's own K7 buttons are used, as before. */}
+                    {session?.status === "paying" && (
+                      <div data-card-reader className={READER} onPointerDownCapture={countTap("kioskTaps")}>
+                        <button
+                          type="button"
+                          onClick={() => cardTap.dispatchEvent(new Event("tap"))}
+                          style={{ backgroundColor: kiosk.theme.accent }}
+                          className={`${READER_BUTTON} ${PRESS} ${FOCUS_ON_DARK}`}
+                        >
+                          <CreditCard {...ICON} />
+                          Kiosk: insert card (demo)
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
-                <div className="col-start-1 row-start-1 flex flex-col gap-2">
-                  {/* The kiosk stays Korean; KIBO says its step in English (with the judge's own phone the pairing panel does). */}
-                  {step && (
-                    <p data-kiosk-step aria-live="polite" className={STEP_LINE}>
-                      {step}
-                    </p>
-                  )}
-                  {/* The card reader stands in under the kiosk, drawn as part of its frame: only the kiosk takes payment,
-                      so the phone half has no button that pays (15-judge-fixes:2). It counts as a kiosk tap. With the
-                      judge's own phone, the kiosk's own K7 buttons are used, as before. */}
-                  {session?.status === "paying" && (
-                    <div data-card-reader className={READER} onPointerDownCapture={countTap("kioskTaps")}>
-                      <button
-                        type="button"
-                        onClick={() => cardTap.dispatchEvent(new Event("tap"))}
-                        style={{ backgroundColor: kiosk.theme.accent }}
-                        className={`${READER_BUTTON} ${PRESS} ${FOCUS_ON_DARK}`}
-                      >
-                        <CreditCard {...ICON} />
-                        Kiosk: insert card (demo)
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </section>
           {ownPhone ? (
             // A slim status column: the QR and code are on the kiosk half's own screen (14-final:1).
-            <section aria-labelledby="demo-phone-caption" className="flex h-full w-[clamp(320px,26vw,440px)] flex-none flex-col gap-2">
-              <Caption id="demo-phone-caption" text="Your own phone (KIBO)" />
-              <div className="min-h-0 flex-1 overflow-hidden rounded-sheet shadow-card">
+            <section data-demo-column aria-labelledby="demo-phone-caption" className={`${COLUMN} w-[clamp(320px,26vw,440px)] flex-none`}>
+              <div className={COLUMN_HEAD}>
+                <Caption id="demo-phone-caption" n={2} name="Your own phone" />
+              </div>
+              <div className="min-h-0 flex-1 overflow-hidden">
                 <PairingPanel
                   kiosk={kiosk}
                   session={session}
@@ -305,16 +285,16 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
             </section>
           ) : (
             <section
+              data-demo-column
               data-demo-check
               aria-labelledby="demo-phone-caption"
-              className="flex h-full w-[clamp(400px,32vw,480px)] flex-none flex-col gap-2"
+              className={`${COLUMN} w-[clamp(400px,32vw,480px)] flex-none`}
             >
-              <Caption id="demo-phone-caption" text="Your phone (KIBO)" />
-              {/* 480px: the phone header at 200% text needs about 450 (WCAG 1.4.4), so the action strip under it gives way first. */}
-              <div
-                className="min-h-[480px] flex-1 overflow-hidden rounded-sheet shadow-card"
-                onPointerDownCapture={countTap("phoneTaps")}
-              >
+              <div className={COLUMN_HEAD}>
+                <Caption id="demo-phone-caption" n={2} name="Your phone" />
+              </div>
+              {/* 480px: the phone header at 200% text needs about 450 (WCAG 1.4.4). */}
+              <div className="min-h-[480px] flex-1 overflow-hidden" onPointerDownCapture={countTap("phoneTaps")}>
                 <AssistantPanel
                   key={tokens.sessionId}
                   kiosk={kiosk}
@@ -343,7 +323,6 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
                   }
                 />
               </div>
-              {!beside && actionStrip}
             </section>
           )}
           <ScenarioGuide
@@ -356,8 +335,9 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
             starting={demo.starting}
             startFailed={demo.error !== null}
             onFresh={tryAgain}
-            wide={wide}
-            aside={beside ? actionStrip : undefined}
+            className={learned ? "min-w-80 flex-1" : "w-[clamp(320px,26vw,400px)] flex-none"}
+            // The judge's own phone: its messages and the AI's tool calls happen on that phone, so there is nothing to list.
+            aside={ownPhone ? undefined : actionStrip}
           />
         </main>
       </DemoFrame>
@@ -380,13 +360,5 @@ function NarrowNotice({ kioskId }: { kioskId: string }) {
         Open the kiosk
       </a>
     </main>
-  );
-}
-
-function Caption({ id, text }: { id: string; text: string }) {
-  return (
-    <h2 id={id} className="flex h-8 flex-none items-center text-base font-bold text-[#33302B]">
-      {text}
-    </h2>
   );
 }

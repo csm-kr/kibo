@@ -37,8 +37,8 @@ test("judge path: intro, order on both halves, confirm, card stand-in, order num
 
   const s = await startDemo(page, "Start");
   expect(s.deviceToken).toBeTruthy();
-  await expect(page.getByRole("heading", { name: "Burger shop kiosk (unchanged)" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Your phone (KIBO)" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Kiosk · unchanged" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Your phone", exact: true })).toBeVisible();
   // The demo's phone is connected from the start, so both halves ask for the dine option.
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "dine");
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "dine");

@@ -147,8 +147,9 @@ async function demoSnapshot(browser: Browser, n: number, kioskId: string, scenar
       await page.goto(`${BASE}/demo?k=${kioskId}`);
       await page.getByRole("button", { name: "Start", exact: true }).click({ timeout: 120_000 });
       const guide = page.locator("[data-scenario-guide]");
-      const toggle = guide.getByRole("button", { name: "Scenarios", exact: true });
-      if ((await toggle.getAttribute("aria-expanded")) === "false") await toggle.click();
+      // The third column's "Scenarios" tab (#1 E), unless it is selected already.
+      const tab = guide.getByRole("tab", { name: "Scenarios" });
+      if ((await tab.count()) > 0 && (await tab.getAttribute("aria-selected")) !== "true") await tab.click();
       await page.locator(`[data-scenario="${scenarioId}"]`).click();
       if (dine) {
         await page.locator("[data-phone-screen]").getByRole("button", { name: "Eat here" }).click();

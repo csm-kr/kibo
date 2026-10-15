@@ -26,7 +26,7 @@ async function startAirportDemo(page: Page): Promise<DemoSession> {
   await page.getByRole("button", { name: "Start", exact: true }).click();
   const json = (await (await created).json()) as DemoSession & { ok: boolean };
   expect(json.ok).toBe(true);
-  await expect(page.getByRole("heading", { name: "Airport rail ticket machine (unchanged)" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Ticket machine · unchanged" })).toBeVisible();
   return json;
 }
 

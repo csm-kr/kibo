@@ -4,11 +4,11 @@ import { expect, type APIRequestContext, type Browser, type Locator, type Page }
 // Shared steps for the kiosk E2E specs. The "phone" here is plain HTTP calls with the device token,
 // the same calls /assistant will make.
 
-/** Opens the /demo scenario guide unless it is open already (it opens by default from 1440px wide). */
+/** Shows the /demo scenario guide: the third column's "Scenarios" tab, unless it is selected already (#1 E). */
 export async function openScenarios(page: Page): Promise<void> {
-  const toggle = page.locator("[data-scenario-guide]").getByRole("button", { name: "Scenarios", exact: true });
-  if ((await toggle.getAttribute("aria-expanded")) === "false") await toggle.click();
-  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  const tab = page.locator("[data-scenario-guide]").getByRole("tab", { name: "Scenarios" });
+  if ((await tab.count()) > 0 && (await tab.getAttribute("aria-selected")) !== "true") await tab.click();
+  await expect(page.locator("#demo-scenario-guide")).toBeVisible();
 }
 
 /** The kiosk root; `data-screen` names the screen (attract, dine, menu, review, payment, done). */

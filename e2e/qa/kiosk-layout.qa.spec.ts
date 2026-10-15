@@ -222,8 +222,8 @@ for (const viewport of [
         expect.soft(Math.abs(at.scale - first.scale), `${at.state}: scale ${at.scale} vs ${first.scale}`).toBeLessThanOrEqual(0.0005);
         expect.soft(at.darkBand, `${at.state}: dark band beside the kiosk (#1 item 10)`).toBeLessThanOrEqual(0.5);
       }
-      // Level with the phone column: both start under their captions.
-      const phoneTop = await page.locator("[data-demo-check] > div").first().evaluate((el) => el.getBoundingClientRect().top);
+      // Level with the phone column: both start under their caption rows.
+      const phoneTop = await page.locator("[data-phone-screen]").evaluate((el) => el.getBoundingClientRect().top);
       expect(Math.abs(first.top - phoneTop)).toBeLessThanOrEqual(0.5);
     });
   });

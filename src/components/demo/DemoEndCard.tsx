@@ -21,10 +21,19 @@ export function DemoEndCard(props: {
 }) {
   const { locale } = props;
   // The phone column is short on a laptop, so the next steps are brought into view when the card appears; a judge
-  // should never have to hunt for them (14-final:1). "nearest" moves nothing when they already show.
+  // should never have to hunt for them (14-final:1). "nearest" moves nothing when they already show. The same when
+  // the window then narrows: under the /demo top bar the column lost the room that kept them in view (#1 E, #1 14).
   const othersRef = useRef<HTMLElement>(null);
   useEffect(() => {
-    othersRef.current?.scrollIntoView({ block: "nearest" });
+    const others = othersRef.current;
+    if (!others) return;
+    const keep = () => others.scrollIntoView({ block: "nearest" });
+    keep();
+    const area = others.closest("[data-phone-scroll]");
+    if (!area) return;
+    const resize = new ResizeObserver(keep);
+    resize.observe(area);
+    return () => resize.disconnect();
   }, []);
   const others = (
     <nav ref={othersRef} aria-labelledby="demo-other-places" className="flex scroll-mb-4 flex-col gap-2">
