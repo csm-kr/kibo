@@ -41,7 +41,7 @@ const MIC_HINT_KEY = "kibo.phone.micHintSeen";
 const noSubscribe = () => () => {};
 /** Under this many seconds a /demo order shows its voice time left. */
 const SHOW_VOICE_LEFT = 60;
-/** The cart summary's height with its padding, in rem; it may wrap to two lines with larger text. */
+/** Room kept for the cart summary, in rem: its one-line pill (3.5rem) and padding, with some to spare. */
 const SUMMARY_REM = 6;
 
 interface Props {
@@ -551,10 +551,17 @@ export function AssistantPanel(props: Props) {
                 type="button"
                 data-cart-summary
                 onClick={() => cartEnd.current?.scrollIntoView({ block: "end" })}
-                className={`flex min-h-14 w-full items-center justify-between gap-2 rounded-full bg-white px-4 text-xl font-semibold text-kibo-deep shadow-card ${PRESS} ${FOCUS}`}
+                className={`@container flex min-h-14 w-full items-center justify-between gap-2 rounded-full bg-white px-4 text-xl font-semibold text-kibo-deep shadow-card ${PRESS} ${FOCUS}`}
               >
-                <span className="min-w-0 text-left">
-                  {pt("cartTitle", locale, kiosk.domain)} {itemCount(itemsInCart, locale)} · {formatWon(session.total, locale)}
+                {/* One line (#1 9): it wrapped to two at 360px with larger text. The title gives way first, to screen
+                    readers only, with larger text or when the pill is too narrow for it; the count and total stay. */}
+                <span className="flex min-w-0 gap-2 text-left whitespace-nowrap">
+                  <span className={props.largeText ? "sr-only" : "min-w-0 truncate @max-[19rem]:sr-only"}>
+                    {pt("cartTitle", locale, kiosk.domain)}{" "}
+                  </span>
+                  <span>
+                    {itemCount(itemsInCart, locale)} · {formatWon(session.total, locale)}
+                  </span>
                 </span>
                 <ChevronRight {...ICON} />
               </button>
