@@ -302,7 +302,9 @@ export function AssistantPanel(props: Props) {
   useEffect(() => {
     const el = cartEnd.current;
     if (!el) return;
-    const io = new IntersectionObserver(([entry]) => setCartInView(entry.isIntersecting));
+    // The newest record: a busy main thread can hand over several at once, and the first of them is stale (it left
+    // the summary off on /demo with the total out of view, 1 of 6 runs of D2-hero-summary, #1 18).
+    const io = new IntersectionObserver((entries) => setCartInView(entries[entries.length - 1].isIntersecting));
     io.observe(el);
     return () => io.disconnect();
   }, [screen]);
