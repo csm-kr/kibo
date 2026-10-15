@@ -183,8 +183,10 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
               )}
             </div>
             <div className="flex min-h-0 flex-1 flex-col items-center">
+              {/* The kiosk's frame keeps 9:16, so nothing is left beside the canvas; its dark fill is cleared because the
+                  centred frame starts on a fraction of a pixel, where the fill showed as a dark hairline (#1 E). */}
               <div
-                className={`min-h-0 flex-1 overflow-hidden ${learned ? "w-full" : "aspect-[9/16] max-w-full"}`}
+                className={`min-h-0 flex-1 overflow-hidden ${learned ? "w-full" : "aspect-[9/16] max-w-full *:bg-transparent"}`}
                 onPointerDownCapture={countTap("kioskTaps")}
               >
                 {learned ? (

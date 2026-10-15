@@ -123,7 +123,7 @@ function kioskBox(page: Page) {
     const f = frame.getBoundingClientRect();
     const painted = getComputedStyle(frame).backgroundColor !== "rgba(0, 0, 0, 0)";
     const uncovered = Math.max(r.left - f.left, f.right - r.right, r.top - f.top, f.bottom - r.bottom);
-    return { top: r.top, height: r.height, scale: r.width / 1080, darkBand: painted ? Math.max(0, uncovered) : 0 };
+    return { top: r.top, height: r.height, scale: r.width / 1080, darkBand: painted ? Math.max(0, uncovered) : 0, painted };
   });
 }
 
@@ -142,7 +142,11 @@ test.describe("/demo", () => {
     await expect(kioskRoot(page)).toHaveAttribute("data-screen", "payment");
     await expect(page.locator("[data-card-reader]")).toBeVisible();
     // The step line and the card reader take height here, which once left a dark band of 49.5px on each side.
-    expect((await kioskBox(page)).darkBand).toBeLessThanOrEqual(0.5);
+    const box = await kioskBox(page);
+    expect(box.darkBand).toBeLessThanOrEqual(0.5);
+    // No dark fill behind the canvas at all: the centred frame starts on a fraction of a pixel, where the fill showed
+    // as a dark hairline along the kiosk's edge (#1 E).
+    expect(box.painted, "the kiosk frame's dark fill on /demo").toBe(false);
   });
 
   test("D3: once the order number is on the kiosk, the step line stops asking the receipt question (#1 item 13)", async ({ page, request }) => {
