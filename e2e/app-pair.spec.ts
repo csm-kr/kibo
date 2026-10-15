@@ -41,7 +41,7 @@ test("only /app/scan may use the camera", async ({ request }) => {
   }
 });
 
-test("the code on the kiosk, typed on /app, connects the phone; a wrong code says so", async ({ browser, page }) => {
+test("the code on the kiosk, typed on /app, connects the phone; a wrong code says so", async ({ browser, page, baseURL }) => {
   const kioskContext = await browser.newContext({ viewport: { width: 1080, height: 1920 }, extraHTTPHeaders: { "X-Forwarded-For": ADDRESS } });
   const kiosk = await kioskContext.newPage();
   await kiosk.goto("/kiosk?k=malo");
@@ -50,7 +50,7 @@ test("the code on the kiosk, typed on /app, connects the phone; a wrong code say
   await expect(codeEl).toBeVisible();
   const code = (await codeEl.getAttribute("data-pair-code")) ?? "";
   expect(code).toMatch(/^\d{6}$/);
-  await expect(kiosk.getByText("localhost:3100/app")).toBeVisible();
+  await expect(kiosk.getByText(`${new URL(baseURL ?? "").host}/app`)).toBeVisible();
 
   await page.goto("/app");
   const field = page.getByLabel("Enter the 6-digit code shown on the kiosk");

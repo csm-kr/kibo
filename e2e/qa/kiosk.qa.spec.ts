@@ -21,7 +21,7 @@ async function check(page: Page, info: TestInfo, state: string, afterShot?: () =
   if (STRICT) expect.soft(f.t, `${state}: T misses`).toEqual([]);
 }
 
-test("touch path: K1 to K8", async ({ page }, info) => {
+test("touch path: K1 to K8", async ({ page, baseURL }, info) => {
   // A fake clock that runs normally, so the K8 countdowns can be moved back while the checks run.
   await page.clock.install();
   await page.goto("/kiosk?k=malo");
@@ -34,7 +34,7 @@ test("touch path: K1 to K8", async ({ page }, info) => {
   const pairUrl = page.locator("[data-pair-url]");
   await expect(pairUrl).toHaveText("kibo-2026.web.app");
   expect(await textLines(pairUrl)).toBe(1);
-  expect(new URL((await page.locator("img[data-claim-url]").getAttribute("data-claim-url")) ?? "").origin).toBe("http://localhost:3200");
+  expect(new URL((await page.locator("img[data-claim-url]").getAttribute("data-claim-url")) ?? "").origin).toBe(new URL(baseURL ?? "").origin);
   await check(page, info, "K1-attract");
 
   // The scaled size /demo uses, for the record; sizes are measured on the full canvas only.
