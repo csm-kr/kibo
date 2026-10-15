@@ -20,6 +20,8 @@ export function PairingPanel(props: {
   /** What to open on the phone, from the server (SHORT_APP_URL or <host>/app); else the claim URL's host. */
   pairUrl?: string | null;
   clockOffset: number;
+  /** /demo: the kiosk beside it shows the order number, past its receipt question (#1 item 13). */
+  numberShown?: boolean;
   /** /demo: the end card ([Try again], other places) once the order is done. */
   children?: ReactNode;
 }) {
@@ -39,7 +41,7 @@ export function PairingPanel(props: {
   ];
   const change = session ? changeLine(session) : null;
   // The kiosk stays Korean; this says its step in English (payment buttons, "no money is charged").
-  const step = session ? kioskStep(kiosk, session) : null;
+  const step = session ? kioskStep(kiosk, session, props.numberShown) : null;
 
   return (
     <aside

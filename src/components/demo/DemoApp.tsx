@@ -84,6 +84,8 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
   const wide = useSyncExternalStore(subscribeWide, () => window.matchMedia(WIDE).matches, () => false);
 
   const [run, setRun] = useState<Run | null>(null);
+  // The session whose order number the kiosk shows (past its receipt question), for the English step line.
+  const [numberFor, setNumberFor] = useState<string | null>(null);
   /** Every new demo order goes through here, so its counts start at zero. `ownPhone`: "Use my phone instead". */
   function startOrder(ownPhone: boolean) {
     setRun({ forId: null, after: demo.tokens?.sessionId ?? null, startAt: Date.now(), sentences: 0, phoneTaps: 0, kioskTaps: 0 });
@@ -138,7 +140,8 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
       />
     ) : undefined;
   const beside = !ownPhone && wide && scenariosFor(kiosk.kioskId).length > 0;
-  const step = session ? kioskStep(kiosk, session) : null;
+  const numberShown = session !== null && numberFor === session.sessionId;
+  const step = session ? kioskStep(kiosk, session, numberShown) : null;
   const actionStrip = (
     <ActionStrip
       // Moving between the columns remounts it, so it opens or folds for where it now is.
@@ -210,6 +213,7 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
                   }}
                   cardTap={cardTap}
                   keepOrderNumber
+                  onOrderNumber={setNumberFor}
                   retrying={demo.streamState === "retrying"}
                 />
               </KioskCanvas>
@@ -237,7 +241,14 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
           <section aria-labelledby="demo-phone-caption" className="flex h-full w-[clamp(320px,26vw,440px)] flex-none flex-col gap-2">
             <Caption id="demo-phone-caption" text="Your own phone (KIBO)" />
             <div className="min-h-0 flex-1 overflow-hidden rounded-sheet shadow-card">
-              <PairingPanel kiosk={kiosk} session={session} claimUrl={tokens.claimUrl} pairUrl={tokens.pairUrl} clockOffset={demo.clockOffset}>
+              <PairingPanel
+                kiosk={kiosk}
+                session={session}
+                claimUrl={tokens.claimUrl}
+                pairUrl={tokens.pairUrl}
+                clockOffset={demo.clockOffset}
+                numberShown={numberShown}
+              >
                 {ended ? (
                   endCard
                 ) : (

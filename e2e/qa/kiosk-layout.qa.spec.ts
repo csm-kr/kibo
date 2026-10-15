@@ -113,4 +113,22 @@ test.describe("/demo", () => {
     expect(box.sideSpace).toBeGreaterThan(1);
     expect(box.letterbox).toBe("rgba(0, 0, 0, 0)");
   });
+
+  test("D3: once the order number is on the kiosk, the step line stops asking the receipt question (#1 item 13)", async ({ page, request }) => {
+    const s = await startDemo(page);
+    let seq = 0;
+    const ai = (type: string, args: object) =>
+      command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "voice", utteranceSeq: ++seq });
+    await ai("setDineOption", { option: "eat_in" });
+    await ai("addToCart", HERO[0]);
+    await ai("requestCheckout", {});
+    await page.getByRole("button", { name: "Yes, pay now" }).click();
+    await page.getByRole("button", { name: "Kiosk: insert card (demo)" }).click();
+    await expect(kioskRoot(page)).toHaveAttribute("data-screen", "done");
+    const step = page.locator("[data-kiosk-step]");
+    await expect(step).toHaveText("Kiosk: receipt question, then the order number.");
+    await page.getByRole("button", { name: "출력 안 함" }).click();
+    await expect(page.getByRole("heading", { name: "주문 번호" })).toBeVisible();
+    await expect(step).toHaveText("Kiosk: order number. The order is done; no money was charged.");
+  });
 });

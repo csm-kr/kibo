@@ -63,9 +63,10 @@ const both = (key: KioskTextKey) => `${kt(key, "ko")} (${kt(key, "en")})`;
 
 /**
  * The kiosk's current step in English, for KIBO's side of the screen (/demo caption, pairing panel): the kiosk itself
- * stays Korean. Learned kiosks have none: the user reviews and pays on the kiosk page.
+ * stays Korean. Learned kiosks have none: the user reviews and pays on the kiosk page. `numberShown`: the kiosk has
+ * moved past its receipt question to the order number, which only the kiosk screen knows (#1 item 13).
  */
-export function kioskStep(kiosk: KioskData, session: Session): string | null {
+export function kioskStep(kiosk: KioskData, session: Session, numberShown = false): string | null {
   if (kiosk.kind === "learned") return null;
   const ticket = kiosk.domain === "ticket";
   switch (session.status) {
@@ -74,6 +75,10 @@ export function kioskStep(kiosk: KioskData, session: Session): string | null {
     case "paying":
       return `Kiosk: payment. Tap ${both("payCard")}, then ${both("insertCardButton")}. Demo only, no money is charged.`;
     case "paid":
+      if (numberShown)
+        return ticket
+          ? "Kiosk: reference number. The purchase is done; no money was charged."
+          : "Kiosk: order number. The order is done; no money was charged.";
       return `Kiosk: receipt question, then the ${ticket ? "reference" : "order"} number.`;
     default:
       return null;

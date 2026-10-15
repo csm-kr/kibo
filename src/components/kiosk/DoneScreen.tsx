@@ -19,6 +19,8 @@ export function DoneScreen(props: {
   /** /demo: no countdown back to K1; the order number stays until the demo moves on. */
   keepNumber: boolean;
   onNewSession(): void;
+  /** The order number is on screen (after the receipt question): /demo's English step line follows it (#1 item 13). */
+  onNumberShown?(sessionId: string): void;
 }) {
   const { kiosk, session, clockOffset } = props;
   const { locale, domain } = kiosk;
@@ -33,7 +35,11 @@ export function DoneScreen(props: {
   const left = doneCountdown(numberAt ?? now + clockOffset, now, clockOffset);
   if (showNumber && numberAt === null) setNumberAt(now + clockOffset);
 
-  const { onNewSession, keepNumber } = props;
+  const { onNewSession, keepNumber, onNumberShown } = props;
+  useEffect(() => {
+    if (showNumber) onNumberShown?.(session.sessionId);
+  }, [showNumber, onNumberShown, session.sessionId]);
+
   useEffect(() => {
     if (keepNumber || numberAt === null || left > 0 || ended.current) return;
     ended.current = true;

@@ -117,6 +117,17 @@ describe("kioskStep", () => {
     expect(kioskStep(rail, session("paid", { orderNumber: 45 }))).toBe("Kiosk: receipt question, then the reference number.");
   });
 
+  it("once the kiosk shows the number, says so instead of the receipt question it has passed (#1 item 13)", () => {
+    expect(kioskStep(malo, session("paid", { orderNumber: 860 }), true)).toBe(
+      "Kiosk: order number. The order is done; no money was charged.",
+    );
+    const ticket = kioskStep(rail, session("paid", { orderNumber: 45 }), true);
+    expect(ticket).toBe("Kiosk: reference number. The purchase is done; no money was charged.");
+    expect(ticket?.toLowerCase()).not.toContain("order");
+    // Before the payment the number cannot be on screen, so the flag changes nothing there.
+    expect(kioskStep(malo, session("paying"), true)).toBe(kioskStep(malo, session("paying")));
+  });
+
   it("a learned kiosk has no KIBO payment step: the user pays on the kiosk itself", () => {
     expect(kioskStep(getKiosk("doughhouse"), session("confirming"))).toBeNull();
   });
