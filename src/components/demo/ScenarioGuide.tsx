@@ -40,7 +40,7 @@ interface Props {
    * phone: the sentences stay as text to say, and nothing here sends or plays.
    */
   send?: SayFn;
-  /** Called right before a step chip sends its sentence, so the page can tell a guided step from typing. */
+  /** Called right before a step chip or [Play it for me] sends a sentence, so the page can tell a guided step from typing. */
   onStepSend?: () => void;
   starting: boolean;
   startFailed: boolean;
@@ -249,7 +249,11 @@ function Checklist(props: Props & { scenario: Scenario }) {
   function start() {
     if (!send) return;
     player.current = playScenario(scenario, locale, done, {
-      send,
+      // A played step is the guide's own turn too: the guide stays open, so its status line stays readable.
+      send: (text) => {
+        props.onStepSend?.();
+        return send(text);
+      },
       session: () => latest.current,
       onState: setPlay,
       sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),

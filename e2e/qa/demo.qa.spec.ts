@@ -520,13 +520,16 @@ test.describe(() => {
     release();
     await check(page, info, "D2-play-stopped-guide", undefined, [VIEWPORTS[0]], DEMO_GUIDE);
 
-    // Failed: the agent answers but the step's check never holds within 20 s.
+    // Failed: the agent answers (with a tool call) but the step's check never holds within 20 s.
     await page.unroute("**/api/chat");
     await page.route("**/api/chat", (route) =>
-      route.fulfill({ json: { ok: true, reply: "OK.", status: "ordering", cart: [], total: 0, cartVersion: 0, actions: [] } }),
+      route.fulfill({ json: { ok: true, reply: "OK.", status: "ordering", cart: [], total: 0, cartVersion: 0, actions: HERO_ACTIONS.slice(0, 1) } }),
     );
     await play.click();
     await expect(guide.getByText("This step didn't go as expected. You can type it yourself or try again.")).toBeVisible({ timeout: 30_000 });
+    // A played step is the guide's own turn: the guide stays open, so its line stays readable (design-qa round 2, 27).
+    await expect(guide.getByRole("tab", { name: /^Scenarios/ })).toHaveAttribute("aria-selected", "true");
+    await expect(guide.getByRole("tab", { name: /^What the AI did/ }).locator("[data-action-count]")).toHaveText("1");
     await check(page, info, "D2-play-failed-guide", undefined, [VIEWPORTS[0], VIEWPORTS[1]], DEMO_GUIDE);
     await check(page, info, "D2-play-failed", undefined, [VIEWPORTS[0]]);
   });

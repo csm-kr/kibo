@@ -51,7 +51,7 @@ export function AppBar(props: {
           {/* max-w-none: a percentage max-width lets the row count the logo as 0px wide (I-062). */}
           <Image src="/kibo-mark.svg" alt="KIBO" width={32} height={32} unoptimized className="size-8 max-w-none flex-none" />
           <div className="flex min-w-0 flex-col">
-            <span className="text-base leading-normal font-bold [overflow-wrap:anywhere]">{props.brand}</span>
+            <span className="text-base leading-normal font-bold break-words">{props.brand}</span>
             {props.connection && (
               <span role="status" className="flex items-center gap-2 text-base leading-normal text-muted">
                 <span aria-hidden className={`size-2 flex-none rounded-full ${online ? "bg-online" : "bg-staff-ink"}`} />

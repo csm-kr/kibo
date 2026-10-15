@@ -151,7 +151,7 @@ export default function Home() {
         {/* Headline and actions share one row, so the picture of the product is the largest thing on the first screen (I-136). */}
         <div className="grid items-end gap-12 lg:grid-cols-[3fr_2fr]">
           <div className="flex flex-col gap-6">
-            <h1 className="font-display text-[40px] leading-tight font-bold text-[#15171C] lg:text-[56px]">
+            <h1 className="font-display text-[40px] leading-tight font-bold text-balance text-[#15171C] lg:text-[56px]">
               <span className="block">Don&apos;t learn the kiosk.</span> <span className="block">Just talk.</span>
             </h1>
             <p>
