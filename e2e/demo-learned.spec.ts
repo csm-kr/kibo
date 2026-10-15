@@ -26,7 +26,7 @@ async function startLearnedDemo(page: Page): Promise<DemoSession> {
   await page.getByRole("button", { name: "Start", exact: true }).click();
   const json = (await (await created).json()) as DemoSession & { ok: boolean };
   expect(json.ok).toBe(true);
-  await expect(page.getByRole("heading", { name: "Pizza shop kiosk (learned by KIBO Learn)" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Kiosk · unchanged, learned by KIBO" })).toBeVisible();
   return json;
 }
 

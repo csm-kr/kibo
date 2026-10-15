@@ -158,7 +158,7 @@ function kioskBox(page: Page) {
     const f = frame.getBoundingClientRect();
     const painted = getComputedStyle(frame).backgroundColor !== "rgba(0, 0, 0, 0)";
     const uncovered = Math.max(r.left - f.left, f.right - r.right, r.top - f.top, f.bottom - r.bottom);
-    return { top: r.top, height: r.height, scale: r.width / 1080, darkBand: painted ? Math.max(0, uncovered) : 0 };
+    return { top: r.top, height: r.height, scale: r.width / 1080, darkBand: painted ? Math.max(0, uncovered) : 0, painted };
   });
 }
 
@@ -177,7 +177,11 @@ test.describe("/demo", () => {
     await expect(kioskRoot(page)).toHaveAttribute("data-screen", "payment");
     await expect(page.locator("[data-card-reader]")).toBeVisible();
     // The step line and the card reader take height here, which once left a dark band of 49.5px on each side.
-    expect((await kioskBox(page)).darkBand).toBeLessThanOrEqual(0.5);
+    const box = await kioskBox(page);
+    expect(box.darkBand).toBeLessThanOrEqual(0.5);
+    // No dark fill behind the canvas at all: the centred frame starts on a fraction of a pixel, where the fill showed
+    // as a dark hairline along the kiosk's edge (#1 E).
+    expect(box.painted, "the kiosk frame's dark fill on /demo").toBe(false);
   });
 
   test("D3: once the order number is on the kiosk, the step line stops asking the receipt question (#1 item 13)", async ({ page, request }) => {
@@ -192,15 +196,19 @@ test.describe("/demo", () => {
     await page.getByRole("button", { name: "Kiosk: insert card (demo)" }).click();
     await expect(kioskRoot(page)).toHaveAttribute("data-screen", "done");
     const step = page.locator("[data-kiosk-step]");
-    await expect(step).toHaveText("Kiosk: receipt question, then the order number.");
+    await expect(step).toHaveText("Receipt question: the order number comes next.");
     await page.getByRole("button", { name: "출력 안 함" }).click();
     await expect(page.getByRole("heading", { name: "주문 번호" })).toBeVisible();
-    await expect(step).toHaveText("Kiosk: order number. The order is done; no money was charged.");
+    await expect(step).toHaveText("Order number: done, no money was charged.");
   });
 });
 
+/** Batch A's kiosk scale on /demo (#1 item 19), the one batch E must beat; 1366×768 measured on its build (2564ebd). */
+const BATCH_A_SCALE: Record<number, number> = { 1280: 0.2458, 1366: 0.2708, 1440: 0.3521, 1920: 0.4458 };
+
 for (const viewport of [
   { width: 1280, height: 720 },
+  { width: 1366, height: 768 },
   { width: 1440, height: 900 },
   { width: 1920, height: 1080 },
 ]) {
@@ -221,21 +229,40 @@ for (const viewport of [
       await expect(page.getByRole("region", { name: "장바구니" }).locator("ul")).toBeInViewport({ ratio: 1 });
     });
 
-    test("the kiosk keeps one size and place from D2 to D3; its English step sits in a fixed area under it (#1 item 19)", async ({ page, request }) => {
+    test("the kiosk keeps one size and place from D2 to D3, larger than before; its English step sits in its caption row (#1 E, #1 item 19)", async ({ page, request }) => {
       const s = await startDemo(page);
       let seq = 0;
       const ai = (type: string, args: object) =>
         command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "voice", utteranceSeq: ++seq });
       const step = page.locator("[data-kiosk-step]");
-      const seen: { state: string; top: number; height: number; scale: number; darkBand: number }[] = [];
-      const record = async (state: string) => seen.push({ state, ...(await kioskBox(page)) });
+      // The kiosk column's caption row: "1 Kiosk · unchanged" with the step beside it, the same 56px as the other
+      // columns' rows at every step (R-022), with nothing cut (#1 E).
+      const row = page.locator('section[aria-labelledby="demo-kiosk-caption"] > div').first();
+      const seen: { state: string; top: number; height: number; scale: number; darkBand: number; row: number; inRow: boolean; cut: boolean }[] = [];
+      const record = async (state: string) =>
+        seen.push({
+          state,
+          ...(await kioskBox(page)),
+          row: (await row.boundingBox())!.height,
+          ...(await step.evaluate((p) => {
+            const r = p.getBoundingClientRect();
+            const h = (p.parentElement as HTMLElement).getBoundingClientRect();
+            // Every line of its text inside the row, and none behind the caption on its left.
+            const caption = document.getElementById("demo-kiosk-caption")!.getBoundingClientRect();
+            const range = document.createRange();
+            range.selectNodeContents(p);
+            const lines = [...range.getClientRects()].filter((l) => l.width > 0);
+            const cut = lines.some((l) => l.top < h.top - 0.5 || l.bottom > h.bottom + 0.5 || l.right > h.right + 0.5 || l.left < caption.right);
+            return { inRow: r.top >= h.top - 0.5 && r.bottom <= h.bottom + 0.5, cut };
+          })),
+        });
 
-      // The dine and menu steps get their English line too (I-248), in the same area as the later ones.
-      await expect(step).toHaveText("Kiosk: eat here or take out. Answer on the phone or on the kiosk.");
+      // The dine and menu steps get their English line too (I-248), in the same place as the later ones.
+      await expect(step).toHaveText("Eat here or take out: answer on either screen.");
       await record("dine");
       await ai("setDineOption", { option: "eat_in" });
       await expect(kioskRoot(page)).toHaveAttribute("data-screen", "menu");
-      await expect(step).toHaveText("Kiosk: menu. Your order shows at the bottom of the kiosk.");
+      await expect(step).toHaveText("Menu: your order shows at the bottom.");
       await record("menu");
       for (const args of HERO) await ai("addToCart", args);
       await expect(page.locator("[data-kiosk-subtitle]")).toBeVisible();
@@ -247,6 +274,12 @@ for (const viewport of [
       await expect(kioskRoot(page)).toHaveAttribute("data-screen", "payment");
       const reader = page.locator("[data-card-reader]").getByRole("button", { name: "Kiosk: insert card (demo)" });
       await expect(reader).toBeInViewport({ ratio: 1 });
+      // Right under the kiosk, as wide as it is: the kiosk's own card slot (#1 E).
+      const canvas = await page.locator("[data-kiosk-canvas]").boundingBox();
+      const strip = await page.locator("[data-card-reader]").boundingBox();
+      expect(Math.abs(strip!.y - (canvas!.y + canvas!.height)), "reader top vs kiosk bottom").toBeLessThanOrEqual(1);
+      expect(Math.abs(strip!.width - canvas!.width), "reader width vs kiosk width").toBeLessThanOrEqual(1);
+      await expect(step).toHaveText("Payment: tap 카드 (Card), then 카드 넣기 (Insert card).");
       // Its label stays on one line in the narrower column (U8).
       const labelLines = await reader.evaluate((button) => {
         const text = [...button.childNodes].find((n) => n.nodeType === Node.TEXT_NODE && n.textContent?.trim());
@@ -265,14 +298,19 @@ for (const viewport of [
 
       // U5: within 0.5px of where it started, at every step.
       const [first] = seen;
+      // Larger than batch A left it, where the step line and the card reader shared an area under the kiosk.
+      expect(first.scale, `scale ${first.scale.toFixed(4)} vs batch A ${BATCH_A_SCALE[viewport.width]}`).toBeGreaterThan(BATCH_A_SCALE[viewport.width]);
       for (const at of seen) {
+        expect.soft(at.row, `${at.state}: caption row height`).toBe(56);
+        expect.soft(at.inRow, `${at.state}: the step line inside the caption row`).toBe(true);
+        expect.soft(at.cut, `${at.state}: the step line cut`).toBe(false);
         expect.soft(Math.abs(at.top - first.top), `${at.state}: top ${at.top} vs ${first.top}`).toBeLessThanOrEqual(0.5);
         expect.soft(Math.abs(at.height - first.height), `${at.state}: height ${at.height} vs ${first.height}`).toBeLessThanOrEqual(0.5);
         expect.soft(Math.abs(at.scale - first.scale), `${at.state}: scale ${at.scale} vs ${first.scale}`).toBeLessThanOrEqual(0.0005);
         expect.soft(at.darkBand, `${at.state}: dark band beside the kiosk (#1 item 10)`).toBeLessThanOrEqual(0.5);
       }
-      // Level with the phone column: both start under their captions.
-      const phoneTop = await page.locator("[data-demo-check] > div").first().evaluate((el) => el.getBoundingClientRect().top);
+      // Level with the phone column: both start under their caption rows.
+      const phoneTop = await page.locator("[data-phone-screen]").evaluate((el) => el.getBoundingClientRect().top);
       expect(Math.abs(first.top - phoneTop)).toBeLessThanOrEqual(0.5);
     });
   });

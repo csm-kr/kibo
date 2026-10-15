@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { command, openScenarios } from "./helpers";
 
-// /demo scenario guide (D2): closed by default; choosing a scenario starts a fresh order; a sentence chip sends the
+// /demo scenario guide (D2): the third column; choosing a scenario starts a fresh order; a sentence chip sends the
 // sentence as the user's message; a step ticks from the live session. No model calls here: /api/chat is answered by
 // the test and the AI's tool call is sent through the API with the demo's device token. The @live test needs
 // E2E_LIVE=1 and plays a scenario through real Gemini.
@@ -29,19 +29,12 @@ async function newSession(page: Page, click: () => Promise<void>): Promise<DemoS
 const guide = (page: Page) => page.locator("[data-scenario-guide]");
 const phoneScreen = (page: Page) => page.locator("[data-phone-screen]");
 
-test("scenario guide: open by default at 1440 wide, a chosen scenario starts fresh, its step ticks from the session", async ({ page, request }) => {
+test("scenario guide: beside the phone, a chosen scenario starts fresh, its step ticks from the session", async ({ page, request }) => {
   await page.goto("/demo");
   await expect(page.getByRole("heading", { name: "Don't learn the kiosk. Just talk." })).toBeVisible({ timeout: 60_000 });
   const first = await newSession(page, () => page.getByRole("button", { name: "Start", exact: true }).click());
 
-  // Open from 1440px wide, where the column fits beside the phone (I-132); the toggle still closes it.
-  const toggle = guide(page).getByRole("button", { name: "Scenarios", exact: true });
-  await expect(toggle).toHaveAttribute("aria-expanded", "true");
-  await expect(page.locator("[data-scenario]")).toHaveCount(6);
-  await toggle.click();
-  await expect(page.locator("[data-scenario]")).toHaveCount(0);
-  await toggle.click();
-  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  // The third column beside the phone at every judge size (#1 E, I-132).
   await expect(page.locator("[data-scenario]")).toHaveCount(6);
 
   // MALO scenario 4: "Is this halal?"
@@ -88,9 +81,6 @@ test("scenario guide: open by default at 1440 wide, a chosen scenario starts fre
   await expect(guide(page).locator("[data-scenario-your-turn]")).toHaveText("Your turn: insert the card at the kiosk.");
   await command(request, kiosk.kioskToken, { sessionId: s.sessionId, type: "cardAction", args: {}, source: "touch" });
   await expect(guide(page).locator("[data-scenario-your-turn]")).toHaveText("Paid. Choose another scenario to try more.");
-
-  await toggle.click();
-  await expect(page.locator("[data-scenario-step]")).toHaveCount(0);
 });
 
 test("@live Play it for me: Sunja's lunch reaches the confirm card with two sets and large fries", async ({ page }) => {
@@ -152,7 +142,9 @@ PLAYED.forEach((p, i) => {
       await play.click();
       const yourTurn = guide(page).locator("[data-scenario-your-turn]");
       const failed = guide(page).getByText(/didn't go as expected|Demo limit reached/);
-      await expect(yourTurn.or(failed)).toBeVisible({ timeout: 200_000 });
+      // Attached, not visible: the first tool call switches the third column to "What the AI did" (#1 E).
+      await expect(yourTurn.or(failed)).toHaveCount(1, { timeout: 200_000 });
+      await openScenarios(page);
       await expect(yourTurn, "the player failed a step").toBeVisible();
       // Nothing in a scenario pays: the phone is never on the card or order-number screen.
       await page.waitForTimeout(2_000);

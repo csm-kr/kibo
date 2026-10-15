@@ -12,7 +12,8 @@ test.use({
 });
 
 const strip = (page: Page) => page.locator("[data-action-strip]");
-const toggle = (page: Page) => strip(page).getByRole("button", { name: /What the AI did/ });
+/** The third column's "What the AI did" tab (#1 E); its badge counts the rows. */
+const aiTab = (page: Page) => page.locator("[data-scenario-guide]").getByRole("tab", { name: /^What the AI did/ });
 
 async function start(page: Page) {
   await page.goto("/demo");
@@ -22,9 +23,10 @@ async function start(page: Page) {
   return (await (await created).json()) as { sessionId: string; deviceToken: string };
 }
 
-test("open at 1440 wide: each action in plain words with its tool and code, newest first, never announced", async ({ page, request }) => {
+test("each action in plain words with its tool and code, newest first, never announced", async ({ page, request }) => {
   const s = await start(page);
-  await expect(toggle(page)).toHaveAttribute("aria-expanded", "true");
+  await aiTab(page).click();
+  await expect(aiTab(page)).toHaveAttribute("aria-selected", "true");
   await expect(strip(page)).toContainText("Gemini decides; the KIBO server checks every action");
   await expect(strip(page)).toContainText("Nothing yet.");
   await command(request, s.deviceToken, { sessionId: s.sessionId, type: "setDineOption", args: { option: "eat_in" }, source: "button" });
@@ -61,8 +63,8 @@ test("open at 1440 wide: each action in plain words with its tool and code, newe
   expect(text).not.toContain(s.sessionId);
   expect(text).not.toContain(s.deviceToken);
 
-  // From 1440 wide the strip sits in the scenario column, not under the phone: it stays through the review and the
-  // confirm card keeps the phone's full height (R-009, I-084).
+  // The strip sits in the third column, not under the phone: it stays through the review and the confirm card keeps
+  // the phone's full height (R-009, I-084).
   await expect(page.locator("[data-scenario-guide] [data-action-strip]")).toHaveCount(1);
   await command(request, s.deviceToken, { sessionId: s.sessionId, type: "requestCheckout", args: {}, source: "text", utteranceSeq: 2 });
   await expect(page.locator("[data-phone-screen]")).toHaveAttribute("data-phone-screen", "confirm");
@@ -72,35 +74,31 @@ test("open at 1440 wide: each action in plain words with its tool and code, newe
   await expect(page.locator("[data-phone-screen]")).toHaveAttribute("data-phone-screen", "talk");
   await expect(rows).toHaveCount(MIXED_ACTIONS.length);
 
-  // Collapsed, it shows how many.
-  await toggle(page).click();
-  await expect(toggle(page)).toHaveAttribute("aria-expanded", "false");
-  await expect(strip(page).locator("[data-action-count]")).toHaveText(String(MIXED_ACTIONS.length));
-  await expect(rows).toHaveCount(0);
+  // Behind the Scenarios tab, its tab still shows how many.
+  await page.locator("[data-scenario-guide]").getByRole("tab", { name: "Scenarios" }).click();
+  await expect(aiTab(page).locator("[data-action-count]")).toHaveText(String(MIXED_ACTIONS.length));
+  await expect(strip(page)).toBeHidden();
 
   // The user's own tap on [Yes, pay now] goes in the list too, so the safety rule shows (D2); the kiosk caption
   // says the Korean kiosk's payment step in English (D1).
-  await toggle(page).click();
+  await aiTab(page).click();
   await command(request, s.deviceToken, { sessionId: s.sessionId, type: "requestCheckout", args: {}, source: "text", utteranceSeq: 3 });
-  await expect(page.locator("[data-kiosk-step]")).toHaveText("Kiosk: order review. Nothing is paid until you confirm.");
+  await expect(page.locator("[data-kiosk-step]")).toHaveText("Order review: nothing is paid until you confirm.");
   await page.getByRole("button", { name: "Yes, pay now" }).click();
   await expect(rows.first()).toContainText("You tapped Yes, pay now");
   await expect(rows.first()).toContainText(/confirmCheckout ✓ \d+ ms/);
   await expect(rows.first()).toContainText("Needs your tap or a new 'yes'");
-  await expect(page.locator("[data-kiosk-step]")).toHaveText(
-    "Kiosk: payment. Tap 카드 (Card), then 카드 넣기 (Insert card). Demo only, no money is charged.",
-  );
+  await expect(page.locator("[data-kiosk-step]")).toHaveText("Payment: tap 카드 (Card), then 카드 넣기 (Insert card).");
 });
 
 test.describe(() => {
   test.use({ viewport: { width: 1280, height: 720 } });
 
-  test("collapsed by default below 1440 wide, under the phone", async ({ page }) => {
+  test("at 1280 wide too it sits in the third column beside the phone, never under it (#1 E)", async ({ page }) => {
     await start(page);
-    await expect(page.locator("[data-demo-check] [data-action-strip]")).toHaveCount(1);
-    await expect(toggle(page)).toHaveAttribute("aria-expanded", "false");
-    await expect(strip(page).locator("[data-action-count]")).toHaveCount(0);
-    await toggle(page).click();
+    await expect(page.locator("[data-scenario-guide] [data-action-strip]")).toHaveCount(1);
+    await expect(page.locator("[data-demo-check] [data-action-strip]")).toHaveCount(0);
+    await aiTab(page).click();
     await expect(strip(page)).toContainText("Nothing yet.");
   });
 });

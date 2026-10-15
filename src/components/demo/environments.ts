@@ -14,8 +14,8 @@ export interface DemoEnvironment {
   how: string;
   /** Who it is for, one sentence (docs/PRD.md personas). */
   persona: string;
-  /** The kiosk half's caption on D2; short, the column is about 360px wide at 1280x720. */
-  caption: string;
+  /** The kiosk column's caption on D2, "Kiosk · unchanged": what it is (bold) and a note (#1 E). */
+  caption: { name: string; note: string };
   image: string;
 }
 
@@ -26,7 +26,7 @@ export const DEMO_ENVIRONMENTS: DemoEnvironment[] = [
     short: "burger shop",
     how: "MALO BURGER · connected directly",
     persona: "Sunja (72) orders lunch in one sentence.",
-    caption: "Burger shop kiosk (unchanged)",
+    caption: { name: "Kiosk", note: "unchanged" },
     image: "/landing/place-malo.webp",
   },
   {
@@ -35,7 +35,7 @@ export const DEMO_ENVIRONMENTS: DemoEnvironment[] = [
     short: "airport rail",
     how: "SKYLINE AIRPORT RAIL · ticket machine",
     persona: "Mei, a visitor, buys tickets in English while the machine shows Korean.",
-    caption: "Airport rail ticket machine (unchanged)",
+    caption: { name: "Ticket machine", note: "unchanged" },
     image: "/landing/place-airport_rail.webp",
   },
   {
@@ -45,7 +45,7 @@ export const DEMO_ENVIRONMENTS: DemoEnvironment[] = [
     short: "pizza shop",
     how: "Doughhouse · no integration, learned by KIBO Learn",
     persona: "Our development pizza kiosk: KIBO learned it once and replays orders without AI.",
-    caption: "Pizza shop kiosk (learned by KIBO Learn)",
+    caption: { name: "Kiosk", note: "unchanged, learned by KIBO" },
     image: "/landing/place-doughhouse.webp",
   },
 ];

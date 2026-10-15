@@ -1,21 +1,23 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import type { SayFn } from "@/components/assistant/AssistantPanel";
-import { Check, ChevronDown, ChevronUp, List } from "lucide-react";
+import { Check } from "lucide-react";
 import { FOCUS, PRESS, PRIMARY, SECONDARY } from "@/components/phone/ui";
 import { canSend, playScenario, type PlayerState } from "@/lib/demo/player";
 import { scenarioProgress, scenariosFor, type Scenario } from "@/lib/demo/scenarios";
 import { playStep, pt, type PhoneTextKey } from "@/lib/i18n/phone";
 import type { KioskData, Locale } from "@/types/menu";
 import type { Session } from "@/types/session";
+import { Caption, COLUMN, COLUMN_HEAD, ColumnNumber, FOCUS_INSIDE } from "./column";
 import { ScrollFade } from "./ScrollFade";
 
-// D2 scenario guide (docs/UX.md Flow C): an optional column, open by default from 1440px wide, that lists what to try on this kiosk.
-// Choosing one starts a fresh order; each step's sentence is a chip that sends it as the user's message, and the check
-// mark ticks from the live session. [Play it for me] sends the same sentences through the same path, one per step, and
-// stops at the confirm card: nothing here confirms or pays. Surfaces follow the phone design (docs/UI_GUIDE.md "Phone
-// design"): a cream column with white cards and soft shadows, tinted tags and sentence chips, no dark outlines.
+// D2 scenario guide (docs/UX.md Flow C): the third column card beside the phone, at every judge size (#1 E), lists
+// what to try on this kiosk. Choosing one starts a fresh order; each step's sentence is a chip that sends it as the
+// user's message, and the check mark ticks from the live session. [Play it for me] sends the same sentences through
+// the same path, one per step, and stops at the confirm card: nothing here confirms or pays. Surfaces follow the phone
+// design (docs/UI_GUIDE.md "Phone design", "/demo frame"): white cards and soft shadows, tinted tags and sentence
+// chips, no dark outlines.
 
 /** A sentence to send: the phone's "Try saying" look at the guide's 16px. */
 const SAY_CHIP = `min-h-14 rounded-tile bg-kibo-tint px-4 py-2 text-left text-base text-kibo-deep active:bg-kibo-tint-pressed disabled:opacity-60 ${PRESS} ${FOCUS}`;
@@ -42,16 +44,23 @@ interface Props {
   startFailed: boolean;
   /** A fresh demo order, the same as [Try again]. */
   onFresh(): void;
-  /** From 1440px wide: open at first (I-132), with "What the AI did" under it instead of under the phone (I-084). */
-  wide: boolean;
-  aside?: ReactNode;
+  /** The column's width (the caller lays out the three columns). */
+  className: string;
+  /**
+   * "What the AI did" behind the column's second tab, with its count (#1 E); none with the judge's own phone, whose
+   * messages and tool calls happen on that phone. The caller holds the selected tab, so the first tool call of an
+   * order can switch to it once.
+   */
+  ai?: { panel: ReactNode; count: number; tab: SideTab; onTab(tab: SideTab): void };
 }
+
+/** The third column's tabs: the scenarios, or what the AI did. */
+export type SideTab = "scenarios" | "ai";
+const TABS: SideTab[] = ["scenarios", "ai"];
 
 export function ScenarioGuide(props: Props) {
   const { locale } = props;
   const scenarios = scenariosFor(props.kiosk.kioskId);
-  // Mounted only after the demo order starts, so `wide` is the real width here.
-  const [open, setOpen] = useState(props.wide);
   const [chosen, setChosen] = useState<{ id: string; from: string } | null>(null);
   const scenario = scenarios.find((s) => s.id === chosen?.id);
 
@@ -118,45 +127,89 @@ export function ScenarioGuide(props: Props) {
   }
 
   if (scenarios.length === 0) return null;
+  const { ai } = props;
+  const tab = ai?.tab ?? "scenarios";
+  const tabId = (t: SideTab) => `demo-tab-${t}`;
+  const panelId = (t: SideTab) => `demo-panel-${t}`;
+  // ARIA tabs (APG): the arrows move to the other tab and select it, Home and End go to the ends; only the selected
+  // tab is in the tab order.
+  function onKeyDown(e: KeyboardEvent) {
+    if (!ai) return;
+    const at = TABS.indexOf(tab);
+    const next =
+      e.key === "ArrowRight" ? TABS[(at + 1) % TABS.length]
+      : e.key === "ArrowLeft" ? TABS[(at + TABS.length - 1) % TABS.length]
+      : e.key === "Home" ? TABS[0]
+      : e.key === "End" ? TABS[TABS.length - 1]
+      : null;
+    if (!next) return;
+    e.preventDefault();
+    ai.onTab(next);
+    document.getElementById(tabId(next))?.focus();
+  }
+
   return (
-    <section data-scenario-guide aria-label={pt("scenarios", locale)} className={`flex h-full flex-none flex-col gap-2 ${open || props.aside ? "w-80" : ""}`}>
-      {/* A 32px caption row like the kiosk's and the phone's, so the three columns start on one line (design QA
-          10-15, #1 4). The toggle's 56px target reaches 12px above and below the row, over the panel's top edge
-          (so it is painted above it); the drawn pill is 32px. */}
-      <div className="flex h-8 flex-none items-center justify-end">
-        <button
-          type="button"
-          aria-expanded={open}
-          aria-controls="demo-scenario-guide"
-          onClick={() => setOpen(!open)}
-          className={`group relative z-10 -my-3 flex h-14 min-w-14 items-center justify-center rounded-full ${PRESS} ${FOCUS}`}
-        >
-          <span className="flex h-8 items-center gap-2 rounded-full bg-white px-4 text-base font-semibold text-ink shadow-card transition-colors duration-150 ease-out group-active:bg-kibo-tint">
-            <List size={20} strokeWidth={2} aria-hidden />
-            {pt("scenarios", locale)}
-            {open ? <ChevronUp size={20} strokeWidth={2} aria-hidden /> : <ChevronDown size={20} strokeWidth={2} aria-hidden />}
-          </span>
-        </button>
-      </div>
-      {open && (
-        // The column's free height, but the cream panel is only as tall as its content and scrolls past it, so one
-        // scenario card leaves no empty cream under it (design QA 10-15, #1 12).
-        <div className="flex min-h-0 flex-1 flex-col">
-          {/* The panel's first 12px do not scroll: a step scrolled to the top stays 8px clear of the toggle's
-              target above (UI_QA target gaps), while the panel itself starts on the other columns' card line. */}
-          <div className="flex min-h-0 flex-col rounded-sheet bg-cream pt-3 shadow-card">
-            <div
-              id="demo-scenario-guide"
-              lang={locale}
-              className="flex min-h-0 scroll-pb-8 flex-col gap-4 overflow-y-auto rounded-b-sheet px-4 pt-1 pb-4 text-ink"
-            >
-              {body}
-              <ScrollFade className="-bottom-4 -mx-4 -mt-12 to-cream" />
+    <section data-demo-column data-scenario-guide aria-labelledby={ai ? undefined : "demo-guide-caption"} className={`${COLUMN} ${props.className}`}>
+      <div className={COLUMN_HEAD}>
+        {ai ? (
+          // The tabs are this column's caption: "3 Scenarios | What the AI did 2" (mockup A).
+          <div data-column-caption className="flex min-w-0 flex-1 items-center gap-3 self-stretch">
+            <ColumnNumber n={3} />
+            <div role="tablist" aria-label={`${pt("scenarios", locale)}, ${pt("aiActions", locale)}`} onKeyDown={onKeyDown} className="flex gap-4 self-stretch">
+              {TABS.map((t) => {
+                const selected = t === tab;
+                return (
+                  <button
+                    key={t}
+                    type="button"
+                    role="tab"
+                    id={tabId(t)}
+                    aria-selected={selected}
+                    aria-controls={panelId(t)}
+                    tabIndex={selected ? 0 : -1}
+                    onClick={() => ai.onTab(t)}
+                    className={`relative flex min-w-14 items-center gap-2 rounded-tile text-base ${
+                      selected ? "font-bold text-ink" : "font-semibold text-muted"
+                    } ${FOCUS_INSIDE}`}
+                  >
+                    {pt(t === "scenarios" ? "scenarios" : "aiActions", locale)}
+                    {t === "ai" && ai.count > 0 && (
+                      <span data-action-count className="flex h-7 min-w-7 items-center justify-center rounded-full bg-kibo-tint px-2 text-base font-bold text-kibo-deep tabular-nums">
+                        {ai.count}
+                      </span>
+                    )}
+                    {/* Selected: a 3px KIBO-blue bar on the row's hairline and bold ink text, never color alone. */}
+                    {selected && <span aria-hidden className="absolute inset-x-0 bottom-0 h-[3px] rounded-t-full bg-kibo" />}
+                  </button>
+                );
+              })}
             </div>
           </div>
+        ) : (
+          <Caption id="demo-guide-caption" n={3} name={pt("scenarios", locale)} />
+        )}
+      </div>
+      {/* Both panels stay mounted, so a scenario playing on keeps playing while the other tab shows. Each panel's first
+          8px do not scroll, so a control scrolled to its top stays 8px clear of the tabs' targets (UI_QA target gaps,
+          as I-282). */}
+      <div
+        role={ai ? "tabpanel" : undefined}
+        id={panelId("scenarios")}
+        aria-labelledby={ai ? tabId("scenarios") : undefined}
+        hidden={tab !== "scenarios"}
+        className="flex min-h-0 flex-1 flex-col pt-2"
+      >
+        {/* As tall as its content and scrolls past it, so one scenario card leaves no empty panel under it (#1 12). */}
+        <div id="demo-scenario-guide" lang={locale} className="flex min-h-0 scroll-pb-8 flex-col gap-4 overflow-y-auto px-4 pt-2 pb-4 text-ink">
+          {body}
+          <ScrollFade className="-bottom-4 -mx-4 -mt-12 to-white" />
+        </div>
+      </div>
+      {ai && (
+        <div role="tabpanel" id={panelId("ai")} aria-labelledby={tabId("ai")} hidden={tab !== "ai"} className="flex min-h-0 flex-1 flex-col">
+          {ai.panel}
         </div>
       )}
-      {props.aside}
     </section>
   );
 }

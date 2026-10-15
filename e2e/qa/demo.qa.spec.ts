@@ -143,7 +143,7 @@ test("D1 to D3", async ({ page, request }, info) => {
   await page.getByRole("button", { name: "Yes, pay now" }).click();
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "payment");
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "pay");
-  await expect(page.locator("[data-kiosk-step]")).toContainText("Kiosk: payment. Tap 카드 (Card)");
+  await expect(page.locator("[data-kiosk-step]")).toContainText("Payment: tap 카드 (Card)");
   // The card stand-in sits under the kiosk half; the phone half has no button that pays (15-judge-fixes:2).
   await check(page, info, "D2-payment", async () => {
     await expect(page.locator("[data-card-reader]").getByRole("button", { name: "Kiosk: insert card (demo)" })).toBeInViewport({ ratio: 1 });
@@ -270,9 +270,12 @@ test.describe(() => {
     await expect(guide.locator('[data-scenario-step][data-done="true"]')).toHaveCount(1);
     const strip = page.locator("[data-action-strip]");
     await expect(strip.getByRole("listitem")).toHaveCount(HERO_ACTIONS.length);
+    // The step's tool calls switched the third column to "What the AI did" (#1 E).
+    await expect(guide.getByRole("tab", { name: /^What the AI did/ })).toHaveAttribute("aria-selected", "true");
     await check(page, info, "D2-actions-open", undefined, [VIEWPORTS[0]]);
 
-    await strip.getByRole("button", { name: /What the AI did/ }).click();
+    // Back on the Scenarios tab, the other tab keeps the count.
+    await openScenarios(page);
     await check(page, info, "D2-actions-collapsed", undefined, [VIEWPORTS[1]]);
   });
 });
@@ -550,6 +553,8 @@ test.describe(() => {
     let seq = 1;
     const ai = (type: string, args: object) =>
       command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "text", utteranceSeq: ++seq });
+    // The step's tool call switched the third column to "What the AI did" (#1 E); back to the guide.
+    await openScenarios(page);
     await ai("addToCart", { itemId: "express_city_center", variant: "single", qty: 1, selections: { passenger: ["child"] } });
     await ai("requestCheckout", {});
     await expect(guide.locator("[data-scenario-your-turn]")).toBeVisible();

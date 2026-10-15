@@ -2,9 +2,10 @@ import { expect, test, type APIRequestContext, type Locator, type Page } from "@
 import { command, openScenarios, textLines } from "./helpers";
 import { HERO_ACTIONS, MIXED_ACTIONS } from "./recordedActions";
 
-// /demo D2 and D3 layout, measured in CSS px (design QA 10-15, issue #1 batch B): the scenario column lines up with
-// the kiosk and phone columns, its scroll areas end in a fade while more is below, "What the AI did" reads as one
-// typeface and gives way under the phone. No model calls: /api/chat is answered by the test.
+// /demo D2 and D3 layout, measured in CSS px (design QA 10-15, issue #1 batch B): the scenario column's scroll areas
+// end in a fade while more is below, and "What the AI did" reads as one typeface. How the three columns line up, and
+// what shows at the smallest size, is in e2e/demo-frame.spec.ts (#1 E). No model calls: /api/chat is answered by the
+// test.
 
 const SIZES = [
   { width: 1280, height: 720 },
@@ -74,7 +75,8 @@ function bottomEdge(area: Locator) {
       }
     }
     return {
-      more: el.scrollHeight - el.scrollTop - el.clientHeight > 1,
+      // Content past the edge; the area's own bottom padding hides nothing (#1 E).
+      more: el.scrollHeight - el.scrollTop - el.clientHeight > parseFloat(getComputedStyle(el).paddingBottom) + 1,
       shown,
       fadeHeight: fr ? fr.height : 0,
       fadeToEdge: fr ? Math.abs(r.bottom - fr.bottom) : null,
@@ -102,43 +104,6 @@ async function expectFadeAtEdge(area: Locator, what: string) {
   await area.evaluate((el) => el.scrollTo({ top: 0, behavior: "instant" }));
 }
 
-test("the scenario column lines up with the kiosk and phone columns at every judge size (#1 4)", async ({ page }) => {
-  await start(page);
-  for (const vp of SIZES) {
-    await page.setViewportSize(vp);
-    await openScenarios(page);
-    const m = await page.evaluate(() => {
-      const box = (s: string) => document.querySelector(s)!.getBoundingClientRect();
-      const mid = (r: DOMRect) => r.top + r.height / 2;
-      const toggle = document.querySelector<HTMLElement>('[data-scenario-guide] button[aria-controls="demo-scenario-guide"]')!;
-      // The part of the toggle that is drawn: the button itself, or its white pill inside a larger hit area.
-      const clear = (el: Element) => getComputedStyle(el).backgroundColor === "rgba(0, 0, 0, 0)";
-      const pill = clear(toggle) ? ([...toggle.querySelectorAll("*")].find((el) => !clear(el)) ?? toggle) : toggle;
-      // The cream panel: the scroll area itself or the painted box around it.
-      const scroller = document.querySelector("#demo-scenario-guide")!;
-      let panel: Element = scroller;
-      while (clear(panel) && panel.parentElement) panel = panel.parentElement;
-      return {
-        kioskCaption: mid(box("#demo-kiosk-caption")),
-        phoneCaption: mid(box("#demo-phone-caption")),
-        pill: mid(pill.getBoundingClientRect()),
-        hit: toggle.getBoundingClientRect().height,
-        hitBottom: toggle.getBoundingClientRect().bottom,
-        phoneTop: box("[data-phone-screen]").top,
-        guideTop: panel.getBoundingClientRect().top,
-        scrollTop: scroller.getBoundingClientRect().top,
-      };
-    });
-    const at = `${vp.width}x${vp.height}`;
-    expect(Math.abs(m.pill - m.phoneCaption), `${at}: [Scenarios] centre vs the column captions`).toBeLessThanOrEqual(1);
-    expect(Math.abs(m.kioskCaption - m.phoneCaption), `${at}: kiosk and phone captions`).toBeLessThanOrEqual(1);
-    expect(Math.abs(m.guideTop - m.phoneTop), `${at}: guide top vs phone top`).toBeLessThanOrEqual(1);
-    expect(m.hit, `${at}: [Scenarios] target height`).toBeGreaterThanOrEqual(56);
-    // A step scrolled to the top of the guide is a target too: 8px apart (UI_QA target gaps).
-    expect(m.scrollTop - m.hitBottom, `${at}: [Scenarios] target to the guide's scroll area`).toBeGreaterThanOrEqual(8);
-  }
-});
-
 test.describe(() => {
   test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.82" } });
 
@@ -149,6 +114,8 @@ test.describe(() => {
     await expectFadeAtEdge(guide, "scenario list 1440");
 
     await sunjaStepOne(page, request);
+    // The step's tool calls switched the column to "What the AI did" (#1 E); back to the guide.
+    await openScenarios(page);
     for (const vp of [SIZES[0], SIZES[3]]) {
       await page.setViewportSize(vp);
       await expectFadeAtEdge(guide, `Sunja step 1 ${vp.width}`);
@@ -164,6 +131,7 @@ test.describe(() => {
     await page.getByRole("button", { name: "Send", exact: true }).click();
     const rows = page.locator("[data-action-strip] li");
     await expect(rows).toHaveCount(HERO_ACTIONS.length + MIXED_ACTIONS.length);
+    await page.locator("[data-scenario-guide]").getByRole("tab", { name: /^What the AI did/ }).click();
     await expectFadeAtEdge(page.locator("#demo-actions"), "What the AI did 1440");
   });
 });
@@ -224,30 +192,9 @@ test.describe(() => {
 });
 
 test.describe(() => {
-  test.use({ viewport: SIZES[0], extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.85" } });
-
-  test("opened under the phone, 'What the AI did' shows its rows, not the legend (#1 15)", async ({ page, request }) => {
-    const s = await start(page);
-    await command(request, s.deviceToken, { sessionId: s.sessionId, type: "setDineOption", args: { option: "eat_in" }, source: "button" });
-    await page.route("**/api/chat", (route) =>
-      route.fulfill({ json: { ok: true, reply: "OK.", status: "ordering", cart: [], total: 0, cartVersion: 0, actions: HERO_ACTIONS } }),
-    );
-    await page.getByRole("textbox", { name: "Type your order" }).fill("Two cheeseburger sets");
-    await page.getByRole("button", { name: "Send", exact: true }).click();
-    const strip = page.locator("[data-demo-check] [data-action-strip]");
-    await strip.getByRole("button", { name: /What the AI did/ }).click();
-    for (const vp of [SIZES[0], SIZES[1]]) {
-      await page.setViewportSize(vp);
-      await expect(strip.getByRole("listitem").first(), `${vp.width}: newest row`).toBeInViewport({ ratio: 1 });
-      await expect(strip.getByText(/Gemini decides/)).toHaveCount(0);
-    }
-  });
-});
-
-test.describe(() => {
   test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.86" } });
 
-  test("after payment the strip under the phone steps aside, so the end card's buttons stay in view (#1 14)", async ({ page, request }) => {
+  test("after payment the end card's buttons stay in view when the window narrows (#1 14)", async ({ page, request }) => {
     const s = await start(page);
     let seq = 0;
     const ai = (type: string, args: object) =>
@@ -259,11 +206,10 @@ test.describe(() => {
     await page.getByRole("button", { name: "Kiosk: insert card (demo)" }).click();
     await page.getByRole("button", { name: "출력 안 함" }).click();
     await expect(page.locator("[data-demo-end]")).toBeVisible();
-    // Reached at 1440, then the window narrows: the strip would come back under the phone and push the end card down.
+    // Reached at 1440, then the window narrows. "What the AI did" stays in the third column at every size (#1 E), so
+    // nothing comes back under the phone to push the end card down.
     for (const vp of [SIZES[1], SIZES[0]]) {
       await page.setViewportSize(vp);
-      // Below 1440 the strip has left the scenario column; only then is its place under the phone settled.
-      await expect(page.locator("[data-scenario-guide] [data-action-strip]")).toHaveCount(0);
       await expect(page.locator("[data-demo-check] [data-action-strip]"), `${vp.width}: strip under the phone`).toHaveCount(0);
       const places = page.getByRole("navigation", { name: "Try another place" });
       await expect(places.getByRole("link", { name: "Pizza shop" }), `${vp.width}: [Pizza shop]`).toBeInViewport({ ratio: 1 });

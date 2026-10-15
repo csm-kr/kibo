@@ -147,8 +147,9 @@ async function demoSnapshot(browser: Browser, n: number, kioskId: string, scenar
       await page.goto(`${BASE}/demo?k=${kioskId}`);
       await page.getByRole("button", { name: "Start", exact: true }).click({ timeout: 120_000 });
       const guide = page.locator("[data-scenario-guide]");
-      const toggle = guide.getByRole("button", { name: "Scenarios", exact: true });
-      if ((await toggle.getAttribute("aria-expanded")) === "false") await toggle.click();
+      // The third column's "Scenarios" tab (#1 E), unless it is selected already.
+      const tab = guide.getByRole("tab", { name: "Scenarios" });
+      if ((await tab.count()) > 0 && (await tab.getAttribute("aria-selected")) !== "true") await tab.click();
       await page.locator(`[data-scenario="${scenarioId}"]`).click();
       if (dine) {
         await page.locator("[data-phone-screen]").getByRole("button", { name: "Eat here" }).click();
@@ -161,11 +162,11 @@ async function demoSnapshot(browser: Browser, n: number, kioskId: string, scenar
       await step.getByRole("button").and(page.locator(":enabled")).click({ timeout: 30_000 });
       const res = await answered;
       if (!(await res.json()).ok) throw new Error(`/api/chat: ${res.status()}`);
-      await page.locator('[data-scenario-step="0"][data-done="true"]').waitFor({ timeout: MODEL_TIMEOUT_MS });
-      const strip = page.locator("[data-action-strip]");
-      const stripToggle = strip.locator("button[aria-expanded]").first();
-      if ((await stripToggle.getAttribute("aria-expanded")) === "false") await stripToggle.click();
-      await strip.locator("[data-action-tool]").first().waitFor();
+      // The first tool call switches the third column to "What the AI did" (#1 E), so the ticked step may be hidden.
+      await page.locator('[data-scenario-step="0"][data-done="true"]').waitFor({ state: "attached", timeout: MODEL_TIMEOUT_MS });
+      const aiTab = guide.getByRole("tab", { name: /^What the AI did/ });
+      if ((await aiTab.getAttribute("aria-selected")) !== "true") await aiTab.click();
+      await page.locator("[data-action-strip] [data-action-tool]").first().waitFor();
       await settled(page);
       await savePng(await page.screenshot(), `snapshot-demo-${kioskId}-1920x1080`);
       if (kioskId === "malo") await savePng(await guide.screenshot(), "snapshot-demo-malo-guide-and-ai-actions");

@@ -297,8 +297,9 @@ function scenarioClip(name: string, kioskId: string, scenarioId: string, dine: b
       await page.getByRole("button", { name: "Start", exact: true }).waitFor({ timeout: 120_000 });
       await rec.mark("intro");
       await newDemoSession(page, () => page.getByRole("button", { name: "Start", exact: true }).click());
-      const toggle = page.locator("[data-scenario-guide]").getByRole("button", { name: "Scenarios", exact: true });
-      if ((await toggle.getAttribute("aria-expanded")) === "false") await toggle.click();
+      // The third column's "Scenarios" tab (#1 E), unless it is selected already.
+      const tab = page.locator("[data-scenario-guide]").getByRole("tab", { name: "Scenarios" });
+      if ((await tab.count()) > 0 && (await tab.getAttribute("aria-selected")) !== "true") await tab.click();
       const s = await newDemoSession(page, () => page.locator(`[data-scenario="${scenarioId}"]`).click());
       const watch = watchSession(s.sessionId, xff(clip));
       try {
@@ -311,7 +312,8 @@ function scenarioClip(name: string, kioskId: string, scenarioId: string, dine: b
         for (const [i, step] of scenario.steps.entries()) {
           await say(page, step.say.en);
           await watch.until(`step ${i + 1}`, check(step.done));
-          await page.locator(`[data-scenario-step="${i}"][data-done="true"]`).waitFor();
+          // Attached, not visible: the first tool call switches the third column to "What the AI did" (#1 E).
+          await page.locator(`[data-scenario-step="${i}"][data-done="true"]`).waitFor({ state: "attached" });
           await rec.mark(`step-${i + 1}`);
         }
         if (!payable) {

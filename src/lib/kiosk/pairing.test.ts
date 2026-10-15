@@ -137,26 +137,36 @@ describe("demoKioskStep", () => {
   const malo = getKiosk("malo");
   const rail = getKiosk("airport_rail");
 
-  it("on /demo also says the steps before the review: the dine question, then the menu (#1 item 19, I-248)", () => {
-    expect(demoKioskStep(malo, session("connected"), false)).toBe("Kiosk: eat here or take out. Answer on the phone or on the kiosk.");
-    expect(demoKioskStep(malo, session("ordering", { dineOption: "eat_in" }), false)).toBe(
-      "Kiosk: menu. Your order shows at the bottom of the kiosk.",
-    );
+  // /demo says it in the kiosk column's caption row, after "Kiosk · unchanged", so each line names the step and what
+  // to do in two short lines at most, with no "Kiosk:" of its own (#1 E).
+  it("names every kiosk step from the dine question to the order number (#1 E, #1 item 19, I-248, R-024)", () => {
+    expect(demoKioskStep(malo, session("connected"), false)).toBe("Eat here or take out: answer on either screen.");
+    expect(demoKioskStep(malo, session("ordering", { dineOption: "eat_in" }), false)).toBe("Menu: your order shows at the bottom.");
     // A phone may add before the dine option; the kiosk then shows its menu (kioskScreen), and so does the line.
-    expect(demoKioskStep(malo, session("ordering", { cart: [LINE] }), false)).toBe("Kiosk: menu. Your order shows at the bottom of the kiosk.");
-  });
-
-  it("from the review on says what kioskStep says, the order number included", () => {
-    for (const status of ["confirming", "paying", "paid"] as const) {
-      expect(demoKioskStep(malo, session(status, { orderNumber: 7 }), false)).toBe(kioskStep(malo, session(status, { orderNumber: 7 })));
-    }
-    expect(demoKioskStep(malo, session("paid", { orderNumber: 7 }), true)).toBe(kioskStep(malo, session("paid", { orderNumber: 7 }), true));
+    expect(demoKioskStep(malo, session("ordering", { cart: [LINE] }), false)).toBe("Menu: your order shows at the bottom.");
+    expect(demoKioskStep(malo, session("confirming", { cart: [LINE] }), false)).toBe("Order review: nothing is paid until you confirm.");
+    expect(demoKioskStep(malo, session("paying", { cart: [LINE] }), false)).toBe("Payment: tap 카드 (Card), then 카드 넣기 (Insert card).");
+    expect(demoKioskStep(malo, session("paid", { orderNumber: 7 }), false)).toBe("Receipt question: the order number comes next.");
+    // The last screen of the flow: past the receipt question, the number is on the kiosk (#1 item 13).
+    expect(demoKioskStep(malo, session("paid", { orderNumber: 7 }), true)).toBe("Order number: done, no money was charged.");
   });
 
   it("a ticket machine has no dine step and says tickets, never order (R-007)", () => {
-    const line = demoKioskStep(rail, session("connected"), false);
-    expect(line).toBe("Kiosk: tickets. Your tickets show at the bottom of the kiosk.");
-    expect(line?.toLowerCase()).not.toContain("order");
+    const lines = [
+      demoKioskStep(rail, session("connected"), false),
+      demoKioskStep(rail, session("confirming", { cart: [LINE] }), false),
+      demoKioskStep(rail, session("paying", { cart: [LINE] }), false),
+      demoKioskStep(rail, session("paid", { orderNumber: 7 }), false),
+      demoKioskStep(rail, session("paid", { orderNumber: 7 }), true),
+    ];
+    expect(lines).toEqual([
+      "Tickets: yours show at the bottom.",
+      "Ticket review: nothing is paid until you confirm.",
+      "Payment: tap 카드 (Card), then 카드 넣기 (Insert card).",
+      "Receipt question: the reference number comes next.",
+      "Reference number: done, no money was charged.",
+    ]);
+    for (const line of lines) expect(line?.toLowerCase()).not.toContain("order");
   });
 
   it("says nothing before a phone is there, after the order ended, or on a learned kiosk", () => {
