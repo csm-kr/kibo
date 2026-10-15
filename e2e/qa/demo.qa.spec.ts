@@ -268,10 +268,13 @@ test.describe(() => {
     });
     await guide.locator('[data-scenario-step="0"]').getByRole("button").click();
     await expect(guide.locator('[data-scenario-step][data-done="true"]')).toHaveCount(1);
+    // A step sent from the guide keeps the guide open (the next step is one tap away); the AI tab counts the calls.
+    const aiTab = guide.getByRole("tab", { name: /^What the AI did/ });
+    await expect(guide.getByRole("tab", { name: /^Scenarios/ })).toHaveAttribute("aria-selected", "true");
+    await expect(aiTab.locator("[data-action-count]")).toHaveText(String(HERO_ACTIONS.length));
+    await aiTab.click();
     const strip = page.locator("[data-action-strip]");
     await expect(strip.getByRole("listitem")).toHaveCount(HERO_ACTIONS.length);
-    // The step's tool calls switched the third column to "What the AI did" (#1 E).
-    await expect(guide.getByRole("tab", { name: /^What the AI did/ })).toHaveAttribute("aria-selected", "true");
     await check(page, info, "D2-actions-open", undefined, [VIEWPORTS[0]]);
 
     // Back on the Scenarios tab, the other tab keeps the count.
@@ -546,14 +549,16 @@ test.describe(() => {
     });
     await guide.locator('[data-scenario-step="0"]').getByRole("button").click();
     await expect(guide.locator('[data-scenario-step][data-done="true"]')).toHaveCount(1);
+    // A step sent from the guide keeps the guide open; the AI tab shows the call when chosen.
+    await check(page, info, "D2-rail-scenario-half-guide", undefined, VIEWPORTS, DEMO_GUIDE);
+    await guide.getByRole("tab", { name: /^What the AI did/ }).click();
     await expect(page.locator("[data-action-strip]").getByRole("listitem")).toHaveCount(RAIL_ACTIONS.length);
     await check(page, info, "D2-rail-scenario-half", undefined, VIEWPORTS);
-    await check(page, info, "D2-rail-scenario-half-guide", undefined, VIEWPORTS, DEMO_GUIDE);
 
     let seq = 1;
     const ai = (type: string, args: object) =>
       command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "text", utteranceSeq: ++seq });
-    // The step's tool call switched the third column to "What the AI did" (#1 E); back to the guide.
+    // Back to the guide.
     await openScenarios(page);
     await ai("addToCart", { itemId: "express_city_center", variant: "single", qty: 1, selections: { passenger: ["child"] } });
     await ai("requestCheckout", {});
