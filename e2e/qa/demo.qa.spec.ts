@@ -46,6 +46,11 @@ const payInView = (page: Page) => async () => {
   await expect(page.getByRole("button", { name: "Yes, pay now" })).toBeInViewport({ ratio: 1 });
 };
 
+/** #1 11, I-179: while the cart is empty, the first "Try saying" example is whole above the dock. */
+const firstExampleInView = (page: Page) => async () => {
+  await expect(phoneScreen(page).getByRole("region", { name: "Try saying" }).getByRole("button").first()).toBeInViewport({ ratio: 1 });
+};
+
 test("D1 on a phone: the laptop note comes first (14-final:1)", async ({ page }, info) => {
   await page.goto("/demo");
   await check(page, info, "D1-intro-phone", async () => {
@@ -140,7 +145,7 @@ test.describe(() => {
     await page.getByRole("button", { name: "Start", exact: true }).click();
     const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
     await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "talk");
-    await check(page, info, "D2-rail-empty");
+    await check(page, info, "D2-rail-empty", firstExampleInView(page));
 
     // A new line per viewport, so each screenshot falls inside its own 2 s highlight.
     const passengers = ["adult", "child", "senior"];
@@ -299,6 +304,17 @@ async function startTalk(page: Page) {
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "talk");
   return s;
 }
+
+test.describe(() => {
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.85" } });
+
+  // #1 11: on a fresh D2 the empty "Your order ₩0" card pushed "Try saying" under the dock at 1280×720 and 1366×768,
+  // so a judge saw no example sentence at all.
+  test("D2 talk with an empty cart: the first example sentence fully in view", async ({ page }, info) => {
+    await startTalk(page);
+    await check(page, info, "D2-talk-empty", firstExampleInView(page), [VIEWPORTS[1], { width: 1366, height: 768 }, VIEWPORTS[0]]);
+  });
+});
 
 test.describe(() => {
   test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.81" } });

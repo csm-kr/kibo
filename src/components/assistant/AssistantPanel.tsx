@@ -367,6 +367,10 @@ export function AssistantPanel(props: Props) {
   const undoable = session !== null && (learned ? learnedUndoLine(session) !== null : session.undoStack.length > 0);
   const placeholder = learned ? pt("learnedPlaceholder", locale) : ticket ? pt("ticketPlaceholder", locale) : undefined;
   const secondsLeft = mode === "demo" && voice.secondsLeft !== null && voice.secondsLeft < SHOW_VOICE_LEFT ? voice.secondsLeft : null;
+  const suggestions = !limited && <Suggestions examples={props.examples ?? []} locale={locale} disabled={busy} onPick={say} />;
+  // /demo with an empty cart: the examples before the empty card, which pushed every one under the dock on a laptop
+  // (#1 11, I-179).
+  const examplesFirst = mode === "demo" && itemsInCart === 0;
 
   /** After the demo limit, a plain notice with [Try again] takes the text field's place. */
   const limitNotice = limited && (
@@ -523,6 +527,7 @@ export function AssistantPanel(props: Props) {
                 />
               )}
             </div>
+            {examplesFirst && suggestions}
             <div className="flex flex-col">
               <OrderCard
                 kiosk={kiosk}
@@ -535,7 +540,7 @@ export function AssistantPanel(props: Props) {
               />
               <span ref={cartEnd} aria-hidden className="block h-px scroll-mb-4" />
             </div>
-            {!limited && <Suggestions examples={props.examples ?? []} locale={locale} disabled={busy} onPick={say} />}
+            {!examplesFirst && suggestions}
           </Scroll>
           {/* /demo too: right after the first order its full dock left the card's total out of view at every laptop
               size (#1 18). Focus stays in view as the summary comes and goes (Scroll, I-220). */}
