@@ -63,6 +63,7 @@ describe("toolDeclarations", () => {
       "yes_no",
       "alternatives",
       "upsell",
+      "ask_staff",
     ]);
     expect(offer.choices.items!.properties!.kind.enum).toEqual(["item", "variant", "option", "dine", "yesno", "staff"]);
   });

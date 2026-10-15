@@ -2,6 +2,7 @@ import type { FunctionCall } from "@google/genai";
 import { agentAction, type AgentAction } from "@/lib/agent/actions";
 import { KIOSK_BUSY, waitForBridge } from "@/lib/agent/bridgeWait";
 import { toolCallToCommand, toolResult } from "@/lib/agent/mapping";
+import { swapTracker } from "@/lib/agent/swap";
 import { ApiError, type CommandReply } from "@/lib/client/api";
 import { CommandError } from "@/lib/commands/errors";
 import type { CommandType } from "@/lib/commands/schemas";
@@ -51,9 +52,9 @@ const INTERNAL = "Something went wrong. Please try again.";
 // Live always sends an id; without one, a fresh id keeps two calls from being taken as one retry.
 const commandIdOf = (call: FunctionCall, ctx: ToolContext) => `${ctx.liveSessionId}:${call.id ?? crypto.randomUUID()}`;
 
-async function runOne(call: FunctionCall, commandId: string, ctx: ToolContext): Promise<Outcome> {
+async function runOne(call: FunctionCall, args: unknown, commandId: string, ctx: ToolContext): Promise<Outcome> {
   try {
-    const cmd = toolCallToCommand(call.name ?? "", call.args);
+    const cmd = toolCallToCommand(call.name ?? "", args);
     const reply = await ctx.send({
       commandId,
       ...cmd,
@@ -95,8 +96,11 @@ export async function runToolCalls(calls: FunctionCall[], ctx: ToolContext): Pro
   // of the batch is answered as busy instead of being sent.
   let replaying: (() => boolean) | null = null;
   let kioskStuck = false;
+  const swap = swapTracker(ctx.kiosk);
   for (const call of calls) {
     const started = performance.now();
+    // A swap's add keeps the replaced line's choices (src/lib/agent/swap.ts).
+    const args = swap.args(call.name ?? "", call.args);
     let outcome: Outcome;
     if (replaying && (kioskStuck || !(await waitForBridge(replaying)))) {
       kioskStuck = true;
@@ -104,10 +108,11 @@ export async function runToolCalls(calls: FunctionCall[], ctx: ToolContext): Pro
     } else {
       const statusAt = ctx.session?.()?.bridgeStatus?.at ?? null;
       const commandId = commandIdOf(call, ctx);
-      outcome = await runOne(call, commandId, ctx);
+      outcome = await runOne(call, args, commandId, ctx);
       replaying = ctx.session && outcome.ok && outcome.response.pending ? replayDone(ctx.session, commandId, statusAt) : null;
     }
-    ctx.onAction?.(agentAction(call.name ?? "", call.args, outcome, performance.now() - started, cart));
+    swap.after(call.name ?? "", outcome, cart);
+    ctx.onAction?.(agentAction(call.name ?? "", args, outcome, performance.now() - started, cart));
     if (outcome.ok) cart = outcome.response.cart;
     out.push({ ...(call.id ? { id: call.id } : {}), name: call.name ?? "", response: toolResult(ctx.kiosk, ctx.locale, outcome) });
   }

@@ -19,7 +19,9 @@ export type TemplateId =
   | "pick_dine"
   | "yes_no"
   | "alternatives"
-  | "upsell";
+  | "upsell"
+  // [Call staff] alone, after an allergy or health question the data cannot settle (16-judge-r3-fixes:1).
+  | "ask_staff";
 
 export interface ChoiceRef {
   /** `staff` (id "staff"): a [Call staff] button after choices that may all be wrong (15-judge-fixes:1). */

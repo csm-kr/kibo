@@ -216,6 +216,27 @@ describe("buildInstructions", () => {
   });
 
   // 14-final:1: judges heard "the order confirm card has appeared" and "Please wait a moment" after an item was added.
+  it("a swap keeps the earlier choices the new item has, and nothing is called added before its tool said so (16-judge-r3-fixes:1)", () => {
+    for (const id of ["malo", "airport_rail"]) {
+      const text = buildInstructions(getKiosk(id), { locale: "en" });
+      expect(text, id).toMatch(/replaces an item with another.*carry over.*unless the user changes them/i);
+      expect(text, id).toContain("send that group with an empty optionIds list");
+      expect(text, id).toMatch(/added, prepared or changed only after its tool call succeeded/);
+    }
+  });
+
+  it("an allergy or health question lists every line's allergens, never calls anything safe, and offers [Call staff] (16-judge-r3-fixes:1)", () => {
+    const text = buildInstructions(k, { locale: "en" });
+    const allergy = text.slice(text.indexOf("## Allergies"), text.indexOf("## Cart changes"));
+    expect(allergy).toMatch(/for a set: the burger, the side and the drink/i);
+    expect(allergy).toMatch(/empty allergens list means none is listed, not that it is free of them/i);
+    expect(allergy).toMatch(/cross-contact/);
+    expect(allergy).toMatch(/Never say an item is safe/);
+    expect(allergy).toContain("offerChoices with ask_staff and {kind: staff, id: staff}");
+    // A ticket machine sells no food.
+    expect(buildInstructions(getKiosk("airport_rail"), { locale: "en" })).not.toContain("## Allergies");
+  });
+
   it("the checkout talks about the user's order, never a card on the screen, and replies never say please wait", () => {
     for (const id of ["malo", "airport_rail", "doughhouse"]) {
       const text = buildInstructions(getKiosk(id), { locale: "ko" });

@@ -16,6 +16,7 @@ import type { ModelClient, ModelTurn } from "./model";
 import { choiceQuestion } from "./choices";
 import { ownWordsLanguage, replyLanguageLine } from "./ownWords";
 import { inScreensLanguage, introOffer, plainRequest, quickReply, summaryReply, type DoneCall } from "./quickReply";
+import { swapTracker } from "./swap";
 import { toolDeclarations } from "./tools";
 
 // The text agent (POST /api/chat): a Gemini function-calling loop over the same commands the phone sends.
@@ -220,6 +221,7 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
   // Every call of the request and the last round's, for a reply the server builds when the model writes none.
   const allDone: DoneCall[] = [];
   let lastRound: DoneCall[] = [];
+  const swap = swapTracker(kiosk);
   let reply = "";
   let replySource: ChatResponse["replySource"] = "model";
   let stoppedEarly = false;
@@ -245,9 +247,12 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
     for (const call of out.functionCalls) {
       const t = performance.now();
       const cartBefore = cart;
-      const outcome = await run(call.name, call.args);
-      record(call.name, call.args, outcome, performance.now() - t);
-      done.push({ name: call.name, args: call.args, outcome, cartBefore });
+      // A swap's add keeps the replaced line's choices (swap.ts); what was really sent is what gets recorded.
+      const args = swap.args(call.name, call.args);
+      const outcome = await run(call.name, args);
+      swap.after(call.name, outcome, cartBefore);
+      record(call.name, args, outcome, performance.now() - t);
+      done.push({ name: call.name, args, outcome, cartBefore });
       const response = toolResult(kiosk, input.locale, outcome);
       parts.push({ functionResponse: { ...(call.id ? { id: call.id } : {}), name: call.name, response } });
     }

@@ -36,7 +36,7 @@ describe("choiceLabel", () => {
 });
 
 describe("choiceQuestion", () => {
-  const templates: TemplateId[] = ["pick_item", "pick_variant", "pick_option", "pick_dine", "yes_no", "alternatives", "upsell"];
+  const templates: TemplateId[] = ["pick_item", "pick_variant", "pick_option", "pick_dine", "yes_no", "alternatives", "upsell", "ask_staff"];
   const ask = (kiosk = k, templateId: TemplateId, choices: ChoiceRef[] = []) => ({
     ko: choiceQuestion(kiosk, { templateId, choices }, "ko"),
     en: choiceQuestion(kiosk, { templateId, choices }, "en"),
@@ -109,6 +109,13 @@ describe("declineLabel", () => {
     expect(declineLabel("upsell", "en")).toBe("No thanks");
   });
 
+  it("an offer to call staff after an allergy question can be turned down too (16-judge-r3-fixes:1)", () => {
+    expect(choiceQuestion(k, { templateId: "ask_staff", choices: [{ kind: "staff", id: "staff" }] }, "ko")).toBe("직원에게 확인해 드릴까요?");
+    expect(choiceQuestion(k, { templateId: "ask_staff", choices: [{ kind: "staff", id: "staff" }] }, "en")).toBe("Shall I call staff to check for you?");
+    expect(declineLabel("ask_staff", "ko")).toBe("괜찮아요");
+    expect(declineLabel("ask_staff", "en", "ja")).toBe("いりません");
+  });
+
   it("other questions need an answer, so they have none", () => {
     for (const t of ["pick_item", "pick_variant", "pick_option", "pick_dine", "yes_no", "alternatives"] as const) {
       expect(declineLabel(t, "en")).toBeNull();
@@ -137,7 +144,7 @@ describe("the AI language on the phone (16-judge-r3-fixes:0)", () => {
   });
 
   it("every fixed text has every AI language", () => {
-    const templates: TemplateId[] = ["pick_item", "pick_variant", "pick_option", "pick_dine", "yes_no", "alternatives", "upsell"];
+    const templates: TemplateId[] = ["pick_item", "pick_variant", "pick_option", "pick_dine", "yes_no", "alternatives", "upsell", "ask_staff"];
     for (const language of ["ja", "zh", "es", "vi", "fr", "th", "id"] as const) {
       for (const t of templates) {
         expect(choiceQuestion(k, { templateId: t, choices: [] }, "en", language)).not.toBe(choiceQuestion(k, { templateId: t, choices: [] }, "en"));

@@ -193,6 +193,58 @@ describe("runChat", () => {
     expect(out.actions).toEqual([{ tool: "removeFromCart", args: { lineId, itemId: "cola" }, code: "ok", ms: expect.any(Number) }]);
   });
 
+  describe("a swap keeps the earlier choices (16-judge-r3-fixes:1)", () => {
+    const CHEESE_LARGE: Call = {
+      name: "addToCart",
+      args: {
+        itemId: "cheese_burger",
+        variant: "set",
+        options: [{ groupId: "side", optionIds: ["fries_l"] }, { groupId: "drink", optionIds: ["cider"] }, { groupId: "ingredients", optionIds: ["no_pickles"] }],
+      },
+    };
+
+    it("remove then add in one request: the new set keeps large fries, cider and no pickles, with no question", async () => {
+      const s = await demo();
+      const first = await runChat(deps(script([CHEESE_LARGE], "Added.").model), input(s));
+      const lineId = first.cart[0].lineId;
+      const out = await runChat(
+        deps(script([{ name: "removeFromCart", args: { lineId } }, { name: "addToCart", args: { itemId: "bulgogi_burger", variant: "set" } }]).model),
+        input(s, { message: "그거 취소하고 불고기버거 세트로 바꿔 주세요", locale: "ko" }),
+      );
+      expect(out.cart.map(({ itemId, variant, selections }) => ({ itemId, variant, selections }))).toEqual([
+        { itemId: "bulgogi_burger", variant: "set", selections: { side: ["fries_l"], drink: ["cider"], ingredients: ["no_pickles"] } },
+      ]);
+      expect((await store.get(s.sessionId))?.pendingChoice).toBeNull();
+      // "What the AI did" shows what was really sent.
+      expect(out.actions[1].args).toMatchObject({ selections: { side: ["fries_l"], drink: ["cider"] } });
+      expect(out.reply).toContain("불고기버거 세트");
+      expect(out.reply).toContain("담았어요");
+    });
+
+    it("a plain add with nothing removed in the request is sent as the model wrote it", async () => {
+      const s = await demo();
+      await runChat(deps(script([CHEESE_LARGE], "Added.").model), input(s));
+      const out = await runChat(deps(script([{ name: "addToCart", args: { itemId: "bulgogi_burger", variant: "set" } }], "Which drink?").model), input(s, { message: "Also a bulgogi set?" }));
+      expect(out.cart).toHaveLength(1);
+      expect((await store.get(s.sessionId))?.pendingChoice).toBeNull();
+      expect(out.actions[0].code).toBe("NEEDS_CHOICE");
+    });
+
+    it("a refused add is never named as added in the server's reply", async () => {
+      const s = await demo();
+      const first = await runChat(deps(script([{ name: "addToCart", args: { itemId: "cheese_burger", variant: "set", options: [{ groupId: "drink", optionIds: ["cider"] }] } }], "Added.").model), input(s));
+      const lineId = first.cart[0].lineId;
+      // The model removes, then adds a sold-out item, and writes nothing: the server replies from the results.
+      const out = await runChat(
+        deps(script([{ name: "removeFromCart", args: { lineId } }, { name: "addToCart", args: { itemId: "shrimp_burger", variant: "set" } }], "").model),
+        input(s, { message: "Change it to a shrimp burger set, then what?" }),
+      );
+      expect(out.cart).toEqual([]);
+      expect(out.reply).toMatch(/Removed/);
+      expect(out.reply).not.toMatch(/Added|prepared/i);
+    });
+  });
+
   it("stops after 5 rounds; the 6th is never executed", async () => {
     const s = await demo();
     const { model, requests } = script([{ name: "addToCart", args: { itemId: "cola" } }]);

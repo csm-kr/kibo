@@ -1,0 +1,198 @@
+{
+  "date": "2026-10-15T00:37:54.527Z",
+  "model": "gemini-3.8-flash",
+  "backend": "auto",
+  "modelCallsByBackend": {
+    "api": 8,
+    "vertex": 0
+  },
+  "thinkingLevel": "low",
+  "evalClock": "14:00 KST",
+  "subset": [
+    "c-ko-swap-keeps-choices",
+    "r-en-allergy-staff",
+    "r-ko-allergy-staff"
+  ],
+  "cases": 3,
+  "passed": 3,
+  "passRate": 1,
+  "byGroup": {
+    "recovery": {
+      "pass": 3,
+      "total": 3
+    }
+  },
+  "byKiosk": {
+    "malo": {
+      "pass": 3,
+      "total": 3
+    }
+  },
+  "byType": {
+    "12-recovery": {
+      "pass": 3,
+      "total": 3
+    }
+  },
+  "latency": {
+    "requests": 4,
+    "totalMedianMs": 4167,
+    "totalP90Ms": 8432,
+    "firstToolRequests": 4,
+    "firstToolMedianMs": 3458,
+    "firstToolP90Ms": 4493,
+    "modelCalls": 8,
+    "roundMedianMs": 2491,
+    "roundP90Ms": 4479,
+    "callsPerRequest": {
+      "1": 1,
+      "2": 2,
+      "3": 1
+    },
+    "oneCallWithTools": 1
+  },
+  "notCovered": [
+    {
+      "type": "7-count-limits",
+      "reason": "Count limits (max 3 toppings) need the learned Doughhouse kiosk, which has no LearnedAdapter yet."
+    }
+  ],
+  "results": [
+    {
+      "id": "c-ko-swap-keeps-choices",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "bulgogi_burger",
+          "variant": "set",
+          "qty": 1,
+          "selections": {
+            "side": [
+              "fries_l"
+            ],
+            "drink": [
+              "cider"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 8432,
+          "firstToolMs": 4493,
+          "rounds": [
+            4479,
+            1836,
+            1995
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 3493,
+          "firstToolMs": 3458,
+          "rounds": [
+            3452
+          ],
+          "tools": [
+            {
+              "name": "removeFromCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-en-allergy-staff",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "ask_staff",
+        "choices": [
+          {
+            "kind": "staff",
+            "id": "staff"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 6668,
+          "firstToolMs": 3967,
+          "rounds": [
+            3964,
+            2655
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-ko-allergy-staff",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "ask_staff",
+        "choices": [
+          {
+            "kind": "staff",
+            "id": "staff"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 4167,
+          "firstToolMs": 1675,
+          "rounds": [
+            1673,
+            2491
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

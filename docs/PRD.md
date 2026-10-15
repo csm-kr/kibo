@@ -88,7 +88,7 @@ MALO BURGER is built as complex as a real fast-food kiosk; rules live in data an
 | Time-limited items, sold out | MALO BURGER | Server rejects; alternatives as buttons |
 | Count limits (max 3 toppings) | Doughhouse (learned) | Server validation |
 | Drink customization (hot/iced, syrup, milk); shot counts not yet expressible | Gureum Darak Coffee (learned, evidence only) | Option groups learned; no orders in the demo |
-| Allergens | MALO BURGER | Answer from data; otherwise call staff |
+| Allergens | MALO BURGER | Answer from data for every line (a set's side and drink too), never "safe"; always offers [Call staff] |
 | Coupons, memberships, mobile wallets | Out of scope | Shown as "not supported" in the deck |
 
 Proof: (1) the complex hero order, (2) a field count of screens/taps/time for the same order at two real fast-food kiosks (notes only, no photos; the simulator should be within ±20% of real taps), (3) an evaluation set grouped by complexity type (`docs/TESTING.md`).

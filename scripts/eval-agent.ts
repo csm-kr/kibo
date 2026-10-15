@@ -31,8 +31,11 @@ interface ExpectedLine {
   selections: Record<string, string[]>;
 }
 
-/** `excludes`: ids that must not be among the buttons ("not spicy" must not offer a Spicy item). */
-type ChoicesExpect = { templateId: string; ids: string[]; excludes?: string[] };
+/**
+ * `excludes`: ids that must not be among the buttons ("not spicy" must not offer a Spicy item). Without `templateId`
+ * any template passes (an allergy answer only has to include [Call staff], 16-judge-r3-fixes:1).
+ */
+type ChoicesExpect = { templateId?: string; ids: string[]; excludes?: string[] };
 
 type Expect =
   // With `choices`: one sentence that adds a line and asks about another ("a coffee for me, something not spicy for him").
@@ -193,7 +196,7 @@ function judge(
 function choiceMiss(final: Session, want: ChoicesExpect): string | null {
   const p = final.pendingChoice;
   if (!p) return "no choice buttons";
-  if (p.templateId !== want.templateId) return `choice template ${p.templateId}`;
+  if (want.templateId && p.templateId !== want.templateId) return `choice template ${p.templateId}`;
   const missing = want.ids.filter((id) => !p.choices.some((ch) => ch.id === id));
   if (missing.length > 0) return `choices miss ${missing.join(",")}`;
   const unwanted = (want.excludes ?? []).filter((id) => p.choices.some((ch) => ch.id === id));

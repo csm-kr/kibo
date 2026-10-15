@@ -576,6 +576,14 @@ describe("offerChoices", () => {
     expect(applyCommand(phoneOrdering(), c, ctx("phone")).session.pendingChoice?.choices).toEqual(choices);
   });
 
+  it("offers [Call staff] alone after an allergy question (ask_staff, 16-judge-r3-fixes:1)", () => {
+    const c = cmd("offerChoices", { templateId: "ask_staff", choices: [{ kind: "staff", id: "staff" }] }, { source: "voice" });
+    expect(applyCommand(phoneOrdering(), c, ctx("phone")).session.pendingChoice).toEqual({
+      templateId: "ask_staff",
+      choices: [{ kind: "staff", id: "staff" }],
+    });
+  });
+
   it("is refused once paying", () => {
     const s: Session = { ...fresh(), status: "paying" };
     const c = cmd("offerChoices", { templateId: "yes_no", choices: [{ kind: "yesno", id: "yes" }] }, { source: "voice" });

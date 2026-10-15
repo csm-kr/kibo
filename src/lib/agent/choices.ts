@@ -64,6 +64,17 @@ const QUESTION: Record<TemplateId, Text> = {
     th: "รับของหวานด้วยไหม",
     id: "Mau tambah makanan penutup?",
   },
+  ask_staff: {
+    ko: "직원에게 확인해 드릴까요?",
+    en: "Shall I call staff to check for you?",
+    ja: "スタッフに確認してもらいましょうか？",
+    zh: "要请店员帮您确认吗？",
+    es: "¿Llamo al personal para que lo compruebe?",
+    vi: "Tôi gọi nhân viên kiểm tra giúp bạn nhé?",
+    fr: "J'appelle le personnel pour vérifier ?",
+    th: "ให้เรียกพนักงานมาตรวจสอบให้ไหม",
+    id: "Mau saya panggilkan staf untuk memastikan?",
+  },
 };
 
 // A ticket machine sells tickets, not menu items.
@@ -79,9 +90,9 @@ const GROUP_QUESTION: Record<string, Text> = {
   top_up: { ko: "얼마를 충전할까요?", en: "How much would you like to top up?", ja: "いくらチャージしますか？", zh: "要充值多少？", es: "¿Cuánto quiere recargar?", vi: "Bạn muốn nạp bao nhiêu?", fr: "Combien voulez-vous recharger ?", th: "ต้องการเติมเงินเท่าไหร่", id: "Mau isi ulang berapa?" },
 };
 
-const DECLINE: Partial<Record<TemplateId, Text>> = {
-  upsell: { ko: "괜찮아요", en: "No thanks", ja: "いりません", zh: "不用了", es: "No, gracias", vi: "Không, cảm ơn", fr: "Non merci", th: "ไม่เป็นไร", id: "Tidak, terima kasih" },
-};
+const NO_THANKS: Text = { ko: "괜찮아요", en: "No thanks", ja: "いりません", zh: "不用了", es: "No, gracias", vi: "Không, cảm ơn", fr: "Non merci", th: "ไม่เป็นไร", id: "Tidak, terima kasih" };
+
+const DECLINE: Partial<Record<TemplateId, Text>> = { upsell: NO_THANKS, ask_staff: NO_THANKS };
 
 /** The AI language's text where the picker chose one the screens do not have, else the screens' locale. */
 const pick = (text: Text, locale: Locale, language?: SpeechLanguage) => text[language && aiOnly(language) ? language : locale];

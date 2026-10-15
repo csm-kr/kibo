@@ -183,6 +183,26 @@ describe("runToolCalls", () => {
     ]);
     expect(JSON.stringify(actions)).not.toMatch(/live-uuid|free text|Please confirm/);
   });
+
+  it("a remove then an add in one batch: the add keeps the removed line's choices (16-judge-r3-fixes:1)", async () => {
+    const old = { ...LINE, selections: { side: ["fries_l"], drink: ["cider"] } };
+    const sent: VoiceCommand[] = [];
+    const c = ctx({
+      cart: () => [old],
+      send: async (cmd) => {
+        sent.push(cmd);
+        return { ...REPLY, cart: [] };
+      },
+    });
+    await runToolCalls(
+      [
+        { id: "1", name: "removeFromCart", args: { lineId: LINE.lineId } },
+        { id: "2", name: "addToCart", args: { itemId: "bulgogi_burger", variant: "set" } },
+      ],
+      c,
+    );
+    expect(sent[1].args).toEqual({ itemId: "bulgogi_burger", variant: "set", selections: { side: ["fries_l"], drink: ["cider"] } });
+  });
 });
 
 describe("runToolCalls on a learned kiosk (I-155)", () => {
