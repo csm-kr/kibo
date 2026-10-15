@@ -97,6 +97,19 @@ Named by the orchestrator on 10-14 from web research. **Not re-read in 14-final:
 | S35 | **15.05 million** foreign visitors to Korea in Jan–Aug 2026, **+21.6%** on the same period of 2025 (12.38 million); August 2026 alone 2.25 million (+23.3%). | Ministry of Culture, Sports and Tourism, press release via Korea Policy Briefing, 2026-09-28. https://www.korea.kr/news/policyNewsView.do?newsId=148972696 | First paragraph: "올해 8월까지 한국을 방문한 외국인 관광객이 누적 1505만 명으로, 지난해 같은 기간 1238만 명 대비 21.6% 늘었다" | not used yet |
 | S36 | Vertex AI: "Session resumption for Gemini Live API is disabled by default"; enabling it stores "text, video, and audio prompt data and model outputs, for up to 24 hours"; "Google won't use your data to train or fine-tune any AI/ML models without your prior permission or instruction." KIBO does not enable session resumption (`docs/SECURITY.md` "Privacy line"). | Google Cloud, "Vertex AI and zero data retention" (data governance), last updated 2026-10-13. https://docs.cloud.google.com/vertex-ai/generative-ai/docs/data-governance | Sections on session resumption and training | landing "Your data" (supports the wording), deck slide 06 |
 
+## 10. Business sources (deck slides 05, 11, 16, A4, A6; opened by the deck agent on 10-15)
+Press reports are secondary sources; quote them as "reported". Research notes: `videos/orchestrator/research-10-15/WINNERS_AND_BUSINESS.md` (git-ignored).
+
+| Id | Fact | Source | Where in it | Used on |
+|---|---|---|---|---|
+| S37 | **349,189** stores had Toss Place payment terminals at the end of Q2 2026. This is stores with terminals, not kiosks. | MTN, 2026-10-12. https://news.mtn.co.kr/news-detail/2026101211105010564 | body | deck 05, A6 |
+| S38 | Toss Place's own kiosk accessibility features: arrow keys, a lowered screen, enlarged and high-contrast view, audio guidance. Its kiosk program runs on kiosks stores already have. | Toss Place, 2025-12-09. https://tossplace.com/story/barrier_free_kiosk ; 2024-11-13. https://tossplace.com/story/kiosk_synk | body | deck 04, A4, A6 |
+| S39 | A standard kiosk costs about ₩2M on average and a barrier-free one about ₩5M ("more than twice"). Of the three big burger chains, one has finished every store. A constitutional complaint was filed 2026-01-13. | Dailian, 2026-09-30. https://www.dailian.co.kr/news/view/1695711 | body | deck 05, 11, A6 |
+| S40 | 2026 Smart Store programme: for a ₩7M barrier-free kiosk, the state pays ₩4.9M (70%; 80% for some owners), the owner pays ₩2.1M plus ₩0.7M VAT. Only technology registered with SEMAS can be applied for, and barrier-free applications can be ranked first. | SEMAS notice, 2026-03-09 (posted by Goesan County). https://www.goesan.go.kr/DATA/bbs/190/89633AC7-0E20-933D-F031-C408A3E3BA43.pdf | p. 3 | deck 05, 11, A6 |
+| S41 | A call bell costs ₩70,000–200,000, with no government subsidy. | Asia Today, 2026-02-13. https://www.asiatoday.co.kr/kn/view.php?key=20260213010005022 | body | deck 11, A6 |
+| S42 | Kiosks in use in 2024: **719,658** (MSIT estimate, reported). | Digital Daily, 2026-09-27. https://www.ddaily.co.kr/page/view/2026092716200808219 | body | deck 05, A6 (same figure as S19) |
+| S43 | Busan funds 6-language menus for 2,015 restaurants (2025). MOEF announced QR menus for visitors (2026-02-25). | Busan news, 2025-07-08. https://www.twig24.com/news/local_bs/2025/07/08/20250708500144 ; MOEF 2026-02-25 (see the deck's A6 link) | body | deck 05, A6 |
+
 ## Claims we do not make
 
 | Claim to avoid | Why | Say instead |
