@@ -106,3 +106,46 @@ for (const vp of [VIEWPORTS[0], VIEWPORTS[1]]) {
     }
   });
 }
+
+// #1 33: on a phone the 24px chevrons in [Back] and [Next] were squeezed by the buttons' width (2–12px at 390 and 360).
+// Every icon in the controls row keeps its 24px, and every label there stays on one line inside its button, in each
+// state of [Play] (Pause while it plays, Play, Play again at the end).
+for (const vp of [{ width: 390, height: 844 }, { width: 360, height: 800 }]) {
+  test(`learn replay at ${vp.width}x${vp.height}: the controls' icons keep 24px and their labels fit (#1 33)`, async ({ page }) => {
+    await page.setViewportSize(vp);
+    await page.goto("/learn/doughhouse");
+    const play = page.locator("[data-learn-play]");
+    const row = page.locator("[data-learn-next]").locator("xpath=..");
+    const measure = () =>
+      row.evaluate((el) =>
+        [...el.querySelectorAll("button")].map((b) => {
+          const icon = b.querySelector("svg")!.getBoundingClientRect();
+          // The label's line boxes: its text nodes only (the icon's own box is not a line).
+          const tops = new Set<number>();
+          for (const n of b.childNodes) {
+            if (n.nodeType !== Node.TEXT_NODE || !n.textContent?.trim()) continue;
+            const range = document.createRange();
+            range.selectNodeContents(n);
+            for (const r of range.getClientRects()) if (r.width > 0) tops.add(Math.round(r.top));
+          }
+          const lines = tops.size;
+          return { label: b.textContent?.trim(), icon: [Math.round(icon.width), Math.round(icon.height)], fits: b.scrollWidth <= b.clientWidth, lines };
+        }),
+      );
+    const expectWhole = async (state: string) => {
+      for (const b of await measure()) {
+        expect(b.icon, `${state}: ${b.label} icon`).toEqual([24, 24]);
+        expect(b.fits, `${state}: ${b.label} fits its button`).toBe(true);
+        expect(b.lines, `${state}: ${b.label} on one line`).toBe(1);
+      }
+    };
+    await expect(play).toHaveText("Pause", { timeout: 60_000 });
+    await expectWhole("playing");
+    await play.click();
+    await expect(play).toHaveText("Play");
+    await expectWhole("paused");
+    await page.getByRole("slider", { name: "Turn" }).press("End");
+    await expect(play).toHaveText("Play again");
+    await expectWhole("at the end");
+  });
+}

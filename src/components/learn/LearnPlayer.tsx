@@ -32,6 +32,11 @@ const SMALL_BASE = `flex min-h-14 min-w-14 flex-1 items-center justify-center ga
 const SMALL = `${SMALL_BASE} bg-kibo-tint text-kibo active:bg-kibo-tint-pressed`;
 /** The chosen speed: deep blue text with a check on the tint (not a second filled button beside [Play]). */
 const SMALL_ON = `${SMALL_BASE} bg-kibo-tint-pressed text-kibo-deep`;
+/**
+ * [Back] and [Next]: on a phone the compact kind (icon over a 16px label, 56px wide, UI_GUIDE "Buttons"), so [Play]
+ * keeps room for "Play again" on one line and no 24px chevron is squeezed (#1 33: 2–12px wide at 360 and 390).
+ */
+const STEP = `${SMALL} max-sm:flex-none max-sm:gap-0 max-sm:px-1 max-sm:text-base`;
 
 export function LearnPlayer({ run }: { run: LearnRun }) {
   const { data } = run;
@@ -108,8 +113,8 @@ export function LearnPlayer({ run }: { run: LearnRun }) {
 
           <div className="flex flex-col gap-3">
             <div className="flex gap-3">
-              <button type="button" onClick={() => go(index - 1)} disabled={index === 0} className={SMALL}>
-                <ChevronLeft {...ICON} />
+              <button type="button" onClick={() => go(index - 1)} disabled={index === 0} className={`${STEP} max-sm:flex-col`}>
+                <ChevronLeft {...ICON} className="shrink-0" />
                 Back
               </button>
               <button
@@ -122,9 +127,9 @@ export function LearnPlayer({ run }: { run: LearnRun }) {
                 {running ? <Pause {...ICON} /> : <Play {...ICON} />}
                 {running ? "Pause" : index >= last ? "Play again" : "Play"}
               </button>
-              <button type="button" data-learn-next onClick={() => go(index + 1)} disabled={index === last} className={SMALL}>
+              <button type="button" data-learn-next onClick={() => go(index + 1)} disabled={index === last} className={`${STEP} max-sm:flex-col-reverse`}>
                 Next
-                <ChevronRight {...ICON} />
+                <ChevronRight {...ICON} className="shrink-0" />
               </button>
             </div>
             <div role="group" aria-label="Speed" className="flex items-center gap-3">
