@@ -288,6 +288,64 @@ test.describe(() => {
   });
 });
 
+/** Opens /demo, starts and chooses "Eat here" on the phone, so the phone is on its talk screen with an empty cart. */
+async function startTalk(page: Page) {
+  await page.goto("/demo");
+  await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible({ timeout: 60_000 });
+  const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
+  await page.getByRole("button", { name: "Start", exact: true }).click();
+  const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
+  await phoneScreen(page).getByRole("button", { name: "Eat here" }).click();
+  await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "talk");
+  return s;
+}
+
+test.describe(() => {
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.81" } });
+
+  // #1 18: right after the hero order the card's total sat under the dock at every laptop size (1440×900 too). The
+  // one-line cart summary above the dock keeps the count and total in view while the card is out of view.
+  test("D2 right after the hero order: the cart summary or the card's total fully in view", async ({ page, request }, info) => {
+    const sizes = [{ width: 1280, height: 720 }, { width: 1366, height: 768 }, { width: 1440, height: 789 }, VIEWPORTS[0]];
+    for (const [i, vp] of sizes.entries()) {
+      // A fresh order at each size, each from its own address, so --repeat-each stays under 10 new sessions a
+      // minute per address (R-005, R-018).
+      await page.setExtraHTTPHeaders({ "X-Forwarded-For": `192.0.2.${81 + i}` });
+      await page.setViewportSize(vp);
+      const s = await startTalk(page);
+      // The hero sentence answered by the test with the agent's recorded actions (no model).
+      await page.route("**/api/chat", async (route) => {
+        for (const a of HERO_ACTIONS) {
+          await command(request, s.deviceToken, { sessionId: s.sessionId, type: a.tool, args: a.args, source: "text", utteranceSeq: 1 });
+        }
+        await route.fulfill({
+          json: {
+            ok: true,
+            reply: "Added one Cheeseburger set with Zero cola and no pickles, and one Cheeseburger set with Cider. Would you like anything else?",
+            status: "ordering",
+            cart: [],
+            total: 0,
+            cartVersion: 2,
+            actions: HERO_ACTIONS,
+          },
+        });
+      });
+      await page.getByRole("textbox", { name: "Type your order" }).fill("Two cheeseburger sets. One without pickles; drinks zero cola and cider.");
+      await page.getByRole("button", { name: "Send", exact: true }).click();
+      await expect(page.locator('[data-bubble="model"]')).toBeVisible();
+      await expect(page.getByRole("region", { name: "Your order" }).locator("li")).toHaveCount(2);
+      const summary = page.locator("[data-cart-summary]");
+      const total = page.getByRole("region", { name: "Your order" }).getByText("₩13,800", { exact: true });
+      await check(page, info, "D2-hero-summary", async () => {
+        await expect(async () => {
+          await expect((await summary.isVisible()) ? summary : total).toBeInViewport({ ratio: 1, timeout: 1_000 });
+        }).toPass({ timeout: 10_000 });
+      }, [vp]);
+      await page.unroute("**/api/chat");
+    }
+  });
+});
+
 /** Opens /demo?k=<kioskId>, starts, opens the guide and chooses a scenario; returns the scenario's own session. */
 async function chooseScenario(page: Page, kioskId: string, scenarioId: string) {
   await page.goto(`/demo?k=${kioskId}`);

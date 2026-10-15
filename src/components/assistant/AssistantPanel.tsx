@@ -295,8 +295,8 @@ export function AssistantPanel(props: Props) {
     say(label);
   }
 
-  // P3: when the cart card is out of view (a small phone, larger text), a one-line summary above the dock shows the
-  // count and total; a tap scrolls to the card's total.
+  // P3: when the cart card is out of view (a small phone, larger text, a laptop's /demo column under its full dock), a
+  // one-line summary above the dock shows the count and total; a tap scrolls to the card's total.
   const cartEnd = useRef<HTMLSpanElement>(null);
   const [cartInView, setCartInView] = useState(true);
   useEffect(() => {
@@ -342,7 +342,7 @@ export function AssistantPanel(props: Props) {
   const ended = screen === "ended" || screen === "taken";
   const itemsInCart = session ? session.cart.reduce((n, l) => n + l.qty, 0) : 0;
   const choicesShown = screen === "talk" && Boolean(session?.pendingChoice) && pendingKey !== declined;
-  const summaryShown = mode === "phone" && itemsInCart > 0 && !cartInView && !choicesShown;
+  const summaryShown = itemsInCart > 0 && !cartInView && !choicesShown;
 
   // P3: after each send and reply, the newest message and the choices under it come fully into view above the dock;
   // on a small phone with larger text they were left under it (15-judge-fixes:2).
@@ -354,7 +354,7 @@ export function AssistantPanel(props: Props) {
     const bubbles = turn.querySelectorAll("[data-bubble]");
     // Room for the cart summary, which appears once the card below scrolls out of view.
     const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-    const reserve = mode === "phone" && itemsInCart > 0 && !choicesShown && !summaryShown ? SUMMARY_REM * rootPx : 0;
+    const reserve = itemsInCart > 0 && !choicesShown && !summaryShown ? SUMMARY_REM * rootPx : 0;
     keepInView(bubbles[bubbles.length - 1] ?? turn, turn, reserve, turn.querySelector("[data-choices]"));
   });
   useEffect(() => showTurn(), [lastId, working, choicesShown, pendingKey]);
@@ -537,8 +537,8 @@ export function AssistantPanel(props: Props) {
             </div>
             {!limited && <Suggestions examples={props.examples ?? []} locale={locale} disabled={busy} onPick={say} />}
           </Scroll>
-          {/* The phone only: /demo's laptop column has room for the card, and a summary appearing there as keyboard
-              focus scrolls the card away would shrink the area under the focused control. */}
+          {/* /demo too: right after the first order its full dock left the card's total out of view at every laptop
+              size (#1 18). Focus stays in view as the summary comes and goes (Scroll, I-220). */}
           {/* Not while choices show: the pill would cover the buttons the AI just asked about (15-judge-fixes:2). */}
           {summaryShown && (
             <div className="flex-none px-4 pt-2 pb-2">
