@@ -553,15 +553,14 @@ export function AssistantPanel(props: Props) {
                 onClick={() => cartEnd.current?.scrollIntoView({ block: "end" })}
                 className={`@container flex min-h-14 w-full items-center justify-between gap-2 rounded-full bg-white px-4 text-xl font-semibold text-kibo-deep shadow-card ${PRESS} ${FOCUS}`}
               >
-                {/* One line (#1 9): it wrapped to two at 360px with larger text. The title gives way first, to screen
-                    readers only, with larger text or when the pill is too narrow for it; the count and total stay. */}
-                <span className="flex min-w-0 gap-2 text-left whitespace-nowrap">
-                  <span className={props.largeText ? "sr-only" : "min-w-0 truncate @max-[19rem]:sr-only"}>
+                {/* One line (#1 9): it wrapped to two at 360px with larger text. The title gives way, to screen readers
+                    only, with larger text or when the pill is too narrow for it; the count and total stay. Never
+                    clipped: text spacing a user sets may still wrap it (WCAG 1.4.12). */}
+                <span className="min-w-0 text-left">
+                  <span className={props.largeText ? "sr-only" : "@max-[19rem]:sr-only"}>
                     {pt("cartTitle", locale, kiosk.domain)}{" "}
                   </span>
-                  <span>
-                    {itemCount(itemsInCart, locale)} · {formatWon(session.total, locale)}
-                  </span>
+                  {itemCount(itemsInCart, locale)} · {formatWon(session.total, locale)}
                 </span>
                 <ChevronRight {...ICON} />
               </button>
