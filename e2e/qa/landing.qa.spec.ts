@@ -88,3 +88,23 @@ test("no dark 2px outlines; the cards and the secondary links follow the phone d
     await expect(link, name).toHaveCSS("border-top-width", "0px");
   }
 });
+
+// #1 35: the hero picture was saved 1280px wide and drawn 1024 CSS px wide, so a 2× (Retina) screen got the 1280px
+// original for its 2048 device px and blurred it (1.6× upscale). The file the browser picks covers the device pixels.
+test.describe(() => {
+  test.use({ deviceScaleFactor: 2 });
+
+  test("the hero picture is sharp on a 2× screen: never upscaled (#1 35)", async ({ page }) => {
+    await page.goto("/");
+    const hero = page.locator('img[src*="demo.webp"], img[srcset*="demo.webp"]').first();
+    await expect(hero).toBeVisible({ timeout: 60_000 });
+    await expect.poll(() => hero.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
+    // The file's own pixels: with a srcset, naturalWidth is scaled by the candidate's density, so decode what came.
+    const fit = await hero.evaluate(async (img: HTMLImageElement) => ({
+      devicePx: Math.round(img.getBoundingClientRect().width * devicePixelRatio),
+      imagePx: (await createImageBitmap(await (await fetch(img.currentSrc)).blob())).width,
+    }));
+    expect(fit.devicePx).toBe(2048);
+    expect(fit.imagePx, `${fit.imagePx}px image for ${fit.devicePx} device px`).toBeGreaterThanOrEqual(fit.devicePx);
+  });
+});

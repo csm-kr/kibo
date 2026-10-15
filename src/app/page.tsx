@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "KIBO — talk to the kiosk",
     description: "Say your order to your own phone, and the kiosk already in front of you fills its own cart. Only you can pay.",
-    images: [{ url: "/landing/demo.webp", width: 1280, height: 1168, alt: "The KIBO demo: a kiosk and a phone side by side" }],
+    images: [{ url: "/landing/demo.webp", width: 2048, height: 1869, alt: "The KIBO demo: a kiosk and a phone side by side" }],
   },
 };
 

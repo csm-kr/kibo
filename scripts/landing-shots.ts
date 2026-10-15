@@ -168,10 +168,11 @@ async function main() {
     const kioskCol = await demo.locator('section[aria-labelledby="demo-kiosk-caption"]').boundingBox();
     const phoneCol = await demo.locator("[data-demo-check]").boundingBox();
     if (!kioskCol || !phoneCol) throw new Error("no demo columns");
-    // Fixed 1280:1168 (the <Image> size on /), anchored on the kiosk column; the phone column ends inside it.
+    // Fixed 1280:1168 (the <Image> size on /), anchored on the kiosk column; the phone column ends inside it. Saved
+    // 2048 wide, as the 2x capture is: / draws it 1024 CSS px wide, and a 1280px file blurred on 2x screens (#1 35).
     const heroWidth = phoneCol.x + phoneCol.width - kioskCol.x + 16;
     const hero = { x: kioskCol.x - 8, y: kioskCol.y - 8, width: heroWidth, height: Math.round((heroWidth * 1168) / 1280) };
-    await saveWebp(encoder, await demo.screenshot({ clip: hero }), "demo", 1280, 1168);
+    await saveWebp(encoder, await demo.screenshot({ clip: hero }), "demo", 2048, Math.round((2048 * 1168) / 1280));
     await demoCtx.close();
 
     // One picture per place on /demo and the landing page: the top 4:3 of each kiosk's first menu screen, in Korean.
