@@ -21,7 +21,8 @@ interface Props {
 export function ActionStrip({ kiosk, actions, locale }: Props) {
   const newestFirst = [...actions].reverse();
   return (
-    <div data-action-strip className="flex min-h-0 flex-1 flex-col text-ink">
+    // Its first 8px do not scroll, as the scenarios' (ScenarioGuide).
+    <div data-action-strip className="flex min-h-0 flex-1 flex-col pt-2 text-ink">
       {/* Legend and rows scroll together, so a short screen still reaches every row; focusable for keyboard scrolling
           (I-067), with its ring inside the card, which clips what lies outside it. */}
       <div
@@ -30,7 +31,7 @@ export function ActionStrip({ kiosk, actions, locale }: Props) {
         role="group"
         aria-label={pt("aiActions", locale)}
         tabIndex={0}
-        className={`flex min-h-0 flex-1 scroll-pb-8 flex-col gap-2 overflow-y-auto p-4 ${FOCUS_INSIDE}`}
+        className={`flex min-h-0 flex-1 scroll-pb-8 flex-col gap-2 overflow-y-auto px-4 pt-2 pb-4 ${FOCUS_INSIDE}`}
       >
         <p className="text-base text-muted">{pt("aiActionsLegend", locale)}</p>
         {actions.length === 0 ? (

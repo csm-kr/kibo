@@ -266,6 +266,16 @@ test.describe(() => {
     // Tab leaves the tablist for the panel's content (the rows scroll with the keyboard, I-067).
     await page.keyboard.press("Tab");
     await expect(page.locator("#demo-actions")).toBeFocused();
+
+    // A control scrolled to the top of either panel stays 8px clear of the tabs' 56px targets (UI_QA target gaps).
+    for (const [name, area] of [["Scenarios", "#demo-scenario-guide"], ["What the AI did", "#demo-actions"]] as const) {
+      await tab(page, name).click();
+      const gap = await page.evaluate((sel) => {
+        const row = document.querySelector("[data-scenario-guide] [role=tablist]")!.getBoundingClientRect();
+        return document.querySelector(sel)!.getBoundingClientRect().top - row.bottom;
+      }, area);
+      expect(gap, `${name}: the scroll area's top under the tabs`).toBeGreaterThanOrEqual(8);
+    }
   });
 
   test("the first tool call of an order switches to 'What the AI did' once; switching back sticks (#1 E)", async ({ page, request }) => {

@@ -189,16 +189,18 @@ export function ScenarioGuide(props: Props) {
           <Caption id="demo-guide-caption" n={3} name={pt("scenarios", locale)} />
         )}
       </div>
-      {/* Both panels stay mounted, so a scenario playing on keeps playing while the other tab shows. */}
+      {/* Both panels stay mounted, so a scenario playing on keeps playing while the other tab shows. Each panel's first
+          8px do not scroll, so a control scrolled to its top stays 8px clear of the tabs' targets (UI_QA target gaps,
+          as I-282). */}
       <div
         role={ai ? "tabpanel" : undefined}
         id={panelId("scenarios")}
         aria-labelledby={ai ? tabId("scenarios") : undefined}
         hidden={tab !== "scenarios"}
-        className="flex min-h-0 flex-1 flex-col"
+        className="flex min-h-0 flex-1 flex-col pt-2"
       >
         {/* As tall as its content and scrolls past it, so one scenario card leaves no empty panel under it (#1 12). */}
-        <div id="demo-scenario-guide" lang={locale} className="flex min-h-0 scroll-pb-8 flex-col gap-4 overflow-y-auto p-4 text-ink">
+        <div id="demo-scenario-guide" lang={locale} className="flex min-h-0 scroll-pb-8 flex-col gap-4 overflow-y-auto px-4 pt-2 pb-4 text-ink">
           {body}
           <ScrollFade className="-bottom-4 -mx-4 -mt-12 to-white" />
         </div>
