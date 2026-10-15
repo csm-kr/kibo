@@ -306,7 +306,8 @@ test.describe(() => {
     await expect(tab(page, "What the AI did").locator("[data-action-count]")).toHaveText(String(2 + MIXED_ACTIONS.length));
     await expect(tab(page, "Scenarios")).toHaveAttribute("aria-selected", "true");
 
-    // A fresh order (a chosen scenario) switches once more on its own first tool call.
+    // A fresh order (a chosen scenario): a step sent from the guide keeps the guide open, so the next step is one tap
+    // away; the AI tab's count still shows the new calls (design-qa round 2, follow-up a).
     const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
     await page.locator('[data-scenario="sunja-lunch"]').click();
     const next = (await (await created).json()) as DemoSession;
@@ -314,6 +315,13 @@ test.describe(() => {
     await expect(tab(page, "What the AI did").locator("[data-action-count]")).toHaveCount(0);
     await answerChat(page, request, next, HERO_ACTIONS, 1);
     await third(page).locator('[data-scenario-step="0"]').getByRole("button").click();
+    await expect(tab(page, "What the AI did").locator("[data-action-count]")).toHaveText("2");
+    await expect(tab(page, "Scenarios")).toHaveAttribute("aria-selected", "true");
+    await expect(third(page).locator('[data-scenario-step="1"]').getByRole("button")).toBeVisible();
+
+    // Typed or spoken in the same order, the first tool call still switches once.
+    await answerChat(page, request, next, MIXED_ACTIONS, 2);
+    await say(page, "And more");
     await expect(tab(page, "What the AI did")).toHaveAttribute("aria-selected", "true");
   });
 

@@ -40,6 +40,8 @@ interface Props {
    * phone: the sentences stay as text to say, and nothing here sends or plays.
    */
   send?: SayFn;
+  /** Called right before a step chip sends its sentence, so the page can tell a guided step from typing. */
+  onStepSend?: () => void;
   starting: boolean;
   startFailed: boolean;
   /** A fresh demo order, the same as [Try again]. */
@@ -297,7 +299,10 @@ function Checklist(props: Props & { scenario: Scenario }) {
                   <button
                     type="button"
                     disabled={playing || !sendable}
-                    onClick={() => void send(step.say[locale])}
+                    onClick={() => {
+                      props.onStepSend?.();
+                      void send(step.say[locale]);
+                    }}
                     className={SAY_CHIP}
                   >
                     {step.say[locale]}

@@ -78,6 +78,10 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
   // The third column's tab. The first tool call of each order switches it to "What the AI did" once, so a judge sees
   // the AI's work without looking for it; a switch back sticks for that order (#1 E).
   const [side, setSide] = useState<{ tab: SideTab; switchedFor: string | null }>({ tab: "scenarios", switchedFor: null });
+  // A step sent from the guide keeps the guide open, so the next step is one tap away; its tool calls still count on the
+  // AI tab (design-qa round 2). Set by the step chip, then read by the user turn it starts.
+  const stepPending = useRef(false);
+  const turnFromGuide = useRef(false);
 
   const [run, setRun] = useState<Run | null>(null);
   // The session whose order number the kiosk shows (past its receipt question), for the English step line.
@@ -311,14 +315,18 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
                   onTryAgain={tryAgain}
                   endCard={endCard}
                   onSay={onSay}
-                  onUserTurn={() => count("sentences")}
+                  onUserTurn={() => {
+                    turnFromGuide.current = stepPending.current;
+                    stepPending.current = false;
+                    count("sentences");
+                  }}
                   onActions={(list) => {
                     setActions((prev) => ({
                       sessionId: tokens.sessionId,
                       list: [...(prev.sessionId === tokens.sessionId ? prev.list : []), ...list].slice(-MAX_ACTIONS),
                     }));
                     // The AI's tool calls only: the user's own tap on [Yes, pay now] is listed but is not the AI's work.
-                    if (list.some((a) => !a.tap)) {
+                    if (list.some((a) => !a.tap) && !turnFromGuide.current) {
                       setSide((t) => (t.switchedFor === tokens.sessionId ? t : { tab: "ai", switchedFor: tokens.sessionId }));
                     }
                   }}
@@ -333,6 +341,7 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
             locale={locale}
             // The judge's own phone: the sentences are to say there, so nothing here sends or plays.
             send={ownPhone ? undefined : send}
+            onStepSend={() => (stepPending.current = true)}
             starting={demo.starting}
             startFailed={demo.error !== null}
             onFresh={tryAgain}
