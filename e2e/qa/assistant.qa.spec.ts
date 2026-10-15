@@ -1,6 +1,6 @@
 import { expect, test, type APIRequestContext, type Page, type TestInfo } from "@playwright/test";
 import { pt } from "@/lib/i18n/phone";
-import { claim, command, hintsCut, warmPhone } from "../helpers";
+import { claim, command, expectPhoneEdgeFaded, hintsCut, phoneEdge, warmPhone } from "../helpers";
 import { PHONE, qaState, type Findings } from "./checks";
 
 // UI QA of the phone screens (docs/UX.md screen map P2–P7, PX) at the phone viewports in docs/UI_QA.md, each with
@@ -546,7 +546,12 @@ test("P3 at 360×800 and 320×700 with larger text: the cart summary is one line
     await expect(summary).toHaveAccessibleName("Your order 2 items · ₩13,800");
     const scroll = await page.locator("[data-phone-scroll]").boundingBox();
     expect((await summary.boundingBox())!.y).toBeGreaterThanOrEqual(scroll!.y + scroll!.height);
+    // The card runs on under the edge: a fade says so (#1 2-phone).
+    await expectPhoneEdgeFaded(page, `P3 ${(await page.viewportSize())!.width}`);
   });
+  // At the end nothing is left below, and no fade lies over the total.
+  await page.locator("[data-phone-scroll]").evaluate((el) => el.scrollTo({ top: el.scrollHeight }));
+  await expect.poll(async () => (await phoneEdge(page)).shown, { message: "no fade at the end" }).toBe(false);
 
   // Normal text: the whole label where it fits (390 wide); at 360 wide the pill is too narrow for it, so the count and
   // total stay on one line and the title goes to screen readers.

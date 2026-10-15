@@ -36,6 +36,41 @@ export function hintsCut(field: Locator, hints: string[]): Promise<string[]> {
   }, hints);
 }
 
+/**
+ * The phone scroll area's bottom edge (#1 2-phone, I-281): whether more is below, whether its fade shows there (32px,
+ * on the edge), and the text lines the edge cuts outside a shown fade.
+ */
+export function phoneEdge(page: Page) {
+  return page.locator("[data-phone-scroll]").evaluate((el) => {
+    const r = el.getBoundingClientRect();
+    const fade = el.querySelector(":scope > [data-scroll-fade]");
+    const fr = fade?.getBoundingClientRect() ?? null;
+    const shown = fade !== null && fr !== null && parseFloat(getComputedStyle(fade).opacity) > 0.9 && fr.height >= 24 && Math.abs(r.bottom - fr.bottom) <= 1;
+    const uncovered: string[] = [];
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      if (!(n.textContent ?? "").trim()) continue;
+      const range = document.createRange();
+      range.selectNodeContents(n);
+      for (const line of range.getClientRects()) {
+        if (line.width === 0 || line.top >= r.bottom - 0.5 || line.bottom <= r.bottom + 0.5) continue;
+        if (!(shown && line.top >= fr!.top - 0.5)) uncovered.push(`${n.textContent?.trim().slice(0, 30)} (${Math.round(r.bottom - line.top)}px shown)`);
+      }
+    }
+    return { more: el.scrollHeight - el.scrollTop - el.clientHeight > 1, shown, uncovered };
+  });
+}
+
+/** While more is below, the phone's scroll area ends in its fade, and no line is cut at that edge outside it. */
+export async function expectPhoneEdgeFaded(page: Page, what: string): Promise<void> {
+  await expect
+    .poll(async () => {
+      const e = await phoneEdge(page);
+      return e.uncovered.length === 0 && (!e.more || e.shown) ? "ok" : JSON.stringify(e);
+    }, { message: `${what}: the phone's bottom edge cuts nothing outside a shown fade` })
+    .toBe("ok");
+}
+
 export function kioskRoot(page: Page): Locator {
   return page.locator("[data-screen]").first();
 }

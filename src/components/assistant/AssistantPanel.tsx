@@ -3,6 +3,7 @@
 import { Bell, ChevronRight, Link2, Mic, Smartphone } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useEffectEvent, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { ScrollFade } from "@/components/demo/ScrollFade";
 import { ModalLayer } from "@/components/kiosk/ModalLayer";
 import { AppBar } from "@/components/phone/AppBar";
 import { ConfirmBar, ConfirmCard, DoneCard, PayCard } from "@/components/phone/Checkout";
@@ -770,9 +771,11 @@ function Scroll({ children }: { children: ReactNode }) {
         if (el !== e.currentTarget && el instanceof HTMLElement && el.matches(":focus-visible"))
           el.scrollIntoView({ block: "nearest" });
       }}
-      className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-6 focus-visible:outline-[3px] focus-visible:-outline-offset-[3px] focus-visible:outline-ink"
+      className="flex min-h-0 flex-1 scroll-pb-8 flex-col gap-4 overflow-y-auto px-4 py-6 focus-visible:outline-[3px] focus-visible:-outline-offset-[3px] focus-visible:outline-ink"
     >
       {children}
+      {/* Lines cut at the bottom edge read as "more below", not as broken (#1 2-phone, I-281). */}
+      <ScrollFade className="-bottom-6 -mx-4 -mt-12 to-cream" />
     </div>
   );
 }

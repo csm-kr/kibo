@@ -1,6 +1,6 @@
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
 import { pt } from "@/lib/i18n/phone";
-import { command, hintsCut, kioskRoot, openScenarios } from "../helpers";
+import { command, expectPhoneEdgeFaded, hintsCut, kioskRoot, openScenarios } from "../helpers";
 import { HERO_ACTIONS, RAIL_ACTIONS } from "../recordedActions";
 import { DEMO, DEMO_GUIDE, qaState, type Findings } from "./checks";
 
@@ -130,7 +130,8 @@ test("D1 to D3", async ({ page, request }, info) => {
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "done");
   await page.getByRole("button", { name: "출력 안 함" }).click();
   await expect(page.locator("[data-demo-end]")).toBeVisible();
-  await check(page, info, "D3-done");
+  // The Touch vs talk card ran on under the phone's edge with nothing to say it scrolls (#1 2-phone).
+  await check(page, info, "D3-done", () => expectPhoneEdgeFaded(page, "D3"));
 });
 
 test.describe(() => {
@@ -313,7 +314,10 @@ test.describe(() => {
   // so a judge saw no example sentence at all.
   test("D2 talk with an empty cart: the first example sentence fully in view", async ({ page }, info) => {
     await startTalk(page);
-    await check(page, info, "D2-talk-empty", firstExampleInView(page), [VIEWPORTS[1], { width: 1366, height: 768 }, VIEWPORTS[0]]);
+    await check(page, info, "D2-talk-empty", async () => {
+      await firstExampleInView(page)();
+      await expectPhoneEdgeFaded(page, "D2 empty"); // "Is this halal?" was cut 29 of 30px at 1366 (#1 2-phone)
+    }, [VIEWPORTS[1], { width: 1366, height: 768 }, VIEWPORTS[0], VIEWPORTS[2]]);
   });
 });
 
@@ -357,6 +361,7 @@ test.describe(() => {
         await expect(async () => {
           await expect((await summary.isVisible()) ? summary : total).toBeInViewport({ ratio: 1, timeout: 1_000 });
         }).toPass({ timeout: 10_000 });
+        await expectPhoneEdgeFaded(page, `D2 hero ${vp.width}x${vp.height}`);
       }, [vp]);
       await page.unroute("**/api/chat");
     }
