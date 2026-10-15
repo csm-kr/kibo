@@ -119,17 +119,23 @@ export function ScenarioGuide(props: Props) {
   if (scenarios.length === 0) return null;
   return (
     <section data-scenario-guide aria-label={pt("scenarios", locale)} className={`flex h-full flex-none flex-col gap-2 ${open || props.aside ? "w-80" : ""}`}>
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-controls="demo-scenario-guide"
-        onClick={() => setOpen(!open)}
-        className={`flex min-h-14 min-w-14 items-center justify-center gap-2 self-end rounded-full bg-white px-4 text-base font-semibold text-ink shadow-card active:bg-kibo-tint ${PRESS} ${FOCUS}`}
-      >
-        <List size={20} strokeWidth={2} aria-hidden />
-        {pt("scenarios", locale)}
-        {open ? <ChevronUp size={20} strokeWidth={2} aria-hidden /> : <ChevronDown size={20} strokeWidth={2} aria-hidden />}
-      </button>
+      {/* A 32px caption row like the kiosk's and the phone's, so the three columns start on one line (design QA
+          10-15, #1 4). The toggle's 56px target reaches 12px above and below the row; the drawn pill is 32px. */}
+      <div className="flex h-8 flex-none items-center justify-end">
+        <button
+          type="button"
+          aria-expanded={open}
+          aria-controls="demo-scenario-guide"
+          onClick={() => setOpen(!open)}
+          className={`group -my-3 flex h-14 min-w-14 items-center justify-center rounded-full ${PRESS} ${FOCUS}`}
+        >
+          <span className="flex h-8 items-center gap-2 rounded-full bg-white px-4 text-base font-semibold text-ink shadow-card transition-colors duration-150 ease-out group-active:bg-kibo-tint">
+            <List size={20} strokeWidth={2} aria-hidden />
+            {pt("scenarios", locale)}
+            {open ? <ChevronUp size={20} strokeWidth={2} aria-hidden /> : <ChevronDown size={20} strokeWidth={2} aria-hidden />}
+          </span>
+        </button>
+      </div>
       {open && (
         <div
           id="demo-scenario-guide"
