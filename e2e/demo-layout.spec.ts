@@ -114,13 +114,19 @@ test("the scenario column lines up with the kiosk and phone columns at every jud
       // The part of the toggle that is drawn: the button itself, or its white pill inside a larger hit area.
       const clear = (el: Element) => getComputedStyle(el).backgroundColor === "rgba(0, 0, 0, 0)";
       const pill = clear(toggle) ? ([...toggle.querySelectorAll("*")].find((el) => !clear(el)) ?? toggle) : toggle;
+      // The cream panel: the scroll area itself or the painted box around it.
+      const scroller = document.querySelector("#demo-scenario-guide")!;
+      let panel: Element = scroller;
+      while (clear(panel) && panel.parentElement) panel = panel.parentElement;
       return {
         kioskCaption: mid(box("#demo-kiosk-caption")),
         phoneCaption: mid(box("#demo-phone-caption")),
         pill: mid(pill.getBoundingClientRect()),
         hit: toggle.getBoundingClientRect().height,
+        hitBottom: toggle.getBoundingClientRect().bottom,
         phoneTop: box("[data-phone-screen]").top,
-        guideTop: box("#demo-scenario-guide").top,
+        guideTop: panel.getBoundingClientRect().top,
+        scrollTop: scroller.getBoundingClientRect().top,
       };
     });
     const at = `${vp.width}x${vp.height}`;
@@ -128,6 +134,8 @@ test("the scenario column lines up with the kiosk and phone columns at every jud
     expect(Math.abs(m.kioskCaption - m.phoneCaption), `${at}: kiosk and phone captions`).toBeLessThanOrEqual(1);
     expect(Math.abs(m.guideTop - m.phoneTop), `${at}: guide top vs phone top`).toBeLessThanOrEqual(1);
     expect(m.hit, `${at}: [Scenarios] target height`).toBeGreaterThanOrEqual(56);
+    // A step scrolled to the top of the guide is a target too: 8px apart (UI_QA target gaps).
+    expect(m.scrollTop - m.hitBottom, `${at}: [Scenarios] target to the guide's scroll area`).toBeGreaterThanOrEqual(8);
   }
 });
 

@@ -121,14 +121,15 @@ export function ScenarioGuide(props: Props) {
   return (
     <section data-scenario-guide aria-label={pt("scenarios", locale)} className={`flex h-full flex-none flex-col gap-2 ${open || props.aside ? "w-80" : ""}`}>
       {/* A 32px caption row like the kiosk's and the phone's, so the three columns start on one line (design QA
-          10-15, #1 4). The toggle's 56px target reaches 12px above and below the row; the drawn pill is 32px. */}
+          10-15, #1 4). The toggle's 56px target reaches 12px above and below the row, over the panel's top edge
+          (so it is painted above it); the drawn pill is 32px. */}
       <div className="flex h-8 flex-none items-center justify-end">
         <button
           type="button"
           aria-expanded={open}
           aria-controls="demo-scenario-guide"
           onClick={() => setOpen(!open)}
-          className={`group -my-3 flex h-14 min-w-14 items-center justify-center rounded-full ${PRESS} ${FOCUS}`}
+          className={`group relative z-10 -my-3 flex h-14 min-w-14 items-center justify-center rounded-full ${PRESS} ${FOCUS}`}
         >
           <span className="flex h-8 items-center gap-2 rounded-full bg-white px-4 text-base font-semibold text-ink shadow-card transition-colors duration-150 ease-out group-active:bg-kibo-tint">
             <List size={20} strokeWidth={2} aria-hidden />
@@ -141,13 +142,17 @@ export function ScenarioGuide(props: Props) {
         // The column's free height, but the cream panel is only as tall as its content and scrolls past it, so one
         // scenario card leaves no empty cream under it (design QA 10-15, #1 12).
         <div className="flex min-h-0 flex-1 flex-col">
-          <div
-            id="demo-scenario-guide"
-            lang={locale}
-            className="flex min-h-0 scroll-pb-8 flex-col gap-4 overflow-y-auto rounded-sheet bg-cream p-4 text-ink shadow-card"
-          >
-            {body}
-            <ScrollFade className="-bottom-4 -mx-4 -mt-12 to-cream" />
+          {/* The panel's first 12px do not scroll: a step scrolled to the top stays 8px clear of the toggle's
+              target above (UI_QA target gaps), while the panel itself starts on the other columns' card line. */}
+          <div className="flex min-h-0 flex-col rounded-sheet bg-cream pt-3 shadow-card">
+            <div
+              id="demo-scenario-guide"
+              lang={locale}
+              className="flex min-h-0 scroll-pb-8 flex-col gap-4 overflow-y-auto rounded-b-sheet px-4 pt-1 pb-4 text-ink"
+            >
+              {body}
+              <ScrollFade className="-bottom-4 -mx-4 -mt-12 to-cream" />
+            </div>
           </div>
         </div>
       )}
