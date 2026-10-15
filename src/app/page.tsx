@@ -16,10 +16,10 @@ import { repoLink } from "@/lib/repo";
 export const metadata: Metadata = {
   title: "KIBO — talk to the kiosk",
   description:
-    "Say your order to your own phone; the self-order kiosk in front of you fills itself. No new hardware, no app to install.",
+    "Say your order to your own phone, and the kiosk already in front of you fills its own cart. Only you can pay. No new hardware, no app to install.",
   openGraph: {
     title: "KIBO — talk to the kiosk",
-    description: "Say your order to your own phone; the self-order kiosk in front of you fills itself.",
+    description: "Say your order to your own phone, and the kiosk already in front of you fills its own cart. Only you can pay.",
     images: [{ url: "/landing/demo.webp", width: 1280, height: 1168, alt: "The KIBO demo: a kiosk and a phone side by side" }],
   },
 };
@@ -156,8 +156,8 @@ export default function Home() {
               <span className="block">Don&apos;t learn the kiosk.</span> <span className="block">Just talk.</span>
             </h1>
             <p>
-              Say your order to your own phone; the self-order kiosk in front of you fills itself. No new hardware, no
-              app to install.
+              Say your order to your own phone, and the kiosk already in front of you fills its own cart. Only you can
+              pay. No new hardware, no app to install.
             </p>
           </div>
           <div className="flex flex-col gap-4">
@@ -338,7 +338,7 @@ export default function Home() {
               sides and drinks, removable ingredients and sold-out items.
             </p>
             <Fact
-              value="80 of 82 test orders passed"
+              value="80 of 82 test cases passed"
               detail="text agent on gemini-3.8-flash (Gemini API, as in production), typed in Korean, English and 7 more languages; cases written by the KIBO team"
             />
             <Fact

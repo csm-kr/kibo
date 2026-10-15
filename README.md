@@ -1,6 +1,6 @@
 # KIBO: Kiosk Intelligence Bridge & Operator
 
-**Say your order to your own phone, and the self-order kiosk already on the counter fills its own cart.** Built for the Google Cloud AI Builder Cup 2026 (Sustainability & Social Impact).
+**Don't learn the kiosk. Just talk.** Say your order to your own phone, and the self-order kiosk already on the counter fills its own cart. Gemini can fill the cart; only you can pay. Built for the Google Cloud AI Builder Cup 2026 (Sustainability & Social Impact).
 
 - **Try it on a laptop:** https://kibo-407514467119.asia-northeast3.run.app/demo
 - **On a phone:** open **kibo-2026.web.app** and type the 6-digit code a KIBO kiosk shows

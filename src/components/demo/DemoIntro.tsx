@@ -45,7 +45,7 @@ export function DemoIntro(props: {
             <span className="block">Don&apos;t learn the kiosk.</span> <span className="block">Just talk.</span>
           </h1>
           <p className="text-xl text-[#33302B]">
-            Your phone becomes the voice of an existing self-order kiosk: say your order, the kiosk fills itself, you
+            Say your order to your own phone, and the kiosk already in front of you fills its own cart. Only you
             confirm and pay.
           </p>
           <ol className="flex flex-col gap-4 rounded-[26px] border border-[#E2DACB] bg-white p-6">
