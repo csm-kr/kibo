@@ -11,21 +11,7 @@ export const CANVAS_H = 1920;
  * so every kiosk size in components is canvas px. The theme comes from the kiosk data, so other kiosks reuse
  * every component through the --k-* variables.
  */
-export function KioskCanvas({
-  theme,
-  locale,
-  letterbox = "dark",
-  children,
-}: {
-  theme: KioskTheme;
-  locale: Locale;
-  /**
-   * What fills the space the 9:16 canvas leaves: the dark kiosk frame on a standalone screen, or nothing on /demo,
-   * where a dark band beside a shrunken kiosk read as a broken screen (#1 item 10).
-   */
-  letterbox?: "dark" | "none";
-  children: ReactNode;
-}) {
+export function KioskCanvas({ theme, locale, children }: { theme: KioskTheme; locale: Locale; children: ReactNode }) {
   const outer = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0);
 
@@ -55,7 +41,7 @@ export function KioskCanvas({
   } as CSSProperties;
 
   return (
-    <div ref={outer} className={`relative h-full w-full overflow-hidden ${letterbox === "dark" ? "bg-[#141210]" : ""}`}>
+    <div ref={outer} className="relative h-full w-full overflow-hidden bg-[#141210]">
       <div
         data-kiosk-canvas
         lang={locale}

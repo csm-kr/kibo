@@ -2,6 +2,7 @@ import { kt, type KioskTextKey } from "@/lib/i18n/kiosk";
 import type { KioskData, KioskDomain } from "@/types/menu";
 import type { Session } from "@/types/session";
 import { formatWon } from "./menu";
+import { kioskScreen } from "./screen";
 import { phonePaused } from "./timers";
 
 // The KIBO pairing panel beside a landscape kiosk (/kiosk, /demo "Use my phone"): what the phone is doing, read only
@@ -61,6 +62,9 @@ export function changeLine(session: Session): string | null {
 /** "카드 (Card)": the Korean kiosk's own label, then what it means. */
 const both = (key: KioskTextKey) => `${kt(key, "ko")} (${kt(key, "en")})`;
 
+/** The payment step's line, the longest of them: /demo sizes the step area under the kiosk by it (#1 item 19). */
+export const PAYMENT_STEP = `Kiosk: payment. Tap ${both("payCard")}, then ${both("insertCardButton")}. Demo only, no money is charged.`;
+
 /**
  * The kiosk's current step in English, for KIBO's side of the screen (/demo caption, pairing panel): the kiosk itself
  * stays Korean. Learned kiosks have none: the user reviews and pays on the kiosk page. `numberShown`: the kiosk has
@@ -73,7 +77,7 @@ export function kioskStep(kiosk: KioskData, session: Session, numberShown = fals
     case "confirming":
       return `Kiosk: ${ticket ? "ticket" : "order"} review. Nothing is paid until you confirm.`;
     case "paying":
-      return `Kiosk: payment. Tap ${both("payCard")}, then ${both("insertCardButton")}. Demo only, no money is charged.`;
+      return PAYMENT_STEP;
     case "paid":
       if (numberShown)
         return ticket
@@ -83,4 +87,21 @@ export function kioskStep(kiosk: KioskData, session: Session, numberShown = fals
     default:
       return null;
   }
+}
+
+/**
+ * /demo's line in the fixed area under the kiosk, from D2's first step to the order number (#1 item 19): also the
+ * steps before the review (I-248), which the pairing panel leaves to the phone. The screen comes from kioskScreen,
+ * so a phone's add before the dine option reads as the menu, as the kiosk shows it.
+ */
+export function demoKioskStep(kiosk: KioskData, session: Session, numberShown: boolean): string | null {
+  if (kiosk.kind === "learned") return null;
+  const screen = kioskScreen(session, { touchStarted: false }, kiosk);
+  if (screen === "dine") return "Kiosk: eat here or take out. Answer on the phone or on the kiosk.";
+  if (screen === "menu") {
+    return kiosk.domain === "ticket"
+      ? "Kiosk: tickets. Your tickets show at the bottom of the kiosk."
+      : "Kiosk: menu. Your order shows at the bottom of the kiosk.";
+  }
+  return kioskStep(kiosk, session, numberShown);
 }

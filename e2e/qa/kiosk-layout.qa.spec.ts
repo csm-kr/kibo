@@ -78,19 +78,18 @@ async function startDemo(page: Page) {
   return s;
 }
 
-/** The kiosk canvas on /demo, the box it is drawn in, and that box's background (the letterbox). */
+/**
+ * The kiosk canvas on /demo, and the dark band beside it: the part of the box it is drawn in that it leaves uncovered,
+ * when that box has a background (KioskCanvas fills it with the kiosk's dark frame).
+ */
 function kioskBox(page: Page) {
   return page.locator("[data-kiosk-canvas]").evaluate((c) => {
     const r = c.getBoundingClientRect();
     const frame = c.parentElement as HTMLElement;
     const f = frame.getBoundingClientRect();
-    return {
-      top: r.top,
-      height: r.height,
-      scale: r.width / 1080,
-      sideSpace: Math.max(r.left - f.left, f.right - r.right),
-      letterbox: getComputedStyle(frame).backgroundColor,
-    };
+    const painted = getComputedStyle(frame).backgroundColor !== "rgba(0, 0, 0, 0)";
+    const uncovered = Math.max(r.left - f.left, f.right - r.right, r.top - f.top, f.bottom - r.bottom);
+    return { top: r.top, height: r.height, scale: r.width / 1080, darkBand: painted ? Math.max(0, uncovered) : 0 };
   });
 }
 
@@ -108,10 +107,8 @@ test.describe("/demo", () => {
     await page.getByRole("button", { name: "Yes, pay now" }).click();
     await expect(kioskRoot(page)).toHaveAttribute("data-screen", "payment");
     await expect(page.locator("[data-card-reader]")).toBeVisible();
-    // The step line and the card reader take height, so the canvas is narrower than its column here.
-    const box = await kioskBox(page);
-    expect(box.sideSpace).toBeGreaterThan(1);
-    expect(box.letterbox).toBe("rgba(0, 0, 0, 0)");
+    // The step line and the card reader take height here, which once left a dark band of 49.5px on each side.
+    expect((await kioskBox(page)).darkBand).toBeLessThanOrEqual(0.5);
   });
 
   test("D3: once the order number is on the kiosk, the step line stops asking the receipt question (#1 item 13)", async ({ page, request }) => {
@@ -132,3 +129,68 @@ test.describe("/demo", () => {
     await expect(step).toHaveText("Kiosk: order number. The order is done; no money was charged.");
   });
 });
+
+for (const viewport of [
+  { width: 1280, height: 720 },
+  { width: 1440, height: 900 },
+  { width: 1920, height: 1080 },
+]) {
+  test.describe(`/demo at ${viewport.width}x${viewport.height}`, () => {
+    test.use({ viewport, extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.83" } });
+
+    test("the kiosk keeps one size and place from D2 to D3; its English step sits in a fixed area under it (#1 item 19)", async ({ page, request }) => {
+      const s = await startDemo(page);
+      let seq = 0;
+      const ai = (type: string, args: object) =>
+        command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "voice", utteranceSeq: ++seq });
+      const step = page.locator("[data-kiosk-step]");
+      const seen: { state: string; top: number; height: number; scale: number; darkBand: number }[] = [];
+      const record = async (state: string) => seen.push({ state, ...(await kioskBox(page)) });
+
+      // The dine and menu steps get their English line too (I-248), in the same area as the later ones.
+      await expect(step).toHaveText("Kiosk: eat here or take out. Answer on the phone or on the kiosk.");
+      await record("dine");
+      await ai("setDineOption", { option: "eat_in" });
+      await expect(kioskRoot(page)).toHaveAttribute("data-screen", "menu");
+      await expect(step).toHaveText("Kiosk: menu. Your order shows at the bottom of the kiosk.");
+      await record("menu");
+      for (const args of HERO) await ai("addToCart", args);
+      await expect(page.locator("[data-kiosk-subtitle]")).toBeVisible();
+      await record("menu with the subtitle");
+      await ai("requestCheckout", {});
+      await expect(kioskRoot(page)).toHaveAttribute("data-screen", "review");
+      await record("review");
+      await page.getByRole("button", { name: "Yes, pay now" }).click();
+      await expect(kioskRoot(page)).toHaveAttribute("data-screen", "payment");
+      const reader = page.locator("[data-card-reader]").getByRole("button", { name: "Kiosk: insert card (demo)" });
+      await expect(reader).toBeInViewport({ ratio: 1 });
+      // Its label stays on one line in the narrower column (U8).
+      const labelLines = await reader.evaluate((button) => {
+        const text = [...button.childNodes].find((n) => n.nodeType === Node.TEXT_NODE && n.textContent?.trim());
+        const range = document.createRange();
+        if (text) range.selectNodeContents(text);
+        return new Set([...range.getClientRects()].map((r) => Math.round(r.top))).size;
+      });
+      expect(labelLines).toBe(1);
+      await record("payment");
+      await reader.click();
+      await expect(kioskRoot(page)).toHaveAttribute("data-screen", "done");
+      await record("receipt question");
+      await page.getByRole("button", { name: "출력 안 함" }).click();
+      await expect(page.getByRole("heading", { name: "주문 번호" })).toBeVisible();
+      await record("order number");
+
+      // U5: within 0.5px of where it started, at every step.
+      const [first] = seen;
+      for (const at of seen) {
+        expect.soft(Math.abs(at.top - first.top), `${at.state}: top ${at.top} vs ${first.top}`).toBeLessThanOrEqual(0.5);
+        expect.soft(Math.abs(at.height - first.height), `${at.state}: height ${at.height} vs ${first.height}`).toBeLessThanOrEqual(0.5);
+        expect.soft(Math.abs(at.scale - first.scale), `${at.state}: scale ${at.scale} vs ${first.scale}`).toBeLessThanOrEqual(0.0005);
+        expect.soft(at.darkBand, `${at.state}: dark band beside the kiosk (#1 item 10)`).toBeLessThanOrEqual(0.5);
+      }
+      // Level with the phone column: both start under their captions.
+      const phoneTop = await page.locator("[data-demo-check] > div").first().evaluate((el) => el.getBoundingClientRect().top);
+      expect(Math.abs(first.top - phoneTop)).toBeLessThanOrEqual(0.5);
+    });
+  });
+}
