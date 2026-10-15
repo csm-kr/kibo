@@ -100,6 +100,8 @@ export const KIOSK_TEXT = {
   receiptNo: { ko: "출력 안 함", en: "No receipt" },
   orderNumber: { ko: "주문 번호", en: "Order number" },
   pickupHint: { ko: "번호를 부르면 카운터에서 받아 가세요", en: "We'll call your number at the counter" },
+  // Under the number: what was paid, like a receipt (#1 item 20).
+  paidList: { ko: "주문 내역", en: "Your order" },
   // KX banners
   staffCalled: { ko: "직원을 불렀어요. 잠시만 기다려 주세요.", en: "Staff is on the way. Please wait a moment." },
   staffMismatch: {
@@ -146,6 +148,7 @@ export const TICKET_TEXT: Partial<Record<KioskTextKey, Record<Locale, string>>> 
   editOrder: { ko: "승차권 수정", en: "Change tickets" },
   orderNumber: { ko: "참조 번호", en: "Reference number" },
   pickupHint: { ko: "승차권을 받아 가세요", en: "Please take your tickets" },
+  paidList: { ko: "구매 내역", en: "Your tickets" },
   idleQuestion: { ko: "계속 구매하시겠어요?", en: "Still buying?" },
   startOverAsk: { ko: "구매를 취소하고 처음으로 갈까요?", en: "Cancel and start over?" },
   keepOrdering: { ko: "계속 고르기", en: "Keep choosing" },

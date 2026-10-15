@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode, type RefObject } from "react";
 import type { CommandReply } from "@/lib/client/api";
 import { findItem, isAvailableNow } from "@/lib/adapters/catalog";
 import type { CommandType } from "@/lib/commands/schemas";
@@ -81,6 +81,8 @@ export function MenuScreen(props: {
   const [recentTouch, setRecentTouch] = useState(false);
   const touchTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const pendingSeq = useRef(0);
+  const rail = useRef<HTMLElement>(null);
+  const grid = useRef<HTMLDivElement>(null);
 
   // A new lastChange starts the 2 s ring. The change present when the menu opened is replayed only if it is
   // under 2 s old: a phone's first add is what moves the kiosk from K2 to K3 (Flow A6), an old one is not news.
@@ -157,6 +159,8 @@ export function MenuScreen(props: {
   // Preview only; the server's total is the truth once the stream catches up.
   const total = session.total + shownPending.reduce((sum, p) => sum + p.line.unitPrice * p.line.qty, 0);
   const items = kiosk.items.filter((i) => i.category === category);
+  const railMore = useMoreBelow(rail, kiosk.categories.length);
+  const gridMore = useMoreBelow(grid, items.length);
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col" onPointerDownCapture={onTouch}>
@@ -173,7 +177,7 @@ export function MenuScreen(props: {
       />
 
       <div className="relative flex min-h-0 flex-1">
-        <nav aria-label={kt("categories", locale, domain)} className="flex w-65 flex-none flex-col gap-2 overflow-y-auto bg-(--k-panel) py-4">
+        <nav ref={rail} aria-label={kt("categories", locale, domain)} className="flex w-65 flex-none flex-col gap-2 overflow-y-auto bg-(--k-panel) py-4">
           {kiosk.categories.map((c) => {
             const current = c.categoryId === category;
             return (
@@ -195,7 +199,7 @@ export function MenuScreen(props: {
           })}
         </nav>
 
-        <div className="min-h-0 flex-1 overflow-y-auto p-8">
+        <div ref={grid} className="min-h-0 flex-1 overflow-y-auto p-8">
           <div className="grid grid-cols-2 gap-8">
             {items.map((item) => {
               const ring = flash?.itemId === item.itemId;
@@ -212,6 +216,14 @@ export function MenuScreen(props: {
             })}
           </div>
         </div>
+        {/* A tile or category cut at the cart bar read as broken (#1 item 3): fade both columns out while they hold
+            more below. Overlays beside the scroll areas, so they stay put and let taps through. */}
+        {railMore && (
+          <div aria-hidden data-menu-more="rail" className="pointer-events-none absolute bottom-0 left-0 h-24 w-65 bg-linear-to-b from-(--k-panel)/0 to-(--k-panel)" />
+        )}
+        {gridMore && (
+          <div aria-hidden data-menu-more="grid" className="pointer-events-none absolute right-0 bottom-0 left-65 h-24 bg-linear-to-b from-(--k-bg)/0 to-(--k-bg)" />
+        )}
       </div>
 
       <CartBar
@@ -351,4 +363,23 @@ function ConfirmClear(props: { kiosk: KioskData; onCancel(): void; onConfirm(): 
       </section>
     </ModalLayer>
   );
+}
+
+/** True while a scroll area holds more than it shows below (the cart bar's row does the same sideways). */
+function useMoreBelow(el: RefObject<HTMLElement | null>, count: number): boolean {
+  const [more, setMore] = useState(false);
+  useEffect(() => {
+    const node = el.current;
+    if (!node) return;
+    const check = () => setMore(node.scrollHeight - node.scrollTop - node.clientHeight > 1);
+    check();
+    node.addEventListener("scroll", check, { passive: true });
+    const ro = new ResizeObserver(check);
+    ro.observe(node);
+    return () => {
+      node.removeEventListener("scroll", check);
+      ro.disconnect();
+    };
+  }, [el, count]);
+  return more;
 }

@@ -57,6 +57,8 @@ interface Props {
   cardTap?: EventTarget;
   /** /demo only: K8 keeps the order number instead of counting back to K1; the demo's end card moves on. */
   keepOrderNumber?: boolean;
+  /** /demo only: K8 moved from the receipt question to the order number (#1 item 13). */
+  onOrderNumber?(sessionId: string): void;
   /** The server refused this screen's session stream and it reconnects after a wait (I-033). */
   retrying?: boolean;
 }
@@ -211,6 +213,7 @@ export function KioskScreen(props: Props) {
           clockOffset={clockOffset}
           keepNumber={props.keepOrderNumber ?? false}
           onNewSession={onNewSession}
+          onNumberShown={props.onOrderNumber}
         />
       ) : (
         <>

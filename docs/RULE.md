@@ -132,3 +132,8 @@ When an issue class in `docs/ISSUE.md` is seen for the **3rd time**, it becomes 
 - From: `small-screen-crowding` — I-084 (seen 10-13/4-voice:4, 10-13/9-polish:0, 10-13/12-phone-app:10, 10-14/14-final:10), I-285 (10-15/session)
 - Why: phone chrome and the `/demo` strip kept taking the room their content needed at 320×700, 360×800 and 1280×720, and at 1280×720 the opened "What the AI did" showed only its legend, none of its rows.
 - Check: at the smallest size of each surface (phone 320×700 and 360×800; `/demo` 1280×720), the first content row of every panel the user can open is fully in view (`toBeInViewport({ ratio: 1 })`, as test #1 15 in `e2e/demo-layout.spec.ts` does).
+
+### R-024 (proposed): A line that says what happens next follows every step the screen beside it shows, including steps only that screen knows
+- From: `stale-status` — I-144 (seen 10-13/10-assets:0), I-242 (10-14/14-final:8), I-306 (10-15/session)
+- Why: three times a KIBO line kept naming a step the user had already done (the scenario guide's "Your turn" after payment and after [Yes, pay now], the kiosk step line's receipt question under the order number), because it followed the session status alone and the status does not change at every step a person sees.
+- Check: a step or status line has a unit test with one case per screen it can sit beside, including the last one of the flow (`kioskStep` in `src/lib/kiosk/pairing.test.ts`; the "Your turn" lines in `e2e/demo-scenarios.spec.ts`); the QA walk reads the line at D3 after the order number shows.

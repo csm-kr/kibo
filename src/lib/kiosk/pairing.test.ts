@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { CartLine, Session, SessionStatus } from "@/types/session";
 import { getKiosk } from "@/lib/adapters/catalog";
-import { changeLine, kioskStep, orderLine, phoneLink } from "./pairing";
+import { changeLine, demoKioskStep, kioskStep, orderLine, phoneLink } from "./pairing";
 
 const T = 1_000_000_000_000;
 const LINE: CartLine = { lineId: "a1", itemId: "cheese_burger", variant: "set", qty: 2, selections: {}, unitPrice: 6900 };
@@ -117,7 +117,51 @@ describe("kioskStep", () => {
     expect(kioskStep(rail, session("paid", { orderNumber: 45 }))).toBe("Kiosk: receipt question, then the reference number.");
   });
 
+  it("once the kiosk shows the number, says so instead of the receipt question it has passed (#1 item 13)", () => {
+    expect(kioskStep(malo, session("paid", { orderNumber: 860 }), true)).toBe(
+      "Kiosk: order number. The order is done; no money was charged.",
+    );
+    const ticket = kioskStep(rail, session("paid", { orderNumber: 45 }), true);
+    expect(ticket).toBe("Kiosk: reference number. The purchase is done; no money was charged.");
+    expect(ticket?.toLowerCase()).not.toContain("order");
+    // Before the payment the number cannot be on screen, so the flag changes nothing there.
+    expect(kioskStep(malo, session("paying"), true)).toBe(kioskStep(malo, session("paying")));
+  });
+
   it("a learned kiosk has no KIBO payment step: the user pays on the kiosk itself", () => {
     expect(kioskStep(getKiosk("doughhouse"), session("confirming"))).toBeNull();
+  });
+});
+
+describe("demoKioskStep", () => {
+  const malo = getKiosk("malo");
+  const rail = getKiosk("airport_rail");
+
+  it("on /demo also says the steps before the review: the dine question, then the menu (#1 item 19, I-248)", () => {
+    expect(demoKioskStep(malo, session("connected"), false)).toBe("Kiosk: eat here or take out. Answer on the phone or on the kiosk.");
+    expect(demoKioskStep(malo, session("ordering", { dineOption: "eat_in" }), false)).toBe(
+      "Kiosk: menu. Your order shows at the bottom of the kiosk.",
+    );
+    // A phone may add before the dine option; the kiosk then shows its menu (kioskScreen), and so does the line.
+    expect(demoKioskStep(malo, session("ordering", { cart: [LINE] }), false)).toBe("Kiosk: menu. Your order shows at the bottom of the kiosk.");
+  });
+
+  it("from the review on says what kioskStep says, the order number included", () => {
+    for (const status of ["confirming", "paying", "paid"] as const) {
+      expect(demoKioskStep(malo, session(status, { orderNumber: 7 }), false)).toBe(kioskStep(malo, session(status, { orderNumber: 7 })));
+    }
+    expect(demoKioskStep(malo, session("paid", { orderNumber: 7 }), true)).toBe(kioskStep(malo, session("paid", { orderNumber: 7 }), true));
+  });
+
+  it("a ticket machine has no dine step and says tickets, never order (R-007)", () => {
+    const line = demoKioskStep(rail, session("connected"), false);
+    expect(line).toBe("Kiosk: tickets. Your tickets show at the bottom of the kiosk.");
+    expect(line?.toLowerCase()).not.toContain("order");
+  });
+
+  it("says nothing before a phone is there, after the order ended, or on a learned kiosk", () => {
+    expect(demoKioskStep(malo, session("idle"), false)).toBeNull();
+    expect(demoKioskStep(malo, session("expired"), false)).toBeNull();
+    expect(demoKioskStep(getKiosk("doughhouse"), session("ordering"), false)).toBeNull();
   });
 });
