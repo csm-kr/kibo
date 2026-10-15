@@ -24,7 +24,7 @@ export default function LearnIndex() {
           <h1 className="font-display text-[32px] leading-tight font-bold">Watch KIBO learn a kiosk from its screens alone.</h1>
           <p>
             Gemini explores the kiosk&apos;s screens once and writes a skill: the menu and how to tap each item. The skill
-            must pass self-tests and a coverage audit, both without AI; after that, every order is replayed without AI.
+            must pass at least 3 different self-test orders and a coverage audit, both without AI; after that, every order is replayed without AI.
           </p>
           <p className="text-base text-muted">
             Limits: web and webview kiosks only. All four kiosks are synthetic: three built by other AI agents for the

@@ -37,4 +37,4 @@ docs/TESTING.md evidence ledger with the medians.
 
 ## Re-measuring the automated run
 `EVIDENCE=1 npx playwright test kiosk-touch-efficient` rewrites `evidence/touch-hero-efficient.json`. A normal
-`npm run test:e2e` keeps the committed file (I-099).
+`npm run test:e2e` keeps the committed file and writes its run to `test-results/evidence/` (I-099, R-021).

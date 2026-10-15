@@ -4,6 +4,7 @@ import { chromium, expect, test, type Page } from "@playwright/test";
 import { getKiosk } from "@/lib/adapters/catalog";
 import { lineLabel } from "@/lib/kiosk/menu";
 import type { CartLine } from "@/types/session";
+import { evidencePath } from "../scripts/evidencePath";
 import { kioskRoot } from "./helpers";
 
 // Voice order end to end on /demo with real Gemini Live (docs/TESTING.md "End to end", "Latency"). Chromium's fake
@@ -12,7 +13,8 @@ import { kioskRoot } from "./helpers";
 // Every run, pass or fail, is added to evidence/voice-e2e.json: fixture, pass, timings, model. No transcript, no token.
 // Relay mode (ADR-012): the same orders on a second app (scripts/e2e-relay-stack.ts, port 3110) with
 // GEMINI_LIVE_BACKEND=vertex, so the phone's voice goes through the kibo-voice relay to Vertex AI Live; its runs go
-// to evidence/voice-e2e-relay.json.
+// to evidence/voice-e2e-relay.json. Only with EVIDENCE=1 (`npm run evidence:live`): otherwise the runs are added to a
+// copy in test-results/evidence/, so a QA run never changes the cited numbers (I-099, R-021).
 
 const ABOUT_TAIL =
   "Synthetic TTS voice " +
@@ -22,12 +24,12 @@ const ABOUT_TAIL =
 
 const MODES = {
   direct: {
-    evidence: join(process.cwd(), "evidence/voice-e2e.json"),
+    evidence: "voice-e2e.json",
     baseURL: undefined as string | undefined,
     about: "Voice order E2E on /demo with real Gemini Live (e2e/voice.live.spec.ts, `npm run test:e2e:live`). " + ABOUT_TAIL,
   },
   relay: {
-    evidence: join(process.cwd(), "evidence/voice-e2e-relay.json"),
+    evidence: "voice-e2e-relay.json",
     baseURL: "http://localhost:3110",
     about:
       "Voice order E2E on /demo through the kibo-voice relay to Vertex AI Live (relay mode of e2e/voice.live.spec.ts, " +
@@ -81,9 +83,12 @@ interface Omitted {
 }
 
 function record(mode: Mode, run: Run) {
-  const { evidence, about } = MODES[mode];
-  const old = existsSync(evidence)
-    ? (JSON.parse(readFileSync(evidence, "utf8")) as { runs: Run[]; omitted?: Omitted[] })
+  const { evidence: name, about } = MODES[mode];
+  const evidence = evidencePath(name);
+  // A scratch copy starts from the committed file, so its summary covers the same runs plus this one.
+  const from = existsSync(evidence) ? evidence : join(process.cwd(), "evidence", name);
+  const old = existsSync(from)
+    ? (JSON.parse(readFileSync(from, "utf8")) as { runs: Run[]; omitted?: Omitted[] })
     : { runs: [], omitted: [] };
   const runs = [...old.runs, { ...run, fixtures: FIXTURES }];
   const omitted = old.omitted ?? [];

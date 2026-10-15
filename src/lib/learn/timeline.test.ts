@@ -102,7 +102,7 @@ describe("buildTimeline", () => {
       ["first-item", 2, "First items written down"],
       ["all-categories", 4, "All 2 categories written down"],
       ["audit", 6, "Coverage audit passed"],
-      ["self-test", 7, "Self-test 3/3 passed"],
+      ["self-test", 7, "First self-test call passed: 3 of 3 orders"],
       ["finish", 8, "Finished"],
     ]);
     expect(t.milestones.find((m) => m.kind === "finish")?.index).toBe(7);

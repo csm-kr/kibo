@@ -342,8 +342,8 @@ export default function Home() {
               detail="text agent on gemini-3.8-flash (Gemini API, as in production), typed in Korean, English and 7 more languages; cases written by the KIBO team"
             />
             <Fact
-              value="1.8 s median from end of speech to the kiosk highlight"
-              detail="2 spoken orders (English, Korean) to gemini-3.8-live, synthetic voice on a laptop, not yet on a real phone; 1.6 s through the Vertex AI relay"
+              value="1.7 s median from end of speech to the kiosk highlight"
+              detail="4 spoken orders (English, Korean) to gemini-3.8-live, synthetic voice on a laptop, not yet on a real phone; also 1.7 s through the Vertex AI relay"
             />
           </article>
           <article className={`${CARD} flex flex-col gap-4`}>

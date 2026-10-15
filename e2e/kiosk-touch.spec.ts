@@ -1,5 +1,6 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
+import { evidencePath } from "../scripts/evidencePath";
 import { addCheeseburgerSet, kioskRoot } from "./helpers";
 
 // The hero order by touch (docs/PRD.md "Demo scenario" step 2) on the 1080x1920 canvas, with the demo counter.
@@ -70,10 +71,10 @@ test("hero order by touch reaches an order number with the server's total", asyn
   const seconds = Number(await counter.getAttribute("data-seconds"));
   expect(taps).toBeGreaterThan(0);
 
-  // Evidence for docs/TESTING.md (R-001). An automated run, so the seconds are not a human timing.
-  mkdirSync("evidence", { recursive: true });
+  // Evidence for docs/TESTING.md (R-001). An automated run, so the seconds are not a human timing. Written to
+  // evidence/ only with EVIDENCE=1 (I-099, R-021).
   writeFileSync(
-    "evidence/touch-hero.json",
+    evidencePath("touch-hero.json"),
     `${JSON.stringify(
       {
         date: new Date().toISOString(),

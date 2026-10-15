@@ -1,16 +1,16 @@
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 import { sameOrder, type OrderLine } from "@/lib/demo/compare";
+import { evidencePath } from "../scripts/evidencePath";
 import { addCheeseburgerSet, kioskRoot } from "./helpers";
 
 // The hero order by touch the way a user who knows the order would tap it: large fries chosen in the sheet while
 // adding each set, no clear-all, dessert declined. This is the touch side of the /demo comparison card (D3);
 // e2e/kiosk-touch.spec.ts keeps the slower edit path (clear and add again).
 //
-// The evidence file is written only when it is missing or EVIDENCE=1, so a normal `npm run test:e2e` never changes
-// the numbers the card and docs/TESTING.md cite (I-099). Re-measure: `EVIDENCE=1 npx playwright test kiosk-touch-efficient`.
-
-const EVIDENCE = "evidence/touch-hero-efficient.json";
+// The evidence file is written only with EVIDENCE=1 (otherwise to test-results/evidence/), so a normal
+// `npm run test:e2e` never changes the numbers the card and docs/TESTING.md cite (I-099).
+// Re-measure: `EVIDENCE=1 npx playwright test kiosk-touch-efficient`.
 
 test.use({
   viewport: { width: 1080, height: 1920 },
@@ -61,10 +61,8 @@ test("hero order by touch, efficient path: options chosen while adding", async (
   // The cited touch count (evidence/touch-hero-efficient.json): a kiosk restyle must not change the path (14-final:2).
   expect(taps).toBe(24);
 
-  if (existsSync(EVIDENCE) && !process.env.EVIDENCE) return;
-  mkdirSync("evidence", { recursive: true });
   writeFileSync(
-    EVIDENCE,
+    evidencePath("touch-hero-efficient.json"),
     `${JSON.stringify(
       {
         date: new Date().toISOString(),

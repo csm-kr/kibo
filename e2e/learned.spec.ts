@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
+import { evidencePath } from "../scripts/evidencePath";
 import { claim, command, readClaim, storedKioskSession } from "./helpers";
 
 // KIBO Learn at runtime (docs/ARCHITECTURE.md sequence 3): the phone's commands wait for the bridge on
@@ -95,10 +96,10 @@ test("phone orders replay on the learned pizza kiosk, and a mismatch calls staff
 
   expect(timings.slice(0, -1).every((t) => t.ok)).toBe(true);
 
-  // Evidence for docs/TESTING.md (R-001). An automated run on a laptop against the dev server.
-  mkdirSync("evidence", { recursive: true });
+  // Evidence for docs/TESTING.md (R-001). An automated run on a laptop against the dev server. Written to evidence/
+  // only with EVIDENCE=1 (I-099, R-021).
   writeFileSync(
-    "evidence/bridge-replay.json",
+    evidencePath("bridge-replay.json"),
     `${JSON.stringify(
       {
         date: new Date().toISOString(),

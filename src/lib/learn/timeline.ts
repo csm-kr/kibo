@@ -173,7 +173,12 @@ export function buildTimeline(run: Pick<LearnRunData, "startedAt" | "turns">): {
     const m = c.tool === "testSkill" ? c.result.match(/(\d+)\/(\d+) passed/) : null;
     return m !== null && m[1] === m[2];
   });
-  if (selfTest >= 0) add("self-test", `Self-test ${run.turns[selfTest].calls.find((c) => c.tool === "testSkill")!.result.match(/\d+\/\d+/)![0]} passed`, selfTest);
+  if (selfTest >= 0) {
+    // One testSkill call; the finish gate counts different passing orders across calls (learner.mjs: >= 3), so name
+    // what this milestone is: the first call whose orders all passed.
+    const [, ok, of] = run.turns[selfTest].calls.find((c) => c.tool === "testSkill")!.result.match(/(\d+)\/(\d+)/)!;
+    add("self-test", `First self-test call passed: ${ok} of ${of} ${of === "1" ? "order" : "orders"}`, selfTest);
+  }
   add("finish", "Finished", callAt((c) => c.tool === "finish" && c.result === "finish accepted"));
   milestones.sort((a, b) => a.index - b.index);
   return { steps, milestones };
