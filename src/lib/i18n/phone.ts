@@ -52,8 +52,8 @@ const PHONE_TEXT = {
   undo: { ko: "되돌리기", en: "Undo" },
   examples: { ko: "이렇게 말해 보세요", en: "Try saying" },
   inputLabel: { ko: "주문을 글자로 입력", en: "Type your order" },
-  // Short enough for the field beside [Send]: English at 360px and Korean at 320px with larger text, and /demo at
-  // 1280px (I-133, R-019, #1 8; measured in e2e/qa/assistant.qa.spec.ts and demo.qa.spec.ts).
+  // Short enough for the field beside [Send]: English and Korean at 320px with larger text, and /demo at 1280px
+  // (I-133, R-019, #1 8, #1 30; measured in e2e/qa/assistant.qa.spec.ts and demo.qa.spec.ts).
   inputPlaceholder: { ko: "예: 버거 세트", en: "e.g. Burger set" },
   learnedPlaceholder: { ko: "예: 페퍼로니", en: "e.g. Pepperoni" },
   ticketPlaceholder: { ko: "예: 어른 2장", en: "e.g. 2 adults" },

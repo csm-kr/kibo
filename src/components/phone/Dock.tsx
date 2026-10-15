@@ -215,7 +215,8 @@ export function TypingSheet(props: {
           }, 300);
         }}
         placeholder={placeholder ?? pt("inputPlaceholder", locale)}
-        className={`min-h-14 min-w-0 flex-1 rounded-tile border border-field bg-white px-4 text-xl placeholder:text-[#6B655C] ${FOCUS}`}
+        // A 12px inset leaves the hints room at 320px wide with larger text in English too (#1 30, I-133).
+        className={`min-h-14 min-w-0 flex-1 rounded-tile border border-field bg-white px-3 text-xl placeholder:text-[#6B655C] ${FOCUS}`}
       />
       <button type="submit" disabled={disabled || !text.trim()} className={quiet ? SECONDARY_SMALL : PRIMARY_SMALL}>
         {pt("send", locale)}

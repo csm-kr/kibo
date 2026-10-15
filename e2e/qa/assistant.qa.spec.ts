@@ -574,7 +574,7 @@ test("P3 at 360×800 and 320×700 with larger text: the cart summary is one line
 // Every kiosk's text-field hint (MALO, the airport rail ticket machine, the learned pizza kiosk), in both languages.
 const HINT_KEYS = ["inputPlaceholder", "ticketPlaceholder", "learnedPlaceholder"] as const;
 
-test("P3: every kiosk's input hint fits beside [Send] with larger text, in English and Korean (#1 8, I-133, R-019)", async ({
+test("P3: every kiosk's input hint fits beside [Send] with larger text at 320 wide, in English and Korean (#1 8, #1 30, I-133, R-019)", async ({
   browser,
 }, info) => {
   const ctx = await browser.newContext({
@@ -593,11 +593,15 @@ test("P3: every kiosk's input hint fits beside [Send] with larger text, in Engli
   await page.getByRole("button", { name: "Eat here" }).click();
   await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
 
-  // English at 360×800 ("e.g. Cheeseburger" with "set" cut, 15-judge-fixes:6), Korean down to 320×700 (R-019).
+  // Both languages down to 320×700 (R-019): English at 360×800 had "e.g. Cheeseburger" with "set" cut
+  // (15-judge-fixes:6), and at 320×700 "e.g. Burger set" and "e.g. Pepperoni" ran 5.6px and 4.7px past the field (#1 30).
   const en = page.getByRole("textbox", { name: "Type your order" });
   await expect(en).toHaveAttribute("placeholder", pt("inputPlaceholder", "en"));
-  expect(await hintsCut(en, HINT_KEYS.map((k) => pt(k, "en"))), "English at 360×800").toEqual([]);
-  await check(page, info, "P3-hint-large", [VIEWPORTS[1]]);
+  for (const vp of [VIEWPORTS[1], VIEWPORTS[3]]) {
+    await page.setViewportSize(vp);
+    expect(await hintsCut(en, HINT_KEYS.map((k) => pt(k, "en"))), `English at ${vp.width}x${vp.height}`).toEqual([]);
+  }
+  await check(page, info, "P3-hint-large", [VIEWPORTS[1], VIEWPORTS[3]]);
 
   await page.getByRole("button", { name: "Language and text size: English" }).click();
   await page.getByRole("dialog", { name: "Language and text size" }).getByRole("button", { name: /^한국어/ }).click();
@@ -716,14 +720,19 @@ test.describe(() => {
   });
 });
 
-test("P7: someone else is using this kiosk", async ({ page, request }, info) => {
-  const res = await request.post("/api/session", { data: { kioskId: "malo" } });
-  const { sessionId, claimUrl } = (await res.json()) as { sessionId: string; claimUrl: string };
-  const claimToken = new URL(claimUrl).hash.replace(/^#t=/, "");
-  expect((await claim(request, sessionId, claimToken)).status()).toBe(200);
-  await page.goto(claimUrl);
-  await expect(page.getByRole("heading", { name: "Someone else is using this kiosk." })).toBeVisible();
-  await check(page, info, "P7-taken");
+test.describe(() => {
+  // Its own address: on the file's shared one it got no claim URL in a full QA run, past 10 new sessions a minute (I-068).
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.99" } });
+
+  test("P7: someone else is using this kiosk", async ({ page, request }, info) => {
+    const res = await request.post("/api/session", { data: { kioskId: "malo" } });
+    const { sessionId, claimUrl } = (await res.json()) as { sessionId: string; claimUrl: string };
+    const claimToken = new URL(claimUrl).hash.replace(/^#t=/, "");
+    expect((await claim(request, sessionId, claimToken)).status()).toBe(200);
+    await page.goto(claimUrl);
+    await expect(page.getByRole("heading", { name: "Someone else is using this kiosk." })).toBeVisible();
+    await check(page, info, "P7-taken");
+  });
 });
 
 test.describe(() => {
