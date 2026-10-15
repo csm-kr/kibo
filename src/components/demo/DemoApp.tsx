@@ -315,7 +315,8 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
                       sessionId: tokens.sessionId,
                       list: [...(prev.sessionId === tokens.sessionId ? prev.list : []), ...list].slice(-MAX_ACTIONS),
                     }));
-                    if (list.length > 0) {
+                    // The AI's tool calls only: the user's own tap on [Yes, pay now] is listed but is not the AI's work.
+                    if (list.some((a) => !a.tap)) {
                       setSide((t) => (t.switchedFor === tokens.sessionId ? t : { tab: "ai", switchedFor: tokens.sessionId }));
                     }
                   }}

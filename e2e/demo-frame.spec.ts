@@ -306,6 +306,19 @@ test.describe(() => {
     await third(page).locator('[data-scenario-step="0"]').getByRole("button").click();
     await expect(tab(page, "What the AI did")).toHaveAttribute("aria-selected", "true");
   });
+
+  test("the user's own tap on [Yes, pay now] is listed but does not switch the tab: it is not the AI's work (#1 E)", async ({ page, request }) => {
+    const s = await start(page);
+    let seq = 0;
+    const ai = (type: string, args: object) =>
+      command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "voice", utteranceSeq: ++seq });
+    await ai("setDineOption", { option: "eat_in" });
+    await ai("addToCart", { itemId: "cheese_burger", variant: "set", qty: 1, selections: { drink: ["cola"] } });
+    await ai("requestCheckout", {});
+    await page.getByRole("button", { name: "Yes, pay now" }).click();
+    await expect(tab(page, "What the AI did").locator("[data-action-count]")).toHaveText("1");
+    await expect(tab(page, "Scenarios")).toHaveAttribute("aria-selected", "true");
+  });
 });
 
 test.describe(() => {
