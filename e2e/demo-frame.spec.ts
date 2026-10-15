@@ -332,3 +332,72 @@ test.describe(() => {
     }
   });
 });
+
+test("D1: descriptions start on one line, the pizza note sits in a box, no dark outlines, a balanced headline (#1 6)", async ({ page }) => {
+  await page.goto("/demo");
+  await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible({ timeout: 60_000 });
+  for (const vp of SIZES) {
+    await page.setViewportSize(vp);
+    const at = `${vp.width}x${vp.height}`;
+    const m = await page.evaluate(() => {
+      const intro = document.querySelector('main[data-demo="intro"]')!;
+      const cards = [...intro.querySelectorAll<HTMLElement>("[data-place-card]")];
+      const tops = cards.map((c) => c.querySelector("[data-place-persona]")!.getBoundingClientRect().top);
+      // The nearest painted box around the /learn link, and the card row it should span.
+      const link = [...intro.querySelectorAll("a")].find((a) => a.textContent?.trim() === "How KIBO learned the pizza kiosk")!;
+      let box: Element | null = link;
+      while (box && getComputedStyle(box).backgroundColor === "rgba(0, 0, 0, 0)") box = box.parentElement;
+      const b = box!.getBoundingClientRect();
+      const first = cards[0].getBoundingClientRect();
+      const last = cards[cards.length - 1].getBoundingClientRect();
+      // Dark 2px outlines: borders of 2px or more in a dark colour (I-165).
+      const dark = [...intro.querySelectorAll<HTMLElement>("*")].filter((el) => {
+        const cs = getComputedStyle(el);
+        if (parseFloat(cs.borderTopWidth) < 2 || cs.borderTopStyle === "none") return false;
+        const [r, g, bl] = (cs.borderTopColor.match(/\d+/g) ?? []).map(Number);
+        return (r + g + bl) / 3 < 80;
+      }).length;
+      // Headline lines that hold a single word ("kiosk." alone).
+      const h1 = intro.querySelector("h1")!;
+      const lone: string[] = [];
+      for (const block of h1.querySelectorAll("span")) {
+        const text = block.firstChild as Text;
+        const lines = new Map<number, string[]>();
+        let i = 0;
+        for (const word of (text.textContent ?? "").split(" ")) {
+          const range = document.createRange();
+          range.setStart(text, i);
+          range.setEnd(text, i + word.length);
+          const top = Math.round(range.getBoundingClientRect().top);
+          lines.set(top, [...(lines.get(top) ?? []), word]);
+          i += word.length + 1;
+        }
+        if (lines.size > 1) for (const words of lines.values()) if (words.length === 1) lone.push(words[0]);
+      }
+      return {
+        // Under the top bar D1 still fits the judge sizes whole, as it did before the frame.
+        hidden: intro.scrollHeight - intro.clientHeight,
+        cards: cards.length,
+        tops,
+        box: { painted: getComputedStyle(box!).backgroundColor, shadow: getComputedStyle(box!).boxShadow, left: b.left - first.left, right: b.right - last.right },
+        dark,
+        wrap: getComputedStyle(h1).textWrapStyle,
+        lone,
+      };
+    });
+    expect(m.cards, at).toBe(3);
+    expect(m.hidden, `${at}: D1 cut under the fold`).toBeLessThanOrEqual(0);
+    if (vp.width >= 900) {
+      for (const top of m.tops) expect(Math.abs(top - m.tops[0]), `${at}: description tops ${m.tops.join(", ")}`).toBeLessThanOrEqual(1);
+      expect(Math.abs(m.box.left), `${at}: the pizza note's box spans the card row (left)`).toBeLessThanOrEqual(1);
+      expect(Math.abs(m.box.right), `${at}: the pizza note's box spans the card row (right)`).toBeLessThanOrEqual(1);
+    }
+    expect(m.box.painted, `${at}: the pizza note sits in a white box`).toBe("rgb(255, 255, 255)");
+    expect(m.dark, `${at}: dark 2px outlines`).toBe(0);
+    expect(m.wrap, `${at}: headline`).toBe("balance");
+    expect(m.lone, `${at}: headline words alone on a line`).toEqual([]);
+  }
+  // The secondary button follows the phone design: tinted, no border (I-165).
+  const phone = page.getByRole("button", { name: "Use my phone instead" });
+  expect(await phone.evaluate((el) => [getComputedStyle(el).backgroundColor, getComputedStyle(el).borderTopWidth])).toEqual(["rgb(238, 240, 253)", "0px"]);
+});
