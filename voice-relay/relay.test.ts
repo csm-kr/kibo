@@ -132,7 +132,7 @@ describe("relayConnection: hello and auth", () => {
     // The same config builders as the token path: instructions with the menu and the current cart, 9 tools, Korean.
     expect(config.systemInstruction).toContain("<menu_data>");
     expect(config.systemInstruction).toContain("Cart lines, already applied; do not add these again:");
-    expect(config.inputAudioTranscription).toEqual({ languageCodes: ["ko-KR"] });
+    expect(config.inputAudioTranscription).toEqual({ languageCodes: ["ko-KR", "en-US"] });
     const [{ functionDeclarations }] = config.tools as { functionDeclarations: unknown[] }[];
     expect(functionDeclarations).toHaveLength(9);
     expect(client.sent).toEqual([

@@ -1,5 +1,5 @@
 import type { ChoiceRef } from "@/lib/commands/errors";
-import { pt } from "@/lib/i18n/phone";
+import { lt, type SpeechLanguage } from "@/lib/i18n/languages";
 import { formatWon, lineLabel } from "@/lib/kiosk/menu";
 import type { KioskData, Locale } from "@/types/menu";
 import type { CartLine } from "@/types/session";
@@ -7,7 +7,7 @@ import type { toolResult } from "./mapping";
 
 // The text agent's reply without a second model round (14-final:5). When every tool call of the first round
 // succeeded and the server's results say everything there is to say, the reply is built here from those results and
-// menu data, in the screens' language, from fixed sentences: no free text, so it stays grounded. Anything else (a
+// menu data, in Korean or English (the user's, else the screens' language), from fixed sentences: no free text, so it stays grounded. Anything else (a
 // failure, a choice, staff, an upsell, a learned kiosk, a question) returns null and the model writes the reply.
 
 export interface DoneCall {
@@ -31,9 +31,13 @@ function hasFinal(word: string, exceptRieul = false): boolean {
 /** "으로" after a final consonant other than ㄹ, else "로". */
 const ro = (word: string) => (hasFinal(word, true) ? "으로" : "로");
 
-export function quickReply(kiosk: KioskData, locale: Locale, calls: DoneCall[]): string | null {
+/**
+ * `locale`: the language of the sentences, which may differ from the screens' (a Korean user on English screens,
+ * 16-judge-r3-fixes:0). `buttons`: the language the phone's buttons are in, so the review names [Yes, pay now] as shown.
+ */
+export function quickReply(kiosk: KioskData, locale: Locale, calls: DoneCall[], buttons: SpeechLanguage = locale): string | null {
   if (kiosk.learned || calls.length === 0) return null;
-  return sentencesFor(kiosk, locale, calls, true)?.join(" ") ?? null;
+  return sentencesFor(kiosk, locale, calls, true, buttons)?.join(" ") ?? null;
 }
 
 /**
@@ -41,8 +45,14 @@ export function quickReply(kiosk: KioskData, locale: Locale, calls: DoneCall[]):
  * sentences for every applied call, failures left out, then `question` (the open choice's question). A user who sees
  * "Sorry, could you say that again?" after a change repeats the order and gets it twice. Null when there is nothing to say.
  */
-export function summaryReply(kiosk: KioskData, locale: Locale, calls: DoneCall[], question: string | null): string | null {
-  const sentences = [...(sentencesFor(kiosk, locale, calls, false) ?? []), ...(question ? [question] : [])];
+export function summaryReply(
+  kiosk: KioskData,
+  locale: Locale,
+  calls: DoneCall[],
+  question: string | null,
+  buttons: SpeechLanguage = locale,
+): string | null {
+  const sentences = [...(sentencesFor(kiosk, locale, calls, false, buttons) ?? []), ...(question ? [question] : [])];
   return sentences.length > 0 ? sentences.join(" ") : null;
 }
 
@@ -50,7 +60,7 @@ export function summaryReply(kiosk: KioskData, locale: Locale, calls: DoneCall[]
  * `strict` (quickReply): null unless every call is a plain applied change the sentences cover. Otherwise failures,
  * choices and lines the result does not hold are skipped, and staff calls and running replays get their own sentence.
  */
-function sentencesFor(kiosk: KioskData, locale: Locale, calls: DoneCall[], strict: boolean): string[] | null {
+function sentencesFor(kiosk: KioskData, locale: Locale, calls: DoneCall[], strict: boolean, buttons: SpeechLanguage): string[] | null {
   const ticket = kiosk.domain === "ticket";
   const ko = locale === "ko";
   const count = ticket ? "장" : "개";
@@ -116,7 +126,7 @@ function sentencesFor(kiosk: KioskData, locale: Locale, calls: DoneCall[], stric
   }
 
   const won = formatWon(total, locale);
-  const payNow = pt("payNow", locale, kiosk.domain);
+  const payNow = lt("payNow", buttons, kiosk.domain);
   const list = (items: string[]) => (ko ? items.join(", ") : items.join(" and "));
   const sentences = parts.map(({ kind, items }) => {
     switch (kind) {

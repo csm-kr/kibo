@@ -6,6 +6,7 @@ import { SPEECH_LANGUAGES } from "@/lib/i18n/languages";
 import { kstDay, type UsageStore } from "@/lib/limits/usage";
 import { bumpSessionCounter, runCommand } from "@/lib/session/service";
 import type { SessionStore } from "@/lib/store/types";
+import type { Locale } from "@/types/menu";
 import type { CartLine, SessionStatus } from "@/types/session";
 import { agentAction, type AgentAction } from "./actions";
 import { KIOSK_BUSY, waitForBridge } from "./bridgeWait";
@@ -13,6 +14,7 @@ import { chatInstructions } from "./instructions";
 import { toolCallToCommand, toolResult } from "./mapping";
 import type { ModelClient, ModelTurn } from "./model";
 import { choiceQuestion } from "./choices";
+import { ownWordsLanguage, replyLanguageLine } from "./ownWords";
 import { inScreensLanguage, introOffer, plainRequest, quickReply, summaryReply, type DoneCall } from "./quickReply";
 import { toolDeclarations } from "./tools";
 
@@ -100,7 +102,15 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
   }
 
   const kiosk = getKiosk(session.kioskId);
+  // The user's own words decide the reply's language over the picker and the screens (16-judge-r3-fixes:0): a Korean
+  // speaker on English screens, or a tap whose English label was sent as the message, still gets Korean.
+  const aiLanguage = input.language ?? input.locale;
+  const own = ownWordsLanguage(kiosk, { message: input.message, history: input.history, pendingChoice: session.pendingChoice, locale: input.locale });
+  const speaks = own ?? aiLanguage;
+  // The server's own sentences exist in Korean and English only; null: the model writes every reply.
+  const sentences: Locale | null = speaks === "ko" || speaks === "en" ? speaks : null;
   const { system, currentOrder } = chatInstructions(kiosk, {
+    replyLanguage: replyLanguageLine(own, aiLanguage),
     cart: session.cart,
     status: session.status,
     dineOption: session.dineOption,
@@ -156,12 +166,13 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
     return outcome;
   };
 
-  // A plain request in the screens' language may get its reply from the first round's results (quickReply.ts):
+  // A plain request in the reply's language may get its reply from the first round's results (quickReply.ts):
   // the second model call only wrote a confirmation the server already knows (14-final:5).
-  const screensLanguage = input.language === undefined || input.language === input.locale;
-  const templated = screensLanguage && plainRequest(input.message, input.locale);
+  const templated = sentences !== null && plainRequest(input.message, sentences);
   // The time budget's reply is in Korean or English only, so a user writing another language waits for the model.
-  const budgeted = screensLanguage && inScreensLanguage(input.message, input.locale);
+  const budgeted = sentences !== null && inScreensLanguage(input.message, sentences);
+  // The server's sentences: the reply's language when it has them, else the screens' (an error after a change).
+  const replyLocale = sentences ?? input.locale;
 
   /**
    * The reply when the model wrote none, or ran out of time (15-judge-fixes:0). After an applied change: fixed
@@ -177,7 +188,7 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
       // The last round's refusal that named choices (NEEDS_CHOICE, SOLD_OUT) is the question the model left unasked.
       const refused = lastRound.findLast((d) => !d.outcome.ok && d.outcome.error.detail?.templateId && d.outcome.error.detail.choices?.length);
       const detail = refused && !refused.outcome.ok ? refused.outcome.error.detail : undefined;
-      const intro = !detail && !applied && OFFER_STATES.has(latest.status) ? introOffer(kiosk, input.locale) : null;
+      const intro = !detail && !applied && OFFER_STATES.has(latest.status) ? introOffer(kiosk, replyLocale) : null;
       const offer = detail
         ? { templateId: detail.templateId, choices: detail.choices!.slice(0, 6) }
         : intro && intro.choices.length > 0
@@ -189,12 +200,12 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
         const outcome = await execute("offerChoices", offer);
         record("offerChoices", offer, outcome, performance.now() - t);
         latest = (await store.get(input.sessionId)) ?? latest;
-        if (outcome.ok && intro) return `${intro.line} ${choiceQuestion(kiosk, latest.pendingChoice!, input.locale)}`;
+        if (outcome.ok && intro) return `${intro.line} ${choiceQuestion(kiosk, latest.pendingChoice!, replyLocale)}`;
       }
     }
     // Any accepted command clears pendingChoice, so one still open after an applied change was set in this request.
-    const question = latest.pendingChoice ? choiceQuestion(kiosk, latest.pendingChoice, input.locale) : null;
-    return summaryReply(kiosk, input.locale, allDone, question) ?? FALLBACK;
+    const question = latest.pendingChoice ? choiceQuestion(kiosk, latest.pendingChoice, replyLocale) : null;
+    return summaryReply(kiosk, replyLocale, allDone, question, aiLanguage) ?? FALLBACK;
   };
 
   // The cart before each call, so a remove or update can name its line.
@@ -244,7 +255,7 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
     allDone.push(...done);
     lastRound = done;
     // Only the first round, and only when the model said nothing itself: its text may hold an answer.
-    const quick = round === 0 && templated && !out.text ? quickReply(kiosk, input.locale, done) : null;
+    const quick = round === 0 && templated && !out.text ? quickReply(kiosk, replyLocale, done, aiLanguage) : null;
     if (quick) {
       reply = quick;
       replySource = "template";

@@ -115,3 +115,36 @@ describe("declineLabel", () => {
     }
   });
 });
+
+describe("the AI language on the phone (16-judge-r3-fixes:0)", () => {
+  const drink = { templateId: "pick_option" as const, choices: [{ kind: "option" as const, id: "cola" }, { kind: "option" as const, id: "cider" }] };
+  const upsell = { templateId: "upsell" as const, choices: [{ kind: "item" as const, id: "soft_cone" }] };
+
+  it("questions and fixed labels follow an AI-only language; names stay from menu data", () => {
+    expect(choiceQuestion(k, upsell, "en", "ja")).toBe("デザートもいかがですか？");
+    expect(choiceQuestion(k, drink, "en", "ja")).toBe("どれにしますか？");
+    expect(choiceQuestion(rail, { templateId: "pick_option", choices: [{ kind: "option", id: "adult" }] }, "en", "ja")).toBe("どなたの乗車券ですか？");
+    expect(declineLabel("upsell", "en", "ja")).toBe("いりません");
+    expect(choiceLabel(k, { kind: "variant", id: "set" }, "en", "ja")).toBe("セット");
+    expect(choiceLabel(k, { kind: "staff", id: "staff" }, "en", "fr")).toBe("Appeler le personnel");
+    expect(choiceLabel(k, { kind: "option", id: "cider" }, "en", "ja")).toBe("Cider");
+  });
+
+  it("Korean or English as the AI language keeps the screens' words", () => {
+    expect(choiceQuestion(k, upsell, "en", "en")).toBe("Would you like a dessert too?");
+    expect(choiceQuestion(k, upsell, "ko", "ko")).toBe("디저트도 함께 드릴까요?");
+    expect(declineLabel("upsell", "en", "ko")).toBe("No thanks");
+  });
+
+  it("every fixed text has every AI language", () => {
+    const templates: TemplateId[] = ["pick_item", "pick_variant", "pick_option", "pick_dine", "yes_no", "alternatives", "upsell"];
+    for (const language of ["ja", "zh", "es", "vi", "fr", "th", "id"] as const) {
+      for (const t of templates) {
+        expect(choiceQuestion(k, { templateId: t, choices: [] }, "en", language)).not.toBe(choiceQuestion(k, { templateId: t, choices: [] }, "en"));
+      }
+      for (const c of [{ kind: "variant", id: "single" }, { kind: "yesno", id: "yes" }, { kind: "staff", id: "staff" }] as ChoiceRef[]) {
+        expect(choiceLabel(k, c, "en", language)).toBeTruthy();
+      }
+    }
+  });
+});

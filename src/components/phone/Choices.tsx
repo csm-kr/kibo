@@ -3,10 +3,11 @@
 import Image from "next/image";
 import { useId } from "react";
 import { findItem } from "@/lib/adapters/catalog";
-import { choiceLabel, choicePrice, choiceQuestion, declineLabel } from "@/lib/agent/choices";
+import { choiceLabel, choicePrice, choiceQuestion, declineLabel, fixedChoice } from "@/lib/agent/choices";
 import type { ChoiceRef } from "@/lib/commands/errors";
 import type { KioskData, Locale } from "@/types/menu";
 import type { Session } from "@/types/session";
+import { useAiText } from "./language";
 import { FOCUS, PRESS } from "./ui";
 
 // Choice buttons from session.pendingChoice (heuristic 6), in the phone design: white cards with a photo, so they read
@@ -38,15 +39,18 @@ export function Choices(props: {
 }) {
   const { kiosk, pending, locale } = props;
   const titleId = useId();
+  // With an AI-only language the question and the fixed labels are in it; names stay from menu data (16-judge-r3-fixes:0).
+  const { ai, lang } = useAiText();
+  const language = ai ?? undefined;
   const choices = pending.choices
-    .map((c) => ({ choice: c, label: choiceLabel(kiosk, c, locale), price: choicePrice(kiosk, c, locale), photo: choicePhoto(kiosk, c) }))
+    .map((c) => ({ choice: c, label: choiceLabel(kiosk, c, locale, language), price: choicePrice(kiosk, c, locale), photo: choicePhoto(kiosk, c) }))
     .filter((c) => c.label);
-  const decline = props.onDecline ? declineLabel(pending.templateId, locale) : null;
+  const decline = props.onDecline ? declineLabel(pending.templateId, locale, language) : null;
   if (choices.length === 0) return null;
   return (
     <section data-choices aria-labelledby={titleId} className="flex flex-col gap-3">
-      <h2 id={titleId} className="text-xl font-bold">
-        {choiceQuestion(kiosk, pending, locale)}
+      <h2 id={titleId} lang={lang} className="text-xl font-bold">
+        {choiceQuestion(kiosk, pending, locale, language)}
       </h2>
       {/* One column: menu names like "Double cheeseburger" do not fit half a phone at 20px. */}
       <div className="flex flex-col gap-2">
@@ -64,7 +68,9 @@ export function Choices(props: {
             {photo && <Image src={photo} alt="" width={48} height={48} className="size-12 flex-none rounded-[12px] bg-cream object-cover" />}
             {/* The tap sends only the name; the price is from menu data, like the kiosk tile's. */}
             <span className="min-w-0 text-xl">
-              <span className="font-semibold">{label}</span>
+              <span lang={fixedChoice(choice) ? lang : undefined} className="font-semibold">
+                {label}
+              </span>
               {price && <span className="text-muted tabular-nums"> · {price}</span>}
             </span>
           </button>
@@ -73,6 +79,7 @@ export function Choices(props: {
           <button
             type="button"
             data-choice-decline
+            lang={lang}
             disabled={props.disabled}
             onClick={() => props.onDecline?.(decline)}
             className={`flex min-h-15 items-center justify-center rounded-tile bg-kibo-tint px-4 text-xl font-semibold text-kibo active:bg-kibo-tint-pressed disabled:opacity-60 ${PRESS} ${FOCUS}`}

@@ -245,6 +245,21 @@ for (const { mode, fixture, ip } of RUNS) {
         )
         .toBe(true);
       await expect.poll(() => page.evaluate(() => (window as unknown as { __kiboHighlightAt?: number }).__kiboHighlightAt ?? null)).not.toBeNull();
+      // Korean speech on /demo's English screens gets a Korean reply (16-judge-r3-fixes:0): the AI's own words,
+      // from its output transcription, shown in the phone's bubble.
+      // On failure the message tells an English reply from no reply yet; the text itself is never kept.
+      if (fixture === "hero-ko") {
+        await expect
+          .poll(
+            async () => {
+              // Without the screen-reader prefix ("KIBO: "), which is always Latin.
+              const texts = (await page.locator('[data-bubble="model"]').allInnerTexts()).map((t) => t.replace(/^[^:]*:\s*/, ""));
+              return `bubbles=${texts.length} hangul=${texts.some((t) => /[가-힣]/.test(t))} latin=${texts.some((t) => /[A-Za-z]{3}/.test(t))}`;
+            },
+            { timeout: 20_000 },
+          )
+          .toMatch(/hangul=true/);
+      }
       await mic.click();
       await expect(mic).toHaveAttribute("data-voice-state", "off");
       expect(leaked, "instructions reached the browser").toBe(false);

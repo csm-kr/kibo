@@ -21,6 +21,7 @@ import type { SpeechLanguage } from "@/lib/i18n/languages";
 import type { Locale } from "@/types/menu";
 import type { CartLine, DineOption, Session, SessionStatus } from "@/types/session";
 import { FALLBACK } from "@/lib/agent/chat";
+import { choiceLabel } from "@/lib/agent/choices";
 import { checkGrounding, internalWords, offersToPay, replyLanguage, saysCannot, type GroundingResult } from "./grounding";
 
 interface ExpectedLine {
@@ -60,8 +61,11 @@ interface Case {
   language?: SpeechLanguage;
   /** Every reply must be in this language (replyLanguage, no AI); only the detected codes are kept. */
   replyIn?: string;
-  /** A string is a typed message; `tapDine` is a tap on a dine button, after which the phone sends a held order again. */
-  turns: (string | { tapDine: DineOption })[];
+  /**
+   * A string is a typed message; `tapDine` is a tap on a dine button, after which the phone sends a held order again;
+   * `tapChoice` is a tap on the open choice with that id, which sends the button's label as the message, as the phone does.
+   */
+  turns: (string | { tapDine: DineOption } | { tapChoice: string })[];
   expect: Expect;
 }
 
@@ -252,7 +256,16 @@ async function runCase(c: Case) {
     let message: string;
     let shown: string | undefined;
     if (typeof turn === "string") message = turn;
-    else {
+    else if ("tapChoice" in turn) {
+      // Like AssistantPanel's pickChoice: the label as the phone shows it (16-judge-r3-fixes:0).
+      const open = (await store.get(sessionId))?.pendingChoice;
+      const choice = open?.choices.find((ch) => ch.id === turn.tapChoice);
+      if (!choice) {
+        requests.push({ ms: 0, firstToolMs: null, rounds: [], tools: [], error: "CHOICE_NOT_OFFERED" });
+        break;
+      }
+      message = choiceLabel(getKiosk(kioskId), choice, c.locale, c.language);
+    } else {
       // Like AssistantPanel's chooseDine (15-judge-fixes:1): the tap goes to the session; a held order is sent again
       // once the session has the dine option (a learned kiosk sets it after the bridge's report).
       const body = { sessionId, commandId: randomUUID(), type: "setDineOption", args: { option: turn.tapDine }, source: "button" };

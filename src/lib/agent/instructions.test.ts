@@ -270,13 +270,23 @@ describe("the pay button by the label the user sees (15-judge-fixes:2)", () => {
 });
 
 describe("language and the dine option (14-final:4)", () => {
-  it("speaks the language the user chose, and the user's own language over it", () => {
+  it("starts in the language the user chose, then follows the user's latest own words (16-judge-r3-fixes:0)", () => {
     const ja = buildInstructions(k, { locale: "en", language: "ja" });
-    expect(ja).toMatch(/user chose Japanese on the phone; speak and write in Japanese/);
-    expect(ja).toMatch(/reply in the language the user speaks or writes/i);
+    expect(ja).toMatch(/user chose Japanese on the phone; start in Japanese\./);
+    expect(ja).toMatch(/From the user's first words on, always reply in the language of the user's latest own words, spoken or typed/);
+    expect(ja).toMatch(/choice button's label sent as the user's message is not their own words/);
     expect(ja).not.toMatch(/otherwise reply in English/);
     // Without a language, the phone's locale is the language, as before.
     expect(buildInstructions(k, { locale: "ko" })).toMatch(/user chose Korean on the phone/);
+  });
+
+  it("the chat order block carries the reply-language line; the system text only says to follow it", () => {
+    const line = "Reply language: Korean (the user's own words are in Korean).";
+    const { system, currentOrder } = chatInstructions(k, { locale: "en", replyLanguage: line });
+    expect(currentOrder).toMatch(new RegExp(`\\n${line.replace(/[().]/g, "\\$&")}\\n</current_order>$`));
+    expect(system).toContain("If the <current_order> block has a Reply language line, write your reply in that language.");
+    expect(system).toBe(chatInstructions(k, { locale: "en" }).system);
+    expect(chatInstructions(k, { locale: "en" }).currentOrder).not.toContain("Reply language");
   });
 
   it("never translates or invents item names, whatever the language", () => {

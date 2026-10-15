@@ -1,0 +1,210 @@
+{
+  "date": "2026-10-15T00:03:49.936Z",
+  "model": "gemini-3.8-flash",
+  "backend": "auto",
+  "modelCallsByBackend": {
+    "api": 9,
+    "vertex": 0
+  },
+  "thinkingLevel": "low",
+  "evalClock": "14:00 KST",
+  "subset": [
+    "l-ko-on-en-tap",
+    "l-ko-voice-like-en"
+  ],
+  "cases": 2,
+  "passed": 2,
+  "passRate": 1,
+  "byGroup": {
+    "language": {
+      "pass": 2,
+      "total": 2
+    }
+  },
+  "byKiosk": {
+    "malo": {
+      "pass": 2,
+      "total": 2
+    }
+  },
+  "byType": {
+    "11-any-language": {
+      "pass": 2,
+      "total": 2
+    }
+  },
+  "latency": {
+    "requests": 3,
+    "totalMedianMs": 6307,
+    "totalP90Ms": 9009,
+    "firstToolRequests": 3,
+    "firstToolMedianMs": 2406,
+    "firstToolP90Ms": 6847,
+    "modelCalls": 9,
+    "roundMedianMs": 2046,
+    "roundP90Ms": 4689,
+    "callsPerRequest": {
+      "3": 3
+    },
+    "oneCallWithTools": 0
+  },
+  "notCovered": [
+    {
+      "type": "7-count-limits",
+      "reason": "Count limits (max 3 toppings) need the learned Doughhouse kiosk, which has no LearnedAdapter yet."
+    }
+  ],
+  "results": [
+    {
+      "id": "l-ko-on-en-tap",
+      "kioskId": "malo",
+      "type": "11-any-language",
+      "group": "language",
+      "locale": "en",
+      "replyLanguages": [
+        "ko",
+        "ko"
+      ],
+      "replySources": [
+        "model",
+        "model"
+      ],
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 1,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "cider"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 9009,
+          "firstToolMs": 6847,
+          "rounds": [
+            4689,
+            2138,
+            2041
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "NEEDS_CHOICE"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 6307,
+          "firstToolMs": 2053,
+          "rounds": [
+            2042,
+            2046,
+            2204
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l-ko-voice-like-en",
+      "kioskId": "malo",
+      "type": "11-any-language",
+      "group": "language",
+      "locale": "en",
+      "replyLanguages": [
+        "ko"
+      ],
+      "replySources": [
+        "model"
+      ],
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 2,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "cola"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 6075,
+          "firstToolMs": 2406,
+          "rounds": [
+            2404,
+            1770,
+            1895
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

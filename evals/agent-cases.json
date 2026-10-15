@@ -617,6 +617,24 @@
       "expect": { "choices": { "templateId": "pick_item", "ids": ["cheese_burger"] } }
     },
     {
+      "id": "l-ko-on-en-tap",
+      "group": "language",
+      "type": "11-any-language",
+      "locale": "en",
+      "replyIn": "ko",
+      "turns": ["치즈버거 세트 하나 주세요.", { "tapChoice": "cider" }],
+      "expect": { "cart": [{ "itemId": "cheese_burger", "variant": "set", "qty": 1, "selections": { "side": ["fries_m"], "drink": ["cider"] } }] }
+    },
+    {
+      "id": "l-ko-voice-like-en",
+      "group": "language",
+      "type": "11-any-language",
+      "locale": "en",
+      "replyIn": "ko",
+      "turns": ["치즈버거 세트 두 개, 음료는 둘 다 콜라로 주세요."],
+      "expect": { "cart": [{ "itemId": "cheese_burger", "variant": "set", "qty": 2, "selections": { "side": ["fries_m"], "drink": ["cola"] } }] }
+    },
+    {
       "id": "r-ko-applied-never-generic",
       "group": "recovery",
       "type": "12-recovery",

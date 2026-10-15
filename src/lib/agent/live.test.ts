@@ -6,7 +6,7 @@ import { resetLimits } from "@/lib/limits/ip";
 import { MemoryUsageStore, type UsageStore } from "@/lib/limits/usage";
 import { claimSession, createSession, runCommand } from "@/lib/session/service";
 import { MemoryStore } from "@/lib/store/memory";
-import { geminiTokenIssuer, issueLiveToken, liveConfig, liveTokenRequest, type LiveTokenIssuer } from "./live";
+import { geminiTokenIssuer, issueLiveToken, liveConfig, liveConnectConfig, liveTokenRequest, type LiveTokenIssuer } from "./live";
 
 /** 2026-10-13 12:00 KST */
 const T0 = Date.UTC(2026, 9, 13, 3, 0);
@@ -238,6 +238,20 @@ describe("liveConfig", () => {
     expect(liveConfig(k, { ...opts, locale: "en" }).languageCode).toBe("en-US");
   });
 
+  it("the recognizer gets the chosen language first, then Korean and English, no duplicates (16-judge-r3-fixes:0)", () => {
+    const codes = (code: string) => liveConnectConfig("sys", [], code).inputAudioTranscription.languageCodes;
+    expect(codes("ja-JP")).toEqual(["ja-JP", "ko-KR", "en-US"]);
+    expect(codes("ko-KR")).toEqual(["ko-KR", "en-US"]);
+    expect(codes("en-US")).toEqual(["en-US", "ko-KR"]);
+  });
+
+  it("Live instructions start in the chosen language and then follow the user's latest words", () => {
+    const k = getKiosk("malo");
+    const en = liveConfig(k, { cart: [], status: "connected", dineOption: null, locale: "en" });
+    expect(en.system).toContain("The user chose English on the phone; start in English.");
+    expect(en.system).toContain("From the user's first words on, always reply in the language of the user's latest own words");
+  });
+
   it("issueLiveToken passes the locale's language code to the issuer", async () => {
     const s = await demo();
     await issueLiveToken(deps(), { sessionId: s.sessionId, bearer: s.deviceToken, locale: "ko", ip: "192.0.2.1" });
@@ -275,7 +289,8 @@ describe("geminiTokenIssuer", () => {
         systemInstruction: "sys",
         tools: INPUT.tools,
         // Without a language, short Korean answers ("네") came back empty or in another language (voice-compare).
-        inputAudioTranscription: { languageCodes: ["ko-KR"] },
+        // Korean and English are always hints too: the user may speak either on any picker (16-judge-r3-fixes:0).
+        inputAudioTranscription: { languageCodes: ["ko-KR", "en-US"] },
         outputAudioTranscription: {},
         realtimeInputConfig: {
           automaticActivityDetection: { endOfSpeechSensitivity: EndSensitivity.END_SENSITIVITY_HIGH, silenceDurationMs: 700 },

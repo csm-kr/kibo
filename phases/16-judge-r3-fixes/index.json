@@ -2,9 +2,28 @@
   "project": "KIBO",
   "phase": "16-judge-r3-fixes",
   "steps": [
-    { "step": 0, "name": "reply-language", "status": "pending" },
-    { "step": 1, "name": "order-care", "status": "pending" },
-    { "step": 2, "name": "evidence-guard", "status": "pending" },
-    { "step": 3, "name": "qa", "status": "pending" }
-  ]
+    {
+      "step": 0,
+      "name": "reply-language",
+      "status": "completed",
+      "summary": "Text: src/lib/agent/ownWords.ts (script-only ownWordsLanguage: Hangul ko, kana ja, Han zh, Thai th, Latin null; button labels skipped, falling back to the latest earlier user turn) adds 'Reply language: …' to the <current_order> block only (system text stays cacheable); chat.ts uses that language for quickReply/summaryReply/introOffer/choice question when ko or en, naming [Yes, pay now] as the phone shows it. Instructions: chosen language is only where to start, then the user's latest own words; a tapped label is not their words. Live: languageCodes = AI language + ko-KR + en-US (SDK field is a list). Phone: choices.ts tables in all 9 languages, optional `language` on choiceQuestion/choiceLabel/declineLabel, Choices.tsx uses useAiText; FIXED_LABELS exported. Eval: tapChoice turn kind, cases l-ko-on-en-tap and l-ko-voice-like-en, 2/2 Korean on backend auto (evals/results/2026-10-15T09-03, listed in NUMBERS.md partial runs). New unit tests failed before the change (ownWords, chat, live, instructions; choices tests were written after its tables). Voice NOT verified: one npm run test:e2e:live, 8 passed / 9 failed; both hero-ko runs filled the cart but showed no Hangul AI bubble within 20 s (I-272, open; check now reports bubbles/hangul/latin); 6 text tests failed on upstream deadlines and a 429 (I-157). Voice evidence files restored to the commit, counts in NUMBERS.md (36 attempted, 25 passed). R-020 (proposed) added: wrong-reply-language reached 3 (I-256, I-269, I-271). Docs: ARCHITECTURE, UX, TESTING, ISSUE (I-271–I-273, I-099 seen)."
+      "started_at": "2026-10-15T08:56:35+0900"
+    },
+    {
+      "step": 1,
+      "name": "order-care",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "name": "evidence-guard",
+      "status": "pending"
+    },
+    {
+      "step": 3,
+      "name": "qa",
+      "status": "pending"
+    }
+  ],
+  "created_at": "2026-10-15T08:56:35+0900"
 }

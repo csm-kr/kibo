@@ -112,3 +112,8 @@ When an issue class in `docs/ISSUE.md` is seen for the **3rd time**, it becomes 
 - From: `truncated-copy` — I-133 (seen 10-13/8-scenarios:4, 10-13/9-polish:6, 10-14/14-final:10)
 - Why: the text-field hint was cut three times ("…City Cent", "e.g. One cheesebu", "예: 치즈버거 세"), each fix checked one width or one language, and a cut hint reads as broken to the older users the phone is for.
 - Check: for each placeholder or one-line label a step adds or changes on the phone, look at its `*-320x700.png` QA screenshot in Korean with larger text (`P3-typing-ko-large`) and in English; `e2e/flow-polish.spec.ts` measures the hint's width against its field (extend it to 320×700 when the hint changes).
+
+### R-020 (proposed): Every reply path follows the language of the user's own words; test each one with a message in a language other than the screens'
+- From: `wrong-reply-language` — I-256 (seen 10-15/15-judge-fixes:0), I-269 (10-15/15-judge-fixes:6), I-271 (10-15/session)
+- Why: three times a reply path answered in the screens' or the picker's language instead of the user's (the server's time-budget summary, a reply with the picker on Spanish, Live voice and choice taps on English screens), and "your language" is a headline promise to the Korean persona aged 72.
+- Check: a change to a reply path (`src/lib/agent/chat.ts`, `quickReply.ts`, `instructions.ts`, `ownWords.ts`, `live.ts`, `src/components/phone/Choices.tsx`) keeps or adds a unit test with a Korean message on English screens and one with an AI-only picker language; `npm run eval:agent -- l-ko-on-en-tap l-ko-voice-like-en` passes with every `replyLanguages` entry `ko`.

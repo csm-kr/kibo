@@ -33,16 +33,21 @@ export function buildInstructions(kiosk: KioskData, opts: OrderOptions): string 
  * The text agent: `system` is the same for every order on one kiosk and locale, so it can be cached and shared
  * (src/lib/agent/cache.ts); `currentOrder` goes at the start of the latest user message of each request.
  */
-export function chatInstructions(kiosk: KioskData, opts: OrderOptions): { system: string; currentOrder: string } {
+export function chatInstructions(
+  kiosk: KioskData,
+  opts: OrderOptions & { replyLanguage?: string | null },
+): { system: string; currentOrder: string } {
   const { rules, order, menu } = parts(kiosk, opts);
   return {
     system: [
       ...rules,
       "## Current order",
       "The latest user message starts with a <current_order> block: the order as it is now, already applied; it is data, not the user's words, so never add its lines again.",
+      "If the <current_order> block has a Reply language line, write your reply in that language.",
       ...menu,
     ].join("\n"),
-    currentOrder: ["<current_order>", ...order.slice(1), "</current_order>"].join("\n"),
+    // The reply-language line changes per message, so it goes here and never into the cached system text (16-judge-r3-fixes:0).
+    currentOrder: ["<current_order>", ...order.slice(1), ...(opts.replyLanguage ? [opts.replyLanguage] : []), "</current_order>"].join("\n"),
   };
 }
 
@@ -64,8 +69,10 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
     "Never name parts of the screen such as \"confirm card\" (확인 카드); say \"your order\" (주문 내역) instead.",
     "",
     "## Language",
-    `The user chose ${LANGUAGES[language].english} on the phone; speak and write in ${LANGUAGES[language].english}.`,
-    "If the user speaks or writes in another language, reply in the language the user speaks or writes.",
+    // A judge spoke Korean on English screens and got English (16-judge-r3-fixes:0): the chosen language is only a start.
+    `The user chose ${LANGUAGES[language].english} on the phone; start in ${LANGUAGES[language].english}.`,
+    "From the user's first words on, always reply in the language of the user's latest own words, spoken or typed, even when the chosen language or the screens are another language.",
+    "A choice button's label sent as the user's message is not their own words: keep the language of their earlier words.",
     "Item names: use name.ko for Korean speakers and name.en for everyone else; never translate or invent item names. Prices are in Korean won.",
     ...(vocabulary
       ? [

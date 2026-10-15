@@ -80,7 +80,8 @@ export function liveConnectConfig(system: string, tools: object[], languageCode:
     tools: tools as ToolListUnion,
     // The phone shows what it heard and what the AI said. Without a language, short Korean answers
     // ("네") came back empty or in another language and menu names were misheard in noise (voice-compare).
-    inputAudioTranscription: { languageCodes: [languageCode] },
+    // Korean and English are hints on every picker: a judge spoke Korean with the picker on English (16-judge-r3-fixes:0).
+    inputAudioTranscription: { languageCodes: [...new Set([languageCode, "ko-KR", "en-US"])] },
     outputAudioTranscription: {},
     realtimeInputConfig: {
       automaticActivityDetection: { endOfSpeechSensitivity: EndSensitivity.END_SENSITIVITY_HIGH, silenceDurationMs: SILENCE_MS },

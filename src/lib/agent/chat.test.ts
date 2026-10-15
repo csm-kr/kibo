@@ -406,6 +406,60 @@ describe("runChat", () => {
     }
   });
 
+  describe("the user's own language (16-judge-r3-fixes:0)", () => {
+    const orderBlock = (requests: { contents: ModelTurn[] }[]) => (requests[0].contents.at(-1)!.parts[0] as { text: string }).text;
+
+    it("a Korean message on English screens gets a reply-language line in the order block, never in the system text", async () => {
+      const s = await demo();
+      const { model, requests } = script("Model reply.");
+      await runChat(deps(model), input(s, { message: "콜라 있어요?" }));
+      expect(orderBlock(requests)).toMatch(/\nReply language: Korean \(the user's own words are in Korean\)\.\n<\/current_order>$/);
+      expect(requests[0].system).not.toContain("Reply language:");
+    });
+
+    it("a tap on [Cider] after a Korean turn keeps Korean", async () => {
+      const s = await demo();
+      await runChat(
+        deps(script([{ name: "offerChoices", args: { templateId: "pick_option", choices: [{ kind: "option", id: "cola" }, { kind: "option", id: "cider" }] } }], "Which drink?").model),
+        input(s, { message: "치즈버거 세트 하나 주세요." }),
+      );
+      const { model, requests } = script("Model reply.");
+      const history = [
+        { role: "user" as const, text: "치즈버거 세트 하나 주세요." },
+        { role: "model" as const, text: "Which drink?" },
+      ];
+      await runChat(deps(model), input(s, { message: "Cider", history, utteranceSeq: 2 }));
+      expect(orderBlock(requests)).toContain("Reply language: Korean");
+    });
+
+    it("a Latin-script message, or one in the AI language, gets no line", async () => {
+      for (const extra of [{ message: "One cola, is it cold?" }, { message: "Un coca ?" }, { message: "コーラ？", language: "ja" as const }, { message: "콜라?", locale: "ko" as const }]) {
+        const s = await demo();
+        const { model, requests } = script("Model reply.");
+        await runChat(deps(model), input(s, extra));
+        expect(orderBlock(requests)).not.toContain("Reply language:");
+      }
+    });
+
+    it("the server's own sentences follow a Korean message on English screens, naming the buttons as shown", async () => {
+      const s = await demo();
+      // Template path: a plain Korean request, one model call.
+      const t = script([{ name: "addToCart", args: { itemId: "cola" } }], "Model reply.");
+      const added = await runChat(deps(t.model), input(s, { message: "콜라 하나 주세요." }));
+      expect(t.requests).toHaveLength(1);
+      expect(added.reply).toMatch(/^콜라.* 1개 담았어요\. 모두 1,800원이에요\.$/);
+      // Summary path: the model wrote nothing.
+      const u = script([{ name: "addToCart", args: { itemId: "cola" } }], "");
+      const summary = await runChat(deps(u.model), input(s, { message: "콜라 하나 더 줄래요?", utteranceSeq: 2 }));
+      expect(summary.replySource).toBe("summary");
+      expect(summary.reply).toMatch(/담았어요\. 모두 3,600원이에요\.$/);
+      // The review names the button by the English words on the phone.
+      await runChat(deps(script([{ name: "setDineOption", args: { option: "eat_in" } }], "ok").model), input(s, { message: "먹고 갈게요?", utteranceSeq: 3 }));
+      const review = await runChat(deps(script([{ name: "requestCheckout" }], "").model), input(s, { message: "결제할게요.", utteranceSeq: 4 }));
+      expect(review.reply).toContain('"Yes, pay now"를 눌러 주세요.');
+    });
+  });
+
   it("a model error after a change was applied is answered from the results, not as an error", async () => {
     const s = await demo();
     const { model: inner } = script([{ name: "addToCart", args: { itemId: "cola" } }]);
