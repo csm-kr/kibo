@@ -14,8 +14,11 @@ export interface DemoEnvironment {
   how: string;
   /** Who it is for, one sentence (docs/PRD.md personas). */
   persona: string;
-  /** The kiosk column's caption on D2, "Kiosk · unchanged": what it is (bold) and a note (#1 E). */
-  caption: { name: string; note: string };
+  /**
+   * The kiosk column's caption on D2, "Kiosk · unchanged": what it is (bold) and a note (#1 E). `noteWide`: the note
+   * shows from 1366px wide only, where the kiosk's step beside it still has room for two lines (#1 24).
+   */
+  caption: { name: string; note: string; noteWide?: boolean };
   image: string;
 }
 
@@ -35,7 +38,7 @@ export const DEMO_ENVIRONMENTS: DemoEnvironment[] = [
     short: "airport rail",
     how: "SKYLINE AIRPORT RAIL · ticket machine",
     persona: "Mei, a visitor, buys tickets in English while the machine shows Korean.",
-    caption: { name: "Ticket machine", note: "unchanged" },
+    caption: { name: "Ticket machine", note: "unchanged", noteWide: true },
     image: "/landing/place-airport_rail.webp",
   },
   {

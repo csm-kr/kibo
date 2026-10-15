@@ -146,7 +146,7 @@ describe("demoKioskStep", () => {
     expect(demoKioskStep(malo, session("ordering", { cart: [LINE] }), false)).toBe("Menu: your order shows at the bottom.");
     expect(demoKioskStep(malo, session("confirming", { cart: [LINE] }), false)).toBe("Order review: nothing is paid until you confirm.");
     expect(demoKioskStep(malo, session("paying", { cart: [LINE] }), false)).toBe("Payment: tap 카드 (Card), then 카드 넣기 (Insert card).");
-    expect(demoKioskStep(malo, session("paid", { orderNumber: 7 }), false)).toBe("Receipt question: the order number comes next.");
+    expect(demoKioskStep(malo, session("paid", { orderNumber: 7 }), false)).toBe("Receipt question: the order number is next.");
     // The last screen of the flow: past the receipt question, the number is on the kiosk (#1 item 13).
     expect(demoKioskStep(malo, session("paid", { orderNumber: 7 }), true)).toBe("Order number: done, no money was charged.");
   });
@@ -163,7 +163,7 @@ describe("demoKioskStep", () => {
       "Tickets: yours show at the bottom.",
       "Ticket review: nothing is paid until you confirm.",
       "Payment: tap 카드 (Card), then 카드 넣기 (Insert card).",
-      "Receipt question: the reference number comes next.",
+      "Receipt question: the reference number is next.",
       "Reference number: done, no money was charged.",
     ]);
     for (const line of lines) expect(line?.toLowerCase()).not.toContain("order");

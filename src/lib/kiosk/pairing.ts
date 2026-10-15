@@ -108,7 +108,7 @@ export function demoKioskStep(kiosk: KioskData, session: Session, numberShown: b
       return `Payment: tap ${both("payCard")}, then ${both("insertCardButton")}.`;
     case "paid":
       if (numberShown) return `${ticket ? "Reference" : "Order"} number: done, no money was charged.`;
-      return `Receipt question: the ${ticket ? "reference" : "order"} number comes next.`;
+      return `Receipt question: the ${ticket ? "reference" : "order"} number is next.`;
     default:
       return null;
   }
