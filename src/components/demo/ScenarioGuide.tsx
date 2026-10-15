@@ -137,12 +137,16 @@ export function ScenarioGuide(props: Props) {
         </button>
       </div>
       {open && (
-        <div
-          id="demo-scenario-guide"
-          lang={locale}
-          className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto rounded-sheet bg-cream p-4 text-ink shadow-card"
-        >
-          {body}
+        // The column's free height, but the cream panel is only as tall as its content and scrolls past it, so one
+        // scenario card leaves no empty cream under it (design QA 10-15, #1 12).
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div
+            id="demo-scenario-guide"
+            lang={locale}
+            className="flex min-h-0 flex-col gap-4 overflow-y-auto rounded-sheet bg-cream p-4 text-ink shadow-card"
+          >
+            {body}
+          </div>
         </div>
       )}
       {props.aside}

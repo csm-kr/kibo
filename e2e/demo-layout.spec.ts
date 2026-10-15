@@ -60,3 +60,19 @@ test("the scenario column lines up with the kiosk and phone columns at every jud
     expect(m.hit, `${at}: [Scenarios] target height`).toBeGreaterThanOrEqual(56);
   }
 });
+
+test.describe(() => {
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.83" } });
+
+  test("on the learned pizza kiosk the guide is as tall as its one card (#1 12)", async ({ page }) => {
+    await start(page, "doughhouse");
+    await openScenarios(page);
+    await expect(page.locator('[data-scenario="learned-pizza"]')).toBeVisible();
+    const empty = await page.locator("#demo-scenario-guide").evaluate((el) => {
+      const content = [...el.children].filter((c) => !c.hasAttribute("data-scroll-fade"));
+      return el.getBoundingClientRect().bottom - content[content.length - 1].getBoundingClientRect().bottom;
+    });
+    // Only the panel's own 16px padding under the card.
+    expect(empty).toBeLessThanOrEqual(17);
+  });
+});
