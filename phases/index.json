@@ -77,7 +77,8 @@
     },
     {
       "dir": "16-judge-r3-fixes",
-      "status": "pending"
+      "status": "completed",
+      "completed_at": "2026-10-15T10:34:55+0900"
     }
   ]
 }
