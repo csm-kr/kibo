@@ -55,15 +55,22 @@ describe("actionRow", () => {
   });
 
   it("a confirm is always the user's own: a tap on the card or a new yes, never the AI alone", () => {
+    // The rule is its own line, so the technical line stays one short line (design QA 10-15, #1 5).
     expect(actionRow(malo, act("confirmCheckout", {}, "ok", 120), "en")).toEqual({
       text: "You confirmed by saying yes",
-      tech: "confirmCheckout ✓ 120 ms · needs your tap or a new 'yes'",
+      tech: "confirmCheckout ✓ 120 ms",
+      note: "Needs your tap or a new 'yes'",
     });
     expect(actionRow(malo, { ...act("confirmCheckout", {}, "ok", 90), tap: true }, "en")).toEqual({
       text: "You tapped Yes, pay now",
-      tech: "confirmCheckout ✓ 90 ms · needs your tap or a new 'yes'",
+      tech: "confirmCheckout ✓ 90 ms",
+      note: "Needs your tap or a new 'yes'",
     });
-    expect(actionRow(malo, { ...act("confirmCheckout", {}), tap: true }, "ko").text).toBe("'네, 결제할게요'를 눌러 확인했어요");
+    const ko = actionRow(malo, { ...act("confirmCheckout", {}), tap: true }, "ko");
+    expect(ko.text).toBe("'네, 결제할게요'를 눌러 확인했어요");
+    expect(ko.note).toBe("직접 누르거나 새로 '네'라고 해야 해요");
+    // Other rows have no rule line.
+    expect(actionRow(malo, act("requestCheckout", {}), "en")).not.toHaveProperty("note");
   });
 
   it("a learned kiosk's pending add says the kiosk is entering it", () => {

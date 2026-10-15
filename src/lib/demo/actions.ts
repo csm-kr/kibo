@@ -14,6 +14,8 @@ export interface ActionRow {
   text: string;
   /** "addToCart ✓ 180 ms", "confirmCheckout refused (CONFLICT)" */
   tech: string;
+  /** The server rule behind the row, on its own line, so the technical line stays short (design QA 10-15, #1 5). */
+  note?: string;
 }
 
 type Words = Record<Locale, string>;
@@ -28,6 +30,8 @@ const REASON: Record<string, Words> = {
 };
 const REFUSED: Words = { ko: "서버가 거절했어요", en: "the server refused it" };
 const CONFIRM_CARD: Words = { ko: "직접 확인해야 해요", en: "you must confirm it yourself" };
+/** Why a confirm is the user's own: a tap on the card or a new "yes" after it appeared (server rule). */
+const NEEDS_YOU: Words = { ko: "직접 누르거나 새로 '네'라고 해야 해요", en: "Needs your tap or a new 'yes'" };
 const AN_ITEM: Words = { ko: "항목", en: "an item" };
 
 /** What was tried, for a refusal: "Tried to add X". */
@@ -131,8 +135,8 @@ function okText(k: KioskData, a: AgentAction, locale: Locale): string {
 export function actionRow(k: KioskData, a: AgentAction, locale: Locale): ActionRow {
   if (a.code === "ok" && a.tool !== "unknown") {
     const pending = a.pending ? (locale === "ko" ? " · 키오스크가 입력 중" : " · kiosk entering it") : "";
-    const rule = a.tool === "confirmCheckout" ? " · needs your tap or a new 'yes'" : "";
-    return { text: okText(k, a, locale), tech: `${a.tool} ✓ ${a.ms} ms${pending}${rule}` };
+    const row = { text: okText(k, a, locale), tech: `${a.tool} ✓ ${a.ms} ms${pending}` };
+    return a.tool === "confirmCheckout" ? { ...row, note: NEEDS_YOU[locale] } : row;
   }
   const tried = Object.hasOwn(TRIED, a.tool) ? TRIED[a.tool](itemTitleFor(k, a, locale), locale) : TRIED_UNKNOWN[locale];
   const reason = a.tool === "confirmCheckout" && a.code === "CONFLICT" ? CONFIRM_CARD : (REASON[a.code] ?? REFUSED);

@@ -1,5 +1,5 @@
 import { expect, test, type APIRequestContext, type Locator, type Page } from "@playwright/test";
-import { command, openScenarios } from "./helpers";
+import { command, openScenarios, textLines } from "./helpers";
 import { HERO_ACTIONS, MIXED_ACTIONS } from "./recordedActions";
 
 // /demo D2 and D3 layout, measured in CSS px (design QA 10-15, issue #1 batch B): the scenario column lines up with
@@ -173,5 +173,44 @@ test.describe(() => {
     });
     // Only the panel's own 16px padding under the card.
     expect(empty).toBeLessThanOrEqual(17);
+  });
+});
+
+test.describe(() => {
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.84" } });
+
+  test("'What the AI did': one typeface, 16px titles, the technical line on one line (#1 5)", async ({ page, request }) => {
+    const s = await start(page);
+    await command(request, s.deviceToken, { sessionId: s.sessionId, type: "setDineOption", args: { option: "eat_in" }, source: "button" });
+    await page.route("**/api/chat", (route) =>
+      route.fulfill({ json: { ok: true, reply: "OK.", status: "ordering", cart: [], total: 0, cartVersion: 0, actions: HERO_ACTIONS } }),
+    );
+    await page.getByRole("textbox", { name: "Type your order" }).fill("Two cheeseburger sets");
+    await page.getByRole("button", { name: "Send", exact: true }).click();
+    await command(request, s.deviceToken, {
+      sessionId: s.sessionId,
+      type: "addToCart",
+      args: { itemId: "cheese_burger", variant: "set", qty: 1, selections: { drink: ["cola"] } },
+      source: "text",
+      utteranceSeq: 1,
+    });
+    await command(request, s.deviceToken, { sessionId: s.sessionId, type: "requestCheckout", args: {}, source: "text", utteranceSeq: 2 });
+    await page.getByRole("button", { name: "Yes, pay now" }).click();
+    const strip = page.locator("[data-action-strip]");
+    const confirm = strip.locator('li[data-action-tool="confirmCheckout"]');
+    await expect(confirm).toContainText("You tapped Yes, pay now");
+
+    for (const vp of [SIZES[2], SIZES[3]]) {
+      await page.setViewportSize(vp);
+      const fonts = await strip.evaluate((el) => [...new Set([...el.querySelectorAll("*")].map((x) => getComputedStyle(x).fontFamily))]);
+      expect(fonts.filter((f) => /mono/i.test(f)), `${vp.width}: no monospace`).toEqual([]);
+      const title = confirm.locator(":scope > *").first();
+      expect(await title.evaluate((el) => [getComputedStyle(el).fontSize, getComputedStyle(el).fontWeight])).toEqual(["16px", "700"]);
+      const tech = confirm.locator(":scope > *").nth(1);
+      await expect(tech).toHaveText(/^confirmCheckout ✓ \d+ ms$/);
+      expect(await textLines(tech), `${vp.width}: technical line`).toBe(1);
+      expect(await tech.evaluate((el) => getComputedStyle(el).fontVariantNumeric)).toBe("tabular-nums");
+      await expect(confirm.locator(":scope > *").nth(2)).toHaveText("Needs your tap or a new 'yes'");
+    }
   });
 });

@@ -80,8 +80,10 @@ export function ActionStrip({ kiosk, actions, locale, status, beside }: Props) {
                     data-action-code={a.code}
                     className={`flex flex-col border-l-4 pl-3 ${ok ? "border-kibo" : "border-staff-ink"}`}
                   >
-                    <span className="text-lg font-bold">{row.text}</span>
-                    <span className={`font-mono text-base ${ok ? "text-muted" : "text-staff-ink"}`}>{row.tech}</span>
+                    {/* One typeface and the panel's 16px; tabular figures keep the timings in line (design QA 10-15, #1 5). */}
+                    <span className="text-base font-bold">{row.text}</span>
+                    <span className={`text-base tabular-nums ${ok ? "text-muted" : "text-staff-ink"}`}>{row.tech}</span>
+                    {row.note && <span className="text-base text-muted">{row.note}</span>}
                   </li>
                 );
               })}
