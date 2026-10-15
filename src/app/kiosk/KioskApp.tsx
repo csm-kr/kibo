@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { KioskCanvas } from "@/components/kiosk/KioskCanvas";
 import { KioskScreen } from "@/components/kiosk/KioskScreen";
 import { PairingPanel } from "@/components/pairing/PairingPanel";
@@ -23,6 +23,9 @@ export function KioskApp({ kiosk, demo }: { kiosk: KioskData; demo: boolean }) {
   // and the two sit centred, the kiosk as tall as the screen; portrait screens keep the canvas alone. The QR and code
   // are only on the kiosk's own screen (14-final:1).
   const landscape = useSyncExternalStore(subscribeLandscape, () => window.matchMedia(LANDSCAPE).matches, () => false);
+  // The session whose order number the kiosk shows (past its receipt question), for the panel's step line, as /demo
+  // does (#1 31): only the kiosk screen knows that step (R-024).
+  const [numberFor, setNumberFor] = useState<string | null>(null);
   // The canvas keeps its place in the tree either way, so turning the screen never remounts the kiosk.
   return (
     <div className={`flex h-full w-full ${landscape ? "justify-center bg-cream" : ""}`}>
@@ -40,13 +43,21 @@ export function KioskApp({ kiosk, demo }: { kiosk: KioskData; demo: boolean }) {
             onNewSession={() => void ks.newSession()}
             onClaimUrl={ks.setClaimUrl}
             onStartOver={() => void ks.newSession()}
+            onOrderNumber={setNumberFor}
             retrying={ks.streamState === "retrying"}
           />
         </KioskCanvas>
       </div>
       {landscape && (
         <div className="w-[clamp(320px,26vw,440px)] min-w-0 flex-none">
-          <PairingPanel kiosk={kiosk} session={ks.session} claimUrl={ks.claimUrl} pairUrl={ks.pairUrl} clockOffset={ks.clockOffset} />
+          <PairingPanel
+            kiosk={kiosk}
+            session={ks.session}
+            claimUrl={ks.claimUrl}
+            pairUrl={ks.pairUrl}
+            clockOffset={ks.clockOffset}
+            numberShown={ks.session !== null && numberFor === ks.session.sessionId}
+          />
         </div>
       )}
     </div>

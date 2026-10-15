@@ -63,6 +63,33 @@ test("/kiosk on a landscape screen: the tall kiosk holds the QR and code, the pa
   await expectNoToken(page, new URL(reissued.claimUrl).hash.replace(/^#t=/, ""));
 });
 
+test("/kiosk on a landscape screen: after [출력 안 함] the panel's step line says the order number, as the kiosk shows it (#1 31)", async ({
+  page,
+  request,
+}) => {
+  await page.goto("/kiosk?k=malo");
+  const panel = page.locator("[data-pairing-panel]");
+  const { sessionId, claimToken } = await readClaim(page);
+  const { deviceToken } = await (await claim(request, sessionId, claimToken)).json();
+  const phone = (type: string, args: object, extra: { source: string; cartVersion?: number; utteranceSeq?: number }) =>
+    command(request, deviceToken, { sessionId, type, args, ...extra });
+  await phone("setDineOption", { option: "eat_in" }, { source: "button" });
+  await phone("addToCart", ITEM, { source: "voice", utteranceSeq: 1 });
+  const checkout = await phone("requestCheckout", {}, { source: "voice", utteranceSeq: 2 });
+  await phone("confirmCheckout", {}, { source: "button", cartVersion: checkout.cartVersion });
+
+  const root = kioskRoot(page);
+  await root.getByRole("button", { name: "카드", exact: true }).click();
+  await root.getByRole("button", { name: "카드 넣기" }).click();
+  // The receipt question first: the line says what comes next.
+  await expect(root.getByRole("button", { name: "출력 안 함" })).toBeVisible();
+  await expect(panel.locator("[data-kiosk-step]")).toHaveText("Kiosk: receipt question, then the order number.");
+  await root.getByRole("button", { name: "출력 안 함" }).click();
+  // Then the order number on the kiosk, and the same step in the panel, beside "Paid · order number …" (R-024).
+  await expect(panel.locator("[data-panel-order]")).toHaveText(/^Paid · order number \d+$/);
+  await expect(panel.locator("[data-kiosk-step]")).toHaveText("Kiosk: order number. The order is done; no money was charged.");
+});
+
 test("/kiosk on a portrait screen has no panel", async ({ page }) => {
   await page.setViewportSize({ width: 1080, height: 1920 });
   await page.goto("/kiosk?k=malo");
