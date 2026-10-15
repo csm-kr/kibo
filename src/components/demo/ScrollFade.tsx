@@ -15,7 +15,11 @@ export function ScrollFade({ className }: { className: string }) {
   useEffect(() => {
     const area = ref.current?.parentElement;
     if (!area) return;
-    const update = () => setMore(area.scrollHeight - area.scrollTop - area.clientHeight > 1);
+    // Content below the edge, not just the area's own bottom padding: when only padding is hidden, nothing is cut, and
+    // the fade could not reach the edge (it sticks there only once content passes it), so it would lie over whole
+    // lines above it (#1 E: the /demo phone at 1920×1080 with an empty cart, 2px of its 24px padding).
+    const update = () =>
+      setMore(area.scrollHeight - area.scrollTop - area.clientHeight > parseFloat(getComputedStyle(area).paddingBottom) + 1);
     update();
     area.addEventListener("scroll", update, { passive: true });
     // The area changes size with the window, and its content with new rows, ticks and status lines.

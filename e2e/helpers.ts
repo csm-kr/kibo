@@ -37,15 +37,17 @@ export function hintsCut(field: Locator, hints: string[]): Promise<string[]> {
 }
 
 /**
- * The phone scroll area's bottom edge (#1 2-phone, I-281): whether more is below, whether its fade shows there (32px,
- * on the edge), and the text lines the edge cuts outside a shown fade.
+ * The phone scroll area's bottom edge (#1 2-phone, I-281): whether content is below it (more than the area's own bottom
+ * padding, which hides nothing), whether its fade shows there (32px, on the edge), whether a fade shows anywhere else
+ * (over content that is not cut, #1 E), and the text lines the edge cuts outside a shown fade.
  */
 export function phoneEdge(page: Page) {
   return page.locator("[data-phone-scroll]").evaluate((el) => {
     const r = el.getBoundingClientRect();
     const fade = el.querySelector(":scope > [data-scroll-fade]");
     const fr = fade?.getBoundingClientRect() ?? null;
-    const shown = fade !== null && fr !== null && parseFloat(getComputedStyle(fade).opacity) > 0.9 && fr.height >= 24 && Math.abs(r.bottom - fr.bottom) <= 1;
+    const visible = fade !== null && parseFloat(getComputedStyle(fade).opacity) > 0.9;
+    const shown = visible && fr !== null && fr.height >= 24 && Math.abs(r.bottom - fr.bottom) <= 1;
     const uncovered: string[] = [];
     const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
     for (let n = walker.nextNode(); n; n = walker.nextNode()) {
@@ -57,17 +59,21 @@ export function phoneEdge(page: Page) {
         if (!(shown && line.top >= fr!.top - 0.5)) uncovered.push(`${n.textContent?.trim().slice(0, 30)} (${Math.round(r.bottom - line.top)}px shown)`);
       }
     }
-    return { more: el.scrollHeight - el.scrollTop - el.clientHeight > 1, shown, uncovered };
+    const more = el.scrollHeight - el.scrollTop - el.clientHeight > parseFloat(getComputedStyle(el).paddingBottom) + 1;
+    return { more, shown, stray: visible && !shown, uncovered };
   });
 }
 
-/** While more is below, the phone's scroll area ends in its fade, and no line is cut at that edge outside it. */
+/**
+ * While more is below, the phone's scroll area ends in its fade, and no line is cut at that edge outside it; with
+ * nothing below, no fade lies over the content.
+ */
 export async function expectPhoneEdgeFaded(page: Page, what: string): Promise<void> {
   await expect
     .poll(async () => {
       const e = await phoneEdge(page);
-      return e.uncovered.length === 0 && (!e.more || e.shown) ? "ok" : JSON.stringify(e);
-    }, { message: `${what}: the phone's bottom edge cuts nothing outside a shown fade` })
+      return e.uncovered.length === 0 && (!e.more || e.shown) && !e.stray ? "ok" : JSON.stringify(e);
+    }, { message: `${what}: the phone's bottom edge cuts nothing outside a shown fade, and no fade lies anywhere else` })
     .toBe("ok");
 }
 

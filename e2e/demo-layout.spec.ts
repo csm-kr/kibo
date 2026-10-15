@@ -75,7 +75,8 @@ function bottomEdge(area: Locator) {
       }
     }
     return {
-      more: el.scrollHeight - el.scrollTop - el.clientHeight > 1,
+      // Content past the edge; the area's own bottom padding hides nothing (#1 E).
+      more: el.scrollHeight - el.scrollTop - el.clientHeight > parseFloat(getComputedStyle(el).paddingBottom) + 1,
       shown,
       fadeHeight: fr ? fr.height : 0,
       fadeToEdge: fr ? Math.abs(r.bottom - fr.bottom) : null,
