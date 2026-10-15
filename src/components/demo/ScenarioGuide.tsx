@@ -9,6 +9,7 @@ import { scenarioProgress, scenariosFor, type Scenario } from "@/lib/demo/scenar
 import { playStep, pt, type PhoneTextKey } from "@/lib/i18n/phone";
 import type { KioskData, Locale } from "@/types/menu";
 import type { Session } from "@/types/session";
+import { ScrollFade } from "./ScrollFade";
 
 // D2 scenario guide (docs/UX.md Flow C): an optional column, open by default from 1440px wide, that lists what to try on this kiosk.
 // Choosing one starts a fresh order; each step's sentence is a chip that sends it as the user's message, and the check
@@ -143,9 +144,10 @@ export function ScenarioGuide(props: Props) {
           <div
             id="demo-scenario-guide"
             lang={locale}
-            className="flex min-h-0 flex-col gap-4 overflow-y-auto rounded-sheet bg-cream p-4 text-ink shadow-card"
+            className="flex min-h-0 scroll-pb-8 flex-col gap-4 overflow-y-auto rounded-sheet bg-cream p-4 text-ink shadow-card"
           >
             {body}
+            <ScrollFade className="-bottom-4 -mx-4 -mt-12 to-cream" />
           </div>
         </div>
       )}

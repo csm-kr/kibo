@@ -8,6 +8,7 @@ import { actionRow } from "@/lib/demo/actions";
 import { pt } from "@/lib/i18n/phone";
 import type { KioskData, Locale } from "@/types/menu";
 import type { SessionStatus } from "@/types/session";
+import { ScrollFade } from "./ScrollFade";
 
 // D2 "What the AI did" (/demo only): each tool call Gemini made and what the KIBO server answered, in plain words
 // from menu data plus the tool name and result code. Not announced (aria-live): the cart announcements already are.
@@ -62,7 +63,7 @@ export function ActionStrip({ kiosk, actions, locale, status, beside }: Props) {
           role="group"
           aria-labelledby="demo-actions-title"
           tabIndex={0}
-          className={`flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto rounded-tile px-3 pb-2 ${FOCUS}`}
+          className={`flex min-h-0 flex-1 scroll-pb-8 flex-col gap-2 overflow-y-auto rounded-tile px-3 pb-2 ${FOCUS}`}
         >
           <p className="text-base text-muted">{pt("aiActionsLegend", locale)}</p>
           {actions.length === 0 ? (
@@ -86,6 +87,7 @@ export function ActionStrip({ kiosk, actions, locale, status, beside }: Props) {
               })}
             </ul>
           )}
+          <ScrollFade className="-bottom-2 -mx-3 -mt-10 to-white" />
         </div>
       )}
     </section>
