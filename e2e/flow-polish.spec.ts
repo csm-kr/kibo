@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
-import { command, kioskRoot } from "./helpers";
+import { pt } from "@/lib/i18n/phone";
+import { command, hintsCut, kioskRoot } from "./helpers";
 
 // Small dead ends judges hit in their 3 minutes (14-final:1, docs/plan/judges/ux/REPORT.md fixes 5–8): feedback the
 // moment a message is sent, on the phone and on the kiosk; a pay button that takes the tap as soon as the card shows;
@@ -126,6 +127,10 @@ test("/assistant at 360×800 in Korean with larger text: a cart summary when the
     return ctx.measureText(el.placeholder).width <= el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
   });
   expect(fits).toBe(true);
+  // And at 320×700 (R-019, #1 8).
+  await page.setViewportSize({ width: 320, height: 700 });
+  expect(await hintsCut(input, [pt("inputPlaceholder", "ko")])).toEqual([]);
+  await page.setViewportSize({ width: 360, height: 800 });
 
   await page.getByRole("button", { name: "매장에서 먹기" }).click();
   await expect(mic).not.toHaveAttribute("data-compact", "true");

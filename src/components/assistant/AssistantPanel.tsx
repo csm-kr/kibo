@@ -3,6 +3,7 @@
 import { Bell, ChevronRight, Link2, Mic, Smartphone } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useEffectEvent, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { ScrollFade } from "@/components/demo/ScrollFade";
 import { ModalLayer } from "@/components/kiosk/ModalLayer";
 import { AppBar } from "@/components/phone/AppBar";
 import { ConfirmBar, ConfirmCard, DoneCard, PayCard } from "@/components/phone/Checkout";
@@ -41,7 +42,7 @@ const MIC_HINT_KEY = "kibo.phone.micHintSeen";
 const noSubscribe = () => () => {};
 /** Under this many seconds a /demo order shows its voice time left. */
 const SHOW_VOICE_LEFT = 60;
-/** The cart summary's height with its padding, in rem; it may wrap to two lines with larger text. */
+/** Room kept for the cart summary, in rem: its one-line pill (3.5rem) and padding, with some to spare. */
 const SUMMARY_REM = 6;
 
 interface Props {
@@ -295,14 +296,16 @@ export function AssistantPanel(props: Props) {
     say(label);
   }
 
-  // P3: when the cart card is out of view (a small phone, larger text), a one-line summary above the dock shows the
-  // count and total; a tap scrolls to the card's total.
+  // P3: when the cart card is out of view (a small phone, larger text, a laptop's /demo column under its full dock), a
+  // one-line summary above the dock shows the count and total; a tap scrolls to the card's total.
   const cartEnd = useRef<HTMLSpanElement>(null);
   const [cartInView, setCartInView] = useState(true);
   useEffect(() => {
     const el = cartEnd.current;
     if (!el) return;
-    const io = new IntersectionObserver(([entry]) => setCartInView(entry.isIntersecting));
+    // The newest record: a busy main thread can hand over several at once, and the first of them is stale (it left
+    // the summary off on /demo with the total out of view, 1 of 6 runs of D2-hero-summary, #1 18).
+    const io = new IntersectionObserver((entries) => setCartInView(entries[entries.length - 1].isIntersecting));
     io.observe(el);
     return () => io.disconnect();
   }, [screen]);
@@ -342,7 +345,7 @@ export function AssistantPanel(props: Props) {
   const ended = screen === "ended" || screen === "taken";
   const itemsInCart = session ? session.cart.reduce((n, l) => n + l.qty, 0) : 0;
   const choicesShown = screen === "talk" && Boolean(session?.pendingChoice) && pendingKey !== declined;
-  const summaryShown = mode === "phone" && itemsInCart > 0 && !cartInView && !choicesShown;
+  const summaryShown = itemsInCart > 0 && !cartInView && !choicesShown;
 
   // P3: after each send and reply, the newest message and the choices under it come fully into view above the dock;
   // on a small phone with larger text they were left under it (15-judge-fixes:2).
@@ -354,7 +357,7 @@ export function AssistantPanel(props: Props) {
     const bubbles = turn.querySelectorAll("[data-bubble]");
     // Room for the cart summary, which appears once the card below scrolls out of view.
     const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-    const reserve = mode === "phone" && itemsInCart > 0 && !choicesShown && !summaryShown ? SUMMARY_REM * rootPx : 0;
+    const reserve = itemsInCart > 0 && !choicesShown && !summaryShown ? SUMMARY_REM * rootPx : 0;
     keepInView(bubbles[bubbles.length - 1] ?? turn, turn, reserve, turn.querySelector("[data-choices]"));
   });
   useEffect(() => showTurn(), [lastId, working, choicesShown, pendingKey]);
@@ -367,6 +370,10 @@ export function AssistantPanel(props: Props) {
   const undoable = session !== null && (learned ? learnedUndoLine(session) !== null : session.undoStack.length > 0);
   const placeholder = learned ? pt("learnedPlaceholder", locale) : ticket ? pt("ticketPlaceholder", locale) : undefined;
   const secondsLeft = mode === "demo" && voice.secondsLeft !== null && voice.secondsLeft < SHOW_VOICE_LEFT ? voice.secondsLeft : null;
+  const suggestions = !limited && <Suggestions examples={props.examples ?? []} locale={locale} disabled={busy} onPick={say} />;
+  // /demo with an empty cart: the examples before the empty card, which pushed every one under the dock on a laptop
+  // (#1 11, I-179).
+  const examplesFirst = mode === "demo" && itemsInCart === 0;
 
   /** After the demo limit, a plain notice with [Try again] takes the text field's place. */
   const limitNotice = limited && (
@@ -523,6 +530,7 @@ export function AssistantPanel(props: Props) {
                 />
               )}
             </div>
+            {examplesFirst && suggestions}
             <div className="flex flex-col">
               <OrderCard
                 kiosk={kiosk}
@@ -535,10 +543,10 @@ export function AssistantPanel(props: Props) {
               />
               <span ref={cartEnd} aria-hidden className="block h-px scroll-mb-4" />
             </div>
-            {!limited && <Suggestions examples={props.examples ?? []} locale={locale} disabled={busy} onPick={say} />}
+            {!examplesFirst && suggestions}
           </Scroll>
-          {/* The phone only: /demo's laptop column has room for the card, and a summary appearing there as keyboard
-              focus scrolls the card away would shrink the area under the focused control. */}
+          {/* /demo too: right after the first order its full dock left the card's total out of view at every laptop
+              size (#1 18). Focus stays in view as the summary comes and goes (Scroll, I-220). */}
           {/* Not while choices show: the pill would cover the buttons the AI just asked about (15-judge-fixes:2). */}
           {summaryShown && (
             <div className="flex-none px-4 pt-2 pb-2">
@@ -546,10 +554,16 @@ export function AssistantPanel(props: Props) {
                 type="button"
                 data-cart-summary
                 onClick={() => cartEnd.current?.scrollIntoView({ block: "end" })}
-                className={`flex min-h-14 w-full items-center justify-between gap-2 rounded-full bg-white px-4 text-xl font-semibold text-kibo-deep shadow-card ${PRESS} ${FOCUS}`}
+                className={`@container flex min-h-14 w-full items-center justify-between gap-2 rounded-full bg-white px-4 text-xl font-semibold text-kibo-deep shadow-card ${PRESS} ${FOCUS}`}
               >
+                {/* One line (#1 9): it wrapped to two at 360px with larger text. The title gives way, to screen readers
+                    only, with larger text or when the pill is too narrow for it; the count and total stay. Never
+                    clipped: text spacing a user sets may still wrap it (WCAG 1.4.12). */}
                 <span className="min-w-0 text-left">
-                  {pt("cartTitle", locale, kiosk.domain)} {itemCount(itemsInCart, locale)} · {formatWon(session.total, locale)}
+                  <span className={props.largeText ? "sr-only" : "@max-[19rem]:sr-only"}>
+                    {pt("cartTitle", locale, kiosk.domain)}{" "}
+                  </span>
+                  {itemCount(itemsInCart, locale)} · {formatWon(session.total, locale)}
                 </span>
                 <ChevronRight {...ICON} />
               </button>
@@ -757,9 +771,11 @@ function Scroll({ children }: { children: ReactNode }) {
         if (el !== e.currentTarget && el instanceof HTMLElement && el.matches(":focus-visible"))
           el.scrollIntoView({ block: "nearest" });
       }}
-      className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-6 focus-visible:outline-[3px] focus-visible:-outline-offset-[3px] focus-visible:outline-ink"
+      className="flex min-h-0 flex-1 scroll-pb-8 flex-col gap-4 overflow-y-auto px-4 py-6 focus-visible:outline-[3px] focus-visible:-outline-offset-[3px] focus-visible:outline-ink"
     >
       {children}
+      {/* Lines cut at the bottom edge read as "more below", not as broken (#1 2-phone, I-281). */}
+      <ScrollFade className="-bottom-6 -mx-4 -mt-12 to-cream" />
     </div>
   );
 }

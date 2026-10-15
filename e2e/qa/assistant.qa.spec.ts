@@ -1,5 +1,6 @@
 import { expect, test, type APIRequestContext, type Page, type TestInfo } from "@playwright/test";
-import { claim, command, warmPhone } from "../helpers";
+import { pt } from "@/lib/i18n/phone";
+import { claim, command, expectPhoneEdgeFaded, hintsCut, phoneEdge, warmPhone } from "../helpers";
 import { PHONE, qaState, type Findings } from "./checks";
 
 // UI QA of the phone screens (docs/UX.md screen map P2–P7, PX) at the phone viewports in docs/UI_QA.md, each with
@@ -35,6 +36,23 @@ async function check(page: Page, info: TestInfo, state: string, viewports = VIEW
 }
 
 const screenOf = (page: Page) => page.locator("[data-phone-screen]");
+
+/** The cart summary as seen: its text without the screen-reader-only words, and how many lines it takes (#1 9). */
+const summaryLook = (page: Page) =>
+  page.locator("[data-cart-summary]").evaluate((el) => {
+    const tops = new Set<number>();
+    let text = "";
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      // Screen-reader-only words sit in a 1px box (sr-only, also from a container query).
+      if ((n.parentElement?.getBoundingClientRect().width ?? 0) <= 2) continue;
+      text += n.textContent;
+      const range = document.createRange();
+      range.selectNodeContents(n);
+      if (n.textContent?.trim()) for (const r of range.getClientRects()) if (r.width > 0) tops.add(Math.round(r.top));
+    }
+    return { text: text.trim(), lines: tops.size };
+  });
 
 /** A kiosk session from the API and the phone opened on its claim URL. */
 async function openPhone(page: Page, request: APIRequestContext) {
@@ -415,6 +433,10 @@ test("P3 in Korean with larger text: the dock while typing, and the cart summary
   await expect(page.locator("[data-cart-summary]")).toBeVisible();
   await check(page, info, "P3-cart-summary-ko-large", [VIEWPORTS[1], VIEWPORTS[3]], async () => {
     await page.locator("[data-phone-scroll]").evaluate((el) => el.scrollTo({ top: 0 }));
+    // One line, count and total only; screen readers still hear "내 주문" (#1 9).
+    await expect(page.locator("[data-cart-summary]")).toBeVisible();
+    expect(await summaryLook(page)).toMatchObject({ text: expect.stringMatching(/^5개 · [\d,]+원$/), lines: 1 });
+    await expect(page.locator("[data-cart-summary]")).toHaveAccessibleName(/^내 주문 5개 · [\d,]+원$/);
   });
   await ctx.close();
 });
@@ -471,6 +493,120 @@ test("P3 at 360×800 with larger text: the AI's reply and its choices stay above
   };
   await shown();
   await check(page, info, "P3-reply-choices-large", [VIEWPORTS[1]], shown);
+  await ctx.close();
+});
+
+test("P3 at 360×800 and 320×700 with larger text: the cart summary is one line, the count and total (#1 9)", async ({
+  browser,
+  request,
+}, info) => {
+  const ctx = await browser.newContext({
+    viewport: VIEWPORTS[1],
+    locale: "en-US",
+    isMobile: true,
+    hasTouch: true,
+    extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.86" },
+  });
+  const page = await ctx.newPage();
+  await page.addInitScript(() => localStorage.setItem("kibo.phone.largeText", "on"));
+  const s = await openPhone(page, request);
+  await page.getByRole("button", { name: "Start" }).click();
+  await page.getByRole("button", { name: "Type instead" }).click();
+  await page.getByRole("button", { name: "Eat here" }).click();
+  await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
+
+  // The hero order (no model): the route adds the two sets, then replies; the reply pushes the card below the dock.
+  await page.route("**/api/chat", async (route) => {
+    await s.phone("addToCart", cheeseSet("zero_cola", { ingredients: ["no_pickles"] }), { source: "text", utteranceSeq: 1 });
+    await s.phone("addToCart", cheeseSet("cider"), { source: "text", utteranceSeq: 1 });
+    await route.fulfill({
+      json: {
+        ok: true,
+        reply: "Added one Cheeseburger set with Zero cola and no pickles, and one Cheeseburger set with Cider. Would you like anything else?",
+        status: "ordering",
+        cart: [],
+        total: 0,
+        cartVersion: 2,
+        actions: [],
+      },
+    });
+  });
+  await page.getByRole("textbox", { name: "Type your order" }).fill("Two cheeseburger sets. One without pickles; drinks zero cola and cider.");
+  await page.getByRole("button", { name: "Send", exact: true }).click();
+  await expect(page.locator('[data-bubble="model"]')).toBeVisible();
+  await page.getByRole("button", { name: "Hide keyboard", exact: true }).click();
+
+  // It wrapped to two lines right under the card's own header (audit P3-two-lines-L-360x800). Back to the messages
+  // at each size, as after the reply: the previous size's checks leave the list elsewhere.
+  const summary = page.locator("[data-cart-summary]");
+  await check(page, info, "P3-cart-summary-large", [VIEWPORTS[1], VIEWPORTS[3]], async () => {
+    await page.locator("[data-phone-scroll]").evaluate((el) => el.scrollTo({ top: 0 }));
+    await expect(summary).toBeVisible();
+    expect(await summaryLook(page)).toEqual({ text: "2 items · ₩13,800", lines: 1 });
+    await expect(summary).toHaveAccessibleName("Your order 2 items · ₩13,800");
+    const scroll = await page.locator("[data-phone-scroll]").boundingBox();
+    expect((await summary.boundingBox())!.y).toBeGreaterThanOrEqual(scroll!.y + scroll!.height);
+    // The card runs on under the edge: a fade says so (#1 2-phone).
+    await expectPhoneEdgeFaded(page, `P3 ${(await page.viewportSize())!.width}`);
+  });
+  // At the end nothing is left below, and no fade lies over the total.
+  await page.locator("[data-phone-scroll]").evaluate((el) => el.scrollTo({ top: el.scrollHeight }));
+  await expect.poll(async () => (await phoneEdge(page)).shown, { message: "no fade at the end" }).toBe(false);
+
+  // Normal text: the whole label where it fits (390 wide); at 360 wide the pill is too narrow for it, so the count and
+  // total stay on one line and the title goes to screen readers.
+  await page.getByRole("button", { name: "Language and text size: English" }).click();
+  await page.getByRole("dialog", { name: "Language and text size" }).getByRole("switch", { name: "Larger text" }).click();
+  await page.getByRole("dialog", { name: "Language and text size" }).getByRole("button", { name: "Close" }).click();
+  for (const [vp, text] of [
+    [VIEWPORTS[0], "Your order 2 items · ₩13,800"],
+    [VIEWPORTS[1], "2 items · ₩13,800"],
+  ] as const) {
+    await page.setViewportSize(vp);
+    await page.locator("[data-phone-scroll]").evaluate((el) => el.scrollTo({ top: 0 }));
+    await expect(summary).toBeVisible();
+    expect(await summaryLook(page), `${vp.width}x${vp.height}`).toEqual({ text, lines: 1 });
+    await expect(summary).toHaveAccessibleName("Your order 2 items · ₩13,800");
+  }
+  await ctx.close();
+});
+
+// Every kiosk's text-field hint (MALO, the airport rail ticket machine, the learned pizza kiosk), in both languages.
+const HINT_KEYS = ["inputPlaceholder", "ticketPlaceholder", "learnedPlaceholder"] as const;
+
+test("P3: every kiosk's input hint fits beside [Send] with larger text, in English and Korean (#1 8, I-133, R-019)", async ({
+  browser,
+  request,
+}, info) => {
+  const ctx = await browser.newContext({
+    viewport: VIEWPORTS[1],
+    locale: "en-US",
+    isMobile: true,
+    hasTouch: true,
+    extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.87" },
+  });
+  const page = await ctx.newPage();
+  await page.addInitScript(() => localStorage.setItem("kibo.phone.largeText", "on"));
+  await openPhone(page, request);
+  await page.getByRole("button", { name: "Start" }).click();
+  await page.getByRole("button", { name: "Type instead" }).click();
+  await page.getByRole("button", { name: "Eat here" }).click();
+  await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
+
+  // English at 360×800 ("e.g. Cheeseburger" with "set" cut, 15-judge-fixes:6), Korean down to 320×700 (R-019).
+  const en = page.getByRole("textbox", { name: "Type your order" });
+  await expect(en).toHaveAttribute("placeholder", pt("inputPlaceholder", "en"));
+  expect(await hintsCut(en, HINT_KEYS.map((k) => pt(k, "en"))), "English at 360×800").toEqual([]);
+  await check(page, info, "P3-hint-large", [VIEWPORTS[1]]);
+
+  await page.getByRole("button", { name: "Language and text size: English" }).click();
+  await page.getByRole("dialog", { name: "Language and text size" }).getByRole("button", { name: /^한국어/ }).click();
+  const ko = page.getByRole("textbox", { name: "주문을 글자로 입력" });
+  for (const vp of [VIEWPORTS[1], VIEWPORTS[3]]) {
+    await page.setViewportSize(vp);
+    expect(await hintsCut(ko, HINT_KEYS.map((k) => pt(k, "ko"))), `Korean at ${vp.width}x${vp.height}`).toEqual([]);
+  }
+  await check(page, info, "P3-hint-ko-large", [VIEWPORTS[3]]);
   await ctx.close();
 });
 

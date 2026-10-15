@@ -1,5 +1,6 @@
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
-import { command, kioskRoot, openScenarios } from "../helpers";
+import { pt } from "@/lib/i18n/phone";
+import { command, expectPhoneEdgeFaded, hintsCut, kioskRoot, openScenarios } from "../helpers";
 import { HERO_ACTIONS, RAIL_ACTIONS } from "../recordedActions";
 import { DEMO, DEMO_GUIDE, qaState, type Findings } from "./checks";
 
@@ -44,6 +45,11 @@ const phoneScreen = (page: Page) => page.locator("[data-phone-screen]");
 /** R-009, I-134: the whole [Yes, pay now], not a sliver of it, at every judge viewport. */
 const payInView = (page: Page) => async () => {
   await expect(page.getByRole("button", { name: "Yes, pay now" })).toBeInViewport({ ratio: 1 });
+};
+
+/** #1 11, I-179: while the cart is empty, the first "Try saying" example is whole above the dock. */
+const firstExampleInView = (page: Page) => async () => {
+  await expect(phoneScreen(page).getByRole("region", { name: "Try saying" }).getByRole("button").first()).toBeInViewport({ ratio: 1 });
 };
 
 test("D1 on a phone: the laptop note comes first (14-final:1)", async ({ page }, info) => {
@@ -124,7 +130,8 @@ test("D1 to D3", async ({ page, request }, info) => {
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "done");
   await page.getByRole("button", { name: "출력 안 함" }).click();
   await expect(page.locator("[data-demo-end]")).toBeVisible();
-  await check(page, info, "D3-done");
+  // The Touch vs talk card ran on under the phone's edge with nothing to say it scrolls (#1 2-phone).
+  await check(page, info, "D3-done", () => expectPhoneEdgeFaded(page, "D3"));
 });
 
 test.describe(() => {
@@ -140,7 +147,7 @@ test.describe(() => {
     await page.getByRole("button", { name: "Start", exact: true }).click();
     const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
     await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "talk");
-    await check(page, info, "D2-rail-empty");
+    await check(page, info, "D2-rail-empty", firstExampleInView(page));
 
     // A new line per viewport, so each screenshot falls inside its own 2 s highlight.
     const passengers = ["adult", "child", "senior"];
@@ -285,6 +292,106 @@ test.describe(() => {
     await expect(page.locator('[data-bubble="model"]').last()).toContainText("사이다를 담았어요");
     expect(sent[1]).toBe("Cider");
     await check(page, info, "D2-ko-on-en-after-tap", undefined, [VIEWPORTS[0], VIEWPORTS[1]]);
+  });
+});
+
+/** Opens /demo, starts and chooses "Eat here" on the phone, so the phone is on its talk screen with an empty cart. */
+async function startTalk(page: Page) {
+  await page.goto("/demo");
+  await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible({ timeout: 60_000 });
+  const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
+  await page.getByRole("button", { name: "Start", exact: true }).click();
+  const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
+  await phoneScreen(page).getByRole("button", { name: "Eat here" }).click();
+  await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "talk");
+  return s;
+}
+
+test.describe(() => {
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.85" } });
+
+  // #1 11: on a fresh D2 the empty "Your order ₩0" card pushed "Try saying" under the dock at 1280×720 and 1366×768,
+  // so a judge saw no example sentence at all.
+  test("D2 talk with an empty cart: the first example sentence fully in view", async ({ page }, info) => {
+    await startTalk(page);
+    await check(page, info, "D2-talk-empty", async () => {
+      await firstExampleInView(page)();
+      await expectPhoneEdgeFaded(page, "D2 empty"); // "Is this halal?" was cut 29 of 30px at 1366 (#1 2-phone)
+    }, [VIEWPORTS[1], { width: 1366, height: 768 }, VIEWPORTS[0], VIEWPORTS[2]]);
+  });
+});
+
+test.describe(() => {
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.81" } });
+
+  // #1 18: right after the hero order the card's total sat under the dock at every laptop size (1440×900 too). The
+  // one-line cart summary above the dock keeps the count and total in view while the card is out of view.
+  test("D2 right after the hero order: the cart summary or the card's total fully in view", async ({ page, request }, info) => {
+    const sizes = [{ width: 1280, height: 720 }, { width: 1366, height: 768 }, { width: 1440, height: 789 }, VIEWPORTS[0]];
+    for (const [i, vp] of sizes.entries()) {
+      // A fresh order at each size, each from its own address, so --repeat-each stays under 10 new sessions a
+      // minute per address (R-005, R-018).
+      await page.setExtraHTTPHeaders({ "X-Forwarded-For": `192.0.2.${81 + i}` });
+      await page.setViewportSize(vp);
+      const s = await startTalk(page);
+      // The hero sentence answered by the test with the agent's recorded actions (no model).
+      await page.route("**/api/chat", async (route) => {
+        for (const a of HERO_ACTIONS) {
+          await command(request, s.deviceToken, { sessionId: s.sessionId, type: a.tool, args: a.args, source: "text", utteranceSeq: 1 });
+        }
+        await route.fulfill({
+          json: {
+            ok: true,
+            reply: "Added one Cheeseburger set with Zero cola and no pickles, and one Cheeseburger set with Cider. Would you like anything else?",
+            status: "ordering",
+            cart: [],
+            total: 0,
+            cartVersion: 2,
+            actions: HERO_ACTIONS,
+          },
+        });
+      });
+      await page.getByRole("textbox", { name: "Type your order" }).fill("Two cheeseburger sets. One without pickles; drinks zero cola and cider.");
+      await page.getByRole("button", { name: "Send", exact: true }).click();
+      await expect(page.locator('[data-bubble="model"]')).toBeVisible();
+      await expect(page.getByRole("region", { name: "Your order" }).locator("li")).toHaveCount(2);
+      const summary = page.locator("[data-cart-summary]");
+      const total = page.getByRole("region", { name: "Your order" }).getByText("₩13,800", { exact: true });
+      await check(page, info, "D2-hero-summary", async () => {
+        await expect(async () => {
+          await expect((await summary.isVisible()) ? summary : total).toBeInViewport({ ratio: 1, timeout: 1_000 });
+        }).toPass({ timeout: 10_000 });
+        await expectPhoneEdgeFaded(page, `D2 hero ${vp.width}x${vp.height}`);
+      }, [vp]);
+      await page.unroute("**/api/chat");
+    }
+  });
+});
+
+test.describe(() => {
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.88" } });
+
+  // #1 8 (I-133): the rail hint read "e.g. Two adults to City Cente" at 1280×720. Every kiosk's hint (MALO, the rail
+  // ticket machine, the learned pizza kiosk) at the narrowest judge size, with normal and larger text, in both languages.
+  test("D2 at 1280×720: every kiosk's input hint fits beside [Send], English and Korean, normal and larger text", async ({ page }, info) => {
+    const keys = ["inputPlaceholder", "ticketPlaceholder", "learnedPlaceholder"] as const;
+    await page.setViewportSize(VIEWPORTS[1]);
+    await startTalk(page);
+    const en = page.getByRole("textbox", { name: "Type your order" });
+    expect(await hintsCut(en, keys.map((k) => pt(k, "en"))), "English").toEqual([]);
+
+    await page.getByRole("button", { name: "Language and text size: English" }).click();
+    const sheet = page.getByRole("dialog", { name: "Language and text size" });
+    await sheet.getByRole("switch", { name: "Larger text" }).click();
+    await sheet.getByRole("button", { name: "Close" }).click();
+    await expect(phoneScreen(page)).toHaveAttribute("data-large-text", "true");
+    expect(await hintsCut(en, keys.map((k) => pt(k, "en"))), "English, larger text").toEqual([]);
+
+    await page.getByRole("button", { name: "Language and text size: English" }).click();
+    await page.getByRole("dialog", { name: "Language and text size" }).getByRole("button", { name: /^한국어/ }).click();
+    const ko = page.getByRole("textbox", { name: "주문을 글자로 입력" });
+    expect(await hintsCut(ko, keys.map((k) => pt(k, "ko"))), "Korean, larger text").toEqual([]);
+    await check(page, info, "D2-hint-ko-large", undefined, [VIEWPORTS[1]]);
   });
 });
 
