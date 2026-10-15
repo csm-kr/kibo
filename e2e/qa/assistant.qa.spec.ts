@@ -474,6 +474,112 @@ test("P3 at 360×800 with larger text: the AI's reply and its choices stay above
   await ctx.close();
 });
 
+test.describe(() => {
+  // Its own address: two sessions per language (R-005).
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.58" } });
+
+  // With an AI-only language the choice question and the fixed labels follow it; names stay from menu data
+  // (16-judge-r3-fixes:0, I-271). A drink question and the dessert offer, at 390×844 and at 360×800 with larger text.
+  const AI_LANGS = [
+    { lang: "ja", drink: "どれにしますか？", upsell: "デザートもいかがですか？", decline: "いりません" },
+    { lang: "zh", drink: "您要哪一种？", upsell: "要不要再来份甜点？", decline: "不用了" },
+    { lang: "es", drink: "¿Cuál prefiere?", upsell: "¿Quiere también un postre?", decline: "No, gracias" },
+  ];
+  for (const t of AI_LANGS) {
+    test(`P3 with the AI in ${t.lang}: choice questions and [No thanks] in it (16-judge-r3-fixes:0)`, async ({ browser, request }, info) => {
+      for (const large of [false, true]) {
+        const vp = large ? VIEWPORTS[1] : VIEWPORTS[0];
+        const ctx = await browser.newContext({
+          viewport: vp,
+          locale: "en-US",
+          isMobile: true,
+          hasTouch: true,
+          extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.58" },
+        });
+        const page = await ctx.newPage();
+        await page.addInitScript(
+          ([lang, big]) => {
+            localStorage.setItem("kibo.phone.aiLang", lang);
+            if (big) localStorage.setItem("kibo.phone.largeText", "on");
+          },
+          [t.lang, large] as const,
+        );
+        const s = await openPhone(page, request);
+        await page.getByRole("button", { name: "Start" }).click();
+        await page.getByRole("button", { name: "Type instead" }).click();
+        await page.getByRole("button", { name: "Eat here" }).click();
+        await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
+        await expect(page.locator("[data-ai-language]")).toHaveAttribute("data-ai-language", t.lang);
+        await page.getByRole("button", { name: "Hide keyboard", exact: true }).click();
+        const suffix = large ? "-large" : "";
+
+        await s.phone("offerChoices", {
+          templateId: "pick_option",
+          choices: [{ kind: "option", id: "cola" }, { kind: "option", id: "zero_cola" }, { kind: "option", id: "cider" }],
+        });
+        await expect(page.getByRole("heading", { name: t.drink })).toBeVisible();
+        await check(page, info, `P3-${t.lang}-drink${suffix}`, [vp]);
+
+        await s.phone("addToCart", cheeseSet("cider"), { utteranceSeq: 1 });
+        await s.phone("offerChoices", { templateId: "upsell", choices: [{ kind: "item", id: "soft_cone" }, { kind: "item", id: "apple_pie" }] });
+        await expect(page.getByRole("heading", { name: t.upsell })).toBeVisible();
+        await expect(page.getByRole("button", { name: t.decline })).toBeVisible();
+        await check(page, info, `P3-${t.lang}-upsell${suffix}`, [vp]);
+        await ctx.close();
+      }
+    });
+  }
+});
+
+test.describe(() => {
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.59" } });
+
+  // Each size in its own page from the start: keepInView runs on a reply, not on a resize (a phone never resizes).
+  for (const vp of [VIEWPORTS[0], VIEWPORTS[3]]) test(`P3: an allergy question ends on [Call staff] at ${vp.width} wide (16-judge-r3-fixes:1)`, async ({ page, request }, info) => {
+    await page.setViewportSize(vp);
+    const s = await openPhone(page, request);
+    await page.getByRole("button", { name: "Start" }).click();
+    await page.getByRole("button", { name: "Type instead" }).click();
+    await page.getByRole("button", { name: "Eat here" }).click();
+    await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
+    await s.phone("addToCart", { itemId: "bulgogi_burger", variant: "set", qty: 1, selections: { drink: ["cola"] } }, { utteranceSeq: 1 });
+
+    // No model: the route does what the allergy instructions ask (allergens from the data, then the staff offer).
+    await page.route("**/api/chat", async (route) => {
+      await command(request, s.deviceToken, {
+        sessionId: s.sessionId,
+        type: "offerChoices",
+        args: { templateId: "ask_staff", choices: [{ kind: "staff", id: "staff" }] },
+        source: "text",
+        utteranceSeq: 2,
+      });
+      await route.fulfill({
+        json: {
+          ok: true,
+          reply:
+            "The kiosk data lists wheat, egg, soy and beef for the Bulgogi burger. Peanut and milk are not listed, but cross-contact is not known, so I can't say it is safe.",
+          status: "ordering",
+          cart: [],
+          total: 0,
+          cartVersion: 1,
+          actions: [],
+        },
+      });
+    });
+    await page.getByRole("textbox", { name: "Type your order" }).fill("I have a peanut and milk allergy. Is the bulgogi burger safe?");
+    await page.getByRole("button", { name: "Send", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Shall I call staff to check for you?" })).toBeVisible();
+    await expect(page.locator("[data-choices]").getByRole("button", { name: "Call staff" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "No thanks" })).toBeVisible();
+    // The whole [Call staff] above the dock, with the text field open (R-009).
+    await expect(page.locator("[data-choices]").getByRole("button", { name: "Call staff" })).toBeInViewport({ ratio: 1 });
+    await check(page, info, "P3-ask-staff", [vp]);
+
+    await page.locator("[data-choices]").getByRole("button", { name: "Call staff" }).click();
+    await expect(page.locator("[data-choices]")).toHaveCount(0);
+  });
+});
+
 test("P7: someone else is using this kiosk", async ({ page, request }, info) => {
   const res = await request.post("/api/session", { data: { kioskId: "malo" } });
   const { sessionId, claimUrl } = (await res.json()) as { sessionId: string; claimUrl: string };

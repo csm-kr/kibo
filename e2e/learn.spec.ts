@@ -34,7 +34,8 @@ test("/learn lists the recorded runs with their numbers", async ({ page }) => {
   await expect(fresh).toHaveAttribute("data-learn-run", "themepark");
   await expect(fresh).toContainText("never seen before this run");
   await expect(fresh).toContainText("10 correct, 0 refused, 0 unsafe, of 10");
-  await expect(fresh).toContainText("In 4 of them the skill's own total was wrong");
+  await expect(fresh).toContainText("In 4 of them the skill's own total differed from the kiosk's");
+  await expect(fresh).toContainText("the bridge stops such an order and calls staff");
   await expect(fresh).toContainText("spikes/blind-kiosks/results/bk6-themepark/final/grade-v2.json");
   const blind = page.locator('[data-learn-run="airport-shop"]');
   await expect(blind).toContainText("37 of 37 items found");

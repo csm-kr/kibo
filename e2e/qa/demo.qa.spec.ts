@@ -244,6 +244,50 @@ test.describe(() => {
   });
 });
 
+test.describe(() => {
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.60" } });
+
+  // A Korean typed order on the English screens, through a choice tap (16-judge-r3-fixes:0, I-271). The tap sends the
+  // English label "Cider"; the reply stays Korean. No model: the route stands in for the agent and checks the message.
+  test("D2: a Korean typed order on English screens, through a choice tap", async ({ page, request }, info) => {
+    await page.goto("/demo");
+    await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible({ timeout: 60_000 });
+    const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
+    await page.getByRole("button", { name: "Start", exact: true }).click();
+    const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
+    await command(request, s.deviceToken, { sessionId: s.sessionId, type: "setDineOption", args: { option: "eat_in" }, source: "button" });
+    await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "talk");
+
+    const sent: string[] = [];
+    await page.route("**/api/chat", async (route) => {
+      const body = route.request().postDataJSON() as { message: string };
+      sent.push(body.message);
+      const ai = (type: string, args: object) =>
+        command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "text", utteranceSeq: sent.length });
+      let reply = "음료는 무엇으로 드릴까요?";
+      if (sent.length === 1) {
+        await ai("offerChoices", {
+          templateId: "pick_option",
+          choices: [{ kind: "option", id: "cola" }, { kind: "option", id: "zero_cola" }, { kind: "option", id: "cider" }],
+        });
+      } else {
+        await ai("addToCart", { itemId: "cheese_burger", variant: "set", qty: 1, selections: { side: ["fries_l"], drink: ["cider"] } });
+        reply = "치즈버거 세트에 감자튀김 L과 사이다를 담았어요.";
+      }
+      await route.fulfill({ json: { ok: true, reply, status: "ordering", cart: [], total: 0, cartVersion: 0, actions: [] } });
+    });
+    await page.getByRole("textbox", { name: "Type your order" }).fill("치즈버거 세트 하나, 감자튀김은 큰 걸로 주세요");
+    await page.getByRole("button", { name: "Send", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Which one would you like?" })).toBeVisible();
+    await check(page, info, "D2-ko-on-en-choices", undefined, [VIEWPORTS[0]]);
+
+    await page.locator("[data-choices]").getByRole("button", { name: /^Cider/ }).click();
+    await expect(page.locator('[data-bubble="model"]').last()).toContainText("사이다를 담았어요");
+    expect(sent[1]).toBe("Cider");
+    await check(page, info, "D2-ko-on-en-after-tap", undefined, [VIEWPORTS[0], VIEWPORTS[1]]);
+  });
+});
+
 /** Opens /demo?k=<kioskId>, starts, opens the guide and chooses a scenario; returns the scenario's own session. */
 async function chooseScenario(page: Page, kioskId: string, scenarioId: string) {
   await page.goto(`/demo?k=${kioskId}`);
