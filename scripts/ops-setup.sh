@@ -55,12 +55,12 @@ CHANNELS=""
 for EMAIL in $(echo "${ALERT_EMAILS:-}" | tr ',' ' '); do
   CHANNEL=""
   [ "$APPLY" -eq 1 ] && CHANNEL=$(gcloud beta monitoring channels list --project "$PROJECT" \
-    --filter "type=email AND labels.email_address=$EMAIL" --format 'value(name)' | head -n 1)
+    --filter "type=\"email\" AND labels.email_address=\"$EMAIL\"" --format 'value(name)' | head -n 1)
   if [ -z "$CHANNEL" ]; then
     run gcloud beta monitoring channels create --project "$PROJECT" --type email \
       --display-name "KIBO alert $EMAIL" --channel-labels "email_address=$EMAIL"
     [ "$APPLY" -eq 1 ] && CHANNEL=$(gcloud beta monitoring channels list --project "$PROJECT" \
-      --filter "type=email AND labels.email_address=$EMAIL" --format 'value(name)' | head -n 1)
+      --filter "type=\"email\" AND labels.email_address=\"$EMAIL\"" --format 'value(name)' | head -n 1)
   fi
   [ -n "$CHANNEL" ] && CHANNELS="$CHANNELS${CHANNELS:+,}\"$CHANNEL\""
 done

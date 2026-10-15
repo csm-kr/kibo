@@ -80,6 +80,8 @@ esac`,
     expect(calls).toContain("ttls update expiresAt --collection-group=pairCodes --enable-ttl");
     expect(calls).toContain("host=kibo.example,project_id=kibo-2026");
     expect(calls).toContain("channels create");
+    // Cloud Monitoring rejects an unquoted address in a filter (INVALID_ARGUMENT on the real run, 10-15).
+    expect(calls).toContain('type="email" AND labels.email_address="a@example.com"');
     expect(calls).toContain("policies create");
     expect(r.stdout).toContain('metric.label.check_id=\\"kibo-deep-health-abc\\"');
     expect(r.stdout).toContain('"notificationChannels": ["projects/p/notificationChannels/7"]');
