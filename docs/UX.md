@@ -55,7 +55,7 @@ What each persona goes through, where they could give up, and which moment must 
 | A7 | Both fries change to L with highlight | "Both fries are now large. +1,000 won" → "Would you like dessert too?" [No thanks] [Show me] (once per order) | 1, 6 |
 | A8 | **Order review** screen (same content) | **Confirm card:** items and total in large type. **[Yes, pay now]** **[Pick more]**. Saying "yes" also works after the card appears | 5 |
 | A9 | Payment: "Insert or tap your card" animation | "**Insert your card into the kiosk**" with an arrow to the kiosk | 2, 1 |
-| A10 | Approving → approved → receipt? → **large order number** | **Large order number** + "We'll call your number at the counter." Stays on the phone | 1, 6 |
+| A10 | Approving → approved → receipt? → **large order number** in the top third, with what was paid under it like a receipt (each line with its options, quantity and price, then the total; GitHub #1 item 20) | **Large order number** + "We'll call your number at the counter." Stays on the phone | 1, 6 |
 | A11 | Back to the attract screen after a visible 10 s countdown | Keeps the order number until the user closes it, then clears conversation and cart | 1 |
 
 ## Flow B: touch ordering
@@ -104,7 +104,7 @@ Every screen and state that a QA pass must look at (`docs/UI_QA.md`). Ids are us
 | K5 | Kiosk upsell pop-up (once per order) | `ordering` | K3 |
 | K6 | Kiosk order review | `confirming` | K7 or K3 |
 | K7 | Kiosk payment method → card insert → approving | `paying` | K8 or K6 (edit) |
-| K8 | Kiosk receipt? → order number | `paid` | K1 after 10 s |
+| K8 | Kiosk receipt? → order number, with the paid order under it ("주문 내역" / "구매 내역") | `paid` | K1 after 10 s |
 | KX | Kiosk banners: staff called, connection paused and server busy ("잠시 후 다시 연결합니다…") (a strip at the top that pushes the screen down), AI highlight + status line (in the toolbar row for 2 s; on a Korean kiosk KIBO's English subtitle row under it for 6 s, "AI added: …"), KIBO's "처리하고 있어요 · Working…" in the toolbar row (KIBO blue with its tag) while the phone waits for the AI, from the send until the reply or 20 s (14-final:1), idle warning. A visible kiosk never pauses (I-172): it waits on K1 with its QR and code for a phone, and a learned kiosk's bridge must replay as soon as a phone orders; only a tab hidden for 60 s closes its stream, and it reopens when visible | any | — |
 | P0 | Phone app home `/app` (the installed app's start page; optional, a QR link never needs it): a [Larger text] switch beside the logo (the settings card has the same one; 15-judge-fixes:2), [Continue my order] while this phone holds an open order, the 6-digit code field (hint "6 digits", not "000000", which looked typed in) with [Connect] (wrong code: "That code doesn't match a kiosk. Check the number on the kiosk screen."), [Scan a kiosk], how it works, settings (language, AI voice, larger text) that `/assistant` reads; in an in-app browser a note to open Safari or Chrome | — | P1 by [Connect], the scanner, or P2–P5 by [Continue my order] |
 | P0-scan | Phone QR scanner `/app/scan`: camera hint with [Turn on the camera] (nothing starts before the tap), scanning (camera with a framing square, "Point at the QR on the kiosk", light toggle when the camera has one), "This QR is not a KIBO kiosk." for any other code, and without a camera "Open your camera app and scan the QR there, or paste the link below" with a link field | — | P1 (`/assistant`, the claim runs there), or `/app` by [Back] |

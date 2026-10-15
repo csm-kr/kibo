@@ -40,6 +40,13 @@ describe("kiosk strings", () => {
     expect(kt("pickupHint", "en", "ticket")).toBe("Please take your tickets");
   });
 
+  it("K8's receipt of what was paid is titled like the review: order details, or purchase details on a ticket machine (#1 item 20)", () => {
+    expect(kt("paidList", "ko")).toBe("주문 내역");
+    expect(kt("paidList", "en")).toBe("Your order");
+    expect(kt("paidList", "ko", "ticket")).toBe("구매 내역");
+    expect(kt("paidList", "en", "ticket")).toBe("Your tickets");
+  });
+
   it("names each language in itself", () => {
     expect(languageName("ko")).toBe("한국어");
     expect(languageName("en")).toBe("English");

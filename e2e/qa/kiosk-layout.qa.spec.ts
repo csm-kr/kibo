@@ -67,6 +67,40 @@ test("K3: the menu grid and the category rail fade out at their bottom edge whil
   await expect.poll(() => bottomEdge(page, RAIL)).toEqual({ more: false, fade: false });
 });
 
+test("K8: the order number sits in the top third, with a receipt of what was paid under it (#1 item 20)", async ({ page, request }) => {
+  await kioskWithHero(page, request);
+  await page.getByRole("button", { name: "주문하기", exact: true }).click();
+  await page.getByRole("button", { name: "결제하기" }).click();
+  await page.getByRole("button", { name: "카드", exact: true }).click();
+  await page.getByRole("button", { name: "카드 넣기" }).click();
+  await expect(kioskRoot(page)).toHaveAttribute("data-screen", "done");
+  await page.getByRole("button", { name: "출력 안 함" }).click();
+  const number = page.getByRole("heading", { name: "주문 번호" });
+  await expect(number).toBeVisible();
+
+  // The number's card: its middle in the top third of the 1920px canvas (it was at 0.48).
+  const card = await number.locator("..").boundingBox();
+  expect(card).not.toBeNull();
+  expect((card!.y + card!.height / 2) / 1920).toBeLessThanOrEqual(0.36);
+
+  // Under it, each paid line with its options, quantity and price, then the total, from the session's cart.
+  const receipt = page.getByRole("region", { name: "주문 내역" });
+  await expect(receipt.getByRole("listitem")).toHaveCount(2);
+  const first = receipt.getByRole("listitem").first();
+  await expect(first).toContainText("치즈버거 세트 ×1");
+  await expect(first).toContainText("감자튀김 M · 제로콜라 · 피클 빼기");
+  await expect(first).toContainText("6,900원");
+  await expect(receipt.getByRole("listitem").nth(1)).toContainText("감자튀김 M · 사이다");
+  await expect(receipt).toContainText("총 결제 금액");
+  await expect(receipt).toContainText("13,800원");
+  const box = await receipt.boundingBox();
+  expect(box!.y).toBeGreaterThanOrEqual(card!.y + card!.height);
+  // Inside the canvas, above the countdown that takes the kiosk back to K1.
+  const timer = await page.getByRole("timer").boundingBox();
+  expect(box!.y + box!.height).toBeLessThanOrEqual(timer!.y);
+  expect(timer!.y + timer!.height).toBeLessThanOrEqual(1920);
+});
+
 /** /demo started on MALO, with the phone half's own session tokens. */
 async function startDemo(page: Page) {
   await page.goto("/demo");
