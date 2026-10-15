@@ -65,8 +65,10 @@ export function CartBar(props: {
               <span className="k-text-40 truncate font-bold">
                 {label.title} ×{line.qty}
               </span>
+              {/* Name ×qty over the line price, like a real kiosk's cart: the options stay on K6 and in KIBO's
+                  subtitle, so two hero lines fit the row whole (owner decision, GitHub #1 item 1, I-244). */}
               <span className="k-text-40 truncate text-[#4B463F]">
-                {pending ? kt("pending", locale, domain) : label.detail || formatWon(line.unitPrice * line.qty, locale)}
+                {pending ? kt("pending", locale, domain) : formatWon(line.unitPrice * line.qty, locale)}
               </span>
             </li>
           );
