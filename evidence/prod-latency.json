@@ -1,9 +1,9 @@
 {
   "about": "Typed hero order on the deployed service: 4 demo sessions (POST /api/session, demo: true) of 3 typed turns each, 12 turns sent to POST /api/chat one after another with the phone's history, locale en, from a laptop in Seoul over the internet. ms = request sent to JSON received, measured on the client (network included). The text backend and the code are whatever the named revision runs; reply text is not kept. One run, no retries (R-001). `earlier` holds the runs this file held before, with their revisions.",
   "url": "https://kibo-407514467119.asia-northeast3.run.app",
-  "revision": "kibo-00016-zj9",
+  "revision": "kibo-00019-rmt",
   "version": "0.1.0",
-  "at": "2026-10-14T17:30:46.074Z",
+  "at": "2026-10-15T01:52:44.609Z",
   "turns": [
     {
       "session": 1,
@@ -18,7 +18,7 @@
       ],
       "cartLines": 0,
       "total": 0,
-      "ms": 4470
+      "ms": 2303
     },
     {
       "session": 1,
@@ -34,7 +34,7 @@
       ],
       "cartLines": 2,
       "total": 13800,
-      "ms": 6339
+      "ms": 4491
     },
     {
       "session": 1,
@@ -50,7 +50,7 @@
       ],
       "cartLines": 2,
       "total": 14800,
-      "ms": 2891
+      "ms": 2586
     },
     {
       "session": 2,
@@ -67,7 +67,7 @@
       ],
       "cartLines": 2,
       "total": 13800,
-      "ms": 9405
+      "ms": 4382
     },
     {
       "session": 2,
@@ -83,7 +83,7 @@
       ],
       "cartLines": 2,
       "total": 14800,
-      "ms": 2668
+      "ms": 2169
     },
     {
       "session": 2,
@@ -98,7 +98,7 @@
       ],
       "cartLines": 2,
       "total": 14800,
-      "ms": 1960
+      "ms": 2025
     },
     {
       "session": 3,
@@ -113,7 +113,7 @@
       ],
       "cartLines": 0,
       "total": 0,
-      "ms": 2609
+      "ms": 2270
     },
     {
       "session": 3,
@@ -129,7 +129,7 @@
       ],
       "cartLines": 2,
       "total": 13800,
-      "ms": 9683
+      "ms": 4854
     },
     {
       "session": 3,
@@ -145,7 +145,7 @@
       ],
       "cartLines": 2,
       "total": 14800,
-      "ms": 3208
+      "ms": 2327
     },
     {
       "session": 4,
@@ -162,7 +162,7 @@
       ],
       "cartLines": 2,
       "total": 13800,
-      "ms": 7137
+      "ms": 4484
     },
     {
       "session": 4,
@@ -178,7 +178,7 @@
       ],
       "cartLines": 2,
       "total": 14800,
-      "ms": 3790
+      "ms": 2302
     },
     {
       "session": 4,
@@ -193,19 +193,33 @@
       ],
       "cartLines": 2,
       "total": 14800,
-      "ms": 2583
+      "ms": 2254
     }
   ],
   "summary": {
     "turns": 12,
     "ok": 12,
-    "medianMs": 3499,
-    "p90Ms": 9405,
-    "minMs": 1960,
-    "maxMs": 9683,
-    "totalMs": 56743
+    "medianMs": 2315,
+    "p90Ms": 4491,
+    "minMs": 2025,
+    "maxMs": 4854,
+    "totalMs": 36447
   },
   "earlier": [
+    {
+      "revision": "kibo-00016-zj9",
+      "at": "2026-10-14T17:30:46.074Z",
+      "summary": {
+        "turns": 12,
+        "ok": 12,
+        "medianMs": 3499,
+        "p90Ms": 9405,
+        "minMs": 1960,
+        "maxMs": 9683,
+        "totalMs": 56743
+      },
+      "note": null
+    },
     {
       "revision": "kibo-00014-859",
       "at": "2026-10-14T11:28:45.949Z",
