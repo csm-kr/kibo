@@ -37,9 +37,12 @@ function TopBar({ kioskId, askBeforeLeaving }: { kioskId: string; askBeforeLeavi
   }, [leaving]);
 
   return (
-    <header data-demo-topbar className="mx-auto grid h-16 w-full max-w-[1600px] flex-none grid-cols-[1fr_auto_1fr] items-center gap-4 px-6">
+    <header
+      data-demo-topbar
+      className="mx-auto flex h-16 w-full max-w-[1600px] flex-none items-center justify-between gap-2 px-6 min-[900px]:grid min-[900px]:gap-4 min-[900px]:grid-cols-[1fr_auto_1fr]"
+    >
       <div className="flex items-center gap-3">
-        <Image src="/kibo-logo.svg" alt="KIBO" width={111} height={30} preload />
+        <Image src="/kibo-logo.svg" alt="KIBO" width={111} height={30} preload className="h-[30px] w-auto flex-none" />
         {/* Below 900px wide (the laptop note) the bar keeps only the mark and "How it works", so it fits 320px. */}
         <span aria-hidden className="h-6 w-px bg-[#D3D0C9] max-[899px]:hidden" />
         <span className="text-base font-semibold text-muted max-[899px]:hidden">Live demo</span>
@@ -76,7 +79,10 @@ function TopBar({ kioskId, askBeforeLeaving }: { kioskId: string; askBeforeLeavi
           })}
         </ul>
       </nav>
-      <Link href="/#how" className={`flex min-h-14 items-center gap-2 justify-self-end rounded-full px-3 text-base font-semibold text-kibo ${FOCUS}`}>
+      <Link
+        href="/#how"
+        className={`flex min-h-14 items-center gap-2 justify-self-end rounded-full px-2 text-base font-semibold whitespace-nowrap text-kibo ${FOCUS}`}
+      >
         <CircleHelp size={20} strokeWidth={2} aria-hidden />
         How it works
       </Link>
