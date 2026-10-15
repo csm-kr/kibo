@@ -756,3 +756,63 @@ test.describe(() => {
     await check(page, info, "PX-idle-warning", [VIEWPORTS[0]]);
   });
 });
+
+// #1 21 (I-341): at 320×700 with larger text in English the app bar's brand broke inside a word ("MALO / BURGE / R",
+// "SKYLIN / E / AIRPOR / T RAIL", "Doughh / ouse") and the bar grew to 120 and 147px: the brand's column had 73.6px
+// for a 74.1px word.
+// The brand wraps only between words, in at most two lines, and the bar keeps one row of controls.
+test("P3 app bar at 320×700 with larger text in English: the brand breaks only between words (#1 21, I-341)", async ({ browser }) => {
+  const ctx = await browser.newContext({
+    viewport: VIEWPORTS[3],
+    locale: "en-US",
+    isMobile: true,
+    hasTouch: true,
+    // Its own address: one session per kiosk (R-005).
+    extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.136" },
+  });
+  const page = await ctx.newPage();
+  await page.addInitScript(() => localStorage.setItem("kibo.phone.largeText", "on"));
+  for (const [kioskId, brand] of [
+    ["malo", "MALO BURGER"],
+    ["airport_rail", "SKYLINE AIRPORT RAIL"],
+    ["doughhouse", "Doughhouse"],
+  ] as const) {
+    const created = (await (await ctx.request.post("/api/session", { data: { kioskId } })).json()) as { claimUrl: string };
+    await page.goto(created.claimUrl);
+    const bar = page.locator("[data-phone-screen] header");
+    const name = bar.getByText(brand, { exact: true });
+    await expect(name).toBeVisible();
+    const box = await name.evaluate((el) => {
+      const text = el.firstChild!;
+      const words: { word: string; lines: number }[] = [];
+      const lineTops = new Set<number>();
+      for (const m of (text.textContent ?? "").matchAll(/\S+/g)) {
+        const range = document.createRange();
+        range.setStart(text, m.index);
+        range.setEnd(text, m.index + m[0].length);
+        const tops = new Set([...range.getClientRects()].filter((r) => r.width > 0).map((r) => Math.round(r.top)));
+        tops.forEach((t) => lineTops.add(t));
+        words.push({ word: m[0], lines: tops.size });
+      }
+      const header = el.closest("header")!.getBoundingClientRect();
+      const buttons = [...el.closest("header")!.querySelectorAll("button")].map((b) => b.getBoundingClientRect());
+      return {
+        broken: words.filter((w) => w.lines > 1).map((w) => w.word),
+        lines: lineTops.size,
+        font: parseFloat(getComputedStyle(el).fontSize),
+        bar: header.height,
+        // One row of controls: every button inside the bar, side by side.
+        oneRow: buttons.every((b) => b.top >= header.top && b.bottom <= header.bottom) && new Set(buttons.map((b) => Math.round(b.top))).size === 1,
+      };
+    });
+    expect(box.broken, `${kioskId}: words broken inside`).toEqual([]);
+    expect(box.lines, `${kioskId}: brand lines`).toBeLessThanOrEqual(2);
+    expect(box.font, `${kioskId}: brand ≥ 16px`).toBeGreaterThanOrEqual(16);
+    expect(box.oneRow, `${kioskId}: one row of controls`).toBe(true);
+    // Two brand lines and the "Connected" line: 92px at most (the bar at 360×800 with "MALO / BURGER" today).
+    expect(box.bar, `${kioskId}: bar height`).toBeLessThanOrEqual(92);
+    // No horizontal scroll at the reflow width (WCAG 1.4.10).
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), kioskId).toBe(0);
+  }
+  await ctx.close();
+});

@@ -48,10 +48,26 @@ export function AppBar(props: {
     <>
       <header className="flex min-h-16 flex-none items-center gap-2 bg-white px-4 py-1 shadow-card">
         <div className="flex min-w-0 flex-1 items-center gap-2">
-          {/* max-w-none: a percentage max-width lets the row count the logo as 0px wide (I-062). */}
-          <Image src="/kibo-mark.svg" alt="KIBO" width={32} height={32} unoptimized className="size-8 max-w-none flex-none" />
+          {/* max-w-none: a percentage max-width lets the row count the logo as 0px wide (I-062). On a phone ≤ 380px wide
+              with larger text the bar gives the mark's room to the brand (as the dock gives up its voice switch there). */}
+          <Image
+            src="/kibo-mark.svg"
+            alt="KIBO"
+            width={32}
+            height={32}
+            unoptimized
+            className={`size-8 max-w-none flex-none ${props.largeText ? "max-[380px]:hidden" : ""}`}
+          />
           <div className="flex min-w-0 flex-col">
-            <span className="text-base leading-normal font-bold break-words">{props.brand}</span>
+            {/* On a phone ≤ 380px wide with larger text the brand's column had about 74px beside the mark and the two
+                buttons, less than "BURGER", "SKYLINE" or "Doughhouse" at 18.4px, so it broke inside the word (I-341,
+                #1 21); there it takes the mark's room and is one step smaller (14px × 1.15, still ≥ 16px), so it
+                breaks only between words. `break-words` stays for a word that fits no line. */}
+            <span
+              className={`text-base leading-normal font-bold break-words ${props.largeText ? "max-[380px]:text-sm" : ""}`}
+            >
+              {props.brand}
+            </span>
             {props.connection && (
               <span role="status" className="flex items-center gap-2 text-base leading-normal text-muted">
                 <span aria-hidden className={`size-2 flex-none rounded-full ${online ? "bg-online" : "bg-staff-ink"}`} />
