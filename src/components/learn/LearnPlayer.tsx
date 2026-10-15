@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Check, ChevronLeft, ChevronRight, Circle, Maximize2, Minimize2, OctagonX, Pause, Play, TriangleAlert } from "lucide-react";
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore, type CSSProperties } from "react";
 import { CARD, FOCUS, ICON, PRESS, PRIMARY, QUIET, SECONDARY } from "@/components/phone/ui";
 import { formatWon } from "@/lib/kiosk/menu";
 import type { LearnRun } from "@/lib/learn/runs";
@@ -154,11 +154,15 @@ export function LearnPlayer({ run }: { run: LearnRun }) {
           </div>
         </div>
 
+        {/* The frames are cut to the kiosk (scripts/learn-trim.ts, #1 item 17), so each run has its own shape: the
+            picture keeps the height the 720×1067 recordings had (the viewport less 280px, 415–711px) and takes
+            its width from the frame. `large` is the frame at its own size. */}
         <figure
+          style={{ "--shot-ratio": step.width / step.height, "--shot-width": `${step.width}px` } as CSSProperties}
           className={
             large
-              ? "mx-auto flex w-full max-w-[720px] flex-col gap-2"
-              : "mx-auto flex w-full max-w-[calc(45dvh*0.675)] flex-col gap-2 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:w-[clamp(280px,calc((100dvh-280px)*0.675),480px)] lg:max-w-none"
+              ? "mx-auto flex w-full max-w-(--shot-width) flex-col gap-2"
+              : "mx-auto flex w-full max-w-[calc(45dvh*var(--shot-ratio))] flex-col gap-2 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:w-[calc(clamp(415px,100dvh-280px,711px)*var(--shot-ratio))] lg:max-w-none"
           }
         >
           <Image

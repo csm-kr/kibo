@@ -83,3 +83,26 @@ test("learn replay: Doughhouse refused payment tap and the order button", async 
   await expect(page.locator("[data-learn-order]")).toBeVisible();
   await check(page, info, "replay-order", "[data-learn-order]");
 });
+
+// The replay picture is the kiosk alone (the recorded frames had the recording page's dark frame baked in, a black box
+// beside the kiosk), drawn at its own aspect ratio, as tall as before and fully on screen at the judge sizes (#1 item 17).
+for (const vp of [VIEWPORTS[0], VIEWPORTS[1]]) {
+  test(`learn replay at ${vp.width}x${vp.height}: every run's picture keeps its shape and fits the screen (#1 item 17)`, async ({ page }) => {
+    await page.setViewportSize(vp);
+    for (const run of ["bunsik", "themepark", "airport-shop", "doughhouse"]) {
+      await page.goto(`/learn/${run}`);
+      await stopAtStart(page);
+      // The slider took focus and may have scrolled itself into view; the picture is judged from the top, as on arrival.
+      await page.evaluate(() => window.scrollTo(0, 0));
+      const shot = page.getByRole("img", { name: "The kiosk screen after turn 1" });
+      await expect(shot, run).toBeInViewport({ ratio: 1 });
+      const box = await shot.evaluate((img: HTMLImageElement) => {
+        const r = img.getBoundingClientRect();
+        return { drawn: r.width / r.height, own: img.naturalWidth / img.naturalHeight, height: r.height };
+      });
+      expect(Math.abs(box.drawn - box.own), run).toBeLessThan(0.01);
+      // The height the 720×1067 frames had: the viewport less 280px, between 415 and 711px.
+      expect(box.height, run).toBeCloseTo(Math.min(Math.max(vp.height - 280, 415), 711), 0);
+    }
+  });
+}
