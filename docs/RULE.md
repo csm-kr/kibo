@@ -122,3 +122,13 @@ When an issue class in `docs/ISSUE.md` is seen for the **3rd time**, it becomes 
 - From: `evidence-overwrite` — I-070 (seen 10-13/3-assistant:5), I-099 (10-13/6-learn:3, 10-15/16-judge-r3-fixes:0); `number-drift` — I-238 (10-14/14-final:7, 10-15/15-judge-fixes:3, 10-15/16-judge-r3-fixes:2)
 - Why: test and QA runs rewrote cited evidence files and broad staging committed them, so the files and every published surface disagreed, which judges check first because the pitch is "every number has an evidence file".
 - Check: a spec or script that measures writes through `evidencePath` (`scripts/evidencePath.ts`), so it reaches `evidence/` only with `EVIDENCE=1`; `npm run test` runs `scripts/numbers.test.ts`, which recomputes the voice, bridge and typed-latency values from `evidence/` and fails when `docs/plan/NUMBERS.md` disagrees; a commit that changes a file in `evidence/` also changes `docs/plan/NUMBERS.md` (`git diff --cached --name-only`).
+
+### R-022 (proposed): Columns or cards shown side by side give their caption or header rows one height, so their content starts on one line; prove it with a box check
+- From: `card-alignment` — I-123 (seen 10-13/7-environments:6, 10-13/9-polish:6), I-282 (10-15/session)
+- Why: three times side-by-side surfaces started their content at different heights because one header row had its own height (D1 place-card titles that wrap, the landing's "How it works" captures, the `/demo` [Scenarios] pill at 56px beside 32px column captions), which a judge sees at once and no check measured.
+- Check: for each row of columns or cards a step adds or changes, a Playwright box assertion compares the content tops and the header centres (≤ 1px) at the judge sizes, as the "lines up" test in `e2e/demo-layout.spec.ts` does; a control in a header row keeps its 56px target 8px clear of the content below it.
+
+### R-023 (proposed): On the smallest supported size, an opened panel shows its first content row; chrome, legends and empty space give way first
+- From: `small-screen-crowding` — I-084 (seen 10-13/4-voice:4, 10-13/9-polish:0, 10-13/12-phone-app:10, 10-14/14-final:10), I-285 (10-15/session)
+- Why: phone chrome and the `/demo` strip kept taking the room their content needed at 320×700, 360×800 and 1280×720, and at 1280×720 the opened "What the AI did" showed only its legend, none of its rows.
+- Check: at the smallest size of each surface (phone 320×700 and 360×800; `/demo` 1280×720), the first content row of every panel the user can open is fully in view (`toBeInViewport({ ratio: 1 })`, as test #1 15 in `e2e/demo-layout.spec.ts` does).
