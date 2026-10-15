@@ -66,3 +66,51 @@ test("K3: the menu grid and the category rail fade out at their bottom edge whil
   await expect.poll(() => bottomEdge(page, GRID)).toEqual({ more: false, fade: false });
   await expect.poll(() => bottomEdge(page, RAIL)).toEqual({ more: false, fade: false });
 });
+
+/** /demo started on MALO, with the phone half's own session tokens. */
+async function startDemo(page: Page) {
+  await page.goto("/demo");
+  await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible({ timeout: 60_000 });
+  const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
+  await page.getByRole("button", { name: "Start", exact: true }).click();
+  const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
+  await expect(kioskRoot(page)).toHaveAttribute("data-screen", "dine");
+  return s;
+}
+
+/** The kiosk canvas on /demo, the box it is drawn in, and that box's background (the letterbox). */
+function kioskBox(page: Page) {
+  return page.locator("[data-kiosk-canvas]").evaluate((c) => {
+    const r = c.getBoundingClientRect();
+    const frame = c.parentElement as HTMLElement;
+    const f = frame.getBoundingClientRect();
+    return {
+      top: r.top,
+      height: r.height,
+      scale: r.width / 1080,
+      sideSpace: Math.max(r.left - f.left, f.right - r.right),
+      letterbox: getComputedStyle(frame).backgroundColor,
+    };
+  });
+}
+
+test.describe("/demo", () => {
+  test.use({ viewport: { width: 1280, height: 720 }, extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.82" } });
+
+  test("the space the kiosk leaves beside it is the page, not a dark band (#1 item 10)", async ({ page, request }) => {
+    const s = await startDemo(page);
+    let seq = 0;
+    const ai = (type: string, args: object) =>
+      command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "voice", utteranceSeq: ++seq });
+    await ai("setDineOption", { option: "eat_in" });
+    for (const args of HERO) await ai("addToCart", args);
+    await ai("requestCheckout", {});
+    await page.getByRole("button", { name: "Yes, pay now" }).click();
+    await expect(kioskRoot(page)).toHaveAttribute("data-screen", "payment");
+    await expect(page.locator("[data-card-reader]")).toBeVisible();
+    // The step line and the card reader take height, so the canvas is narrower than its column here.
+    const box = await kioskBox(page);
+    expect(box.sideSpace).toBeGreaterThan(1);
+    expect(box.letterbox).toBe("rgba(0, 0, 0, 0)");
+  });
+});

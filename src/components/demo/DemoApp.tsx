@@ -191,7 +191,7 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
                 strip
               />
             ) : (
-              <KioskCanvas theme={kiosk.theme} locale={kiosk.locale}>
+              <KioskCanvas theme={kiosk.theme} locale={kiosk.locale} letterbox="none">
                 <KioskScreen
                   kiosk={kiosk}
                   session={session}
