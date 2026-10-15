@@ -1,5 +1,5 @@
 import { expect, test, type APIRequestContext, type Locator, type Page } from "@playwright/test";
-import { command, openScenarios, textLines } from "./helpers";
+import { command, expectTopEdgeFaded, openScenarios, textLines, topEdge } from "./helpers";
 import { HERO_ACTIONS, MIXED_ACTIONS } from "./recordedActions";
 
 // /demo D2 and D3 layout, measured in CSS px (design QA 10-15, issue #1 batch B): the scenario column's scroll areas
@@ -213,6 +213,128 @@ test.describe(() => {
       await expect(page.locator("[data-demo-check] [data-action-strip]"), `${vp.width}: strip under the phone`).toHaveCount(0);
       const places = page.getByRole("navigation", { name: "Try another place" });
       await expect(places.getByRole("link", { name: "Pizza shop" }), `${vp.width}: [Pizza shop]`).toBeInViewport({ ratio: 1 });
+    }
+  });
+});
+
+/**
+ * The top edge (#1 32): after the hero order, at D3 and after scenario steps, the phone and the guide had scrolled, and
+ * their top edge cut a bubble, a title or [All scenarios] mid-line with nothing to say more is above. Every line cut
+ * there lies under a shown 32px top fade; at the top, no fade lies over the first lines.
+ */
+async function expectTopFaded(area: Locator, what: string) {
+  await expectTopEdgeFaded(area, what);
+  // Scrolled back to the top, nothing is above, and the fade must not lie over the first lines.
+  await area.evaluate((el) => el.scrollTo({ top: 0, behavior: "instant" }));
+  await expect.poll(async () => (await topEdge(area)).shown, { message: `${what}: no top fade at the top` }).toBe(false);
+}
+
+test.describe(() => {
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.130" } });
+
+  test("the phone's scroll area and the scenario guide fade at their top edge while content is above (#1 32)", async ({ page, request }) => {
+    const phone = page.locator("[data-phone-scroll]");
+    const guide = page.locator("#demo-scenario-guide");
+    const say = async (text: string) => {
+      await page.getByRole("textbox", { name: "Type your order" }).fill(text);
+      await page.getByRole("button", { name: "Send", exact: true }).click();
+    };
+
+    // MALO at 1280×720: the hero order left the user's bubble cut at the top (36 of 108px), and D3 the "Order number"
+    // title (4 of 28px).
+    await page.setViewportSize(SIZES[0]);
+    let s = await start(page);
+    await expectTopEdgeFaded(phone, "D2 empty 1280");
+    await command(request, s.deviceToken, { sessionId: s.sessionId, type: "setDineOption", args: { option: "eat_in" }, source: "button" });
+    await expect(page.locator('[data-phone-screen="talk"]')).toBeVisible();
+    let seq = 0;
+    await page.route("**/api/chat", async (route) => {
+      const { message } = route.request().postDataJSON() as { message: string };
+      const hero = message.startsWith("Two cheeseburger sets");
+      if (hero) for (const a of HERO_ACTIONS) await command(request, s.deviceToken, { sessionId: s.sessionId, type: a.tool, args: a.args, source: "text", utteranceSeq: ++seq });
+      else await command(request, s.deviceToken, { sessionId: s.sessionId, type: "requestCheckout", source: "text", utteranceSeq: ++seq });
+      const reply = hero
+        ? "Added one Cheeseburger set with Zero cola and no pickles, and one Cheeseburger set with Cider. Would you like anything else?"
+        : "Please check your order.";
+      await route.fulfill({ json: { ok: true, reply, status: hero ? "ordering" : "confirming", cart: [], total: 0, cartVersion: 0, actions: [] } });
+    });
+    await say("Two cheeseburger sets. One without pickles; drinks zero cola and cider.");
+    await expect(page.getByRole("region", { name: "Your order" }).locator("li")).toHaveCount(2);
+    await expect(page.locator('[data-bubble="model"]')).toHaveCount(1);
+    await expectTopEdgeFaded(phone, "D2 hero 1280");
+    await say("That's all. I'll pay.");
+    await page.getByRole("button", { name: "Yes, pay now" }).click();
+    await page.getByRole("button", { name: "Kiosk: insert card (demo)" }).click();
+    await page.getByRole("button", { name: "출력 안 함" }).click();
+    await expect(page.locator("[data-demo-end]")).toBeVisible();
+    for (const vp of [SIZES[0], SIZES[1]]) {
+      await page.setViewportSize(vp);
+      await expectTopEdgeFaded(phone, `D3 ${vp.width}`);
+    }
+    await expectTopFaded(phone, "D3 1366");
+    await page.unroute("**/api/chat");
+
+    // The scenario guide after steps 1 and 2 at 1280×720: [All scenarios] was cut 32 of 60px.
+    await page.setViewportSize(SIZES[0]);
+    await page.setExtraHTTPHeaders({ "X-Forwarded-For": "192.0.2.131" });
+    s = await start(page);
+    await openScenarios(page);
+    await expectTopEdgeFaded(guide, "scenario list 1280");
+    const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
+    await page.locator('[data-scenario="sunja-lunch"]').click();
+    s = (await (await created).json()) as DemoSession;
+    await command(request, s.deviceToken, { sessionId: s.sessionId, type: "setDineOption", args: { option: "eat_in" }, source: "button" });
+    let lineIds: string[] = [];
+    await page.route("**/api/chat", async (route) => {
+      const { message } = route.request().postDataJSON() as { message: string };
+      if (message.startsWith("Two cheeseburger sets")) {
+        for (const a of HERO_ACTIONS) {
+          const r = await command(request, s.deviceToken, { sessionId: s.sessionId, type: a.tool, args: a.args, source: "text", utteranceSeq: ++seq });
+          lineIds = (r.cart as { lineId: string }[]).map((l) => l.lineId);
+        }
+      } else {
+        for (const lineId of lineIds)
+          await command(request, s.deviceToken, { sessionId: s.sessionId, type: "updateCart", args: { lineId, changes: { selections: { side: ["fries_l"] } } }, source: "text", utteranceSeq: ++seq });
+      }
+      await route.fulfill({ json: { ok: true, reply: "Done.", status: "ordering", cart: [], total: 0, cartVersion: 0, actions: [] } });
+    });
+    const steps = page.locator("[data-scenario-guide] [data-scenario-step]");
+    await steps.nth(0).getByRole("button").click();
+    await expect(page.locator('[data-scenario-step][data-done="true"]')).toHaveCount(1);
+    await expectTopEdgeFaded(guide, "Sunja step 1 1280");
+    await steps.nth(1).getByRole("button").click();
+    await expect(page.locator('[data-scenario-step][data-done="true"]')).toHaveCount(2);
+    await expectTopFaded(guide, "Sunja step 2 1280");
+    await page.unroute("**/api/chat");
+
+    // The learned pizza kiosk's review at 1440 and 1920: a bubble and the kiosk's hint were cut mid-line (13 of 30px).
+    for (const [i, vp] of [SIZES[2], SIZES[3]].entries()) {
+      await page.setViewportSize(vp);
+      await page.setExtraHTTPHeaders({ "X-Forwarded-For": `192.0.2.${132 + i}` });
+      s = await start(page, "doughhouse");
+      await command(request, s.deviceToken, { sessionId: s.sessionId, type: "setDineOption", args: { option: "eat_in" }, source: "button" });
+      await expect(page.locator("[data-learned-widget]")).toHaveAttribute("data-bridge-ok", "true");
+      await page.route("**/api/chat", async (route) => {
+        const { message } = route.request().postDataJSON() as { message: string };
+        const add = /pepperoni/i.test(message);
+        if (add)
+          await command(request, s.deviceToken, {
+            sessionId: s.sessionId,
+            type: "addToCart",
+            args: { itemId: "pepperoni", qty: 1, selections: { size: ["large"], dough: ["thin"], toppings: ["bacon"] } },
+            source: "text",
+            utteranceSeq: ++seq,
+          });
+        else await command(request, s.deviceToken, { sessionId: s.sessionId, type: "requestCheckout", source: "text", utteranceSeq: ++seq });
+        const reply = add ? "Added one large Pepperoni with thin dough and bacon." : "Please check your order.";
+        await route.fulfill({ json: { ok: true, reply, status: add ? "ordering" : "confirming", cart: [], total: 0, cartVersion: 0, actions: [] } });
+      });
+      await say("One large pepperoni, thin dough, with bacon.");
+      await expect(page.locator("[data-learned-widget]")).toContainText("Added: Pepperoni");
+      await say("That's all. I'll pay.");
+      await expect(page.locator("[data-demo-end]")).toBeVisible();
+      await expectTopEdgeFaded(phone, `pizza D3 ${vp.width}`);
+      await page.unroute("**/api/chat");
     }
   });
 });

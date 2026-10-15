@@ -77,6 +77,46 @@ export async function expectPhoneEdgeFaded(page: Page, what: string): Promise<vo
     .toBe("ok");
 }
 
+/**
+ * A scroll area's top edge (#1 32), the mirror of `phoneEdge`: whether content is above it (more than the area's own
+ * top padding, which hides nothing), whether its top fade shows there (32px, on the edge), whether that fade shows
+ * anywhere else, and the text lines the edge cuts outside a shown fade. A line taller than the fade (the 120px order
+ * number) cannot lie under it; the fade on its edge is what says it goes on.
+ */
+export function topEdge(area: Locator) {
+  return area.evaluate((el) => {
+    const r = el.getBoundingClientRect();
+    const fade = el.querySelector(":scope > [data-scroll-fade-top]");
+    const fr = fade?.getBoundingClientRect() ?? null;
+    const visible = fade !== null && parseFloat(getComputedStyle(fade).opacity) > 0.9;
+    const shown = visible && fr !== null && fr.height >= 24 && Math.abs(fr.top - r.top) <= 1;
+    const uncovered: string[] = [];
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      if (!(n.textContent ?? "").trim()) continue;
+      const range = document.createRange();
+      range.selectNodeContents(n);
+      for (const line of range.getClientRects()) {
+        if (line.width === 0 || line.bottom <= r.top + 0.5 || line.top >= r.top - 0.5) continue;
+        if (!(shown && (line.bottom <= fr!.bottom + 0.5 || line.height > fr!.height)))
+          uncovered.push(`${n.textContent?.trim().slice(0, 30)} (${Math.round(line.bottom - r.top)}px shown)`);
+      }
+    }
+    const above = el.scrollTop > parseFloat(getComputedStyle(el).paddingTop) + 1;
+    return { above, shown, stray: visible && !shown, uncovered };
+  });
+}
+
+/** While content is above, the area starts in its top fade, and no line is cut at that edge outside it; at the top, no fade. */
+export async function expectTopEdgeFaded(area: Locator, what: string): Promise<void> {
+  await expect
+    .poll(async () => {
+      const e = await topEdge(area);
+      return e.uncovered.length === 0 && (!e.above || e.shown) && !e.stray ? "ok" : JSON.stringify(e);
+    }, { message: `${what}: the top edge cuts nothing outside a shown fade, and no top fade lies anywhere else` })
+    .toBe("ok");
+}
+
 export function kioskRoot(page: Page): Locator {
   return page.locator("[data-screen]").first();
 }

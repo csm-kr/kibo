@@ -203,6 +203,7 @@ export function ScenarioGuide(props: Props) {
       >
         {/* As tall as its content and scrolls past it, so one scenario card leaves no empty panel under it (#1 12). */}
         <div id="demo-scenario-guide" lang={locale} className="flex min-h-0 scroll-pb-8 flex-col gap-4 overflow-y-auto px-4 pt-2 pb-4 text-ink">
+          <ScrollFade edge="top" className="-top-2 -mx-4 -mb-12 to-white" />
           {body}
           <ScrollFade className="-bottom-4 -mx-4 -mt-12 to-white" />
         </div>

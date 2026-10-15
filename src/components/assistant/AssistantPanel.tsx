@@ -773,6 +773,8 @@ function Scroll({ children }: { children: ReactNode }) {
       }}
       className="flex min-h-0 flex-1 scroll-pb-8 flex-col gap-4 overflow-y-auto px-4 py-6 focus-visible:outline-[3px] focus-visible:-outline-offset-[3px] focus-visible:outline-ink"
     >
+      {/* And lines cut at the top edge read as "more above" (#1 32). */}
+      <ScrollFade edge="top" className="-top-6 -mx-4 -mb-12 to-cream" />
       {children}
       {/* Lines cut at the bottom edge read as "more below", not as broken (#1 2-phone, I-281). */}
       <ScrollFade className="-bottom-6 -mx-4 -mt-12 to-cream" />
