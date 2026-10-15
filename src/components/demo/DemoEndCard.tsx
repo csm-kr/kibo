@@ -23,13 +23,18 @@ export function DemoEndCard(props: {
   // The phone column is short on a laptop, so the next steps are brought into view when the card appears; a judge
   // should never have to hunt for them (14-final:1). "nearest" moves nothing when they already show. The same when
   // the window then narrows: under the /demo top bar the column lost the room that kept them in view (#1 E, #1 14).
+  // The learned kiosk's card is taller (its "never pays" line, [Try again], the replay link and the places) than the
+  // column at 1280×720, so it keeps its own top in view instead, and the phone's fade says the places are below (#1 25).
   const othersRef = useRef<HTMLElement>(null);
+  const learnedRef = useRef<HTMLElement>(null);
   useEffect(() => {
-    const others = othersRef.current;
-    if (!others) return;
-    const keep = () => others.scrollIntoView({ block: "nearest" });
+    const learnedCard = learnedRef.current;
+    const target = learnedCard ?? othersRef.current;
+    if (!target) return;
+    const area = target.closest("[data-phone-scroll]");
+    const keep = () =>
+      target.scrollIntoView({ block: learnedCard && area && learnedCard.offsetHeight > area.clientHeight ? "start" : "nearest" });
     keep();
-    const area = others.closest("[data-phone-scroll]");
     if (!area) return;
     const resize = new ResizeObserver(keep);
     resize.observe(area);
@@ -49,7 +54,7 @@ export function DemoEndCard(props: {
   );
   if (props.learned) {
     return (
-      <section data-demo-end className={`${CARD} flex flex-col gap-4`}>
+      <section ref={learnedRef} data-demo-end className={`${CARD} flex scroll-mt-6 flex-col gap-4`}>
         <p className="text-xl">{pt("learnedDemoEnd", locale)}</p>
         <button type="button" onClick={props.onTryAgain} className={PRIMARY}>
           {pt("tryAgain", locale)}

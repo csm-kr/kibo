@@ -616,8 +616,37 @@ test("D1 to D3 with the learned pizza kiosk", async ({ page, request }, info) =>
   await expect(widget).toContainText("Added: Pepperoni");
   await check(page, info, "D2-learned-added", undefined, judge);
 
+  // D3 first appears at the smallest judge size, then the window grows; at the end it narrows from 1440 to 1280 (#1 25).
+  await page.setViewportSize({ width: 1280, height: 720 });
   await ai("requestCheckout");
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "confirmLearned");
   await expect(page.locator("[data-demo-end]")).toBeVisible();
-  await check(page, info, "D3-learned-confirm", undefined, judge);
+  const sizes = [{ width: 1280, height: 720 }, { width: 1366, height: 768 }, VIEWPORTS[0], VIEWPORTS[2]];
+  await check(page, info, "D3-learned-confirm", learnedEndInView(page), sizes);
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await learnedEndInView(page)();
 });
+
+/**
+ * #1 25: the learned kiosk's end card. Its "never pays" line and [Try again] are whole, above the phone's bottom fade
+ * and 8px clear of the app bar's buttons (UI_QA target gaps); what does not fit below them lies under the fade.
+ */
+const learnedEndInView = (page: Page) => async () => {
+  const end = page.locator("[data-demo-end]");
+  await expect(end.getByText(pt("learnedDemoEnd", "en"))).toBeInViewport({ ratio: 1 });
+  await expect(end.getByRole("button", { name: "Try again" })).toBeInViewport({ ratio: 1 });
+  await expect
+    .poll(() =>
+      end.evaluate((card) => {
+        const area = card.closest("[data-phone-scroll]")!;
+        const fade = area.querySelector(":scope > [data-scroll-fade]");
+        const shown = fade !== null && parseFloat(getComputedStyle(fade).opacity) > 0.9;
+        const floor = shown ? fade.getBoundingClientRect().top : area.getBoundingClientRect().bottom;
+        const button = [...card.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Try again")!.getBoundingClientRect();
+        const bar = Math.max(...[...document.querySelectorAll("[data-phone-screen] header button")].map((b) => b.getBoundingClientRect().bottom));
+        return { gapToAppBar: button.top - bar >= 8, aboveFade: button.bottom <= floor + 0.5 };
+      }),
+    )
+    .toEqual({ gapToAppBar: true, aboveFade: true });
+  await expectPhoneEdgeFaded(page, "D3 learned");
+};
