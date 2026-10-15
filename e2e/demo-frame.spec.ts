@@ -1,5 +1,6 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
 import { command } from "./helpers";
+import { HERO_ACTIONS, MIXED_ACTIONS } from "./recordedActions";
 
 // The /demo frame (issue #1 batch E, mockup A "Clean studio"): a slim top bar with the place tabs over D1, D2 and D3,
 // and three white column cards. Measured in CSS px at the judge sizes; no model calls (/api/chat is answered by the test).
@@ -193,6 +194,141 @@ test.describe(() => {
         document.documentElement.scrollHeight - document.documentElement.clientHeight,
       ]);
       expect(scroll, `${at}: page scroll`).toEqual([0, 0]);
+    }
+  });
+});
+
+const third = (page: Page) => page.locator("[data-scenario-guide]");
+const tab = (page: Page, name: "Scenarios" | "What the AI did") => third(page).getByRole("tab", { name: new RegExp(`^${name}`) });
+
+/** Answers the next /api/chat with these tool calls, made through the API as the agent would (no model). */
+async function answerChat(page: Page, request: APIRequestContext, s: DemoSession, actions: typeof HERO_ACTIONS, seq: number) {
+  await page.unroute("**/api/chat");
+  await page.route("**/api/chat", async (route) => {
+    for (const a of actions) {
+      if (a.code !== "ok" || a.tool !== "addToCart") continue;
+      await command(request, s.deviceToken, { sessionId: s.sessionId, type: a.tool, args: a.args, source: "text", utteranceSeq: seq });
+    }
+    await route.fulfill({
+      json: {
+        ok: true,
+        reply: "Added one Cheeseburger set with Zero cola and no pickles, and one Cheeseburger set with Cider. Would you like anything else?",
+        status: "ordering",
+        cart: [],
+        total: 0,
+        cartVersion: 2,
+        actions,
+      },
+    });
+  });
+}
+
+async function say(page: Page, text: string) {
+  await page.getByRole("textbox", { name: "Type your order" }).fill(text);
+  await page.getByRole("button", { name: "Send", exact: true }).click();
+}
+
+test.describe(() => {
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.93" } });
+
+  test("the third column is one panel with two tabs that switch by keyboard (#1 E)", async ({ page }) => {
+    await start(page);
+    const list = third(page).getByRole("tablist");
+    await expect(list.getByRole("tab")).toHaveText(["Scenarios", "What the AI did"]);
+    await expect(tab(page, "Scenarios")).toHaveAttribute("aria-selected", "true");
+    await expect(tab(page, "What the AI did")).toHaveAttribute("aria-selected", "false");
+    // Roving focus: only the selected tab is in the tab order.
+    await expect(tab(page, "Scenarios")).toHaveAttribute("tabindex", "0");
+    await expect(tab(page, "What the AI did")).toHaveAttribute("tabindex", "-1");
+    const scenarios = page.getByRole("tabpanel", { name: "Scenarios" });
+    await expect(scenarios).toBeVisible();
+    await expect(scenarios.locator("[data-scenario]").first()).toBeVisible();
+
+    await tab(page, "Scenarios").focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(tab(page, "What the AI did")).toBeFocused();
+    await expect(tab(page, "What the AI did")).toHaveAttribute("aria-selected", "true");
+    const ai = page.getByRole("tabpanel", { name: /^What the AI did/ });
+    await expect(ai).toBeVisible();
+    await expect(ai).toContainText("Gemini decides; the KIBO server checks every action");
+    await expect(scenarios).toBeHidden();
+    // It wraps around, and Home and End go to the ends.
+    await page.keyboard.press("ArrowRight");
+    await expect(tab(page, "Scenarios")).toBeFocused();
+    await expect(scenarios).toBeVisible();
+    await page.keyboard.press("End");
+    await expect(tab(page, "What the AI did")).toHaveAttribute("aria-selected", "true");
+    await page.keyboard.press("Home");
+    await expect(tab(page, "Scenarios")).toHaveAttribute("aria-selected", "true");
+    await page.keyboard.press("ArrowLeft");
+    await expect(tab(page, "What the AI did")).toBeFocused();
+    await expect(ai).toBeVisible();
+    // Tab leaves the tablist for the panel's content (the rows scroll with the keyboard, I-067).
+    await page.keyboard.press("Tab");
+    await expect(page.locator("#demo-actions")).toBeFocused();
+  });
+
+  test("the first tool call of an order switches to 'What the AI did' once; switching back sticks (#1 E)", async ({ page, request }) => {
+    const s = await start(page);
+    await command(request, s.deviceToken, { sessionId: s.sessionId, type: "setDineOption", args: { option: "eat_in" }, source: "button" });
+    await expect(page.locator('[data-phone-screen="talk"]')).toBeVisible();
+    await expect(tab(page, "Scenarios")).toHaveAttribute("aria-selected", "true");
+
+    // A reply with no tool call leaves the scenarios as they are.
+    await page.route("**/api/chat", (route) =>
+      route.fulfill({ json: { ok: true, reply: "Hello.", status: "ordering", cart: [], total: 0, cartVersion: 0, actions: [] } }),
+    );
+    await say(page, "Hello");
+    await expect(page.locator('[data-bubble="model"]')).toHaveCount(1);
+    await expect(tab(page, "Scenarios")).toHaveAttribute("aria-selected", "true");
+
+    // The first tool call: the judge sees the AI's work without looking for it.
+    await answerChat(page, request, s, HERO_ACTIONS, 1);
+    await say(page, "Two cheeseburger sets. One without pickles; drinks zero cola and cider.");
+    await expect(tab(page, "What the AI did")).toHaveAttribute("aria-selected", "true");
+    await expect(tab(page, "What the AI did").locator("[data-action-count]")).toHaveText("2");
+    await expect(page.getByRole("tabpanel", { name: /^What the AI did/ }).getByRole("listitem")).toHaveCount(2);
+
+    // Back to the scenarios: later tool calls in this order never take it away again.
+    await tab(page, "Scenarios").click();
+    await answerChat(page, request, s, MIXED_ACTIONS, 2);
+    await say(page, "And more");
+    await expect(tab(page, "What the AI did").locator("[data-action-count]")).toHaveText(String(2 + MIXED_ACTIONS.length));
+    await expect(tab(page, "Scenarios")).toHaveAttribute("aria-selected", "true");
+
+    // A fresh order (a chosen scenario) switches once more on its own first tool call.
+    const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
+    await page.locator('[data-scenario="sunja-lunch"]').click();
+    const next = (await (await created).json()) as DemoSession;
+    await command(request, next.deviceToken, { sessionId: next.sessionId, type: "setDineOption", args: { option: "eat_in" }, source: "button" });
+    await expect(tab(page, "What the AI did").locator("[data-action-count]")).toHaveCount(0);
+    await answerChat(page, request, next, HERO_ACTIONS, 1);
+    await third(page).locator('[data-scenario-step="0"]').getByRole("button").click();
+    await expect(tab(page, "What the AI did")).toHaveAttribute("aria-selected", "true");
+  });
+});
+
+test.describe(() => {
+  test("right after the hero order, the order's total and the first 'What the AI did' row are both fully in view (#1 E, #1 18, R-023)", async ({ page, request }) => {
+    for (const [i, vp] of SIZES.entries()) {
+      // A fresh order at each size, each from its own address (R-005).
+      await page.setExtraHTTPHeaders({ "X-Forwarded-For": `192.0.2.${94 + i}` });
+      await page.setViewportSize(vp);
+      const s = await start(page);
+      await page.locator("[data-phone-screen]").getByRole("button", { name: "Eat here" }).click();
+      await expect(page.locator('[data-phone-screen="talk"]')).toBeVisible();
+      await answerChat(page, request, s, HERO_ACTIONS, 1);
+      await say(page, "Two cheeseburger sets. One without pickles; drinks zero cola and cider.");
+      await expect(page.getByRole("region", { name: "Your order" }).locator("li")).toHaveCount(2);
+      const at = `${vp.width}x${vp.height}`;
+      const summary = page.locator("[data-cart-summary]");
+      const total = page.getByRole("region", { name: "Your order" }).getByText("₩13,800", { exact: true });
+      await expect(async () => {
+        await expect((await summary.isVisible()) ? summary : total, `${at}: summary pill or card total`).toBeInViewport({ ratio: 1, timeout: 1_000 });
+      }).toPass({ timeout: 10_000 });
+      const row = page.getByRole("tabpanel", { name: /^What the AI did/ }).getByRole("listitem").first();
+      await expect(row, `${at}: first row of What the AI did`).toBeInViewport({ ratio: 1 });
+      await page.unroute("**/api/chat");
     }
   });
 });

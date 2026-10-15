@@ -244,9 +244,12 @@ test.describe(() => {
     await expect(guide.locator('[data-scenario-step][data-done="true"]')).toHaveCount(1);
     const strip = page.locator("[data-action-strip]");
     await expect(strip.getByRole("listitem")).toHaveCount(HERO_ACTIONS.length);
+    // The step's tool calls switched the third column to "What the AI did" (#1 E).
+    await expect(guide.getByRole("tab", { name: /^What the AI did/ })).toHaveAttribute("aria-selected", "true");
     await check(page, info, "D2-actions-open", undefined, [VIEWPORTS[0]]);
 
-    await strip.getByRole("button", { name: /What the AI did/ }).click();
+    // Back on the Scenarios tab, the other tab keeps the count.
+    await openScenarios(page);
     await check(page, info, "D2-actions-collapsed", undefined, [VIEWPORTS[1]]);
   });
 });
@@ -504,6 +507,8 @@ test.describe(() => {
     let seq = 1;
     const ai = (type: string, args: object) =>
       command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "text", utteranceSeq: ++seq });
+    // The step's tool call switched the third column to "What the AI did" (#1 E); back to the guide.
+    await openScenarios(page);
     await ai("addToCart", { itemId: "express_city_center", variant: "single", qty: 1, selections: { passenger: ["child"] } });
     await ai("requestCheckout", {});
     await expect(guide.locator("[data-scenario-your-turn]")).toBeVisible();

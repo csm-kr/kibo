@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import type { SayFn } from "@/components/assistant/AssistantPanel";
 import { Check } from "lucide-react";
 import { FOCUS, PRESS, PRIMARY, SECONDARY } from "@/components/phone/ui";
@@ -9,7 +9,7 @@ import { scenarioProgress, scenariosFor, type Scenario } from "@/lib/demo/scenar
 import { playStep, pt, type PhoneTextKey } from "@/lib/i18n/phone";
 import type { KioskData, Locale } from "@/types/menu";
 import type { Session } from "@/types/session";
-import { Caption, COLUMN, COLUMN_HEAD } from "./column";
+import { Caption, COLUMN, COLUMN_HEAD, ColumnNumber, FOCUS_INSIDE } from "./column";
 import { ScrollFade } from "./ScrollFade";
 
 // D2 scenario guide (docs/UX.md Flow C): the third column card beside the phone, at every judge size (#1 E), lists
@@ -46,9 +46,17 @@ interface Props {
   onFresh(): void;
   /** The column's width (the caller lays out the three columns). */
   className: string;
-  /** "What the AI did", under the guide in this column (I-084); none with the judge's own phone. */
-  aside?: ReactNode;
+  /**
+   * "What the AI did" behind the column's second tab, with its count (#1 E); none with the judge's own phone, whose
+   * messages and tool calls happen on that phone. The caller holds the selected tab, so the first tool call of an
+   * order can switch to it once.
+   */
+  ai?: { panel: ReactNode; count: number; tab: SideTab; onTab(tab: SideTab): void };
 }
+
+/** The third column's tabs: the scenarios, or what the AI did. */
+export type SideTab = "scenarios" | "ai";
+const TABS: SideTab[] = ["scenarios", "ai"];
 
 export function ScenarioGuide(props: Props) {
   const { locale } = props;
@@ -119,23 +127,87 @@ export function ScenarioGuide(props: Props) {
   }
 
   if (scenarios.length === 0) return null;
+  const { ai } = props;
+  const tab = ai?.tab ?? "scenarios";
+  const tabId = (t: SideTab) => `demo-tab-${t}`;
+  const panelId = (t: SideTab) => `demo-panel-${t}`;
+  // ARIA tabs (APG): the arrows move to the other tab and select it, Home and End go to the ends; only the selected
+  // tab is in the tab order.
+  function onKeyDown(e: KeyboardEvent) {
+    if (!ai) return;
+    const at = TABS.indexOf(tab);
+    const next =
+      e.key === "ArrowRight" ? TABS[(at + 1) % TABS.length]
+      : e.key === "ArrowLeft" ? TABS[(at + TABS.length - 1) % TABS.length]
+      : e.key === "Home" ? TABS[0]
+      : e.key === "End" ? TABS[TABS.length - 1]
+      : null;
+    if (!next) return;
+    e.preventDefault();
+    ai.onTab(next);
+    document.getElementById(tabId(next))?.focus();
+  }
+
   return (
-    <section data-demo-column data-scenario-guide aria-labelledby="demo-guide-caption" className={`${COLUMN} ${props.className}`}>
+    <section data-demo-column data-scenario-guide aria-labelledby={ai ? undefined : "demo-guide-caption"} className={`${COLUMN} ${props.className}`}>
       <div className={COLUMN_HEAD}>
-        <Caption id="demo-guide-caption" n={3} name={pt("scenarios", locale)} />
+        {ai ? (
+          // The tabs are this column's caption: "3 Scenarios | What the AI did 2" (mockup A).
+          <div data-column-caption className="flex min-w-0 flex-1 items-center gap-3 self-stretch">
+            <ColumnNumber n={3} />
+            <div role="tablist" aria-label={`${pt("scenarios", locale)}, ${pt("aiActions", locale)}`} onKeyDown={onKeyDown} className="flex gap-4 self-stretch">
+              {TABS.map((t) => {
+                const selected = t === tab;
+                return (
+                  <button
+                    key={t}
+                    type="button"
+                    role="tab"
+                    id={tabId(t)}
+                    aria-selected={selected}
+                    aria-controls={panelId(t)}
+                    tabIndex={selected ? 0 : -1}
+                    onClick={() => ai.onTab(t)}
+                    className={`relative flex min-w-14 items-center gap-2 rounded-tile text-base ${
+                      selected ? "font-bold text-ink" : "font-semibold text-muted"
+                    } ${FOCUS_INSIDE}`}
+                  >
+                    {pt(t === "scenarios" ? "scenarios" : "aiActions", locale)}
+                    {t === "ai" && ai.count > 0 && (
+                      <span data-action-count className="flex h-7 min-w-7 items-center justify-center rounded-full bg-kibo-tint px-2 text-base font-bold text-kibo-deep tabular-nums">
+                        {ai.count}
+                      </span>
+                    )}
+                    {/* Selected: a 3px KIBO-blue bar on the row's hairline and bold ink text, never color alone. */}
+                    {selected && <span aria-hidden className="absolute inset-x-0 bottom-0 h-[3px] rounded-t-full bg-kibo" />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          <Caption id="demo-guide-caption" n={3} name={pt("scenarios", locale)} />
+        )}
       </div>
-      <div className="flex min-h-0 flex-1 flex-col gap-2">
+      {/* Both panels stay mounted, so a scenario playing on keeps playing while the other tab shows. */}
+      <div
+        role={ai ? "tabpanel" : undefined}
+        id={panelId("scenarios")}
+        aria-labelledby={ai ? tabId("scenarios") : undefined}
+        hidden={tab !== "scenarios"}
+        className="flex min-h-0 flex-1 flex-col"
+      >
         {/* As tall as its content and scrolls past it, so one scenario card leaves no empty panel under it (#1 12). */}
-        <div
-          id="demo-scenario-guide"
-          lang={locale}
-          className="flex min-h-0 scroll-pb-8 flex-col gap-4 overflow-y-auto px-4 pt-4 pb-4 text-ink"
-        >
+        <div id="demo-scenario-guide" lang={locale} className="flex min-h-0 scroll-pb-8 flex-col gap-4 overflow-y-auto p-4 text-ink">
           {body}
           <ScrollFade className="-bottom-4 -mx-4 -mt-12 to-white" />
         </div>
-        {props.aside}
       </div>
+      {ai && (
+        <div role="tabpanel" id={panelId("ai")} aria-labelledby={tabId("ai")} hidden={tab !== "ai"} className="flex min-h-0 flex-1 flex-col">
+          {ai.panel}
+        </div>
+      )}
     </section>
   );
 }

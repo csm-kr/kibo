@@ -312,7 +312,8 @@ function scenarioClip(name: string, kioskId: string, scenarioId: string, dine: b
         for (const [i, step] of scenario.steps.entries()) {
           await say(page, step.say.en);
           await watch.until(`step ${i + 1}`, check(step.done));
-          await page.locator(`[data-scenario-step="${i}"][data-done="true"]`).waitFor();
+          // Attached, not visible: the first tool call switches the third column to "What the AI did" (#1 E).
+          await page.locator(`[data-scenario-step="${i}"][data-done="true"]`).waitFor({ state: "attached" });
           await rec.mark(`step-${i + 1}`);
         }
         if (!payable) {

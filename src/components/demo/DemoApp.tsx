@@ -25,7 +25,7 @@ import { DemoEndCard } from "./DemoEndCard";
 import { DemoFrame } from "./DemoFrame";
 import { DemoIntro } from "./DemoIntro";
 import { environmentOf } from "./environments";
-import { ScenarioGuide } from "./ScenarioGuide";
+import { ScenarioGuide, type SideTab } from "./ScenarioGuide";
 
 // /demo (docs/UX.md Flow C, screen map D1–D3): the real KioskScreen (or a learned kiosk page with the bridge) and
 // AssistantPanel on one real session. Nothing is recorded or simulated beyond the card reader, and the stand-in goes
@@ -79,6 +79,9 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
   const learned = kiosk.kind === "learned";
   // What the AI did in this demo order; another session id means [Try again] started a new one.
   const [actions, setActions] = useState<{ sessionId: string; list: AgentAction[] }>({ sessionId: "", list: [] });
+  // The third column's tab. The first tool call of each order switches it to "What the AI did" once, so a judge sees
+  // the AI's work without looking for it; a switch back sticks for that order (#1 E).
+  const [side, setSide] = useState<{ tab: SideTab; switchedFor: string | null }>({ tab: "scenarios", switchedFor: null });
 
   const [run, setRun] = useState<Run | null>(null);
   // The session whose order number the kiosk shows (past its receipt question), for the English step line.
@@ -143,9 +146,7 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
   // own K7 takes the card) nor on a learned kiosk (its page has its own strip).
   const guided = !ownPhone && !learned;
   const step = guided && session ? demoKioskStep(kiosk, session, numberShown) : null;
-  const actionStrip = (
-    <ActionStrip kiosk={kiosk} actions={actions.sessionId === tokens.sessionId ? actions.list : []} locale={locale} />
-  );
+  const actionList = actions.sessionId === tokens.sessionId ? actions.list : [];
   const endCard = (
     <DemoEndCard kioskId={kiosk.kioskId} locale={locale} learned={learned} compare={compare} onTryAgain={tryAgain} onIntro={demo.stop} />
   );
@@ -315,12 +316,15 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
                   endCard={endCard}
                   onSay={onSay}
                   onUserTurn={() => count("sentences")}
-                  onActions={(list) =>
+                  onActions={(list) => {
                     setActions((prev) => ({
                       sessionId: tokens.sessionId,
                       list: [...(prev.sessionId === tokens.sessionId ? prev.list : []), ...list].slice(-MAX_ACTIONS),
-                    }))
-                  }
+                    }));
+                    if (list.length > 0) {
+                      setSide((t) => (t.switchedFor === tokens.sessionId ? t : { tab: "ai", switchedFor: tokens.sessionId }));
+                    }
+                  }}
                 />
               </div>
             </section>
@@ -337,7 +341,16 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
             onFresh={tryAgain}
             className={learned ? "min-w-80 flex-1" : "w-[clamp(320px,26vw,400px)] flex-none"}
             // The judge's own phone: its messages and the AI's tool calls happen on that phone, so there is nothing to list.
-            aside={ownPhone ? undefined : actionStrip}
+            ai={
+              ownPhone
+                ? undefined
+                : {
+                    panel: <ActionStrip kiosk={kiosk} actions={actionList} locale={locale} />,
+                    count: actionList.length,
+                    tab: side.tab,
+                    onTab: (tab) => setSide((t) => ({ ...t, tab })),
+                  }
+            }
           />
         </main>
       </DemoFrame>

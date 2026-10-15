@@ -113,6 +113,8 @@ test.describe(() => {
     await expectFadeAtEdge(guide, "scenario list 1440");
 
     await sunjaStepOne(page, request);
+    // The step's tool calls switched the column to "What the AI did" (#1 E); back to the guide.
+    await openScenarios(page);
     for (const vp of [SIZES[0], SIZES[3]]) {
       await page.setViewportSize(vp);
       await expectFadeAtEdge(guide, `Sunja step 1 ${vp.width}`);
@@ -128,6 +130,7 @@ test.describe(() => {
     await page.getByRole("button", { name: "Send", exact: true }).click();
     const rows = page.locator("[data-action-strip] li");
     await expect(rows).toHaveCount(HERO_ACTIONS.length + MIXED_ACTIONS.length);
+    await page.locator("[data-scenario-guide]").getByRole("tab", { name: /^What the AI did/ }).click();
     await expectFadeAtEdge(page.locator("#demo-actions"), "What the AI did 1440");
   });
 });
