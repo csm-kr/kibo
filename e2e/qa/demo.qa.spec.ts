@@ -87,16 +87,40 @@ test("D1 to D3", async ({ page, request }, info) => {
   await check(page, info, "D2-voice-fallback");
   await page.unroute("**/api/live-token");
 
-  const ai = (type: string, args: object, utteranceSeq: number) =>
-    command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "voice", utteranceSeq });
+  const ai = (type: string, args: object, utteranceSeq: number, source = "voice") =>
+    command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source, utteranceSeq });
   await ai("setDineOption", { option: "eat_in" }, 1);
-  // A new line per viewport, so each screenshot (taken first) falls inside its own 2 s highlight.
-  const drinks = ["zero_cola", "cider", "cola"];
   let seq = 1;
+  // The order is typed into the phone half, and the test answers /api/chat (no model) with what the agent would do,
+  // as e2e/qa/assistant.qa.spec.ts does, so D3's Touch vs talk counts this order's real messages (#1 item 16).
+  const turns: { type: string; args: object; reply: string; status: string }[] = [];
+  await page.route("**/api/chat", async (route) => {
+    const turn = turns.shift()!;
+    await ai(turn.type, turn.args, ++seq, "text");
+    await route.fulfill({ json: { ok: true, reply: turn.reply, status: turn.status, cart: [], total: 0, cartVersion: 0, actions: [] } });
+  });
+  const say = async (text: string, turn: (typeof turns)[number]) => {
+    turns.push(turn);
+    await page.getByRole("textbox", { name: "Type your order" }).fill(text);
+    await page.getByRole("button", { name: "Send", exact: true }).click();
+    await expect(page.locator('[data-bubble="model"]').last()).toContainText(turn.reply);
+  };
+  // A new line per viewport, so each screenshot (taken first) falls inside its own 2 s highlight.
+  const drinks = [
+    ["zero_cola", "zero cola", "Zero cola"],
+    ["cider", "cider", "Cider"],
+    ["cola", "cola", "Cola"],
+  ];
+  let lines = 0;
   await check(page, info, "D2-ai-highlight", async () => {
-    const drink = drinks[seq - 1];
-    await ai("addToCart", { itemId: "cheese_burger", variant: "set", qty: 1, selections: { drink: [drink] } }, seq++);
-    await expect(page.getByRole("region", { name: "Your order" }).locator("li")).toHaveCount(seq - 1);
+    const [drink, said, name] = drinks[lines++];
+    await say(`One cheeseburger set with ${said}`, {
+      type: "addToCart",
+      args: { itemId: "cheese_burger", variant: "set", qty: 1, selections: { drink: [drink] } },
+      reply: `Added one Cheeseburger set with ${name}.`,
+      status: "ordering",
+    });
+    await expect(page.getByRole("region", { name: "Your order" }).locator("li")).toHaveCount(lines);
     await expect(page.locator("[data-kiosk-subtitle]")).toContainText("AI added: Cheeseburger set");
   });
 
@@ -111,7 +135,7 @@ test("D1 to D3", async ({ page, request }, info) => {
   await page.getByRole("dialog", { name: "Language and text size" }).getByRole("button", { name: "Close" }).click();
   await expect(phoneScreen(page)).not.toHaveAttribute("data-large-text", "true");
 
-  await ai("requestCheckout", {}, seq++);
+  await say("That's all. I'll pay.", { type: "requestCheckout", args: {}, reply: "Please check your order.", status: "confirming" });
   await expect(page.getByRole("heading", { name: "Please check your order" })).toBeVisible();
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "review");
   await check(page, info, "D2-confirm", payInView(page));
@@ -130,6 +154,8 @@ test("D1 to D3", async ({ page, request }, info) => {
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "done");
   await page.getByRole("button", { name: "출력 안 함" }).click();
   await expect(page.locator("[data-demo-end]")).toBeVisible();
+  // Touch vs talk counts this order's own messages to the AI, so the D3 screenshots must not say 0 (#1 item 16).
+  expect(Number(await page.locator('[data-compare="sentences"]').textContent())).toBeGreaterThanOrEqual(1);
   // The Touch vs talk card ran on under the phone's edge with nothing to say it scrolls (#1 2-phone).
   await check(page, info, "D3-done", () => expectPhoneEdgeFaded(page, "D3"));
 });
@@ -420,10 +446,29 @@ test.describe(() => {
     const ai = (type: string, args: object) =>
       command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "text", utteranceSeq: ++seq });
     await ai("setDineOption", { option: "eat_in" });
-    for (const drink of ["zero_cola", "cider"]) {
-      await ai("addToCart", { itemId: "cheese_burger", variant: "set", qty: 1, selections: { drink: [drink], side: ["fries_l"] } });
+    // Each step is sent from its chip, and the test answers /api/chat (no model) with what the agent would do, so D3's
+    // Touch vs talk counts the three messages (#1 item 16).
+    let lineIds: string[] = [];
+    await page.route("**/api/chat", async (route) => {
+      const { message } = route.request().postDataJSON() as { message: string };
+      let status = "ordering";
+      if (message.startsWith("Two cheeseburger sets")) {
+        for (const selections of [{ drink: ["zero_cola"], ingredients: ["no_pickles"] }, { drink: ["cider"] }]) {
+          const r = await ai("addToCart", { itemId: "cheese_burger", variant: "set", qty: 1, selections });
+          lineIds = (r.cart as { lineId: string }[]).map((l) => l.lineId);
+        }
+      } else if (message.startsWith("Make both fries large")) {
+        for (const lineId of lineIds) await ai("updateCart", { lineId, changes: { selections: { side: ["fries_l"] } } });
+      } else {
+        await ai("requestCheckout", {});
+        status = "confirming";
+      }
+      await route.fulfill({ json: { ok: true, reply: "Done.", status, cart: [], total: 0, cartVersion: 0, actions: [] } });
+    });
+    for (const [step, done] of [[0, 1], [1, 2], [2, 3]]) {
+      await guide.locator(`[data-scenario-step="${step}"]`).getByRole("button").click();
+      await expect(guide.locator('[data-scenario-step][data-done="true"]')).toHaveCount(done);
     }
-    await ai("requestCheckout", {});
     await expect(guide.locator("[data-scenario-your-turn]")).toBeVisible();
     await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "confirm");
     // R-009: the guide column must not push the total and [Yes, pay now] off screen.
@@ -440,6 +485,7 @@ test.describe(() => {
     await check(page, info, "D2-scenario-paying-guide", () => yourTurn.scrollIntoViewIfNeeded(), VIEWPORTS, DEMO_GUIDE);
     await page.getByRole("button", { name: "Kiosk: insert card (demo)" }).click();
     await expect(yourTurn).toHaveText("Paid. Choose another scenario to try more.");
+    expect(Number(await page.locator('[data-compare="sentences"]').textContent())).toBeGreaterThanOrEqual(1);
     await check(page, info, "D3-scenario-paid-guide", () => yourTurn.scrollIntoViewIfNeeded(), VIEWPORTS, DEMO_GUIDE);
   });
 });

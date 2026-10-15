@@ -27,7 +27,7 @@ for (const vp of [
   { width: 1440, height: 900 },
   { width: 1920, height: 1080 },
 ]) {
-  test(`/kiosk landscape ${vp.width}x${vp.height}: waiting, then connected`, async ({ page, request }, info) => {
+  test(`/kiosk landscape ${vp.width}x${vp.height}: waiting, then connected`, async ({ page, request, baseURL }, info) => {
     await page.setViewportSize(vp);
     await page.goto("/kiosk?k=malo");
     const panel = page.locator("[data-pairing-panel]");
@@ -38,7 +38,7 @@ for (const vp of [
     // SHORT_APP_URL is set on the QA server: the short host on one line (I-167); the claim URL keeps this server.
     await expect(panel.locator("[data-panel-pair-url]")).toHaveText("kibo-2026.web.app");
     expect(await textLines(panel.locator("[data-panel-pair-url]"))).toBe(1);
-    expect(new URL(url).origin).toBe("http://localhost:3200");
+    expect(new URL(url).origin).toBe(new URL(baseURL ?? "").origin);
     await check(page, info, "kiosk-pairing-waiting");
 
     const { deviceToken } = await (await claim(request, sessionId, claimToken)).json();

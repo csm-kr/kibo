@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { claim, command, kioskRoot, readClaim } from "../helpers";
+import { KIOSK, textSpacing } from "./checks";
 
 // Coordinate checks for the kiosk half (issue #1, batch A): what is cut, faded or moved, measured on the canvas
 // instead of judged on screenshots.
@@ -51,6 +52,40 @@ function bottomEdge(page: Page, selector: string) {
     return { more: el.scrollHeight - el.scrollTop - el.clientHeight > 1, fade };
   });
 }
+
+/**
+ * The K3 cart chips: each chip's text, how far it runs past the row's visible box (canvas px), and whether a line of
+ * it is cut short with an ellipsis.
+ */
+function cartChips(page: Page) {
+  return page
+    .getByRole("region", { name: "장바구니" })
+    .locator("ul")
+    .evaluate((ul) => {
+      const scale = ul.closest("[data-kiosk-canvas]")!.getBoundingClientRect().width / 1080;
+      const row = ul.getBoundingClientRect();
+      return [...ul.children].map((li) => {
+        const b = li.getBoundingClientRect();
+        return {
+          text: (li as HTMLElement).innerText.replace(/\n/g, " / "),
+          cut: Math.round(Math.max(0, b.right - row.right, row.left - b.left) / scale),
+          ellipsis: [...li.querySelectorAll("span")].some((s) => s.scrollWidth > s.clientWidth + 1),
+        };
+      });
+    });
+}
+
+/** Owner decision (b) for #1 item 1: a chip is the line's name ×qty over its price; options are on K6 and in KIBO's subtitle. */
+const HERO_CHIPS = ["치즈버거 세트 ×1 / 6,900원", "치즈버거 세트 ×1 / 6,900원"];
+
+test("K3: both hero cart chips are whole, name ×qty over the line price, with the WCAG 1.4.12 spacing too (#1 item 1)", async ({ page, request }) => {
+  await kioskWithHero(page, request);
+  const chips = await cartChips(page);
+  expect(chips.map((c) => c.text)).toEqual(HERO_CHIPS);
+  // The second chip was cut 59 canvas px into "감자튀김 M · 사이…" (I-244).
+  expect(chips.filter((c) => c.cut > 0 || c.ellipsis)).toEqual([]);
+  expect((await textSpacing(page, KIOSK)).h).toEqual([]);
+});
 
 const RAIL = "[data-kiosk-canvas] nav[aria-label]";
 const GRID = "[data-kiosk-canvas] nav[aria-label] + div";
@@ -171,6 +206,20 @@ for (const viewport of [
 ]) {
   test.describe(`/demo at ${viewport.width}x${viewport.height}`, () => {
     test.use({ viewport, extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.83" } });
+
+    test("K3: both hero cart chips are whole on the scaled kiosk (#1 item 1)", async ({ page, request }) => {
+      const s = await startDemo(page);
+      let seq = 0;
+      const ai = (type: string, args: object) =>
+        command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "voice", utteranceSeq: ++seq });
+      await ai("setDineOption", { option: "eat_in" });
+      for (const args of HERO) await ai("addToCart", args);
+      await expect(page.locator("[data-kiosk-subtitle]")).toBeVisible();
+      const chips = await cartChips(page);
+      expect(chips.map((c) => c.text)).toEqual(HERO_CHIPS);
+      expect(chips.filter((c) => c.cut > 0 || c.ellipsis)).toEqual([]);
+      await expect(page.getByRole("region", { name: "장바구니" }).locator("ul")).toBeInViewport({ ratio: 1 });
+    });
 
     test("the kiosk keeps one size and place from D2 to D3; its English step sits in a fixed area under it (#1 item 19)", async ({ page, request }) => {
       const s = await startDemo(page);

@@ -137,3 +137,8 @@ When an issue class in `docs/ISSUE.md` is seen for the **3rd time**, it becomes 
 - From: `stale-status` — I-144 (seen 10-13/10-assets:0), I-242 (10-14/14-final:8), I-306 (10-15/session)
 - Why: three times a KIBO line kept naming a step the user had already done (the scenario guide's "Your turn" after payment and after [Yes, pay now], the kiosk step line's receipt question under the order number), because it followed the session status alone and the status does not change at every step a person sees.
 - Check: a step or status line has a unit test with one case per screen it can sit beside, including the last one of the flow (`kioskStep` in `src/lib/kiosk/pairing.test.ts`; the "Your turn" lines in `e2e/demo-scenarios.spec.ts`); the QA walk reads the line at D3 after the order number shows.
+
+### R-025 (proposed): A row or area that scrolls shows whole items, or ends in a fade where it cuts; nothing is cut at its edge without one
+- From: `clipped-scroll-row` — I-244 (seen 10-14/14-final:8, 10-15/session), I-281 (10-15/session); the third token came with the merge of design-qa batches A and B (10-15)
+- Why: three times a scroll area cut its content at its edge with nothing saying more is there (the K3 cart chip "감자튀김 M · 사이…", the scenario guide and "What the AI did" mid-line, the phone's scroll area), which reads as broken on the judge screens and in the video.
+- Check: for each scroll row or area a step adds or changes, a Playwright box check at the judge sizes asserts that the items are whole (as #1 1 in `e2e/qa/kiosk-layout.qa.spec.ts` does) or that every item cut at the edge lies under a shown fade that takes no tap and is not a CSS mask (as #1 2 in `e2e/demo-layout.spec.ts` and #1 3 in `e2e/qa/kiosk-layout.qa.spec.ts` do).

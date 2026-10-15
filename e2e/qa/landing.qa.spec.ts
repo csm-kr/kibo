@@ -48,3 +48,43 @@ test("root landing page", async ({ page }, info) => {
     }
   }
 });
+
+// UI_GUIDE "Phone design": no 2px dark outlines anywhere, white cards with the soft shadow and no border (I-165).
+test("no dark 2px outlines; the cards and the secondary links follow the phone design (#1 item 7)", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("link", { name: "Two-device mode" })).toBeVisible({ timeout: 60_000 });
+  const look = await page.evaluate(() => {
+    const lum = (c: string) => {
+      const m = (c.match(/[\d.]+/g) ?? []).map(Number);
+      return m.length >= 4 && m[3] === 0 ? 255 : 0.2126 * m[0] + 0.7152 * m[1] + 0.0722 * m[2];
+    };
+    const name = (el: Element) => (el.textContent ?? "").trim().replace(/\s+/g, " ").slice(0, 40);
+    const outlines = [...document.querySelectorAll("main *")]
+      .filter((el) => el.checkVisibility())
+      .filter((el) => {
+        const cs = getComputedStyle(el);
+        const sides = (["Top", "Right", "Bottom", "Left"] as const).map((s) =>
+          cs.getPropertyValue(`border-${s.toLowerCase()}-style`) === "none" ? 0 : parseFloat(cs.getPropertyValue(`border-${s.toLowerCase()}-width`)),
+        );
+        return sides.every((w) => w >= 2) && lum(cs.borderTopColor) < 80;
+      })
+      .map((el) => `${el.tagName.toLowerCase()} "${name(el)}"`);
+    // White surfaces that hold content: the cards and the diagram's scroll box.
+    const cards = [...document.querySelectorAll("main *")]
+      .filter((el) => getComputedStyle(el).backgroundColor === "rgb(255, 255, 255)")
+      .map((el) => {
+        const cs = getComputedStyle(el);
+        return { card: name(el), border: cs.borderTopStyle === "none" ? "0px" : cs.borderTopWidth, shadow: cs.boxShadow !== "none" };
+      });
+    return { outlines, cards };
+  });
+  expect(look.outlines).toEqual([]);
+  expect(look.cards.length).toBeGreaterThan(0);
+  expect(look.cards.filter((c) => c.border !== "0px" || !c.shadow)).toEqual([]);
+  // Secondary links are kibo-tint with no border, like the phone's [Pick more].
+  for (const name of ["Two-device mode", "Try the burger shop", "Try the airport rail", "Try the pizza shop"]) {
+    const link = page.getByRole("link", { name, exact: true });
+    await expect(link, name).toHaveCSS("background-color", "rgb(238, 240, 253)");
+    await expect(link, name).toHaveCSS("border-top-width", "0px");
+  }
+});

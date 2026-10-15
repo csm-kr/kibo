@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { FOCUS, PRIMARY, SECONDARY } from "@/components/assistant/styles";
+import { CARD, FOCUS, PRIMARY, SECONDARY } from "@/components/phone/ui";
 import { DEMO_ENVIRONMENTS, demoHref } from "@/components/demo/environments";
 import { SESSION_TTL_MS } from "@/lib/commands/session";
 import { LEARN_ALL_ROUNDS, LEARN_HEADLINE, LEARN_HEADLINE_DETAIL } from "@/lib/learn/headline";
@@ -25,7 +25,6 @@ export const metadata: Metadata = {
 };
 
 const H2 = "font-display text-[28px] leading-tight font-bold text-[#15171C]";
-const CARD = "rounded-[18px] border border-[#E2DACB] bg-white p-6";
 const EVIDENCE = "text-base text-[#4B463F]";
 
 const PEOPLE = [
@@ -421,7 +420,7 @@ export default function Home() {
           role="region"
           aria-label="Architecture diagram, scrolls sideways on small screens"
           tabIndex={0}
-          className={`overflow-x-auto rounded-[18px] border border-[#E2DACB] bg-white p-4 ${FOCUS}`}
+          className={`${CARD} overflow-x-auto ${FOCUS}`}
         >
           <Architecture />
         </div>

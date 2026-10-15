@@ -4,7 +4,8 @@ import sharp from "sharp";
 
 // Copies recorded KIBO Learn runs into public/learn/<runId>/ for the /learn viewer (`npm run learn:runs`).
 // The trace is copied, never edited: every turn in order, its tools with labels only (no prompts, no model text),
-// its one-line result and its discovery counts. Screenshots are re-encoded to WebP <= 60 KB each.
+// its one-line result and its discovery counts. Screenshots are re-encoded to WebP <= 60 KB each. Afterwards run
+// `npx tsx scripts/learn-trim.ts`, which cuts the recording page's dark frame off the screenshots (GitHub #1 item 17).
 
 const OUT = "public/learn";
 const MAX_IMAGE_BYTES = 60 * 1024;

@@ -21,7 +21,8 @@ export interface LearnRun {
   noDemoReason?: string;
   /**
    * The recorded turn whose screenshot is the card picture, what it shows, and the part of it shown (screenshot
-   * pixels): a whole kiosk shrunk to a card was unreadable (I-198), one sheet at about its recorded size is not.
+   * pixels, after `scripts/learn-trim.ts` cut the recording's dark frame off): a whole kiosk shrunk to a card was
+   * unreadable (I-198), one sheet at about its recorded size is not.
    */
   cover: { n: number; alt: string; crop: { x: number; y: number; w: number; h: number } };
 }
@@ -38,7 +39,7 @@ export const LEARN_RUNS: LearnRun[] = [
     cover: {
       n: 3,
       alt: "Turn 3: the snack bar kiosk's tteokbokki sheet with a required spice level and toppings, in Korean",
-      crop: { x: 140, y: 158, w: 440, h: 540 },
+      crop: { x: 20, y: 158, w: 440, h: 540 },
     },
   },
   {
@@ -53,7 +54,7 @@ export const LEARN_RUNS: LearnRun[] = [
     cover: {
       n: 6,
       alt: "Turn 6: the theme park kiosk's aquarium ticket sheet with discount types and passenger steppers, one adult set by the learner, in Korean",
-      crop: { x: 120, y: 310, w: 480, h: 545 },
+      crop: { x: 0, y: 310, w: 480, h: 544 },
     },
   },
   {
@@ -67,7 +68,7 @@ export const LEARN_RUNS: LearnRun[] = [
     cover: {
       n: 29,
       alt: "Turn 29: the airport shop kiosk's Americano sheet, with two extra espresso shots set by the learner, in Korean",
-      crop: { x: 153, y: 718, w: 414, h: 349 },
+      crop: { x: 0, y: 718, w: 414, h: 349 },
     },
   },
   {
