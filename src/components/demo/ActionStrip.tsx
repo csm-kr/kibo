@@ -29,7 +29,8 @@ export function ActionStrip({ kiosk, actions, locale, status, beside }: Props) {
 
   // Under the phone, the confirm card needs the phone's full height: even folded, the strip pushed [Yes, pay now]
   // below the fold (I-129, R-009). It steps aside until the order leaves the review, then comes back as it was.
-  if (status === "confirming" && !beside) return null;
+  // The end card after payment needs it too: [Try again] and the other places (design QA 10-15, #1 14).
+  if ((status === "confirming" || status === "paid") && !beside) return null;
 
   return (
     <section

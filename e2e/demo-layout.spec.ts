@@ -235,3 +235,30 @@ test.describe(() => {
     }
   });
 });
+
+test.describe(() => {
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.86" } });
+
+  test("after payment the strip under the phone steps aside, so the end card's buttons stay in view (#1 14)", async ({ page, request }) => {
+    const s = await start(page);
+    let seq = 0;
+    const ai = (type: string, args: object) =>
+      command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "voice", utteranceSeq: ++seq });
+    await ai("setDineOption", { option: "eat_in" });
+    await ai("addToCart", { itemId: "cheese_burger", variant: "set", qty: 1, selections: { drink: ["cola"] } });
+    await ai("requestCheckout", {});
+    await page.getByRole("button", { name: "Yes, pay now" }).click();
+    await page.getByRole("button", { name: "Kiosk: insert card (demo)" }).click();
+    await page.getByRole("button", { name: "출력 안 함" }).click();
+    await expect(page.locator("[data-demo-end]")).toBeVisible();
+    // Reached at 1440, then the window narrows: the strip would come back under the phone and push the end card down.
+    for (const vp of [SIZES[1], SIZES[0]]) {
+      await page.setViewportSize(vp);
+      // Below 1440 the strip has left the scenario column; only then is its place under the phone settled.
+      await expect(page.locator("[data-scenario-guide] [data-action-strip]")).toHaveCount(0);
+      await expect(page.locator("[data-demo-check] [data-action-strip]"), `${vp.width}: strip under the phone`).toHaveCount(0);
+      const places = page.getByRole("navigation", { name: "Try another place" });
+      await expect(places.getByRole("link", { name: "Pizza shop" }), `${vp.width}: [Pizza shop]`).toBeInViewport({ ratio: 1 });
+    }
+  });
+});
