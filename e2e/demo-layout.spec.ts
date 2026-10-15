@@ -214,3 +214,24 @@ test.describe(() => {
     }
   });
 });
+
+test.describe(() => {
+  test.use({ viewport: SIZES[0], extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.85" } });
+
+  test("opened under the phone, 'What the AI did' shows its rows, not the legend (#1 15)", async ({ page, request }) => {
+    const s = await start(page);
+    await command(request, s.deviceToken, { sessionId: s.sessionId, type: "setDineOption", args: { option: "eat_in" }, source: "button" });
+    await page.route("**/api/chat", (route) =>
+      route.fulfill({ json: { ok: true, reply: "OK.", status: "ordering", cart: [], total: 0, cartVersion: 0, actions: HERO_ACTIONS } }),
+    );
+    await page.getByRole("textbox", { name: "Type your order" }).fill("Two cheeseburger sets");
+    await page.getByRole("button", { name: "Send", exact: true }).click();
+    const strip = page.locator("[data-demo-check] [data-action-strip]");
+    await strip.getByRole("button", { name: /What the AI did/ }).click();
+    for (const vp of [SIZES[0], SIZES[1]]) {
+      await page.setViewportSize(vp);
+      await expect(strip.getByRole("listitem").first(), `${vp.width}: newest row`).toBeInViewport({ ratio: 1 });
+      await expect(strip.getByText(/Gemini decides/)).toHaveCount(0);
+    }
+  });
+});

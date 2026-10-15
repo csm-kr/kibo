@@ -65,7 +65,8 @@ export function ActionStrip({ kiosk, actions, locale, status, beside }: Props) {
           tabIndex={0}
           className={`flex min-h-0 flex-1 scroll-pb-8 flex-col gap-2 overflow-y-auto rounded-tile px-3 pb-2 ${FOCUS}`}
         >
-          <p className="text-base text-muted">{pt("aiActionsLegend", locale)}</p>
+          {/* Under the phone the strip has about 80px open (1280x720): the rows come first there (design QA 10-15, #1 15). */}
+          {beside && <p className="text-base text-muted">{pt("aiActionsLegend", locale)}</p>}
           {actions.length === 0 ? (
             <p className="text-base text-[#33302B]">{pt("aiActionsEmpty", locale)}</p>
           ) : (
