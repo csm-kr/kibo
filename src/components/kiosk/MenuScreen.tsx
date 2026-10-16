@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode, type RefObject } from "react";
 import type { CommandReply } from "@/lib/client/api";
-import { findItem, isAvailableNow } from "@/lib/adapters/catalog";
+import { findItem, isAvailableNow, localName } from "@/lib/adapters/catalog";
 import type { CommandType } from "@/lib/commands/schemas";
 import { aiSubtitle, kt, type KioskTextKey } from "@/lib/i18n/kiosk";
 import { formatWon, lineLabel, tilePrice } from "@/lib/kiosk/menu";
-import type { KioskData, Locale, MenuItem } from "@/types/menu";
+import type { KioskData, KioskLocale, MenuItem } from "@/types/menu";
 import type { CartLine, ChangeKind, LineInput, Session } from "@/types/session";
 import { CartBar } from "./CartBar";
 import { Header } from "./KioskScreen";
@@ -101,7 +101,8 @@ export function MenuScreen(props: {
       const ai = lc.source === "voice" || lc.source === "text";
       const itemId = lc.kind === "undo" || lc.kind === "clear" ? null : (session.screen.itemId ?? null);
       const line = session.cart.find((l) => l.lineId === lc.lineId);
-      const name = line ? lineLabel(kiosk, line, locale).title : itemId ? (findItem(kiosk, itemId)?.name[locale] ?? "") : "";
+      const found = itemId ? findItem(kiosk, itemId) : undefined;
+      const name = line ? lineLabel(kiosk, line, locale).title : found ? localName(found.name, locale) : "";
       const text = kt(AI_TEXT[lc.kind], locale, domain);
       let subtitle: string | null = null;
       if (ai && locale !== "en") {
@@ -194,7 +195,7 @@ export function MenuScreen(props: {
                 <span className={`relative size-20 overflow-hidden rounded-full bg-white ${current ? "ring-4 ring-(--k-primary)" : ""}`}>
                   <KioskImage src={c.icon} sizes={ICON_SIZES} inset="p-3" />
                 </span>
-                <span className="k-text-40">{c.name[locale]}</span>
+                <span className="k-text-40">{localName(c.name, locale)}</span>
               </button>
             );
           })}
@@ -280,18 +281,33 @@ export function MenuScreen(props: {
  * An English name whose longest word would not fit the tile at 48px ("Cheeseburger", "Rechargeable") gets a smaller
  * size, so it wraps only between words (14-final:4): the canvas's lang="ko" rule lets a word that does not fit break
  * anywhere ("Cheeseburge / r"), which stays as the last resort under WCAG 1.4.12 spacing. About 0.6em per bold
- * Latin letter; at the tile's ~300px a 12-letter word gets ~42px, above the 40px kiosk minimum.
+ * Latin letter; at the tile's ~300px a 12-letter word gets ~42px, above the 40px kiosk minimum. A Japanese name's
+ * parts are written with spaces between them ("直通列車 シティセンター") and count 1em per character, so a 7-character
+ * station name gets ~44px and stays whole (catalog test: at most 7). Korean keeps 48px and wraps by its own rule.
  */
-function latinFit(name: string, locale: Locale): CSSProperties | undefined {
+function nameFit(name: string, locale: KioskLocale): CSSProperties | undefined {
   if (locale === "ko") return undefined;
-  const longest = Math.max(...name.split(/\s+/).map((w) => w.length));
-  return longest > 10 ? { fontSize: `min(calc(48px * var(--k-fs, 1)), calc(100cqi / ${(longest * 0.6).toFixed(1)}))` } : undefined;
+  const longest = Math.max(...name.split(/\s+/).map((w) => w.length)) * (locale === "ja" ? 1 : 0.6);
+  return longest > 6 ? { fontSize: `min(calc(48px * var(--k-fs, 1)), calc(100cqi / ${longest.toFixed(1)}))` } : undefined;
+}
+
+/**
+ * The Japanese screen writes won after the number ("10,500ウォン"), about 6.6em, which at 56px is wider than the tile
+ * and split as "10,500ウォ / ン". It gets the size that fits one line (about 46px; 0.6em per digit or comma, 1em per
+ * kana), still at least 40px for any price under 1,000,000; with WCAG 1.4.12 spacing it may wrap, never clip.
+ */
+function priceFit(price: string, locale: KioskLocale): CSSProperties | undefined {
+  if (locale !== "ja") return undefined;
+  const em = price.replace(/[^\d,]/g, "").length * 0.6 + price.replace(/[\d,]/g, "").length;
+  return { fontSize: `min(calc(56px * var(--k-fs, 1)), calc(100cqi / ${em.toFixed(1)}))` };
 }
 
 function ProductTile(props: { kiosk: KioskData; item: MenuItem; available: boolean; ring: boolean; onOpen(): void }) {
   const { item } = props;
   const { locale, domain } = props.kiosk;
   const blocked = item.soldOut ? kt("soldOut", locale, domain) : !props.available ? kt("notNow", locale) : null;
+  const name = localName(item.name, locale);
+  const price = formatWon(tilePrice(item), locale);
   return (
     <button
       type="button"
@@ -320,12 +336,14 @@ function ProductTile(props: { kiosk: KioskData; item: MenuItem; available: boole
       )}
       {/* Name, then a large price; kcal sits quietly beside the price (14-final:2). */}
       <span className="flex flex-1 flex-col px-7 pt-5 pb-7 [container-type:inline-size]">
-        <span className="k-text-48 font-bold" style={latinFit(item.name[locale], locale)}>
-          {item.name[locale]}
+        <span className="k-text-48 font-bold" style={nameFit(name, locale)}>
+          {name}
         </span>
-        {item.subtitle && <span className="k-text-40 text-[#4B463F]">{item.subtitle[locale]}</span>}
+        {item.subtitle && <span className="k-text-40 text-[#4B463F]">{localName(item.subtitle, locale)}</span>}
         <span className="mt-auto flex flex-wrap items-baseline justify-between gap-x-4 pt-3">
-          <span className="k-text-56 font-display font-bold text-(--k-primary)">{formatWon(tilePrice(item), locale)}</span>
+          <span className="k-text-56 font-display font-bold text-(--k-primary)" style={priceFit(price, locale)}>
+            {price}
+          </span>
           {item.kcal !== null && (
             <span className="k-text-40 text-[#4B463F]">
               {item.kcal} {kt("kcal", locale)}

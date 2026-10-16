@@ -71,14 +71,14 @@ export function KioskToolbar(props: {
                 {status}
               </p>
             )}
-            {/* KIBO's line, not the kiosk's: KIBO blue with its tag, like the English subtitle row; a Korean screen
-                says it in English too. */}
+            {/* KIBO's line, not the kiosk's: KIBO blue with its tag, like the English subtitle row; a Korean or
+                Japanese screen says it in English too. */}
             {working && (
               <p data-kibo-working className="k-text-40 flex w-full items-center justify-center gap-6 rounded-full bg-[#3446D4] px-12 py-3 font-bold text-white">
                 <span className="flex-none rounded-full bg-white px-4 font-display text-[#3446D4]">KIBO</span>
                 <span>
                   {kt("kiboWorking", kiosk.locale)}
-                  {kiosk.locale === "ko" && <span lang="en"> · Working…</span>}
+                  {kiosk.locale !== "en" && <span lang="en"> · Working…</span>}
                 </span>
               </p>
             )}

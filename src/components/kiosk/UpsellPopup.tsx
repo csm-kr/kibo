@@ -1,6 +1,6 @@
 "use client";
 
-import { findItem } from "@/lib/adapters/catalog";
+import { findItem, localName } from "@/lib/adapters/catalog";
 import { kt } from "@/lib/i18n/kiosk";
 import { formatWon } from "@/lib/kiosk/menu";
 import type { KioskData } from "@/types/menu";
@@ -36,7 +36,7 @@ export function UpsellPopup(props: { kiosk: KioskData; offerItemIds: string[]; o
               <span className="relative block h-68 w-full">
                 <KioskImage src={item.image} sizes={ITEM_SIZES} />
               </span>
-              <span className="k-text-48 block px-8 pt-6 font-bold">{item.name[locale]}</span>
+              <span className="k-text-48 block px-8 pt-6 font-bold">{localName(item.name, locale)}</span>
               <span className="flex items-center justify-between gap-4 px-8 pt-2 pb-8">
                 <span className="k-text-40 font-bold text-(--k-primary)">{formatWon(item.variants[0].price, locale)}</span>
                 <span className="k-text-40 rounded-full bg-(--k-accent) px-8 py-3 font-bold text-[#1E1B18]">

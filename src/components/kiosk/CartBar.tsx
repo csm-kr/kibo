@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
-import { vocabularyOf } from "@/lib/adapters/catalog";
+import { localName, vocabularyOf } from "@/lib/adapters/catalog";
 import { kt } from "@/lib/i18n/kiosk";
 import { formatWon, lineLabel } from "@/lib/kiosk/menu";
 import type { KioskData } from "@/types/menu";
@@ -36,7 +36,7 @@ export function CartBar(props: {
   return (
     // A white panel lifted over the menu, like a real kiosk's cart drawer (14-final:2).
     <section
-      aria-label={vocabularyOf(kiosk).cart[locale]}
+      aria-label={localName(vocabularyOf(kiosk).cart, locale)}
       className="relative z-10 flex flex-none flex-col gap-6 rounded-t-[48px] bg-white px-12 pt-10 pb-8 shadow-[0_-12px_32px_rgb(30_27_24/0.12)]"
     >
       <div className="flex items-baseline justify-between">

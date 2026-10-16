@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { CommandReply } from "@/lib/client/api";
-import { findItem } from "@/lib/adapters/catalog";
+import { findItem, localName } from "@/lib/adapters/catalog";
 import type { CommandType } from "@/lib/commands/schemas";
 import { kt } from "@/lib/i18n/kiosk";
 import { formatWon, lineLabel } from "@/lib/kiosk/menu";
@@ -78,7 +78,7 @@ export function ReviewScreen(props: {
           <div className="flex items-baseline justify-between gap-6">
             <span className="k-text-40 text-[#4B463F]">{kt("dineLabel", locale)}</span>
             <span className="k-text-48 font-bold">
-              {session.dineOption ? kiosk.dineOptions[session.dineOption].name[locale] : kt("dineNotSet", locale)}
+              {session.dineOption ? localName(kiosk.dineOptions[session.dineOption].name, locale) : kt("dineNotSet", locale)}
             </span>
           </div>
         )}

@@ -74,9 +74,9 @@ describe.each(allKioskIds())("kiosk %s (generic checks)", (id) => {
     }
   });
 
-  it("has short single-line names in Korean and English", () => {
+  it("has short single-line names in Korean and English (and Japanese where the kiosk has it)", () => {
     for (const n of allNames(k)) {
-      for (const s of [n.ko, n.en]) {
+      for (const s of [n.ko, n.en, ...(n.ja === undefined ? [] : [n.ja])]) {
         expect(s.trim().length, JSON.stringify(n)).toBeGreaterThan(0);
         expect(s.length, s).toBeLessThanOrEqual(40);
         expect(s, s).not.toMatch(/[\r\n]/);
@@ -161,11 +161,33 @@ describe("kioskSchema (domain model)", () => {
     expect(parsed.data?.items[0].kcal).toBeNull();
   });
 
-  it("defaults locales to Korean only and rejects other languages", () => {
+  it("defaults locales to Korean only; the screen may also offer Japanese, nothing else", () => {
     const noLocales = structuredClone(raw) as Record<string, unknown>;
     delete noLocales.locales;
     expect(kioskSchema.parse(noLocales).locales).toEqual(["ko"]);
-    expect(kioskSchema.safeParse({ ...ticketRaw(), locales: ["ko", "ja"] }).success).toBe(false);
+    expect(kioskSchema.safeParse({ ...ticketRaw(), locales: ["ko", "en", "ja"] }).success).toBe(true);
+    expect(kioskSchema.safeParse({ ...ticketRaw(), locales: ["ko", "zh"] }).success).toBe(false);
+  });
+
+  it("keeps the default screen language Korean or English: Japanese is a kiosk screen choice only", () => {
+    expect(kioskSchema.safeParse({ ...ticketRaw(), locales: ["ko", "ja"], locale: "ja" }).success).toBe(false);
+  });
+
+  it("accepts an optional Japanese name and still rejects unknown keys", () => {
+    const withJa = ticketRaw();
+    const item = withJa.items[0] as { name: Record<string, string>; subtitle: Record<string, string> };
+    item.name.ja = "チーズバーガー";
+    item.subtitle.ja = "直通 · 39分";
+    const parsed = kioskSchema.safeParse(withJa);
+    expect(parsed.success, JSON.stringify(parsed.error?.issues)).toBe(true);
+    expect(parsed.data?.items[0].name.ja).toBe("チーズバーガー");
+
+    const withFr = ticketRaw();
+    (withFr.items[0] as { name: Record<string, string> }).name.fr = "Cheeseburger";
+    expect(kioskSchema.safeParse(withFr).success).toBe(false);
+    const emptyJa = ticketRaw();
+    (emptyJa.items[0] as { name: Record<string, string> }).name.ja = "";
+    expect(kioskSchema.safeParse(emptyJa).success).toBe(false);
   });
 
   it("requires a known domain", () => {
@@ -330,13 +352,13 @@ describe("airport_rail.json", () => {
   const rail = getKiosk("airport_rail");
   const trains = rail.items.filter((i) => i.category === "express" || i.category === "all_stop");
 
-  it("is a direct ticket kiosk in Korean and English without dine options or hours", () => {
+  it("is a direct ticket kiosk in Korean, English and Japanese without dine options or hours", () => {
     expect(rail.kind).toBe("direct");
     expect(rail.domain).toBe("ticket");
     expect(rail.locale).toBe("ko");
-    expect(rail.locales).toEqual(["ko", "en"]);
+    expect(rail.locales).toEqual(["ko", "en", "ja"]);
     expect(rail.dineOptions).toBeUndefined();
-    expect(vocabularyOf(rail).item).toEqual({ ko: "승차권", en: "ticket" });
+    expect(vocabularyOf(rail).item).toEqual({ ko: "승차권", en: "ticket", ja: "乗車券" });
     for (const item of rail.items) {
       expect(item.availableHours, item.itemId).toBeNull();
       expect(item.kcal, item.itemId).toBeNull();
@@ -418,11 +440,34 @@ describe("airport_rail.json", () => {
     }
   });
 
+  it("has a Japanese name for the brand, every category, item, subtitle, group and option, and the vocabulary", () => {
+    // Its screen offers 日本語 (K1), so nothing on it may fall back to English.
+    const JAPANESE = /[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}]/u;
+    const names = allNames(rail);
+    expect(names.length).toBeGreaterThan(60);
+    for (const n of names) {
+      expect(n.ja, JSON.stringify(n)).toBeDefined();
+      expect(n.ja, JSON.stringify(n)).toMatch(JAPANESE);
+      expect(n.ja, JSON.stringify(n)).not.toMatch(/[가-힣]/);
+    }
+  });
+
+  it("splits each Japanese item name into parts of at most 7 characters, so a tile shows each part whole at 40px or more", () => {
+    // MenuScreen's nameFit sizes a tile name by its longest space-separated part: 7 characters fit the ~306px tile at
+    // about 44px; 8 would go under the kiosk's 40px minimum.
+    for (const item of rail.items) {
+      for (const part of item.name.ja!.split(" ")) expect([...part].length, `${item.itemId}: ${part}`).toBeLessThanOrEqual(7);
+    }
+  });
+
   it("names no real airport, line, station, operator or transit card", () => {
     const text = JSON.stringify(rail).toLowerCase();
     const real = [
       "incheon", "gimpo", "seoul", "hongik", "digital media", "cheongna", "yeongjong", "t-money", "tmoney",
       "cashbee", "rail+", "인천", "김포", "서울", "홍대", "디지털미디어", "청라", "영종", "티머니", "캐시비",
+      // The Japanese screen too: no real Korean or Japanese place, line or card in katakana or kanji.
+      "仁川", "金浦", "ソウル", "弘大", "ティーマネー", "成田", "羽田", "京成", "スカイライナー", "東京", "モノレール",
+      "suica", "pasmo", "icoca",
     ];
     for (const w of real) expect(text, w).not.toContain(w);
   });
@@ -464,8 +509,10 @@ describe("catalog helpers", () => {
     expect(isAvailableNow(findItem(kiosk, "cheese_burger")!, Date.UTC(2026, 9, 13, 2, 0))).toBe(true);
   });
 
-  it("localName picks the locale", () => {
+  it("localName picks the locale; a Japanese screen falls back to English where the data has no Japanese", () => {
     expect(localName({ ko: "콜라", en: "Cola" }, "ko")).toBe("콜라");
     expect(localName({ ko: "콜라", en: "Cola" }, "en")).toBe("Cola");
+    expect(localName({ ko: "콜라", en: "Cola", ja: "コーラ" }, "ja")).toBe("コーラ");
+    expect(localName({ ko: "콜라", en: "Cola" }, "ja")).toBe("Cola");
   });
 });

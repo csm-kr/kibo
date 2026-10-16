@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import type { KioskTheme, Locale } from "@/types/menu";
+import type { KioskLocale, KioskTheme } from "@/types/menu";
 
 export const CANVAS_W = 1080;
 export const CANVAS_H = 1920;
@@ -11,7 +11,7 @@ export const CANVAS_H = 1920;
  * so every kiosk size in components is canvas px. The theme comes from the kiosk data, so other kiosks reuse
  * every component through the --k-* variables.
  */
-export function KioskCanvas({ theme, locale, children }: { theme: KioskTheme; locale: Locale; children: ReactNode }) {
+export function KioskCanvas({ theme, locale, children }: { theme: KioskTheme; locale: KioskLocale; children: ReactNode }) {
   const outer = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0);
 

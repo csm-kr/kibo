@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { vocabularyOf } from "@/lib/adapters/catalog";
+import { localName, vocabularyOf } from "@/lib/adapters/catalog";
 import { MAX_QTY } from "@/lib/commands/cart";
 import { kt, stepLabel, variantWord } from "@/lib/i18n/kiosk";
-import { draftSelections, formatWon, sheetPrice, sheetSteps, type SheetDraft } from "@/lib/kiosk/menu";
-import type { KioskData, Locale, MenuItem, MenuOption, Variant } from "@/types/menu";
+import { draftSelections, formatWon, sheetPrice, sheetSteps, WON_JA, type SheetDraft } from "@/lib/kiosk/menu";
+import type { KioskData, KioskLocale, MenuItem, MenuOption, Variant } from "@/types/menu";
 import type { LineInput } from "@/types/session";
 import { ITEM_SIZES, KioskImage } from "./KioskImage";
 import { ModalLayer } from "./ModalLayer";
@@ -89,7 +89,7 @@ export function ProductSheet(props: {
           </span>
           <div className="min-w-0 flex-1">
             <h2 id={titleId} className="k-text-56 font-bold">
-              {item.name[locale]}
+              {localName(item.name, locale)}
             </h2>
             <p className="k-text-40 mt-2 font-bold text-(--k-primary-dark)">{stepLabel(step, locale)}</p>
           </div>
@@ -123,7 +123,7 @@ export function ProductSheet(props: {
           {group && (
             <>
               <p className="k-text-48 mb-8 font-bold">
-                {group.name[locale]}
+                {localName(group.name, locale)}
                 <span className="k-text-40 ml-6 font-normal text-[#4B463F]">
                   {group.required
                     ? kt("chooseOne", locale)
@@ -143,7 +143,7 @@ export function ProductSheet(props: {
                       disabled={o.soldOut || full}
                       soldOut={o.soldOut}
                       image={o.image}
-                      name={o.name[locale]}
+                      name={localName(o.name, locale)}
                       sub={fullPrices ? formatWon(basePrice + o.priceDelta, locale) : signedDelta(o.priceDelta, locale)}
                       locale={locale}
                       onPick={() => toggleOption(o)}
@@ -200,7 +200,7 @@ export function ProductSheet(props: {
             onClick={isLast ? add : () => setStepIndex((i) => i + 1)}
             className={`k-text-48 min-h-32 min-w-80 rounded-full bg-(--k-accent) px-12 font-bold text-[#1E1B18] disabled:bg-[#E2DACB] disabled:text-[#4B463F] ${FOCUS}`}
           >
-            {isLast ? vocabularyOf(kiosk).add[locale] : kt("next", locale)}
+            {isLast ? localName(vocabularyOf(kiosk).add, locale) : kt("next", locale)}
           </button>
         </div>
       </section>
@@ -209,7 +209,7 @@ export function ProductSheet(props: {
 }
 
 /** "+500원" for a surcharge, nothing when the price stays. */
-function signedDelta(delta: number, locale: Locale): string | undefined {
+function signedDelta(delta: number, locale: KioskLocale): string | undefined {
   if (delta === 0) return undefined;
   return `${delta > 0 ? "+" : "−"}${formatWon(Math.abs(delta), locale)}`;
 }
@@ -219,9 +219,22 @@ function capitalized(word: string): string {
   return word.charAt(0).toUpperCase() + word.slice(1);
 }
 
-/** "어린이 (6–12세)": the bracketed range never breaks inside, `break-keep` allows a break after the dash (I-109). */
+/** "어린이 (6–12세)", "こども (6〜12歳)": the bracketed range never breaks inside, `break-keep` allows a break after the dash (I-109). */
 function KeepRange({ name }: { name: string }) {
   return name.split(/(\([^)]*\))/).map((part, i) => (i % 2 === 1 ? <span key={i} className="whitespace-nowrap">{part}</span> : part));
+}
+
+/** "+10,000ウォン" in a narrow card wraps before its unit, never inside it ("+10,000ウォ / ン"); other text is unchanged. */
+function UnitBreak({ text }: { text: string }) {
+  const i = text.indexOf(WON_JA);
+  if (i <= 0) return text;
+  return (
+    <>
+      {text.slice(0, i)}
+      <wbr />
+      {text.slice(i)}
+    </>
+  );
 }
 
 function Choice(props: {
@@ -253,7 +266,11 @@ function Choice(props: {
       <span className="k-text-40 block px-6 pt-4 font-bold">
         <KeepRange name={props.name} />
       </span>
-      {props.sub && <span className="k-text-40 block px-6 text-(--k-primary-dark)">{props.sub}</span>}
+      {props.sub && (
+        <span className="k-text-40 block px-6 text-(--k-primary-dark)">
+          <UnitBreak text={props.sub} />
+        </span>
+      )}
       {props.soldOut && (
         <span className="k-text-40 mx-6 mt-2 self-start rounded-full bg-[#FFF1CC] px-4 font-bold text-[#7A2E0E]">
           {kt("soldOut", props.locale)}

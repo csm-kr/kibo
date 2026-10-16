@@ -108,8 +108,9 @@ export function DoneScreen(props: {
                 return (
                   <li key={line.lineId} className="flex flex-none items-start justify-between gap-8">
                     <div className="flex min-w-0 flex-col gap-2">
+                      {/* A no-break space: a wrapped name keeps "×1" with its last word, never alone on a line. */}
                       <span className="k-text-48 font-bold">
-                        {label.title} ×{line.qty}
+                        {label.title}&nbsp;×{line.qty}
                       </span>
                       {label.detail && <span className="k-text-40 text-[#4B463F]">{label.detail}</span>}
                     </div>

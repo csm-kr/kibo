@@ -46,4 +46,16 @@ describe("menuForModel", () => {
     expect(json).not.toContain("/menu/");
     expect(json).not.toContain(k.theme.primary);
   });
+
+  it("names things in Korean and English only: the ticket machine's Japanese screen names stay on the kiosk", () => {
+    const rail = getKiosk("airport_rail");
+    const json = JSON.stringify(menuForModel(rail));
+    expect(json).not.toMatch(/"ja"/);
+    expect(json).not.toMatch(/[\p{Script=Hiragana}\p{Script=Katakana}]/u);
+    const express = menuForModel(rail).items.find((i) => i.itemId === "express_city_center")!;
+    expect(express.name).toEqual({ ko: "직통열차 시티센터", en: "Express to City Center" });
+    expect(express.subtitle).toEqual({ ko: "직통 · 39분", en: "Non-stop · 39 min" });
+    expect(express.groups[0].name).toEqual({ ko: "승객", en: "Passenger" });
+    expect(express.groups[0].options[0].name).toEqual({ ko: "어른", en: "Adult" });
+  });
 });

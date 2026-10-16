@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { useNow } from "@/hooks/useNow";
 import { useQrSrc } from "@/hooks/useQrSrc";
+import { localName } from "@/lib/adapters/catalog";
 import { ApiError, sendCommand, type CommandReply } from "@/lib/client/api";
 import type { ErrorDetail } from "@/lib/commands/errors";
 import type { CommandType } from "@/lib/commands/schemas";
@@ -11,7 +12,7 @@ import { kt, languageName } from "@/lib/i18n/kiosk";
 import { formatWon, tilePrice } from "@/lib/kiosk/menu";
 import { kioskScreen, startOverStep } from "@/lib/kiosk/screen";
 import { kiboWorking } from "@/lib/kiosk/timers";
-import type { KioskData, Locale } from "@/types/menu";
+import type { KioskData, KioskLocale } from "@/types/menu";
 import type { DineOption, Session } from "@/types/session";
 import { DemoCounter } from "./DemoCounter";
 import { DoneScreen } from "./DoneScreen";
@@ -67,7 +68,7 @@ export function KioskScreen(props: Props) {
   const { session, kioskToken, claimUrl, demo = false, clockOffset, onNewSession, onClaimUrl } = props;
   const sessionId = session?.sessionId ?? null;
   // The language row on K1 picks the screen language for this order; a new session starts in the kiosk's default.
-  const [lang, setLang] = useState<{ forId: string | null; locale: Locale }>({ forId: null, locale: props.kiosk.locale });
+  const [lang, setLang] = useState<{ forId: string | null; locale: KioskLocale }>({ forId: null, locale: props.kiosk.locale });
   // A choice made before the first session arrived belongs to that session.
   if (lang.forId === null && sessionId !== null) setLang({ forId: sessionId, locale: lang.locale });
   const locale = lang.forId === sessionId || lang.forId === null ? lang.locale : props.kiosk.locale;
@@ -170,7 +171,7 @@ export function KioskScreen(props: Props) {
           claimUrl={claimUrl} pairCode={props.pairCode} pairUrl={props.pairUrl}
           canStart={Boolean(session && kioskToken)}
           large={large}
-          onLocale={(l: Locale) => setLang({ forId: sessionId, locale: l })}
+          onLocale={(l: KioskLocale) => setLang({ forId: sessionId, locale: l })}
           onTouch={startTouch}
           onLarge={() => setLarge((v) => !v)}
         />
@@ -254,7 +255,8 @@ export function KioskScreen(props: Props) {
           role="alert"
           className="absolute inset-x-12 bottom-12 z-40 flex items-center gap-8 rounded-[32px] border-4 border-[#7A2E0E] bg-[#FFF1CC] p-10 text-[#7A2E0E]"
         >
-          <p className="k-text-40 flex-1 font-bold">{errorCopy(error.code, locale, error.detail)}</p>
+          {/* Error copy is Korean and English only; the ticket machine's Japanese screen shows the English. */}
+          <p className="k-text-40 flex-1 font-bold">{errorCopy(error.code, locale === "ja" ? "en" : locale, error.detail)}</p>
           {error.detail?.templateId === "pick_dine" &&
             // [주문하기] without a dine option (a phone added items first): answer here, then order again (I-034).
             (["eat_in", "take_out"] as const).map((option) => (
@@ -266,7 +268,7 @@ export function KioskScreen(props: Props) {
                 }}
                 className={`k-text-40 min-h-22 rounded-full bg-(--k-primary) px-10 font-bold text-white ${FOCUS}`}
               >
-                {kiosk.dineOptions?.[option].name[locale]}
+                {kiosk.dineOptions && localName(kiosk.dineOptions[option].name, locale)}
               </button>
             ))}
           <button
@@ -301,7 +303,7 @@ function Attract(props: {
   pairUrl?: string | null;
   canStart: boolean;
   large: boolean;
-  onLocale(locale: Locale): void;
+  onLocale(locale: KioskLocale): void;
   onTouch(): void;
   onLarge(): void;
 }) {
@@ -315,6 +317,9 @@ function Attract(props: {
   return (
     <>
       <Header kiosk={kiosk} />
+      {/* Scrolls rather than clips when larger text and WCAG 1.4.12 spacing make K1 taller than the canvas, after the
+          hero has given way (three language buttons wrap the row below; 10-16 日本語). It never scrolls otherwise. */}
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
       <div className="relative min-h-0 flex-1 bg-(--k-primary-tint) [container-type:size]">
         {/* A pictogram hero keeps its bottom free for the offer below; a photo just runs under it. */}
         {kiosk.hero && <KioskImage src={kiosk.hero} sizes="1080px" inset={promo ? "px-12 pt-12 pb-36" : "p-12"} preload />}
@@ -329,13 +334,13 @@ function Attract(props: {
             >
               {kt(promo.badge === "best" ? "badgeBest" : "badgeNew", locale)}
             </span>
-            <span className="k-text-40 font-bold">{promo.name[locale]}</span>
+            <span className="k-text-40 font-bold">{localName(promo.name, locale)}</span>
             <span className="k-text-40 font-display font-bold text-(--k-primary)">{formatWon(tilePrice(promo), locale)}</span>
           </p>
         )}
       </div>
       <h1 className="k-text-72 flex-none px-16 pt-12 pb-10 font-bold text-(--k-primary-dark)">
-        {kiosk.brand.tagline[locale]}
+        {localName(kiosk.brand.tagline, locale)}
       </h1>
       <div className="grid flex-none grid-cols-2 gap-8 px-12">
         <div className={`flex flex-col items-center gap-6 rounded-[32px] border-[6px] border-(--k-primary) bg-white p-8 text-center ${CARD_SHADOW}`}>
@@ -397,6 +402,7 @@ function Attract(props: {
           {kt("largeText", locale)}
         </button>
       </div>
+      </div>
     </>
   );
 }
@@ -423,7 +429,7 @@ function Dine(props: { kiosk: KioskData; phoneConnected: boolean; onPick(o: Dine
               <KioskImage src={dine[o].image} sizes={DINE_SIZES} />
             </span>
             <span className="k-text-56 flex w-full flex-none items-center justify-center gap-4 px-6 py-10 font-bold">
-              {dine[o].name[locale]}
+              {localName(dine[o].name, locale)}
               <svg width="56" height="56" viewBox="0 0 24 24" aria-hidden fill="none" stroke="var(--k-primary)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 6l6 6-6 6" />
               </svg>

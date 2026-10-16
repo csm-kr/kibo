@@ -4,8 +4,8 @@ import malo from "../../../data/kiosks/malo.json";
 import doughhouse from "../../../skills/doughhouse.json";
 import type {
   KioskData,
+  KioskLocale,
   KioskVocabulary,
-  Locale,
   LocalizedName,
   MenuItem,
   MenuOption,
@@ -23,7 +23,8 @@ export class CatalogError extends Error {
   }
 }
 
-const localizedName = z.strictObject({ ko: z.string(), en: z.string() });
+// `ja` only where the kiosk's screen offers Japanese (K1); the AI never gets it (menuForModel).
+const localizedName = z.strictObject({ ko: z.string(), en: z.string(), ja: z.string().min(1).optional() });
 const variant = z.enum(["single", "set", "largeSet"]);
 /** Food photos live in /menu/, other kiosks' pictograms in /kiosks/<kioskId>/. */
 const imagePath = z.string().regex(/^\/(menu|kiosks)\//);
@@ -79,8 +80,9 @@ export const kioskSchema: z.ZodType<KioskData> = z.strictObject({
     background: z.string(),
     panel: z.string().optional(),
   }),
+  // The default stays Korean or English; Japanese is a choice on the kiosk screen only.
   locale: z.enum(["ko", "en"]),
-  locales: z.array(z.enum(["ko", "en"])).min(1).default(["ko"]),
+  locales: z.array(z.enum(["ko", "en", "ja"])).min(1).default(["ko"]),
   currency: z.literal("KRW"),
   dineOptions: z.strictObject({ eat_in: dineOption, take_out: dineOption }).optional(),
   vocabulary: z.strictObject({ item: localizedName, add: localizedName, cart: localizedName }).optional(),
@@ -158,6 +160,7 @@ export function isAvailableNow(item: MenuItem, now: number): boolean {
   return minuteOfDay >= start && minuteOfDay < end;
 }
 
-export function localName(n: LocalizedName, locale: Locale): string {
-  return n[locale];
+/** The name in the screen's language; a Japanese screen falls back to English where the data has no Japanese. */
+export function localName(n: LocalizedName, locale: KioskLocale): string {
+  return n[locale] ?? n.en;
 }

@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { useNow } from "@/hooks/useNow";
 import { demoCounterText } from "@/lib/i18n/kiosk";
-import type { Locale } from "@/types/menu";
+import type { KioskLocale } from "@/types/menu";
 
 // `&demo=1` only (docs/UX.md heuristic 8): taps and seconds for the touch-vs-voice comparison (docs/TESTING.md).
 // The values freeze at `paid`; data-taps and data-seconds are what the E2E test reads.
 
-export function DemoCounter(props: { locale: Locale; taps: number; startAt: number | null; paid: boolean }) {
+export function DemoCounter(props: { locale: KioskLocale; taps: number; startAt: number | null; paid: boolean }) {
   const now = useNow();
   const [endAt, setEndAt] = useState<number | null>(null);
   if (props.paid && props.startAt !== null && endAt === null) setEndAt(now);

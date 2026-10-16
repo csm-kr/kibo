@@ -179,3 +179,20 @@ body {
   word-break: keep-all;
   overflow-wrap: anywhere;
 }
+
+/* The airport rail ticket machine's 日本語 screen. Japanese has no spaces, so it wraps at phrase ends where the browser
+   can find them ("スマホで話して / 購入", not "購 / 入"), never before a small kana or "ー" (strict), and breaks inside a
+   phrase only when it cannot fit its line. Kiosk canvas only (the phone's Japanese lines are unchanged); in the base
+   layer, so a utility such as the pair URL's break-all still wins. */
+@layer base {
+  [data-kiosk-canvas] :lang(ja) {
+    word-break: normal;
+    line-break: strict;
+    overflow-wrap: anywhere;
+  }
+  @supports (word-break: auto-phrase) {
+    [data-kiosk-canvas] :lang(ja) {
+      word-break: auto-phrase;
+    }
+  }
+}

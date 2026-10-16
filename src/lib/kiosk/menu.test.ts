@@ -25,6 +25,12 @@ describe("formatWon", () => {
     expect(formatWon(0, "en")).toBe("₩0");
     expect(formatWon(1234567, "en")).toBe("₩1,234,567");
   });
+
+  it("Japanese (the ticket machine's 日本語 screen): still won, written the Japanese way", () => {
+    expect(formatWon(9500, "ja")).toBe("9,500ウォン");
+    expect(formatWon(0, "ja")).toBe("0ウォン");
+    expect(formatWon(21800, "ja")).toBe("21,800ウォン");
+  });
 });
 
 describe("tilePrice", () => {
@@ -73,6 +79,18 @@ describe("lineLabel", () => {
     expect(lineLabel(k, l, "ko").detail).toBe("감자튀김 M · 제로콜라 · 피클 빼기 · 치즈 추가");
   });
 
+  it("names a ticket and its options in Japanese on the ticket machine's 日本語 screen", () => {
+    const ticket = line({ itemId: "express_city_center", selections: { seat: ["window"], passenger: ["child"] } });
+    expect(lineLabel(rail, ticket, "ja")).toEqual({ title: "直通列車 シティセンター", detail: "こども (6〜12歳) · 窓側" });
+  });
+
+  it("falls back to English where the data has no Japanese", () => {
+    expect(lineLabel(k, line({ variant: "set", selections: { drink: ["zero_cola"] } }), "ja")).toEqual({
+      title: "Cheeseburger set",
+      detail: "Zero cola",
+    });
+  });
+
   it("has an empty detail when nothing was chosen", () => {
     expect(lineLabel(k, line({ itemId: "soft_cone" }), "ko")).toEqual({ title: "소프트콘", detail: "" });
   });
@@ -117,6 +135,8 @@ describe("sheetSteps", () => {
       { kind: "qty", label: "승차권 수", index: 1, count: 1 },
     ]);
     expect(sheetSteps(railItem("day_pass"), "single", "en", "ticket")[0].label).toBe("Tickets");
+    expect(sheetSteps(railItem("express_city_center"), "single", "ja", "ticket").map((s) => s.label)).toEqual(["お客さま", "座席"]);
+    expect(sheetSteps(railItem("day_pass"), "single", "ja", "ticket")[0].label).toBe("枚数");
   });
 
   it("item without choices still has one step for the quantity", () => {

@@ -1,5 +1,11 @@
 export type Locale = "ko" | "en";
-export type LocalizedName = { ko: string; en: string };
+/**
+ * A language the kiosk's own screen can show. Japanese is a kiosk screen language only (the airport rail ticket
+ * machine's K1 offers 日本語): the phone, the server and the AI keep `Locale`, and the model never sees `ja` names.
+ */
+export type KioskLocale = Locale | "ja";
+/** `ja` only in kiosk data whose screen offers Japanese; a screen without it falls back to `en`. */
+export type LocalizedName = { ko: string; en: string; ja?: string };
 export type Variant = "single" | "set" | "largeSet";
 
 /** What a kiosk sells: food has dine options and kcal; tickets have neither. */
@@ -134,10 +140,13 @@ export interface KioskData {
   /** K1 attract picture: a photo, or an SVG drawn on the theme tint; absent shows the tint alone. */
   hero?: string;
   theme: KioskTheme;
-  /** The kiosk screen's default language. */
-  locale: Locale;
+  /**
+   * The kiosk screen's language: in the data its default (Korean or English), on the kiosk screens the one chosen on
+   * K1 for this order (KioskScreen passes the kiosk down with it).
+   */
+  locale: KioskLocale;
   /** The languages the kiosk's own screen offers; includes `locale`. */
-  locales: Locale[];
+  locales: KioskLocale[];
   currency: "KRW";
   /** Absent on kiosks that do not ask eat-in or take-out (tickets). */
   dineOptions?: {

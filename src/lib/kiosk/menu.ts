@@ -1,15 +1,20 @@
-import { findItem, findOption, groupsFor } from "@/lib/adapters/catalog";
+import { findItem, findOption, groupsFor, localName } from "@/lib/adapters/catalog";
 import { unitPriceOf } from "@/lib/commands/cart";
 import { kt, variantWord } from "@/lib/i18n/kiosk";
-import type { KioskData, KioskDomain, Locale, MenuItem, OptionGroup, Variant } from "@/types/menu";
+import type { KioskData, KioskDomain, KioskLocale, MenuItem, OptionGroup, Variant } from "@/types/menu";
 import type { CartLine } from "@/types/session";
 
 // Pure helpers for the kiosk menu (K3) and product sheet (K4). Names and prices come only from menu data.
 
-/** "4,900원" in Korean, "₩4,900" in English. */
-export function formatWon(n: number, locale: Locale): string {
+/** The Japanese screen's word for won, after the number. */
+export const WON_JA = "ウォン";
+
+/** "4,900원" in Korean, "₩4,900" in English, "4,900ウォン" on the ticket machine's Japanese screen (still won). */
+export function formatWon(n: number, locale: KioskLocale): string {
   const digits = n.toLocaleString("en-US");
-  return locale === "ko" ? `${digits}원` : `₩${digits}`;
+  if (locale === "ko") return `${digits}원`;
+  if (locale === "ja") return `${digits}${WON_JA}`;
+  return `₩${digits}`;
 }
 
 /**
@@ -26,15 +31,16 @@ export function tilePrice(item: MenuItem): number {
 }
 
 /** "치즈버거 세트" and "감자튀김 M · 제로콜라 · 피클 빼기": groups in menu order, options in menu order. */
-export function lineLabel(k: KioskData, line: CartLine, locale: Locale): { title: string; detail: string } {
+export function lineLabel(k: KioskData, line: CartLine, locale: KioskLocale): { title: string; detail: string } {
   const item = findItem(k, line.itemId);
   if (!item) return { title: "", detail: "" };
-  const title = item.variants.length > 1 ? `${item.name[locale]} ${variantWord(line.variant, locale)}` : item.name[locale];
+  const name = localName(item.name, locale);
+  const title = item.variants.length > 1 ? `${name} ${variantWord(line.variant, locale)}` : name;
   const names: string[] = [];
   for (const group of groupsFor(item, line.variant)) {
     const chosen = line.selections[group.groupId] ?? [];
     for (const option of group.options) {
-      if (chosen.includes(option.optionId)) names.push(option.name[locale]);
+      if (chosen.includes(option.optionId)) names.push(localName(option.name, locale));
     }
   }
   return { title, detail: names.join(" · ") };
@@ -58,10 +64,10 @@ function sheetGroups(item: MenuItem, variant: Variant | null): OptionGroup[] {
  * K4 steps: the variant (only when there are several), then one step per option group in menu order
  * (side, drink, ingredients). The last step also holds the quantity; an item with no choices gets a quantity step.
  */
-export function sheetSteps(item: MenuItem, variant: Variant | null, locale: Locale, domain: KioskDomain = "food"): SheetStep[] {
+export function sheetSteps(item: MenuItem, variant: Variant | null, locale: KioskLocale, domain: KioskDomain = "food"): SheetStep[] {
   const steps: Omit<SheetStep, "index" | "count">[] = [];
   if (item.variants.length > 1) steps.push({ kind: "variant", label: kt("stepVariant", locale) });
-  for (const g of sheetGroups(item, variant)) steps.push({ kind: "group", groupId: g.groupId, label: g.name[locale] });
+  for (const g of sheetGroups(item, variant)) steps.push({ kind: "group", groupId: g.groupId, label: localName(g.name, locale) });
   if (steps.length === 0) steps.push({ kind: "qty", label: kt("stepQty", locale, domain) });
   return steps.map((s, i) => ({ ...s, index: i + 1, count: steps.length }));
 }
