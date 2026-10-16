@@ -240,6 +240,119 @@ test.describe("other kiosk data", () => {
     await check(page, info, "K3-rail-cards-en");
   });
 
+  test.describe("airport rail in 日本語", () => {
+    // Its own address: two more sessions (R-005).
+    test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.202" } });
+
+    /** K1's language row: 한국어, English and 日本語 in one row inside the 48px margins, 72px tall, 8px apart. */
+    async function languageRow(page: Page) {
+      return page.locator("[data-kiosk-canvas] [role=group]").evaluate((group) => {
+        const canvas = group.closest("[data-kiosk-canvas]")!.getBoundingClientRect();
+        const px = canvas.width / 1080;
+        const boxes = [...group.querySelectorAll("button")].map((b) => b.getBoundingClientRect());
+        return {
+          names: [...group.querySelectorAll("button")].map((b) => b.textContent),
+          rows: new Set(boxes.map((b) => Math.round(b.top / px))).size,
+          minHeight: Math.min(...boxes.map((b) => Math.round(b.height / px))),
+          minGap: Math.min(...boxes.slice(1).map((b, i) => Math.round((b.left - boxes[i].right) / px))),
+          inside: boxes.every((b) => (b.left - canvas.left) / px >= 47.5 && (b.right - canvas.left) / px <= 1032.5),
+        };
+      });
+    }
+
+    test("K1 to K8 in Japanese, the language row, larger text and the AI highlight", async ({ page, request }, info) => {
+      await page.clock.install();
+      await page.goto("/kiosk?k=airport_rail");
+      const root = kioskRoot(page);
+      const { sessionId, claimToken } = await readClaim(page);
+      await page.getByRole("button", { name: "日本語" }).click();
+      await expect(page.getByRole("button", { name: /画面をタッチして購入/ })).toBeEnabled();
+      expect(await languageRow(page)).toEqual({ names: ["한국어", "English", "日本語"], rows: 1, minHeight: 72, minGap: 8, inside: true });
+      // The store's offer stays on the hero (shown only while the hero is 240px or taller).
+      await expect(root.getByText("10,500ウォン")).toBeVisible();
+      await check(page, info, "K1-rail-attract-ja");
+      await page.getByRole("button", { name: "大きな文字・低い画面" }).click();
+      expect((await languageRow(page)).rows).toBe(1);
+      await check(page, info, "K1-rail-attract-ja-large");
+      await page.getByRole("button", { name: "大きな文字・低い画面" }).click();
+
+      await page.getByRole("button", { name: /画面をタッチして購入/ }).click();
+      await expect(root).toHaveAttribute("data-screen", "menu");
+      await check(page, info, "K3-rail-menu-ja");
+      await page.getByRole("button", { name: "カード・パス", exact: true }).click();
+      await expect(buttonWithText(page, "チャージ式 交通カード")).toBeVisible();
+      await check(page, info, "K3-rail-cards-ja");
+
+      await buttonWithText(page, "チャージ式 交通カード").click();
+      const card = page.getByRole("dialog", { name: "チャージ式 交通カード" });
+      await expect(buttonWithText(card, "チャージなし")).toBeVisible();
+      await check(page, info, "K4-rail-top-up-ja");
+      await card.getByRole("button", { name: "閉じる" }).click();
+
+      await page.getByRole("button", { name: "直通列車", exact: true }).click();
+      await buttonWithText(page, "直通列車 シティセンター").click();
+      const sheet = page.getByRole("dialog", { name: "直通列車 シティセンター" });
+      await buttonWithText(sheet, "こども (6〜12歳)").click();
+      await check(page, info, "K4-rail-passenger-ja");
+      await sheet.getByRole("button", { name: "次へ", exact: true }).click();
+      await buttonWithText(sheet, "窓側").click();
+      await check(page, info, "K4-rail-seat-ja");
+      await sheet.getByRole("button", { name: "選択", exact: true }).click();
+      await expect(page.getByText("1枚選択")).toBeVisible();
+
+      // The phone joins mid-order and the AI adds a ticket: the kiosk's Japanese banner, KIBO's English line.
+      const { deviceToken } = await (await claim(request, sessionId, claimToken)).json();
+      await command(request, deviceToken, {
+        sessionId,
+        type: "addToCart",
+        args: { itemId: "all_stop_harbor_gate", variant: "single", qty: 1, selections: { passenger: ["adult"] } },
+        source: "voice",
+        utteranceSeq: 1,
+      });
+      await expect(page.locator("[data-kiosk-subtitle]")).toContainText("AI chose: All-stop to Harbor Gate · Adult");
+      await expect(root.getByText("AIが選びました: 一般列車 ハーバーゲート")).toBeVisible();
+      await check(page, info, "K3-rail-ai-highlight-ja");
+      await command(request, deviceToken, { sessionId, type: "callStaff", args: { reasonCode: "user_request" }, source: "button" });
+      await expect(page.getByText("係員を呼びました。少々お待ちください。")).toBeVisible();
+      await check(page, info, "KX-rail-staff-ja");
+
+      await page.getByRole("button", { name: "購入する", exact: true }).click();
+      await expect(root).toHaveAttribute("data-screen", "review");
+      await check(page, info, "K6-rail-review-ja");
+
+      await page.getByRole("button", { name: "お支払い", exact: true }).click();
+      await expect(page.getByRole("heading", { name: "お支払い方法を選んでください" })).toBeVisible();
+      await check(page, info, "K7-rail-pay-method-ja");
+      await page.getByRole("button", { name: "カード", exact: true }).click();
+      await expect(page.getByRole("heading", { name: "カードを下の挿入口に入れてください" })).toBeVisible();
+      await check(page, info, "K7-rail-card-insert-ja");
+
+      await page.getByRole("button", { name: "カードを入れる" }).click();
+      await expect(root).toHaveAttribute("data-screen", "done");
+      await check(page, info, "K8-rail-receipt-ja");
+      await page.getByRole("button", { name: "発行しない" }).click();
+      await expect(page.getByRole("heading", { name: "受付番号" })).toBeVisible();
+      await check(page, info, "K8-rail-reference-number-ja", async () =>
+        page.clock.setSystemTime((await page.evaluate(() => Date.now())) - 60_000),
+      );
+    });
+
+    test("idle warning in Japanese", async ({ page }, info) => {
+      await page.clock.install();
+      await page.goto("/kiosk?k=airport_rail");
+      await readClaim(page);
+      await page.getByRole("button", { name: "日本語" }).click();
+      await page.getByRole("button", { name: /画面をタッチして購入/ }).click();
+      await expect(kioskRoot(page)).toHaveAttribute("data-screen", "menu");
+      // As in "idle warning one minute before expiry": only the page clock moves 9.5 min ahead.
+      await page.clock.setSystemTime(Date.now() + 9.5 * 60_000);
+      const idle = page.getByRole("alertdialog", { name: "購入を続けますか？" });
+      await expect(idle).toBeVisible();
+      await expect(idle.getByRole("timer")).toHaveText(/^残り\d+秒$/);
+      await check(page, info, "KX-rail-idle-warning-ja");
+    });
+  });
+
   test("MALO in English: K1 to K8", async ({ page }, info) => {
     await page.clock.install();
     await page.goto("/kiosk?k=malo");
