@@ -152,3 +152,8 @@ When an issue class in `docs/ISSUE.md` is seen for the **3rd time**, it becomes 
 - From: `undetected-overflow` — I-062 (seen 10-13/3-assistant:3, 10-13/12-phone-app:10), I-372 (10-15/session)
 - Why: three times a `min-w-*` that replaces the automatic minimum let a flex item shrink below its content on a narrow phone (a choice label spilled out of its button, the app bar's brand ran under the language button, the `/learn` chevrons were squeezed to 2px), and no check failed because the controls stayed on screen.
 - Check: for each row of buttons or labels a step adds or changes on a phone screen, a Playwright box check at 320×700 and 360×800 (larger text where the screen has it) asserts each icon at its size and each label on whole lines inside its box (as "#1 33" in `e2e/qa/learn.qa.spec.ts` and "#1 21" in `e2e/qa/assistant.qa.spec.ts` do); lucide icons in such rows carry `shrink-0`.
+
+### R-033 (proposed): Every language a kiosk screen offers has its own wrapping rule on the canvas, and its QA screenshots are read for a word broken inside
+- From: `korean-line-break` — I-044 (seen 10-13/2-kiosk:5, 10-13/2-kiosk:6), I-387 (10-16/session; I-391 the same pass)
+- Why: Korean and then Japanese each wrapped inside words on the kiosk canvas ("포장하시나 / 요?", "スマホで話して購 / 入") until a rule for that language was set, and no automated check sees a CJK word broken inside (`splitWords` in `e2e/qa/checks.ts` checks Latin words only).
+- Check: for each code in a kiosk's `locales`, `src/app/globals.css` has its wrapping rule (`:lang(ko)` keep-all; `[data-kiosk-canvas] :lang(ja)` auto-phrase and strict), `e2e/qa/kiosk.qa.spec.ts` has that language's K1 to K8 states, and the step's QA report says their screenshots were read for breaks inside a word.

@@ -296,7 +296,7 @@ Pages: `/kiosk?k=<kioskId>` (`&demo=1` shows the tap counter and timer; on a lan
 - JSON over HTTPS, body ≤ 64 KB (a chat history of Korean text needs more than 16 KB), every body parsed with a zod schema before anything else.
 - Actor token in `Authorization: Bearer <deviceToken|kioskToken>`. The server stores only SHA-256 hashes and compares in constant time. Tokens are 32 random bytes, base64url.
 - Success: `{ "ok": true, ... }`. Failure: `{ "ok": false, "error": { "code", "message", "detail"? } }`. `message` is plain words a user can read (heuristic 9); no stack traces, ids or model text.
-- `message` stays plain English, for the AI, logs and as a fallback; the server never translates it. Screens show their own ko/en copy chosen by `error.code` (and `detail.templateId`) with `errorCopy` in `src/lib/i18n/errors.ts`, which also covers the client-side `NETWORK` (no answer).
+- `message` stays plain English, for the AI, logs and as a fallback; the server never translates it. Screens show their own ko/en copy chosen by `error.code` (and `detail.templateId`) with `errorCopy` in `src/lib/i18n/errors.ts`, which also covers the client-side `NETWORK` (no answer); the airport rail machine's Japanese screen shows the English copy.
 
 | Code | HTTP | When |
 |---|---|---|
@@ -363,7 +363,7 @@ Firestore Native mode in `asia-northeast3` (the location cannot be changed later
 
 ### `data/kiosks/{kioskId}.json` (repo, read-only)
 ```
-kind: "direct", domain (food|ticket), brand, hero? (K1 picture: photo, or SVG on the theme tint), theme{colors, panel? (rail and toolbar; default cream)}, locale (default), locales[] (ko|en the kiosk screen offers on K1's language row, reset to `locale` for each new session; default ["ko"]),
+kind: "direct", domain (food|ticket), brand, hero? (K1 picture: photo, or SVG on the theme tint), theme{colors, panel? (rail and toolbar; default cream)}, locale (default screen language, ko|en), locales[] (ko|en|ja the kiosk screen offers on K1's language row, reset to `locale` for each new session; default ["ko"]),
 dineOptions?{eat_in, take_out: {name{ko,en}, image}} (absent: the kiosk never asks eat-in or take-out),
 vocabulary?{item, add, cart: name{ko,en}} (domain words; default 메뉴/menu, 담기/Add, 장바구니/Cart), categories[],
 items[{itemId, name{ko,en}, subtitle?{ko,en}, category, image (/menu/ photo or /kiosks/<kioskId>/ pictogram), kcal (int | null: hidden), badge (best|new|null), allergens[] (may be empty), soldOut,
@@ -373,6 +373,8 @@ items[{itemId, name{ko,en}, subtitle?{ko,en}, category, image (/menu/ photo or /
          options[{optionId, name{ko,en}, image?, priceDelta (may be negative: a child fare), soldOut}]}]}],
 upsellRules[{whenCategory | whenItemId, offerItemIds}]   (upsell once per order; may be empty)
 ```
+Every `name{ko,en}` (and `subtitle`, `brand`, `vocabulary`) may also hold `ja` (non-empty): only `airport_rail.json`, whose `locales` include `ja`, has it, on every name (catalog test), and its item names keep each space-separated part to 7 characters so a tile fits it at 40px or more (`nameFit`, `src/components/kiosk/MenuScreen.tsx`). The schema rejects any other key. **Japanese is a kiosk screen language only** (10-16, for the film: the machine's own screens in another language): `KioskLocale = Locale | "ja"` (`src/types/menu.ts`) is used by the kiosk components and kiosk i18n (`src/lib/i18n/kiosk.ts`: `kt` falls back to English for a key without `ja`, such as the food-only dine, set and dessert lines; `localName` falls back to `en`; `formatWon` writes "9,500ウォン"; the currency stays KRW). `Locale` (ko|en) stays for the phone, the server and the AI: the server never reads the kiosk's screen language, `menuForModel` sends the model `{ko, en}` names only, and error copy (`errorCopy`) shows its English on the Japanese screen. KIBO's own lines on the kiosk (the English subtitle under the AI banner, "· Working…", the `/demo` caption step) stay English on a Japanese screen too.
+
 A required group with `defaultOptionIds` (the set side: medium fries) takes the default when the order does not say; a required group without defaults (the set drink) is rejected with `NEEDS_CHOICE` so the AI asks. The kiosk sheet preselects defaults. Prices are multiples of 10, and no valid selection may bring a unit price below 0; the catalog tests check both for every kiosk (`allKioskIds()`). Learned kiosks normalize to `domain: "food"`, `locales: [locale]`.
 
 ### `skills/{kioskId}.json` (learned, reviewed, committed)
