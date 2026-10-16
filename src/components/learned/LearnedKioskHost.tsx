@@ -278,8 +278,9 @@ function KiboWidget(props: {
                   <span className="size-52 self-center rounded-tile bg-[#F3EEE4]" />
                 )}
                 {props.pairCode && address && (
-                  <p className="flex flex-col gap-1 text-base">
-                    <span>
+                  // Centred under the centred QR, the address line balanced so "enter" never sits alone (qa 10-16).
+                  <p className="flex flex-col items-center gap-1 text-center text-base">
+                    <span className="text-balance">
                       Or open <strong data-pair-url className="break-all text-kibo-deep">{address}</strong> and enter
                     </span>
                     <span aria-hidden data-pair-code={props.pairCode} className="font-display text-[32px] leading-tight font-bold tracking-wider tabular-nums">

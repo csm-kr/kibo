@@ -97,6 +97,38 @@ test("/demo [Start] on the learned pizza kiosk 1280x720: KIBO's panel with the Q
   await page.getByRole("button", { name: "Start", exact: true }).click();
   const { sessionId, claimToken } = await readClaim(page);
   await expect(page.locator("[data-learned-widget] [data-pair-code]")).toBeInViewport({ ratio: 1 });
+  // The address line and the code sit centred under the centred QR, and the line never leaves one word alone on its
+  // last line ("…and" / "enter", qa 10-16).
+  const panel = await page.locator("[data-learned-widget]").evaluate((w) => {
+    // The text's own extent, not its box: a stretched flex child's box is centred even when its text is not.
+    const centre = (el: Element | null) => {
+      const range = document.createRange();
+      range.selectNodeContents(el!);
+      const r = range.getBoundingClientRect();
+      return r.left + r.width / 2;
+    };
+    const sentence = w.querySelector("[data-pair-url]")!.parentElement!;
+    const range = document.createRange();
+    range.selectNodeContents(sentence);
+    const rows = new Map<number, { left: number; right: number }>();
+    for (const r of range.getClientRects()) {
+      if (r.width === 0) continue;
+      const row = rows.get(Math.round(r.top)) ?? { left: r.left, right: r.right };
+      rows.set(Math.round(r.top), { left: Math.min(row.left, r.left), right: Math.max(row.right, r.right) });
+    }
+    const widths = [...rows.values()].map((r) => r.right - r.left);
+    return {
+      qr: ((r) => r.left + r.width / 2)(w.querySelector("img[data-claim-url]")!.getBoundingClientRect()),
+      code: centre(w.querySelector("[data-pair-code]")),
+      sentence: (Math.min(...[...rows.values()].map((r) => r.left)) + Math.max(...[...rows.values()].map((r) => r.right))) / 2,
+      lines: widths.length,
+      lastShare: widths[widths.length - 1] / widths[0],
+    };
+  });
+  expect(Math.abs(panel.code - panel.qr)).toBeLessThanOrEqual(1);
+  expect(Math.abs(panel.sentence - panel.qr)).toBeLessThanOrEqual(1);
+  expect(panel.lines).toBeLessThanOrEqual(2);
+  expect(panel.lastShare).toBeGreaterThanOrEqual(0.4);
   await check(page, info, "demo-D2-own-phone-learned-waiting", LEARNED);
   await claim(request, sessionId, claimToken);
   await expect(page.locator("[data-learned-widget]").getByText("Phone connected")).toBeVisible();
