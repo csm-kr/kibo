@@ -281,7 +281,12 @@ function KiboWidget(props: {
                   // Centred under the centred QR, the address line balanced so "enter" never sits alone (qa 10-16).
                   <p className="flex flex-col items-center gap-1 text-center text-base">
                     <span className="text-balance">
-                      Or open <strong data-pair-url className="break-all text-kibo-deep">{address}</strong> and enter
+                      Or open{" "}
+                      {/* The short host stays whole; a long fallback host (no SHORT_APP_URL) may break anywhere. */}
+                      <strong data-pair-url className={`${address.length <= 24 ? "whitespace-nowrap" : "break-all"} text-kibo-deep`}>
+                        {address}
+                      </strong>{" "}
+                      and enter
                     </span>
                     <span aria-hidden data-pair-code={props.pairCode} className="font-display text-[32px] leading-tight font-bold tracking-wider tabular-nums">
                       {props.pairCode.slice(0, 3)} {props.pairCode.slice(3)}

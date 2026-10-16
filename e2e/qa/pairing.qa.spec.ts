@@ -107,6 +107,20 @@ test("/demo [Start] on the learned pizza kiosk 1280x720: KIBO's panel with the Q
       const r = range.getBoundingClientRect();
       return r.left + r.width / 2;
     };
+    // The words on the sentence's last line, each word measured by its own range.
+    const lastLineWords = (el: Element) => {
+      const tops: number[] = [];
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+        for (const m of (n.textContent ?? "").matchAll(/\S+/g)) {
+          const word = document.createRange();
+          word.setStart(n, m.index!);
+          word.setEnd(n, m.index! + m[0].length);
+          tops.push(Math.round(word.getBoundingClientRect().top));
+        }
+      }
+      return tops.filter((t) => t === Math.max(...tops)).length;
+    };
     const sentence = w.querySelector("[data-pair-url]")!.parentElement!;
     const range = document.createRange();
     range.selectNodeContents(sentence);
@@ -122,13 +136,15 @@ test("/demo [Start] on the learned pizza kiosk 1280x720: KIBO's panel with the Q
       code: centre(w.querySelector("[data-pair-code]")),
       sentence: (Math.min(...[...rows.values()].map((r) => r.left)) + Math.max(...[...rows.values()].map((r) => r.right))) / 2,
       lines: widths.length,
-      lastShare: widths[widths.length - 1] / widths[0],
+      lastLineWords: lastLineWords(sentence),
     };
   });
   expect(Math.abs(panel.code - panel.qr)).toBeLessThanOrEqual(1);
   expect(Math.abs(panel.sentence - panel.qr)).toBeLessThanOrEqual(1);
   expect(panel.lines).toBeLessThanOrEqual(2);
-  expect(panel.lastShare).toBeGreaterThanOrEqual(0.4);
+  if (panel.lines === 2) expect(panel.lastLineWords).toBeGreaterThanOrEqual(2);
+  // The short address never breaks inside itself ("kibo-2026." / "web.app").
+  expect(await textLines(page.locator("[data-learned-widget] [data-pair-url]"))).toBe(1);
   await check(page, info, "demo-D2-own-phone-learned-waiting", LEARNED);
   await claim(request, sessionId, claimToken);
   await expect(page.locator("[data-learned-widget]").getByText("Phone connected")).toBeVisible();
