@@ -55,21 +55,22 @@ journey
   title A judge tries KIBO on /demo
   section First 20 seconds
     Reads one sentence and a 3-step guide: 4: Judge
-    Starts without reading the docs: 4: Judge
+    Presses Start; the laptop becomes the kiosk: 4: Judge
+    Scans the kiosk's QR with their own phone: 3: Judge
   section Ordering
-    Mic blocked or no mic, types instead: 3: Judge
-    Uses an example sentence: 5: Judge
-    Watches the kiosk on the left move by itself: 5: Judge
+    Says the order to the phone: 5: Judge
+    Watches the kiosk on the laptop move by itself: 5: Judge
   section End
-    Confirms, taps the card reader under the kiosk: 4: Judge
-    Sees the order number, clicks Try again or opens /kiosk: 4: Judge
+    Confirms on the phone, pays on the kiosk: 4: Judge
+    Sees the order number, clicks Try again or another place: 4: Judge
 ```
 | Stage | Thinking | Drop-off risk | What must work |
 |---|---|---|---|
 | Land | "What am I looking at?" | Wall of text, nothing to click | One sentence, 3 steps, three place cards that say who each serves, one [Start] (Flow C1) |
+| Scan | "How do I get in?" | No phone at hand, QR will not scan | The caption row says "Start: scan the QR with your phone's camera."; the 6-digit code under the QR; [Try it on this screen] on D1 (Flow C1a) |
 | Try | "Does the AI really drive the kiosk?" | Mic denied, Live down, quota hit | Text input comes forward automatically; clear "try again in a moment" on 429 (Flow C3) |
 | Judge | "Is this safe and real?" | AI seems to pay by itself; fake screens | Confirm card visible; kiosk highlight is the proof; no mock video inside the app |
-| Leave | "Can I see more?" | Dead end | [Try again] and a link to two-device mode (Flow C5) |
+| Leave | "Can I see more?" | Dead end | [Try again] and Try another place under the kiosk (Flow C1a, C5) |
 
 ## Using the journeys
 - Each "What must work" cell is a QA check: walk it on the real screens during the QA pass in `docs/UI_QA.md`.

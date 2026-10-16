@@ -84,7 +84,7 @@ async function post<T>(path: string, body: object, token?: string, timeoutMs?: n
   throw new ApiError(code as ScreenErrorCode, message, json.error?.detail);
 }
 
-/** `pairPhone` (with `demo`): /demo "Use my phone", a demo session the judge's own phone claims. */
+/** `pairPhone` (with `demo`): /demo [Start], a demo session the judge's own phone claims. */
 export function createSession(kioskId: string, demo?: boolean, pairPhone?: boolean): Promise<CreatedSession> {
   return post("/api/session", demo ? { kioskId, demo, ...(pairPhone ? { pairPhone } : {}) } : { kioskId });
 }

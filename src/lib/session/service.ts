@@ -130,7 +130,7 @@ export async function createSession(
       "Only a demo order can wait for a phone this way.",
     );
   const demo = input.demo === true;
-  // /demo "Use my phone": still a demo session (demo limits), but a real phone claims it by QR or code.
+  // /demo [Start]: still a demo session (demo limits), but a real phone claims it by QR or code.
   const preClaimed = demo && input.pairPhone !== true;
   const sessionId = newSessionId();
   const claimToken = newToken();

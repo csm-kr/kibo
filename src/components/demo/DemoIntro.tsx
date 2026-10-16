@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Smartphone } from "lucide-react";
+import { Monitor } from "lucide-react";
 import { CARD, FOCUS, PRIMARY, SECONDARY } from "@/components/phone/ui";
 import { errorCopy, type ScreenErrorCode } from "@/lib/i18n/errors";
 import { DEMO_ENVIRONMENTS, demoHref } from "./environments";
@@ -12,22 +12,18 @@ import { DEMO_ENVIRONMENTS, demoHref } from "./environments";
 // and [Start] opens the selected one. Cards and buttons follow the phone design: white cards with the soft shadow,
 // tinted secondary buttons, no dark outlines (I-165, #1 6).
 
-// The split (kiosk left, phone beside it) needs 900px; below that the steps cannot point left or right (14-final:1).
-// The phone is the middle column once the scenario guide opens beside it, so step 1 names it, not its side
-// (15-judge-fixes:2).
-const STEPS = [
-  { wide: "Talk or type to the phone next to the kiosk.", narrow: "Talk or type to the phone." },
-  { wide: "Watch the kiosk on the left move by itself.", narrow: "Watch the kiosk move by itself." },
-  { wide: "Confirm, then pay on the kiosk.", narrow: "Confirm, then pay on the kiosk." },
-];
+// [Start] makes this laptop the kiosk and the judge's own phone the assistant, as in a real store (C1a); the phone
+// drawn beside the kiosk is the second choice, for a judge without a phone at hand.
+const STEPS = ["Scan the QR on the kiosk with your phone.", "Say your order. The kiosk fills its own cart.", "Confirm on your phone, then pay on the kiosk."];
 
 export function DemoIntro(props: {
   kioskId: string;
   starting: boolean;
   error: ScreenErrorCode | null;
-  onStart(): void;
-  /** "Use my phone instead": the kiosk and a pairing panel; the judge's own phone claims the order. */
+  /** [Start]: this page is the kiosk; the judge's own phone claims the order by its QR or code. */
   onStartPhone(): void;
+  /** "Try it on this screen": the kiosk and a phone drawn beside it, on one session. */
+  onStart(): void;
 }) {
   return (
     // Inside the /demo frame, whose top bar carries the KIBO mark and the place tabs.
@@ -37,7 +33,7 @@ export function DemoIntro(props: {
         <div className="flex flex-col gap-6">
           {/* Said before anything else on a phone, not after [Start] (I-074). */}
           <div role="note" data-demo-narrow-note className="flex flex-col gap-3 rounded-[18px] bg-[#FFF1CC] p-4 text-[#7A2E0E] min-[900px]:hidden">
-            <p className="text-xl font-bold">Open this on a laptop to see the kiosk and the phone side by side.</p>
+            <p className="text-xl font-bold">Open this on a laptop: it shows the kiosk, and your phone orders.</p>
             <p className="text-base">On this phone, try the real two-device mode: open the kiosk on a computer and scan its QR.</p>
             <a href={`/kiosk?k=${props.kioskId}`} className={SECONDARY}>
               Open the kiosk
@@ -53,12 +49,11 @@ export function DemoIntro(props: {
           </p>
           <ol className={`${CARD} flex flex-col gap-4`}>
             {STEPS.map((step, i) => (
-              <li key={step.wide} className="flex items-center gap-4 text-xl">
+              <li key={step} className="flex items-center gap-4 text-xl">
                 <span aria-hidden className="flex size-10 flex-none items-center justify-center rounded-full bg-kibo text-xl font-bold text-white">
                   {i + 1}
                 </span>
-                <span className="max-[899px]:hidden">{step.wide}</span>
-                <span className="min-[900px]:hidden">{step.narrow}</span>
+                {step}
               </li>
             ))}
           </ol>
@@ -127,17 +122,17 @@ export function DemoIntro(props: {
           <div className="flex flex-col gap-2">
             {/* Together as wide as the card row above it, so they read as the row's actions (I-123). */}
             <div className="grid gap-3 sm:grid-cols-2">
-              <button type="button" disabled={props.starting} onClick={props.onStart} className={PRIMARY}>
+              <button type="button" data-demo-own-phone disabled={props.starting} onClick={props.onStartPhone} className={PRIMARY}>
                 {props.starting ? "Starting…" : "Start"}
               </button>
-              <button type="button" data-demo-own-phone disabled={props.starting} onClick={props.onStartPhone} className={SECONDARY}>
-                <Smartphone size={24} strokeWidth={2} aria-hidden />
-                Use my phone instead
+              <button type="button" disabled={props.starting} onClick={props.onStart} className={SECONDARY}>
+                <Monitor size={24} strokeWidth={2} aria-hidden />
+                Try it on this screen
               </button>
             </div>
             <p className="text-base text-[#4B463F]">
-              Screens in English and Korean; the AI talks in 9 languages (tested by typing). No microphone? Type instead. With your own phone, scan the kiosk&apos;s QR and
-              talk to it.
+              Screens in English and Korean; the AI talks in 9 languages (tested by typing). No phone at hand? Try it on
+              this screen, with a phone beside the kiosk that you can type to.
             </p>
           </div>
           {props.error && (

@@ -23,7 +23,7 @@ async function startAirportDemo(page: Page): Promise<DemoSession> {
   await expect(page.getByRole("link", { name: /SKYLINE AIRPORT RAIL/ })).toHaveAttribute("aria-current", "true");
   await expect(page.getByRole("link", { name: /MALO BURGER/ })).not.toHaveAttribute("aria-current", "true");
   const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
-  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await page.getByRole("button", { name: "Try it on this screen" }).click();
   const json = (await (await created).json()) as DemoSession & { ok: boolean };
   expect(json.ok).toBe(true);
   await expect(page.getByRole("heading", { name: "Ticket machine · unchanged" })).toBeVisible();

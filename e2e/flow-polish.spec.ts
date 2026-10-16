@@ -17,7 +17,7 @@ async function startDemo(page: Page) {
   await page.goto("/demo");
   await expect(page.getByRole("heading", { name: "Don't learn the kiosk. Just talk." })).toBeVisible({ timeout: 60_000 });
   const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
-  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await page.getByRole("button", { name: "Try it on this screen" }).click();
   const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
   await page.locator("[data-phone-screen]").getByRole("button", { name: "Eat here" }).click();
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "menu");
@@ -164,9 +164,9 @@ test("/assistant at 360×800 in Korean with larger text: a cart summary when the
 test("/demo on a phone says to use a laptop on D1 straight away, without left or right", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/demo");
-  await expect(page.locator("[data-demo-narrow-note]")).toContainText("Open this on a laptop to see the kiosk and the phone side by side.");
-  await expect(page.getByText("Talk or type to the phone next to the kiosk.")).toBeHidden();
-  await expect(page.getByText("Talk or type to the phone.")).toBeVisible();
+  await expect(page.locator("[data-demo-narrow-note]")).toContainText("Open this on a laptop: it shows the kiosk, and your phone orders.");
+  await expect(page.getByText("Scan the QR on the kiosk with your phone.")).toBeVisible();
+  await expect(page.getByText(/on the left|on the right/)).toHaveCount(0);
 });
 
 test("/app: the code field's hint is words, not a code", async ({ page }) => {

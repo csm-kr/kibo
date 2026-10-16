@@ -1,13 +1,13 @@
 "use client";
 
 import { ArrowLeft, CreditCard } from "lucide-react";
+import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
 import { AssistantPanel, type SayFn } from "@/components/assistant/AssistantPanel";
-import { ICON, PRESS, QUIET, SECONDARY } from "@/components/phone/ui";
+import { ICON, PRESS, PRIMARY_SMALL, QUIET, SECONDARY, SECONDARY_SMALL } from "@/components/phone/ui";
 import { KioskCanvas } from "@/components/kiosk/KioskCanvas";
 import { KioskScreen } from "@/components/kiosk/KioskScreen";
 import { LearnedKioskHost } from "@/components/learned/LearnedKioskHost";
-import { PairingPanel } from "@/components/pairing/PairingPanel";
 import { PausedLayer } from "@/components/PausedLayer";
 import { useDemoSession } from "@/hooks/useDemoSession";
 import type { AgentAction } from "@/lib/agent/actions";
@@ -24,13 +24,14 @@ import { CompareCard } from "./CompareCard";
 import { DemoEndCard } from "./DemoEndCard";
 import { DemoFrame } from "./DemoFrame";
 import { DemoIntro } from "./DemoIntro";
-import { environmentOf } from "./environments";
+import { DEMO_ENVIRONMENTS, demoHref, environmentOf } from "./environments";
 import { ScenarioGuide, type SideTab } from "./ScenarioGuide";
 
 // /demo (docs/UX.md Flow C, screen map D1–D3): the real KioskScreen (or a learned kiosk page with the bridge) and
 // AssistantPanel on one real session. Nothing is recorded or simulated beyond the card reader, and the stand-in goes
-// through the kiosk's own path. "Use my phone instead" swaps the phone half for KIBO's pairing panel: the judge's own
-// phone claims the same demo session (demo limits) by QR or code.
+// through the kiosk's own path. [Start] (the default) makes the page only the kiosk, as in a real store: the judge's
+// own phone claims the same demo session (demo limits) by the QR or code on the kiosk's screen, and nothing else
+// shows beside it. "Try it on this screen" draws the phone and the scenario guide beside the kiosk.
 
 /** The server's per-order chat limit for demo sessions (docs/ARCHITECTURE.md "Limits and cost"). */
 const DEMO_CHAT_LIMIT = 30;
@@ -86,7 +87,7 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
   const [run, setRun] = useState<Run | null>(null);
   // The session whose order number the kiosk shows (past its receipt question), for the English step line.
   const [numberFor, setNumberFor] = useState<string | null>(null);
-  /** Every new demo order goes through here, so its counts start at zero. `ownPhone`: "Use my phone instead". */
+  /** Every new demo order goes through here, so its counts start at zero. `ownPhone`: [Start], the judge's phone. */
   function startOrder(ownPhone: boolean) {
     setRun({ forId: null, after: demo.tokens?.sessionId ?? null, startAt: Date.now(), sentences: 0, phoneTaps: 0, kioskTaps: 0 });
     void demo.start(ownPhone);
@@ -107,15 +108,15 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
           kioskId={kiosk.kioskId}
           starting={demo.starting}
           error={demo.error}
-          onStart={() => startOrder(false)}
           onStartPhone={() => startOrder(true)}
+          onStart={() => startOrder(false)}
         />
       </DemoFrame>
     );
   }
 
   const { tokens, session } = demo;
-  // "Use my phone instead": the page is only the kiosk; the judge's own phone holds the device token.
+  // [Start]: the page is only the kiosk; the judge's own phone holds the device token.
   const ownPhone = tokens.deviceToken === undefined;
   const tryAgain = () => startOrder(ownPhone);
   if (run && run.forId === null && run.after !== tokens.sessionId) setRun({ ...run, forId: tokens.sessionId });
@@ -142,15 +143,17 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
       />
     ) : undefined;
   const numberShown = session !== null && numberFor === session.sessionId;
-  // The kiosk's step in English and the card stand-in under it: not with the judge's own phone (the pairing panel says
-  // the step, and the kiosk's own K7 takes the card) nor on a learned kiosk (its page has its own strip).
+  // The card stand-in under the kiosk: not with the judge's own phone (the kiosk's own K7 takes the card) nor on a
+  // learned kiosk (its page has its own strip). The kiosk's step in English shows with either phone (a learned kiosk
+  // only says where to scan).
   const guided = !ownPhone && !learned;
-  const step = guided && session ? demoKioskStep(kiosk, session, numberShown) : null;
+  const step = session ? demoKioskStep(kiosk, session, numberShown, ownPhone) : null;
   const actionList = actions.sessionId === tokens.sessionId ? actions.list : [];
   const endCard = (
     <DemoEndCard kioskId={kiosk.kioskId} locale={locale} learned={learned} compare={compare} onTryAgain={tryAgain} onIntro={demo.stop} />
   );
-  // Own phone: the pairing panel shows the end card when the phone half would (paid, ended, a learned kiosk's review).
+  // Own phone: the row under the kiosk offers the next order when the phone half would show the end card (paid, ended,
+  // a learned kiosk's review).
   const ended =
     session !== null && (session.status === "paid" || session.status === "expired" || (learned && session.status === "confirming"));
   // A place tab would clear an order that has lines and is not paid yet, so it asks first (N5).
@@ -163,20 +166,17 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
         {/* Three white column cards on one top line under the top bar (#1 E). The kiosk column takes the width the
             phone and the third column leave, so the row spans the bar; the kiosk inside it is as tall as the column
             allows and keeps 9:16. The learned page has its own width (1080:1600 and its strip) and the third column
-            takes the rest. */}
+            takes the rest. With the judge's own phone the kiosk column is alone and centred: the laptop is the
+            kiosk. */}
         <main
           data-demo="split"
           data-demo-kiosk={kiosk.kioskId}
           data-demo-own-phone={ownPhone || undefined}
-          className="mx-auto flex min-h-0 w-full max-w-[1600px] flex-1 gap-4 px-6 pb-4 min-[1440px]:gap-5"
+          className={`mx-auto flex min-h-0 w-full max-w-[1600px] flex-1 gap-4 px-6 pb-4 min-[1440px]:gap-5 ${ownPhone ? "justify-center" : ""}`}
         >
-          <section
-            data-demo-column
-            aria-labelledby="demo-kiosk-caption"
-            className={`${COLUMN} ${learned ? "w-[calc((100dvh-136px)*27/40)] flex-none" : "min-w-0 flex-1"}`}
-          >
+          <section data-demo-column aria-labelledby="demo-kiosk-caption" className={`${COLUMN} ${kioskColumnWidth(ownPhone, learned)}`}>
             <div className={`${COLUMN_HEAD} justify-between`}>
-              <Caption id="demo-kiosk-caption" n={1} {...environmentOf(kiosk.kioskId).caption} />
+              <Caption id="demo-kiosk-caption" n={ownPhone ? undefined : 1} {...environmentOf(kiosk.kioskId).caption} />
               {/* The kiosk stays Korean; KIBO says its step in English beside the caption, in two lines at most, so the
                   kiosk under the row keeps one size and place from D2 to D3 (#1 E, #1 item 19). break-keep: it quotes
                   Korean button labels, which would otherwise split mid-word (I-044). */}
@@ -195,14 +195,19 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
               >
                 {learned ? (
                   // Keyed by session: [Try again] reloads the kiosk page, so the new order never starts on the old cart.
+                  // With the judge's own phone, KIBO's panel beside the page carries the QR and the code, which the
+                  // learned page itself cannot show; the phone drawn beside it needs neither, so it keeps the strip.
                   <LearnedKioskHost
                     key={tokens.sessionId}
                     kiosk={kiosk}
                     session={session}
                     kioskToken={tokens.kioskToken}
                     claimUrl={tokens.claimUrl}
+                    pairCode={tokens.pairCode}
+                    pairUrl={tokens.pairUrl}
                     clockOffset={demo.clockOffset}
-                    strip
+                    strip={!ownPhone}
+                    compact={ownPhone}
                   />
                 ) : (
                   <KioskCanvas theme={kiosk.theme} locale={kiosk.locale}>
@@ -256,35 +261,38 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
                   )}
                 </div>
               )}
-            </div>
-          </section>
-          {ownPhone ? (
-            // A slim status column: the QR and code are on the kiosk half's own screen (14-final:1).
-            <section data-demo-column aria-labelledby="demo-phone-caption" className={`${COLUMN} w-[clamp(320px,26vw,440px)] flex-none`}>
-              <div className={COLUMN_HEAD}>
-                <Caption id="demo-phone-caption" n={2} name="Your own phone" />
-              </div>
-              <div className="min-h-0 flex-1 overflow-hidden">
-                <PairingPanel
-                  kiosk={kiosk}
-                  session={session}
-                  claimUrl={tokens.claimUrl}
-                  pairUrl={tokens.pairUrl}
-                  clockOffset={demo.clockOffset}
-                  numberShown={numberShown}
-                >
+              {/* With the judge's own phone, a row of one height under the kiosk holds this page's only controls: back
+                  to the start while the order runs, then the next order (C1a, C5). 76px, so its 56px targets and their
+                  focus rings keep clear of the card's edge (#1 22), and the kiosk keeps one size from start to end. */}
+              {ownPhone && (
+                <div data-demo-next data-demo-check className="flex h-19 w-full flex-none items-center justify-center gap-3 px-4">
                   {ended ? (
-                    endCard
+                    <>
+                      <button type="button" onClick={tryAgain} className={PRIMARY_SMALL}>
+                        {pt("tryAgain", locale)}
+                      </button>
+                      <nav aria-labelledby="demo-other-places" className="flex items-center gap-2">
+                        <h2 id="demo-other-places" className="text-base font-semibold text-muted">
+                          {pt("tryAnotherPlace", locale)}
+                        </h2>
+                        {DEMO_ENVIRONMENTS.filter((e) => e.kioskId !== kiosk.kioskId).map((e) => (
+                          <Link key={e.kioskId} href={demoHref(e.kioskId)} className={SECONDARY_SMALL}>
+                            {e.place[locale]}
+                          </Link>
+                        ))}
+                      </nav>
+                    </>
                   ) : (
-                    <button type="button" onClick={demo.stop} className={`${QUIET} self-start`}>
+                    <button type="button" onClick={demo.stop} className={QUIET}>
                       <ArrowLeft {...ICON} />
                       Back to the start
                     </button>
                   )}
-                </PairingPanel>
-              </div>
-            </section>
-          ) : (
+                </div>
+              )}
+            </div>
+          </section>
+          {!ownPhone && (
             <section
               data-demo-column
               data-demo-check
@@ -334,30 +342,26 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
               </div>
             </section>
           )}
-          <ScenarioGuide
-            kiosk={kiosk}
-            session={session}
-            sessionId={tokens.sessionId}
-            locale={locale}
-            // The judge's own phone: the sentences are to say there, so nothing here sends or plays.
-            send={ownPhone ? undefined : send}
-            onStepSend={() => (stepPending.current = true)}
-            starting={demo.starting}
-            startFailed={demo.error !== null}
-            onFresh={tryAgain}
-            className={learned ? "min-w-80 flex-1" : "w-[clamp(320px,26vw,400px)] flex-none"}
-            // The judge's own phone: its messages and the AI's tool calls happen on that phone, so there is nothing to list.
-            ai={
-              ownPhone
-                ? undefined
-                : {
-                    panel: <ActionStrip kiosk={kiosk} actions={actionList} locale={locale} />,
-                    count: actionList.length,
-                    tab: side.tab,
-                    onTab: (tab) => setSide((t) => ({ ...t, tab })),
-                  }
-            }
-          />
+          {!ownPhone && (
+            <ScenarioGuide
+              kiosk={kiosk}
+              session={session}
+              sessionId={tokens.sessionId}
+              locale={locale}
+              send={send}
+              onStepSend={() => (stepPending.current = true)}
+              starting={demo.starting}
+              startFailed={demo.error !== null}
+              onFresh={tryAgain}
+              className={learned ? "min-w-80 flex-1" : "w-[clamp(320px,26vw,400px)] flex-none"}
+              ai={{
+                panel: <ActionStrip kiosk={kiosk} actions={actionList} locale={locale} />,
+                count: actionList.length,
+                tab: side.tab,
+                onTab: (tab) => setSide((t) => ({ ...t, tab })),
+              }}
+            />
+          )}
         </main>
       </DemoFrame>
       {/* Outside the counted columns, so the tap that resumes is no kiosk or phone tap. A paid order keeps its end card. */}
@@ -366,14 +370,24 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
   );
 }
 
+/** The kiosk column's width: alone and centred with the judge's own phone, else beside the phone and the guide. */
+function kioskColumnWidth(ownPhone: boolean, learned: boolean): string {
+  if (!ownPhone) return learned ? "w-[calc((100dvh-136px)*27/40)] flex-none" : "min-w-0 flex-1";
+  // The learned page at the height the row under it leaves, plus KIBO's panel with the QR beside it; the kiosk canvas
+  // in a card wide enough for its step line and the next-order row under it.
+  return learned
+    ? "w-[calc((100dvh-212px)*27/40_+_clamp(320px,28vw,440px))] max-w-full flex-none"
+    : "w-[clamp(680px,56vw,820px)] max-w-full flex-none";
+}
+
 /** Below 900px the split's fixed columns would both be cut off, so point to the real two-device mode (I-074). */
 function NarrowNotice({ kioskId }: { kioskId: string }) {
   return (
     <main lang="en" className="hidden h-dvh w-full flex-col gap-4 overflow-y-auto bg-[#FBF7EF] p-6 text-[#15171C] max-[899px]:flex">
       <h1 className="text-2xl font-bold">Open this on a laptop</h1>
       <p className="text-xl">
-        The demo shows the kiosk and the phone side by side, which needs a wider screen. On a phone, try the real
-        two-device mode: open the kiosk on a computer and scan its QR.
+        The demo makes this screen the kiosk, which needs a wider screen. On a phone, try the real two-device mode:
+        open the kiosk on a computer and scan its QR.
       </p>
       <a href={`/kiosk?k=${kioskId}`} className={SECONDARY}>
         Open the kiosk

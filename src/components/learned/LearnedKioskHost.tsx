@@ -65,6 +65,13 @@ export function LearnedKioskHost(props: {
    * page is, the QR and the code (I-101, R-006).
    */
   strip?: boolean;
+  /**
+   * /demo with the judge's own phone: the panel keeps only the QR and code and the replay line, because the caption
+   * row above says what the page is and where to scan, so it fits beside the page at 1280×720. The page fills its box
+   * there, so the dark fill is dropped: it showed as a hairline where the centred box starts on a fraction of a pixel
+   * (as on the kiosk frame, #1 E).
+   */
+  compact?: boolean;
 }) {
   const { kiosk, session, kioskToken } = props;
   const outer = useRef<HTMLDivElement>(null);
@@ -136,11 +143,12 @@ export function LearnedKioskHost(props: {
       outcome={outcome}
       caption={caption}
       strip={props.strip ?? false}
+      compact={props.compact ?? false}
     />
   );
   return (
     <div className={`flex h-full w-full ${props.strip ? "flex-col" : "flex-row"}`}>
-      <div ref={outer} className="relative min-h-0 min-w-0 flex-1 overflow-hidden bg-[#141210]">
+      <div ref={outer} className={`relative min-h-0 min-w-0 flex-1 overflow-hidden ${props.compact ? "" : "bg-[#141210]"}`}>
         <iframe
           ref={attach}
           src={kiosk.learned?.page}
@@ -188,8 +196,9 @@ function KiboWidget(props: {
   outcome: BridgeOutcome | null;
   caption: ReturnType<typeof replayCaption>;
   strip: boolean;
+  compact: boolean;
 }) {
-  const { session, outcome, caption, strip } = props;
+  const { session, outcome, caption, strip, compact } = props;
   const connected = session?.phoneConnectedAt != null;
   const src = useQrSrc(connected || strip ? null : props.claimUrl);
   const intro = INTRO[props.kiosk.kioskId] ?? INTRO_DEFAULT;
@@ -235,13 +244,15 @@ function KiboWidget(props: {
         line
       ) : (
         <>
-          <header className="flex flex-col gap-2">
-            <h1 className="text-2xl leading-snug font-bold">{intro.en}</h1>
-            <p className="text-base">Scan the QR or enter the code to order by talking.</p>
-            <p lang="ko" className="text-base text-muted">
-              {intro.ko} QR을 찍거나 번호를 넣고 말로 주문하세요.
-            </p>
-          </header>
+          {!compact && (
+            <header className="flex flex-col gap-2">
+              <h1 className="text-2xl leading-snug font-bold">{intro.en}</h1>
+              <p className="text-base">Scan the QR or enter the code to order by talking.</p>
+              <p lang="ko" className="text-base text-muted">
+                {intro.ko} QR을 찍거나 번호를 넣고 말로 주문하세요.
+              </p>
+            </header>
+          )}
           <section className="flex flex-col gap-3 rounded-sheet bg-white p-4 shadow-card">
             {connected ? (
               <p className="text-xl font-bold">
@@ -284,9 +295,11 @@ function KiboWidget(props: {
           <section aria-label="What KIBO did on the kiosk" className="flex flex-col gap-2">
             {line}
           </section>
-          <Link href="/learn" className={`${SECONDARY} mt-auto`}>
-            Watch how KIBO learned it
-          </Link>
+          {!compact && (
+            <Link href="/learn" className={`${SECONDARY} mt-auto`}>
+              Watch how KIBO learned it
+            </Link>
+          )}
         </>
       )}
     </aside>

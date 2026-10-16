@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { claim, command, kioskRoot, readClaim, storedKioskSession } from "./helpers";
 
 // A laptop as the kiosk and a real phone (12-phone-app:4): on a landscape screen /kiosk shows KIBO's status column
-// beside the tall portrait canvas, and /demo "Use my phone instead" shows the same column instead of the phone half.
+// beside the tall portrait canvas; /demo's [Start] shows the kiosk alone, its QR and code on its own screen.
 // The QR and code are only on the kiosk's own screen (14-final:1). The "phone" here is plain HTTP with the device token.
 
 test.use({
@@ -97,58 +97,74 @@ test("/kiosk on a portrait screen has no panel", async ({ page }) => {
   await expect(page.locator("[data-pairing-panel]")).toHaveCount(0);
 });
 
-test("/demo Use my phone instead: the judge's phone claims a demo session; [Try again] makes a fresh pairable one", async ({
+test("/demo [Start]: the laptop is only the kiosk; the judge's phone claims a demo session; [Try again] makes a fresh pairable one", async ({
   page,
   request,
 }) => {
   await page.goto("/demo?k=malo");
-  await page.getByRole("button", { name: "Use my phone instead" }).click();
-  const panel = page.locator("[data-pairing-panel]");
-  await expect(panel.getByText("Waiting for a phone")).toBeVisible();
-  // No simulated phone in this mode.
+  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await expect(page.locator("main[data-demo-own-phone]")).toBeVisible();
+  // Only the kiosk, as in a store: no phone drawn beside it, no status column, no scenario guide or "What the AI did".
+  await expect(page.locator("[data-demo-column]")).toHaveCount(1);
   await expect(page.locator("[data-phone-screen]")).toHaveCount(0);
+  await expect(page.locator("[data-pairing-panel]")).toHaveCount(0);
+  await expect(page.locator("[data-scenario-guide]")).toHaveCount(0);
+  await expect(page.getByText("What the AI did")).toHaveCount(0);
+  const step = page.locator("[data-kiosk-step]");
+  await expect(step).toHaveText("Start: scan the QR with your phone's camera.");
+  const next = page.locator("[data-demo-next]");
+  await expect(next.getByRole("button", { name: "Back to the start" })).toBeVisible();
   const { sessionId, claimToken } = await readClaim(page);
-  await expectNoToken(page, claimToken);
   const firstCode = (await kioskRoot(page).locator("[data-pair-code]").getAttribute("data-pair-code")) ?? "";
-  await expectOneQr(page, firstCode);
+  await expect(page.locator("img[data-claim-url]")).toHaveCount(1);
+  // The token only lives inside the QR picture.
+  expect(await page.locator("main[data-demo-own-phone]").innerText()).not.toContain(claimToken);
 
   const claimed = await claim(request, sessionId, claimToken);
   const { deviceToken } = await claimed.json();
-  await expect(panel.getByText(/^Phone connected at/)).toBeVisible();
-
-  // The scenario guide stays, but its sentences are text to say on the phone: nothing here sends or plays.
-  await page.locator("[data-scenario]").first().click();
-  await expect(page.locator("[data-scenario-say]").first()).toBeVisible();
-  await expect(page.getByRole("button", { name: "Play it for me" })).toHaveCount(0);
-  await expect(page.getByText("Say or type these on your phone.")).toBeVisible();
+  await expect(step).toHaveText("Eat here or take out: answer on either screen.");
 
   const phone = (type: string, args: object, extra: { source: string; cartVersion?: number; utteranceSeq?: number }) =>
     command(request, deviceToken, { sessionId, type, args, ...extra });
   await phone("setDineOption", { option: "eat_in" }, { source: "button" });
   await phone("addToCart", ITEM, { source: "voice", utteranceSeq: 1 });
-  await expect(panel.locator("[data-panel-order]")).toHaveText(/^Ordering · 1 item/);
+  await expect(step).toHaveText("Menu: your order shows at the bottom.");
   const checkout = await phone("requestCheckout", {}, { source: "voice", utteranceSeq: 2 });
   await phone("confirmCheckout", {}, { source: "button", cartVersion: checkout.cartVersion });
 
-  // Paying happens on the kiosk half, as at a real kiosk; the panel says the Korean kiosk's step in English.
+  // Paying happens on the kiosk itself, as at a real kiosk; the caption says the Korean kiosk's step in English.
   const root = kioskRoot(page);
   await expect(root).toHaveAttribute("data-screen", "payment");
-  await expect(panel.locator("[data-panel-change]")).toHaveText("Confirmed by you");
-  await expect(panel.locator("[data-kiosk-step]")).toContainText("Tap 카드 (Card), then 카드 넣기 (Insert card)");
-  // The caption's copy is for the phone-half demo; here the panel holds it, once.
-  await expect(page.locator("[data-kiosk-step]")).toHaveCount(1);
+  await expect(step).toHaveText("Payment: tap 카드 (Card), then 카드 넣기 (Insert card).");
+  // No card stand-in: the kiosk's own buttons take the card.
+  await expect(page.locator("[data-card-reader]")).toHaveCount(0);
   await root.getByRole("button", { name: "카드", exact: true }).click();
   await root.getByRole("button", { name: "카드 넣기" }).click();
   await expect(root).toHaveAttribute("data-screen", "done");
-  await expect(panel.locator("[data-panel-order]")).toHaveText(/^Paid · order number \d+$/);
-  await expect(panel.locator("[data-panel-change]")).toHaveText("Paid at the kiosk · confirmed by you");
   // No touch-vs-talk card: the judge's messages and taps happened on their own phone.
   await expect(page.getByText("Touch vs talk")).toHaveCount(0);
+  await expect(next.getByRole("button", { name: "Back to the start" })).toHaveCount(0);
+  await expect(next.getByRole("navigation", { name: "Try another place" }).getByRole("link")).toHaveText(["Airport rail", "Pizza shop"]);
 
-  await panel.getByRole("button", { name: "Try again" }).click();
-  await expect(panel.getByText("Waiting for a phone")).toBeVisible();
+  await next.getByRole("button", { name: "Try again" }).click();
+  await expect(step).toHaveText("Start: scan the QR with your phone's camera.");
   await expect(page.locator("main[data-demo-own-phone]")).toBeVisible();
   await expect(kioskRoot(page).locator("[data-pair-code]")).not.toHaveAttribute("data-pair-code", firstCode);
   const fresh = await readClaim(page);
   expect(fresh.sessionId).not.toBe(sessionId);
+});
+
+test("/demo [Start] on the learned pizza kiosk: KIBO's panel beside the page shows the whole QR and the code at 1280x720", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto("/demo?k=doughhouse");
+  await page.getByRole("button", { name: "Start", exact: true }).click();
+  const widget = page.locator("[data-learned-widget]");
+  await expect(widget.locator("img[data-claim-url]")).toBeInViewport({ ratio: 1 });
+  await expect(widget.locator("[data-pair-code]")).toHaveAttribute("data-pair-code", /^\d{6}$/);
+  await expect(widget.locator("[data-pair-code]")).toBeInViewport({ ratio: 1 });
+  // The caption row says what the page is and where to scan, so the panel does not repeat it.
+  await expect(page.locator("[data-kiosk-step]")).toHaveText("Start: scan the QR with your phone's camera.");
+  expect(await widget.evaluate((el) => el.scrollHeight <= el.clientHeight)).toBe(true);
+  await expect(page.locator("[data-demo-column]")).toHaveCount(1);
+  await expect(page.locator("[data-scenario-guide]")).toHaveCount(0);
 });

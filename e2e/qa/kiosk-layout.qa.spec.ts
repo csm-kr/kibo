@@ -142,9 +142,9 @@ test("K8: the order number sits in the top third, with a receipt of what was pai
 /** /demo started at a place (MALO unless named), with the phone half's own session tokens. */
 async function startDemo(page: Page, kioskId: "malo" | "airport_rail" | "doughhouse" = "malo") {
   await page.goto(kioskId === "malo" ? "/demo" : `/demo?k=${kioskId}`);
-  await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByRole("button", { name: "Try it on this screen" })).toBeVisible({ timeout: 60_000 });
   const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
-  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await page.getByRole("button", { name: "Try it on this screen" }).click();
   const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
   // The learned kiosk is its own page in a frame; the ticket machine has no dine step.
   if (kioskId === "doughhouse") await expect(page.locator("[data-learned-widget]")).toBeVisible();

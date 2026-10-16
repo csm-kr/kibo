@@ -40,7 +40,7 @@ test("/demo D2 retrying", async ({ page }, info) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await refuseStreams(page);
   await page.goto("/demo?k=malo");
-  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await page.getByRole("button", { name: "Try it on this screen" }).click();
   await expect(page.locator("[data-demo-check]").getByText("Busy right now. Reconnecting…")).toBeVisible();
   await check(page, info, DEMO, "D2-retrying");
 });

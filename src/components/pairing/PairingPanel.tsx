@@ -1,17 +1,17 @@
 "use client";
 
 import Image from "next/image";
-import type { ReactNode } from "react";
 import { CARD } from "@/components/phone/ui";
 import { useNow } from "@/hooks/useNow";
 import { changeLine, kioskStep, orderLine, phoneLink } from "@/lib/kiosk/pairing";
 import type { KioskData } from "@/types/menu";
 import type { Session } from "@/types/session";
 
-// KIBO's status column beside a landscape kiosk: /kiosk on a laptop and /demo "Use my phone" (docs/UX.md Flow A,
-// Flow C). KIBO's surface, not the store's, so it uses the phone design (docs/UI_GUIDE.md "Phone design") at
-// >= 18px. The QR and the 6-digit code live only on the kiosk's own screen, as on a real kiosk (14-final:1); this
-// column says where to find them, then what the phone is doing, read-only from the session.
+// KIBO's status column beside a landscape kiosk: /kiosk on a laptop (docs/UX.md Flow A); /demo shows the kiosk alone
+// with the judge's own phone (Flow C1a). KIBO's surface, not the store's, so it uses the phone design
+// (docs/UI_GUIDE.md "Phone design") at >= 18px. The QR and the 6-digit code live only on the kiosk's own screen, as on
+// a real kiosk (14-final:1); this column says where to find them, then what the phone is doing, read-only from the
+// session.
 
 export function PairingPanel(props: {
   kiosk: KioskData;
@@ -20,10 +20,8 @@ export function PairingPanel(props: {
   /** What to open on the phone, from the server (SHORT_APP_URL or <host>/app); else the claim URL's host. */
   pairUrl?: string | null;
   clockOffset: number;
-  /** /demo: the kiosk beside it shows the order number, past its receipt question (#1 item 13). */
+  /** The kiosk beside it shows the order number, past its receipt question (#1 item 13, #1 31). */
   numberShown?: boolean;
-  /** /demo: the end card ([Try again], other places) once the order is done. */
-  children?: ReactNode;
 }) {
   const { kiosk, session, claimUrl, clockOffset } = props;
   const now = useNow();
@@ -90,7 +88,6 @@ export function PairingPanel(props: {
           </section>
         )
       )}
-      {props.children}
     </aside>
   );
 }

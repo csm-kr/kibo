@@ -26,7 +26,7 @@ test("/demo: a refused stream says so on both halves, then reconnects by itself"
   await page.setViewportSize({ width: 1440, height: 900 });
   await refuseStreams(page);
   await page.goto("/demo?k=malo");
-  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await page.getByRole("button", { name: "Try it on this screen" }).click();
   const phone = page.locator("[data-phone-screen]");
   await expect(phone).toHaveAttribute("data-phone-screen", "connecting");
   await expect(phone.getByRole("status").filter({ hasText: BUSY_EN })).toBeVisible();

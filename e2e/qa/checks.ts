@@ -20,13 +20,16 @@ export interface Profile {
 
 export const KIOSK: Profile = { route: "/kiosk", root: "[data-kiosk-canvas]", canvasWidth: 1080, minFont: 40, minTarget: 40 };
 export const PHONE: Profile = { route: "/assistant", root: "body", minFont: 16, minTarget: 56 };
-/** /demo: the intro, or the phone column of the split. The kiosk half is the scaled canvas, measured at full size by KIOSK. */
+/**
+ * /demo: the intro, the phone column of the split, or with the judge's phone the row under the kiosk. The kiosk half
+ * is the scaled canvas, measured at full size by KIOSK.
+ */
 export const DEMO: Profile = { route: "/demo", root: "[data-demo-check]", minFont: 16, minTarget: 56 };
 /** /demo: the D2 scenario guide column, judged by the phone numbers like the phone column next to it. */
 export const DEMO_GUIDE: Profile = { route: "/demo", root: "[data-scenario-guide]", minFont: 16, minTarget: 56 };
 /** /learned/<kiosk>: KIBO's corner widget only; the learned kiosk page in the iframe is not KIBO's UI and is shown unchanged. */
 export const LEARNED: Profile = { route: "/learned", root: "[data-learned-widget]", minFont: 16, minTarget: 56 };
-/** KIBO's pairing panel beside a landscape kiosk (/kiosk, /demo "Use my phone"): phone numbers, text >= 18px. */
+/** KIBO's pairing panel beside a landscape kiosk (/kiosk): phone numbers, text >= 18px. */
 export const PAIRING: Profile = { route: "/kiosk", root: "[data-pairing-panel]", minFont: 18, minTarget: 56 };
 /** The root landing page `/`, judged by the phone numbers (a judge may open it on either device). */
 export const HOME: Profile = { route: "/", root: "body", minFont: 16, minTarget: 56 };

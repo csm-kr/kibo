@@ -28,9 +28,9 @@ interface DemoSession {
 
 async function start(page: Page, kioskId = "malo"): Promise<DemoSession> {
   await page.goto(`/demo?k=${kioskId}`);
-  await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByRole("button", { name: "Try it on this screen" })).toBeVisible({ timeout: 60_000 });
   const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
-  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await page.getByRole("button", { name: "Try it on this screen" }).click();
   return (await (await created).json()) as DemoSession;
 }
 

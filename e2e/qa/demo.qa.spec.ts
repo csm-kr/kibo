@@ -65,7 +65,7 @@ test("D1 to D3", async ({ page, request }, info) => {
   await check(page, info, "D1-intro");
 
   const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
-  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await page.getByRole("button", { name: "Try it on this screen" }).click();
   const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "dine");
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "dine");
@@ -170,7 +170,7 @@ test.describe(() => {
     await check(page, info, "D1-intro-rail");
 
     const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
-    await page.getByRole("button", { name: "Start", exact: true }).click();
+    await page.getByRole("button", { name: "Try it on this screen" }).click();
     const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
     await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "talk");
     await check(page, info, "D2-rail-empty", firstExampleInView(page));
@@ -220,7 +220,7 @@ test.describe(() => {
   test("D2 with the scenario guide open and a scenario half done", async ({ page, request }, info) => {
     await page.goto("/demo");
     await expect(page.getByRole("heading", { name: "Don't learn the kiosk. Just talk." })).toBeVisible({ timeout: 60_000 });
-    await page.getByRole("button", { name: "Start", exact: true }).click();
+    await page.getByRole("button", { name: "Try it on this screen" }).click();
     await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "dine");
     const guide = page.locator("[data-scenario-guide]");
     await openScenarios(page);
@@ -250,7 +250,7 @@ test.describe(() => {
   test("D2 with 'What the AI did' open after a scenario step, and collapsed", async ({ page, request }, info) => {
     await page.goto("/demo");
     await expect(page.getByRole("heading", { name: "Don't learn the kiosk. Just talk." })).toBeVisible({ timeout: 60_000 });
-    await page.getByRole("button", { name: "Start", exact: true }).click();
+    await page.getByRole("button", { name: "Try it on this screen" }).click();
     await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "dine");
     const guide = page.locator("[data-scenario-guide]");
     await openScenarios(page);
@@ -290,9 +290,9 @@ test.describe(() => {
   // English label "Cider"; the reply stays Korean. No model: the route stands in for the agent and checks the message.
   test("D2: a Korean typed order on English screens, through a choice tap", async ({ page, request }, info) => {
     await page.goto("/demo");
-    await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible({ timeout: 60_000 });
+    await expect(page.getByRole("button", { name: "Try it on this screen" })).toBeVisible({ timeout: 60_000 });
     const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
-    await page.getByRole("button", { name: "Start", exact: true }).click();
+    await page.getByRole("button", { name: "Try it on this screen" }).click();
     const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
     await command(request, s.deviceToken, { sessionId: s.sessionId, type: "setDineOption", args: { option: "eat_in" }, source: "button" });
     await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "talk");
@@ -330,9 +330,9 @@ test.describe(() => {
 /** Opens /demo, starts and chooses "Eat here" on the phone, so the phone is on its talk screen with an empty cart. */
 async function startTalk(page: Page) {
   await page.goto("/demo");
-  await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByRole("button", { name: "Try it on this screen" })).toBeVisible({ timeout: 60_000 });
   const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
-  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await page.getByRole("button", { name: "Try it on this screen" }).click();
   const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
   await phoneScreen(page).getByRole("button", { name: "Eat here" }).click();
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "talk");
@@ -430,8 +430,8 @@ test.describe(() => {
 /** Opens /demo?k=<kioskId>, starts, opens the guide and chooses a scenario; returns the scenario's own session. */
 async function chooseScenario(page: Page, kioskId: string, scenarioId: string) {
   await page.goto(`/demo?k=${kioskId}`);
-  await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible({ timeout: 60_000 });
-  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Try it on this screen" })).toBeVisible({ timeout: 60_000 });
+  await page.getByRole("button", { name: "Try it on this screen" }).click();
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", /^(dine|talk)$/);
   const guide = page.locator("[data-scenario-guide]");
   await openScenarios(page);
@@ -602,7 +602,7 @@ test("D1 to D3 with the learned pizza kiosk", async ({ page, request }, info) =>
   await check(page, info, "D1-intro-learned", undefined, judge);
 
   const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
-  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await page.getByRole("button", { name: "Try it on this screen" }).click();
   const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
   const widget = page.locator("[data-learned-widget]");
   let seq = 0;

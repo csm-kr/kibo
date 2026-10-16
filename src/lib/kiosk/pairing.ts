@@ -5,8 +5,9 @@ import { formatWon } from "./menu";
 import { kioskScreen } from "./screen";
 import { phonePaused } from "./timers";
 
-// The KIBO pairing panel beside a landscape kiosk (/kiosk, /demo "Use my phone"): what the phone is doing, read only
-// from the public session. English (judges and laptop demos); ticket machines use ticket words (R-007).
+// The KIBO pairing panel beside a landscape kiosk (/kiosk; /demo says the step in its caption row): what the phone
+// is doing, read only from the public session. English (judges and laptop demos); ticket machines use ticket words
+// (R-007).
 
 export type PhoneLink = "waiting" | "connected" | "paused";
 
@@ -94,8 +95,11 @@ export function kioskStep(kiosk: KioskData, session: Session, numberShown = fals
  * question to the order number (#1 item 19, I-248), as "<step>: <what to do or know>." in two short lines at most, so
  * the row keeps its 56px and the kiosk under it never moves. The screen comes from kioskScreen, so a phone's add
  * before the dine option reads as the menu, as the kiosk shows it. `numberShown`: past the receipt question (#1 item 13).
+ * `ownPhone`: the judge's own phone, the /demo default, where the laptop shows only the kiosk, so until a phone claims
+ * the order the line says to scan the QR (on the kiosk's own screen; beside a learned page, on KIBO's panel).
  */
-export function demoKioskStep(kiosk: KioskData, session: Session, numberShown: boolean): string | null {
+export function demoKioskStep(kiosk: KioskData, session: Session, numberShown: boolean, ownPhone = false): string | null {
+  if (ownPhone && session.status === "idle") return "Start: scan the QR with your phone's camera.";
   if (kiosk.kind === "learned") return null;
   const ticket = kiosk.domain === "ticket";
   const screen = kioskScreen(session, { touchStarted: false }, kiosk);

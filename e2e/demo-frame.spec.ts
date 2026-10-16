@@ -27,9 +27,9 @@ interface DemoSession {
 
 async function start(page: Page, kioskId = "malo"): Promise<DemoSession> {
   await page.goto(`/demo?k=${kioskId}`);
-  await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByRole("button", { name: "Try it on this screen" })).toBeVisible({ timeout: 60_000 });
   const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
-  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await page.getByRole("button", { name: "Try it on this screen" }).click();
   return (await (await created).json()) as DemoSession;
 }
 
@@ -51,7 +51,7 @@ async function expectBar(page: Page, current: string, at: string) {
 
 test("D1, D2 and D3 share one top bar: KIBO, Live demo, the place tabs with the current place selected, How it works (#1 E)", async ({ page, request }) => {
   await page.goto("/demo?k=airport_rail");
-  await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByRole("button", { name: "Try it on this screen" })).toBeVisible({ timeout: 60_000 });
   await expectBar(page, "Airport rail", "D1");
   const d1 = await bar(page).boundingBox();
 
@@ -65,7 +65,7 @@ test("D1, D2 and D3 share one top bar: KIBO, Live demo, the place tabs with the 
   expect(reached).toEqual(expect.arrayContaining(["Burger shop", "Airport rail", "Pizza shop"]));
 
   const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
-  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await page.getByRole("button", { name: "Try it on this screen" }).click();
   const s = (await (await created).json()) as DemoSession;
   await expect(page.locator("[data-phone-screen]")).toBeVisible();
   await expectBar(page, "Airport rail", "D2");
@@ -92,7 +92,7 @@ test.describe(() => {
     await start(page);
     await places(page).getByRole("link", { name: "Pizza shop" }).click();
     await expect(page).toHaveURL(/\/demo\?k=doughhouse$/);
-    await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Try it on this screen" })).toBeVisible();
 
     // Lines in the order: one plain question first; keeping the order changes nothing.
     const s = await start(page);
@@ -124,7 +124,7 @@ test.describe(() => {
     await places(page).getByRole("link", { name: "Airport rail" }).click();
     await ask.getByRole("button", { name: "Start over" }).click();
     await expect(page).toHaveURL(/\/demo\?k=airport_rail$/);
-    await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Try it on this screen" })).toBeVisible();
   });
 
   test("after payment a place tab asks nothing: the order is done (#1 E)", async ({ page, request }) => {
@@ -366,7 +366,7 @@ test.describe(() => {
 
 test("D1: descriptions start on one line, the pizza note sits in a box, no dark outlines, a balanced headline (#1 6)", async ({ page }) => {
   await page.goto("/demo");
-  await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByRole("button", { name: "Try it on this screen" })).toBeVisible({ timeout: 60_000 });
   for (const vp of SIZES) {
     await page.setViewportSize(vp);
     const at = `${vp.width}x${vp.height}`;
@@ -429,6 +429,6 @@ test("D1: descriptions start on one line, the pizza note sits in a box, no dark 
     expect(m.lone, `${at}: headline words alone on a line`).toEqual([]);
   }
   // The secondary button follows the phone design: tinted, no border (I-165).
-  const phone = page.getByRole("button", { name: "Use my phone instead" });
+  const phone = page.getByRole("button", { name: "Try it on this screen" });
   expect(await phone.evaluate((el) => [getComputedStyle(el).backgroundColor, getComputedStyle(el).borderTopWidth])).toEqual(["rgb(238, 240, 253)", "0px"]);
 });

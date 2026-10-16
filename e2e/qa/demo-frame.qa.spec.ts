@@ -44,11 +44,11 @@ async function check(page: Page, info: TestInfo, state: string, profile: Profile
 
 test("the /demo frame: top bar, the leave question, the kiosk's caption row and card stand-in", async ({ page, request }, info) => {
   await page.goto("/demo");
-  await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByRole("button", { name: "Try it on this screen" })).toBeVisible({ timeout: 60_000 });
   await check(page, info, "D1-topbar", TOPBAR);
 
   const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
-  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await page.getByRole("button", { name: "Try it on this screen" }).click();
   const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "dine");
   await check(page, info, "D2-kiosk-caption-dine", KIOSK_CAPTION);
@@ -110,9 +110,9 @@ test.describe(() => {
 
   test("a keyboard walk through D2 at 1280×720: every focus ring is whole, none cut by the frame, a card or a scroll edge (#1 22)", async ({ page, request }) => {
     await page.goto("/demo");
-    await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible({ timeout: 60_000 });
+    await expect(page.getByRole("button", { name: "Try it on this screen" })).toBeVisible({ timeout: 60_000 });
     const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
-    await page.getByRole("button", { name: "Start", exact: true }).click();
+    await page.getByRole("button", { name: "Try it on this screen" }).click();
     const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
     await expect(kioskRoot(page)).toHaveAttribute("data-screen", "dine");
     let seq = 0;

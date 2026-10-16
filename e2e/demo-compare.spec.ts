@@ -22,7 +22,7 @@ test("the hero order by text: this session's counts next to the efficient touch 
   await page.goto("/demo");
   await expect(page.getByRole("heading", { name: "Don't learn the kiosk. Just talk." })).toBeVisible({ timeout: 60_000 });
   const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
-  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await page.getByRole("button", { name: "Try it on this screen" }).click();
   const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
 
   // Tap 1: the dine option on the phone.

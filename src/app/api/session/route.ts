@@ -4,7 +4,7 @@ import { checkIpLimit } from "@/lib/limits/ip";
 import { createSession } from "@/lib/session/service";
 import { getStore } from "@/lib/store";
 
-// `pairPhone` (with `demo`): /demo "Use my phone", a demo session that a real phone claims instead of the page.
+// `pairPhone` (with `demo`): /demo [Start], a demo session that the judge's own phone claims instead of the page.
 const bodySchema = z.strictObject({
   kioskId: z.string().min(1).max(64),
   demo: z.boolean().optional(),

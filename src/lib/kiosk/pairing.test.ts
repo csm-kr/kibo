@@ -174,4 +174,15 @@ describe("demoKioskStep", () => {
     expect(demoKioskStep(malo, session("expired"), false)).toBeNull();
     expect(demoKioskStep(getKiosk("doughhouse"), session("ordering"), false)).toBeNull();
   });
+
+  // The judge's own phone (the /demo default): the laptop shows only the kiosk, so the line says where to start.
+  it("with the judge's own phone, says to scan the kiosk's QR until a phone is there", () => {
+    expect(demoKioskStep(malo, session("idle"), false, true)).toBe("Start: scan the QR with your phone's camera.");
+    expect(demoKioskStep(rail, session("idle"), false, true)).toBe("Start: scan the QR with your phone's camera.");
+    expect(demoKioskStep(malo, session("connected"), false, true)).toBe("Eat here or take out: answer on either screen.");
+    expect(demoKioskStep(malo, session("expired"), false, true)).toBeNull();
+    // The learned page cannot show KIBO's QR, so KIBO's panel beside it does; the line points there all the same.
+    expect(demoKioskStep(getKiosk("doughhouse"), session("idle"), false, true)).toBe("Start: scan the QR with your phone's camera.");
+    expect(demoKioskStep(getKiosk("doughhouse"), session("ordering"), false, true)).toBeNull();
+  });
 });

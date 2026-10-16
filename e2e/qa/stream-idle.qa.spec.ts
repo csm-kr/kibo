@@ -55,7 +55,7 @@ test("/demo D2 paused", async ({ page }, info) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await shortIdle(page);
   await page.goto("/demo?k=malo");
-  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await page.getByRole("button", { name: "Try it on this screen" }).click();
   await expect(page.locator('[data-demo="split"]')).toBeVisible();
   await checkPaused(page, info, DEMO_PAUSED, "D2-paused");
 });

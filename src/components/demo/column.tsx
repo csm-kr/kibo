@@ -31,11 +31,12 @@ export function ColumnNumber({ n }: { n: number }) {
 /**
  * "1 Kiosk · unchanged": the number, the name in bold and an optional note in muted. A `noteWide` note gives way below
  * 1366px wide, where a long name would leave the kiosk's step too little room (#1 24); screen readers still hear it.
+ * No number when the column is alone (the judge's own phone): there is no order to look in.
  */
-export function Caption({ id, n, name, note, noteWide }: { id: string; n: number; name: string; note?: string; noteWide?: boolean }) {
+export function Caption({ id, n, name, note, noteWide }: { id: string; n?: number; name: string; note?: string; noteWide?: boolean }) {
   return (
     <h2 id={id} data-column-caption className="flex min-w-0 flex-none items-center gap-2 text-base font-bold">
-      <ColumnNumber n={n} />
+      {n !== undefined && <ColumnNumber n={n} />}
       <span>
         {name}
         {note && <span className={`font-normal text-muted ${noteWide ? "max-[1365px]:sr-only" : ""}`}> · {note}</span>}

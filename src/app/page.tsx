@@ -179,8 +179,8 @@ export default function Home() {
           className="mx-auto h-auto w-full max-w-5xl rounded-[18px] border border-[#E2DACB]"
         />
         <p className={EVIDENCE}>
-          The live demo shows the kiosk and the phone side by side and works best on a laptop. Two-device mode opens the
-          kiosk; scan its QR code with your phone.
+          Open the live demo on a laptop: it shows the kiosk, and you order by scanning its QR with your phone. Without a
+          phone at hand, “Try it on this screen” shows the phone beside the kiosk, as in this picture.
         </p>
       </section>
 

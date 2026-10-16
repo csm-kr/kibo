@@ -32,7 +32,7 @@ const phoneScreen = (page: Page) => page.locator("[data-phone-screen]");
 test("scenario guide: beside the phone, a chosen scenario starts fresh, its step ticks from the session", async ({ page, request }) => {
   await page.goto("/demo");
   await expect(page.getByRole("heading", { name: "Don't learn the kiosk. Just talk." })).toBeVisible({ timeout: 60_000 });
-  const first = await newSession(page, () => page.getByRole("button", { name: "Start", exact: true }).click());
+  const first = await newSession(page, () => page.getByRole("button", { name: "Try it on this screen" }).click());
 
   // The third column beside the phone at every judge size (#1 E, I-132).
   await expect(page.locator("[data-scenario]")).toHaveCount(6);
@@ -88,7 +88,7 @@ test("@live Play it for me: Sunja's lunch reaches the confirm card with two sets
   test.setTimeout(240_000);
   await page.goto("/demo");
   await expect(page.getByRole("heading", { name: "Don't learn the kiosk. Just talk." })).toBeVisible({ timeout: 60_000 });
-  await newSession(page, () => page.getByRole("button", { name: "Start", exact: true }).click());
+  await newSession(page, () => page.getByRole("button", { name: "Try it on this screen" }).click());
   await openScenarios(page);
   await newSession(page, () => page.locator('[data-scenario="sunja-lunch"]').click());
 
@@ -131,8 +131,8 @@ PLAYED.forEach((p, i) => {
       test.skip(process.env.E2E_LIVE !== "1", "calls real Gemini; run `npm run test:e2e:live`");
       test.setTimeout(240_000);
       await page.goto(`/demo?k=${p.kioskId}`);
-      await expect(page.getByRole("button", { name: "Start", exact: true })).toBeVisible({ timeout: 60_000 });
-      await newSession(page, () => page.getByRole("button", { name: "Start", exact: true }).click());
+      await expect(page.getByRole("button", { name: "Try it on this screen" })).toBeVisible({ timeout: 60_000 });
+      await newSession(page, () => page.getByRole("button", { name: "Try it on this screen" }).click());
       await openScenarios(page);
       await newSession(page, () => page.locator(`[data-scenario="${p.id}"]`).click());
       if (p.dine) await phoneScreen(page).getByRole("button", { name: "Eat here" }).click();

@@ -35,11 +35,11 @@ test("a visible kiosk never pauses: after the idle time it still mirrors a chang
   await expect(page.getByRole("region", { name: "장바구니" }).getByText(/치즈버거 세트/)).toBeVisible();
 });
 
-test("/demo Use my phone instead is the kiosk, so it never pauses either (I-172)", async ({ page }) => {
+test("/demo [Start] makes the page the kiosk, so it never pauses either (I-172)", async ({ page }) => {
   await shortIdle(page);
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/demo?k=malo");
-  await page.getByRole("button", { name: "Use my phone instead" }).click();
+  await page.getByRole("button", { name: "Start", exact: true }).click();
   await expect(page.locator("img[data-claim-url]")).toBeVisible();
   await page.waitForTimeout(IDLE_MS * 2);
   await expect(page.locator("[data-stream-paused]")).toHaveCount(0);

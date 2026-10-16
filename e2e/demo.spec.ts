@@ -35,7 +35,7 @@ test("judge path: intro, order on both halves, confirm, card stand-in, order num
   // The kiosk picker under [Start] defaults to MALO BURGER.
   await expect(page.getByRole("link", { name: /MALO BURGER/ })).toHaveAttribute("aria-current", "true");
 
-  const s = await startDemo(page, "Start");
+  const s = await startDemo(page, "Try it on this screen");
   expect(s.deviceToken).toBeTruthy();
   await expect(page.getByRole("heading", { name: "Kiosk · unchanged" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Your phone", exact: true })).toBeVisible();
@@ -93,7 +93,7 @@ test("judge path: intro, order on both halves, confirm, card stand-in, order num
 test("@live typing an order reaches real Gemini and fills the cart", async ({ page }) => {
   test.skip(process.env.E2E_LIVE !== "1", "calls real Gemini; run `npm run test:e2e:live`");
   await page.goto("/demo");
-  await startDemo(page, "Start");
+  await startDemo(page, "Try it on this screen");
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "dine");
   await page.getByRole("textbox", { name: "Type your order" }).fill("One cheeseburger set with zero cola");
   await page.getByRole("button", { name: "Send" }).click();

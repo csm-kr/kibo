@@ -141,7 +141,7 @@ function isHero(cart: CartLine[]): boolean {
 async function startDemo(page: Page) {
   await page.goto("/demo?e2e=1");
   await expect(page.getByRole("heading", { name: "Don't learn the kiosk. Just talk." })).toBeVisible({ timeout: 60_000 });
-  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await page.getByRole("button", { name: "Try it on this screen" }).click();
   await expect(page.locator("[data-phone-screen]")).toHaveAttribute("data-phone-screen", "dine");
   // The first 6-8 px ring on the kiosk half, in the page's clock (the same clock as the voice marks).
   await page.evaluate(() => {

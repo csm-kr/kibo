@@ -11,19 +11,19 @@ const ACTIVE_MS = 30_000;
 interface DemoTokens {
   sessionId: string;
   kioskToken: string;
-  /** Absent in "Use my phone" mode: the judge's own phone claims the session and holds its token. */
+  /** Absent with the judge's own phone ([Start]): that phone claims the session and holds its token. */
   deviceToken?: string;
   claimUrl: string;
-  /** "Use my phone" mode only: the 6-digit code for /app. */
+  /** With the judge's own phone only: the 6-digit code for /app. */
   pairCode: string | null;
-  /** "Use my phone" mode only: the address shown beside the code. */
+  /** With the judge's own phone only: the address shown beside the code. */
   pairUrl: string | null;
 }
 
 /**
  * The /demo session: `POST /api/session` with `demo: true` returns both tokens, so one page is the kiosk and the
- * phone (docs/ARCHITECTURE.md "Pages"). With `pairPhone` ("Use my phone") the page is only the kiosk and a real
- * phone claims the session by QR or code; the demo limits still apply. Kept in memory only: a reload goes back to
+ * phone (docs/ARCHITECTURE.md "Pages"). With `pairPhone` ([Start]) the page is only the kiosk and a real phone
+ * claims the session by QR or code; the demo limits still apply. Kept in memory only: a reload goes back to
  * the intro. Pings every 30 s (with the device token, or the kiosk token when the phone is the judge's own), so
  * the kiosk half never shows "connection paused" for its own phone and activity extends the session.
  */
@@ -34,7 +34,7 @@ export function useDemoSession(kioskId: string) {
   const [clockOffset, setClockOffset] = useState(0);
   const busy = useRef(false);
   const lastActive = useRef(0);
-  // "Use my phone" makes this page the kiosk, which never pauses while visible (I-172); the judge view with the
+  // [Start] makes this page the kiosk, which never pauses while visible (I-172); the judge view with the
   // simulated phone keeps the 20 min pause.
   const ownPhone = tokens !== null && !tokens.deviceToken;
   const { session, state, paused, resume } = useSessionStream(tokens?.sessionId ?? null, { idlePause: !ownPhone });
@@ -96,7 +96,7 @@ export function useDemoSession(kioskId: string) {
     };
   }, [tokens]);
 
-  /** "Use my phone": [Connect another phone] on the kiosk half issued a new QR and code. */
+  /** [Start]: [Connect another phone] on the kiosk half issued a new QR and code. */
   const setClaimUrl = useCallback((claimUrl: string, pairCode?: string) => {
     setTokens((t) => (t ? { ...t, claimUrl, pairCode: pairCode ?? null } : t));
   }, []);
