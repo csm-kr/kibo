@@ -38,7 +38,8 @@ export function MicState({ state, locale }: { state: VoiceState; locale: Locale 
   return key ? <span className="sr-only">{pt(key, locale)} </span> : null;
 }
 
-const SIDE = `${COMPACT} text-ink active:bg-kibo-tint disabled:opacity-60`;
+// One width for both side buttons, so [Type] and the voice switch sit the same distance from their edges (qa 10-16 F13).
+const SIDE = `${COMPACT} min-w-20 text-ink active:bg-kibo-tint disabled:opacity-60`;
 
 export function Dock(props: {
   state: VoiceState;

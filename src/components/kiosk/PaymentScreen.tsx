@@ -88,7 +88,7 @@ export function PaymentScreen(props: {
             <button
               type="button"
               onClick={insertCard}
-              className={`k-text-56 min-h-36 w-full rounded-full bg-(--k-accent) font-bold text-[#1E1B18] ${FOCUS}`}
+              className={`k-text-56 mb-12 min-h-36 w-full rounded-full bg-(--k-accent) font-bold text-[#1E1B18] ${FOCUS}`}
             >
               {kt("insertCardButton", locale)}
             </button>
@@ -123,6 +123,11 @@ export function PaymentScreen(props: {
   );
 }
 
+/**
+ * A payment method tile. Its content starts at one top line in every tile, so icons and labels line up even when one
+ * note wraps to two lines ("지원하지 않아요"); the tiles are tall enough that the screen keeps no empty band over 30%
+ * (qa 10-16 F2, F3).
+ */
 function MethodButton(props: { label: string; note?: string; icon: ReactNode; onClick?(): void }) {
   const enabled = Boolean(props.onClick);
   return (
@@ -130,7 +135,7 @@ function MethodButton(props: { label: string; note?: string; icon: ReactNode; on
       type="button"
       disabled={!enabled}
       onClick={props.onClick}
-      className={`flex min-h-100 flex-col items-center justify-center gap-6 rounded-[32px] border-[6px] p-6 text-center ${
+      className={`flex min-h-152 flex-col items-center justify-start gap-6 rounded-[32px] border-[6px] px-6 pt-24 pb-6 text-center ${
         enabled
           ? `border-(--k-primary) bg-white text-(--k-primary-dark) active:bg-(--k-primary-tint) ${CARD_SHADOW}`
           : "border-[#E2DACB] bg-(--k-panel) text-[#4B463F]"

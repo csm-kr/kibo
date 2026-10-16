@@ -790,8 +790,9 @@ function StartScreen({ locale, onStart }: { locale: Locale; onStart(): void }) {
       <p className="text-xl text-muted">{pt("startLead", locale)}</p>
       <ol className={`${CARD} flex flex-col gap-4`}>
         {steps.map((key, i) => (
-          <li key={key} className="flex items-center gap-3 text-xl">
-            <span aria-hidden className="flex size-8 flex-none items-center justify-center rounded-full bg-kibo-tint text-base font-bold text-kibo-deep">
+          // The number sits on the middle of the step's first line, also when the step wraps (qa 10-16 F1).
+          <li key={key} className="flex items-start gap-3 text-xl">
+            <span aria-hidden className="-mt-px flex size-8 flex-none items-center justify-center rounded-full bg-kibo-tint text-base font-bold text-kibo-deep">
               {i + 1}
             </span>
             {pt(key, locale)}

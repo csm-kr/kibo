@@ -173,7 +173,7 @@ export function DoneCard(props: { orderNumber: number; locale: Locale; domain?: 
         </h1>
         {/* Proportional figures: the tabular "1" of Space Grotesk has a foot that reads oddly at this size. A little
             tracking keeps a 7 and a 1 from touching. */}
-        <p className="font-display text-[7.5rem] leading-none font-bold tracking-[0.04em] text-kibo proportional-nums">{props.orderNumber}</p>
+        <p className="font-display text-[7.5rem] leading-none font-bold tracking-[0.04em] text-kibo proportional-nums pl-[0.04em]">{props.orderNumber}</p>
         <p className="text-xl">{pt(ticket ? "takeTickets" : "pickup", locale)}</p>
       </section>
       {props.onDone && (
