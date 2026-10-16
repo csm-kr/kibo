@@ -110,6 +110,15 @@ Press reports are secondary sources; quote them as "reported". Research notes: `
 | S42 | Kiosks in use in 2024: **719,658** (MSIT estimate, reported). | Digital Daily, 2026-09-27. https://www.ddaily.co.kr/page/view/2026092716200808219 | body | deck 05, A6 (same figure as S19) |
 | S43 | Busan funds 6-language menus for 2,015 restaurants (2025). MOEF announced QR menus for visitors (2026-02-25). | Busan news, 2025-07-08. https://www.twig24.com/news/local_bs/2025/07/08/20250708500144 ; MOEF 2026-02-25 (see the deck's A6 link) | body | deck 05, A6 |
 
+## 11. Global context (video v4, read on 10-16 with web access)
+Use these only as worldwide context next to the Korean figures; none of them is about kiosks.
+
+| Id | Claim | Source | Quote | Used in |
+|---|---|---|---|---|
+| S44 | By 2030, 1 in 6 people in the world will be 60 or over (1.4 billion, up from 1 billion in 2020). | WHO, "Ageing and health" fact sheet, 1 Oct 2025. https://www.who.int/news-room/fact-sheets/detail/ageing-and-health | "By 2030, 1 in 6 people in the world will be aged 60 years or over." | video v4 (planned) |
+| S45 | At least 2.2 billion people worldwide have a near or distance vision impairment. | WHO, "Blindness and vision impairment" fact sheet, 10 Feb 2026. https://www.who.int/news-room/fact-sheets/detail/blindness-and-visual-impairment | "Globally, at least 2.2 billion people have a near or distance vision impairment." | video v4 (planned) |
+| S46 | About 1.52 billion international tourist arrivals in 2025 (+4%). An estimate; another UN Tourism page puts 2024 at 1.4 billion. | UN Tourism, World Tourism Barometer data page. https://www.untourism.int/un-tourism-world-tourism-barometer-data | "an estimated 1.52 billion international tourists were recorded globally in 2025" | video v4 (planned) |
+
 ## Claims we do not make
 
 | Claim to avoid | Why | Say instead |
