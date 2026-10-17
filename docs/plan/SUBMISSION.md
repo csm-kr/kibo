@@ -35,7 +35,7 @@ Talk to your own phone, and the self-order kiosk already there fills its own car
 | Criterion | Weight | What we show |
 |---|---|---|
 | Technical merit & GenAI | 40% | Gemini Live voice, function-calling agent, Firestore realtime sync, Cloud Run; KIBO Learn; architecture diagram |
-| Problem alignment & impact | 25% | Worldwide groups as context (S44 WHO: 1 in 6 people 60 or over by 2030; S45 WHO: at least 2.2 billion with a near or distance vision impairment; S46 UN Tourism: an estimated 1.52 billion international tourist arrivals in 2025), none of them a kiosk figure; Korea as one example (S16: 17.9% of people 65+ say they can order or check in at a kiosk); touch vs talk (24 taps vs 3 sentences · 2 taps, the talk side a recorded take, `docs/plan/DECK_FACTS.md` slot 12); every statistic sourced in `docs/plan/SOURCES.md` |
+| Problem alignment & impact | 25% | Worldwide groups as context (S44 WHO: 1 in 6 people 60 or over by 2030; S45 WHO: at least 2.2 billion with a near or distance vision impairment; S46 UN Tourism: an estimated 1.52 billion international tourist arrivals in 2025), none of them a kiosk figure; Korea as one example (S16: 17.9% of people 65+ say they can order or check in at a kiosk); touch vs talk (24 taps vs 3 sentences · 2 taps: `evidence/touch-hero-efficient.json`, automated; `evidence/voice-only-hero.json`, one recorded take; `docs/plan/DECK_FACTS.md` slot 12); every statistic sourced in `docs/plan/SOURCES.md` |
 | Innovation | 25% | No kiosk replacement, the user's own phone becomes the accessibility tool; KIBO Learn connects kiosks without integration (measured numbers only) |
 | UX | 10% | The judge's own phone on `/demo` (the laptop is the kiosk, ADR-013), voice until payment, Nielsen heuristics, older-user accessibility, undo and call-staff |
 
@@ -52,7 +52,7 @@ Draft v4.3 (10-17, 2:42.0); the beat sheet with times is `videos/orchestrator/vi
 
 | Scene | What it shows |
 |---|---|
-| Hook | TOUCH vs TALK on the burger kiosk, tagged "One example: a burger kiosk in Seoul": **24 taps vs 3 sentences · 2 taps**. Footnote: "Counted until the card is paid, on both sides. Not counted: waking the kiosk; scanning the QR and turning on the mic." Touch from `evidence/touch-hero-efficient.json`; talk from a recorded take on production (10-16), no evidence file (`docs/plan/DECK_FACTS.md` slot 12) |
+| Hook | TOUCH vs TALK on the burger kiosk, tagged "One example: a burger kiosk in Seoul": **24 taps vs 3 sentences · 2 taps**. Footnote: "Counted until the card is paid, on both sides. Not counted: waking the kiosk; scanning the QR and turning on the mic." Touch from `evidence/touch-hero-efficient.json`; talk from `evidence/voice-only-hero.json` (one recorded take on production, 10-16, order 259) (`docs/plan/DECK_FACTS.md` slot 12) |
 | Title | "Don't learn the kiosk. Just talk." |
 | Language montage | Real voice orders: English → English kiosk, English → the ticket machine's 日本語 screen, Japanese → Korean kiosk, an older Korean voice → Korean kiosk |
 | Impact | 1 in 6 people 60 or over by 2030 (S44) · 2.2 billion with a vision impairment (S45) · 1.5 billion international tourist arrivals in 2025 (S46), then Korea: 17.9% of people 65+ say they can order or check in at a kiosk (S16) |
@@ -65,6 +65,8 @@ Draft v4.3 (10-17, 2:42.0); the beat sheet with times is `videos/orchestrator/vi
 Made with our motion-graphics skill (`.claude/skills/motion-demo-video/`). Motion graphics frame real footage; they never fake a feature.
 
 ## Deck (mandatory template, 16 slots)
+The final deck has 28 pages (10-17); which pages hold each slot is at the top of `docs/plan/DECK_FACTS.md`.
+
 | Slot | Content |
 |---|---|
 | 1 Team | malo · Sungmin Cho, Ye Seul Ahn · Sustainability & Social Impact |
