@@ -115,9 +115,9 @@ Use these only as worldwide context next to the Korean figures; none of them is 
 
 | Id | Claim | Source | Quote | Used in |
 |---|---|---|---|---|
-| S44 | By 2030, 1 in 6 people in the world will be 60 or over (1.4 billion, up from 1 billion in 2020). | WHO, "Ageing and health" fact sheet, 1 Oct 2025. https://www.who.int/news-room/fact-sheets/detail/ageing-and-health | "By 2030, 1 in 6 people in the world will be aged 60 years or over." | video v4 (planned) |
-| S45 | At least 2.2 billion people worldwide have a near or distance vision impairment. | WHO, "Blindness and vision impairment" fact sheet, 10 Feb 2026. https://www.who.int/news-room/fact-sheets/detail/blindness-and-visual-impairment | "Globally, at least 2.2 billion people have a near or distance vision impairment." | video v4 (planned) |
-| S46 | About 1.52 billion international tourist arrivals in 2025 (+4%). An estimate; another UN Tourism page puts 2024 at 1.4 billion. | UN Tourism, World Tourism Barometer data page. https://www.untourism.int/un-tourism-world-tourism-barometer-data | "an estimated 1.52 billion international tourists were recorded globally in 2025" | video v4 (planned) |
+| S44 | By 2030, 1 in 6 people in the world will be 60 or over (1.4 billion, up from 1 billion in 2020). | WHO, "Ageing and health" fact sheet, 1 Oct 2025. https://www.who.int/news-room/fact-sheets/detail/ageing-and-health | "By 2030, 1 in 6 people in the world will be aged 60 years or over." | video v4, deck 02, A6 |
+| S45 | At least 2.2 billion people worldwide have a near or distance vision impairment. | WHO, "Blindness and vision impairment" fact sheet, 10 Feb 2026. https://www.who.int/news-room/fact-sheets/detail/blindness-and-visual-impairment | "Globally, at least 2.2 billion people have a near or distance vision impairment." | video v4, deck 02, A6 |
+| S46 | About 1.52 billion international tourist arrivals in 2025 (+4%). An estimate; another UN Tourism page puts 2024 at 1.4 billion. | UN Tourism, World Tourism Barometer data page. https://www.untourism.int/un-tourism-world-tourism-barometer-data | "an estimated 1.52 billion international tourists were recorded globally in 2025" | video v4, deck 02, A6 |
 
 ## Claims we do not make
 

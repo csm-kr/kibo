@@ -1,0 +1,122 @@
+{
+ "date": "2026-10-16T01:15:57.469Z",
+ "what": "Voice-only hero order on production, two devices: /kiosk?k=malo (1080x1920) and the phone web app (390x844) in Chromium; customer lines are synthetic (Gemini TTS, voice Kore) fed to the phone microphone; recorded once for video v4 (take c2-t1), not a human timing",
+ "service": "https://kibo-407514467119.asia-northeast3.run.app",
+ "revision": "kibo-00023-hth",
+ "customerLines": [
+  "Two cheeseburger sets for here, with large fries: one zero cola, no pickles, the other a cider.",
+  "That's all, I'll pay.",
+  "Yes, pay now."
+ ],
+ "heard": "Two cheeseburger sets for here. With large fries. One zero cola, no pickles, the other a cider. | That's all. I'll pay. | Yes, pay now.",
+ "commands": [
+  {
+   "at": 26.48,
+   "type": "setDineOption",
+   "source": "voice",
+   "utteranceSeq": 1,
+   "ok": true,
+   "status": "ordering",
+   "args": {
+    "option": "eat_in"
+   }
+  },
+  {
+   "at": 26.64,
+   "type": "addToCart",
+   "source": "voice",
+   "utteranceSeq": 1,
+   "ok": true,
+   "status": "ordering",
+   "args": {
+    "itemId": "cheese_burger",
+    "variant": "set",
+    "qty": 1,
+    "selections": {
+     "side": [
+      "fries_l"
+     ],
+     "drink": [
+      "zero_cola"
+     ],
+     "ingredients": [
+      "no_pickles"
+     ]
+    }
+   }
+  },
+  {
+   "at": 26.79,
+   "type": "addToCart",
+   "source": "voice",
+   "utteranceSeq": 1,
+   "ok": true,
+   "status": "ordering",
+   "args": {
+    "itemId": "cheese_burger",
+    "variant": "set",
+    "qty": 1,
+    "selections": {
+     "side": [
+      "fries_l"
+     ],
+     "drink": [
+      "cider"
+     ]
+    }
+   }
+  },
+  {
+   "at": 41.54,
+   "type": "requestCheckout",
+   "source": "voice",
+   "utteranceSeq": 2,
+   "ok": true,
+   "status": "confirming",
+   "args": {}
+  },
+  {
+   "at": 50.99,
+   "type": "confirmCheckout",
+   "source": "voice",
+   "utteranceSeq": 3,
+   "ok": true,
+   "status": "paying",
+   "args": {}
+  }
+ ],
+ "taps": [
+  {
+   "at": 8.7,
+   "device": "phone",
+   "label": "Start",
+   "counted": false
+  },
+  {
+   "at": 9.72,
+   "device": "phone",
+   "label": "Turn on the microphone",
+   "counted": false
+  },
+  {
+   "at": 53.42,
+   "device": "kiosk",
+   "label": "카드",
+   "counted": true
+  },
+  {
+   "at": 54.44,
+   "device": "kiosk",
+   "label": "카드 넣기",
+   "counted": true
+  }
+ ],
+ "orderNumber": 259,
+ "total": 14800,
+ "counts": {
+  "sentences": 3,
+  "phoneTaps": 0,
+  "kioskTaps": 2,
+  "rule": "Counted until the card is paid, as the kiosk counter counts the touch path (evidence/touch-hero-efficient.json: 24 taps). Not counted: the phone setup taps (Start, Turn on the microphone) and the receipt question after payment."
+ }
+}
