@@ -1,8 +1,10 @@
 # Deck facts
 
-Not injected into harness steps (lives under `docs/plan/`). For the deck owner: what each slide of the mandatory template (`docs/plan/SUBMISSION.md` "Deck") may state, and where it comes from. Written 10-13 (10-assets:1).
+Not injected into harness steps (lives under `docs/plan/`). For the deck owner: what each slide of the mandatory template (`docs/plan/SUBMISSION.md` "Deck") may state, and where it comes from. Written 10-13 (10-assets:1); updated 10-17 for the worldwide framing, the own-phone `/demo` (ADR-013), voice until payment and the ticket machine's 日本語 screen.
 
-**Status:** **measured** = a saved result file in the repo; **design** = what the code and docs do (cite the file, not a number); **unverified** = not checked, say so on the slide or leave it out (R-001). Numbers come only from `evidence/*`, `evals/results/*`, `spikes/*/results/*` and the evidence ledger in `docs/TESTING.md`. No OpenAI numbers in public material; no claim of legal compliance; no pricing or sales pitch (T&C).
+**Status:** **measured** = a saved result file in the repo; **design** = what the code and docs do (cite the file, not a number); **sourced** = an outside fact with its S-id in `docs/plan/SOURCES.md`; **unverified** = not checked, say so on the slide or leave it out (R-001). Numbers come only from `evidence/*`, `evals/results/*`, `spikes/*/results/*` and the evidence ledger in `docs/TESTING.md`. No OpenAI numbers in public material; no claim of legal compliance; no pricing or sales pitch (T&C).
+
+Words never to use on a slide: "any kiosk", "anyone", "first", "only" (as in "the only …"), "payment commands" (the safety number is "37 of 37 forged commands refused"), "multilingual" without the list (`docs/plan/SOURCES.md` "Claims we do not make").
 
 Pictures: real captures in `docs/assets/deck/` (`npm run shots:deck`, `scripts/deck-shots.ts`). Never mockups. All retaken 10-14 (14-final:8) from the local production build of the final UI, each under 600 KB; video stills are in `videos/footage/2026-10-14/` (git-ignored, `docs/plan/FOOTAGE.md`).
 
@@ -15,7 +17,9 @@ Pictures: real captures in `docs/assets/deck/` (`npm run shots:deck`, `scripts/d
 | Fact | Source | Status |
 |---|---|---|
 | "Don't learn the kiosk. Just talk." Say one thing to your phone and the existing kiosk fills its own cart | `docs/PRD.md` "Goal" | design |
-| For older adults, people with low vision, people who cannot speak easily (text and buttons) and visitors who cannot read Korean | `docs/PRD.md` "Users" | design |
+| For older adults, people with low vision, people who cannot speak easily (text and buttons) and travellers who cannot read the kiosk's language (in the demo, Korean) | `docs/PRD.md` "Users" | design |
+| The problem is worldwide; these are context for the groups, none of them a kiosk figure: by 2030, 1 in 6 people in the world will be 60 or over (WHO, 2025); at least 2.2 billion people have a near or distance vision impairment (WHO, 2026); an estimated 1.52 billion international tourist arrivals in 2025 (UN Tourism; say "estimated", and never put it beside the 1.4 billion that another UN Tourism page gives for 2024) | `docs/plan/SOURCES.md` S44, S45, S46 (publisher links there; read 10-16) | sourced |
+| Korea is one example: 17.9% of people aged 65+ say they can order or check in at a kiosk (self-reported; KIHASA 2024, re-analysis of the 2023 Survey of Older Koreans) | `docs/plan/SOURCES.md` S16 (p. 32, Table 5) | sourced |
 | No app install: scan the kiosk's QR, a web page opens | `docs/PRD.md` "Why the phone"; `src/app/assistant/` | design |
 | Korea's barrier-free kiosk requirement (dates, fines, cost) | `docs/PRD.md` "Problem" says "reported; verify the decree text" | **unverified**: leave out until the decree is checked; never say KIBO satisfies it |
 
@@ -29,7 +33,8 @@ Pictures: real captures in `docs/assets/deck/` (`npm run shots:deck`, `scripts/d
 ## 5 Features
 | Fact | Source | Status |
 |---|---|---|
-| QR connect, voice (Gemini Live) or text (Gemini Flash); screens Korean and English; the AI also in Japanese, Chinese (Simplified), Spanish, Vietnamese, French, Thai and Indonesian, tested by typing only (14-final:4) | `docs/ARCHITECTURE.md` "Voice"; `src/lib/agent/`; `evidence/live-languages.json`; `docs/plan/SOURCES.md` G1b | design; spoken input in the seven unverified |
+| QR connect, voice (Gemini Live) or text (Gemini Flash). **People:** the AI talks and writes in 9 languages (Korean, English, Japanese, Chinese (Simplified), Spanish, Vietnamese, French, Thai, Indonesian), each answering a typed turn on both voice paths (18/18, 14-final:4); spoken orders measured in English and Korean; spoken Japanese tried in two probes on production (cart right in both, one reply in Korean, I-377). **Screens:** the phone in Korean or English; the kiosk in Korean and English, and 日本語 on the airport rail ticket machine (next row) | `docs/ARCHITECTURE.md` "Voice"; `src/lib/agent/`; `evidence/live-languages.json`; `evidence/voice-e2e.json`; `docs/ISSUE.md` I-377; `docs/plan/SOURCES.md` G1b | measured (typed 9; spoken en, ko); spoken Japanese **unverified** (no evidence file); the other six not tried by voice |
+| **The ticket machine's 日本語 screen:** SKYLINE AIRPORT RAIL's start screen offers 한국어 · English · 日本語 for the order, and every kiosk screen from the start to the reference number is then Japanese, with prices in won ("10,500ウォン"). A kiosk screen language: the phone keeps its own language, the AI gets the Korean and English names, and KIBO's English lines (the subtitle under the AI banner, the `/demo` caption step) stay English. In production since `kibo-00024-bzf` (10-16); the video shows an English voice order filling the Japanese screen. Known gaps: the English step line names the Korean payment buttons (I-389); the kiosk's error bar has no Japanese and shows English (I-390); the banner keeps "Working…" while Gemini Live speaks (I-394) | `data/kiosks/airport_rail.json` (`locales`, `ja` names); `e2e/kiosk-rail-ja.spec.ts`; `docs/UX.md` "Language" | design (E2E-tested) |
 | 9 agent tools; the whole menu is in the instructions, so one tool call per sentence | ADR-004; `src/lib/agent/tools.ts` | design |
 | Live mirror: every change shows on the kiosk with a 2 s highlight and "Added by AI" | `docs/UX.md` A6; `docs/UI_GUIDE.md` "Components" | design |
 | Confirm before pay: the AI can open the confirm card but cannot pay; payment needs the user's tap or a new "yes", then the card at the kiosk | ADR-005; `src/lib/commands/machine.ts` (unit-tested in `machine.test.ts`) | design |
@@ -39,6 +44,8 @@ Pictures: real captures in `docs/assets/deck/` (`npm run shots:deck`, `scripts/d
 ## 6 Flow
 | Fact | Source | Status |
 |---|---|---|
+| `/demo` with the judge's own phone (the default since 10-16): [Start] makes the laptop the kiosk, which it shows alone with its QR and 6-digit code; the judge scans the QR with their own phone and talks; payment is on the kiosk's own 카드 (Card) → 카드 넣기 (Insert card). [Try it on this screen] opens the three-column view (the kiosk, a phone drawn beside it, Scenarios and "What the AI did") for a judge without a phone at hand | ADR-013; `docs/UX.md` C1, C1a; `src/components/demo/DemoIntro.tsx` | design |
+| Voice until payment: the dine option, the order, "That's all, I'll pay." (`requestCheckout`, the review opens on both screens) and "Yes, pay now." (`confirmCheckout`, accepted from the AI on a new user utterance at least 1.5 s after the review opened); the card stays two taps on the kiosk | ADR-005; `isConfirmed` in `src/lib/commands/machine.ts` | design |
 | QR → claim → talk → Gemini function call → `POST /api/command` (zod, actor token, state machine, catalog) → Firestore transaction → SSE → kiosk highlight and phone cart → confirm card → card at the kiosk → order number | `docs/ARCHITECTURE.md` "Sequence diagrams" 1 | design |
 | Learned kiosk: the command waits for the in-page bridge, which replays the recipe and checks the kiosk's own total before the session changes | `docs/ARCHITECTURE.md` "Sequence diagrams" 3 | design |
 
@@ -55,6 +62,8 @@ Real screens, not drawings. MALO hero order (two cheeseburger sets, one without 
 | `docs/assets/deck/wireframe-kiosk-K6-review.png` | Kiosk order review | measured (capture) |
 | `videos/footage/2026-10-14/two-device-1440x900--phone--06-paying.png`, `two-device-1440x900--06-paying.png` | The pay step (I-146): the phone says "Insert your card into the kiosk", the laptop kiosk shows its payment screen and the step in English | measured (footage still) |
 | `videos/footage/2026-10-14/two-device-1440x900--phone--02-code-typed.png` | Connecting without a camera: the kiosk's 6-digit code typed on the phone's `/app` | measured (footage still) |
+
+No deck capture of the ticket machine's 日本語 screen exists yet: take one from production (`/kiosk?k=airport_rail`, then 日本語) or use a frame of the video's English → 日本語 montage take; never a mockup.
 
 Phone captures are 390×844 CSS px at 2×; kiosk captures are the 1080×1920 canvas scaled to 1080 px high. Kiosk text is Korean: add English captions on the slide (the K3 subtitle row already carries one). In the K3 picture the second cart chip is cut at the right edge (a sideways-scrolling row, I-244) and the subtitle names only the second set (I-243): crop above the cart bar or caption it.
 
@@ -88,7 +97,7 @@ Phone captures are 390×844 CSS px at 2×; kiosk captures are the 1080×1920 can
 USD only. Do not show KRW without an official exchange-rate source and date. No prices to customers (T&C).
 
 ## 11 Snapshots
-Real `/demo` at 1920×1080 (2×) after the first sentence of a scenario, sent to real Gemini through `/api/chat`; "What the AI did" lists the real tool calls.
+Real `/demo` at 1920×1080 (2×) after the first sentence of a scenario, sent to real Gemini through `/api/chat`; "What the AI did" lists the real tool calls. These show the three-column view, which `/demo` has opened behind [Try it on this screen] since 10-16; [Start] shows the kiosk alone and the judge's own phone (ADR-013), so caption a three-column picture "Try it on this screen".
 
 | Picture | Shows | Status |
 |---|---|---|
@@ -120,8 +129,9 @@ Blind KIBO Learn first (`docs/plan/SUBMISSION.md`).
 | Forged commands: 37 of 37 refused with the documented status; 5 of 5 legitimate controls accepted | `evidence/forged-commands.json` | measured on a local production build |
 | Voice hero order: 4/4 runs direct, end of speech → kiosk highlight median 1,669 ms (target ≤ 3 s); → first AI audio median 2,382 ms (target ≤ 2 s, missed); Vertex AI relay 4/4 (relay run locally, not on Cloud Run), 1,715 / 2,841 ms. All attempts on record: 40, 28 passed, 6 upstream failures (I-104), 2 model failures (I-115, I-251), 4 failures in two later runs (I-272; counts in NUMBERS.md) | `evidence/voice-e2e.json`, `evidence/voice-e2e-relay.json` | measured, synthetic TTS voice on a laptop, not a real phone; earlier 6/6 and 1,084 ms came from fixtures with a click and noise tail (I-237), and 1,833 / 2,708 ms (2 runs) were replaced by the files' 4 runs (NUMBERS.md "Retired numbers"), do not quote |
 | Speech recognition with `languageCodes`: Korean key terms 97.1% clean / 95.4% noisy; English 100% / 100% | `spikes/voice-compare/RESULTS.md` | measured, synthetic voices, one run |
-| Touch hero order on `/kiosk`, efficient path: 24 taps | `evidence/touch-hero-efficient.json` | measured, taps only (automated, no human time) |
-| Touch vs voice, 3 human runs each (taps, utterances, seconds) | `evidence/human-runs.json` | **planned 10/16**: no numbers until the file exists |
+| Touch hero order on `/kiosk`, efficient path: 24 taps, counted as the kiosk's demo counter counts (from 매장에서 먹기 to 카드 넣기: the attract tap is not counted and the count stops at paid, so the receipt question after payment is not counted either) | `evidence/touch-hero-efficient.json`; `countTap` in `src/components/kiosk/KioskScreen.tsx` | measured, taps only (automated, no human time) |
+| **Touch vs talk, as the video says it:** "24 taps vs 3 sentences · 2 taps", with its rule beside it: "Counted until the card is paid, on both sides. Not counted: waking the kiosk; scanning the QR and turning on the mic." Talk side: "Two cheeseburger sets for here, with large fries: one zero cola, no pickles, the other a cider." → "That's all, I'll pay." → "Yes, pay now." (the AI confirms on the new utterance), then 카드 and 카드 넣기 on the kiosk; no phone tap after the QR scan and the mic; the same order as the touch path, ₩14,800 | Touch: row above. Talk: a recorded take on production (10-16; two orders by synthetic voice, numbers 508 and 259, both ₩14,800); no evidence file in the repo | touch measured; talk **a recorded take, no evidence file**: on a slide say "a recorded take on production (10-16)", keep the counting rule beside it, show no times, and never make it a headline or benchmark number |
+| Touch vs voice, 3 human runs each (taps, utterances, seconds) | `evidence/human-runs.json` | **planned**: no numbers until the file exists |
 | Latency on a real phone; real kiosk tap counts | TESTING ledger | **planned**: leave out |
 
 ## 13 Future
@@ -133,7 +143,7 @@ Blind KIBO Learn first (`docs/plan/SUBMISSION.md`).
 ## 14 Links
 | Fact | Source | Status |
 |---|---|---|
-| Product: the Cloud Run URL of `/demo` | `README.md` | **unverified** until the first deploy is checked (I-086, I-092) |
+| Product: https://kibo-407514467119.asia-northeast3.run.app/demo (the Cloud Run service `kibo`, `asia-northeast3`; production revision `kibo-00024-bzf` on 10-17) | `README.md`; `gcloud run services describe kibo --region asia-northeast3` | deployed (host confirmed 10-14, I-092); the revision changes with each deploy, so read it again before quoting it |
 | GitHub repo, demo video | — | not yet public (license open, I-089) |
 
 Slots 2, 15 and 16 of the template are not planned in `docs/plan/SUBMISSION.md`; check the template.

@@ -1,26 +1,31 @@
 # KIBO: Kiosk Intelligence Bridge & Operator
 
-**Don't learn the kiosk. Just talk.** Say your order to your own phone, and the self-order kiosk already on the counter fills its own cart. Gemini can fill the cart; only you can pay. Built for the Google Cloud AI Builder Cup 2026 (Sustainability & Social Impact).
+**Don't learn the kiosk. Just talk.** Say your order to your own phone, and the self-order kiosk already on the counter fills its own cart. Gemini can fill the cart but cannot pay: payment needs your own yes or tap, then your card at the kiosk. Built for the Google Cloud AI Builder Cup 2026 (Sustainability & Social Impact).
 
-- **Try it on a laptop:** https://kibo-407514467119.asia-northeast3.run.app/demo
+KIBO is for older adults, people with low vision and travellers who cannot read the kiosk's language, and these groups are large worldwide: by 2030, 1 in 6 people in the world will be 60 or over ([WHO, Ageing and health, 2025](https://www.who.int/news-room/fact-sheets/detail/ageing-and-health)); at least 2.2 billion people have a near or distance vision impairment ([WHO, Blindness and vision impairment, 2026](https://www.who.int/news-room/fact-sheets/detail/blindness-and-visual-impairment)); an estimated 1.52 billion international tourist arrivals were recorded in 2025 ([UN Tourism](https://www.untourism.int/un-tourism-world-tourism-barometer-data)). None of these figures is about kiosks. Korea is one example of the kiosk problem: 17.9% of people aged 65+ say they can order or check in at a kiosk (self-reported; [KIHASA, 2024](https://www.kihasa.re.kr/api/kihasa/file/download?seq=28260), p. 32). Sources: [`docs/plan/SOURCES.md`](docs/plan/SOURCES.md) S44–S46, S16.
+
+- **Try it:** open https://kibo-407514467119.asia-northeast3.run.app/demo on a laptop, press **Start**, and scan the kiosk's QR with your phone
 - **On a phone:** open **kibo-2026.web.app** and type the 6-digit code a KIBO kiosk shows
 - Video and deck: linked from the submission
 
 ![The live demo: on the left the Korean kiosk with two cheeseburger sets the AI just added, highlighted; on the right the phone with the same order and total](public/landing/demo.webp)
 
+The picture shows "Try it on this screen". With **Start**, the laptop shows the kiosk alone and you order on your own phone.
+
 ## Try it in 60 seconds
 
-**One laptop (`/demo`):**
-1. Open [`/demo`](https://kibo-407514467119.asia-northeast3.run.app/demo), pick a place (burger shop, airport rail, pizza shop) and press **Start**.
-2. Tap an example sentence, say it (allow the microphone) or type your own, e.g. "Two cheeseburger sets, one without pickles".
-3. Watch the kiosk on the left: what the AI changed lights up, with an English subtitle under the Korean screen. "What the AI did" lists every Gemini tool call and the server's answer.
-4. Say "I'll pay". The AI can only open the review; tap **Yes, pay now** yourself, then the card stand-in on the kiosk side. No real payment happens.
+**With your own phone (`/demo`, the default):**
+1. On a laptop, open [`/demo`](https://kibo-407514467119.asia-northeast3.run.app/demo), pick a place (burger shop, airport rail, pizza shop) and press **Start**. The laptop becomes the kiosk: it shows the kiosk alone, with its QR and 6-digit code.
+2. Scan the QR with your phone's camera (or open **kibo-2026.web.app** and type the code), and allow the microphone.
+3. Talk. On the burger shop, for example: "Two cheeseburger sets for here, with large fries: one zero cola, no pickles, the other a cider." Then "That's all, I'll pay." The AI opens the order review on both screens, and confirms it on your next "yes" ("Yes, pay now.") or your tap on **Yes, pay now**, never by itself.
+4. Pay on the kiosk: tap 카드 (Card), then 카드 넣기 (Insert card). The caption above the kiosk says each step in English. No real payment happens.
+5. In KakaoTalk, NAVER or another in-app browser the microphone often fails: open the link in Safari or Chrome.
 
-**Phone + laptop:**
-1. Open [`/kiosk`](https://kibo-407514467119.asia-northeast3.run.app/kiosk) on a laptop. The kiosk shows a QR and a 6-digit code.
-2. On the phone, scan the QR, or open **kibo-2026.web.app** and type the code.
-3. Allow the microphone, choose eat here or take out, and talk. Confirm on the phone, then tap 카드 (Card) and 카드 넣기 (Insert card) on the laptop; the column beside the kiosk says each step in English.
-4. In KakaoTalk, NAVER or another in-app browser the microphone often fails: open the link in Safari or Chrome.
+In a recorded take on production (10-16), those three sentences and the kiosk's two card taps placed the order, with no tap on the phone after scanning the QR and turning on the microphone. There is no evidence file for that take yet.
+
+**No phone at hand: "Try it on this screen"** on `/demo` opens the same place with a phone drawn beside the kiosk. Tap an example sentence, say it or type your own. What the AI changed lights up on the kiosk, with an English subtitle under the Korean screen, and "What the AI did" lists every Gemini tool call and the server's answer. Tap **Yes, pay now** yourself, then the card stand-in under the kiosk.
+
+The kiosk on its own is at [`/kiosk`](https://kibo-407514467119.asia-northeast3.run.app/kiosk); `/kiosk?k=airport_rail` is the ticket machine, whose start screen also offers 日本語.
 
 ## What Gemini does, and where
 
@@ -31,7 +36,7 @@
 | One agent definition for both | 9 tools (`setDineOption`, `addToCart`, `updateCart`, `removeFromCart`, `undoLastChange`, `offerChoices`, `callStaff`, `requestCheckout`, `confirmCheckout`) and instructions built from the kiosk's menu data | [`src/lib/agent/tools.ts`](src/lib/agent/tools.ts), [`src/lib/agent/instructions.ts`](src/lib/agent/instructions.ts) |
 | KIBO Learn: learn a kiosk that has no integration | `gemini-3.8-flash` on **Vertex AI (`global`)**, offline, driving the kiosk's web page with Playwright; orders are then replayed **without AI** | [`spikes/kibo-learn/learner.mjs`](spikes/kibo-learn/learner.mjs), [`src/lib/bridge/`](src/lib/bridge/) |
 
-The AI speaks and writes Korean, English, Japanese, Chinese (Simplified), Spanish, Vietnamese, French, Thai and Indonesian; the phone's screens are Korean or English.
+**Languages.** People talk or type to the AI in 9 languages: Korean, English, Japanese, Chinese (Simplified), Spanish, Vietnamese, French, Thai and Indonesian (a typed turn answered in each, on both voice paths, [`evidence/live-languages.json`](evidence/live-languages.json)). Spoken orders are measured in English and Korean ([`evidence/voice-e2e.json`](evidence/voice-e2e.json)); spoken Japanese was tried on production, with the cart right in both probes and one reply in Korean (I-377 in [`docs/ISSUE.md`](docs/ISSUE.md), no evidence file). The phone's screens are Korean or English. The kiosk screens are Korean and English, and the airport rail ticket machine also offers 日本語: a kiosk screen language with prices in won ("10,500ウォン"), while the AI keeps working with the Korean and English names ([`data/kiosks/airport_rail.json`](data/kiosks/airport_rail.json), [`e2e/kiosk-rail-ja.spec.ts`](e2e/kiosk-rail-ja.spec.ts)).
 
 ## Google Cloud services
 
@@ -149,7 +154,7 @@ Every value comes from [`docs/plan/NUMBERS.md`](docs/plan/NUMBERS.md) and the ev
 | Voice order on `/demo` | 4/4 runs passed direct (English and Korean, two runs each): end of speech → kiosk highlight median 1,669 ms, → first AI audio 2,382 ms (target ≤ 2 s, missed). Through the Vertex AI relay (run locally, not on Cloud Run) 4/4: 1,715 ms and 2,841 ms. All attempts on record: 40, 28 passed, 6 failed upstream (the API key's credits ran out), 2 failed in the model, 4 failed in two later runs (one cart not reached, three Korean orders filled the cart without a Korean reply shown) (`docs/plan/NUMBERS.md`). Synthetic voice on a laptop, not a real phone | [`evidence/voice-e2e.json`](evidence/voice-e2e.json), [`evidence/voice-e2e-relay.json`](evidence/voice-e2e-relay.json) |
 | Cost per hero order | text $0.0080, voice $0.0885 (median of 3; Gemini API list prices) | [`evidence/cost-per-order.json`](evidence/cost-per-order.json) |
 | Forged commands | 37 of 37 refused; 5 of 5 legitimate controls accepted | [`evidence/forged-commands.json`](evidence/forged-commands.json) |
-| Touch hero order on `/kiosk` | 24 taps (automated run, taps only) | [`evidence/touch-hero-efficient.json`](evidence/touch-hero-efficient.json) |
+| Touch hero order on `/kiosk` | 24 taps (automated run, taps only), counted as the kiosk's demo counter counts: from 매장에서 먹기 (Eat here) to 카드 넣기 (Insert card), so until the card is paid; waking the kiosk is not counted | [`evidence/touch-hero-efficient.json`](evidence/touch-hero-efficient.json) |
 | Lighthouse 13.5.0 (local production build) | Accessibility, Best Practices and SEO 100 on every page; Performance 100, 98, 100, 88 and 99 | [`evidence/lighthouse.json`](evidence/lighthouse.json) |
 | KIBO Learn, 2 kiosks never seen before their run (latest learner, frozen first) | **On two kiosks it had never seen, KIBO handled all 20 test orders safely: 16 finished hands-free, 4 stopped safely (2 handed to staff, 2 refused), and none was wrong (round 4, synthetic kiosks).** (short form: 20/20 safe · 0 wrong; 16 hands-free · 4 stopped safely, 2 to staff, 2 refused) Items 62/62; the 2 handed to staff are the orders where the skill's own total differed from the kiosk's (the grader counts them correct, the app's bridge stops them and calls staff); learning $0.79 for both. The learned option lists matched the chicken kiosk's answer key exactly for 2 of its 14 items with options (34 of 39 option groups found): it recorded the +500원 sauces and a +1,000원 flavour at 0원, which made those 2 skill totals differ, and left out the set's cola upgrade, which the 2 refused orders asked for. The 4 stopped orders, one by one, as exception tests: [`docs/KIBO_LEARN.md`](docs/KIBO_LEARN.md#results-so-far) "Exception tests (round 4)" | [`spikes/blind-kiosks/ROUND4.md`](spikes/blind-kiosks/ROUND4.md), [`evidence/learn-cost.json`](evidence/learn-cost.json) |
 | KIBO Learn, every never-seen kiosk so far (6 kiosks, rounds 2–4) | 60 orders: 32 correct, 15 refused safely, **3 unsafe**, 10 not learned (one kiosk never finished); skill total differed in 6 of the 35 that reached a kiosk total | [`ROUND4.md`](spikes/blind-kiosks/ROUND4.md), [`ROUND3.md`](spikes/blind-kiosks/ROUND3.md), [`RESULTS.md`](spikes/blind-kiosks/RESULTS.md) |
@@ -161,9 +166,9 @@ All test kiosks are synthetic web kiosks built by separate AI agents, one run ea
 ## Known limits
 - **KIBO Learn covers web and webview kiosks.** Learning runs offline; replay runs in the app. Native kiosk apps are roadmap.
 - **Learned kiosks support fewer edits:** no line edits (remove and add instead), undo only of the last add, payment on the kiosk itself; per-person prices and count options are still weak ([`docs/KIBO_LEARN.md`](docs/KIBO_LEARN.md)).
-- **Languages:** the seven AI-only languages were tested by typing; speaking them is not tested ([`evidence/live-languages.json`](evidence/live-languages.json)).
+- **Languages:** the seven AI-only languages were tested by typing ([`evidence/live-languages.json`](evidence/live-languages.json)); Japanese was also tried by voice, in two probes on production (I-377), and the other six were not tried by voice. On the ticket machine's 日本語 screen, KIBO's English step line still names the Korean payment buttons (I-389).
 - **Virtual payment.** No real payment, POS, coupons or memberships.
-- **Automated measurements.** Voice latency used a synthetic voice on a laptop; real-phone and human touch-vs-voice timings are not measured yet.
+- **Automated measurements.** Voice latency used a synthetic voice on a laptop; real-phone and human touch-vs-voice timings are not measured yet. The voice-only order through payment is one recorded take (10-16) with no evidence file.
 - Open issues are logged in [`docs/ISSUE.md`](docs/ISSUE.md).
 
 ## Run it yourself in 5 minutes
@@ -200,6 +205,8 @@ All dates are 2026, KST. Submissions close 2026-10-19 03:29; judging runs 10-19 
 | 10-13 | Phases 6–12: in-app learned kiosk and bridge; Gemini on Vertex AI and the airport rail ticket machine; `/demo` scenarios and "What the AI did"; polish; footage; security audit, prompt cache, load and Lighthouse checks; the phone app, 6-digit pairing, Firebase Hosting short address and the `kibo-voice` relay. |
 | 10-13 to 10-14 | Phase 13: six blind test kiosks built by separate agents, a grader, baseline and final learning runs. |
 | 10-14 | KIBO Learn rounds 3 and 4 on side branches, each measured on two fresh kiosks, merged during phase 14. Phase 14: English subtitles on the kiosk, flow fixes, kiosk polish, visible replay, nine AI languages, faster replies, sourced impact content, one source of truth for numbers, final pictures, this README. |
+| 10-14 to 10-15 | Phases 15 and 16: fixes from review rounds by judge agents (agent recovery, learned kiosk and rail, phone UX, bridge parity, reply language, order care, an evidence guard); typed latency re-measured on production; design QA rounds that gave `/demo` its frame, place tabs and the Scenarios and "What the AI did" tabs. |
+| 10-16 | `/demo` starts with the judge's own phone, and the laptop shows the kiosk alone ([ADR-013](docs/ADR.md)); 日本語 screens on the airport rail ticket machine; design QA on production. |
 
 Each phase is a list of small steps run one at a time (`phases/<phase>/step*.md`); every step ends with its tests and is committed as `feat(<phase>): step N — <name>`, so the history shows the build in order. The harness that ran the steps is a local tool and is not part of the submission.
 

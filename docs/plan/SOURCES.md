@@ -140,7 +140,7 @@ Use these only as worldwide context next to the Korean figures; none of them is 
 | "Barrier-free kiosks cost 3×", "replacing all kiosks costs KRW 333 billion" | Press assumptions, not official estimates (S26) | — |
 | Kiosk e-waste tonnage in Korea | No data (S27) | "No kiosk is replaced", without a number |
 | "N people in Korea have low vision" | Registration does not separate low vision (S25) | "245,361 registered as visually disabled" |
-| "Multilingual" or "any language" without a list | KIBO's screens are Korean and English; AI languages are limited to what ships and is tested (G1) | Name the languages |
+| "Multilingual" or "any language" without a list | KIBO's phone screens are Korean and English, its kiosk screens Korean and English plus 日本語 on the airport rail ticket machine; AI languages are limited to what ships and is tested (G1) | Name the languages |
 | "99 languages" for KIBO | That is Gemini Live's list, not what KIBO tests (G1) | The tested list |
 | "KIBO is the first / only …", "no one else …" | Close prior art exists (S30–S33) | Say what KIBO does differently |
 | "No audio is ever stored" or "Google keeps nothing" | KIBO's own servers keep no audio; Google's retention follows its own terms and was not read (section 9) | "KIBO keeps no audio … processed by Google Gemini under Google's terms" |
