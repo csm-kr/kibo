@@ -2,6 +2,7 @@ import type { FunctionCall } from "@google/genai";
 import { agentAction, type AgentAction } from "@/lib/agent/actions";
 import { KIOSK_BUSY, waitForBridge } from "@/lib/agent/bridgeWait";
 import { toolCallToCommand, toolResult } from "@/lib/agent/mapping";
+import { offerTracker, type OfferTracker } from "@/lib/agent/offers";
 import { swapTracker } from "@/lib/agent/swap";
 import { ApiError, type CommandReply } from "@/lib/client/api";
 import { CommandError } from "@/lib/commands/errors";
@@ -37,6 +38,8 @@ export interface ToolContext {
   onAction?(action: AgentAction): void;
   /** The latest session from the stream; on a learned kiosk the next call waits for the bridge's replay (I-155). */
   session?: () => BridgeView | null;
+  /** The Live session's offers, so a repeat in a later tool call message of the same utterance is not sent (offers.ts). */
+  offers?: OfferTracker;
 }
 
 export interface ToolResponse {
@@ -71,7 +74,7 @@ async function runOne(call: FunctionCall, args: unknown, commandId: string, ctx:
   }
 }
 
-type BridgeView = Pick<Session, "pendingBridgeCommand" | "bridgeStatus">;
+type BridgeView = Pick<Session, "pendingBridgeCommand" | "bridgeStatus"> & Partial<Pick<Session, "pendingChoice" | "recentCommandIds">>;
 
 /**
  * The phone's view of a replay it sent: done once the stream no longer shows it pending, after it either showed it
@@ -97,24 +100,34 @@ export async function runToolCalls(calls: FunctionCall[], ctx: ToolContext): Pro
   let replaying: (() => boolean) | null = null;
   let kioskStuck = false;
   const swap = swapTracker(ctx.kiosk);
+  const offers = ctx.offers ?? offerTracker();
   for (const call of calls) {
     const started = performance.now();
+    const name = call.name ?? "";
+    const id = call.id ? { id: call.id } : {};
+    // The same buttons again for this utterance: answered from the first result, not sent and not listed (offers.ts).
+    const repeated = offers.repeat(name, call.args, ctx.utteranceSeq, ctx.session?.());
+    if (repeated) {
+      out.push({ ...id, name, response: toolResult(ctx.kiosk, ctx.locale, { ok: true, response: repeated }, name) });
+      continue;
+    }
     // A swap's add keeps the replaced line's choices (src/lib/agent/swap.ts).
-    const args = swap.args(call.name ?? "", call.args);
+    const args = swap.args(name, call.args);
+    const commandId = commandIdOf(call, ctx);
     let outcome: Outcome;
     if (replaying && (kioskStuck || !(await waitForBridge(replaying)))) {
       kioskStuck = true;
       outcome = KIOSK_BUSY;
     } else {
       const statusAt = ctx.session?.()?.bridgeStatus?.at ?? null;
-      const commandId = commandIdOf(call, ctx);
       outcome = await runOne(call, args, commandId, ctx);
       replaying = ctx.session && outcome.ok && outcome.response.pending ? replayDone(ctx.session, commandId, statusAt) : null;
     }
-    swap.after(call.name ?? "", outcome, cart);
-    ctx.onAction?.(agentAction(call.name ?? "", args, outcome, performance.now() - started, cart));
+    swap.after(name, outcome, cart);
+    offers.after(name, args, ctx.utteranceSeq, commandId, outcome);
+    ctx.onAction?.(agentAction(name, args, outcome, performance.now() - started, cart));
     if (outcome.ok) cart = outcome.response.cart;
-    out.push({ ...(call.id ? { id: call.id } : {}), name: call.name ?? "", response: toolResult(ctx.kiosk, ctx.locale, outcome) });
+    out.push({ ...id, name, response: toolResult(ctx.kiosk, ctx.locale, outcome, name) });
   }
   return out;
 }

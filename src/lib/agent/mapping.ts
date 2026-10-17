@@ -89,8 +89,14 @@ type Outcome =
   | { ok: true; response: CommandResponse }
   | { ok: false; error: { code: string; message: string; detail?: ErrorDetail } };
 
+// After a refusal Live offered the same drinks three times and spoke the question twice (10-17): the result now says
+// the buttons are on screen, and a repeat (dropped on the phone, src/lib/agent/offers.ts) that nothing new is.
+const OFFERED = "The buttons are on the phone now. Ask their question only once, then wait for the user's answer.";
+const OFFERED_ALREADY =
+  "These buttons are already on the phone. Do not ask again and do not call offerChoices for them again; wait for the user's answer.";
+
 /** What the model sees after a tool call. Never tokens, ids of the session or the claim token. */
-export function toolResult(k: KioskData, locale: Locale, outcome: Outcome): object {
+export function toolResult(k: KioskData, locale: Locale, outcome: Outcome, tool?: string): object {
   if (!outcome.ok) {
     const { code, message, detail } = outcome.error;
     return {
@@ -105,12 +111,13 @@ export function toolResult(k: KioskData, locale: Locale, outcome: Outcome): obje
       ...(detail?.field && { field: detail.field, reason: detail.reason }),
     };
   }
-  const { status, total, cart, result, pending, dineOption } = outcome.response;
+  const { status, total, cart, result, pending, dineOption, duplicate } = outcome.response;
   const upsell = result?.upsell?.offerItemIds;
   return {
     ok: true,
     // Learned kiosks: the cart below is from before the change, which the kiosk is still replaying.
     ...(pending && { pending: true, message: "The kiosk is doing it now; say you are adding it and wait." }),
+    ...(tool === "offerChoices" && { message: duplicate ? OFFERED_ALREADY : OFFERED }),
     status,
     // A tap on the phone may have set it after the voice model's instructions were pinned (14-final:4).
     ...(k.dineOptions && dineOption !== undefined && { dineOption }),

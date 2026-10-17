@@ -3,6 +3,7 @@
 import type { FunctionCall, FunctionResponse, LiveServerMessage } from "@google/genai";
 import { useEffect, useState } from "react";
 import type { AgentAction } from "@/lib/agent/actions";
+import { offerTracker, type OfferTracker } from "@/lib/agent/offers";
 import { aiLanguageField, ApiError, liveToken, sendCommand } from "@/lib/client/api";
 import type { SpeechLanguage } from "@/lib/i18n/languages";
 import { errorCopy } from "@/lib/i18n/errors";
@@ -89,6 +90,8 @@ interface Run {
   misses: number;
   /** The dine option the open session knows: pinned with its token, or told since. */
   toldDine: DineOption | null;
+  /** Choice buttons offered for the current utterance, across tool call messages and reconnects (offers.ts). */
+  offers: OfferTracker;
 }
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -240,6 +243,7 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
         cart: () => o.getCart?.() ?? [],
         session: () => o.getSession?.() ?? null,
         onAction: (action) => o.onAction?.(action),
+        offers: r.offers,
       });
       // After a reconnect the new instructions already hold the cart, so a lost answer loses nothing.
       if (r.liveSessionId !== id || !r.live) return;
@@ -443,6 +447,7 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
       respTools: false,
       misses: 0,
       toldDine: null,
+      offers: offerTracker(),
     };
     run = r;
     setState("connecting");

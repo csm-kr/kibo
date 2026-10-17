@@ -3,6 +3,7 @@ import { getKiosk } from "@/lib/adapters/catalog";
 import { ApiError, type CommandReply } from "@/lib/client/api";
 import type { AgentAction } from "@/lib/agent/actions";
 import type { Session } from "@/types/session";
+import { offerTracker } from "@/lib/agent/offers";
 import { runToolCalls, type ToolContext, type VoiceCommand } from "./toolRunner";
 
 const kiosk = getKiosk("malo");
@@ -273,5 +274,92 @@ describe("runToolCalls on a learned kiosk (I-155)", () => {
       { ok: false, code: "CONFLICT", message: "The kiosk is still working on your last request." },
       { ok: false, code: "CONFLICT", message: "The kiosk is still working on your last request." },
     ]);
+  });
+});
+
+// 10-17 on a real iPhone: after a refusal Live offered the same drinks three times for one utterance, each in its own
+// tool call message, and spoke the question twice.
+describe("repeated offers", () => {
+  const DRINKS = {
+    templateId: "pick_option",
+    choices: [
+      { kind: "option", id: "cola" },
+      { kind: "option", id: "zero_cola" },
+    ],
+  };
+  // The same buttons, keys and choices in another order.
+  const SAME = { choices: [{ id: "zero_cola", kind: "option" }, { id: "cola", kind: "option" }], templateId: "pick_option" };
+  const OFFERED = "The buttons are on the phone now. Ask their question only once, then wait for the user's answer.";
+  const ALREADY = "These buttons are already on the phone. Do not ask again and do not call offerChoices for them again; wait for the user's answer.";
+
+  it("answers an identical offerChoices in the same batch without sending it or listing it", async () => {
+    const actions: AgentAction[] = [];
+    const c = ctx({ onAction: (a) => actions.push(a) });
+    const out = await runToolCalls(
+      [
+        { id: "a", name: "offerChoices", args: DRINKS },
+        { id: "b", name: "offerChoices", args: SAME },
+      ],
+      c,
+    );
+    expect(c.sent.map((s) => s.commandId)).toEqual(["live-uuid:a"]);
+    expect(out[0].response).toMatchObject({ ok: true, message: OFFERED });
+    expect(out[1]).toMatchObject({ id: "b", name: "offerChoices", response: { ok: true, message: ALREADY, total: 7200 } });
+    expect(actions.map((a) => a.tool)).toEqual(["offerChoices"]);
+  });
+
+  it("across tool call messages of one utterance, with the tracker the Live session keeps", async () => {
+    const offers = offerTracker();
+    const c = ctx({ offers });
+    await runToolCalls([{ id: "a", name: "offerChoices", args: DRINKS }], c);
+    const second = await runToolCalls([{ id: "b", name: "offerChoices", args: DRINKS }], c);
+    expect(c.sent).toHaveLength(1);
+    expect(second[0].response).toMatchObject({ message: ALREADY });
+    // The user spoke again: a new utterance may ask the same thing again.
+    await runToolCalls([{ id: "c", name: "offerChoices", args: DRINKS }], { ...c, utteranceSeq: 4 });
+    expect(c.sent.map((s) => s.commandId)).toEqual(["live-uuid:a", "live-uuid:c"]);
+  });
+
+  it("sends it again after a different offer or another change, or when the screen shows the offer was answered", async () => {
+    const offers = offerTracker();
+    const c = ctx({ offers });
+    const VARIANT = { templateId: "pick_variant", choices: [{ kind: "variant", id: "set" }] };
+    await runToolCalls(
+      [
+        { id: "a", name: "offerChoices", args: DRINKS },
+        { id: "b", name: "offerChoices", args: VARIANT },
+        { id: "c", name: "offerChoices", args: DRINKS },
+        { id: "d", name: "addToCart", args: { itemId: "cola" } },
+        { id: "e", name: "offerChoices", args: DRINKS },
+      ],
+      c,
+    );
+    expect(c.sent.map((s) => s.commandId)).toEqual(["a", "b", "c", "d", "e"].map((id) => `live-uuid:${id}`));
+
+    // The stream shows the offer arrived and was then cleared (a tap, the kiosk): the buttons are gone, so show them.
+    const cleared = { pendingBridgeCommand: null, bridgeStatus: null, pendingChoice: null, recentCommandIds: ["live-uuid:e", "x"] };
+    await runToolCalls([{ id: "f", name: "offerChoices", args: DRINKS }], { ...c, session: () => cleared });
+    expect(c.sent.at(-1)?.commandId).toBe("live-uuid:f");
+    // A stream that has not caught up yet says nothing about it: the repeat is dropped.
+    const behind = { pendingBridgeCommand: null, bridgeStatus: null, pendingChoice: null, recentCommandIds: ["x"] };
+    await runToolCalls([{ id: "g", name: "offerChoices", args: DRINKS }], { ...c, session: () => behind });
+    expect(c.sent.at(-1)?.commandId).toBe("live-uuid:f");
+  });
+
+  it("a refused offer is not one the phone shows", async () => {
+    const c = ctx({
+      send: vi.fn(async () => {
+        throw new ApiError("BAD_REQUEST", "That choice is not on the menu.");
+      }),
+    });
+    const out = await runToolCalls(
+      [
+        { id: "a", name: "offerChoices", args: DRINKS },
+        { id: "b", name: "offerChoices", args: DRINKS },
+      ],
+      c,
+    );
+    expect(c.send).toHaveBeenCalledTimes(2);
+    expect(out.map((r) => (r.response as { ok: boolean }).ok)).toEqual([false, false]);
   });
 });

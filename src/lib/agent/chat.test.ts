@@ -130,6 +130,26 @@ describe("runChat", () => {
     });
   });
 
+  // 10-17 (Live on a real iPhone): the same drinks offered three times for one utterance. One request is one utterance.
+  it("answers an identical offerChoices in a later round without sending it again, and says the buttons are shown", async () => {
+    const s = await demo();
+    const drinks = { templateId: "pick_option", choices: [{ kind: "option", id: "cola" }, { kind: "option", id: "cider" }] };
+    const { model, requests } = script(
+      [{ name: "offerChoices", args: drinks }],
+      [{ name: "offerChoices", args: { ...drinks, choices: [...drinks.choices].reverse() } }],
+      "Which drink would you like?",
+    );
+    const req = input(s, { message: "A cheeseburger set" });
+    const out = await runChat(deps(model), req);
+    expect(out.reply).toBe("Which drink would you like?");
+    expect((await store.get(s.sessionId))?.recentCommandIds).toEqual([`${req.chatRequestId}:0`]);
+    expect(out.actions.map((a) => a.tool)).toEqual(["offerChoices"]);
+    const answer = (round: number) =>
+      (requests[round].contents.at(-1)!.parts[0] as { functionResponse: { response: Record<string, unknown> } }).functionResponse.response;
+    expect(answer(1)).toMatchObject({ ok: true, message: expect.stringMatching(/^The buttons are on the phone now\./) });
+    expect(answer(2)).toMatchObject({ ok: true, message: expect.stringMatching(/^These buttons are already on the phone\./) });
+  });
+
   it("requestCheckout and confirmCheckout in one request: confirm is CONFLICT; a later utterance 1.6 s on pays", async () => {
     const s = await demo();
     await runChat(deps(script([{ name: "addToCart", args: { itemId: "cola" } }, { name: "setDineOption", args: { option: "eat_in" } }], "Done.").model), input(s));

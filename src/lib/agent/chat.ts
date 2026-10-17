@@ -13,6 +13,7 @@ import { KIOSK_BUSY, waitForBridge } from "./bridgeWait";
 import { chatInstructions } from "./instructions";
 import { toolCallToCommand, toolResult } from "./mapping";
 import type { ModelClient, ModelTurn } from "./model";
+import { offerTracker } from "./offers";
 import { choiceQuestion } from "./choices";
 import { ownWordsLanguage, replyLanguageLine } from "./ownWords";
 import { inScreensLanguage, introOffer, plainRequest, quickReply, summaryReply, type DoneCall } from "./quickReply";
@@ -129,8 +130,11 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
   ];
 
   let n = 0;
+  // The commandId of the latest call sent, for the repeated-offer check (offers.ts).
+  let lastCommandId = "";
   const execute = async (name: string, args: unknown): Promise<Outcome> => {
     const commandId = `${input.chatRequestId}:${n++}`;
+    lastCommandId = commandId;
     try {
       const cmd = toolCallToCommand(name, args);
       // The confirm card shows a cartVersion; without one the user has not seen a card to say yes to.
@@ -204,7 +208,8 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
         if (outcome.ok && intro) return `${intro.line} ${choiceQuestion(kiosk, latest.pendingChoice!, replyLocale)}`;
       }
     }
-    // Any accepted command clears pendingChoice, so one still open after an applied change was set in this request.
+    // Any accepted command but a dine option clears pendingChoice, so one still open after an applied change was set in
+    // this request or is a question a dine option left open; either is still to answer.
     const question = latest.pendingChoice ? choiceQuestion(kiosk, latest.pendingChoice, replyLocale) : null;
     return summaryReply(kiosk, replyLocale, allDone, question, aiLanguage) ?? FALLBACK;
   };
@@ -222,6 +227,7 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
   const allDone: DoneCall[] = [];
   let lastRound: DoneCall[] = [];
   const swap = swapTracker(kiosk);
+  const offers = offerTracker();
   let reply = "";
   let replySource: ChatResponse["replySource"] = "model";
   let stoppedEarly = false;
@@ -247,14 +253,26 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
     for (const call of out.functionCalls) {
       const t = performance.now();
       const cartBefore = cart;
+      const id = call.id ? { id: call.id } : {};
+      // The same buttons again in this request: answered from the first result, not sent and not listed (offers.ts).
+      // The store is read only for a likely repeat, to see that the offer is still open.
+      const seq = input.utteranceSeq;
+      const repeated =
+        offers.repeat(call.name, call.args, seq) && offers.repeat(call.name, call.args, seq, await store.get(input.sessionId));
+      if (repeated) {
+        const response = toolResult(kiosk, input.locale, { ok: true, response: repeated }, call.name);
+        parts.push({ functionResponse: { ...id, name: call.name, response } });
+        continue;
+      }
       // A swap's add keeps the replaced line's choices (swap.ts); what was really sent is what gets recorded.
       const args = swap.args(call.name, call.args);
       const outcome = await run(call.name, args);
       swap.after(call.name, outcome, cartBefore);
+      offers.after(call.name, args, seq, lastCommandId, outcome);
       record(call.name, args, outcome, performance.now() - t);
       done.push({ name: call.name, args, outcome, cartBefore });
-      const response = toolResult(kiosk, input.locale, outcome);
-      parts.push({ functionResponse: { ...(call.id ? { id: call.id } : {}), name: call.name, response } });
+      const response = toolResult(kiosk, input.locale, outcome, call.name);
+      parts.push({ functionResponse: { ...id, name: call.name, response } });
     }
     contents.push({ role: "user", parts });
     allDone.push(...done);

@@ -238,6 +238,19 @@ describe("toolResult", () => {
     expect(out).toEqual({ ok: false, code: "BAD_REQUEST", message: "That request could not be understood.", field: "args.choices", reason: "at most 6 items" });
   });
 
+  // 10-17 on a real iPhone: after a refusal Live offered the same drinks three times and spoke the question twice; the
+  // result said nothing about the buttons.
+  it("tells the model the buttons are on the phone now, and to ask once", () => {
+    const offered = toolResult(k, "en", { ok: true, response: { ...response, result: {} } }, "offerChoices") as { message?: string };
+    expect(offered.message).toBe("The buttons are on the phone now. Ask their question only once, then wait for the user's answer.");
+    // The same offer again (a repeat dropped on the phone, or a retried call): nothing new is on screen.
+    const again = toolResult(k, "en", { ok: true, response: { ...response, result: {}, duplicate: true } }, "offerChoices") as { message?: string };
+    expect(again.message).toBe("These buttons are already on the phone. Do not ask again and do not call offerChoices for them again; wait for the user's answer.");
+    // Other tools keep their plain result.
+    expect(toolResult(k, "en", { ok: true, response: { ...response, result: {} } }, "addToCart")).not.toHaveProperty("message");
+    expect(toolResult(k, "en", { ok: true, response: { ...response, result: {} } })).not.toHaveProperty("message");
+  });
+
   it("keeps a plain error small", () => {
     expect(toolResult(k, "ko", { ok: false, error: { code: "CONFLICT", message: "Please confirm on the card." } })).toEqual({
       ok: false,
