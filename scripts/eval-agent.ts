@@ -41,7 +41,8 @@ type Expect =
   // With `choices`: one sentence that adds a line and asks about another ("a coffee for me, something not spicy for him").
   // With `saysCannot` (15-judge-fixes:0): the last reply names one of these words and says it cannot be done.
   | { cart: ExpectedLine[]; choices?: ChoicesExpect; saysCannot?: string[] }
-  | { choices: ChoicesExpect }
+  // `noCheckout` (10-17, "I'll pay in cash" on a card-only kiosk): no requestCheckout or confirmCheckout call either.
+  | { choices: ChoicesExpect; noCheckout?: true }
   // A question back instead of a staff call (14-final:4): cart unchanged, no staff, choice buttons or a question mark,
   // and a grounded reply; `mentionsAny`: the reply or the buttons name one of these items.
   | { ask: { mentionsAny?: string[] } }
@@ -188,7 +189,10 @@ function judge(
   }
   if ("status" in e) return final.status === e.status ? null : `status ${final.status}`;
   if (!unchanged) return "cart changed";
-  if ("choices" in e) return choiceMiss(final, e.choices);
+  if ("choices" in e) {
+    if (e.noCheckout && calls.some((t) => t.name === "requestCheckout" || t.name === "confirmCheckout")) return "tried checkout";
+    return choiceMiss(final, e.choices);
+  }
   if ("staff" in e) return final.staffCalled?.reasonCode === "unknown_info" ? null : "staff not called";
   return calls.some((t) => t.code === "BAD_REQUEST") ? "a tool call failed with BAD_REQUEST" : null;
 }

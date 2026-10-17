@@ -126,6 +126,9 @@ export interface LearnedKiosk {
   };
 }
 
+/** How a kiosk takes payment; KIBO's kiosks take cards only (10-17). */
+export type PaymentMethod = "card" | "cash";
+
 export interface KioskVocabulary {
   item: LocalizedName;
   add: LocalizedName;
@@ -148,6 +151,9 @@ export interface KioskData {
   /** The languages the kiosk's own screen offers; includes `locale`. */
   locales: KioskLocale[];
   currency: "KRW";
+  /** What the kiosk takes at payment, for the AI's answer to "can I pay in cash?". Absent on a learned kiosk, which the
+   *  user pays on its own page. */
+  payment?: { methods: PaymentMethod[] };
   /** Absent on kiosks that do not ask eat-in or take-out (tickets). */
   dineOptions?: {
     eat_in: { name: LocalizedName; image: string };

@@ -18,6 +18,7 @@
   "locale": "ko",
   "locales": ["ko", "en", "ja"],
   "currency": "KRW",
+  "payment": { "methods": ["card"] },
   "vocabulary": {
     "item": { "ko": "승차권", "en": "ticket", "ja": "乗車券" },
     "add": { "ko": "선택", "en": "Select", "ja": "選択" },

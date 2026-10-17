@@ -84,6 +84,8 @@ export const kioskSchema: z.ZodType<KioskData> = z.strictObject({
   locale: z.enum(["ko", "en"]),
   locales: z.array(z.enum(["ko", "en", "ja"])).min(1).default(["ko"]),
   currency: z.literal("KRW"),
+  // Every direct kiosk says how it takes payment, so the AI never guesses (10-17: "I'll pay in cash").
+  payment: z.strictObject({ methods: z.array(z.enum(["card", "cash"])).min(1) }),
   dineOptions: z.strictObject({ eat_in: dineOption, take_out: dineOption }).optional(),
   vocabulary: z.strictObject({ item: localizedName, add: localizedName, cart: localizedName }).optional(),
   categories: z.array(z.strictObject({ categoryId: z.string(), name: localizedName, icon: imagePath })),

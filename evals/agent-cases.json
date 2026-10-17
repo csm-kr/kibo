@@ -1,5 +1,5 @@
 {
-  "about": "Text-agent evaluation set for the MALO BURGER kiosk and, for cases with kioskId \"airport_rail\", the SKYLINE AIRPORT RAIL ticket machine, and for kioskId \"doughhouse\", the learned Doughhouse pizza kiosk with a stand-in bridge that reports every replay as done (docs/TESTING.md \"Agent evaluation set\"). Written by the KIBO team, not an external benchmark. Each case starts on a fresh /demo session of its kioskId (default malo; status connected, empty cart) at 14:00 KST. Types follow TESTING 1-6, 8, 9; \"checkout\" checks the confirm rule; \"grounded-reply\" checks that the reply describes items only with menu data (scripts/grounding.ts, I-072). A cart expectation merges identical lines and counts defaults (set side fries_m, drink size m). Added in 14-final:4 and reported apart (`group`): \"colloquial\" (type 10), vague and spoken-style requests in Korean and English, also team-written, not real older users' speech; \"ask\" means a question or choice buttons instead of a staff call, and `excludes` lists choices that must not appear. \"language\" (type 11): two cases per AI-only language, one with the phone's picker set to it (`language`) and one with the picker on English, where the reply must still follow the user's language (`replyIn`, checked without AI by scripts/grounding.ts replyLanguage). Added in 15-judge-fixes:0 (`group` \"recovery\", type 12) from the round-2 judges' sessions: an applied order, a read-back while a choice is open (the reply must name the item still waiting), a change the item has no option for (`saysCannot`: the reply names it and says it cannot be done) and a request this kiosk cannot serve. Every case fails when any reply is the generic \"Sorry, could you say that again?\".",
+  "about": "Text-agent evaluation set for the MALO BURGER kiosk and, for cases with kioskId \"airport_rail\", the SKYLINE AIRPORT RAIL ticket machine, and for kioskId \"doughhouse\", the learned Doughhouse pizza kiosk with a stand-in bridge that reports every replay as done (docs/TESTING.md \"Agent evaluation set\"). Written by the KIBO team, not an external benchmark. Each case starts on a fresh /demo session of its kioskId (default malo; status connected, empty cart) at 14:00 KST. Types follow TESTING 1-6, 8, 9; \"checkout\" checks the confirm rule; \"grounded-reply\" checks that the reply describes items only with menu data (scripts/grounding.ts, I-072). A cart expectation merges identical lines and counts defaults (set side fries_m, drink size m). Added in 14-final:4 and reported apart (`group`): \"colloquial\" (type 10), vague and spoken-style requests in Korean and English, also team-written, not real older users' speech; \"ask\" means a question or choice buttons instead of a staff call, and `excludes` lists choices that must not appear. \"language\" (type 11): two cases per AI-only language, one with the phone's picker set to it (`language`) and one with the picker on English, where the reply must still follow the user's language (`replyIn`, checked without AI by scripts/grounding.ts replyLanguage). Added in 15-judge-fixes:0 (`group` \"recovery\", type 12) from the round-2 judges' sessions: an applied order, a read-back while a choice is open (the reply must name the item still waiting), a change the item has no option for (`saysCannot`: the reply names it and says it cannot be done) and a request this kiosk cannot serve. Every case fails when any reply is the generic \"Sorry, could you say that again?\". The cash cases (10-17, a real iPhone) ask to pay in cash on a card-only kiosk: the cart must stay as it was, the open choice must include [Call staff] and `noCheckout` fails the case on any requestCheckout or confirmCheckout call.",
   "notCovered": [
     { "type": "7-count-limits", "reason": "Count limits (max 3 toppings) need the learned Doughhouse kiosk, which has no LearnedAdapter yet." }
   ],
@@ -689,6 +689,22 @@
       "locale": "ko",
       "turns": ["저 땅콩이랑 우유 알레르기가 있어요. 불고기버거 먹어도 괜찮을까요?"],
       "expect": { "choices": { "ids": ["staff"] } }
+    },
+    {
+      "id": "r-ko-cash",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "ko",
+      "turns": ["콜라 하나 포장이요.", "현금으로 계산할게요"],
+      "expect": { "choices": { "ids": ["staff"] }, "noCheckout": true }
+    },
+    {
+      "id": "r-en-cash",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "en",
+      "turns": ["Can I pay in cash?"],
+      "expect": { "choices": { "ids": ["staff"] }, "noCheckout": true }
     },
     {
       "id": "r-en-out-of-domain",

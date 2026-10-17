@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import skill from "../../../skills/doughhouse.json";
 import { getKiosk } from "@/lib/adapters/catalog";
 import { learnedToKiosk, skillSchema } from "@/lib/adapters/learned";
+import type { KioskData } from "@/types/menu";
 import type { CartLine } from "@/types/session";
 import { dineNote } from "@/lib/voice/dineNote";
 import { buildInstructions, chatInstructions } from "./instructions";
@@ -235,6 +236,34 @@ describe("buildInstructions", () => {
     expect(allergy).toContain("offerChoices with ask_staff and {kind: staff, id: staff}");
     // A ticket machine sells no food.
     expect(buildInstructions(getKiosk("airport_rail"), { locale: "en" })).not.toContain("## Allergies");
+  });
+
+  // 10-17 on a real iPhone: "I'll pay in cash" was handled badly; the kiosks take cards only.
+  it("says from data how the kiosk takes payment, and answers cash with card only and [Call staff], never a cart change", () => {
+    const checkout = (kiosk: KioskData) => {
+      const t = buildInstructions(kiosk, { locale: "en" });
+      return t.slice(t.indexOf("## Checkout"), t.indexOf("## Current order"));
+    };
+    const malo = checkout(k);
+    expect(malo).toContain("This kiosk takes card only.");
+    expect(malo).toContain("If the user asks to pay in cash or in any way this kiosk does not take, never say it works");
+    expect(malo).toContain("do not change the order or call requestCheckout for it");
+    expect(malo).toContain("say this kiosk takes card only, and cash can be paid to staff at the counter.");
+    expect(malo).toContain("Then call offerChoices with ask_staff and {kind: staff, id: staff}");
+    const rail = checkout(getKiosk("airport_rail"));
+    expect(rail).toContain("This machine takes card only.");
+    expect(rail).toContain("say this machine takes card only, and staff can help with paying in cash.");
+    expect(rail).not.toContain("counter");
+    // With cash in the data there is nothing to refuse.
+    const both: KioskData = { ...k, payment: { methods: ["card", "cash"] } };
+    expect(checkout(both)).toContain("This kiosk takes card and cash.");
+    expect(checkout(both)).not.toContain("does not take");
+    // A learned kiosk is paid on its own page: no method is claimed for it.
+    expect(checkout(getKiosk("doughhouse"))).not.toMatch(/card only|cash/i);
+    // A kiosk fact: in the cached system text, the same for every order.
+    const empty = chatInstructions(k, { locale: "en" }).system;
+    expect(chatInstructions(k, { locale: "en", cart, status: "ordering", dineOption: "eat_in" }).system).toBe(empty);
+    expect(empty).toContain("This kiosk takes card only.");
   });
 
   it("the checkout talks about the user's order, never a card on the screen, and replies never say please wait", () => {

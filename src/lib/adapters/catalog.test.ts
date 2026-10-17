@@ -190,6 +190,20 @@ describe("kioskSchema (domain model)", () => {
     expect(kioskSchema.safeParse(emptyJa).success).toBe(false);
   });
 
+  // 10-17 on a real iPhone: "I'll pay in cash" got a muddled answer. The kiosks take cards only, and no data said so.
+  it("requires the payment methods a direct kiosk takes; both kiosks take card only", () => {
+    for (const id of ["malo", "airport_rail"]) expect(getKiosk(id).payment, id).toEqual({ methods: ["card"] });
+    const none = ticketRaw();
+    delete none.payment;
+    expect(kioskSchema.safeParse(none).success).toBe(false);
+    expect(kioskSchema.safeParse({ ...ticketRaw(), payment: { methods: [] } }).success).toBe(false);
+    expect(kioskSchema.safeParse({ ...ticketRaw(), payment: { methods: ["card", "coins"] } }).success).toBe(false);
+    expect(kioskSchema.safeParse({ ...ticketRaw(), payment: { methods: ["card"], note: "x" } }).success).toBe(false);
+    expect(kioskSchema.safeParse({ ...ticketRaw(), payment: { methods: ["card", "cash"] } }).success).toBe(true);
+    // A learned kiosk is paid on its own page; KIBO claims nothing about how.
+    expect(getKiosk("doughhouse").payment).toBeUndefined();
+  });
+
   it("requires a known domain", () => {
     const noDomain = ticketRaw();
     delete noDomain.domain;

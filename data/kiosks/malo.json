@@ -23,6 +23,7 @@
   "locale": "ko",
   "locales": ["ko", "en"],
   "currency": "KRW",
+  "payment": { "methods": ["card"] },
   "dineOptions": {
     "eat_in": {
       "name": {

@@ -51,6 +51,26 @@ export function chatInstructions(
   };
 }
 
+/**
+ * How this kiosk takes payment, from its data (10-17: "I'll pay in cash" got a muddled answer). A kiosk fact, so it is
+ * in the cached system text with the other kiosk lines. A learned kiosk has none: the user pays on its own page.
+ */
+function paymentLines(kiosk: KioskData): string[] {
+  const methods = kiosk.payment?.methods;
+  if (!methods) return [];
+  const machine = kiosk.domain === "ticket" ? "machine" : "kiosk";
+  const takes = methods.length === 1 ? `${methods[0]} only` : methods.join(" and ");
+  const lines = [`Payment happens on the ${machine}. This ${machine} takes ${takes}.`];
+  if (!methods.includes("cash")) {
+    const cash = kiosk.domain === "ticket" ? "staff can help with paying in cash" : "cash can be paid to staff at the counter";
+    lines.push(
+      `If the user asks to pay in cash or in any way this ${machine} does not take, never say it works, and do not change the order or call requestCheckout for it:`,
+      `say this ${machine} takes ${takes}, and ${cash}. Then call offerChoices with ask_staff and {kind: staff, id: staff}, and ask whether to call staff. Call callStaff only when the user asks for staff or taps that choice.`,
+    );
+  }
+  return lines;
+}
+
 function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: string[]; menu: string[] } {
   const locale = opts.locale ?? "en";
   const language = opts.language ?? locale;
@@ -192,7 +212,8 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
           "Call confirmCheckout only when the user clearly says yes in a new turn after their order appeared.",
           "Never call requestCheckout and confirmCheckout in the same turn.",
           `If confirmCheckout is refused with "Please confirm on the card.", ask the user to tap "${payNow}" on the phone. Do not retry.`,
-          "Payment happens on the kiosk with a card. You never pay and cannot complete a payment.",
+          ...paymentLines(kiosk),
+          "You never pay and cannot complete a payment.",
           "Status confirming means the user is checking their order; paying means the user is paying at the kiosk; do not change the cart then.",
         ]),
     "",
