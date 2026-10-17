@@ -95,3 +95,18 @@ describe("build context", () => {
     });
   }
 });
+
+// Cloud Run logged `EACCES: permission denied, mkdir '/app/.next/cache'` and an unhandledRejection on every image
+// optimisation since at least kibo-00021 (10-17): the run stage copied the standalone build as root, then ran as node.
+describe("Dockerfile run stage", () => {
+  const text = readFileSync(join(ROOT, "Dockerfile"), "utf8");
+  const run = text.slice(text.indexOf("AS run"));
+
+  it("gives the node user a writable .next/cache before it switches to node", () => {
+    const user = run.indexOf("USER node");
+    const cache = run.search(/RUN mkdir -p \.next\/cache && chown -R node:node \.next/);
+    expect(user).toBeGreaterThan(0);
+    expect(cache).toBeGreaterThan(run.indexOf("COPY --from=build"));
+    expect(cache).toBeLessThan(user);
+  });
+});
