@@ -547,8 +547,34 @@ describe("offerChoices", () => {
       .session;
     expect(s.pendingChoice).toEqual({ templateId: "pick_item", choices });
     expect(s.cartVersion).toBe(0);
-    s = applyCommand(s, cmd("setDineOption", { option: "eat_in" }, { source: "button" }), ctx("phone")).session;
+    s = applyCommand(s, cmd("addToCart", { itemId: "cola" }, { source: "voice", utteranceSeq: 1 }), ctx("phone")).session;
     expect(s.pendingChoice).toBeNull();
+  });
+
+  // 10-17 on a real iPhone: the AI asked "which burger?" before the dine tap, and the tap wiped the buttons.
+  it("a dine option keeps an open question that is not the dine question, and answers the dine question", () => {
+    const choices = [
+      { kind: "item", id: "cheese_burger" },
+      { kind: "item", id: "bulgogi_burger" },
+    ];
+    const connected: Session = { ...fresh(), status: "connected" };
+    const offered = applyCommand(connected, cmd("offerChoices", { templateId: "pick_item", choices }, { source: "voice" }), ctx("phone")).session;
+    for (const source of ["button", "voice"] as const) {
+      const s = applyCommand(offered, cmd("setDineOption", { option: "eat_in" }, { source, utteranceSeq: 1 }), ctx("phone")).session;
+      expect(s.dineOption).toBe("eat_in");
+      expect(s.pendingChoice).toEqual({ templateId: "pick_item", choices });
+    }
+    // The kiosk's own dine tap too: the AI's question is still unanswered.
+    const touched = applyCommand(offered, cmd("setDineOption", { option: "take_out" }), ctx("kiosk")).session;
+    expect(touched.pendingChoice).toEqual({ templateId: "pick_item", choices });
+
+    const dine = [
+      { kind: "dine", id: "eat_in" },
+      { kind: "dine", id: "take_out" },
+    ];
+    const asked = applyCommand(connected, cmd("offerChoices", { templateId: "pick_dine", choices: dine }, { source: "voice" }), ctx("phone")).session;
+    const answered = applyCommand(asked, cmd("setDineOption", { option: "eat_in" }, { source: "button" }), ctx("phone")).session;
+    expect(answered.pendingChoice).toBeNull();
   });
 
   it.each([

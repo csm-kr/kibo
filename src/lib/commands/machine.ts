@@ -394,8 +394,12 @@ export function applyCommand(
   }
 
   const { next, result } = ctx.kiosk.kind === "learned" ? learnedTransition(s, cmd, ctx) : transition(s, cmd, ctx);
-  // The bridge's report is not a user answer, so an open question stays open.
-  const keepsChoice = cmd.type === "offerChoices" || cmd.type === "bridgeReport";
+  // The bridge's report is not a user answer, so an open question stays open. A dine option answers only the dine
+  // question: the AI may have asked "which burger?" before it (10-17, a real iPhone lost those buttons to the dine tap).
+  const keepsChoice =
+    cmd.type === "offerChoices" ||
+    cmd.type === "bridgeReport" ||
+    (cmd.type === "setDineOption" && next.pendingChoice?.templateId !== "pick_dine");
   return {
     session: {
       ...next,

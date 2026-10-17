@@ -43,10 +43,13 @@ export function phoneScreen(session: Session | null, local: PhoneLocal, learned 
       // The claim moves idle to connected; until that snapshot arrives there is nothing to show yet.
       return "connecting";
     case "connected":
-      // No dine option yet (the first one moves to ordering). The dine screen also lets the user just talk.
+      // No dine option yet (the first one moves to ordering). The dine screen also lets the user just talk; once the AI
+      // asks something else there (which burger, set or not), talking shows its buttons, and the dine question comes at
+      // checkout (requestCheckout asks it). P2 had no choice buttons, so they were invisible (10-17).
       if (!local.startSeen) return "start";
       if (local.micHint) return "mic";
-      return dine ? "dine" : "talk";
+      if (!dine) return "talk";
+      return session.pendingChoice && session.pendingChoice.templateId !== "pick_dine" ? "talk" : "dine";
     case "ordering":
       // Scanned mid-order (Flow B) or the dine option is set: straight to talking, after the mic hint.
       return local.micHint ? "mic" : "talk";

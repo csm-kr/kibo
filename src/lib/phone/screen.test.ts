@@ -54,6 +54,20 @@ describe("phoneScreen", () => {
     expect(phoneScreen(session("connected"), started)).toBe("dine");
   });
 
+  // 10-17 on a real iPhone: the user spoke before choosing eat-in or take-out, the AI offered buttons, and P2 hid them.
+  it("connected with an open question that is not the dine question: talking, so its buttons show", () => {
+    const pick = { templateId: "pick_item" as const, choices: [{ kind: "item" as const, id: "cheese_burger" }] };
+    expect(phoneScreen(session("connected", { pendingChoice: pick }), started)).toBe("talk");
+    const variant = { templateId: "pick_variant" as const, choices: [{ kind: "variant" as const, id: "set" }] };
+    expect(phoneScreen(session("connected", { pendingChoice: variant }), started)).toBe("talk");
+    // The dine question itself stays on P2, which shows the two dine buttons.
+    const dine = { templateId: "pick_dine" as const, choices: [{ kind: "dine" as const, id: "eat_in" }] };
+    expect(phoneScreen(session("connected", { pendingChoice: dine }), started)).toBe("dine");
+    // The start screen and the microphone hint still come first.
+    expect(phoneScreen(session("connected", { pendingChoice: pick }), fresh)).toBe("start");
+    expect(phoneScreen(session("connected", { pendingChoice: pick }), { ...started, micHint: true })).toBe("mic");
+  });
+
   it("connected on a kiosk without dine options (tickets): straight to talking, never the dine question", () => {
     expect(phoneScreen(session("connected"), fresh, false, false)).toBe("start");
     expect(phoneScreen(session("connected"), started, false, false)).toBe("talk");
