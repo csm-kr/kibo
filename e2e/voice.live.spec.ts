@@ -290,10 +290,10 @@ for (const { mode, fixture, ip } of RUNS) {
       const canvas = page.locator("[data-kiosk-canvas]");
       for (const line of cart) {
         const en = lineLabel(kiosk, line, "en");
-        const ko = lineLabel(kiosk, line, "ko");
         await expect(phoneCart.getByText(en.detail, { exact: true })).toBeVisible();
-        await expect(canvas.getByText(ko.detail, { exact: true })).toBeVisible();
       }
+      // The kiosk's cart chips show name ×qty over the line price only (#1 1, 10-15); the options stay on the phone,
+      // K6 and KIBO's subtitle, so the canvas is checked by its chips.
       await expect(phoneCart.getByText("Cheeseburger set", { exact: true })).toHaveCount(2);
       await expect(canvas.getByText("치즈버거 세트 ×1", { exact: true })).toHaveCount(2);
     });
