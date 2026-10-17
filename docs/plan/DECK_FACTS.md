@@ -66,7 +66,7 @@ Real screens, not drawings. MALO hero order (two cheeseburger sets, one without 
 | `videos/footage/2026-10-14/two-device-1440x900--phone--06-paying.png`, `two-device-1440x900--06-paying.png` | The pay step (I-146): the phone says "Insert your card into the kiosk", the laptop kiosk shows its payment screen and the step in English | measured (footage still) |
 | `videos/footage/2026-10-14/two-device-1440x900--phone--02-code-typed.png` | Connecting without a camera: the kiosk's 6-digit code typed on the phone's `/app` | measured (footage still) |
 
-No deck capture of the ticket machine's 日本語 screen exists yet: take one from production (`/kiosk?k=airport_rail`, then 日本語) or use a frame of the video's English → 日本語 montage take; never a mockup.
+Deck page 07 shows the ticket machine's 日本語 screen from the video v4 take m5-t1 (English voice → 日本語 ticket machine, production `kibo-00024-bzf`, 10-16): a real recorded frame, never a mockup.
 
 Phone captures are 390×844 CSS px at 2×; kiosk captures are the 1080×1920 canvas scaled to 1080 px high. Kiosk text is Korean: add English captions on the slide (the K3 subtitle row already carries one). In the K3 picture the second cart chip is cut at the right edge (a sideways-scrolling row, I-244) and the subtitle names only the second set (I-243): crop above the cart bar or caption it.
 
