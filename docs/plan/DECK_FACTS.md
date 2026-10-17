@@ -50,7 +50,7 @@ Pictures: real captures in `docs/assets/deck/` (`npm run shots:deck`, `scripts/d
 | Voice until payment: the dine option, the order, "That's all, I'll pay." (`requestCheckout`, the review opens on both screens) and "Yes, pay now." (`confirmCheckout`, accepted from the AI on a new user utterance at least 1.5 s after the review opened); the card stays two taps on the kiosk | ADR-005; `isConfirmed` in `src/lib/commands/machine.ts` | design |
 | QR → claim → talk → Gemini function call → `POST /api/command` (zod, actor token, state machine, catalog) → Firestore transaction → SSE → kiosk highlight and phone cart → confirm card → card at the kiosk → order number | `docs/ARCHITECTURE.md` "Sequence diagrams" 1 | design |
 | Learned kiosk: the command waits for the in-page bridge, which replays the recipe and checks the kiosk's own total before the session changes | `docs/ARCHITECTURE.md` "Sequence diagrams" 3 | design |
-| The phone flow on main (10-17), **not yet deployed**: after the QR the phone lands on the mic screen and the AI greets first (I-400); the AI's choice buttons show before the dine option (I-395); a choice is asked once per utterance (I-397); "pay in cash" gets card only and [Call staff] (I-398); a refused command tells the model which field failed (I-396) | `docs/ISSUE.md` I-395 to I-400 | design; put it on a slide only after the deploy, and recapture the pictures from production |
+| The phone flow, **deployed as `kibo-00025-cwl` on 10-17**: after the QR the phone lands on the mic screen and the AI greets first (I-400); the AI's choice buttons show before the dine option (I-395); a choice is asked once per utterance (I-397); "pay in cash" gets card only and [Call staff] (I-398); a refused command tells the model which field failed (I-396) | `docs/ISSUE.md` I-395 to I-400 | design; put it on a slide only after the deploy, and recapture the pictures from production |
 
 ## 7 Wireframes
 Real screens, not drawings. MALO hero order (two cheeseburger sets, one without pickles, zero cola and cider).
@@ -146,7 +146,7 @@ Blind KIBO Learn first (`docs/plan/SUBMISSION.md`).
 ## 14 Links
 | Fact | Source | Status |
 |---|---|---|
-| Product: https://kibo-407514467119.asia-northeast3.run.app/demo (the Cloud Run service `kibo`, `asia-northeast3`; production revision `kibo-00024-bzf` on 10-17) | `README.md`; `gcloud run services describe kibo --region asia-northeast3` | deployed (host confirmed 10-14, I-092); the revision changes with each deploy, so read it again before quoting it |
+| Product: https://kibo-407514467119.asia-northeast3.run.app/demo (the Cloud Run service `kibo`, `asia-northeast3`; production revision `kibo-00025-cwl` on 10-17, relay `kibo-voice-00005-ptd`) | `README.md`; `gcloud run services describe kibo --region asia-northeast3` | deployed (host confirmed 10-14, I-092); the revision changes with each deploy, so read it again before quoting it |
 | GitHub repo, demo video | — | not yet public (license open, I-089) |
 
 Slots 2, 15 and 16 of the template are not planned in `docs/plan/SUBMISSION.md`. In the final deck slot 2 (download instructions) is removed, slot 15 is the Impact page (20) and slot 16 the thank-you page (28).
