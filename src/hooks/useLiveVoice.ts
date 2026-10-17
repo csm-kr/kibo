@@ -16,6 +16,7 @@ import { initialTurns, noiseStep, raiseSeq, turnEvents, turnsReducer, type TurnE
 import type { KioskData, Locale } from "@/types/menu";
 import type { CartLine, DineOption, Session, SessionStatus } from "@/types/session";
 import { dineNote } from "@/lib/voice/dineNote";
+import { greeter, HELD_RESULT } from "@/lib/voice/greeting";
 
 // The phone's Gemini Live connection (ADR-003, docs/ARCHITECTURE.md "Voice"): audio goes straight to Gemini with a
 // one-use token, or through the Vertex relay when /api/live-token says so (ADR-012; the same Live messages, so one
@@ -52,6 +53,8 @@ export interface LiveVoiceOptions {
   getSession?: () => Session | null;
   /** /demo: each tool call as ids and a result code, for "What the AI did". */
   onAction?: (action: AgentAction) => void;
+  /** The AI's first line, said when voice opens; null once anything was said, after the review starts, or off the phone. */
+  greeting?: string | null;
 }
 
 const OUTPUT_RATE = 24000;
@@ -92,6 +95,8 @@ interface Run {
   toldDine: DineOption | null;
   /** Choice buttons offered for the current utterance, across tool call messages and reconnects (offers.ts). */
   offers: OfferTracker;
+  /** The greeting, once per voice start (src/lib/voice/greeting.ts). */
+  greeter: ReturnType<typeof greeter>;
 }
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -231,6 +236,19 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     if (!sessionId || !deviceToken) return;
     // The seq of the response these calls belong to, taken before any await.
     const utteranceSeq = turns.seq;
+    // The greeting's own response asked for something: nothing is run, and the model is told to wait for the user.
+    if (r.greeter.holdsTools) {
+      const held = calls.map((c) => ({ ...(c.id ? { id: c.id } : {}), name: c.name ?? "", response: HELD_RESULT }));
+      r.tools = r.tools.then(() => {
+        if (r.liveSessionId !== id || !r.live) return;
+        try {
+          r.live.sendToolResponse({ functionResponses: held });
+        } catch {
+          // The socket is closing; onclose reconnects.
+        }
+      });
+      return;
+    }
     setState("thinking");
     r.tools = r.tools.then(async () => {
       const responses = await runToolCalls(calls, {
@@ -264,6 +282,7 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
   function onMessage(r: Run, id: string, m: LiveServerMessage) {
     const events = turnEvents(m);
     countTurns(events);
+    r.greeter.onMessage(events);
     const sc = m.serverContent;
     if (marks) {
       const now = performance.now();
@@ -346,6 +365,7 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
       r.live = live;
       r.toldDine = dineAtToken;
       tellDine(r);
+      greet(r);
     };
 
     if (t.mode === "relay") {
@@ -448,6 +468,7 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
       misses: 0,
       toldDine: null,
       offers: offerTracker(),
+      greeter: greeter(),
     };
     run = r;
     setState("connecting");
@@ -493,6 +514,20 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
       r.toldDine = dine;
     } catch {
       // A closing socket: the next connection's token carries the dine option.
+    }
+  }
+
+  /**
+   * The AI speaks first (owner 10-17): the phone's greeting as one text turn when the first connection of this voice
+   * start opens. Not counted as an utterance (no countTurns), so it can never be the "yes" that confirms.
+   */
+  function greet(r: Run) {
+    const turn = r.greeter.onConnected(o.greeting ?? null, o.status);
+    if (!turn || !r.live) return;
+    try {
+      r.live.sendClientContent(turn);
+    } catch {
+      // A closing socket: nothing to greet.
     }
   }
 

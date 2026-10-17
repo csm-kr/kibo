@@ -122,7 +122,6 @@ async function main() {
     const key = `kibo.phone.${created.sessionId}`;
     await phone.waitForFunction((k) => localStorage.getItem(k) !== null, key, { timeout: 60_000 });
     const deviceToken = (await phone.evaluate((k) => localStorage.getItem(k), key)) ?? "";
-    await phone.getByRole("button", { name: "Start" }).click();
     await phone.getByRole("button", { name: "Type instead" }).click();
     await phone.getByRole("button", { name: "Eat here" }).click();
     await phone.locator('[data-phone-screen="talk"]').waitFor();

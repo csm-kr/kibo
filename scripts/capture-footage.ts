@@ -487,9 +487,8 @@ const CLIPS: Clip[] = [
       const watch = watchSession(created.sessionId, headers);
       try {
         await page.goto(created.claimUrl.replace(/^https?:\/\/[^/]+/, BASE));
-        await page.getByRole("heading", { name: "Tell your phone, and the kiosk orders for you" }).waitFor({ timeout: 120_000 });
+        await page.getByRole("heading", { name: "Turn on the microphone to talk" }).waitFor({ timeout: 120_000 });
         await rec.mark("start");
-        await page.getByRole("button", { name: "Start" }).click();
         await page.getByRole("button", { name: "Type instead" }).click();
         await page.getByRole("button", { name: "Eat here" }).click();
         await watch.until("dine option", (x) => x.dineOption !== null);
@@ -634,8 +633,7 @@ CLIPS.push(
       const watch = watchSession(sessionId, xff(this));
       try {
         await kiosk.locator("[data-pairing-panel]").getByText(/^Phone connected at/).waitFor();
-        await phone.getByRole("button", { name: "Start" }).click({ timeout: 60_000 });
-        await phone.getByRole("button", { name: "Type instead" }).click();
+        await phone.getByRole("button", { name: "Type instead" }).click({ timeout: 60_000 });
         await Recorder.both(rec, phoneRec, "connected");
         await phone.getByRole("button", { name: "Eat here" }).click();
         await watch.until("dine option", (x) => x.dineOption !== null);

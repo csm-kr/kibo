@@ -1,8 +1,8 @@
 import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
 import { claim, command, kioskRoot, readClaim } from "../helpers";
 
-// Alignment checks from the 10-16 design-QA pass over the screens the submission video films (F1, F2, F3, F4, F5,
-// F10, F13 in the pass's table): measured coordinates, not screenshots.
+// Alignment checks from the 10-16 design-QA pass over the screens the submission video films (F2, F3, F4, F5, F10,
+// F13 in the pass's table; F1's intro screen is gone since 10-17): measured coordinates, not screenshots.
 
 test.use({
   // Its own address for the dev server's per-IP limits (R-005).
@@ -89,26 +89,8 @@ async function openPhone(page: Page, request: APIRequestContext) {
 
 const screenOf = (page: Page) => page.locator("[data-phone-screen]");
 
-test("phone intro: each step's number sits on the middle of its first line (F1)", async ({ page, request }) => {
-  await openPhone(page, request);
-  await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "start");
-  const offsets = await page.locator("ol > li").evaluateAll((items) =>
-    items.map((li) => {
-      const badge = li.querySelector("span")!.getBoundingClientRect();
-      const text = [...li.childNodes].find((n) => n.nodeType === Node.TEXT_NODE && n.textContent?.trim())!;
-      const range = document.createRange();
-      range.selectNodeContents(text);
-      const first = [...range.getClientRects()].filter((r) => r.width > 0)[0];
-      return badge.top + badge.height / 2 - (first.top + first.height / 2);
-    }),
-  );
-  expect(offsets).toHaveLength(3);
-  for (const o of offsets) expect(Math.abs(o)).toBeLessThanOrEqual(1);
-});
-
 test("phone dock: [Type] and the voice switch sit the same distance from their edges (F13)", async ({ page, request }) => {
   await openPhone(page, request);
-  await page.getByRole("button", { name: "Start" }).click();
   await page.getByRole("button", { name: "Type instead" }).click();
   await page.getByRole("button", { name: "Eat here" }).click();
   await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
@@ -123,7 +105,6 @@ test("phone dock: [Type] and the voice switch sit the same distance from their e
 
 test("phone done: the order number's tracking is balanced, so the digits centre on the card (F10)", async ({ page, request }) => {
   const s = await openPhone(page, request);
-  await page.getByRole("button", { name: "Start" }).click();
   await page.getByRole("button", { name: "Type instead" }).click();
   await page.getByRole("button", { name: "Eat here" }).click();
   await s.phone("addToCart", HERO[1]);

@@ -34,49 +34,49 @@ function session(status: SessionStatus, over: Partial<Session> = {}): Session {
   };
 }
 
-const fresh: PhoneLocal = { claimError: null, startSeen: false, doneDismissed: false, micHint: false, inAppHold: false };
-const started: PhoneLocal = { ...fresh, startSeen: true };
+const fresh: PhoneLocal = { claimError: null, doneDismissed: false, micHint: false, inAppHold: false };
 
 describe("phoneScreen", () => {
   it("shows the claim errors before anything else", () => {
-    expect(phoneScreen(session("ordering"), { ...started, claimError: "taken" })).toBe("taken");
+    expect(phoneScreen(session("ordering"), { ...fresh, claimError: "taken" })).toBe("taken");
     expect(phoneScreen(null, { ...fresh, claimError: "taken" })).toBe("taken");
     expect(phoneScreen(null, { ...fresh, claimError: "gone" })).toBe("ended");
   });
 
   it("waits for the session", () => {
     expect(phoneScreen(null, fresh)).toBe("connecting");
-    expect(phoneScreen(session("idle"), started)).toBe("connecting");
+    expect(phoneScreen(session("idle"), fresh)).toBe("connecting");
   });
 
-  it("connected: the start screen, then the dine question", () => {
-    expect(phoneScreen(session("connected"), fresh)).toBe("start");
-    expect(phoneScreen(session("connected"), started)).toBe("dine");
+  // Owner 10-17: people who struggle with kiosks may struggle with the phone's entry steps too. A phone that arrives by
+  // the kiosk's QR link or its 6-digit code lands on the microphone screen; the 3 steps are a line there.
+  it("connected, arriving by the claim link or the code: the microphone hint first, never an intro screen", () => {
+    expect(phoneScreen(session("connected"), { ...fresh, micHint: true })).toBe("mic");
+    expect(phoneScreen(session("connected"), fresh)).toBe("dine");
+    expect(phoneScreen(session("connected"), fresh, false, false)).toBe("talk");
   });
 
   // 10-17 on a real iPhone: the user spoke before choosing eat-in or take-out, the AI offered buttons, and P2 hid them.
   it("connected with an open question that is not the dine question: talking, so its buttons show", () => {
     const pick = { templateId: "pick_item" as const, choices: [{ kind: "item" as const, id: "cheese_burger" }] };
-    expect(phoneScreen(session("connected", { pendingChoice: pick }), started)).toBe("talk");
+    expect(phoneScreen(session("connected", { pendingChoice: pick }), fresh)).toBe("talk");
     const variant = { templateId: "pick_variant" as const, choices: [{ kind: "variant" as const, id: "set" }] };
-    expect(phoneScreen(session("connected", { pendingChoice: variant }), started)).toBe("talk");
+    expect(phoneScreen(session("connected", { pendingChoice: variant }), fresh)).toBe("talk");
     // The dine question itself stays on P2, which shows the two dine buttons.
     const dine = { templateId: "pick_dine" as const, choices: [{ kind: "dine" as const, id: "eat_in" }] };
-    expect(phoneScreen(session("connected", { pendingChoice: dine }), started)).toBe("dine");
-    // The start screen and the microphone hint still come first.
-    expect(phoneScreen(session("connected", { pendingChoice: pick }), fresh)).toBe("start");
-    expect(phoneScreen(session("connected", { pendingChoice: pick }), { ...started, micHint: true })).toBe("mic");
+    expect(phoneScreen(session("connected", { pendingChoice: dine }), fresh)).toBe("dine");
+    // The microphone hint still comes first.
+    expect(phoneScreen(session("connected", { pendingChoice: pick }), { ...fresh, micHint: true })).toBe("mic");
   });
 
   it("connected on a kiosk without dine options (tickets): straight to talking, never the dine question", () => {
-    expect(phoneScreen(session("connected"), fresh, false, false)).toBe("start");
-    expect(phoneScreen(session("connected"), started, false, false)).toBe("talk");
-    expect(phoneScreen(session("connected"), { ...started, micHint: true }, false, false)).toBe("mic");
+    expect(phoneScreen(session("connected"), fresh, false, false)).toBe("talk");
+    expect(phoneScreen(session("connected"), { ...fresh, micHint: true }, false, false)).toBe("mic");
   });
 
   it("ordering goes straight to talking, also when scanned mid-order", () => {
     expect(phoneScreen(session("ordering"), fresh)).toBe("talk");
-    expect(phoneScreen(session("ordering", { dineOption: "eat_in" }), started)).toBe("talk");
+    expect(phoneScreen(session("ordering", { dineOption: "eat_in" }), fresh)).toBe("talk");
   });
 
   it("follows confirming, paying and paid", () => {
@@ -86,18 +86,17 @@ describe("phoneScreen", () => {
   });
 
   it("keeps the order number until the user dismisses it", () => {
-    expect(phoneScreen(session("paid"), { ...started, doneDismissed: true })).toBe("ended");
+    expect(phoneScreen(session("paid"), { ...fresh, doneDismissed: true })).toBe("ended");
   });
 
   it("expired ends the order", () => {
-    expect(phoneScreen(session("expired"), started)).toBe("ended");
+    expect(phoneScreen(session("expired"), fresh)).toBe("ended");
   });
 
-  it("P1: the microphone hint comes after start and before the dine question or talking", () => {
-    const hint: PhoneLocal = { ...started, micHint: true };
-    expect(phoneScreen(session("connected"), { ...fresh, micHint: true })).toBe("start");
+  it("P1: the microphone hint comes before the dine question or talking", () => {
+    const hint: PhoneLocal = { ...fresh, micHint: true };
     expect(phoneScreen(session("connected"), hint)).toBe("mic");
-    // Scanned mid-order (Flow B): no start screen, the hint first.
+    // Scanned mid-order (Flow B): the hint first.
     expect(phoneScreen(session("ordering"), { ...fresh, micHint: true })).toBe("mic");
     expect(phoneScreen(session("confirming"), hint)).toBe("confirm");
   });
@@ -108,9 +107,9 @@ describe("phoneScreen", () => {
   });
 
   it("a learned kiosk's review is its own screen: the user pays on the kiosk, never on the phone", () => {
-    expect(phoneScreen(session("confirming", { kioskId: "doughhouse" }), started, true)).toBe("confirmLearned");
-    expect(phoneScreen(session("ordering", { kioskId: "doughhouse" }), started, true)).toBe("talk");
-    expect(phoneScreen(session("confirming"), started, false)).toBe("confirm");
+    expect(phoneScreen(session("confirming", { kioskId: "doughhouse" }), fresh, true)).toBe("confirmLearned");
+    expect(phoneScreen(session("ordering", { kioskId: "doughhouse" }), fresh, true)).toBe("talk");
+    expect(phoneScreen(session("confirming"), fresh, false)).toBe("confirm");
   });
 });
 

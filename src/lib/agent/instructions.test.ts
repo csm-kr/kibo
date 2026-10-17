@@ -5,6 +5,7 @@ import { learnedToKiosk, skillSchema } from "@/lib/adapters/learned";
 import type { KioskData } from "@/types/menu";
 import type { CartLine } from "@/types/session";
 import { dineNote } from "@/lib/voice/dineNote";
+import { GREETING_NOTE } from "@/lib/voice/greeting";
 import { buildInstructions, chatInstructions } from "./instructions";
 import { menuForModel } from "./menu";
 
@@ -421,6 +422,15 @@ describe("chatInstructions (static system for the prompt cache, the order per re
     const { system } = chatInstructions(k, empty);
     expect(system).toMatch(/read back the order.*question that is still open/i);
     expect(system).toMatch(/no option for.*say in one sentence that this kiosk cannot do it/i);
+  });
+
+  // Owner 10-17: the AI speaks first when voice opens. The phone sends the greeting as a text turn; only voice gets the
+  // rule for it, so the text agent's cached system text stays as it was.
+  it("voice says the phone's greeting word for word and calls no tool for it; the text agent's system text has no such line", () => {
+    const voice = buildInstructions(k, full);
+    expect(voice).toContain(`A message that starts with "${GREETING_NOTE}" comes from the phone when voice opens, not from the user:`);
+    expect(voice).toContain("say the sentence after it once, word for word, then wait for the user. Call no tool for it.");
+    expect(chatInstructions(k, full).system).not.toContain(GREETING_NOTE);
   });
 
   it("voice keeps one text with the same rules, order and menu (the Live token pins it)", () => {

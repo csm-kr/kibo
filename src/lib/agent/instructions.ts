@@ -1,5 +1,6 @@
 import { LANGUAGES, lt, type SpeechLanguage } from "@/lib/i18n/languages";
 import { PHONE_NOTE } from "@/lib/voice/dineNote";
+import { GREETING_NOTE } from "@/lib/voice/greeting";
 import type { KioskData, Locale } from "@/types/menu";
 import type { CartLine, DineOption, Session, SessionStatus } from "@/types/session";
 import { choiceLabel, choiceQuestion } from "./choices";
@@ -23,10 +24,18 @@ type OrderOptions = {
   language?: SpeechLanguage;
 };
 
+// Voice only: the phone greets through Live when voice opens (owner 10-17); the text agent never gets the note, so its
+// cached system text stays as it was.
+const VOICE_RULES = [
+  "## Greeting",
+  `A message that starts with "${GREETING_NOTE}" comes from the phone when voice opens, not from the user: say the sentence after it once, word for word, then wait for the user. Call no tool for it.`,
+  "",
+];
+
 /** Gemini Live: one text, pinned in the ephemeral token with the order as it was when the token was issued. */
 export function buildInstructions(kiosk: KioskData, opts: OrderOptions): string {
   const { rules, order, menu } = parts(kiosk, opts);
-  return [...rules, ...order, ...menu].join("\n");
+  return [...rules, ...VOICE_RULES, ...order, ...menu].join("\n");
 }
 
 /**

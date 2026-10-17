@@ -76,8 +76,7 @@ test("laptop kiosk and phone: scan in /app, order, confirm on the phone, pay on 
     await expect(panel.getByText(/^Phone connected at \d\d:\d\d$/)).toBeVisible();
     await expect(kioskRoot(kiosk)).toHaveAttribute("data-screen", "dine");
 
-    // The phone's own buttons: start, the microphone hint (typing here; voice is the @live test), the dine option.
-    await phone.getByRole("button", { name: "Start" }).click();
+    // The phone's own buttons: the microphone hint (typing here; voice is the @live test), the dine option.
     await expect(phone.getByRole("heading", { name: "Turn on the microphone to talk" })).toBeVisible();
     await phone.getByRole("button", { name: "Type instead" }).click();
     await phone.getByRole("button", { name: "Eat here" }).click();
@@ -152,9 +151,8 @@ test("@live laptop kiosk and phone: the hero order spoken in Korean to the phone
       }
     });
 
-    await phone.getByRole("button", { name: "Start" }).click({ timeout: 60_000 });
     // P1: [Turn on the microphone] starts voice at once; the dine option is a tap on P2 while it listens.
-    await phone.getByRole("button", { name: "Turn on the microphone" }).click();
+    await phone.getByRole("button", { name: "Turn on the microphone" }).click({ timeout: 60_000 });
     await phone.getByRole("button", { name: "Eat here" }).click();
     const mic = phone.locator("button[data-voice-state]");
     await expect(mic).toHaveAttribute("data-voice-state", /listening|thinking|speaking/, { timeout: 20_000 });

@@ -36,7 +36,6 @@ async function ownPhone(laptop: Page, browser: Browser, baseURL: string | undefi
   });
   const phone = await context.newPage();
   await phone.goto(url);
-  await phone.getByRole("button", { name: "Start" }).click();
   await phone.getByRole("button", { name: "Type instead" }).click();
   await expect(phone.locator("[data-phone-screen]")).toHaveAttribute("data-phone-screen", "dine");
   const key = `kibo.phone.${sessionId}`;

@@ -76,7 +76,6 @@ async function openLearnedPhone(page: Page, request: APIRequestContext) {
 test("learned kiosk on the phone: entering, check the kiosk, mismatch, pay on the kiosk", async ({ page, request }, info) => {
   test.setTimeout(180_000);
   const s = await openLearnedPhone(page, request);
-  await page.getByRole("button", { name: "Start" }).click();
   await page.getByRole("button", { name: "Type instead" }).click();
   await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "dine");
 

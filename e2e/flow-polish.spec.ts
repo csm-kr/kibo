@@ -109,8 +109,6 @@ test("/assistant at 360×800 in Korean with larger text: a cart summary when the
   const deviceToken = (await page.evaluate((k) => localStorage.getItem(k), key)) ?? "";
   const phone = (type: string, args: object) =>
     command(context.request, deviceToken, { sessionId: created.sessionId, type, args, source: "voice", utteranceSeq: 1 });
-
-  await page.getByRole("button", { name: "시작하기" }).click();
   await page.getByRole("button", { name: "글자로 입력할게요" }).click();
   const input = page.getByRole("textbox", { name: "주문을 글자로 입력" });
   await expect(input).toBeFocused();

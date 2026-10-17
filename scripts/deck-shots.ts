@@ -80,7 +80,6 @@ async function phoneWireframes(browser: Browser) {
   const key = `kibo.phone.${created.sessionId}`;
   await page.waitForFunction((k) => localStorage.getItem(k) !== null, key, { timeout: 60_000 });
   const deviceToken = (await page.evaluate((k) => localStorage.getItem(k), key)) ?? "";
-  await page.getByRole("button", { name: "Start" }).click();
   await page.getByRole("button", { name: "Type instead" }).click();
   await page.getByRole("button", { name: "Eat here" }).click();
   await page.locator('[data-phone-screen="talk"]').waitFor();

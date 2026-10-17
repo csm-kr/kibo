@@ -3,7 +3,6 @@ import type { Session } from "@/types/session";
 export type PhoneScreenId =
   | "connecting"
   | "inapp"
-  | "start"
   | "mic"
   | "dine"
   | "talk"
@@ -18,8 +17,6 @@ export type PhoneScreenId =
 export interface PhoneLocal {
   /** The claim was refused: another phone holds the session, or the session is over. */
   claimError: "taken" | "gone" | null;
-  /** The user tapped [Start] on the start screen. */
-  startSeen: boolean;
   /** The user closed the order number with [Done]. */
   doneDismissed: boolean;
   /** P1: this browser has not seen the microphone hint yet. */
@@ -30,6 +27,8 @@ export interface PhoneLocal {
 
 /**
  * Which phone screen to show (docs/UX.md screen map P1–P7). The session status decides; local flags fill the gaps.
+ * A phone arrives by the kiosk's QR link or its 6-digit code (or reconnects to one), and lands on the microphone hint:
+ * the intro screen with [Start] was one step too many for people who struggle with the entry steps (owner 10-17).
  * A learned kiosk's order ends at its review: the user pays on the kiosk itself, so P4 there has no pay button.
  * A kiosk without dine options (a ticket machine) never asks P2; the phone goes straight to talking.
  */
@@ -46,7 +45,6 @@ export function phoneScreen(session: Session | null, local: PhoneLocal, learned 
       // No dine option yet (the first one moves to ordering). The dine screen also lets the user just talk; once the AI
       // asks something else there (which burger, set or not), talking shows its buttons, and the dine question comes at
       // checkout (requestCheckout asks it). P2 had no choice buttons, so they were invisible (10-17).
-      if (!local.startSeen) return "start";
       if (local.micHint) return "mic";
       if (!dine) return "talk";
       return session.pendingChoice && session.pendingChoice.templateId !== "pick_dine" ? "talk" : "dine";

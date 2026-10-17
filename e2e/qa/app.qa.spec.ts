@@ -61,7 +61,7 @@ test("/app home: first visit, then Korean with larger text and an order to conti
   const { sessionId, claimUrl } = (await res.json()) as { sessionId: string; claimUrl: string };
   await page.goto(claimUrl);
   await expect.poll(() => page.evaluate((k) => localStorage.getItem(k), `kibo.phone.${sessionId}`)).not.toBeNull();
-  await expect(page.locator("[data-phone-screen]")).toHaveAttribute("data-phone-screen", "start");
+  await expect(page.locator("[data-phone-screen]")).toHaveAttribute("data-phone-screen", "mic");
 
   await page.goto("/app");
   await page.getByRole("button", { name: "한국어" }).click();

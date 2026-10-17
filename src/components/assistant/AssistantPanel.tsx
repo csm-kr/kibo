@@ -25,10 +25,10 @@ import type { CommandType } from "@/lib/commands/schemas";
 import type { SendResult } from "@/lib/demo/player";
 import { learnedUndoLine } from "@/lib/commands/undo";
 import { cartAnnouncement, itemCount, learnedPayHint, phoneSecondsLeft, pt, voiceSecondsLeft } from "@/lib/i18n/phone";
-import type { SpeechLanguage } from "@/lib/i18n/languages";
+import { lt, type SpeechLanguage } from "@/lib/i18n/languages";
 import { formatWon } from "@/lib/kiosk/menu";
 import { idleWarning, staffBannerVisible } from "@/lib/kiosk/timers";
-import { bridgeNotice, phoneScreen, type BridgeNotice, type PhoneLocal } from "@/lib/phone/screen";
+import { bridgeNotice, phoneScreen, type BridgeNotice, type PhoneLocal, type PhoneScreenId } from "@/lib/phone/screen";
 import { LARGE_TEXT_SCALE } from "@/lib/phone/settings";
 import type { KioskData, Locale, LocalizedName } from "@/types/menu";
 import type { DineOption, Session } from "@/types/session";
@@ -39,6 +39,8 @@ import type { DineOption, Session } from "@/types/session";
 
 /** P1 is shown once per browser (docs/UX.md A3). */
 const MIC_HINT_KEY = "kibo.phone.micHintSeen";
+/** Screens that show no messages: P1 and what comes before it. */
+const ENTRY_SCREENS = new Set<PhoneScreenId>(["connecting", "inapp", "mic"]);
 const noSubscribe = () => () => {};
 /** Under this many seconds a /demo order shows its voice time left. */
 const SHOW_VOICE_LEFT = 60;
@@ -100,8 +102,6 @@ export function AssistantPanel(props: Props) {
   const { kiosk, session, deviceToken, locale, mode } = props;
   const language = props.language ?? locale;
   const clockOffset = props.clockOffset ?? 0;
-  // /demo explains the three steps before it starts, so its phone skips the start screen.
-  const [startSeen, setStartSeen] = useState(mode === "demo");
   const [doneDismissed, setDoneDismissed] = useState(false);
   const [sending, setSending] = useState(false);
   // Typed and spoken turns share one utteranceSeq (I-079).
@@ -133,7 +133,6 @@ export function AssistantPanel(props: Props) {
     session,
     {
       claimError: props.claimError ?? null,
-      startSeen,
       doneDismissed,
       micHint,
       inAppHold: props.inApp?.held ?? false,
@@ -143,6 +142,12 @@ export function AssistantPanel(props: Props) {
   );
   const busy = chat.busy || sending || !deviceToken;
   const limited = props.chatLimit !== undefined && chat.sent >= props.chatLimit;
+  // The AI's first line (owner 10-17): spoken when voice opens, or the first bubble when typing, while nothing has
+  // been said yet and before the review. Phone only: /demo's laptop column keeps its own examples first.
+  const greeting =
+    mode === "phone" && chat.messages.length === 0 && (session?.status === "connected" || session?.status === "ordering")
+      ? lt("greeting", language, kiosk.domain)
+      : null;
 
   // The text field sits behind [Type] in the dock and, once open, stays open for this order until the user closes it
   // (UX C3). /demo opens it at once: a judge on a laptop types more often than they talk.
@@ -158,6 +163,8 @@ export function AssistantPanel(props: Props) {
     }
   }, []);
   function focusText() {
+    // Typing instead of talking: the same greeting the voice would have said, without a model call.
+    if (greeting) chat.voice("model", greeting);
     setTyping(true);
     if (input.current) input.current.focus();
     else focusPending.current = true;
@@ -195,6 +202,7 @@ export function AssistantPanel(props: Props) {
     getCart: () => session?.cart ?? [],
     getSession: () => session,
     onAction: props.onActions ? (action) => props.onActions?.([action]) : undefined,
+    greeting,
   });
   const voiceOpen = voice.state === "listening" || voice.state === "thinking" || voice.state === "speaking";
 
@@ -319,9 +327,11 @@ export function AssistantPanel(props: Props) {
       focused.scrollIntoView({ block: "nearest" });
   }, [cartInView]);
 
-  // Screens other than talk show only replies that came after they opened, so an old error never lingers there.
+  // Screens other than talk show only replies that came after they opened, so an old error never lingers there. The
+  // entry screens show no messages, so what came while one showed (the greeting when [Type instead] is tapped) still
+  // counts as new on the screen after it.
   const [opened, setOpened] = useState({ screen, count: chat.messages.length });
-  if (opened.screen !== screen) setOpened({ screen, count: chat.messages.length });
+  if (opened.screen !== screen) setOpened({ screen, count: ENTRY_SCREENS.has(opened.screen) ? opened.count : chat.messages.length });
   const fresh = chat.messages.slice(opened.screen === screen ? opened.count : chat.messages.length);
 
   // At once on every send: a gap without feedback reads as broken (14-final:1).
@@ -431,9 +441,6 @@ export function AssistantPanel(props: Props) {
         </Scroll>
       );
       break;
-    case "start":
-      body = <StartScreen locale={locale} onStart={() => setStartSeen(true)} />;
-      break;
     case "inapp":
       body = (
         <InAppScreen
@@ -450,6 +457,8 @@ export function AssistantPanel(props: Props) {
       body = (
         <Scroll>
           <h1 className="text-2xl font-bold">{pt("micHintTitle", locale)}</h1>
+          {/* The intro screen's 3 steps, now that the claim link lands here (owner 10-17). */}
+          <p className="text-xl text-muted">{pt("micHintSteps", locale)}</p>
           <AllowPicture locale={locale} />
           <p className="text-xl">
             {pt("micHintPre", locale)}
@@ -779,30 +788,6 @@ function Scroll({ children }: { children: ReactNode }) {
       {/* Lines cut at the bottom edge read as "more below", not as broken (#1 2-phone, I-281). */}
       <ScrollFade className="-bottom-6 -mx-4 -mt-12 to-cream" />
     </div>
-  );
-}
-
-function StartScreen({ locale, onStart }: { locale: Locale; onStart(): void }) {
-  const steps = ["step1", "step2", "step3"] as const;
-  return (
-    <Scroll>
-      <h1 className="text-2xl font-bold">{pt("startTitle", locale)}</h1>
-      <p className="text-xl text-muted">{pt("startLead", locale)}</p>
-      <ol className={`${CARD} flex flex-col gap-4`}>
-        {steps.map((key, i) => (
-          // The number sits on the middle of the step's first line, also when the step wraps (qa 10-16 F1).
-          <li key={key} className="flex items-start gap-3 text-xl">
-            <span aria-hidden className="-mt-px flex size-8 flex-none items-center justify-center rounded-full bg-kibo-tint text-base font-bold text-kibo-deep">
-              {i + 1}
-            </span>
-            {pt(key, locale)}
-          </li>
-        ))}
-      </ol>
-      <button type="button" onClick={onStart} className={PRIMARY}>
-        {pt("start", locale)}
-      </button>
-    </Scroll>
   );
 }
 

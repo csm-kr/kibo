@@ -21,7 +21,6 @@ test("choosing 日本語 sends language ja with voice and text, keeps English sc
   const res = await request.post("/api/session", { data: { kioskId: "malo" } });
   const created = (await res.json()) as { sessionId: string; claimUrl: string };
   await page.goto(created.claimUrl);
-  await page.getByRole("button", { name: "Start" }).click();
   await page.getByRole("button", { name: "Type instead" }).click();
   await page.getByRole("button", { name: "Eat here" }).click();
 

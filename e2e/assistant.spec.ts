@@ -25,16 +25,18 @@ test("phone claims the QR, mirrors the cart, confirms and gets the order number"
   const phoneCtx = await browser.newContext(PHONE);
   const phone = await phoneCtx.newPage();
   await phone.goto(url);
-  await expect(phone.getByRole("heading", { name: "Tell your phone, and the kiosk orders for you" })).toBeVisible();
+  // The claim link lands on P1 at once, with the 3 steps in one line there (owner 10-17): no intro screen.
+  await expect(phone.getByRole("heading", { name: "Turn on the microphone to talk" })).toBeVisible();
+  await expect(phone.getByText("Talk or type your order, and the kiosk fills itself in. You pay at the kiosk.")).toBeVisible();
+  await expect(phone.getByRole("button", { name: "Start" })).toHaveCount(0);
   // The one-use claim token leaves the address bar right after the claim.
   await expect.poll(() => phone.url()).not.toContain("#t=");
   const deviceToken = await phoneToken(phone, sessionId);
   await expect(kioskRoot(kiosk)).toHaveAttribute("data-screen", "dine");
-
-  await phone.getByRole("button", { name: "Start" }).click();
-  // P1, first time in this browser: the microphone hint; typing skips the microphone.
-  await expect(phone.getByRole("heading", { name: "Turn on the microphone to talk" })).toBeVisible();
+  // P1, first time in this browser: the microphone hint; typing skips the microphone, and the AI's greeting is the
+  // first bubble, without a model call.
   await phone.getByRole("button", { name: "Type instead" }).click();
+  await expect(phone.getByText("Hi! What would you like? Just say it.")).toBeVisible();
   await expect(phone.getByRole("textbox", { name: "Type your order" })).toBeFocused();
   await phone.getByRole("button", { name: "Eat here" }).click();
   await expect(phone.locator("[data-phone-screen]")).toHaveAttribute("data-phone-screen", "talk");

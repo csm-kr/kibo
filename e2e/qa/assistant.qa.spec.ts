@@ -75,18 +75,24 @@ const cheeseSet = (drink: string, extra: Record<string, string[]> = {}) => ({
   selections: { drink: [drink], ...extra },
 });
 
-test("phone path: start to order number", async ({ page, request }, info) => {
+test("phone path: claim link to order number", async ({ page, request }, info) => {
   const s = await openPhone(page, request);
-  await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "start");
-  await check(page, info, "P-start");
-
-  await page.getByRole("button", { name: "Start" }).click();
+  // The claim link lands on P1, with the 3 steps in one line (owner 10-17): no intro screen before it.
   await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "mic");
+  await expect(page.getByText("Talk or type your order, and the kiosk fills itself in. You pay at the kiosk.")).toBeVisible();
+  // At 320x700 too, the microphone stays on the first screen.
+  for (const vp of VIEWPORTS) {
+    await page.setViewportSize(vp);
+    await expect(page.getByRole("button", { name: "Turn on the microphone" }), `${vp.width}x${vp.height}`).toBeInViewport({ ratio: 1 });
+  }
+  await page.setViewportSize(VIEWPORTS[0]);
   await check(page, info, "P1-mic-hint");
 
   await page.getByRole("button", { name: "Type instead" }).click();
   await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "dine");
   await expect(page.getByRole("textbox", { name: "Type your order" })).toBeFocused();
+  // Typing instead of talking: the AI's greeting is the first bubble, as voice would say it.
+  await expect(page.getByText("Hi! What would you like? Just say it.")).toBeVisible();
   await check(page, info, "P2-dine");
 
   await page.getByRole("button", { name: "Eat here" }).click();
@@ -158,7 +164,6 @@ test("phone path: start to order number", async ({ page, request }, info) => {
 
 test("P-lang: the language picker, then the phone with the AI in Japanese (14-final:4)", async ({ page, request }, info) => {
   const s = await openPhone(page, request);
-  await page.getByRole("button", { name: "Start" }).click();
   await page.getByRole("button", { name: "Type instead" }).click();
   await page.getByRole("button", { name: "Eat here" }).click();
   await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
@@ -234,7 +239,6 @@ const pulseRunning = (page: Page) =>
 test("P1 to P3 by voice: connecting, listening, stop", async ({ page, request }, info) => {
   const release = await fakeLive(page);
   await openPhone(page, request);
-  await page.getByRole("button", { name: "Start" }).click();
   await page.getByRole("button", { name: "Turn on the microphone" }).click();
   await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "dine");
   await expect(micButton(page)).toHaveAttribute("data-voice-state", "connecting");
@@ -269,7 +273,6 @@ test("P3: voice gives way to text when it is busy", async ({ page, request }, in
     }),
   );
   await openPhone(page, request);
-  await page.getByRole("button", { name: "Start" }).click();
   await page.getByRole("button", { name: "Type instead" }).click();
   await page.getByRole("button", { name: "Eat here" }).click();
   await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
@@ -310,7 +313,6 @@ test("P3: noise hint, voice reconnecting, then text after the retries fail", asy
   });
 
   await openPhone(page, request);
-  await page.getByRole("button", { name: "Start" }).click();
   await page.getByRole("button", { name: "Type instead" }).click();
   await page.getByRole("button", { name: "Eat here" }).click();
   await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
@@ -342,7 +344,6 @@ test("P3: noise hint, voice reconnecting, then text after the retries fail", asy
 
 test("PX: the session stream drops, and the same phone continues after a reload", async ({ page, request, baseURL }, info) => {
   const s = await openPhone(page, request);
-  await page.getByRole("button", { name: "Start" }).click();
   await page.getByRole("button", { name: "Type instead" }).click();
   await page.getByRole("button", { name: "Eat here" }).click();
   await s.phone("addToCart", cheeseSet("cider"), { utteranceSeq: 1 });
@@ -387,8 +388,6 @@ test("P1 in an in-app browser: copy the link or order here by typing", async ({ 
   await page.getByRole("button", { name: "Copy link" }).click();
   await expect(page.getByRole("status").filter({ hasText: /Copied|Couldn't copy/ })).toBeVisible();
   await page.getByRole("button", { name: "Order here by typing" }).click();
-  await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "start");
-  await page.getByRole("button", { name: "Start" }).click();
   // The user already chose typing, so no microphone hint; the banner stays.
   await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "dine");
   await expect(page.getByRole("note")).toHaveText(/Microphones often don't work in this app/);
@@ -411,7 +410,6 @@ test("P3 in Korean with larger text: the dock while typing, and the cart summary
   const deviceToken = (await page.evaluate((k) => localStorage.getItem(k), key)) ?? "";
   const phone = (type: string, args: object) =>
     command(request, deviceToken, { sessionId: created.sessionId, type, args, source: "voice", utteranceSeq: 1 });
-  await page.getByRole("button", { name: "시작하기" }).click();
   await page.getByRole("button", { name: "글자로 입력할게요" }).click();
   await page.getByRole("button", { name: "매장에서 먹기" }).click();
   await expect(page.locator("[data-phone-screen]")).toHaveAttribute("data-phone-screen", "talk");
@@ -454,7 +452,6 @@ test("P3 at 360×800 with larger text: the AI's reply and its choices stay above
   const key = `kibo.phone.${created.sessionId}`;
   await expect.poll(() => page.evaluate((k) => localStorage.getItem(k), key)).not.toBeNull();
   const deviceToken = (await page.evaluate((k) => localStorage.getItem(k), key)) ?? "";
-  await page.getByRole("button", { name: "Start" }).click();
   await page.getByRole("button", { name: "Type instead" }).click();
   await page.getByRole("button", { name: "Eat here" }).click();
   await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
@@ -510,7 +507,6 @@ test("P3 at 360×800 and 320×700 with larger text: the cart summary is one line
   const page = await ctx.newPage();
   await page.addInitScript(() => localStorage.setItem("kibo.phone.largeText", "on"));
   const s = await openPhone(page, request);
-  await page.getByRole("button", { name: "Start" }).click();
   await page.getByRole("button", { name: "Type instead" }).click();
   await page.getByRole("button", { name: "Eat here" }).click();
   await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
@@ -588,7 +584,6 @@ test("P3: every kiosk's input hint fits beside [Send] with larger text at 320 wi
   await page.addInitScript(() => localStorage.setItem("kibo.phone.largeText", "on"));
   // The context's own address: the file's shared one runs out of sessions per minute by this test (I-068).
   await openPhone(page, ctx.request);
-  await page.getByRole("button", { name: "Start" }).click();
   await page.getByRole("button", { name: "Type instead" }).click();
   await page.getByRole("button", { name: "Eat here" }).click();
   await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
@@ -645,7 +640,6 @@ test.describe(() => {
           [t.lang, large] as const,
         );
         const s = await openPhone(page, request);
-        await page.getByRole("button", { name: "Start" }).click();
         await page.getByRole("button", { name: "Type instead" }).click();
         await page.getByRole("button", { name: "Eat here" }).click();
         await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
@@ -678,7 +672,6 @@ test.describe(() => {
   for (const vp of [VIEWPORTS[0], VIEWPORTS[3]]) test(`P3: an allergy question ends on [Call staff] at ${vp.width} wide (16-judge-r3-fixes:1)`, async ({ page, request }, info) => {
     await page.setViewportSize(vp);
     const s = await openPhone(page, request);
-    await page.getByRole("button", { name: "Start" }).click();
     await page.getByRole("button", { name: "Type instead" }).click();
     await page.getByRole("button", { name: "Eat here" }).click();
     await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
@@ -742,7 +735,6 @@ test.describe(() => {
   test("PX: idle warning one minute before expiry", async ({ page, request }, info) => {
     await page.clock.install();
     const s = await openPhone(page, request);
-    await page.getByRole("button", { name: "Start" }).click();
     await page.getByRole("button", { name: "Type instead" }).click();
     await page.getByRole("button", { name: "Eat here" }).click();
     await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");

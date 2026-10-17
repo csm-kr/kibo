@@ -30,12 +30,9 @@ const PHONE_TEXT = {
   // The screen stopped reading the order after 20 min with nothing happening (12-phone-app:7).
   streamPaused: { ko: "일시정지됨 · 화면을 누르면 계속합니다", en: "Paused · Tap to continue" },
   // Start
-  startTitle: { ko: "휴대폰으로 말하면 키오스크가 주문해요", en: "Tell your phone, and the kiosk orders for you" },
-  startLead: { ko: "키오스크를 배우지 않아도 돼요.", en: "You don't need to learn the kiosk." },
-  step1: { ko: "여기에 말하거나 글자로 주문하세요.", en: "Talk or type your order here." },
-  step2: { ko: "키오스크 화면이 저절로 채워져요.", en: "The kiosk fills itself in." },
-  step3: { ko: "주문을 확인하고, 키오스크에서 결제하세요.", en: "Check your order, then pay at the kiosk." },
-  start: { ko: "시작하기", en: "Start" },
+  // The AI's first line, spoken when voice opens and the first bubble when typing (owner 10-17); AI-only languages in
+  // languages.ts.
+  greeting: { ko: "안녕하세요! 무엇을 드릴까요? 말씀만 하세요.", en: "Hi! What would you like? Just say it." },
   // Dine
   dineQuestion: { ko: "드시고 가세요, 포장하세요?", en: "Eat here or take out?" },
   dineOrTalk: { ko: "아니면 바로 주문을 말해 주세요.", en: "Or just tell me your order." },
@@ -159,6 +156,8 @@ const PHONE_TEXT = {
   aiActionsList: { ko: "AI 동작, 최근 것부터", en: "AI actions, newest first" },
   // P1 microphone hint, before the browser asks
   micHintTitle: { ko: "말로 주문하려면 마이크를 켜 주세요", en: "Turn on the microphone to talk" },
+  // The intro screen's 3 steps, in two short sentences: the claim link lands here now (owner 10-17).
+  micHintSteps: { ko: "말하거나 글자로 주문하면 키오스크가 저절로 채워져요. 결제는 키오스크에서 해요.", en: "Talk or type your order, and the kiosk fills itself in. You pay at the kiosk." },
   micHintPre: { ko: "다음 화면에서 ", en: "Tap " },
   micHintAllow: { ko: "허용", en: "Allow" },
   micHintPost: { ko: "을 눌러 주세요.", en: " on the next screen." },

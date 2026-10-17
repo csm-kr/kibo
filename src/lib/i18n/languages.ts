@@ -30,7 +30,7 @@ export const uiLocale = (language: SpeechLanguage): Locale => (language === "ko"
 /** The AI speaks it, the screens do not. */
 export const aiOnly = (language: SpeechLanguage): language is AiOnlyLanguage => language !== "ko" && language !== "en";
 
-/** The mic label, the review's two buttons, "insert your card into the kiosk" and the order number (P3–P6). */
+/** The mic label, the review's two buttons, "insert your card into the kiosk", the order number (P3–P6) and the greeting. */
 const AI_TEXT = {
   // Short: Japanese and Chinese wrap between any two characters, and the mic's label column is ~120px at 320 wide.
   micTap: { ja: "押して話す", zh: "点击说话", es: "Toca para hablar", vi: "Chạm để nói", fr: "Touchez pour parler", th: "แตะเพื่อพูด", id: "Ketuk untuk bicara" },
@@ -56,6 +56,16 @@ const AI_TEXT = {
   },
   orderNumber: { ja: "注文番号", zh: "订单号", es: "Número de pedido", vi: "Số đơn hàng", fr: "Numéro de commande", th: "หมายเลขคำสั่งซื้อ", id: "Nomor pesanan" },
   referenceNumber: { ja: "参照番号", zh: "参考号", es: "Número de referencia", vi: "Số tham chiếu", fr: "Numéro de référence", th: "หมายเลขอ้างอิง", id: "Nomor referensi" },
+  // The AI's first line when voice opens or typing starts (owner 10-17), in the language it speaks.
+  greeting: {
+    ja: "こんにちは！何にしますか？話すだけで大丈夫です。",
+    zh: "您好！您想要什么？直接说就可以。",
+    es: "¡Hola! ¿Qué desea? Solo dígalo.",
+    vi: "Xin chào! Bạn muốn gì? Cứ nói là được.",
+    fr: "Bonjour ! Que désirez-vous ? Dites-le simplement.",
+    th: "สวัสดี ต้องการอะไร พูดบอกได้เลย",
+    id: "Halo! Mau pesan apa? Cukup ucapkan saja.",
+  },
 } satisfies Partial<Record<PhoneTextKey, Record<AiOnlyLanguage, string>>>;
 
 export const AI_ONLY_KEYS = Object.keys(AI_TEXT) as (keyof typeof AI_TEXT)[];
