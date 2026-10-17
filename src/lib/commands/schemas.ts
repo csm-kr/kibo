@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CommandError } from "./errors";
+import { CommandError, type ErrorDetail } from "./errors";
 import { MAX_QTY } from "./cart";
 
 // Every command body comes from a browser, so everything is bounded here before any logic runs.
@@ -81,8 +81,64 @@ const commandSchema = z.discriminatedUnion("type", [
 export type Command = z.infer<typeof commandSchema>;
 export type CommandType = Command["type"];
 
+const COMMAND_TYPES = new Set<string>(commandSchema.options.map((o) => o.shape.type.value));
+
+export function isCommandType(v: unknown): v is CommandType {
+  return typeof v === "string" && COMMAND_TYPES.has(v);
+}
+
+// Field names of the command and tool-call schemas. A path segment that is not one of these (a record key, a made-up
+// field) came from the browser or the model, so it is shown as "*", never echoed.
+const FIELDS = new Set([
+  ...Object.keys(envelope),
+  ...["type", "args", "itemId", "variant", "qty", "selections", "lineId", "changes", "option", "templateId", "choices"],
+  ...["kind", "id", "reasonCode", "commandId", "ok", "kioskTotal", "kioskLines", "options", "groupId", "optionIds"],
+]);
+
+const size = (origin: unknown) => (origin === "array" ? " items" : origin === "string" ? " characters" : "");
+
+function reasonOf(issue: z.core.$ZodIssue): string {
+  switch (issue.code) {
+    case "invalid_type":
+      return `expected ${issue.expected}`;
+    case "too_big":
+      return `at most ${issue.maximum}${size(issue.origin)}`;
+    case "too_small":
+      return `at least ${issue.minimum}${size(issue.origin)}`;
+    case "invalid_value":
+      return `one of ${issue.values.map(String).join(", ")}`.slice(0, 200);
+    case "invalid_format":
+      return "wrong format";
+    case "invalid_key":
+      return "invalid key";
+    case "unrecognized_keys":
+      return "unknown field";
+    case "invalid_union":
+      return "not an accepted value";
+    case "custom":
+      // Our own refine messages ("No change", "At most 6 option groups").
+      return issue.message;
+    default:
+      return "invalid";
+  }
+}
+
+/**
+ * The first schema issue as a field path and a short reason, so a model can fix its call (10-17). Built from the
+ * schema only: no value, record key or unknown field name from the request (SECURITY "Command handling").
+ */
+export function issueDetail(error: z.ZodError): ErrorDetail | undefined {
+  const issue = error.issues[0];
+  if (!issue) return undefined;
+  const field = issue.path
+    .slice(0, 6)
+    .map((p) => (typeof p === "number" || FIELDS.has(String(p)) ? String(p) : "*"))
+    .join(".");
+  return { field, reason: reasonOf(issue) };
+}
+
 export function parseCommand(body: unknown): Command {
   const parsed = commandSchema.safeParse(body);
-  if (!parsed.success) throw new CommandError("BAD_REQUEST", "That request could not be understood.");
+  if (!parsed.success) throw new CommandError("BAD_REQUEST", "That request could not be understood.", issueDetail(parsed.error));
   return parsed.data;
 }

@@ -103,6 +103,21 @@ describe("toolCallToCommand", () => {
       expect((err as CommandError).code).toBe("BAD_REQUEST");
     }
   });
+
+  it("names the argument that failed, so the model can fix its call (10-17)", () => {
+    const failed = (name: string, args: unknown) => {
+      try {
+        toolCallToCommand(name, args);
+      } catch (e) {
+        return (e as CommandError).detail;
+      }
+      throw new Error("expected a refusal");
+    };
+    expect(failed("addToCart", { itemId: "cola", qty: "two" })).toEqual({ field: "qty", reason: "expected number" });
+    expect(failed("addToCart", { itemId: "cola", options: [{ groupId: "size" }] })).toEqual({ field: "options.0.optionIds", reason: "expected array" });
+    // An unknown tool is model text: no detail.
+    expect(failed("payNow", {})).toBeUndefined();
+  });
 });
 
 describe("toolResult", () => {
@@ -213,6 +228,14 @@ describe("toolResult", () => {
         { kind: "option", id: "iced_coffee", name: "Iced coffee" },
       ],
     });
+  });
+
+  it("passes on which argument failed and why for BAD_REQUEST (10-17)", () => {
+    const out = toolResult(k, "en", {
+      ok: false,
+      error: { code: "BAD_REQUEST", message: "That request could not be understood.", detail: { field: "args.choices", reason: "at most 6 items" } },
+    });
+    expect(out).toEqual({ ok: false, code: "BAD_REQUEST", message: "That request could not be understood.", field: "args.choices", reason: "at most 6 items" });
   });
 
   it("keeps a plain error small", () => {

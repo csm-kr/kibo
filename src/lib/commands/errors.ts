@@ -34,6 +34,9 @@ export interface ErrorDetail {
   itemId?: string;
   groupId?: string;
   choices?: ChoiceRef[];
+  /** BAD_REQUEST from a schema: the path of the field that failed ("args.choices") and why ("at most 6 items"). */
+  field?: string;
+  reason?: string;
 }
 
 /** `message` is shown to users: plain words, never ids or stack traces. */

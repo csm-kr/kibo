@@ -68,6 +68,23 @@ describe("toolDeclarations", () => {
     expect(offer.choices.items!.properties!.kind.enum).toEqual(["item", "variant", "option", "dine", "yesno", "staff"]);
   });
 
+  // 10-17: a free-text choice id ("Zero cola", "call_staff") got a bare 400 from the server, which takes only these.
+  it("limits offerChoices ids to what the server accepts on this kiosk", () => {
+    const ids = params("offerChoices").properties!.choices.items!.properties!.id.enum!;
+    const options = k.items.flatMap((i) => i.optionGroups.flatMap((g) => g.options.map((o) => o.optionId)));
+    const expected = new Set([...k.items.map((i) => i.itemId), "single", "set", "largeSet", ...options, "eat_in", "take_out", "yes", "no", "staff"]);
+    expect(new Set(ids)).toEqual(expected);
+    expect(ids).toHaveLength(expected.size);
+    // The ticket machine: no dine ids, only the variant it sells.
+    const rail = getKiosk("airport_rail");
+    const railOffer = (toolDeclarations(rail).find((d) => d.name === "offerChoices")!.parametersJsonSchema as Schema).properties!;
+    const railIds = railOffer.choices.items!.properties!.id.enum!;
+    expect(railIds).not.toContain("eat_in");
+    expect(railIds).toContain("single");
+    expect(railIds).not.toContain("set");
+    expect(railIds).toContain("staff");
+  });
+
   it("gives the no-argument tools an empty object", () => {
     for (const name of ["undoLastChange", "requestCheckout", "confirmCheckout"]) {
       expect(params(name).properties).toEqual({});

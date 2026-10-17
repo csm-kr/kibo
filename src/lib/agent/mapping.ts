@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { findItem, groupsFor } from "@/lib/adapters/catalog";
 import { CommandError, type ErrorDetail } from "@/lib/commands/errors";
-import type { CommandType } from "@/lib/commands/schemas";
+import { issueDetail, type CommandType } from "@/lib/commands/schemas";
 import type { CommandResponse } from "@/lib/session/service";
 import type { KioskData, Locale } from "@/types/menu";
 import type { CartLine } from "@/types/session";
@@ -47,7 +47,7 @@ export function toolCallToCommand(name: string, args: unknown): { type: CommandT
   if (!Object.hasOwn(TOOL_ARGS, name)) throw new CommandError("BAD_REQUEST", "That action is not available.");
   const tool = name as ToolName;
   const parsed = TOOL_ARGS[tool].safeParse(args ?? {});
-  if (!parsed.success) throw new CommandError("BAD_REQUEST", BAD);
+  if (!parsed.success) throw new CommandError("BAD_REQUEST", BAD, issueDetail(parsed.error));
   const a = parsed.data;
 
   switch (tool) {
@@ -101,6 +101,8 @@ export function toolResult(k: KioskData, locale: Locale, outcome: Outcome): obje
       ...(detail?.choices && {
         choices: detail.choices.map((c) => ({ kind: c.kind, id: c.id, name: choiceLabel(k, c, locale) })),
       }),
+      // Which argument a schema refused and why (10-17), so the model fixes its call instead of asking again.
+      ...(detail?.field && { field: detail.field, reason: detail.reason }),
     };
   }
   const { status, total, cart, result, pending, dineOption } = outcome.response;

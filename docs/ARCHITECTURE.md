@@ -300,7 +300,7 @@ Pages: `/kiosk?k=<kioskId>` (`&demo=1` shows the tap counter and timer; on a lan
 
 | Code | HTTP | When |
 |---|---|---|
-| `BAD_REQUEST` | 400 | zod failure, unknown command type, value out of range |
+| `BAD_REQUEST` | 400 | zod failure, unknown command type, value out of range. A schema failure on `/api/command` (and a tool call's arguments on the phone or in `/api/chat`) carries `detail: { field, reason }`, e.g. `args.choices` and `at most 6 items`, so the model can fix its call (10-17, I-396): the path keeps only the schemas' own field names and indexes (a record key or unknown field shows as `*`), the reason is built from the schema (expected type, limit, allowed values), never a value from the request. The catalog's own refusals (`cart.ts`) keep their specific messages |
 | `UNAUTHORIZED` | 401 | missing or wrong actor token |
 | `FORBIDDEN` | 403 | actor may not send this command (table below) |
 | `NOT_FOUND` | 404 | no such session; a pairing code that matches no live, unclaimed kiosk session ("That code doesn't match a kiosk. Check the number on the kiosk screen.") |
@@ -310,6 +310,8 @@ Pages: `/kiosk?k=<kioskId>` (`&demo=1` shows the tap counter and timer; on a lan
 | `RATE_LIMITED` | 429 | per-session, daily or per-IP limit (see Limits) |
 | `UPSTREAM` | 502 | Gemini error; the phone falls back to text |
 | `INTERNAL` | 500 | any other server error; the log records only the error name |
+
+`POST /api/command` logs one line per refused command (10-17, I-396: two 400s from a real iPhone left no trace): `command refused: <type> <source> <code> <HTTP status> <detail.field or -> s=<first 6 characters of the session id>`, with `unknown` for a type the server does not know and `-` for a missing or unknown source; never args, tokens or the whole session id.
 
 ### Endpoints
 | Route | Request | Response |
@@ -454,7 +456,7 @@ Mutating tools return the updated cart, so no separate summary tool is needed. T
 | `updateCart(lineId, changes{qty?, variant?, selections?})` | **Edit an existing line** ("make the fries large") | A7 |
 | `removeFromCart(lineId)` | Remove | |
 | `undoLastChange()` | Revert the last change; the phone's [Undo] uses the same path | Heuristic 3 |
-| `offerChoices(templateId, choices[{kind, id}])` | Show choice buttons (catalog ids only; the server builds the question and labels) | Heuristic 6 |
+| `offerChoices(templateId, choices[{kind, id}])` | Show choice buttons (catalog ids only; the server builds the question and labels). The declared `id` is an enum of every id the server takes on this kiosk (items, the variants it sells, options, dine ids where it has them, yes, no, staff; 10-17: a free string got a bare 400); `addToCart` and `updateCart` say to send only the item's own groups for its variant, since their `groupId` enum lists every item's groups | Heuristic 6 |
 | `callStaff(reasonCode)` | Unanswerable question or stuck user; fixed banner text on the kiosk | Data principle |
 | `requestCheckout()` | Open the confirm card (`confirming`) | A8 |
 | `confirmCheckout()` | Accepted only in `confirming`, with matching `cartVersion`, after a new user utterance on a review the AI opened; a review the kiosk opened or reopened needs a tap on the card | Heuristic 5 |

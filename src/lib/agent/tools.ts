@@ -22,9 +22,22 @@ export function toolDeclarations(k: KioskData): FunctionDeclaration[] {
   const variant = { type: "string", enum: VARIANTS.filter((v) => k.items.some((i) => i.variants.some((x) => x.variant === v))) };
   // A kiosk without dine options (a ticket machine) never asks eat-in or take-out; the server refuses it there too.
   const dine = k.dineOptions !== undefined;
+  const variants = variant.enum;
+  // Every id the server takes for some choice kind (isValidChoice); a free string got a bare 400 (10-17).
+  const choiceIds = unique([
+    ...k.items.map((i) => i.itemId),
+    ...variants,
+    ...groups.flatMap((g) => g.options.map((o) => o.optionId)),
+    ...(dine ? ["eat_in", "take_out"] : []),
+    "yes",
+    "no",
+    "staff",
+  ]);
   const options = {
     type: "array",
-    description: "Choices per option group; leave a group out to keep its default or current choice.",
+    // The enums below list every kiosk's groups; the server refuses a group the item or its variant does not have.
+    description:
+      "Choices per option group of this item and variant only (its optionGroups and appliesTo in the menu data); leave a group out to keep its default or current choice.",
     items: object(
       {
         groupId: { type: "string", enum: unique(groups.map((g) => g.groupId)) },
@@ -61,7 +74,7 @@ export function toolDeclarations(k: KioskData): FunctionDeclaration[] {
           minItems: 1,
           maxItems: 6,
           items: object(
-            { kind: { type: "string", enum: dine ? CHOICE_KINDS : CHOICE_KINDS.filter((c) => c !== "dine") }, id: { type: "string" } },
+            { kind: { type: "string", enum: dine ? CHOICE_KINDS : CHOICE_KINDS.filter((c) => c !== "dine") }, id: { type: "string", enum: choiceIds } },
             ["kind", "id"],
           ),
         },

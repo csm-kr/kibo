@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { resetLimits } from "@/lib/limits/ip";
 import { POST as createSession } from "../session/route";
 import { POST as claim } from "../session/claim/route";
@@ -49,7 +49,64 @@ describe("POST /api/command", () => {
     for (const b of bodies) {
       const { status, body } = await read(await POST(jsonRequest("/api/command", b, auth(s.deviceToken))));
       expect(status).toBe(400);
-      expect(body).toEqual({ ok: false, error: { code: "BAD_REQUEST", message: expect.any(String) } });
+      expect(body).toEqual({ ok: false, error: { code: "BAD_REQUEST", message: expect.any(String), ...(body.error.detail && { detail: expect.any(Object) }) } });
+    }
+  });
+
+  // 10-17: two 400s from a real iPhone's voice left no trace on the server, and the model got only "could not be
+  // understood", so it asked the user again instead of fixing its call.
+  it("BAD_REQUEST names the field that failed and why, from the schema only", async () => {
+    const s = await claimed();
+    const burgers = ["cheese_burger", "bulgogi_burger", "double_cheese_burger", "spicy_chicken_burger", "shrimp_burger", "classic_burger", "bacon_cheese_burger"];
+    const cases: [object, string, string][] = [
+      [{ templateId: "pick_item", choices: burgers.map((id) => ({ kind: "item", id })) }, "args.choices", "at most 6 items"],
+      [{ templateId: "pick_option", choices: [{ kind: "option", id: "Zero cola" }] }, "args.choices.0.id", "wrong format"],
+      [{ templateId: "which_one", choices: [{ kind: "item", id: "cola" }] }, "args.templateId", "one of pick_item, pick_variant, pick_option, pick_dine, yes_no, alternatives, upsell, ask_staff"],
+    ];
+    for (const [args, field, reason] of cases) {
+      const cmd = commandBody(s.sessionId, "offerChoices", args, { source: "voice", utteranceSeq: 1 });
+      const { status, body } = await read(await POST(jsonRequest("/api/command", cmd, auth(s.deviceToken))));
+      expect(status).toBe(400);
+      expect(body.error).toEqual({ code: "BAD_REQUEST", message: "That request could not be understood.", detail: { field, reason } });
+    }
+    // A key the request made up is never echoed: record keys and unknown fields come from the browser.
+    const odd = commandBody(s.sessionId, "addToCart", { ...HERO_LINE, selections: { "My Drink": ["cola"] } }, { source: "voice" });
+    const { body } = await read(await POST(jsonRequest("/api/command", odd, auth(s.deviceToken))));
+    expect(body.error.detail).toEqual({ field: "args.selections.*", reason: "invalid key" });
+    const extra = commandBody(s.sessionId, "addToCart", { ...HERO_LINE, secretNote: "hi" }, { source: "voice" });
+    const second = await read(await POST(jsonRequest("/api/command", extra, auth(s.deviceToken))));
+    expect(second.body.error.detail).toEqual({ field: "args", reason: "unknown field" });
+    expect(JSON.stringify(second.body)).not.toContain("secretNote");
+  });
+
+  it("logs every refused command by type, source, code, status and field; never its args, token or full session id", async () => {
+    const s = await claimed();
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const burgers = ["cheese_burger", "bulgogi_burger", "double_cheese_burger", "spicy_chicken_burger", "shrimp_burger", "classic_burger", "bacon_cheese_burger"];
+      const offer = commandBody(s.sessionId, "offerChoices", { templateId: "pick_item", choices: burgers.map((id) => ({ kind: "item", id })) }, { source: "voice" });
+      await POST(jsonRequest("/api/command", offer, auth(s.deviceToken)));
+      const set = commandBody(s.sessionId, "addToCart", { itemId: "cheese_burger", variant: "set" }, { source: "voice" });
+      await POST(jsonRequest("/api/command", set, auth(s.deviceToken)));
+      await POST(jsonRequest("/api/command", commandBody(s.sessionId, "payNow", { card: "4111" }), auth(s.deviceToken)));
+      await POST(jsonRequest("/api/command", "{nope", auth(s.deviceToken)));
+
+      const lines = warn.mock.calls.map((c) => c.map(String).join(" "));
+      const prefix = s.sessionId.slice(0, 6);
+      expect(lines).toEqual([
+        `command refused: offerChoices voice BAD_REQUEST 400 args.choices s=${prefix}`,
+        `command refused: addToCart voice NEEDS_CHOICE 422 - s=${prefix}`,
+        // A type the server does not know is model or browser text, so it is not logged.
+        `command refused: unknown touch BAD_REQUEST 400 type s=${prefix}`,
+        "command refused: unknown - BAD_REQUEST 400 - s=-",
+      ]);
+      for (const line of lines) {
+        expect(line).not.toContain(s.sessionId);
+        expect(line).not.toContain(s.deviceToken);
+        for (const value of ["cheese_burger", "4111", "payNow"]) expect(line).not.toContain(value);
+      }
+    } finally {
+      warn.mockRestore();
     }
   });
 
