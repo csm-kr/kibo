@@ -6,7 +6,7 @@
 
 ### Talk to your phone. The kiosk already there takes the order.
 
-[**▶ Live demo**](https://kibo-2026.web.app/demo) · **Video:** VIDEO_LINK_PENDING · **Deck:** PDF in the submission · Google Cloud AI Builder Cup 2026, Sustainability & Social Impact
+[**▶ Live demo**](https://kibo-2026.web.app/demo) · [**▶ 3-min video**](https://youtu.be/2jPeDGbLsQM) · **Deck:** PDF in the submission · Google Cloud AI Builder Cup 2026, Sustainability & Social Impact
 
 ![KIBO: on the left, "Don't learn the kiosk. Just talk."; on the right, the phone with a spoken order and the Korean self-order kiosk filling the same cart](docs/images/hero.webp)
 
