@@ -37,6 +37,8 @@ export interface ErrorDetail {
   /** BAD_REQUEST from a schema: the path of the field that failed ("args.choices") and why ("at most 6 items"). */
   field?: string;
   reason?: string;
+  /** RATE_LIMITED by this order's own allowance (its voice tokens), not by shared load (I-410). */
+  limit?: "session";
 }
 
 /** `message` is shown to users: plain words, never ids or stack traces. */

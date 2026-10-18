@@ -2,7 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import { CommandError } from "@/lib/commands/errors";
 import { BEFORE_PAYING } from "@/lib/commands/machine";
 import { bumpSessionCounter } from "@/lib/session/service";
-import { BUSY, issueLiveToken, KeyUnavailableError, liveTokenLimit, VOICE_UNAVAILABLE, type LiveTokenDeps } from "./live";
+import { issueLiveToken, KeyUnavailableError, liveTokenLimit, VOICE_UNAVAILABLE, voiceUsedUp, type LiveTokenDeps } from "./live";
 
 // Which way the phone's voice goes (ADR-012). GEMINI_LIVE_BACKEND=auto (default): a one-use token for Gemini Live
 // on the API key, as measured (evidence/voice-e2e.json), while the key can still generate; when its prepaid
@@ -147,7 +147,7 @@ export async function startLiveVoice(
       },
       deps.now(),
     );
-    if (!allowed) throw new CommandError("RATE_LIMITED", BUSY);
+    if (!allowed) throw voiceUsedUp();
     return { mode: "relay", url };
   }
 

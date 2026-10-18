@@ -147,7 +147,10 @@ export function relayConnection(client: ClientSocket, deps: RelayDeps): { onMess
       // The same voice time as a token from the token route.
       endTimer = setTimeout(() => closeBoth(4000, "Voice time is up."), out.expiresAt - deps.now());
     } catch (e) {
-      if (e instanceof CommandError) return closeBoth(4000 + HTTP_STATUS[e.code], e.message);
+      // This order's own tokens used up is the end of its voice time (4000), not shared load (I-410).
+      if (e instanceof CommandError) {
+        return closeBoth(e.detail?.limit === "session" ? 4000 : 4000 + HTTP_STATUS[e.code], e.message);
+      }
       console.error("voice relay error:", e instanceof Error ? e.name : typeof e);
       closeBoth(4500, "Voice could not start. Please try again.");
     }

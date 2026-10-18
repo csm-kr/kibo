@@ -111,7 +111,9 @@ describe("startLiveVoice", () => {
   it("relay mode refuses a session whose token budget is spent, without counting", async () => {
     const s = await claimed();
     for (let i = 0; i < 6; i++) await start(s, s.deviceToken, "api");
-    expect((await errorOf(start(s, s.deviceToken, "vertex"))).code).toBe("RATE_LIMITED");
+    const e = await errorOf(start(s, s.deviceToken, "vertex"));
+    expect(e.code).toBe("RATE_LIMITED");
+    expect(e.detail).toEqual({ limit: "session" });
     expect(await liveTokenCount(s.sessionId)).toBe(6);
   });
 

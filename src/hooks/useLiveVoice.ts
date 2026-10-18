@@ -195,6 +195,8 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
   }
 
   function failure(e: unknown): string {
+    // This order's own voice is used up, not shared load (I-410).
+    if (e instanceof ApiError && e.detail?.limit === "session") return pt("voiceTimeUp", o.locale);
     return failureFor(e instanceof ApiError ? e.code : null);
   }
 

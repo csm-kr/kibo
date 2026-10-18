@@ -67,8 +67,8 @@ describe("POST /api/live-token", () => {
     expect(JSON.parse(text)).toEqual({ ok: true, mode: "relay", url: RELAY });
     expect(text).not.toContain(KEY);
     expect(create).not.toHaveBeenCalled();
-    // Nothing counted here, so a demo session can still ask more than its 2 tokens of the relay's address.
-    for (let i = 0; i < 3; i++) expect((await tokenRequest(s.sessionId, s.deviceToken)).status).toBe(200);
+    // Nothing counted here, so a demo session can still ask more than its 6 tokens of the relay's address.
+    for (let i = 0; i < 7; i++) expect((await tokenRequest(s.sessionId, s.deviceToken)).status).toBe(200);
     expect((await read(await tokenRequest(s.sessionId))).status).toBe(401);
   });
 
@@ -123,13 +123,16 @@ describe("POST /api/live-token", () => {
     }
   });
 
-  it("429 on the 3rd token of a demo session", async () => {
+  it("429 on the 7th token of a demo session, saying this order's voice is used up (I-410)", async () => {
     const s = await demo();
-    await tokenRequest(s.sessionId, s.deviceToken);
-    await tokenRequest(s.sessionId, s.deviceToken);
+    for (let i = 0; i < 6; i++) expect((await tokenRequest(s.sessionId, s.deviceToken)).status).toBe(200);
     const { status, body } = await read(await tokenRequest(s.sessionId, s.deviceToken));
     expect(status).toBe(429);
-    expect(body.error).toEqual({ code: "RATE_LIMITED", message: "Voice is busy right now. Please type instead." });
+    expect(body.error).toEqual({
+      code: "RATE_LIMITED",
+      message: "Voice time for this order is up. Please type instead.",
+      detail: { limit: "session" },
+    });
   });
 
   it("an issuer 429 is 429 with the plain message", async () => {
@@ -151,9 +154,8 @@ describe("POST /api/live-token", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     create.mockRejectedValueOnce(new CommandError("UPSTREAM", "Voice is not available right now. Please type instead."));
     expect((await tokenRequest(s.sessionId, s.deviceToken)).status).toBe(502);
-    expect((await tokenRequest(s.sessionId, s.deviceToken)).status).toBe(200);
-    // A demo session has 2 tokens; the failed one must not have used one up.
-    expect((await tokenRequest(s.sessionId, s.deviceToken)).status).toBe(200);
+    // A demo session has 6 tokens; the failed one must not have used one up.
+    for (let i = 0; i < 6; i++) expect((await tokenRequest(s.sessionId, s.deviceToken)).status).toBe(200);
   });
 
   // I-148: the daily voice budget (200 tokens a day, shared by everyone) was the only cap above one session, and new

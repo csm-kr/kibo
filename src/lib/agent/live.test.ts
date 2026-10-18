@@ -143,26 +143,27 @@ describe("issueLiveToken", () => {
     expect(issued).toEqual([]);
   });
 
-  it("RATE_LIMITED: the 3rd token of a demo session and the 7th of a normal one", async () => {
+  // I-410: a demo session had 2 tokens, so a third mic tap (or a tap again while connecting) said "Voice is busy".
+  it("RATE_LIMITED: the 7th token of a demo or a normal session, saying this order's voice is used up", async () => {
     const d = await demo();
-    await issue(d, d.deviceToken);
-    await issue(d, d.deviceToken);
+    for (let i = 0; i < 6; i++) await issue(d, d.deviceToken);
     const e = await errorOf(issue(d, d.deviceToken));
     expect(e.code).toBe("RATE_LIMITED");
-    expect(e.message).toBe("Voice is busy right now. Please type instead.");
+    expect(e.message).toBe("Voice time for this order is up. Please type instead.");
+    expect(e.detail).toEqual({ limit: "session" });
 
     const n = await claimed();
     for (let i = 0; i < 6; i++) await issue(n, n.deviceToken);
-    expect((await errorOf(issue(n, n.deviceToken))).code).toBe("RATE_LIMITED");
-    expect(issued).toHaveLength(8);
+    expect((await errorOf(issue(n, n.deviceToken))).detail).toEqual({ limit: "session" });
+    expect(issued).toHaveLength(12);
   });
 
-  it("a judge's own phone on a pairable demo session keeps the demo limits: 3 min, 2 tokens", async () => {
+  it("a judge's own phone on a pairable demo session keeps the demo limits: 3 min, 6 tokens", async () => {
     const r = await createSession(store, { kioskId: "malo", demo: true, pairPhone: true }, T0);
     const { deviceToken } = await claimSession(store, { sessionId: r.sessionId, claimToken: r.claimToken }, T0);
     const s = { sessionId: r.sessionId };
     expect((await issue(s, deviceToken)).voiceSeconds).toBe(180);
-    await issue(s, deviceToken);
+    for (let i = 0; i < 5; i++) await issue(s, deviceToken);
     expect((await errorOf(issue(s, deviceToken))).code).toBe("RATE_LIMITED");
   });
 
@@ -174,7 +175,7 @@ describe("issueLiveToken", () => {
       throw new CommandError("UPSTREAM", "Voice is not available right now. Please type instead.");
     };
     expect((await errorOf(issue(s, s.deviceToken))).code).toBe("UPSTREAM");
-    // The day's last token and both of the demo session's are still there.
+    // The day's last token and all of the demo session's are still there.
     expect(await usage.bump("2026-10-13", "voiceSessions", 200)).toBe(true);
     await usage.refund("2026-10-13", "voiceSessions");
     issuer.create = async () => ({ name: "auth_tokens/ok" });
@@ -197,6 +198,9 @@ describe("issueLiveToken", () => {
     const s = await demo();
     const e = await errorOf(issue(s, s.deviceToken));
     expect(e.code).toBe("RATE_LIMITED");
+    // Shared load, not this order's own allowance (I-410).
+    expect(e.message).toBe("Voice is busy right now. Please type instead.");
+    expect(e.detail).toBeUndefined();
     expect(issued).toEqual([]);
   });
 });

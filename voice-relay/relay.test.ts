@@ -181,13 +181,13 @@ describe("relayConnection: hello and auth", () => {
     expect(c.client.closed?.code).toBe(4408);
   });
 
-  it("budget exhausted: the demo's two voice starts, then 4429 with the busy reason", async () => {
+  // I-410: this order's own tokens are used up, so the phone hears "voice time is up" (4000), not "busy" (4429).
+  it("budget exhausted: the demo's six voice starts, then 4000 with the used-up reason", async () => {
     const s = await demo();
-    await opened(s);
-    await opened(s);
-    const third = await opened(s);
-    expect(third.client.closed).toEqual({ code: 4429, reason: "Voice is busy right now. Please type instead." });
-    expect(vertex.opened).toHaveLength(2);
+    for (let i = 0; i < 6; i++) await opened(s);
+    const seventh = await opened(s);
+    expect(seventh.client.closed).toEqual({ code: 4000, reason: "Voice time for this order is up. Please type instead." });
+    expect(vertex.opened).toHaveLength(6);
   });
 
   it("the daily budget per address applies, as on the token route (I-148)", async () => {
