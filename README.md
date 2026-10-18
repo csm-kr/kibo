@@ -15,7 +15,7 @@ The picture shows "Try it on this screen". With **Start**, the laptop shows the 
 ## Try it in 60 seconds
 
 **With your own phone (`/demo`, the default):**
-1. On a laptop, open [`/demo`](https://kibo-407514467119.asia-northeast3.run.app/demo), pick a place (burger shop, airport rail, pizza shop) and press **Start**. The laptop becomes the kiosk: it shows the kiosk alone, with its QR and 6-digit code.
+1. On a laptop, open [`/demo`](https://kibo-407514467119.asia-northeast3.run.app/demo), pick a place (burger shop, airport rail, pizza shop, or the snack bar tab: a kiosk KIBO learned blind) and press **Start**. The laptop becomes the kiosk: it shows the kiosk alone, with its QR and 6-digit code.
 2. Scan the QR with your phone's camera (or open **kibo-2026.web.app** and type the code), and allow the microphone.
 3. Talk. On the burger shop, for example: "Two cheeseburger sets for here, with large fries: one zero cola, no pickles, the other a cider." Then "That's all, I'll pay." The AI opens the order review on both screens, and confirms it on your next "yes" ("Yes, pay now.") or your tap on **Yes, pay now**, never by itself.
 4. Pay on the kiosk: tap 카드 (Card), then 카드 넣기 (Insert card). The caption above the kiosk says each step in English. No real payment happens.
@@ -139,7 +139,7 @@ stateDiagram-v2
 ## KIBO Learn
 
 For kiosks with no integration, Gemini explores the kiosk's web screen once (Playwright, accessibility tree and the tappable labels), writes a **skill** (catalog plus click recipes), and may finish only after the skill passes its own AI-free self-tests and a coverage audit. Every order after that is a deterministic replay with no AI; the in-page bridge checks the kiosk's own total, and on a mismatch nothing is added and staff is called.
-- **See it:** [`/learn`](https://kibo-407514467119.asia-northeast3.run.app/learn) replays recorded learning runs turn by turn; [`/demo`](https://kibo-407514467119.asia-northeast3.run.app/demo) "Pizza shop" orders on a learned kiosk and marks every tap KIBO replays.
+- **See it:** [`/learn`](https://kibo-407514467119.asia-northeast3.run.app/learn) replays recorded learning runs turn by turn; on [`/demo`](https://kibo-407514467119.asia-northeast3.run.app/demo), "Pizza shop" (Doughhouse, our development kiosk) and "Snack bar" (보리별 분식, built by a separate AI agent and learned blind in round 4; a top bar tab, no D1 card) order on a learned kiosk and mark every tap KIBO replays.
 - **Getting onto a real kiosk:** kiosks that share menu data use a direct adapter (`data/kiosks/*.json`). On a web kiosk the bridge is one script in the page, added by the vendor or store (script tag, kiosk-browser extension or WebView injection). Native kiosk apps are roadmap. There are no vendor or store partnerships yet.
 - Details: [`docs/KIBO_LEARN.md`](docs/KIBO_LEARN.md), [`spikes/blind-kiosks/`](spikes/blind-kiosks/).
 

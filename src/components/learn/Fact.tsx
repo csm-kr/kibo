@@ -36,7 +36,10 @@ export function RunFacts({ run }: { run: LearnRun }) {
       <Fact value={`${data.minutes.toFixed(1)} min, ${data.turnCount} turns`} detail={`${data.model}, ${data.inputTokens.toLocaleString("en-US")} input tokens`} />
       <Fact
         value={`${grade.itemsFound} of ${grade.itemsOf} items found, ${grade.pricesCorrect} prices right`}
-        detail={run.demoKioskId ? "Compared with the reviewed skill the demo uses" : "Compared with the kiosk builder's answer key"}
+        detail={
+          // Doughhouse is ours, so its items are checked against our reviewed skill; a blind kiosk's against its builder's key.
+          grade.itemsSource.includes("skills/") ? "Compared with the reviewed skill the demo uses" : "Compared with the kiosk builder's answer key"
+        }
       />
       <Fact
         value={`Orders without AI: ${o.correct} correct, ${o.safeRefusal} refused, ${o.unsafe} unsafe, of ${o.total}`}

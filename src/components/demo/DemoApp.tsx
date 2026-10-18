@@ -2,7 +2,7 @@
 
 import { ArrowLeft, CreditCard } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, type CSSProperties } from "react";
 import { AssistantPanel, type SayFn } from "@/components/assistant/AssistantPanel";
 import { ICON, PRESS, PRIMARY_SMALL, QUIET, SECONDARY, SECONDARY_SMALL } from "@/components/phone/ui";
 import { KioskCanvas } from "@/components/kiosk/KioskCanvas";
@@ -12,6 +12,7 @@ import { PausedLayer } from "@/components/PausedLayer";
 import { useDemoSession } from "@/hooks/useDemoSession";
 import type { AgentAction } from "@/lib/agent/actions";
 import { examplesFor } from "@/lib/agent/examples";
+import { pageSizeOf } from "@/lib/bridge/replayView";
 import { buildComparison, HERO_KIOSK } from "@/lib/demo/compare";
 import { EDIT_PATH_TAPS, HUMAN_RUNS, TOUCH_RUN } from "@/lib/demo/evidence";
 import { demoKioskStep } from "@/lib/kiosk/pairing";
@@ -156,6 +157,7 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
   // a learned kiosk's review).
   const ended =
     session !== null && (session.status === "paid" || session.status === "expired" || (learned && session.status === "confirming"));
+  const kioskColumn = kioskColumnWidth(ownPhone, kiosk);
   // A place tab would clear an order that has lines and is not paid yet, so it asks first (N5).
   const openOrder = session !== null && session.cart.length > 0 && session.status !== "paid" && session.status !== "expired";
 
@@ -165,7 +167,7 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
       <DemoFrame kioskId={kiosk.kioskId} askBeforeLeaving={openOrder} className="max-[899px]:hidden">
         {/* Three white column cards on one top line under the top bar (#1 E). The kiosk column takes the width the
             phone and the third column leave, so the row spans the bar; the kiosk inside it is as tall as the column
-            allows and keeps 9:16. The learned page has its own width (1080:1600 and its strip) and the third column
+            allows and keeps 9:16. A learned page has its own width (its page size and its strip) and the third column
             takes the rest. With the judge's own phone the kiosk column is alone and centred: the laptop is the
             kiosk. */}
         <main
@@ -174,7 +176,12 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
           data-demo-own-phone={ownPhone || undefined}
           className={`mx-auto flex min-h-0 w-full max-w-[1600px] flex-1 gap-4 px-6 pb-4 min-[1440px]:gap-5 ${ownPhone ? "justify-center" : ""}`}
         >
-          <section data-demo-column aria-labelledby="demo-kiosk-caption" className={`${COLUMN} ${kioskColumnWidth(ownPhone, learned)}`}>
+          <section
+            data-demo-column
+            aria-labelledby="demo-kiosk-caption"
+            className={`${COLUMN} ${kioskColumn.className}`}
+            style={kioskColumn.style}
+          >
             <div className={`${COLUMN_HEAD} justify-between`}>
               <Caption id="demo-kiosk-caption" n={ownPhone ? undefined : 1} {...environmentOf(kiosk.kioskId).caption} />
               {/* The kiosk stays Korean; KIBO says its step in English beside the caption, in two lines at most, so the
@@ -370,14 +377,23 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
   );
 }
 
-/** The kiosk column's width: alone and centred with the judge's own phone, else beside the phone and the guide. */
-function kioskColumnWidth(ownPhone: boolean, learned: boolean): string {
-  if (!ownPhone) return learned ? "w-[calc((100dvh-136px)*27/40)] flex-none" : "min-w-0 flex-1";
-  // The learned page at the height the row under it leaves, plus KIBO's panel with the QR beside it; the kiosk canvas
-  // in a card wide enough for its step line and the next-order row under it.
-  return learned
-    ? "w-[calc((100dvh-212px)*27/40_+_clamp(320px,28vw,440px))] max-w-full flex-none"
-    : "w-[clamp(680px,56vw,820px)] max-w-full flex-none";
+/**
+ * The kiosk column's width: alone and centred with the judge's own phone, else beside the phone and the guide. A
+ * learned page keeps its own width to height (Doughhouse 1080:1600, the snack bar's fixed 720:1280, I-405).
+ */
+function kioskColumnWidth(ownPhone: boolean, kiosk: KioskData): { className: string; style?: CSSProperties } {
+  if (!kiosk.learned) return { className: ownPhone ? "w-[clamp(680px,56vw,820px)] max-w-full flex-none" : "min-w-0 flex-1" };
+  const page = pageSizeOf(kiosk.learned);
+  const aspect = `${page.w} / ${page.maxH}`;
+  // Beside the phone: the page as tall as the column. Own phone: the page at the height the row under it leaves, plus
+  // KIBO's panel with the QR beside it, and at least as wide as the next-order row with three other places on one line
+  // (the snack bar has no D1 card, so all three are "another place"; 1280×720, I-405).
+  return ownPhone
+    ? {
+        className: "max-w-full flex-none",
+        style: { width: `max(calc((100dvh - 212px) * ${aspect} + clamp(320px, 28vw, 440px)), 744px)` },
+      }
+    : { className: "flex-none", style: { width: `calc((100dvh - 136px) * ${aspect})` } };
 }
 
 /** Below 900px the split's fixed columns would both be cut off, so point to the real two-device mode (I-074). */

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Monitor } from "lucide-react";
 import { CARD, FOCUS, PRIMARY, SECONDARY } from "@/components/phone/ui";
 import { errorCopy, type ScreenErrorCode } from "@/lib/i18n/errors";
-import { DEMO_ENVIRONMENTS, demoHref } from "./environments";
+import { DEMO_ENVIRONMENTS, demoHref, MORE_PLACES } from "./environments";
 
 // D1 (docs/UX.md Flow C1): one sentence, three steps, one [Start]. Nothing else competes (V1). English: judges.
 // Three equal place cards pick the kiosk; the choice lives in the URL (`/demo?k=airport_rail`) so it can be linked,
@@ -25,6 +25,7 @@ export function DemoIntro(props: {
   /** "Try it on this screen": the kiosk and a phone drawn beside it, on one session. */
   onStart(): void;
 }) {
+  const extra = MORE_PLACES.find((p) => p.kioskId === props.kioskId);
   return (
     // Inside the /demo frame, whose top bar carries the KIBO mark and the place tabs.
     // py-4 and the gaps below keep D1 whole at 1280×720 under the top bar (#1 E).
@@ -108,16 +109,34 @@ export function DemoIntro(props: {
               })}
             </ul>
             {/* The recorded run that taught KIBO the pizza kiosk (/learn): a box of its own under the card row, outside
-                the cards, because a link cannot hold a link (I-123, #1 6). */}
-            <p className={`${CARD} flex flex-wrap items-center justify-between gap-x-4 py-1 text-base text-muted`}>
-              The pizza shop has no integration.
-              <Link
-                href="/learn/doughhouse"
-                className={`flex min-h-14 items-center rounded-tile font-semibold text-kibo underline underline-offset-4 ${FOCUS}`}
-              >
-                How KIBO learned the pizza kiosk
-              </Link>
-            </p>
+                the cards, because a link cannot hold a link (I-123, #1 6). A place without a card (the snack bar,
+                reached from /learn or its tab, I-405) is named here instead, selected, so [Start] says what it opens. */}
+            {extra ? (
+              <p data-place-extra aria-current="true" className={`${CARD} flex flex-wrap items-center justify-between gap-x-4 py-1 text-base ring-4 ring-kibo`}>
+                <span className="flex items-center gap-2">
+                  <CheckIcon />
+                  <span>
+                    <strong>{extra.place.en}</strong> <span className="text-muted">· {extra.how}</span>
+                  </span>
+                </span>
+                <Link
+                  href={`/learn/${extra.kioskId}`}
+                  className={`flex min-h-14 items-center rounded-tile font-semibold text-kibo underline underline-offset-4 ${FOCUS}`}
+                >
+                  How KIBO learned the {extra.short} kiosk
+                </Link>
+              </p>
+            ) : (
+              <p className={`${CARD} flex flex-wrap items-center justify-between gap-x-4 py-1 text-base text-muted`}>
+                The pizza shop has no integration.
+                <Link
+                  href="/learn/doughhouse"
+                  className={`flex min-h-14 items-center rounded-tile font-semibold text-kibo underline underline-offset-4 ${FOCUS}`}
+                >
+                  How KIBO learned the pizza kiosk
+                </Link>
+              </p>
+            )}
           </nav>
           <div className="flex flex-col gap-2">
             {/* Together as wide as the card row above it, so they read as the row's actions (I-123). */}

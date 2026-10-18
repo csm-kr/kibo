@@ -43,9 +43,11 @@ describe("recorded learn runs", () => {
     }
   });
 
-  it("only Doughhouse has an order button, and it opens the live demo kiosk", () => {
+  it("Doughhouse and the snack bar have an order button, and it opens their live demo kiosk (I-405)", () => {
     expect(learnRun("doughhouse")?.demoKioskId).toBe("doughhouse");
-    for (const id of ["bunsik", "themepark", "airport-shop"]) {
+    expect(learnRun("bunsik")?.demoKioskId).toBe("bunsik");
+    expect(learnRun("bunsik")?.noDemoReason).toBeUndefined();
+    for (const id of ["themepark", "airport-shop"]) {
       expect(learnRun(id)?.demoKioskId).toBeNull();
       expect(learnRun(id)?.noDemoReason).toBeTruthy();
     }
