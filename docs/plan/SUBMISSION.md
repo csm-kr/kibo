@@ -44,11 +44,11 @@ Talk to your own phone, and the self-order kiosk already there fills its own car
 - No personal videos, no real store photos or screens.
 - Harness files adapted from a third-party repo stay out (no license, pre-hackathon code).
 - Ideas borrowed from browser-harness, jev-browser, dev-browser and Aside are credited in the README; no code copied.
-- Music: Google Lyria only.
+- Music: our own score, synthesized from the video's cue list (`videos/orchestrator/video-v4/build/score_v4.py`), with percussion samples from VSCO 2 Community Edition (CC0); no third-party tracks.
 - gitleaks over the whole history before making the repo public.
 
-## Video (≤ 2:50, English)
-Draft v4.3 (10-17, 2:42.0); the beat sheet with times is `videos/orchestrator/video-v4/PLAN-draft.md` (git-ignored). Real screens throughout; scenes in order:
+## Video (3:00.6, English)
+Final v4.6 (10-18, 3:00.6; the Terms ask for three to four minutes). v4.5 (2:42.0) is the fallback. The v4.3 beat sheet is `videos/orchestrator/video-v4/PLAN-draft.md`; what changed since and every check on the final files are in `REPORT-v4.4.md` to `REPORT-v4.6.md` there (git-ignored). Real screens throughout; scenes in order:
 
 | Scene | What it shows |
 |---|---|
@@ -57,9 +57,9 @@ Draft v4.3 (10-17, 2:42.0); the beat sheet with times is `videos/orchestrator/vi
 | Language montage | Real voice orders: English → English kiosk, English → the ticket machine's 日本語 screen, Japanese → Korean kiosk, an older Korean voice → Korean kiosk |
 | Impact | 1 in 6 people 60 or over by 2030 (S44) · 2.2 billion with a vision impairment (S45) · 1.5 billion international tourist arrivals in 2025 (S46), then Korea: 17.9% of people 65+ say they can order or check in at a kiosk (S16) |
 | Pairing, hero order, review, payment | QR → connected; Gemini Live answers aloud, tool-call chips checked by the server before the kiosk moves; the AI stops at the review; your yes, your card |
-| Care | Larger text; an allergy question → [Call staff] |
+| Care | Larger text; an allergy question → [Call staff]; asking for the menu by voice: "Show me the drinks, please." moves the kiosk to its drinks, and a phone set to Korean turns English on its own (take n1-t1 on production, 10-18) |
 | KIBO Learn | Gemini on Vertex AI explores a kiosk it has never seen, then a replay without AI; the round 4 short form "20 / 20 safe · 0 wrong" with its line under it (`docs/plan/NUMBERS.md`) |
-| Under the hood | The architecture node by node (Gemini Live direct or through the relay on Cloud Run, `/api/command`, Firestore transaction, SSE, Gemini Flash with Vertex AI as backup, Firebase Hosting, Secret Manager); 1.7 s end of speech → kiosk highlight (median, synthetic voice on a laptop) · 80 / 82 |
+| Under the hood | The architecture node by node (Gemini Live direct or through the relay on Cloud Run, `/api/command`, Firestore transaction, SSE, Gemini Flash with Vertex AI as backup, Firebase Hosting, Secret Manager); 1.7 s end of speech → kiosk highlight (median, synthetic voice on a laptop) · 91 / 92 test cases passed (`docs/plan/NUMBERS.md`) |
 | Recap, end card | QR and kibo-2026.web.app |
 
 Made with our motion-graphics skill (`.claude/skills/motion-demo-video/`). Motion graphics frame real footage; they never fake a feature.
