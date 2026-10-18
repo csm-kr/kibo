@@ -95,6 +95,8 @@ export function MenuScreen(props: {
   // KIBO's English line under an AI change on a Korean kiosk (judges, tourists). It stays longer than the 2 s ring:
   // a whole set with its options takes a few seconds to read.
   const [subtitle, setSubtitle] = useState<{ key: string; text: string } | null>(null);
+  // The tile or the page the AI moved the kiosk to, scrolled into view once the category shows (QA 10-18).
+  const [reveal, setReveal] = useState<{ key: string; itemId?: string; scroll?: "down" | "up" } | null>(null);
   if (changeKey !== seenKey) {
     setSeenKey(changeKey);
     if (lc && changeKey) {
@@ -114,18 +116,37 @@ export function MenuScreen(props: {
       if (subtitle) setSubtitle({ key: changeKey, text: subtitle });
       // Never move the screen under someone choosing (sheet open or a touch in the last 5 s).
       const target = session.screen.category;
-      if (ai && target && !sheetItem && !recentTouch) setCategory(target);
+      if (ai && target && !sheetItem && !recentTouch) {
+        setCategory(target);
+        if (itemId) setReveal({ key: changeKey, itemId });
+      }
     }
   }
 
-  // showMenu: the AI asked the kiosk to show a category (QA 10-18), with the same rule as a change above.
+  // showMenu: the AI asked the kiosk to show a category, one item of it or the next page (QA 10-18), with the same
+  // rule as a change above. Opened from K2 by that ask, the menu replays it like a fresh change.
   const shownAt = session.screen.at ?? null;
-  const [seenShownAt, setSeenShownAt] = useState(shownAt);
+  const [seenShownAt, setSeenShownAt] = useState(() =>
+    shownAt !== null && Date.now() + props.clockOffset - shownAt < RING_MS ? null : shownAt,
+  );
   if (shownAt !== seenShownAt) {
     setSeenShownAt(shownAt);
-    const target = session.screen.category;
-    if (shownAt !== null && target && !sheetItem && !recentTouch) setCategory(target);
+    const { category: target, itemId, scroll } = session.screen;
+    if (shownAt !== null && target && !sheetItem && !recentTouch) {
+      setCategory(target);
+      if (itemId || scroll) setReveal({ key: `show:${shownAt}`, itemId, scroll });
+      if (itemId) setFlash({ key: `show:${shownAt}`, lineId: null, itemId, status: null });
+    }
   }
+
+  // After the new category has rendered: only the grid scrolls, never the page around the kiosk.
+  useEffect(() => {
+    const node = grid.current;
+    if (!reveal || !node) return;
+    const tile = reveal.itemId ? node.querySelector<HTMLElement>(`[data-item-id="${reveal.itemId}"]`) : null;
+    if (tile) revealTile(node, tile);
+    else if (reveal.scroll) node.scrollBy({ top: (reveal.scroll === "down" ? 1 : -1) * Math.round(node.clientHeight * 0.8) });
+  }, [reveal]);
 
   useEffect(() => {
     if (!flash) return;
@@ -320,6 +341,7 @@ function ProductTile(props: { kiosk: KioskData; item: MenuItem; available: boole
   return (
     <button
       type="button"
+      data-item-id={item.itemId}
       disabled={blocked !== null}
       onClick={props.onOpen}
       className={`relative flex flex-col overflow-hidden rounded-[32px] bg-white text-left active:bg-(--k-primary-tint) ${
@@ -391,6 +413,19 @@ function ConfirmClear(props: { kiosk: KioskData; onCancel(): void; onConfirm(): 
       </section>
     </ModalLayer>
   );
+}
+
+/**
+ * Scrolls the menu grid just enough to show the tile above its bottom fade (scroll-pt-4, scroll-pb-28). By hand, not
+ * scrollIntoView, which would also scroll the /demo page around the kiosk; the canvas may be drawn scaled.
+ */
+function revealTile(grid: HTMLElement, tile: HTMLElement) {
+  const box = grid.getBoundingClientRect();
+  const scale = box.height / grid.offsetHeight || 1;
+  const top = (tile.getBoundingClientRect().top - box.top) / scale + grid.scrollTop;
+  const bottom = top + tile.offsetHeight;
+  if (top - 16 < grid.scrollTop) grid.scrollTop = top - 16;
+  else if (bottom + 112 > grid.scrollTop + grid.clientHeight) grid.scrollTop = bottom + 112 - grid.clientHeight;
 }
 
 /** True while a scroll area holds more than it shows below (the cart bar's row does the same sideways). */

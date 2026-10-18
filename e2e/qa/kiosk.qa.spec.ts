@@ -147,6 +147,26 @@ test("phone path: AI highlight on K3 and the staff banner", async ({ page, reque
   await check(page, info, "KX-staff");
 });
 
+// QA 10-18 (I-424): the burger a question is about, brought into view and ringed while the phone asks single or set.
+test("phone path: K3 shows the item the AI asks about", async ({ page, request }, info) => {
+  await page.goto("/kiosk?k=malo");
+  const root = kioskRoot(page);
+  const { sessionId, claimToken } = await readClaim(page);
+  const { deviceToken } = await (await claim(request, sessionId, claimToken)).json();
+  await expect(root).toHaveAttribute("data-screen", "dine");
+
+  await command(request, deviceToken, {
+    sessionId,
+    type: "showMenu",
+    args: { category: "burger", itemId: "bacon_cheese_burger" },
+    source: "voice",
+    utteranceSeq: 1,
+  });
+  await expect(root).toHaveAttribute("data-screen", "menu");
+  await expect(page.locator('[data-item-id="bacon_cheese_burger"]')).toHaveClass(/k-ring/);
+  await check(page, info, "K3-ai-show-item");
+});
+
 test("phone path: KIBO is working on K3 while the phone waits for the AI (14-final:1)", async ({ page, request }, info) => {
   await page.goto("/kiosk?k=malo");
   const root = kioskRoot(page);
