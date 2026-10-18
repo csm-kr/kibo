@@ -1,4 +1,4 @@
-import { isForbiddenLabel } from "@/lib/adapters/learned";
+import { isForbiddenLabel, isPaymentText } from "@/lib/adapters/learned";
 import type { GroupCondition, RecipeStep } from "@/types/menu";
 import { clickables, findByLabel } from "./labels";
 
@@ -136,9 +136,12 @@ export interface Target {
   text: string;
 }
 
-/** The last guard before a click: the target's label or text holds a forbidden word. */
+/**
+ * The last guard before a click: the target's label holds a forbidden word, or its text holds a payment or order
+ * control (read in whole lines, as the learner does, so a notice that mentions paying does not refuse it; I-405).
+ */
 export function isForbiddenTarget(t: Pick<Target, "label" | "text">, forbidden: string[]): boolean {
-  return isForbiddenLabel(t.label, forbidden) || isForbiddenLabel(t.text, forbidden);
+  return isForbiddenLabel(t.label, forbidden) || isPaymentText(t.text, forbidden);
 }
 
 function textOf(el: HTMLElement): string {

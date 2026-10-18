@@ -174,6 +174,32 @@ export function isForbiddenLabel(label: string, forbidden: string[]): boolean {
   });
 }
 
+// The learner's whole-line rule (spikes/kibo-learn/plan.mjs `isForbidden`, R-016), ported for the text a target shows
+// besides its label: a line refuses when it is one of the skill's forbidden labels or is a payment or order action
+// (exactly one, starting with a payment word, or ending with an order or pay verb); prices and counts are not words.
+const bare = (s: string) => norm(s.replace(/\d[\d,.]*\s*(원|won|개)?/gi, ""));
+const PAY_EXACT = ["주문", "주문하기", "주문완료", "결제", "결제하기", "카드", "카드결제", "간편결제", "신용카드", "체크카드", "신용체크카드",
+  "쿠폰", "상품권", "구매하기", "order", "ordernow", "placeorder", "submitorder", "confirmorder", "completeorder", "pay", "paynow",
+  "payment", "checkout", "card", "creditcard", "buynow"];
+const PAY_START = ["결제", "pay", "checkout"];
+const PAY_END = ["주문하기", "결제하기", "구매하기", "주문완료", "결제", "checkout", "ordernow", "placeorder", "paynow", "payment"];
+const LEARNER_KEEP_ORDERING = ["계속", "더담기", "취소", "이전", "continue", "back", "cancel"];
+const isPayAction = (t: string) => !!t && (PAY_EXACT.includes(t) || PAY_START.some((w) => t.startsWith(w)) || PAY_END.some((w) => t.endsWith(w)));
+
+/**
+ * True when a target's shown text holds a payment or order control (a harmless label on a payment button). Whole
+ * lines, as the learner reads them, so a notice like bk9's "현금 결제는 카운터에서 도와드려요" on its tap-anywhere start
+ * tile is not one (I-405). The target's label and every step target keep the stricter isForbiddenLabel.
+ */
+export function isPaymentText(text: string, forbidden: string[]): boolean {
+  const lines = text.split("\n").filter((l) => norm(l));
+  const own = forbidden.map(norm).filter(Boolean);
+  if (lines.some((l) => own.includes(norm(l)) || own.includes(bare(l)))) return true;
+  const all = bare(lines.join(" "));
+  if (LEARNER_KEEP_ORDERING.some((w) => all.includes(w))) return PAYMENT.some((w) => all.includes(w));
+  return lines.some((l) => isPayAction(bare(l)));
+}
+
 function both(key: "dineChip" | "takeOutChip"): LocalizedName {
   return { ko: kt(key, "ko"), en: kt(key, "en") };
 }

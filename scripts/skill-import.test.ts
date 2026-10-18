@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import graded from "../spikes/blind-kiosks/results/bk9-bunsik/final/grade-v2.json";
 import raw from "../spikes/blind-kiosks/results/bk9-bunsik/final/skill.json";
-import { orderPlan } from "../spikes/kibo-learn/plan.mjs";
+import { isForbidden, orderPlan } from "../spikes/kibo-learn/plan.mjs";
 import bunsikReviewed from "../skills/bunsik.json";
 import { getKiosk } from "../src/lib/adapters/catalog";
-import { learnedToKiosk, type Skill, skillSchema } from "../src/lib/adapters/learned";
+import { isPaymentText, learnedToKiosk, type Skill, skillSchema } from "../src/lib/adapters/learned";
 import { changeVars } from "../src/lib/bridge/bridge";
 import { planSteps, type PlainStep } from "../src/lib/bridge/recipe";
 import type { KioskData } from "../src/types/menu";
@@ -132,6 +132,31 @@ describe("skills/bunsik.json: the reviewed snack bar on /demo is the learner's s
       expect(plain(bridgePlan(kiosk, order))).toEqual(plain(orderPlan(raw, order)));
     });
   }
+});
+
+describe("isPaymentText is the learner's whole-line rule (plan.mjs isForbidden), ported for a target's text (I-405)", () => {
+  it("gives the learner's answer for every label, line and payment text of both learned kiosks", () => {
+    const cases = [
+      ...raw.uiLabels,
+      ...raw.forbiddenLabels,
+      "현금 결제는 카운터에서 도와드려요",
+      "화면을 터치하여 주문을 시작하세요\n현금 결제는 카운터에서 도와드려요",
+      "다음\n카드 결제",
+      "결제하실 금액 9,000원",
+      "계속 주문하기",
+      "계속 결제하기",
+      "주문하기 23,400원",
+      "💳 신용/체크카드",
+      "Continue to payment",
+      "Pay now",
+      "곱빼기",
+      "삭제",
+    ];
+    for (const kioskId of ["bunsik", "doughhouse"]) {
+      const f = getKiosk(kioskId).learned!.forbiddenLabels;
+      for (const t of cases) expect(isPaymentText(t, f), `${kioskId}: ${t}`).toBe(isForbidden(t, f));
+    }
+  });
 });
 
 describe("skill-import: round 3–4 fields", () => {

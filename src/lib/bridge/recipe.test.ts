@@ -295,6 +295,20 @@ describe("isForbiddenTarget", () => {
     expect(isForbiddenTarget({ label: "💳 신용/체크카드", text: "💳 신용/체크카드" }, forbidden)).toBe(true);
   });
 
+  it("reads a target's other text lines whole, as the learner does: a notice that mentions paying is not a payment control (I-405)", () => {
+    const f = getKiosk("bunsik").learned!.forbiddenLabels;
+    // bk9's start screen is one tap-anywhere tile; its footer says cash is paid at the counter.
+    const attract = ["10.14 (수) 12:30", "★", "보리별 분식", "오늘도 든든하게, 한 그릇 뚝딱", "오늘의 할인 로제 떡볶이 6,500원 5,500원",
+      "화면을 터치하여 주문을 시작하세요", "현금 결제는 카운터에서 도와드려요"].join("\n");
+    expect(isForbiddenTarget({ label: "보리별 분식", text: attract }, f)).toBe(false);
+    // A line that is a payment or order control still refuses the target, whatever its label.
+    for (const line of ["카드 결제", "결제하실 금액 9,000원", "신용/체크카드", "주문하기", "주문 확인하기", "처음으로", "Pay now", "💳 카드로 결제"]) {
+      expect(isForbiddenTarget({ label: "다음", text: `다음\n${line}` }, f), line).toBe(true);
+    }
+    // The label itself keeps the strict rule: any payment word in it refuses.
+    expect(isForbiddenTarget({ label: "현금 결제는 카운터에서 도와드려요", text: "현금 결제는 카운터에서 도와드려요" }, f)).toBe(true);
+  });
+
   it("allows ordinary kiosk controls", () => {
     expect(isForbiddenTarget({ label: "화면을 터치하여 주문을 시작하세요", text: "화면을 터치하여 주문을 시작하세요" }, forbidden)).toBe(false);
     expect(isForbiddenTarget({ label: "페퍼로니", text: "페퍼로니\n17,900원" }, forbidden)).toBe(false);
