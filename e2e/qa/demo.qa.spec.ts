@@ -633,12 +633,12 @@ test("D1 to D3 with the learned pizza kiosk", async ({ page, request }, info) =>
 test.describe(() => {
   test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.154" } });
 
-  // The snack bar KIBO learned blind (I-405): D1 keeps its three cards and names it under them; its page is a fixed
+  // The bunsik shop KIBO learned blind (I-405): D1's fourth place card, selected (I-414); its page is a fixed
   // 720×1280 screen in the kiosk column, with a set of five choices replayed through its own popup.
-  test("D1 to D3 with the learned snack bar kiosk", async ({ page, request }, info) => {
+  test("D1 to D3 with the learned bunsik shop kiosk", async ({ page, request }, info) => {
     const judge = [VIEWPORTS[0], { width: 1280, height: 720 }];
     await page.goto("/demo?k=bunsik");
-    await expect(page.locator("[data-place-extra]")).toBeVisible({ timeout: 60_000 });
+    await expect(page.locator("[data-place-card][aria-current]")).toContainText("Bunsik shop", { timeout: 60_000 });
     await check(page, info, "D1-intro-bunsik", undefined, judge);
 
     const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");

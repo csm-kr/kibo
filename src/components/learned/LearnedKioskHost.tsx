@@ -35,8 +35,8 @@ const INTRO: Record<string, { en: string; ko: string }> = {
     ko: "KIBO가 스스로 익힌 피자 키오스크예요 (저희 개발용 키오스크).",
   },
   bunsik: {
-    en: "A snack bar kiosk KIBO learned by itself the first time it saw it (a blind test kiosk).",
-    ko: "KIBO가 처음 보고 스스로 익힌 분식 키오스크예요 (블라인드 시험용 키오스크).",
+    en: "A bunsik shop kiosk KIBO learned by itself the first time it saw it (a blind test kiosk).",
+    ko: "KIBO가 처음 보고 스스로 익힌 분식집 키오스크예요 (블라인드 시험용 키오스크).",
   },
 };
 const INTRO_DEFAULT = { en: "A kiosk KIBO learned by itself.", ko: "KIBO가 스스로 익힌 키오스크예요." };

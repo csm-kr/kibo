@@ -36,7 +36,7 @@ describe("examplesFor", () => {
     ]);
   });
 
-  it("snack bar examples (the learned 보리별 분식, I-405): names and options from skills/bunsik.json", () => {
+  it("bunsik shop examples (the learned 보리별 분식, I-405): names and options from skills/bunsik.json", () => {
     expect(examplesFor("bunsik", "en")).toEqual([
       "Cheese tteokbokki, medium spicy, with a boiled egg",
       "Add a tuna gimbap, sliced",

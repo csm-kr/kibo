@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { CircleHelp } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { FOCUS_INSIDE, PRIMARY, SECONDARY } from "@/components/phone/ui";
-import { ALL_PLACES, demoHref, type DemoPlace } from "./environments";
+import { DEMO_ENVIRONMENTS, demoHref, type DemoPlace } from "./environments";
 
 // The /demo frame around D1, D2 and D3 (docs/UI_GUIDE.md "/demo frame", issue #1 batch E): a light neutral canvas and
 // a slim top bar with KIBO, "Live demo", the place tabs and a quiet "How it works". A place tab starts that place
@@ -51,7 +51,7 @@ function TopBar({ kioskId, askBeforeLeaving }: { kioskId: string; askBeforeLeavi
       <nav aria-label="Places" className="max-[899px]:hidden">
         {/* The drawn track is 48px; each tab's target reaches 56px over its edges, 8px from the next one. */}
         <ul className="flex h-12 items-center gap-2 rounded-full bg-[#E3E2DE] px-1">
-          {ALL_PLACES.map((env) => {
+          {DEMO_ENVIRONMENTS.map((env) => {
             const current = env.kioskId === kioskId;
             return (
               <li key={env.kioskId}>

@@ -12,7 +12,7 @@ describe("recorded learn runs", () => {
       expect(t.steps).toHaveLength(data.turnCount);
       expect(t.steps.map((s) => s.n)).toEqual(data.turns.map((_, i) => i + 1));
       expect(t.milestones.at(-1)).toMatchObject({ kind: "finish", index: data.turnCount - 1 });
-      // The theme park and snack bar runs never used `record`, so they have no note milestones and their counters stay at 0.
+      // The theme park and bunsik shop runs never used `record`, so they have no note milestones and their counters stay at 0.
       if (data.runId === "themepark" || data.runId === "bunsik") {
         expect(t.milestones.map((m) => m.kind).sort()).toEqual(["audit", "finish", "self-test"]);
         expect(t.steps.every((s) => s.known.items === 0 && s.known.categories === 0)).toBe(true);
@@ -43,7 +43,7 @@ describe("recorded learn runs", () => {
     }
   });
 
-  it("Doughhouse and the snack bar have an order button, and it opens their live demo kiosk (I-405)", () => {
+  it("Doughhouse and the bunsik shop have an order button, and it opens their live demo kiosk (I-405)", () => {
     expect(learnRun("doughhouse")?.demoKioskId).toBe("doughhouse");
     expect(learnRun("bunsik")?.demoKioskId).toBe("bunsik");
     expect(learnRun("bunsik")?.noDemoReason).toBeUndefined();

@@ -66,8 +66,8 @@ test("learned kiosk widget: QR, then an order the bridge entered, with its taps 
 test.describe(() => {
   test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.152" } });
 
-  // The snack bar KIBO learned blind (bk9-bunsik, I-405): a page of its own fixed 720×1280 size, drawn as large as fits.
-  test("learned snack bar widget: QR, then the set the bridge entered through its three-step popup", async ({ page, request }, info) => {
+  // The bunsik shop KIBO learned blind (bk9-bunsik, I-405): a page of its own fixed 720×1280 size, drawn as large as fits.
+  test("learned bunsik shop widget: QR, then the set the bridge entered through its three-step popup", async ({ page, request }, info) => {
     await page.goto("/learned/bunsik");
     const { sessionId, claimToken } = await readClaim(page);
     const frame = page.locator("iframe[data-learned-kiosk]");

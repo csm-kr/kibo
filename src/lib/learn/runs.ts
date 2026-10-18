@@ -30,14 +30,14 @@ export interface LearnRun {
 export const LEARN_RUNS: LearnRun[] = [
   {
     data: bunsik as LearnRunData,
-    title: "Snack bar kiosk",
-    phrase: "snack bar kiosk",
+    title: "Bunsik shop kiosk",
+    phrase: "bunsik shop kiosk",
     provenance:
       "Built by a separate AI agent from a short brief and never seen before this run: the learner was frozen first (round 4) and learned it once, in 9.6 min. Its orders were checked against the kiosk's total and cart afterwards. Its skill, reviewed by a person, is a learned kiosk in the live demo too.",
     demoKioskId: "bunsik",
     cover: {
       n: 3,
-      alt: "Turn 3: the snack bar kiosk's tteokbokki sheet with a required spice level and toppings, in Korean",
+      alt: "Turn 3: the bunsik shop kiosk's tteokbokki sheet with a required spice level and toppings, in Korean",
       crop: { x: 20, y: 158, w: 440, h: 540 },
     },
   },

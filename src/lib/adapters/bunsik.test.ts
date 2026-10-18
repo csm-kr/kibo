@@ -7,7 +7,7 @@ import type { RecipeStep } from "@/types/menu";
 import { allKioskIds, findItem, getKiosk } from "./catalog";
 import { isForbiddenLabel, learnedToKiosk, skillSchema } from "./learned";
 
-// 보리별 분식 (bk9-bunsik), the snack bar kiosk KIBO learned blind in round 4, as a public learned kiosk on /demo
+// 보리별 분식 (bk9-bunsik), the bunsik shop kiosk KIBO learned blind in round 4, as a public learned kiosk on /demo
 // (I-405). The skill is the learner's own output (spikes/blind-kiosks/results/bk9-bunsik/final/skill.json) converted
 // by `npm run skill:import`, plus only what a person adds in review: ids, English names, the cart line reading, the
 // removal recipe, the review order button as a forbidden label and the page's fixed size.
@@ -101,7 +101,7 @@ describe("skills/bunsik.json", () => {
   });
 });
 
-describe("resolveLine on the snack bar", () => {
+describe("resolveLine on the bunsik shop", () => {
   it("prices holdout h4's set with its upgrades, and h1's tteokbokki with two toppings", () => {
     const set = resolveLine(kiosk, {
       itemId: "boribyeol_set",

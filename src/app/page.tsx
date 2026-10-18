@@ -260,8 +260,8 @@ export default function Home() {
         <h2 id="places" className={H2}>
           One phone, many kiosks
         </h2>
-        <p>The same phone, the same way of talking, three different places. Each one opens a working kiosk.</p>
-        <ul className="grid gap-6 lg:grid-cols-3">
+        <p>The same phone, the same way of talking, four different places. Each one opens a working kiosk.</p>
+        <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {DEMO_ENVIRONMENTS.map((env) => (
             <li key={env.kioskId} className={`${CARD} flex flex-col gap-4`}>
               <Image
@@ -269,7 +269,7 @@ export default function Home() {
                 alt={`The top of the ${env.short} kiosk screen, in Korean`}
                 width={800}
                 height={600}
-                sizes="(min-width: 1024px) 33vw, 100vw"
+                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
                 className="h-auto w-full rounded-[12px] border border-[#E2DACB]"
               />
               <h3 className="font-bold text-[#15171C]">{env.place.en}</h3>

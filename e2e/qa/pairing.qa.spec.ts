@@ -86,7 +86,13 @@ for (const vp of [
     await root.getByRole("button", { name: "출력 안 함" }).click();
     await expect(step).toHaveText("Order number: done, no money was charged.");
     // [Try again] and the other places in view under the kiosk, the kiosk at the size it had from the start.
-    await expect(page.locator("[data-demo-next]").getByRole("button", { name: "Try again" })).toBeInViewport({ ratio: 1 });
+    const next = page.locator("[data-demo-next]");
+    await expect(next.getByRole("button", { name: "Try again" })).toBeInViewport({ ratio: 1 });
+    // Three other places since the bunsik shop got its card (I-414), and the row's label still on one line.
+    const places = next.getByRole("navigation", { name: "Try another place" }).getByRole("link");
+    await expect(places).toHaveText(["Airport rail", "Pizza shop", "Bunsik shop"]);
+    for (const link of await places.all()) await expect(link).toBeInViewport({ ratio: 1 });
+    expect(await textLines(next.getByRole("heading", { name: "Try another place" }))).toBe(1);
     await check(page, info, "demo-D3-own-phone-done", DEMO);
   });
 }
@@ -154,9 +160,9 @@ test("/demo [Start] on the learned pizza kiosk 1280x720: KIBO's panel with the Q
 test.describe(() => {
   test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.155" } });
 
-  // The snack bar (I-405): its fixed 720×1280 page beside KIBO's panel, then the review with three other places in the
+  // The bunsik shop (I-405): its fixed 720×1280 page beside KIBO's panel, then the review with three other places in the
   // row under it (it has no D1 card, so every card place is "another").
-  test("/demo [Start] on the learned snack bar 1280x720: QR and code beside the page, then the next order row", async ({ page, request }, info) => {
+  test("/demo [Start] on the learned bunsik shop 1280x720: QR and code beside the page, then the next order row", async ({ page, request }, info) => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto("/demo?k=bunsik");
     await page.getByRole("button", { name: "Start", exact: true }).click();
