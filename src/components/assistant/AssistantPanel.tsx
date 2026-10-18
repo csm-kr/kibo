@@ -383,8 +383,12 @@ export function AssistantPanel(props: Props) {
   const lastId = chat.messages.at(-1)?.id ?? 0;
   const changeAt = session?.lastChange?.at ?? 0;
   const followedAt = useRef(0);
+  const turnKey = `${lastId}|${working}|${choicesShown}|${pendingKey}`;
+  const shownKey = useRef("");
   const showTurn = useEffectEvent(() => {
     const turn = turnRef.current;
+    const turnChanged = shownKey.current !== turnKey;
+    shownKey.current = turnKey;
     const lineId = followLine(session?.lastChange ?? null, choicesShown, Date.now() + clockOffset);
     if (!turn || (lastId === 0 && !choicesShown && !lineId)) return;
     const bubbles = turn.querySelectorAll("[data-bubble]");
@@ -401,9 +405,14 @@ export function AssistantPanel(props: Props) {
       const changed = followedAt.current !== changeAt;
       followedAt.current = changeAt;
       keepInView(last, line, reserve);
-      if (changed || session?.lastChange?.source !== "text") keepInView(line, line, reserve);
+      // A typed reply that already landed stays readable: the line follows a typed change only while the reply is
+      // still pending (the stream can bring the change after the reply).
+      const source = session?.lastChange?.source;
+      if (source === "voice" || (changed && (source !== "text" || working))) keepInView(line, line, reserve);
       return;
     }
+    // A change with no line to follow (remove, undo, clear) leaves the view where the user put it.
+    if (!turnChanged) return;
     keepInView(last, turn, reserve, turn.querySelector("[data-choices]"));
   });
   useEffect(() => showTurn(), [lastId, working, choicesShown, pendingKey, changeAt]);
