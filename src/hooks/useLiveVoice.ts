@@ -8,6 +8,7 @@ import { aiLanguageField, ApiError, liveToken, sendCommand } from "@/lib/client/
 import type { SpeechLanguage } from "@/lib/i18n/languages";
 import { errorCopy } from "@/lib/i18n/errors";
 import { pt } from "@/lib/i18n/phone";
+import { bargeIn } from "@/lib/voice/bargeIn";
 import { e2eFrame, e2eMarks, e2eOutput, frameRms } from "@/lib/voice/e2eMarks";
 import { base64ToFloat32, downsampleTo16k, int16ToBase64 } from "@/lib/voice/pcm";
 import { connectRelay, relayCloseOutcome, type LiveLink } from "@/lib/voice/relayLink";
@@ -66,6 +67,9 @@ const RETRY_DELAY_MS = 1000;
 const SETUP_TIMEOUT_MS = 10_000;
 /** The relay checks the session and opens Vertex first, with its own 10 s limits; give it room to say why it failed. */
 const RELAY_SETUP_TIMEOUT_MS = 15_000;
+/** Where the person may talk over the AI (bargeIn.ts). Not on the order review: only a yes said after the AI finished
+ *  (or a tap) confirms there, so the AI's own "say yes" can never come back through the mic as the person's answer. */
+const BARGE_STATES = new Set<SessionStatus | null>(["connected", "ordering"]);
 
 interface Run {
   ctx: AudioContext;
@@ -78,6 +82,10 @@ interface Run {
   sources: Set<AudioBufferSourceNode>;
   playEnd: number;
   mutedUntil: number;
+  /** Frames heard while the mic is shut, for a cut-in (bargeIn.ts). */
+  barge: ReturnType<typeof bargeIn>;
+  /** The person cut in: the rest of the running reply is not played. */
+  dropReply: boolean;
   /** Reconnects since the last successful setup. */
   retries: number;
   deadline: number;
@@ -196,16 +204,32 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     return pt("voiceFailed", o.locale);
   }
 
-  function sendFrame(r: Run, frame: Float32Array) {
-    // Half-duplex: nothing goes up while the AI voice plays or just after.
-    if (!r.live || r.sources.size > 0 || performance.now() < r.mutedUntil) return;
-    if (marks && !e2eFrame(marks, frameRms(frame), performance.now())) return;
+  function sendPcm(r: Run, frame: Float32Array) {
     const pcm = downsampleTo16k(frame, r.ctx.sampleRate);
     try {
-      r.live.sendRealtimeInput({ audio: { data: int16ToBase64(pcm), mimeType: "audio/pcm;rate=16000" } });
+      r.live?.sendRealtimeInput({ audio: { data: int16ToBase64(pcm), mimeType: "audio/pcm;rate=16000" } });
     } catch {
       // The socket is closing; onclose reconnects.
     }
+  }
+
+  function sendFrame(r: Run, frame: Float32Array) {
+    if (!r.live) return;
+    // Half-duplex: nothing goes up while the AI voice plays or just after, unless the person talks over it (owner
+    // 10-18): then the AI stops at once and Live hears them from the start of their words.
+    if (r.sources.size > 0 || performance.now() < r.mutedUntil) {
+      // The voice E2E's fake mic loops its sentence; it sends one utterance only (e2eMarks.ts), so no cut-in there.
+      if (marks || !BARGE_STATES.has(o.status) || !r.barge.push(frame, frameRms(frame))) return;
+      r.dropReply = turns.responding;
+      stopPlayback(r);
+      r.mutedUntil = 0;
+      setState("listening");
+      for (const kept of r.barge.take()) sendPcm(r, kept);
+      return;
+    }
+    r.barge.reset();
+    if (marks && !e2eFrame(marks, frameRms(frame), performance.now())) return;
+    sendPcm(r, frame);
   }
 
   function play(r: Run, b64: string) {
@@ -308,15 +332,16 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     }
     if (sc?.inputTranscription?.text) r.userText += sc.inputTranscription.text;
     if (events.some((e) => e.type === "modelOutput")) flushUser(r);
-    if (sc?.outputTranscription?.text) r.aiText += sc.outputTranscription.text;
+    if (sc?.outputTranscription?.text && !r.dropReply) r.aiText += sc.outputTranscription.text;
     if (sc?.interrupted) stopPlayback(r);
-    if (o.voiceOutput) {
+    if (o.voiceOutput && !r.dropReply) {
       for (const part of sc?.modelTurn?.parts ?? []) {
         if (part.inlineData?.data && part.inlineData.mimeType?.startsWith("audio/")) play(r, part.inlineData.data);
       }
     }
     if (sc?.turnComplete || sc?.interrupted) {
       flushText(r);
+      r.dropReply = false;
       if (r.sources.size === 0) setState("listening");
     }
     const calls = m.toolCall?.functionCalls ?? [];
@@ -416,6 +441,7 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     if (r.stopped) return;
     flushText(r);
     stopPlayback(r);
+    r.dropReply = false;
     turns = turnsReducer(turns, { type: "responseEnd" });
     const old = r.live;
     r.live = null;
@@ -456,6 +482,8 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
       sources: new Set(),
       playEnd: 0,
       mutedUntil: 0,
+      barge: bargeIn(),
+      dropReply: false,
       retries: 0,
       deadline: 0,
       timer: null,
