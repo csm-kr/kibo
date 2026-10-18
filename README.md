@@ -14,9 +14,9 @@
 
 Self-order kiosks leave many people out: older adults, people with low vision, travellers who cannot read the screen, and anyone who finds the touch maze a hassle. KIBO lets them order by talking to **their own phone**, in their own language. **Gemini** turns each sentence into tool calls, our **Cloud Run** server checks every call against the kiosk's own menu and rules, and the kiosk on the counter fills its own cart, step by step, as you talk. **The AI can never pay**: that takes your own yes or tap, then your card at the kiosk.
 
-| 96 of 98 | 2.1 s | 20 of 20 | 0 |
+| 96 of 98 | 2.1 s | 20 of 20 safe · 0 wrong | 0 |
 |:---:|:---:|:---:|:---:|
-| text-agent test cases passed on the final code | median from the end of your sentence to the kiosk moving (voice) | test orders handled safely on two kiosks KIBO had never seen | payments the AI can complete |
+| text-agent test cases passed on the final code | median from the end of your sentence to the kiosk moving (voice) | test orders on two kiosks KIBO had never seen: 16 hands-free, 4 stopped safely (2 to staff, 2 refused) | payments the AI can complete |
 
 <sub>Team-written cases; synthetic voice on a laptop; synthetic test kiosks. Every number and its limits: [Results](#results), [`docs/plan/NUMBERS.md`](docs/plan/NUMBERS.md).</sub>
 
@@ -25,7 +25,7 @@ Self-order kiosks leave many people out: older adults, people with low vision, t
 | 1. Talk to your phone | 2. The kiosk fills its own cart | 3. Say yes, pay at the kiosk |
 |:---:|:---:|:---:|
 | ![The phone's order card: two cheeseburger sets with their sides and drinks, and the total](public/landing/phone-talk.webp) | ![The Korean kiosk highlighting the cheeseburger the AI just added, with KIBO's English subtitle "AI added: Cheeseburger set"](public/landing/kiosk-ai-highlight.webp) | ![The phone's review with "Yes, pay now" and "You can also say yes."](public/landing/phone-confirm.webp) |
-| Scan the kiosk's QR (or type its 6-digit code at **kibo-2026.web.app**) and speak or type, in Korean, English or 7 more languages. | Gemini calls one of **11 tools**; the server validates it and applies it in a Firestore transaction, and both screens update over a live stream. | The AI may open the review. Only your tap or your own new "yes" confirms it, and only the kiosk's card action pays. |
+| Scan the kiosk's QR (or type its 6-digit code at **kibo-2026.web.app**) and speak or type in Korean or English; type in 7 more languages. | Gemini calls one of **11 tools**; the server validates it and applies it in a Firestore transaction, and both screens update over a live stream. | The AI may open the review. Only your tap or your own new "yes" confirms it, and only the kiosk's card action pays. |
 
 ![/demo after a spoken "yes": the Korean kiosk shows its insert-card step, the phone says "Insert your card into the kiosk", and "What the AI did" lists every Gemini tool call with the server's check](docs/images/voice-to-card.webp)
 
@@ -35,7 +35,7 @@ Self-order kiosks leave many people out: older adults, people with low vision, t
 
 - **1 in 6** people in the world will be 60 or over by 2030 ([WHO, 2025](https://www.who.int/news-room/fact-sheets/detail/ageing-and-health)).
 - **At least 2.2 billion** people have a near or distance vision impairment ([WHO, 2026](https://www.who.int/news-room/fact-sheets/detail/blindness-and-visual-impairment)).
-- **1.52 billion** international tourist arrivals were recorded in 2025 ([UN Tourism](https://www.untourism.int/un-tourism-world-tourism-barometer-data)).
+- **An estimated 1.52 billion** international tourist arrivals in 2025 ([UN Tourism](https://www.untourism.int/un-tourism-world-tourism-barometer-data)).
 - In Korea, only **17.9%** of people aged 65+ say they can order or check in at a kiosk (self-reported; [KIHASA, 2024](https://www.kihasa.re.kr/api/kihasa/file/download?seq=28260), p. 32).
 
 None of the worldwide figures is about kiosks; Korea is one example of the kiosk problem. Sources: [`docs/plan/SOURCES.md`](docs/plan/SOURCES.md) S44–S46, S16. KIBO needs no new kiosk: the store keeps its kiosk, and people keep their phone.
@@ -67,6 +67,8 @@ More: [What Gemini does, and where](#what-gemini-does-and-where), [Google Cloud 
 ## Results at a glance
 
 ![96 of 98 team-written test cases passed; the kiosk moves 2.1 s after you stop talking (voice median), first audio 3.2 s; typed full order 7.1 s, follow-up 2.3 s](docs/images/results.webp)
+
+<sub>Voice timings: synthetic voice through a laptop's fake microphone, local server, 7 of 8 runs. Typed timings: the deployed service, one run from Seoul. Details: [`docs/plan/NUMBERS.md`](docs/plan/NUMBERS.md).</sub>
 
 | Claim | Value |
 |---|---|
