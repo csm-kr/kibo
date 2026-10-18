@@ -1,0 +1,113 @@
+{
+  "date": "2026-10-18T07:45:20.666Z",
+  "model": "gemini-3.8-flash",
+  "backend": "auto",
+  "modelCallsByBackend": {
+    "api": 2,
+    "vertex": 0
+  },
+  "thinkingLevel": "low",
+  "evalClock": "14:00 KST",
+  "subset": [
+    "c-en-grandson-not-spicy"
+  ],
+  "cases": 1,
+  "passed": 1,
+  "passRate": 1,
+  "byGroup": {
+    "colloquial": {
+      "pass": 1,
+      "total": 1
+    }
+  },
+  "byKiosk": {
+    "malo": {
+      "pass": 1,
+      "total": 1
+    }
+  },
+  "byType": {
+    "10-colloquial": {
+      "pass": 1,
+      "total": 1
+    }
+  },
+  "latency": {
+    "requests": 1,
+    "totalMedianMs": 10372,
+    "totalP90Ms": 10372,
+    "firstToolRequests": 1,
+    "firstToolMedianMs": 8013,
+    "firstToolP90Ms": 8013,
+    "modelCalls": 2,
+    "roundMedianMs": 2210,
+    "roundP90Ms": 7957,
+    "callsPerRequest": {
+      "2": 1
+    },
+    "oneCallWithTools": 0
+  },
+  "notCovered": [
+    {
+      "type": "7-count-limits",
+      "reason": "Count limits (max 3 toppings) need the learned Doughhouse kiosk, which has no LearnedAdapter yet."
+    }
+  ],
+  "results": [
+    {
+      "id": "c-en-grandson-not-spicy",
+      "kioskId": "malo",
+      "type": "10-colloquial",
+      "group": "colloquial",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "hot_coffee",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bulgogi_burger"
+          },
+          {
+            "kind": "item",
+            "id": "chicken_nuggets"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 10372,
+          "firstToolMs": 8013,
+          "rounds": [
+            7957,
+            2210
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

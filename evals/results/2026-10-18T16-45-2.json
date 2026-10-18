@@ -1,0 +1,113 @@
+{
+  "date": "2026-10-18T07:45:42.118Z",
+  "model": "gemini-3.8-flash",
+  "backend": "auto",
+  "modelCallsByBackend": {
+    "api": 2,
+    "vertex": 0
+  },
+  "thinkingLevel": "low",
+  "evalClock": "14:00 KST",
+  "subset": [
+    "c-en-grandson-not-spicy"
+  ],
+  "cases": 1,
+  "passed": 1,
+  "passRate": 1,
+  "byGroup": {
+    "colloquial": {
+      "pass": 1,
+      "total": 1
+    }
+  },
+  "byKiosk": {
+    "malo": {
+      "pass": 1,
+      "total": 1
+    }
+  },
+  "byType": {
+    "10-colloquial": {
+      "pass": 1,
+      "total": 1
+    }
+  },
+  "latency": {
+    "requests": 1,
+    "totalMedianMs": 12528,
+    "totalP90Ms": 12528,
+    "firstToolRequests": 1,
+    "firstToolMedianMs": 9903,
+    "firstToolP90Ms": 9903,
+    "modelCalls": 2,
+    "roundMedianMs": 2490,
+    "roundP90Ms": 9789,
+    "callsPerRequest": {
+      "2": 1
+    },
+    "oneCallWithTools": 0
+  },
+  "notCovered": [
+    {
+      "type": "7-count-limits",
+      "reason": "Count limits (max 3 toppings) need the learned Doughhouse kiosk, which has no LearnedAdapter yet."
+    }
+  ],
+  "results": [
+    {
+      "id": "c-en-grandson-not-spicy",
+      "kioskId": "malo",
+      "type": "10-colloquial",
+      "group": "colloquial",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "hot_coffee",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "chicken_nuggets"
+          },
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bulgogi_burger"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 12528,
+          "firstToolMs": 9903,
+          "rounds": [
+            9789,
+            2490
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

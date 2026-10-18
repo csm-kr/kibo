@@ -1,0 +1,117 @@
+{
+  "date": "2026-10-18T07:45:58.654Z",
+  "model": "gemini-3.8-flash",
+  "backend": "auto",
+  "modelCallsByBackend": {
+    "api": 2,
+    "vertex": 0
+  },
+  "thinkingLevel": "low",
+  "evalClock": "14:00 KST",
+  "subset": [
+    "c-en-grandson-not-spicy"
+  ],
+  "cases": 1,
+  "passed": 1,
+  "passRate": 1,
+  "byGroup": {
+    "colloquial": {
+      "pass": 1,
+      "total": 1
+    }
+  },
+  "byKiosk": {
+    "malo": {
+      "pass": 1,
+      "total": 1
+    }
+  },
+  "byType": {
+    "10-colloquial": {
+      "pass": 1,
+      "total": 1
+    }
+  },
+  "latency": {
+    "requests": 1,
+    "totalMedianMs": 10188,
+    "totalP90Ms": 10188,
+    "firstToolRequests": 1,
+    "firstToolMedianMs": 7935,
+    "firstToolP90Ms": 7935,
+    "modelCalls": 2,
+    "roundMedianMs": 2069,
+    "roundP90Ms": 7841,
+    "callsPerRequest": {
+      "2": 1
+    },
+    "oneCallWithTools": 0
+  },
+  "notCovered": [
+    {
+      "type": "7-count-limits",
+      "reason": "Count limits (max 3 toppings) need the learned Doughhouse kiosk, which has no LearnedAdapter yet."
+    }
+  ],
+  "results": [
+    {
+      "id": "c-en-grandson-not-spicy",
+      "kioskId": "malo",
+      "type": "10-colloquial",
+      "group": "colloquial",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "hot_coffee",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "bulgogi_burger"
+          },
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "chicken_nuggets"
+          },
+          {
+            "kind": "item",
+            "id": "crispy_chicken_burger"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 10188,
+          "firstToolMs": 7935,
+          "rounds": [
+            7841,
+            2069
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
