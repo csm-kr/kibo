@@ -240,11 +240,10 @@ test.describe("/demo", () => {
     await expect(root.getByRole("heading", { name: "購入内容をご確認ください" })).toBeVisible();
     await expect(step).toHaveText("Ticket review: nothing is paid until you confirm.");
     await command(request, deviceToken, { sessionId, type: "confirmCheckout", args: {}, source: "button", cartVersion: checkout.cartVersion });
-    await expect(root.getByRole("heading", { name: "お支払い方法を選んでください" })).toBeVisible();
+    // The phone confirmed on a card-only kiosk, so KIBO picks カード and the card step opens (I-427).
     // KIBO's step line stays English (it names the Korean kiosk's own labels, docs/ISSUE.md).
-    await expect(step).toHaveText(/^Payment: tap /);
+    await expect(step).toHaveText(/^Payment: insert your card/);
     expect(await step.innerText()).not.toMatch(/[\p{Script=Hiragana}\p{Script=Katakana}]/u);
-    await root.getByRole("button", { name: "カード", exact: true }).click();
     await root.getByRole("button", { name: "カードを入れる" }).click();
     await root.getByRole("button", { name: "発行しない" }).click();
     await expect(root.getByRole("heading", { name: "受付番号" })).toBeVisible();
