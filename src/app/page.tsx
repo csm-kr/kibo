@@ -401,7 +401,7 @@ export default function Home() {
         </article>
         <Sources
           paths={[
-            "evals/results/2026-10-15T09-56.md",
+            "evals/results/2026-10-18T16-28.md",
             "evidence/voice-e2e.json",
             "evidence/voice-e2e-relay.json",
             "spikes/blind-kiosks/ROUND4.md",

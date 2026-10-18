@@ -92,6 +92,15 @@ export function AppHome() {
           </ol>
         </section>
 
+        <section aria-labelledby="demo" className={`${CARD} flex flex-col gap-3`}>
+          <h2 id="demo" className="text-xl font-bold">
+            {pt("noKioskNearby", locale)}
+          </h2>
+          <a href="/demo" className={SECONDARY}>
+            {pt("openDemo", locale)}
+          </a>
+        </section>
+
         <section aria-labelledby="settings" className={`${CARD} flex flex-col gap-4`}>
           <h2 id="settings" className="text-xl font-bold">
             {pt("settings", locale)}

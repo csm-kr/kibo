@@ -205,6 +205,9 @@ const PHONE_TEXT = {
   scanKiosk: { ko: "키오스크 QR 찍기", en: "Scan a kiosk" },
   continueOrder: { ko: "하던 주문 이어서 하기", en: "Continue my order" },
   howTitle: { ko: "이렇게 써요", en: "How it works" },
+  // The video's QR and the bare short host land here; a judge on a laptop needs a way to /demo (mock judging 10-18).
+  noKioskNearby: { ko: "근처에 KIBO 키오스크가 없나요?", en: "No KIBO kiosk nearby?" },
+  openDemo: { ko: "라이브 데모 열기", en: "Open the live demo" },
   appStep1: { ko: "키오스크 화면의 번호를 넣거나 QR을 찍어요.", en: "Enter the code on the kiosk screen, or scan its QR." },
   appStep2: { ko: "휴대폰에 주문을 말해요.", en: "Tell your phone what you want." },
   appStep3: { ko: "주문을 확인하고, 키오스크에서 결제해요.", en: "Check your order, then pay at the kiosk." },
