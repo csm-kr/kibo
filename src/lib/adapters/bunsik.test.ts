@@ -77,11 +77,21 @@ describe("skills/bunsik.json", () => {
     for (const i of skill.catalog) expect(i.name.ko).toBe(i.label);
   });
 
-  it("keeps every item and price of the kiosk page, and the page is the blind kiosk's app unchanged", () => {
+  it("keeps every item and price of the kiosk page, and the page is the blind kiosk's app with only its photos added", () => {
     const dir = join(publicDir, "learned-kiosks/bunsik");
     const spike = join(process.cwd(), "spikes/blind-kiosks/bk9-bunsik/app");
-    expect(readdirSync(dir).sort()).toEqual(readdirSync(spike).sort());
-    for (const f of readdirSync(spike)) expect(readFileSync(join(dir, f)).equals(readFileSync(join(spike, f))), f).toBe(true);
+    const read = (d: string, f: string) => readFileSync(join(d, f), "utf8");
+    expect(readdirSync(dir).filter((f) => f !== "img").sort()).toEqual(readdirSync(spike).sort());
+    for (const f of ["index.html", "menu.js"]) expect(read(dir, f), f).toBe(read(spike, f));
+    // Food photos (10-18, after learning): each thumbnail names its item in a data-img attribute, nothing else in the
+    // app changed, and the stylesheet only gains a block at its end. The page's text and labels stay as learned.
+    const app = read(spike, "app.js")
+      .replace("  function thumb(it, cls) {\n", "  function thumb(it, cls) {\n    var img = it.id ? ' data-img=\"' + it.id + '\"' : '';\n")
+      .replace(" t-gimbap\"><div class=\"roll", " t-gimbap\"' + img + '><div class=\"roll")
+      .replace(" t-' + it.cat + '\"><span", " t-' + it.cat + '\"' + img + '><span");
+    expect(read(dir, "app.js")).toBe(app);
+    expect(read(dir, "style.css").startsWith(read(spike, "style.css"))).toBe(true);
+    expect(read(dir, "style.css").slice(read(spike, "style.css").length)).toMatch(/^\n\/\* ---------- food photos \(10-18, added after learning\)/);
     const menu = readFileSync(join(dir, "menu.js"), "utf8");
     for (const item of skill.catalog) {
       // 로제 떡볶이 is on today's discount: the kiosk charges its promo price.

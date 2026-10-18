@@ -37,8 +37,9 @@
   function dineText() { return S.dine === 'eatin' ? '매장 식사' : '포장 주문'; }
 
   function thumb(it, cls) {
-    if (it.roll) return '<div class="thumb ' + (cls || '') + ' t-gimbap"><div class="roll r-' + it.roll + '"><i></i><i></i><i></i><i></i></div></div>';
-    return '<div class="thumb ' + (cls || '') + ' t-' + it.cat + '"><span class="emo">' + it.icon + '</span></div>';
+    var img = it.id ? ' data-img="' + it.id + '"' : '';
+    if (it.roll) return '<div class="thumb ' + (cls || '') + ' t-gimbap"' + img + '><div class="roll r-' + it.roll + '"><i></i><i></i><i></i><i></i></div></div>';
+    return '<div class="thumb ' + (cls || '') + ' t-' + it.cat + '"' + img + '><span class="emo">' + it.icon + '</span></div>';
   }
 
   /* selections: single/multi -> [optionId,...], quantity -> {optionId: n} */
