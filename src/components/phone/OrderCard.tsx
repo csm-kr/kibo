@@ -27,7 +27,7 @@ export function OrderLines({ kiosk, cart, locale }: { kiosk: KioskData; cart: Ca
         return (
           // The name never shrinks below its longest word; when the row cannot also hold the price (320px wide), the
           // price wraps to its own row on the right instead of running into the name.
-          <li key={line.lineId} className="flex flex-wrap items-start gap-x-3 gap-y-1 py-3">
+          <li key={line.lineId} data-line-id={line.lineId} className="flex flex-wrap items-start gap-x-3 gap-y-1 py-3">
             {/* A learned kiosk has no photos, only a placeholder that reads as a broken picture (I-103). */}
             {item && kiosk.kind !== "learned" && (
               <Image src={item.image} alt="" width={48} height={48} className="size-12 flex-none rounded-[12px] bg-cream object-cover" />

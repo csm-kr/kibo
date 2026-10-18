@@ -30,6 +30,7 @@ import { lt, uiLocale, type SpeechLanguage } from "@/lib/i18n/languages";
 import { formatWon } from "@/lib/kiosk/menu";
 import { kioskPickedCard } from "@/lib/kiosk/payment";
 import { idleWarning, staffBannerVisible } from "@/lib/kiosk/timers";
+import { followLine } from "@/lib/phone/follow";
 import { bridgeNotice, phoneScreen, type BridgeNotice, type PhoneLocal, type PhoneScreenId } from "@/lib/phone/screen";
 import { greetingKey } from "@/lib/voice/greeting";
 import { LARGE_TEXT_SCALE } from "@/lib/phone/settings";
@@ -380,16 +381,32 @@ export function AssistantPanel(props: Props) {
   // on a small phone with larger text they were left under it (15-judge-fixes:2).
   const turnRef = useRef<HTMLDivElement>(null);
   const lastId = chat.messages.at(-1)?.id ?? 0;
+  const changeAt = session?.lastChange?.at ?? 0;
+  const followedAt = useRef(0);
   const showTurn = useEffectEvent(() => {
     const turn = turnRef.current;
-    if (!turn || (lastId === 0 && !choicesShown)) return;
+    const lineId = followLine(session?.lastChange ?? null, choicesShown, Date.now() + clockOffset);
+    if (!turn || (lastId === 0 && !choicesShown && !lineId)) return;
     const bubbles = turn.querySelectorAll("[data-bubble]");
+    const last = bubbles[bubbles.length - 1] ?? turn;
+    // The kiosk follows the talk, and so does the phone: a line the talk just added or changed (its photo, sides and
+    // drink) comes into view under the reply (owner 10-18, I-430). When both do not fit, the change itself puts the
+    // line in view; a spoken reply, which lands only when the voice stops, keeps it there (it was heard), and a typed
+    // reply is read, so it goes first.
+    const line = lineId ? turn.closest("[data-phone-scroll]")?.querySelector(`[data-line-id="${CSS.escape(lineId)}"]`) : null;
+    if (line) {
+      const changed = followedAt.current !== changeAt;
+      followedAt.current = changeAt;
+      keepInView(last, line);
+      if (changed || session?.lastChange?.source !== "text") keepInView(line, line);
+      return;
+    }
     // Room for the cart summary, which appears once the card below scrolls out of view.
     const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
     const reserve = itemsInCart > 0 && !choicesShown && !summaryShown ? SUMMARY_REM * rootPx : 0;
-    keepInView(bubbles[bubbles.length - 1] ?? turn, turn, reserve, turn.querySelector("[data-choices]"));
+    keepInView(last, turn, reserve, turn.querySelector("[data-choices]"));
   });
-  useEffect(() => showTurn(), [lastId, working, choicesShown, pendingKey]);
+  useEffect(() => showTurn(), [lastId, working, choicesShown, pendingKey, changeAt]);
 
   const bridgeLine = notice && (
     <BridgeLine notice={notice} locale={locale} onCallStaff={() => void command("callStaff", { reasonCode: "user_request" })} />
