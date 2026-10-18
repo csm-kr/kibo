@@ -190,6 +190,13 @@ describe("createKeyHealth", () => {
     expect(probe).toHaveBeenCalledTimes(2);
   });
 
+  // 10-18: a spend cap or a used-up daily quota answers 429, not 402, and holds for hours; voice stayed on the key.
+  it("a 429 on the probe (spend cap, daily quota): down for 10 min, so voice takes the relay", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const capped = createKeyHealth({ probe: vi.fn().mockRejectedValue(Object.assign(new Error("cap"), { status: 429 })), now: () => 0 });
+    expect(await capped.usable()).toBe(false);
+  });
+
   it("402 or no key: down for 10 min, then probed again", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     let t = 0;
@@ -207,9 +214,9 @@ describe("createKeyHealth", () => {
     expect(await noKey.usable()).toBe(false);
   });
 
-  it("other probe errors (429, 5xx, network, timeout) say nothing about billing: usable", async () => {
+  it("other probe errors (5xx, network, timeout) say nothing about billing: usable", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
-    for (const e of [Object.assign(new Error("busy"), { status: 429 }), Object.assign(new Error("down"), { status: 503 }), new TypeError("fetch failed")]) {
+    for (const e of [Object.assign(new Error("down"), { status: 503 }), new TypeError("fetch failed")]) {
       expect(await createKeyHealth({ probe: vi.fn().mockRejectedValue(e), now: () => 0 }).usable()).toBe(true);
     }
     const hang = createKeyHealth({ probe: () => new Promise(() => {}), now: () => 0, timeoutMs: 5 });

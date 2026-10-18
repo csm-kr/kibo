@@ -43,7 +43,7 @@ export function relayHealthUrl(relayUrl: string): string {
 }
 
 export interface KeyHealth {
-  /** False when the key cannot generate (402 or missing), from a cached probe. */
+  /** False when the key cannot generate (402, 429 or missing), from a cached probe. */
   usable(): Promise<boolean>;
   /** The token issuer saw a 402 or no key: down without another probe. */
   failed(): void;
@@ -56,7 +56,8 @@ const PROBE_TIMEOUT_MS = 5_000;
 
 /** Ephemeral tokens are free and kept working with the credits used up (I-104), so the probe is one output token
  *  through generateContent on the key, like the deep health's keyGenerate. At most one probe a minute per instance;
- *  only billing (402) and a missing key mean down, other errors say nothing about billing. */
+ *  billing (402), a 429 (a spend cap or a used-up daily quota also answers 429 and holds for hours; one token a minute
+ *  is never a burst) and a missing key mean down, other errors say nothing about billing. */
 export function createKeyHealth(deps: { probe: () => Promise<unknown>; now: () => number; timeoutMs?: number }): KeyHealth {
   let state: { usable: boolean; until: number } | null = null;
   let running: Promise<boolean> | null = null;
@@ -76,7 +77,7 @@ export function createKeyHealth(deps: { probe: () => Promise<unknown>; now: () =
       const noKey = e instanceof Error && e.message === "GEMINI_API_KEY is not set";
       // Name and status only: upstream messages can carry request data.
       console.error("voice key probe:", `${e instanceof Error ? e.name : typeof e}${status === undefined ? "" : ` ${String(status)}`}`);
-      return !(status === 402 || noKey);
+      return !(status === 402 || status === 429 || noKey);
     } finally {
       clearTimeout(timer);
     }
