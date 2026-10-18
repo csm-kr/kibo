@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { CARD, FOCUS, PRIMARY, SECONDARY } from "@/components/phone/ui";
-import { DEMO_ENVIRONMENTS, demoHref } from "@/components/demo/environments";
+import { demoHref, offeredPlaces } from "@/components/demo/environments";
 import { SESSION_TTL_MS } from "@/lib/commands/session";
 import { LEARN_ALL_ROUNDS, LEARN_HEADLINE, LEARN_HEADLINE_DETAIL } from "@/lib/learn/headline";
 import { repoLink } from "@/lib/repo";
@@ -260,16 +260,17 @@ export default function Home() {
         <h2 id="places" className={H2}>
           One phone, many kiosks
         </h2>
-        <p>The same phone, the same way of talking, four different places. Each one opens a working kiosk.</p>
-        <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {DEMO_ENVIRONMENTS.map((env) => (
+        {/* The two direct kiosks only (owner 10-18, I-426); the learned ones open from their own links. */}
+        <p>The same phone, the same way of talking, two different places. Each one opens a working kiosk.</p>
+        <ul className="grid gap-6 sm:grid-cols-2">
+          {offeredPlaces().map((env) => (
             <li key={env.kioskId} className={`${CARD} flex flex-col gap-4`}>
               <Image
                 src={env.image}
                 alt={`The top of the ${env.short} kiosk screen, in Korean`}
                 width={800}
                 height={600}
-                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                sizes="(min-width: 640px) 50vw, 100vw"
                 className="h-auto w-full rounded-[12px] border border-[#E2DACB]"
               />
               <h3 className="font-bold text-[#15171C]">{env.place.en}</h3>
@@ -373,12 +374,6 @@ export default function Home() {
               value="Our pizza kiosk: learned in 5.2 min, 4 of 4 unseen orders replayed without AI"
               detail="Doughhouse, the kiosk the learner was developed on, so not a blind test; a planted rule break was also caught"
             />
-            <Link href="/demo?k=doughhouse" className={SECONDARY}>
-              Try the learned pizza kiosk
-            </Link>
-            <Link href="/learn" className={SECONDARY}>
-              Watch KIBO learn a new kiosk
-            </Link>
           </article>
         </div>
         <article className={`${CARD} flex flex-col gap-4`}>

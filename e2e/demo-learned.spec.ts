@@ -63,11 +63,12 @@ test("learned pizza kiosk on /demo: the bridge enters the order, the phone never
   await expect(page.locator("[data-pay-on-kiosk]")).toHaveText("Your order is on the kiosk. Tap 주문하기 (Order) on the kiosk and pay there.");
   await expect(page.getByRole("button", { name: "Yes, pay now" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Kiosk: insert card (demo)" })).toHaveCount(0);
-  // D3 for a learned kiosk: what happens next, [Try again] and the three other places.
+  // D3 for a learned kiosk: what happens next, [Try again] and the two offered places (I-426).
   await expect(page.locator("[data-demo-end]")).toContainText("you would now pay on the kiosk itself");
   const others = page.getByRole("navigation", { name: "Try another place" });
   await expect(others.getByRole("link", { name: "Burger shop" })).toHaveAttribute("href", "/demo?k=malo");
   await expect(others.getByRole("link", { name: "Airport rail" })).toHaveAttribute("href", "/demo?k=airport_rail");
+  await expect(others.getByRole("link")).toHaveText(["Burger shop", "Airport rail"]);
 
   await page.getByRole("button", { name: "Pick more" }).click();
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "talk");

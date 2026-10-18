@@ -39,12 +39,12 @@ const places = (page: Page) => bar(page).getByRole("navigation", { name: "Places
 async function expectBar(page: Page, current: string, at: string) {
   await expect(bar(page).getByRole("img", { name: "KIBO" }), at).toBeVisible();
   await expect(bar(page).getByText("Live demo", { exact: true }), at).toBeVisible();
+  // The two direct kiosks only; a learned kiosk gets a tab only while it is the current place (I-426).
   const hrefs = {
     "Burger shop": "/demo?k=malo",
     "Airport rail": "/demo?k=airport_rail",
-    "Pizza shop": "/demo?k=doughhouse",
-    "Bunsik shop": "/demo?k=bunsik",
   };
+  await expect(places(page).getByRole("link"), at).toHaveText(Object.keys(hrefs));
   for (const [name, href] of Object.entries(hrefs)) {
     const tab = places(page).getByRole("link", { name, exact: true });
     await expect(tab, `${at}: ${name}`).toHaveAttribute("href", href);
@@ -67,7 +67,7 @@ test("D1, D2 and D3 share one top bar: KIBO, Live demo, the place tabs with the 
     await page.keyboard.press("Tab");
     reached.push(await page.evaluate(() => document.activeElement?.textContent?.trim() ?? ""));
   }
-  expect(reached).toEqual(expect.arrayContaining(["Burger shop", "Airport rail", "Pizza shop"]));
+  expect(reached).toEqual(expect.arrayContaining(["Burger shop", "Airport rail"]));
 
   const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
   await page.getByRole("button", { name: "Try it on this screen" }).click();
@@ -95,8 +95,8 @@ test.describe(() => {
   test("a place tab starts that place fresh; with order lines not yet paid it asks first (#1 E, N5)", async ({ page, request }) => {
     // An empty order: straight to the other place's start, as Try another place does.
     await start(page);
-    await places(page).getByRole("link", { name: "Pizza shop" }).click();
-    await expect(page).toHaveURL(/\/demo\?k=doughhouse$/);
+    await places(page).getByRole("link", { name: "Airport rail" }).click();
+    await expect(page).toHaveURL(/\/demo\?k=airport_rail$/);
     await expect(page.getByRole("button", { name: "Try it on this screen" })).toBeVisible();
 
     // Lines in the order: one plain question first; keeping the order changes nothing.
@@ -143,9 +143,9 @@ test.describe(() => {
     await page.getByRole("button", { name: "Yes, pay now" }).click();
     await page.getByRole("button", { name: "Kiosk: insert card (demo)" }).click();
     await expect(page.locator("[data-demo-end]")).toBeVisible();
-    await places(page).getByRole("link", { name: "Pizza shop" }).click();
+    await places(page).getByRole("link", { name: "Airport rail" }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
-    await expect(page).toHaveURL(/\/demo\?k=doughhouse$/);
+    await expect(page).toHaveURL(/\/demo\?k=airport_rail$/);
   });
 });
 
@@ -369,7 +369,7 @@ test.describe(() => {
   });
 });
 
-test("D1: four equal place cards two by two, descriptions of a row start on one line, the /learn links sit in a box, no dark outlines, a balanced headline (#1 6, I-414)", async ({ page }) => {
+test("D1: two equal place cards side by side, the direct kiosks only, descriptions on one line, no dark outlines, a balanced headline (#1 6, I-414, I-426)", async ({ page }) => {
   await page.goto("/demo");
   await expect(page.getByRole("button", { name: "Try it on this screen" })).toBeVisible({ timeout: 60_000 });
   for (const vp of SIZES) {
@@ -392,18 +392,12 @@ test("D1: four equal place cards two by two, descriptions of a row start on one 
           h: boxes[i].height,
           img: { w: img.width, h: img.height },
           titleLines: Math.round(title.getBoundingClientRect().height / lh),
-          contentLeft: img.left,
         };
       });
-      // The nearest painted box around the /learn links, and the card rows it should span.
-      const link = [...intro.querySelectorAll("a")].find((a) => a.textContent?.trim() === "How KIBO learned the pizza kiosk")!;
-      const link2 = [...intro.querySelectorAll("a")].find((a) => a.textContent?.trim() === "How KIBO learned the bunsik shop kiosk")!;
-      let box: Element | null = link;
-      while (box && getComputedStyle(box).backgroundColor === "rgba(0, 0, 0, 0)") box = box.parentElement;
-      const b = box!.getBoundingClientRect();
-      const first = boxes[0];
-      const last = boxes[boxes.length - 1];
-      const links = [link, link2].map((l) => ({ left: l.getBoundingClientRect().left, inBox: box!.contains(l) }));
+      // No card or link leads to a learned kiosk or its /learn run from the default D1 (I-426).
+      const learnedLinks = [...intro.querySelectorAll("a")]
+        .map((a) => a.getAttribute("href") ?? "")
+        .filter((h) => /doughhouse|bunsik|^\/learn/.test(h));
       // Dark 2px outlines: borders of 2px or more in a dark colour (I-165).
       const dark = [...intro.querySelectorAll<HTMLElement>("*")].filter((el) => {
         const cs = getComputedStyle(el);
@@ -432,23 +426,23 @@ test("D1: four equal place cards two by two, descriptions of a row start on one 
         // Under the top bar D1 still fits the judge sizes whole, as it did before the frame.
         hidden: intro.scrollHeight - intro.clientHeight,
         cards: cards.length,
+        names: cards.map((c) => c.querySelector("img + span > span")!.textContent?.trim()),
         each,
-        links,
-        box: { painted: getComputedStyle(box!).backgroundColor, shadow: getComputedStyle(box!).boxShadow, left: b.left - first.left, right: b.right - last.right },
+        learnedLinks,
         dark,
         wrap: getComputedStyle(h1).textWrapStyle,
         lone,
       };
     });
-    expect(m.cards, at).toBe(4);
+    expect(m.cards, at).toBe(2);
+    expect(m.names, at).toEqual(["Burger shop", "Airport rail"]);
+    expect(m.learnedLinks, `${at}: links to learned kiosks`).toEqual([]);
     expect(m.hidden, `${at}: D1 cut under the fold`).toBeLessThanOrEqual(0);
     if (vp.width >= 900) {
-      const [a, b, c, d] = m.each;
-      // Two by two: two rows of two cards.
-      expect([a.top === b.top, c.top === d.top, c.top > a.top], `${at}: card tops ${m.each.map((e) => e.top).join(", ")}`).toEqual([true, true, true]);
-      for (const [x, y] of [[a, b], [c, d]]) {
-        expect(Math.abs(x.persona - y.persona), `${at}: description tops of a row ${x.persona}, ${y.persona}`).toBeLessThanOrEqual(1);
-      }
+      const [a, b] = m.each;
+      // Side by side: one row of two cards.
+      expect(a.top === b.top, `${at}: card tops ${m.each.map((e) => e.top).join(", ")}`).toBe(true);
+      expect(Math.abs(a.persona - b.persona), `${at}: description tops of the row ${a.persona}, ${b.persona}`).toBeLessThanOrEqual(1);
       for (const e of m.each) {
         expect(Math.abs(e.w - a.w), `${at}: card widths ${m.each.map((x) => x.w).join(", ")}`).toBeLessThanOrEqual(1);
         expect(Math.abs(e.h - a.h), `${at}: card heights ${m.each.map((x) => x.h).join(", ")}`).toBeLessThanOrEqual(1);
@@ -456,14 +450,7 @@ test("D1: four equal place cards two by two, descriptions of a row start on one 
         expect(Math.abs(e.img.w / e.img.h - 4 / 3), `${at}: pictures 4:3`).toBeLessThanOrEqual(0.02);
         expect(e.titleLines, `${at}: a place name on one line`).toBe(1);
       }
-      expect(Math.abs(m.box.left), `${at}: the /learn box spans the card rows (left)`).toBeLessThanOrEqual(1);
-      expect(Math.abs(m.box.right), `${at}: the /learn box spans the card rows (right)`).toBeLessThanOrEqual(1);
-      // Each /learn link starts under its own card's content (the pizza card left, the bunsik shop card right).
-      expect(Math.abs(m.links[0].left - c.contentLeft), `${at}: pizza link under its card`).toBeLessThanOrEqual(1);
-      expect(Math.abs(m.links[1].left - d.contentLeft), `${at}: bunsik shop link under its card`).toBeLessThanOrEqual(1);
     }
-    expect(m.links.every((l) => l.inBox), `${at}: both /learn links in the box`).toBe(true);
-    expect(m.box.painted, `${at}: the /learn links sit in a white box`).toBe("rgb(255, 255, 255)");
     expect(m.dark, `${at}: dark 2px outlines`).toBe(0);
     expect(m.wrap, `${at}: headline`).toBe("balance");
     expect(m.lone, `${at}: headline words alone on a line`).toEqual([]);
