@@ -171,6 +171,11 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
           "If the latest dineOption is eat_in or take_out, the user already chose it on the phone: never ask again.",
           `A message that starts with "${PHONE_NOTE}" comes from the phone, not the user: take it as the order now and do not answer it.`,
           "Ask \"Eat here or take out?\" only when dineOption is null and the order needs it, then call setDineOption.",
+          // Eval l-ja-order, 10-18 (I-409): the line above let the model ask instead of adding. A learned kiosk asks
+          // first, in its own section.
+          ...(kiosk.learned
+            ? []
+            : ["On this kiosk the order comes first: call addToCart for what the user ordered before anything else; you may ask eat here or take out after that, never instead of it."]),
           // The phone keeps the message and sends it again after the dine tap (15-judge-fixes:1).
           "NEEDS_CHOICE with pick_dine: call offerChoices with it and ask eat here or take out. Never ask the user to repeat the order: after the tap the phone sends it again.",
         ]

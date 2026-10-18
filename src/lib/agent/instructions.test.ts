@@ -183,6 +183,14 @@ describe("buildInstructions", () => {
     expect(buildInstructions(getKiosk("airport_rail"), { locale: "en" })).not.toContain(LINE);
   });
 
+  // Eval l-ja-order, 10-18 (I-409): a Japanese order on MALO got only the dine buttons and an empty cart.
+  it("a direct kiosk adds the order first and never asks the dine option instead; a learned kiosk keeps dine first", () => {
+    const LINE = "On this kiosk the order comes first: call addToCart for what the user ordered before anything else; you may ask eat here or take out after that, never instead of it.";
+    expect(text).toContain(LINE);
+    expect(buildInstructions(getKiosk("doughhouse"), { locale: "en" })).not.toContain(LINE);
+    expect(buildInstructions(getKiosk("airport_rail"), { locale: "en" })).not.toContain(LINE);
+  });
+
   // QA 10-18: "키오스크 메뉴 보여줘" changed nothing on the kiosk; a learned kiosk's own page shows its menu.
   it("a menu request moves the kiosk with showMenu, also with the buttons; never on a learned kiosk", () => {
     const LINES = [
