@@ -18,7 +18,7 @@ Not injected into harness steps (lives under `docs/plan/`).
 2. Prototype link: the Cloud Run URL of **`/demo`**
 3. Deck PDF on the mandatory template, ≤ 5 MB
 4. Public GitHub repo (https)
-5. Demo video link: rules say strictly under 3 minutes → **≤ 2:50**, public YouTube, English captions
+5. Demo video link: the public Terms (re-read 10-18) say "a video demonstration strictly three to four minutes in length"; the FAQ still says under 3 minutes and the form field "up to 3 minutes", so the final cut is **3:00.6** (v4.6), public YouTube, English captions
 6. Solution description ≤ 1,024 characters, naming how Firebase/Firestore, Cloud Run and Gemini are used
 
 ## Solution description (draft)
@@ -48,7 +48,7 @@ Talk to your own phone, and the self-order kiosk already there fills its own car
 - gitleaks over the whole history before making the repo public.
 
 ## Video (3:00.6, English)
-Final v4.6 (10-18, 3:00.6; the Terms ask for three to four minutes). v4.5 (2:42.0) is the fallback. The v4.3 beat sheet is `videos/orchestrator/video-v4/PLAN-draft.md`; what changed since and every check on the final files are in `REPORT-v4.4.md` to `REPORT-v4.6.md` there (git-ignored). Real screens throughout; scenes in order:
+Final v4.6 (10-18, 3:00.6; the Terms ask for three to four minutes). v4.5 (2:42.0) is not a fallback any more: it still shows 80/82. The v4.3 beat sheet is `videos/orchestrator/video-v4/PLAN-draft.md`; what changed since and every check on the final files are in `REPORT-v4.4.md` to `REPORT-v4.6.md` there (git-ignored). Real screens throughout; scenes in order:
 
 | Scene | What it shows |
 |---|---|
