@@ -489,6 +489,15 @@ describe("chatInstructions (static system for the prompt cache, the order per re
     expect(chatInstructions(k, full).system).not.toContain(GREETING_NOTE);
   });
 
+  // Owner 10-18: on a kiosk with dine options the greeting asks eat here or take out, so the answer must set it and
+  // the kiosk moves on; a ticket kiosk never asks it.
+  it("voice on a dine kiosk: an answer to the greeting's dine question calls setDineOption; tickets have no such line", () => {
+    const line = "When the greeting asked eat here or take out and the user answers it, call setDineOption.";
+    expect(buildInstructions(k, full)).toContain(line);
+    expect(chatInstructions(k, full).system).not.toContain(line);
+    expect(buildInstructions(getKiosk("airport_rail"), full)).not.toContain(line);
+  });
+
   it("voice keeps one text with the same rules, order and menu (the Live token pins it)", () => {
     const text = buildInstructions(k, full);
     const { system, currentOrder } = chatInstructions(k, full);

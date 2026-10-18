@@ -26,16 +26,18 @@ type OrderOptions = {
 
 // Voice only: the phone greets through Live when voice opens (owner 10-17); the text agent never gets the note, so its
 // cached system text stays as it was.
-const VOICE_RULES = [
+const voiceRules = (kiosk: KioskData) => [
   "## Greeting",
   `A message that starts with "${GREETING_NOTE}" comes from the phone when voice opens, not from the user: say the sentence after it once, word for word, then wait for the user. Call no tool for it.`,
+  // On a kiosk with dine options the greeting asks what K2 and P2 ask (owner 10-18, I-420).
+  ...(kiosk.dineOptions ? ["When the greeting asked eat here or take out and the user answers it, call setDineOption."] : []),
   "",
 ];
 
 /** Gemini Live: one text, pinned in the ephemeral token with the order as it was when the token was issued. */
 export function buildInstructions(kiosk: KioskData, opts: OrderOptions): string {
   const { rules, order, menu } = parts(kiosk, opts);
-  return [...rules, ...VOICE_RULES, ...order, ...menu].join("\n");
+  return [...rules, ...voiceRules(kiosk), ...order, ...menu].join("\n");
 }
 
 /**

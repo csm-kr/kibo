@@ -33,6 +33,8 @@ const PHONE_TEXT = {
   // The AI's first line, spoken when voice opens and the first bubble when typing (owner 10-17); AI-only languages in
   // languages.ts.
   greeting: { ko: "안녕하세요! 무엇을 드릴까요? 말씀만 하세요.", en: "Hi! What would you like? Just say it." },
+  // While K2 and P2 ask eat here or take out, the greeting asks it too, in dineQuestion's words (owner 10-18, I-420).
+  greetingDine: { ko: "안녕하세요! 드시고 가세요, 포장하세요?", en: "Hi! Eat here or take out?" },
   // Dine
   dineQuestion: { ko: "드시고 가세요, 포장하세요?", en: "Eat here or take out?" },
   dineOrTalk: { ko: "아니면 바로 주문을 말해 주세요.", en: "Or just tell me your order." },

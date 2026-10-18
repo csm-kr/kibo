@@ -51,7 +51,7 @@ describe("POST /api/live-token", () => {
     expect(res.status).toBe(200);
     expect(text).not.toContain(KEY);
     const body = JSON.parse(text);
-    expect(body).toMatchObject({ ok: true, mode: "direct", token: "auth_tokens/abc", model: "gemini-3.8-live", voiceSeconds: 180 });
+    expect(body).toMatchObject({ ok: true, mode: "direct", token: "auth_tokens/abc", model: "gemini-3.8-live", voiceSeconds: 600 });
     expect(typeof body.expiresAt).toBe("number");
     // The instructions travel inside the token, not to the browser.
     expect(text).not.toContain("menu_data");

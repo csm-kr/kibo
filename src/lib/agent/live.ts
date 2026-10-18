@@ -39,13 +39,14 @@ export interface LiveTokenDeps {
 }
 
 /** Every start and every reconnect needs a token, and a tap while connecting starts again, so /demo has room for
- *  a few (2 ran out after one stop and start, I-410); its voice time stays 3 min a start. */
+ *  a few (2 ran out after one stop and start, I-410). */
 const SESSION_LIMIT = 6;
 const DEMO_SESSION_LIMIT = 6;
 export const liveTokenLimit = (demo: boolean) => (demo ? DEMO_SESSION_LIMIT : SESSION_LIMIT);
 const DAILY_LIMIT = 200;
 const VOICE_SECONDS = 600;
-const DEMO_VOICE_SECONDS = 180;
+/** A real phone's 10 min: 3 min ran out mid-order on /demo (owner 10-18, I-421); the daily limit bounds the cost. */
+const DEMO_VOICE_SECONDS = 600;
 /** The phone connects right after it gets the token. */
 const NEW_SESSION_MS = 60_000;
 export const BUSY = "Voice is busy right now. Please type instead.";
@@ -53,9 +54,10 @@ export const VOICE_UNAVAILABLE = "Voice is not available right now. Please type 
 /** This order's own tokens are used up: said plainly, because "busy" read as the server failing (I-410). */
 export const voiceUsedUp = () =>
   new CommandError("RATE_LIMITED", "Voice time for this order is up. Please type instead.", { limit: "session" });
-/** End of speech after 700 ms of silence: short answers ("네") sometimes waited 3.5–8.9 s with the default
- *  (spikes/voice-compare/RESULTS.md); not shorter, so slow speakers' pauses do not end their turn. */
-const SILENCE_MS = 700;
+/** End of speech after 1,000 ms of silence: short answers ("네") sometimes waited 3.5–8.9 s with the default
+ *  (spikes/voice-compare/RESULTS.md); 700 ms cut the owner off between words (10-18, I-422), so slow speakers'
+ *  pauses get a little more room. */
+const SILENCE_MS = 1000;
 
 /** The Gemini API key cannot serve voice (prepaid credits used up, HTTP 402, or no key). With
  *  GEMINI_LIVE_BACKEND=auto the phone then goes to the Vertex relay (src/lib/agent/liveBackend.ts). */
