@@ -395,7 +395,11 @@ export function AssistantPanel(props: Props) {
   // A learned kiosk undoes only the last add that made a new line, and nothing while the kiosk is still busy.
   const waiting = notice === "pending" || notice === "slow";
   const undoable = session !== null && (learned ? learnedUndoLine(session) !== null : session.undoStack.length > 0);
-  const placeholder = learned ? pt("learnedPlaceholder", locale) : ticket ? pt("ticketPlaceholder", locale) : undefined;
+  const placeholder = learned
+    ? pt(kiosk.kioskId === "bunsik" ? "snackPlaceholder" : "learnedPlaceholder", locale)
+    : ticket
+      ? pt("ticketPlaceholder", locale)
+      : undefined;
   const secondsLeft = mode === "demo" && voice.secondsLeft !== null && voice.secondsLeft < SHOW_VOICE_LEFT ? voice.secondsLeft : null;
   const suggestions = !limited && <Suggestions examples={props.examples ?? []} locale={locale} disabled={busy} onPick={say} />;
   // /demo with an empty cart: the examples before the empty card, which pushed every one under the dock on a laptop

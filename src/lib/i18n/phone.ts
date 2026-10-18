@@ -53,6 +53,8 @@ const PHONE_TEXT = {
   // (I-133, R-019, #1 8, #1 30; measured in e2e/qa/assistant.qa.spec.ts and demo.qa.spec.ts).
   inputPlaceholder: { ko: "예: 버거 세트", en: "e.g. Burger set" },
   learnedPlaceholder: { ko: "예: 페퍼로니", en: "e.g. Pepperoni" },
+  // The snack bar, the second learned kiosk (I-413); no longer than the burger hint.
+  snackPlaceholder: { ko: "예: 떡볶이", en: "e.g. Tteokbokki" },
   ticketPlaceholder: { ko: "예: 어른 2장", en: "e.g. 2 adults" },
   send: { ko: "보내기", en: "Send" },
   useButtons: {
