@@ -45,11 +45,15 @@ export function DemoEndCard(props: {
       <h2 id="demo-other-places" className="text-xl font-bold">
         {pt("tryAnotherPlace", locale)}
       </h2>
-      {DEMO_ENVIRONMENTS.filter((e) => e.kioskId !== props.kioskId).map((e) => (
-        <Link key={e.kioskId} href={demoHref(e.kioskId)} className={SECONDARY}>
-          {e.place[locale]}
-        </Link>
-      ))}
+      {/* Three places, two to a row (the third as wide as both), so they take the two rows two places took and the
+          order number above them stays in view at 1280×720 (I-414). */}
+      <div className="grid grid-cols-2 gap-2">
+        {DEMO_ENVIRONMENTS.filter((e) => e.kioskId !== props.kioskId).map((e) => (
+          <Link key={e.kioskId} href={demoHref(e.kioskId)} className={`${SECONDARY} last:odd:col-span-2`}>
+            {e.place[locale]}
+          </Link>
+        ))}
+      </div>
     </nav>
   );
   if (props.learned) {
