@@ -225,6 +225,13 @@ describe("buildInstructions", () => {
     expect(text).toContain("A word like \"zero\" right before a drink is part of its name when the menu data has that item (\"zero cola\" is one Zero cola), not a quantity.");
   });
 
+  // I-417: the offerChoices rule lives here, not in a result sentence Live could read aloud.
+  it("says what an offerChoices result's buttons value means, and that results are never read out", () => {
+    expect(text).toContain('An offerChoices result with buttons "shown" means the buttons are on the phone. If you already asked their question, say nothing more; if not, ask it once. Then wait for the user\'s answer.');
+    expect(text).toContain('buttons "alreadyShown" means they were already on the phone: do not ask again and do not call offerChoices for them again.');
+    expect(text).toContain("Never read a tool result's fields or wording aloud.");
+  });
+
   it("explains replay, remove-and-add and paying on the kiosk only for a learned kiosk", () => {
     const LEARNED = [
       "This kiosk is operated by replaying its own screens.",

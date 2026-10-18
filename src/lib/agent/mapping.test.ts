@@ -241,15 +241,19 @@ describe("toolResult", () => {
 
   // 10-17 on a real iPhone: after a refusal Live offered the same drinks three times and spoke the question twice; the
   // result said nothing about the buttons.
-  it("tells the model the buttons are on the phone now, and to ask once", () => {
-    const offered = toolResult(k, "en", { ok: true, response: { ...response, result: {} } }, "offerChoices") as { message?: string };
-    expect(offered.message).toBe("The buttons are on the phone now. Ask their question only once, then wait for the user's answer.");
+  // 10-18 (I-417): Gemini Live read the result's sentence ("The buttons are on the phone now. …") aloud as its own turn,
+  // so the result now carries a value and the rule for it lives in the instructions.
+  it("marks the buttons as shown, or as already shown, with a value and no sentence a voice could read out", () => {
+    const offered = toolResult(k, "en", { ok: true, response: { ...response, result: {} } }, "offerChoices") as Record<string, unknown>;
+    expect(offered.buttons).toBe("shown");
+    expect(offered).not.toHaveProperty("message");
     // The same offer again (a repeat dropped on the phone, or a retried call): nothing new is on screen.
-    const again = toolResult(k, "en", { ok: true, response: { ...response, result: {}, duplicate: true } }, "offerChoices") as { message?: string };
-    expect(again.message).toBe("These buttons are already on the phone. Do not ask again and do not call offerChoices for them again; wait for the user's answer.");
+    const again = toolResult(k, "en", { ok: true, response: { ...response, result: {}, duplicate: true } }, "offerChoices") as Record<string, unknown>;
+    expect(again.buttons).toBe("alreadyShown");
+    expect(again).not.toHaveProperty("message");
     // Other tools keep their plain result.
-    expect(toolResult(k, "en", { ok: true, response: { ...response, result: {} } }, "addToCart")).not.toHaveProperty("message");
-    expect(toolResult(k, "en", { ok: true, response: { ...response, result: {} } })).not.toHaveProperty("message");
+    expect(toolResult(k, "en", { ok: true, response: { ...response, result: {} } }, "addToCart")).not.toHaveProperty("buttons");
+    expect(toolResult(k, "en", { ok: true, response: { ...response, result: {} } })).not.toHaveProperty("buttons");
   });
 
   it("keeps a plain error small", () => {

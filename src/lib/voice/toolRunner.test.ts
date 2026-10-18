@@ -289,8 +289,8 @@ describe("repeated offers", () => {
   };
   // The same buttons, keys and choices in another order.
   const SAME = { choices: [{ id: "zero_cola", kind: "option" }, { id: "cola", kind: "option" }], templateId: "pick_option" };
-  const OFFERED = "The buttons are on the phone now. Ask their question only once, then wait for the user's answer.";
-  const ALREADY = "These buttons are already on the phone. Do not ask again and do not call offerChoices for them again; wait for the user's answer.";
+  const OFFERED = "shown";
+  const ALREADY = "alreadyShown";
 
   it("answers an identical offerChoices in the same batch without sending it or listing it", async () => {
     const actions: AgentAction[] = [];
@@ -303,8 +303,8 @@ describe("repeated offers", () => {
       c,
     );
     expect(c.sent.map((s) => s.commandId)).toEqual(["live-uuid:a"]);
-    expect(out[0].response).toMatchObject({ ok: true, message: OFFERED });
-    expect(out[1]).toMatchObject({ id: "b", name: "offerChoices", response: { ok: true, message: ALREADY, total: 7200 } });
+    expect(out[0].response).toMatchObject({ ok: true, buttons: OFFERED });
+    expect(out[1]).toMatchObject({ id: "b", name: "offerChoices", response: { ok: true, buttons: ALREADY, total: 7200 } });
     expect(actions.map((a) => a.tool)).toEqual(["offerChoices"]);
   });
 
@@ -314,7 +314,7 @@ describe("repeated offers", () => {
     await runToolCalls([{ id: "a", name: "offerChoices", args: DRINKS }], c);
     const second = await runToolCalls([{ id: "b", name: "offerChoices", args: DRINKS }], c);
     expect(c.sent).toHaveLength(1);
-    expect(second[0].response).toMatchObject({ message: ALREADY });
+    expect(second[0].response).toMatchObject({ buttons: ALREADY });
     // The user spoke again: a new utterance may ask the same thing again.
     await runToolCalls([{ id: "c", name: "offerChoices", args: DRINKS }], { ...c, utteranceSeq: 4 });
     expect(c.sent.map((s) => s.commandId)).toEqual(["live-uuid:a", "live-uuid:c"]);

@@ -189,6 +189,10 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
     "",
     "## Choices",
     "NEEDS_CHOICE: call offerChoices with the templateId and choices from the result, then ask one short question.",
+    // I-417: these used to be sentences in the result, which Live read aloud as its own turn.
+    'An offerChoices result with buttons "shown" means the buttons are on the phone. If you already asked their question, say nothing more; if not, ask it once. Then wait for the user\'s answer.',
+    'buttons "alreadyShown" means they were already on the phone: do not ask again and do not call offerChoices for them again.',
+    "Never read a tool result's fields or wording aloud.",
     "SOLD_OUT or UNAVAILABLE: say so plainly and offer the alternatives with offerChoices (alternatives).",
     `Ambiguous requests (${ticket ? "\"one ticket\"" : "\"one burger\""}): offer the matching items with offerChoices (pick_item), at most 6.`,
     "When the menu data can narrow a vague request (words in item names, categories, variants, kcal, allergens or badges), offer the matching items with offerChoices (pick_item) and ask one short question.",

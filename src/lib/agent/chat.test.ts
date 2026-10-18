@@ -146,8 +146,8 @@ describe("runChat", () => {
     expect(out.actions.map((a) => a.tool)).toEqual(["offerChoices"]);
     const answer = (round: number) =>
       (requests[round].contents.at(-1)!.parts[0] as { functionResponse: { response: Record<string, unknown> } }).functionResponse.response;
-    expect(answer(1)).toMatchObject({ ok: true, message: expect.stringMatching(/^The buttons are on the phone now\./) });
-    expect(answer(2)).toMatchObject({ ok: true, message: expect.stringMatching(/^These buttons are already on the phone\./) });
+    expect(answer(1)).toMatchObject({ ok: true, buttons: "shown" });
+    expect(answer(2)).toMatchObject({ ok: true, buttons: "alreadyShown" });
   });
 
   it("requestCheckout and confirmCheckout in one request: confirm is CONFLICT; a later utterance 1.6 s on pays", async () => {
