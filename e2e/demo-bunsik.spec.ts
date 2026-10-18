@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { claim, command, readClaim } from "./helpers";
 
-// /demo?k=bunsik (I-405): the snack bar kiosk a separate AI agent built and KIBO learned blind in round 4
+// /demo?k=bunsik (I-405): the bunsik shop kiosk a separate AI agent built and KIBO learned blind in round 4
 // (spikes/blind-kiosks/bk9-bunsik), shown unchanged and driven by the bridge with its reviewed skill (skills/bunsik.json).
 // No model calls: the AI's tool calls go through the command API with the demo's device token, and the bridge replays
 // each one on the real kiosk page. The order ends at the review: the user pays on the kiosk itself. @live needs E2E_LIVE=1.
@@ -36,20 +36,28 @@ async function startOnScreen(page: Page): Promise<DemoSession> {
 const kioskPage = (page: Page) => page.frameLocator("iframe[data-learned-kiosk]");
 const phoneScreen = (page: Page) => page.locator("[data-phone-screen]");
 
-test("D1 keeps its three place cards and names the snack bar, which the top bar selects (I-405)", async ({ page }) => {
+test("D1 has the bunsik shop as its fourth place card, selected, and the top bar selects it too (I-405, I-414)", async ({ page }) => {
   await openIntro(page);
   const cards = page.locator("[data-place-card]");
-  await expect(cards).toHaveCount(3);
+  await expect(cards).toHaveCount(4);
+  const card = cards.nth(3);
+  await expect(card).toContainText("Bunsik shop");
+  await expect(card).toContainText("Boribyeol Bunsik");
+  await expect(card).toHaveAttribute("href", "/demo?k=bunsik");
+  await expect(card).toHaveAttribute("aria-current", "true");
   for (let i = 0; i < 3; i++) await expect(cards.nth(i)).not.toHaveAttribute("aria-current", /.+/);
-  const extra = page.locator("[data-place-extra]");
-  await expect(extra).toContainText("Snack bar");
-  await expect(extra.getByRole("link", { name: "How KIBO learned the snack bar kiosk" })).toHaveAttribute("href", "/learn/bunsik");
-  const tab = page.locator("[data-demo-topbar]").getByRole("navigation", { name: "Places" }).getByRole("link", { name: "Snack bar" });
+  // Its picture is its own kiosk's menu, not another place's.
+  expect(await card.locator("img").getAttribute("src")).toContain("place-bunsik.webp");
+  const learned = page.locator("[data-place-learned]");
+  await expect(learned.getByRole("link", { name: "How KIBO learned the bunsik shop kiosk" })).toHaveAttribute("href", "/learn/bunsik");
+  const tab = page.locator("[data-demo-topbar]").getByRole("navigation", { name: "Places" }).getByRole("link", { name: "Bunsik shop" });
   await expect(tab).toHaveAttribute("aria-current", "page");
   await expect(tab).toHaveAttribute("href", "/demo?k=bunsik");
+  // The owner's word for the place is 분식집 / bunsik shop, never "snack bar" (I-414).
+  await expect(page.getByText(/snack bar/i)).toHaveCount(0);
 });
 
-test("snack bar on /demo: the bridge enters a tteokbokki, a set and a gimbap, undoes one, and never reaches payment", async ({ page }) => {
+test("bunsik shop on /demo: the bridge enters a tteokbokki, a set and a gimbap, undoes one, and never reaches payment", async ({ page }) => {
   const s = await startOnScreen(page);
   const kiosk = kioskPage(page);
   const kioskLines = kiosk.locator(".cart-list .ln");
@@ -119,7 +127,7 @@ test("snack bar on /demo: the bridge enters a tteokbokki, a set and a gimbap, un
 test.describe(() => {
   test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.151" } });
 
-  test("snack bar with the judge's own phone ([Start]): KIBO's panel shows the QR and code, and a claimed phone orders on the page", async ({
+  test("bunsik shop with the judge's own phone ([Start]): KIBO's panel shows the QR and code, and a claimed phone orders on the page", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
@@ -164,10 +172,10 @@ test("/learn/bunsik offers the kiosk on /demo from its first screen", async ({ p
   const link = page.locator("[data-learn-try]");
   await expect(link).toHaveAttribute("href", "/demo?k=bunsik", { timeout: 60_000 });
   await link.click();
-  await expect(page.locator("[data-place-extra]")).toContainText("Snack bar");
+  await expect(page.locator("[data-place-card][aria-current]")).toContainText("Bunsik shop");
 });
 
-test("@live typing a snack bar order reaches real Gemini and the kiosk's own cart gets the line", async ({ page }) => {
+test("@live typing a bunsik shop order reaches real Gemini and the kiosk's own cart gets the line", async ({ page }) => {
   test.skip(process.env.E2E_LIVE !== "1", "calls real Gemini; run `npm run test:e2e:live`");
   await startOnScreen(page);
   await page.getByRole("button", { name: "Eat here" }).click();

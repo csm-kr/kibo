@@ -108,7 +108,7 @@ function learnerPart(s: Skill) {
   };
 }
 
-describe("skills/bunsik.json: the reviewed snack bar on /demo is the learner's skill and plans its clicks (I-405)", () => {
+describe("skills/bunsik.json: the reviewed bunsik shop on /demo is the learner's skill and plans its clicks (I-405)", () => {
   const kiosk = getKiosk("bunsik");
   const reviewed = skillSchema.parse(bunsikReviewed);
 

@@ -3,8 +3,8 @@
 // missing here, so a new run (`npm run learn:runs`) needs its labels added.
 
 export const GLOSSARY: Record<string, string> = {
-  // Snack bar (bk9-bunsik)
-  "보리별 분식": "Boribyeol snack bar",
+  // Bunsik shop (bk9-bunsik)
+  "보리별 분식": "Boribyeol Bunsik",
   "매장에서 먹어요": "Eat here",
   "보리별 떡볶이": "Boribyeol tteokbokki",
   "1단계 순한맛": "Level 1 mild",

@@ -153,7 +153,8 @@ async function main() {
     const demo = await demoCtx.newPage();
     await demo.goto(`${BASE}/demo`);
     const started = demo.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
-    await demo.getByRole("button", { name: "Start", exact: true }).click({ timeout: 120_000 });
+    // [Start] uses the judge's own phone since 10-16 (no phone drawn), so the hero takes [Try it on this screen].
+    await demo.getByRole("button", { name: "Try it on this screen" }).click({ timeout: 120_000 });
     const s = (await (await started).json()) as { sessionId: string; deviceToken: string };
     await demo.locator('[data-phone-screen="dine"]').waitFor();
     const demoAi = phoneAi(s.sessionId, s.deviceToken);
@@ -205,6 +206,17 @@ async function main() {
     await settled(learned);
     await saveWebp(encoder, await learned.screenshot({ clip: { x: 0, y: 0, width: 1080, height: 810 } }), "place-doughhouse", 800, 600);
     await learnedCtx.close();
+    // The bunsik shop KIBO learned blind is a page of its own fixed 720x1280 size (I-405): its top 4:3 at 1.5x is the
+    // same 1080x810 pixels as the other three, so the four D1 pictures share one crop and sharpness (I-414).
+    const bunsikCtx = await browser.newContext({ viewport: { width: 720, height: 1280 }, deviceScaleFactor: 1.5 });
+    const bunsik = await bunsikCtx.newPage();
+    await bunsik.goto(`${BASE}/learned-kiosks/bunsik/index.html`);
+    await bunsik.locator('[data-act="start"]').click();
+    await bunsik.locator('[data-act="dine"][data-v="eatin"]').click();
+    await bunsik.locator('[data-act="cat"]').first().waitFor();
+    await settled(bunsik);
+    await saveWebp(encoder, await bunsik.screenshot({ clip: { x: 0, y: 0, width: 720, height: 540 } }), "place-bunsik", 800, 600);
+    await bunsikCtx.close();
   } finally {
     await browser.close();
     server.stop();

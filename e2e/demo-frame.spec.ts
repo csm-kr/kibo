@@ -39,7 +39,12 @@ const places = (page: Page) => bar(page).getByRole("navigation", { name: "Places
 async function expectBar(page: Page, current: string, at: string) {
   await expect(bar(page).getByRole("img", { name: "KIBO" }), at).toBeVisible();
   await expect(bar(page).getByText("Live demo", { exact: true }), at).toBeVisible();
-  const hrefs = { "Burger shop": "/demo?k=malo", "Airport rail": "/demo?k=airport_rail", "Pizza shop": "/demo?k=doughhouse" };
+  const hrefs = {
+    "Burger shop": "/demo?k=malo",
+    "Airport rail": "/demo?k=airport_rail",
+    "Pizza shop": "/demo?k=doughhouse",
+    "Bunsik shop": "/demo?k=bunsik",
+  };
   for (const [name, href] of Object.entries(hrefs)) {
     const tab = places(page).getByRole("link", { name, exact: true });
     await expect(tab, `${at}: ${name}`).toHaveAttribute("href", href);
@@ -364,7 +369,7 @@ test.describe(() => {
   });
 });
 
-test("D1: descriptions start on one line, the pizza note sits in a box, no dark outlines, a balanced headline (#1 6)", async ({ page }) => {
+test("D1: four equal place cards two by two, descriptions of a row start on one line, the /learn links sit in a box, no dark outlines, a balanced headline (#1 6, I-414)", async ({ page }) => {
   await page.goto("/demo");
   await expect(page.getByRole("button", { name: "Try it on this screen" })).toBeVisible({ timeout: 60_000 });
   for (const vp of SIZES) {
@@ -373,14 +378,32 @@ test("D1: descriptions start on one line, the pizza note sits in a box, no dark 
     const m = await page.evaluate(() => {
       const intro = document.querySelector('main[data-demo="intro"]')!;
       const cards = [...intro.querySelectorAll<HTMLElement>("[data-place-card]")];
-      const tops = cards.map((c) => c.querySelector("[data-place-persona]")!.getBoundingClientRect().top);
-      // The nearest painted box around the /learn link, and the card row it should span.
+      const boxes = cards.map((c) => c.getBoundingClientRect());
+      // Per card: its top (cards of one row share it), its description's top, its size, its picture's size, and
+      // whether its title takes one line (a name never wraps).
+      const each = cards.map((c, i) => {
+        const title = c.querySelector("img + span > span")!;
+        const lh = parseFloat(getComputedStyle(title).lineHeight);
+        const img = c.querySelector("img")!.getBoundingClientRect();
+        return {
+          top: Math.round(boxes[i].top),
+          persona: c.querySelector("[data-place-persona]")!.getBoundingClientRect().top,
+          w: boxes[i].width,
+          h: boxes[i].height,
+          img: { w: img.width, h: img.height },
+          titleLines: Math.round(title.getBoundingClientRect().height / lh),
+          contentLeft: img.left,
+        };
+      });
+      // The nearest painted box around the /learn links, and the card rows it should span.
       const link = [...intro.querySelectorAll("a")].find((a) => a.textContent?.trim() === "How KIBO learned the pizza kiosk")!;
+      const link2 = [...intro.querySelectorAll("a")].find((a) => a.textContent?.trim() === "How KIBO learned the bunsik shop kiosk")!;
       let box: Element | null = link;
       while (box && getComputedStyle(box).backgroundColor === "rgba(0, 0, 0, 0)") box = box.parentElement;
       const b = box!.getBoundingClientRect();
-      const first = cards[0].getBoundingClientRect();
-      const last = cards[cards.length - 1].getBoundingClientRect();
+      const first = boxes[0];
+      const last = boxes[boxes.length - 1];
+      const links = [link, link2].map((l) => ({ left: l.getBoundingClientRect().left, inBox: box!.contains(l) }));
       // Dark 2px outlines: borders of 2px or more in a dark colour (I-165).
       const dark = [...intro.querySelectorAll<HTMLElement>("*")].filter((el) => {
         const cs = getComputedStyle(el);
@@ -409,21 +432,38 @@ test("D1: descriptions start on one line, the pizza note sits in a box, no dark 
         // Under the top bar D1 still fits the judge sizes whole, as it did before the frame.
         hidden: intro.scrollHeight - intro.clientHeight,
         cards: cards.length,
-        tops,
+        each,
+        links,
         box: { painted: getComputedStyle(box!).backgroundColor, shadow: getComputedStyle(box!).boxShadow, left: b.left - first.left, right: b.right - last.right },
         dark,
         wrap: getComputedStyle(h1).textWrapStyle,
         lone,
       };
     });
-    expect(m.cards, at).toBe(3);
+    expect(m.cards, at).toBe(4);
     expect(m.hidden, `${at}: D1 cut under the fold`).toBeLessThanOrEqual(0);
     if (vp.width >= 900) {
-      for (const top of m.tops) expect(Math.abs(top - m.tops[0]), `${at}: description tops ${m.tops.join(", ")}`).toBeLessThanOrEqual(1);
-      expect(Math.abs(m.box.left), `${at}: the pizza note's box spans the card row (left)`).toBeLessThanOrEqual(1);
-      expect(Math.abs(m.box.right), `${at}: the pizza note's box spans the card row (right)`).toBeLessThanOrEqual(1);
+      const [a, b, c, d] = m.each;
+      // Two by two: two rows of two cards.
+      expect([a.top === b.top, c.top === d.top, c.top > a.top], `${at}: card tops ${m.each.map((e) => e.top).join(", ")}`).toEqual([true, true, true]);
+      for (const [x, y] of [[a, b], [c, d]]) {
+        expect(Math.abs(x.persona - y.persona), `${at}: description tops of a row ${x.persona}, ${y.persona}`).toBeLessThanOrEqual(1);
+      }
+      for (const e of m.each) {
+        expect(Math.abs(e.w - a.w), `${at}: card widths ${m.each.map((x) => x.w).join(", ")}`).toBeLessThanOrEqual(1);
+        expect(Math.abs(e.h - a.h), `${at}: card heights ${m.each.map((x) => x.h).join(", ")}`).toBeLessThanOrEqual(1);
+        expect(Math.abs(e.img.h - a.img.h), `${at}: picture heights`).toBeLessThanOrEqual(1);
+        expect(Math.abs(e.img.w / e.img.h - 4 / 3), `${at}: pictures 4:3`).toBeLessThanOrEqual(0.02);
+        expect(e.titleLines, `${at}: a place name on one line`).toBe(1);
+      }
+      expect(Math.abs(m.box.left), `${at}: the /learn box spans the card rows (left)`).toBeLessThanOrEqual(1);
+      expect(Math.abs(m.box.right), `${at}: the /learn box spans the card rows (right)`).toBeLessThanOrEqual(1);
+      // Each /learn link starts under its own card's content (the pizza card left, the bunsik shop card right).
+      expect(Math.abs(m.links[0].left - c.contentLeft), `${at}: pizza link under its card`).toBeLessThanOrEqual(1);
+      expect(Math.abs(m.links[1].left - d.contentLeft), `${at}: bunsik shop link under its card`).toBeLessThanOrEqual(1);
     }
-    expect(m.box.painted, `${at}: the pizza note sits in a white box`).toBe("rgb(255, 255, 255)");
+    expect(m.links.every((l) => l.inBox), `${at}: both /learn links in the box`).toBe(true);
+    expect(m.box.painted, `${at}: the /learn links sit in a white box`).toBe("rgb(255, 255, 255)");
     expect(m.dark, `${at}: dark 2px outlines`).toBe(0);
     expect(m.wrap, `${at}: headline`).toBe("balance");
     expect(m.lone, `${at}: headline words alone on a line`).toEqual([]);

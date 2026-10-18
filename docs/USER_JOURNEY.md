@@ -66,7 +66,7 @@ journey
 ```
 | Stage | Thinking | Drop-off risk | What must work |
 |---|---|---|---|
-| Land | "What am I looking at?" | Wall of text, nothing to click | One sentence, 3 steps, three place cards that say who each serves, one [Start] (Flow C1) |
+| Land | "What am I looking at?" | Wall of text, nothing to click | One sentence, 3 steps, four place cards that say who each serves, one [Start] (Flow C1) |
 | Scan | "How do I get in?" | No phone at hand, QR will not scan | The caption row says "Start: scan the QR with your phone's camera."; the 6-digit code under the QR; [Try it on this screen] on D1 (Flow C1a) |
 | Try | "Does the AI really drive the kiosk?" | Mic denied, Live down, quota hit | Text input comes forward automatically; clear "try again in a moment" on 429 (Flow C3) |
 | Judge | "Is this safe and real?" | AI seems to pay by itself; fake screens | Confirm card visible; kiosk highlight is the proof; no mock video inside the app |

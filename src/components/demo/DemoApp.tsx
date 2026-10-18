@@ -379,15 +379,16 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
 
 /**
  * The kiosk column's width: alone and centred with the judge's own phone, else beside the phone and the guide. A
- * learned page keeps its own width to height (Doughhouse 1080:1600, the snack bar's fixed 720:1280, I-405).
+ * learned page keeps its own width to height (Doughhouse 1080:1600, the bunsik shop's fixed 720:1280, I-405). With the
+ * judge's own phone every card is at least 744px wide, so the next-order row under it holds the three other places on
+ * one line (1280×720, I-405, I-414).
  */
 function kioskColumnWidth(ownPhone: boolean, kiosk: KioskData): { className: string; style?: CSSProperties } {
-  if (!kiosk.learned) return { className: ownPhone ? "w-[clamp(680px,56vw,820px)] max-w-full flex-none" : "min-w-0 flex-1" };
+  if (!kiosk.learned) return { className: ownPhone ? "w-[clamp(744px,56vw,820px)] max-w-full flex-none" : "min-w-0 flex-1" };
   const page = pageSizeOf(kiosk.learned);
   const aspect = `${page.w} / ${page.maxH}`;
   // Beside the phone: the page as tall as the column. Own phone: the page at the height the row under it leaves, plus
-  // KIBO's panel with the QR beside it, and at least as wide as the next-order row with three other places on one line
-  // (the snack bar has no D1 card, so all three are "another place"; 1280×720, I-405).
+  // KIBO's panel with the QR beside it, and at least as wide as the next-order row.
   return ownPhone
     ? {
         className: "max-w-full flex-none",

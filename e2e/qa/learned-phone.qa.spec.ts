@@ -116,9 +116,9 @@ test("learned kiosk on the phone: entering, check the kiosk, mismatch, pay on th
 test.describe(() => {
   test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.153" } });
 
-  // The snack bar KIBO learned blind (I-405): long English names, a set with five choices, a count option, and the
+  // The bunsik shop KIBO learned blind (I-405): long English names, a set with five choices, a count option, and the
   // kiosk's own review button named on P4 ("Tap 주문 확인하기 (Review order)"). R-007: no burger or counter words.
-  test("learned snack bar on the phone: three lines with their options, then pay on the kiosk", async ({ page, request }, info) => {
+  test("learned bunsik shop on the phone: three lines with their options, then pay on the kiosk", async ({ page, request }, info) => {
     test.setTimeout(180_000);
     const s = await openLearnedPhone(page, request, "bunsik");
     await page.getByRole("button", { name: "Type instead" }).click();

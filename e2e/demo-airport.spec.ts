@@ -72,7 +72,7 @@ test("airport rail on /demo: tickets on both halves, confirm, card stand-in, ref
   await expect(canvas.getByRole("heading", { name: "참조 번호" })).toBeVisible();
   await expect(canvas.getByText(number, { exact: true })).toBeVisible();
 
-  // D3: the two other places and the two-device mode of this kiosk.
+  // D3: the three other places and the two-device mode of this kiosk.
   const others = page.getByRole("navigation", { name: "Try another place" });
   await expect(others.getByRole("link", { name: "Burger shop" })).toHaveAttribute("href", "/demo?k=malo");
   await expect(others.getByRole("link", { name: "Pizza shop" })).toHaveAttribute("href", "/demo?k=doughhouse");

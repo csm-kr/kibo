@@ -51,8 +51,8 @@ function session(over: Partial<Session> = {}): Session {
   } as Session;
 }
 
-describe("pageFrame for a page of a fixed size (the snack bar's 720×1280 screen, I-405)", () => {
-  it("keeps the learner's width and 1120–1600 height for Doughhouse, and the page's own size for the snack bar", () => {
+describe("pageFrame for a page of a fixed size (the bunsik shop's 720×1280 screen, I-405)", () => {
+  it("keeps the learner's width and 1120–1600 height for Doughhouse, and the page's own size for the bunsik shop", () => {
     expect(pageSizeOf(kiosk.learned!)).toEqual({ w: PAGE_W, minH: MIN_PAGE_H, maxH: MAX_PAGE_H });
     expect(pageSizeOf(getKiosk("bunsik").learned!)).toEqual({ w: 720, minH: 1280, maxH: 1280 });
   });

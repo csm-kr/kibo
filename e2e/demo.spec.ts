@@ -78,10 +78,11 @@ test("judge path: intro, order on both halves, confirm, card stand-in, order num
   await page.getByRole("button", { name: "출력 안 함" }).click();
   await expect(page.locator("[data-kiosk-canvas]").getByText(phoneNumber, { exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: "Open two-device mode" })).toHaveAttribute("href", "/kiosk?k=malo");
-  // D3: the two other places.
+  // D3: the three other places.
   const others = page.getByRole("navigation", { name: "Try another place" });
   await expect(others.getByRole("link", { name: "Airport rail" })).toHaveAttribute("href", "/demo?k=airport_rail");
   await expect(others.getByRole("link", { name: "Pizza shop" })).toHaveAttribute("href", "/demo?k=doughhouse");
+  await expect(others.getByRole("link", { name: "Bunsik shop" })).toHaveAttribute("href", "/demo?k=bunsik");
 
   const next = await startDemo(page, "Try again");
   expect(next.sessionId).not.toBe(s.sessionId);

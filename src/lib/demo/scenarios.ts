@@ -248,10 +248,10 @@ const DOUGHHOUSE: Scenario[] = [
 
 const BUNSIK: Scenario[] = [
   {
-    id: "learned-snack-bar",
+    id: "learned-bunsik-shop",
     kioskId: "bunsik",
     persona: MINSU,
-    title: { en: "A snack bar KIBO learned blind", ko: "KIBO가 처음 보고 배운 분식 키오스크" },
+    title: { en: "A bunsik shop KIBO learned blind", ko: "KIBO가 처음 보고 배운 분식집 키오스크" },
     goal: {
       en: "Another AI agent built this kiosk; KIBO learned it the first time it saw it, then taps its screen and checks its total.",
       ko: "다른 AI가 만든 키오스크를 KIBO가 처음 보고 배웠어요. 화면을 직접 누르고 합계를 확인해요.",

@@ -84,7 +84,7 @@ test("learn replay: Doughhouse refused payment tap and the order button", async 
   await check(page, info, "replay-order", "[data-learn-order]");
 });
 
-test("learn replay: the snack bar offers its /demo place from the first screen and at the end (I-405)", async ({ page }, info) => {
+test("learn replay: the bunsik shop offers its /demo place from the first screen and at the end (I-405)", async ({ page }, info) => {
   await page.goto("/learn/bunsik");
   await stopAtStart(page);
   await expect(page.locator("[data-learn-try]")).toHaveAttribute("href", "/demo?k=bunsik");

@@ -33,7 +33,7 @@ const DOUGHHOUSE: Examples = {
   en: ["A large pepperoni with thin dough and extra bacon", "Add a cola, 1.25 liters", "Remove the cola", "I'm done"],
 };
 
-// The snack bar KIBO learned blind (skills/bunsik.json): a required spice level, a priced topping, a gimbap cut.
+// The bunsik shop KIBO learned blind (skills/bunsik.json): a required spice level, a priced topping, a gimbap cut.
 const BUNSIK: Examples = {
   ko: ["치즈 떡볶이 3단계 보통맛으로, 삶은 계란 추가해 주세요.", "참치 김밥 하나 썰어서 추가해 주세요.", "김밥은 빼 주세요.", "다 골랐어요."],
   en: ["Cheese tteokbokki, medium spicy, with a boiled egg", "Add a tuna gimbap, sliced", "Remove the gimbap", "I'm done"],

@@ -350,14 +350,14 @@ for (const viewport of [
           const [first] = seen;
           // I-352: KIBO's replay line under the learned page takes its height from the page's box, and at 1280×720 its
           // six lines after the first item make the page height-bound, 0.0007 smaller (0.8px). Left open, not hidden.
-          // The snack bar's page has a fixed 720×1280 size, so it is height-bound and the whole growth of that line comes
+          // The bunsik shop's page has a fixed 720×1280 size, so it is height-bound and the whole growth of that line comes
           // off its scale (I-352, I-405): measured and reported here, not asserted, until I-352 gets its design choice.
           const scaleSlack = kioskId === "bunsik" ? Infinity : learned && viewport.width === 1280 ? 0.001 : 0.0005;
           if (kioskId === "bunsik") {
             const scales = seen.map((x) => x.scale);
             test.info().annotations.push({
               type: "I-352",
-              description: `${viewport.width}x${viewport.height}: snack bar scale ${Math.max(...scales).toFixed(3)} to ${Math.min(...scales).toFixed(3)} (${seen.map((x) => `${x.state} ${x.scale.toFixed(3)}`).join(", ")})`,
+              description: `${viewport.width}x${viewport.height}: bunsik shop scale ${Math.max(...scales).toFixed(3)} to ${Math.min(...scales).toFixed(3)} (${seen.map((x) => `${x.state} ${x.scale.toFixed(3)}`).join(", ")})`,
             });
             console.log(`I-352 ${viewport.width}x${viewport.height}: ${seen.map((x) => `${x.state} ${x.scale.toFixed(3)} top ${x.top.toFixed(1)}`).join(", ")}`);
           }
