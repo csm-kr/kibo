@@ -136,7 +136,7 @@ describe("relayConnection: hello and auth", () => {
     const [{ functionDeclarations }] = config.tools as { functionDeclarations: unknown[] }[];
     expect(functionDeclarations).toHaveLength(11);
     expect(client.sent).toEqual([
-      { relay: { model: "gemini-3.8-live", expiresAt: T0 + 180_000, voiceSeconds: 180 } },
+      { relay: { model: "gemini-3.8-live", expiresAt: T0 + 600_000, voiceSeconds: 600 } },
       { setupComplete: {} },
     ]);
     // Nothing of the instructions or tools reaches the browser.
@@ -307,10 +307,10 @@ describe("relayConnection: closing", () => {
     expect(vertex.upstream.closed).toBe(true);
   });
 
-  it("the voice time runs out: both sides close together (3 min on /demo)", async () => {
+  it("the voice time runs out: both sides close together (10 min on /demo too, I-421)", async () => {
     const s = await demo();
     const { client } = await opened(s);
-    await vi.advanceTimersByTimeAsync(179_000);
+    await vi.advanceTimersByTimeAsync(599_000);
     expect(client.closed).toBeNull();
     await vi.advanceTimersByTimeAsync(1_000);
     expect(client.closed).toEqual({ code: 4000, reason: "Voice time is up." });

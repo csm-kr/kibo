@@ -832,6 +832,30 @@
       "locale": "en",
       "turns": ["Please change the kiosk screen to Japanese."],
       "expect": { "kioskLanguage": null }
+    },
+    {
+      "id": "r-ko-choice-shows-item",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "ko",
+      "turns": ["베이컨치즈버거 하나 주세요"],
+      "expect": { "screen": { "category": "burger", "itemId": "bacon_cheese_burger" } }
+    },
+    {
+      "id": "r-ko-scroll-after-burger",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "ko",
+      "turns": ["치즈버거 하나 주세요", "키오스크 내려줘"],
+      "expect": { "screen": { "category": "burger", "scroll": "down" } }
+    },
+    {
+      "id": "r-en-scroll-down",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "en",
+      "turns": ["What burgers are there?", "Scroll down the kiosk, please."],
+      "expect": { "screen": { "category": "burger", "scroll": "down" } }
     }
   ]
 }

@@ -144,7 +144,7 @@ test("/demo [Start]: the laptop is only the kiosk; the judge's phone claims a de
   // No touch-vs-talk card: the judge's messages and taps happened on their own phone.
   await expect(page.getByText("Touch vs talk")).toHaveCount(0);
   await expect(next.getByRole("button", { name: "Back to the start" })).toHaveCount(0);
-  await expect(next.getByRole("navigation", { name: "Try another place" }).getByRole("link")).toHaveText(["Airport rail", "Pizza shop", "Bunsik shop"]);
+  await expect(next.getByRole("navigation", { name: "Try another place" }).getByRole("link")).toHaveText(["Airport rail"]);
 
   await next.getByRole("button", { name: "Try again" }).click();
   await expect(step).toHaveText("Start: scan the QR with your phone's camera.");

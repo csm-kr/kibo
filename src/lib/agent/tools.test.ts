@@ -103,6 +103,13 @@ describe("toolDeclarations", () => {
     expect((rail.parametersJsonSchema as Schema).properties!.language.enum).toEqual(["ko", "en", "ja"]);
   });
 
+  // QA 10-18: the kiosk never showed a burger waiting for its choice, and "scroll down" had no tool.
+  it("lets showMenu bring one item into view or scroll the shown category", () => {
+    const p = params("showMenu");
+    expect(p.properties!.itemId.enum).toEqual(k.items.map((i) => i.itemId));
+    expect(p.properties!.scroll.enum).toEqual(["down", "up"]);
+  });
+
   it("gives the no-argument tools an empty object", () => {
     for (const name of ["undoLastChange", "requestCheckout", "confirmCheckout"]) {
       expect(params(name).properties).toEqual({});

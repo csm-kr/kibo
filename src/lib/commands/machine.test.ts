@@ -674,6 +674,27 @@ describe("showMenu", () => {
     const s = applyCommand({ ...fresh(), status: "connected" }, show("pass"), { ...ctx("phone", T0 + 7000), kiosk: rail }).session;
     expect(s.screen).toEqual({ category: "pass", at: T0 + 7000 });
   });
+
+  // QA 10-18: a cheeseburger waiting for single-or-set left the kiosk on 매장/포장, and "키오스크 내려줘" called staff.
+  it("with itemId brings that item into view while its question is open", () => {
+    const s = applyCommand({ ...fresh(), status: "connected" }, cmd("showMenu", { category: "burger", itemId: "bacon_cheese_burger" }, { source: "voice", utteranceSeq: 1 }), ctx("phone", T0 + 8000)).session;
+    expect(s.status).toBe("ordering");
+    expect(s.screen).toEqual({ category: "burger", itemId: "bacon_cheese_burger", at: T0 + 8000 });
+  });
+
+  it("an itemId that is not in that category → BAD_REQUEST", () => {
+    const c = cmd("showMenu", { category: "drink", itemId: "cheese_burger" }, { source: "voice", utteranceSeq: 1 });
+    expect(catchError(() => applyCommand(ordering(), c, ctx("phone"))).code).toBe("BAD_REQUEST");
+  });
+
+  it.each(["down", "up"] as const)("scroll %s moves the shown category on the kiosk", (scroll) => {
+    const c = cmd("showMenu", { category: "burger", scroll }, { source: "text", utteranceSeq: 1 });
+    expect(applyCommand(ordering(), c, ctx("phone", T0 + 9000)).session.screen).toEqual({ category: "burger", scroll, at: T0 + 9000 });
+  });
+
+  it("scroll takes only down or up (BAD_REQUEST)", () => {
+    expect(() => cmd("showMenu", { category: "burger", scroll: "left" }, { source: "text" })).toThrow();
+  });
 });
 
 // Owner 10-18 (deck p9): "키오스크도 영어로 바꿔줘" switches the kiosk's screen, when the kiosk has that language.

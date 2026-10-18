@@ -8,6 +8,14 @@ export const GREETING_NOTE = "Greeting from the phone:";
 
 const BEFORE_REVIEW = new Set<SessionStatus>(["idle", "connected", "ordering"]);
 
+/**
+ * Which first line (src/lib/i18n/phone.ts): while the kiosk (K2) and the phone (P2) ask eat here or take out, the
+ * greeting asks it too (owner 10-18, I-420); "connected" never has a dine option, the first one moves to ordering.
+ */
+export function greetingKey(status: SessionStatus, dine: boolean): "greetingDine" | "greeting" {
+  return dine && status === "connected" ? "greetingDine" : "greeting";
+}
+
 /** What a tool call in the greeting's own response gets instead of running: nothing is done. */
 export const HELD_RESULT = {
   ok: false,

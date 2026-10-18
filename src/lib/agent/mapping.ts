@@ -21,7 +21,7 @@ const TOOL_ARGS = {
   removeFromCart: z.object({ lineId: str }),
   undoLastChange: z.object({}),
   offerChoices: z.object({ templateId: str, choices: z.array(z.object({ kind: str, id: str })) }),
-  showMenu: z.object({ category: str }),
+  showMenu: z.object({ category: str, itemId: str.optional(), scroll: str.optional() }),
   setKioskLanguage: z.object({ language: str }),
   callStaff: z.object({ reasonCode: str }),
   requestCheckout: z.object({}),

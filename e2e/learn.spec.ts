@@ -121,7 +121,8 @@ test("play advances by itself; the Doughhouse replay ends with an order button t
   await expect(order).toHaveAttribute("href", "/demo?k=doughhouse");
   await order.click();
   await expect(page).toHaveURL(/\/demo\?k=doughhouse$/);
-  await expect(page.getByRole("link", { name: "How KIBO learned the pizza kiosk" })).toHaveAttribute("href", "/learn/doughhouse");
+  // D1 adds the learned kiosk's card, selected, though it is not offered otherwise (I-426).
+  await expect(page.locator("[data-place-card][aria-current]")).toContainText("Pizza shop", { timeout: 60_000 });
 });
 
 test("on a phone the action and [Play] are on the first screen; the picture can be shown larger", async ({ page }) => {
@@ -148,9 +149,12 @@ test("with reduced motion the replay never plays by itself", async ({ page }) =>
   await expect(page.getByText("Step with Back and Next.")).toBeVisible();
 });
 
-test("the landing page links to /learn", async ({ page }) => {
+test("the landing page no longer links to the learned kiosks or /learn; /learn still opens by its own URL (I-426)", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("link", { name: "Watch KIBO learn a new kiosk" })).toHaveAttribute("href", "/learn", { timeout: 60_000 });
+  await expect(page.getByRole("link", { name: "Try the live demo" })).toBeVisible({ timeout: 60_000 });
+  expect(await page.locator('a[href*="k=doughhouse"], a[href*="k=bunsik"], a[href^="/learn"]').count()).toBe(0);
+  await page.goto("/learn");
+  await expect(page.getByRole("heading", { name: "Watch KIBO learn a kiosk from its screens alone." })).toBeVisible({ timeout: 60_000 });
 });
 
 // One learner headline, word for word, on both pages (docs/plan/NUMBERS.md); every never-seen kiosk one click away.

@@ -157,3 +157,8 @@ When an issue class in `docs/ISSUE.md` is seen for the **3rd time**, it becomes 
 - From: `korean-line-break` — I-044 (seen 10-13/2-kiosk:5, 10-13/2-kiosk:6), I-387 (10-16/session; I-391 the same pass)
 - Why: Korean and then Japanese each wrapped inside words on the kiosk canvas ("포장하시나 / 요?", "スマホで話して購 / 入") until a rule for that language was set, and no automated check sees a CJK word broken inside (`splitWords` in `e2e/qa/checks.ts` checks Latin words only).
 - Check: for each code in a kiosk's `locales`, `src/app/globals.css` has its wrapping rule (`:lang(ko)` keep-all; `[data-kiosk-canvas] :lang(ja)` auto-phrase and strict), `e2e/qa/kiosk.qa.spec.ts` has that language's K1 to K8 states, and the step's QA report says their screenshots were read for breaks inside a word.
+
+### R-034 (proposed): A Live tool whose answer needs no new words (offerChoices) is answered so it cannot start a second spoken response; measure repeats on the real model, never only by instruction wording
+- From: `repeated-question` — I-378 (seen 10-16/session), I-397 (10-17/session), I-423 (10-18/session)
+- Why: three rounds of instruction lines ("ask their question only once") lowered but never ended the repeated question, because every blocking tool answer starts a new response and the model had already asked before the call.
+- Check: a change to Live tools, tool results or their instructions runs the offline token-path probe (the phone's pinned config, `offerChoices` answered as the app does) over the allergy, cash and vague-item questions in Korean and English, 20+ runs, and reports runs with a sentence said twice (target 0) and runs with nothing said (target 0).

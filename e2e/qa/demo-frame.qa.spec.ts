@@ -131,7 +131,7 @@ test.describe(() => {
       const at = await focusRingCut(page);
       if (at && !seen.has(at.name)) seen.set(at.name, at.cut);
     }
-    for (const name of ["Burger shop", "Pizza shop", "How it works", "버거", "디저트", "Language and text size: English", "Call staff", "Scenarios"])
+    for (const name of ["Burger shop", "Airport rail", "How it works", "버거", "디저트", "Language and text size: English", "Call staff", "Scenarios"])
       expect([...seen.keys()].some((n) => n.startsWith(name)), `the walk reaches ${name}`).toBe(true);
     expect([...seen].filter(([, cut]) => cut !== "").map(([name, cut]) => `${name}: ${cut}`)).toEqual([]);
   });

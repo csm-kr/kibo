@@ -5,18 +5,13 @@ import Link from "next/link";
 import { Monitor } from "lucide-react";
 import { CARD, FOCUS, PRIMARY, SECONDARY } from "@/components/phone/ui";
 import { errorCopy, type ScreenErrorCode } from "@/lib/i18n/errors";
-import { DEMO_ENVIRONMENTS, demoHref } from "./environments";
+import { demoHref, offeredPlaces } from "./environments";
 
 // D1 (docs/UX.md Flow C1): one sentence, three steps, one [Start]. Nothing else competes (V1). English: judges.
-// Four equal place cards, two by two, pick the kiosk; the choice lives in the URL (`/demo?k=airport_rail`) so it can
-// be linked, and [Start] opens the selected one. Cards and buttons follow the phone design: white cards with the soft
+// Two equal place cards side by side, the two direct kiosks (owner 10-18, I-426), pick the kiosk; the choice lives in
+// the URL (`/demo?k=airport_rail`) so it can be linked, and [Start] opens the selected one. A learned kiosk's own link
+// (/learn, the deck) adds its card, selected. Cards and buttons follow the phone design: white cards with the soft
 // shadow, tinted secondary buttons, no dark outlines (I-165, #1 6).
-
-/** The recorded runs (/learn) that taught KIBO the two learned places, each under its own card in the box below. */
-const LEARN_LINKS = [
-  { href: "/learn/doughhouse", text: "How KIBO learned the pizza kiosk" },
-  { href: "/learn/bunsik", text: "How KIBO learned the bunsik shop kiosk" },
-];
 
 // [Start] makes this laptop the kiosk and the judge's own phone the assistant, as in a real store (C1a); the phone
 // drawn beside the kiosk is the second choice, for a judge without a phone at hand.
@@ -34,7 +29,7 @@ export function DemoIntro(props: {
   return (
     // Inside the /demo frame, whose top bar carries the KIBO mark and the place tabs.
     // py-4 and the gaps below keep D1 whole at 1280×720 under the top bar (#1 E). The intro column is 360px, so the
-    // four cards get two columns of about 400px, each wide enough for its brand line on two lines (I-414).
+    // cards get two columns of about 400px, each wide enough for its brand line on two lines (I-414).
     <main data-demo="intro" className="flex min-h-0 w-full flex-1 overflow-y-auto px-6 py-4 text-[#15171C]">
       <div data-demo-check className="m-auto grid w-full max-w-7xl items-start gap-12 lg:grid-cols-[22.5rem_minmax(0,1fr)]">
         <div className="flex flex-col gap-6">
@@ -70,11 +65,11 @@ export function DemoIntro(props: {
             <h2 id="demo-place-pick" className="text-xl font-bold">
               Pick a place. The phone works the same in each.
             </h2>
-            {/* Two by two. Each card is a subgrid over its row's two tracks (the picture beside the title and brand,
+            {/* Two to a row. Each card is a subgrid over its row's two tracks (the picture beside the title and brand,
                 then who it is for), so a brand line that wraps moves both cards' next line down with it and the
                 descriptions of a row start on one line (#1 6). */}
             <ul className="grid gap-4 sm:grid-cols-2">
-              {DEMO_ENVIRONMENTS.map((env) => {
+              {offeredPlaces(props.kioskId).map((env) => {
                 const current = env.kioskId === props.kioskId;
                 return (
                   <li key={env.kioskId} className="flex sm:row-span-2 sm:grid sm:grid-rows-subgrid sm:gap-2">
@@ -111,19 +106,6 @@ export function DemoIntro(props: {
                 );
               })}
             </ul>
-            {/* The recorded runs that taught KIBO the two learned kiosks (/learn): a box of its own under the cards,
-                outside them, because a link cannot hold a link (I-123, #1 6); each link under its own card. */}
-            <p data-place-learned className={`${CARD} grid gap-x-12 py-1 text-base sm:grid-cols-2`}>
-              {LEARN_LINKS.map((l) => (
-                <Link
-                  key={l.href}
-                  href={l.href}
-                  className={`flex min-h-14 items-center rounded-tile font-semibold text-kibo underline underline-offset-4 ${FOCUS}`}
-                >
-                  {l.text}
-                </Link>
-              ))}
-            </p>
           </nav>
           <div className="flex flex-col gap-2">
             {/* Together as wide as the card row above it, so they read as the row's actions (I-123). */}

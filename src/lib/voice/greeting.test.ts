@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { initialTurns, turnEvents, turnsReducer, type LiveMessage, type TurnState } from "./turns";
-import { GREETING_NOTE, greeter } from "./greeting";
+import { GREETING_NOTE, greeter, greetingKey } from "./greeting";
 
 // Owner 10-17: when the microphone turns on and Live connects, the AI speaks first, one short line, then listens.
 // The greeting is the phone's own text turn: it must never count as the user's words (utteranceSeq) and never lead
@@ -40,6 +40,15 @@ describe("greeter", () => {
     heard.onConnected(HELLO, "connected");
     heard.onMessage(turnEvents({ serverContent: { inputTranscription: { text: "치즈버거" } } }));
     expect(heard.holdsTools).toBe(false);
+  });
+
+  // Owner 10-18: the kiosk (K2) and the phone (P2) ask eat here or take out while the voice asked "what would you
+  // like?". The greeting asks what both screens ask.
+  it("asks the dine question while both screens ask it: a kiosk with dine options, before the first dine option", () => {
+    expect(greetingKey("connected", true)).toBe("greetingDine");
+    // ordering: the dine option is set, or the order went on without it (the kiosk shows the menu); tickets: no K2.
+    expect(greetingKey("ordering", true)).toBe("greeting");
+    expect(greetingKey("connected", false)).toBe("greeting");
   });
 
   it("is never a user utterance: the greeting's response leaves utteranceSeq as it was; the user's next words count", () => {

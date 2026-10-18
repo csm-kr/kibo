@@ -19,8 +19,11 @@ export interface Session {
   cart: CartLine[];
   total: number;
   cartVersion: number;
-  /** `at`: when the AI last asked the kiosk to show `category` (showMenu), so the kiosk moves its rail once per ask. */
-  screen: { category?: string; itemId?: string; at?: number };
+  /**
+   * `at`: when the AI last asked the kiosk to show `category` (showMenu), so the kiosk moves its rail once per ask;
+   * with it, `itemId` is the item to bring into view and `scroll` a page down or up in that category.
+   */
+  screen: { category?: string; itemId?: string; scroll?: "down" | "up"; at?: number };
   /**
    * The kiosk screen language the user asked for on the phone ("키오스크도 영어로 바꿔줘", setKioskLanguage), so the kiosk
    * shows it unless K1's language row was tapped later. Absent on sessions stored before it existed.
