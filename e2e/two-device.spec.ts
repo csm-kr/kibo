@@ -102,13 +102,13 @@ test("laptop kiosk and phone: scan in /app, order, confirm on the phone, pay on 
     await expect(phone.getByRole("heading", { name: "Insert your card into the kiosk" })).toBeVisible();
     // The user confirmed, never the AI (D2); the panel says the kiosk's payment step in English.
     await expect(panel.locator("[data-panel-change]")).toHaveText("Confirmed by you");
+    // The yes came from the phone and this kiosk takes card only, so KIBO picked 카드 for the user (owner 10-18).
     await expect(panel.locator("[data-kiosk-step]")).toHaveText(
-      "Kiosk: payment. Tap 카드 (Card), then 카드 넣기 (Insert card). Demo only, no money is charged.",
+      "Kiosk: payment. Insert your card, 카드 넣기 (Insert card). Demo only, no money is charged.",
     );
 
     // The card goes into the kiosk (A), and the number shows on the phone (B).
     const root = kioskRoot(kiosk);
-    await root.getByRole("button", { name: "카드", exact: true }).click();
     await root.getByRole("button", { name: "카드 넣기" }).click();
     await expect(root).toHaveAttribute("data-screen", "done");
     await expect(phone.getByRole("heading", { name: "Order number" })).toBeVisible();

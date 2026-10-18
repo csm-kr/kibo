@@ -23,6 +23,7 @@ export function toPublicSession(s: Session): Session {
     recentCommandIds: s.recentCommandIds,
     checkoutUtteranceSeq: s.checkoutUtteranceSeq,
     checkoutAt: s.checkoutAt,
+    ...(s.confirmedBy ? { confirmedBy: s.confirmedBy } : {}),
     upsellOffered: s.upsellOffered,
     orderNumber: s.orderNumber,
     paidAt: s.paidAt,

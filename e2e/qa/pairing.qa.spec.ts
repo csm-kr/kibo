@@ -52,7 +52,8 @@ for (const vp of [
     await command(request, deviceToken, { sessionId, type: "confirmCheckout", args: {}, source: "button", cartVersion: review.cartVersion });
     await expect(kioskRoot(page)).toHaveAttribute("data-screen", "payment");
     await expect(panel.locator("[data-panel-change]")).toHaveText("Confirmed by you");
-    await expect(panel.locator("[data-kiosk-step]")).toContainText("Tap 카드 (Card), then 카드 넣기 (Insert card)");
+    // KIBO picked 카드 after the phone's yes on this card-only kiosk, so only the card is left (I-427).
+    await expect(panel.locator("[data-kiosk-step]")).toContainText("Insert your card, 카드 넣기 (Insert card)");
     await check(page, info, "kiosk-pairing-paying");
   });
 }
@@ -80,8 +81,8 @@ for (const vp of [
 
     const checkout = await phone("requestCheckout", {}, { source: "voice", utteranceSeq: 2 });
     await phone("confirmCheckout", {}, { source: "button", cartVersion: checkout.cartVersion });
+    // KIBO picked 카드 after the phone's yes (owner 10-18), so the kiosk opens on its card step.
     const root = kioskRoot(page);
-    await root.getByRole("button", { name: "카드", exact: true }).click();
     await root.getByRole("button", { name: "카드 넣기" }).click();
     await root.getByRole("button", { name: "출력 안 함" }).click();
     await expect(step).toHaveText("Order number: done, no money was charged.");

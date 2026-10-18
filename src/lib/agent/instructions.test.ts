@@ -49,6 +49,17 @@ describe("buildInstructions", () => {
     expect(text).toMatch(/never pay/i);
   });
 
+  // Owner 10-18, voice to the card: Live said "tap Yes, pay now" at the review and "proceed with the payment on the
+  // screen" after the yes, so the user did not know a spoken yes works or where the card goes.
+  it("at the review always offers the spoken yes, and after the yes says to insert the card into the kiosk", () => {
+    expect(text).toContain('If it is right, they can just say yes (or tap "Yes, pay now"); always say they can say yes.');
+    expect(text).toContain(
+      "After confirmCheckout succeeds, KIBO has picked card on the kiosk: say one short sentence telling the user to insert their card into the kiosk. Never say \"on the screen\", and never say the payment is done.",
+    );
+    const rail = buildInstructions(getKiosk("airport_rail"), { cart: [], status: "ordering", dineOption: null, locale: "en" });
+    expect(rail).toContain("telling the user to insert their card into the machine.");
+  });
+
   it("states the grounding and staff rule", () => {
     expect(text).toMatch(/only from the <menu_data> block/);
     expect(text).toContain("callStaff with unknown_info");

@@ -2,6 +2,7 @@ import { kt, type KioskTextKey } from "@/lib/i18n/kiosk";
 import type { KioskData, KioskDomain } from "@/types/menu";
 import type { Session } from "@/types/session";
 import { formatWon } from "./menu";
+import { kioskPickedCard } from "./payment";
 import { kioskScreen } from "./screen";
 import { phonePaused } from "./timers";
 
@@ -66,6 +67,9 @@ const both = (key: KioskTextKey) => `${kt(key, "ko")} (${kt(key, "en")})`;
 /** The payment step's line in the pairing panel. */
 export const PAYMENT_STEP = `Kiosk: payment. Tap ${both("payCard")}, then ${both("insertCardButton")}. Demo only, no money is charged.`;
 
+/** The payment step once KIBO has picked 카드 for the user (kioskPickedCard): only the card is left to do. */
+const CARD_STEP = `Kiosk: payment. Insert your card, ${both("insertCardButton")}. Demo only, no money is charged.`;
+
 /**
  * The kiosk's current step in English, for KIBO's side of the screen (/demo caption, pairing panel): the kiosk itself
  * stays Korean. Learned kiosks have none: the user reviews and pays on the kiosk page. `numberShown`: the kiosk has
@@ -78,7 +82,7 @@ export function kioskStep(kiosk: KioskData, session: Session, numberShown = fals
     case "confirming":
       return `Kiosk: ${ticket ? "ticket" : "order"} review. Nothing is paid until you confirm.`;
     case "paying":
-      return PAYMENT_STEP;
+      return kioskPickedCard(kiosk, session) ? CARD_STEP : PAYMENT_STEP;
     case "paid":
       if (numberShown)
         return ticket
@@ -109,7 +113,9 @@ export function demoKioskStep(kiosk: KioskData, session: Session, numberShown: b
     case "confirming":
       return `${ticket ? "Ticket" : "Order"} review: nothing is paid until you confirm.`;
     case "paying":
-      return `Payment: tap ${both("payCard")}, then ${both("insertCardButton")}.`;
+      return kioskPickedCard(kiosk, session)
+        ? `Payment: insert your card, ${both("insertCardButton")}.`
+        : `Payment: tap ${both("payCard")}, then ${both("insertCardButton")}.`;
     case "paid":
       if (numberShown) return `${ticket ? "Reference" : "Order"} number: done, no money was charged.`;
       return `Receipt question: the ${ticket ? "reference" : "order"} number is next.`;
