@@ -31,6 +31,13 @@ describe("P5 payment hint (I-118)", () => {
     const ko = payMethodHint("ko");
     expect(`${ko.pre}${ko.label}${ko.gloss}${ko.post}`).toBe("키오스크에서 '카드'를 누르고 카드를 넣어 주세요.");
   });
+
+  it("after KIBO picked 카드 on the kiosk (the phone's yes), says only to insert the card (owner 10-18)", () => {
+    const en = payMethodHint("en", true);
+    expect(`${en.pre}${en.label}${en.gloss}${en.post}`).toBe("KIBO picked 카드 (Card) on the kiosk. Insert your card there.");
+    const ko = payMethodHint("ko", true);
+    expect(`${ko.pre}${ko.label}${ko.gloss}${ko.post}`).toBe("키오스크에서 '카드'를 골라 두었어요. 카드를 넣어 주세요.");
+  });
 });
 
 describe("learned kiosk copy", () => {

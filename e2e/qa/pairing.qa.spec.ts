@@ -80,8 +80,8 @@ for (const vp of [
 
     const checkout = await phone("requestCheckout", {}, { source: "voice", utteranceSeq: 2 });
     await phone("confirmCheckout", {}, { source: "button", cartVersion: checkout.cartVersion });
+    // KIBO picked 카드 after the phone's yes (owner 10-18), so the kiosk opens on its card step.
     const root = kioskRoot(page);
-    await root.getByRole("button", { name: "카드", exact: true }).click();
     await root.getByRole("button", { name: "카드 넣기" }).click();
     await root.getByRole("button", { name: "출력 안 함" }).click();
     await expect(step).toHaveText("Order number: done, no money was charged.");

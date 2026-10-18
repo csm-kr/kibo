@@ -134,10 +134,10 @@ export function ConfirmBar(props: {
 }
 
 /** P5: the card goes into the kiosk. The picture points right, toward a kiosk beside the phone; `/demo` mirrors it. */
-export function PayCard(props: { total: number; locale: Locale; mirrored?: boolean }) {
+export function PayCard(props: { total: number; locale: Locale; mirrored?: boolean; picked?: boolean }) {
   const { locale } = props;
   const ai = useAiText();
-  const hint = payMethodHint(locale);
+  const hint = payMethodHint(locale, props.picked);
   return (
     <section className={`${CARD} flex flex-col items-center gap-4 text-center`}>
       <CardIntoKiosk mirrored={props.mirrored} />

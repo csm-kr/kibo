@@ -143,7 +143,7 @@ test("D1 to D3", async ({ page, request }, info) => {
   await page.getByRole("button", { name: "Yes, pay now" }).click();
   await expect(kioskRoot(page)).toHaveAttribute("data-screen", "payment");
   await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "pay");
-  await expect(page.locator("[data-kiosk-step]")).toContainText("Payment: tap 카드 (Card)");
+  await expect(page.locator("[data-kiosk-step]")).toContainText("Payment: insert your card");
   // The card stand-in sits under the kiosk half; the phone half has no button that pays (15-judge-fixes:2).
   await check(page, info, "D2-payment", async () => {
     await expect(page.locator("[data-card-reader]").getByRole("button", { name: "Kiosk: insert card (demo)" })).toBeInViewport({ ratio: 1 });

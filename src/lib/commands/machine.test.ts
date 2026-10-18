@@ -302,6 +302,16 @@ describe("payment safety", () => {
     expect(confirm(s, "phone", "voice", T0 + 3600, { utteranceSeq: 4 }).session.status).toBe("paying");
   });
 
+  it("a confirm records who confirmed: the phone (voice or tap) or the kiosk's touch; editOrder clears it", () => {
+    const s = phoneConfirming();
+    expect(confirm(s, "phone", "voice", T0 + 3600, { utteranceSeq: 4 }).session.confirmedBy).toBe("phone");
+    expect(confirm(s, "phone", "button", T0 + 2000).session.confirmedBy).toBe("phone");
+    const kiosk = applyCommand(ordering(), cmd("requestCheckout"), ctx("kiosk")).session;
+    const touched = applyCommand(kiosk, cmd("confirmCheckout", {}, { cartVersion: kiosk.cartVersion }), ctx("kiosk")).session;
+    expect(touched.confirmedBy).toBe("kiosk");
+    expect(applyCommand(touched, cmd("editOrder"), ctx("kiosk")).session.confirmedBy).toBeUndefined();
+  });
+
   it("a confirm-card tap from the phone needs no utterance", () => {
     const s = phoneConfirming();
     expect(confirm(s, "phone", "button", T0 + 2000).session.status).toBe("paying");

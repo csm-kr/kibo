@@ -88,7 +88,7 @@ test("each action in plain words with its tool and code, newest first, never ann
   await expect(rows.first()).toContainText("You tapped Yes, pay now");
   await expect(rows.first()).toContainText(/confirmCheckout ✓ \d+ ms/);
   await expect(rows.first()).toContainText("Needs your tap or a new 'yes'");
-  await expect(page.locator("[data-kiosk-step]")).toHaveText("Payment: tap 카드 (Card), then 카드 넣기 (Insert card).");
+  await expect(page.locator("[data-kiosk-step]")).toHaveText("Payment: insert your card, 카드 넣기 (Insert card).");
 });
 
 test.describe(() => {

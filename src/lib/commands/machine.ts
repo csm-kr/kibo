@@ -235,12 +235,16 @@ function transition(s: Session, cmd: Command, ctx: CommandContext): { next: Sess
         throw new CommandError("CONFLICT", "Your order changed. Please check it again.");
       }
       if (!isConfirmed(s, cmd, ctx)) throw new CommandError("CONFLICT", "Please confirm on the card.");
-      return { next: { ...s, status: "paying" }, result: {} };
+      return { next: { ...s, status: "paying", confirmedBy: ctx.actor }, result: {} };
 
-    case "editOrder":
+    case "editOrder": {
       requireStatus(s, ["paying"], "There is no payment to go back from.");
-      // The review card appears again and no utterance after it is known, so the phone must tap the card.
-      return { next: { ...s, status: "confirming", checkoutUtteranceSeq: null, checkoutAt: ctx.now }, result: {} };
+      // The review card appears again and no utterance after it is known, so the phone must tap the card. The field is
+      // left out, not set to undefined: Firestore refuses undefined values.
+      const next: Session = { ...s, status: "confirming", checkoutUtteranceSeq: null, checkoutAt: ctx.now };
+      delete next.confirmedBy;
+      return { next, result: {} };
+    }
 
     case "cardAction":
       requireStatus(s, ["paying"], "Please confirm the order before paying.");

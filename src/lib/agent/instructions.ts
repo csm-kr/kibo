@@ -1,4 +1,5 @@
 import { LANGUAGES, lt, type SpeechLanguage } from "@/lib/i18n/languages";
+import { takesCardOnly } from "@/lib/kiosk/payment";
 import { PHONE_NOTE } from "@/lib/voice/dineNote";
 import { GREETING_NOTE } from "@/lib/voice/greeting";
 import type { KioskData, Locale } from "@/types/menu";
@@ -244,8 +245,14 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
           "Status confirming means the order is ready on the kiosk; do not change the cart then unless the user asks.",
         ]
       : [
-          `When the user is done or wants to pay, call requestCheckout. It shows the order on the phone; ask the user to check their order and say yes or tap "${payNow}".`,
+          `When the user is done or wants to pay, call requestCheckout. It shows the order on the phone and the ${ticket ? "machine" : "kiosk"}; ask the user to check it. If it is right, they can just say yes (or tap "${payNow}"); always say they can say yes.`,
           "Call confirmCheckout only when the user clearly says yes in a new turn after their order appeared.",
+          // Owner 10-18: after the yes the kiosk opens on its card step (src/lib/kiosk/payment.ts); Live said "proceed on the screen".
+          ...(takesCardOnly(kiosk)
+            ? [
+                `After confirmCheckout succeeds, KIBO has picked card on the ${ticket ? "machine" : "kiosk"}: say one short sentence telling the user to insert their card into the ${ticket ? "machine" : "kiosk"}. Never say "on the screen", and never say the payment is done.`,
+              ]
+            : []),
           "Never call requestCheckout and confirmCheckout in the same turn.",
           `If confirmCheckout is refused with "Please confirm on the card.", ask the user to tap "${payNow}" on the phone. Do not retry.`,
           ...paymentLines(kiosk),

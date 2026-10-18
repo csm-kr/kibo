@@ -78,8 +78,8 @@ test("/kiosk on a landscape screen: after [출력 안 함] the panel's step line
   const checkout = await phone("requestCheckout", {}, { source: "voice", utteranceSeq: 2 });
   await phone("confirmCheckout", {}, { source: "button", cartVersion: checkout.cartVersion });
 
+  // The phone's yes on a card-only kiosk: KIBO picked 카드, so the kiosk opens on its card step (owner 10-18).
   const root = kioskRoot(page);
-  await root.getByRole("button", { name: "카드", exact: true }).click();
   await root.getByRole("button", { name: "카드 넣기" }).click();
   // The receipt question first: the line says what comes next.
   await expect(root.getByRole("button", { name: "출력 안 함" })).toBeVisible();
@@ -135,10 +135,9 @@ test("/demo [Start]: the laptop is only the kiosk; the judge's phone claims a de
   // Paying happens on the kiosk itself, as at a real kiosk; the caption says the Korean kiosk's step in English.
   const root = kioskRoot(page);
   await expect(root).toHaveAttribute("data-screen", "payment");
-  await expect(step).toHaveText("Payment: tap 카드 (Card), then 카드 넣기 (Insert card).");
-  // No card stand-in: the kiosk's own buttons take the card.
+  await expect(step).toHaveText("Payment: insert your card, 카드 넣기 (Insert card).");
+  // No card stand-in: the kiosk's own buttons take the card. KIBO picked 카드 after the phone's yes.
   await expect(page.locator("[data-card-reader]")).toHaveCount(0);
-  await root.getByRole("button", { name: "카드", exact: true }).click();
   await root.getByRole("button", { name: "카드 넣기" }).click();
   await expect(root).toHaveAttribute("data-screen", "done");
   // No touch-vs-talk card: the judge's messages and taps happened on their own phone.

@@ -28,6 +28,7 @@ import { cartAnnouncement, itemCount, learnedPayHint, phoneSecondsLeft, pt, voic
 import { followSpeaker } from "@/lib/i18n/heard";
 import { lt, uiLocale, type SpeechLanguage } from "@/lib/i18n/languages";
 import { formatWon } from "@/lib/kiosk/menu";
+import { kioskPickedCard } from "@/lib/kiosk/payment";
 import { idleWarning, staffBannerVisible } from "@/lib/kiosk/timers";
 import { bridgeNotice, phoneScreen, type BridgeNotice, type PhoneLocal, type PhoneScreenId } from "@/lib/phone/screen";
 import { LARGE_TEXT_SCALE } from "@/lib/phone/settings";
@@ -672,7 +673,7 @@ export function AssistantPanel(props: Props) {
         <Scroll>
           {/* In /demo the kiosk is on the left, so the picture points there (I-069). */}
           {/* Only words here: no phone control may pay. /demo's card stand-in is on the kiosk half (15-judge-fixes:2). */}
-          <PayCard total={session.total} locale={locale} mirrored={mode === "demo"} />
+          <PayCard total={session.total} locale={locale} mirrored={mode === "demo"} picked={kioskPickedCard(kiosk, session)} />
           <LastMessage messages={fresh} locale={locale} />
         </Scroll>
       );

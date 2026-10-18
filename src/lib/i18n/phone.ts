@@ -310,8 +310,13 @@ export function voiceSecondsLeft(seconds: number, locale: Locale): string {
  * P5: the kiosk first asks for the payment method in Korean, so name its own button, with its meaning in English
  * (J2 Pay, I-118). The label is the kiosk's K7 button (src/lib/i18n/kiosk.ts `payCard`).
  */
-export function payMethodHint(locale: Locale): { pre: string; label: string; gloss: string; post: string } {
+export function payMethodHint(locale: Locale, picked = false): { pre: string; label: string; gloss: string; post: string } {
   const label = kt("payCard", "ko");
+  // `picked`: KIBO already chose 카드 on the kiosk after the phone's yes (src/lib/kiosk/payment.ts), so only the card is left.
+  if (picked)
+    return locale === "ko"
+      ? { pre: "키오스크에서 '", label, gloss: "", post: "'를 골라 두었어요. 카드를 넣어 주세요." }
+      : { pre: "KIBO picked ", label, gloss: ` (${kt("payCard", "en")})`, post: " on the kiosk. Insert your card there." };
   return locale === "ko"
     ? { pre: "키오스크에서 '", label, gloss: "", post: "'를 누르고 카드를 넣어 주세요." }
     : { pre: "On the kiosk, tap ", label, gloss: ` (${kt("payCard", "en")})`, post: ", then insert your card." };

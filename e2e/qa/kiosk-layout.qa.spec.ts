@@ -326,7 +326,7 @@ for (const viewport of [
             const strip = await page.locator("[data-card-reader]").boundingBox();
             expect(Math.abs(strip!.y - (canvas!.y + canvas!.height)), "reader top vs kiosk bottom").toBeLessThanOrEqual(1);
             expect(Math.abs(strip!.width - canvas!.width), "reader width vs kiosk width").toBeLessThanOrEqual(1);
-            await expect(step).toHaveText("Payment: tap 카드 (Card), then 카드 넣기 (Insert card).");
+            await expect(step).toHaveText("Payment: insert your card, 카드 넣기 (Insert card).");
             // Its label stays on one line in the narrower column (U8).
             const labelLines = await reader.evaluate((button) => {
               const text = [...button.childNodes].find((n) => n.nodeType === Node.TEXT_NODE && n.textContent?.trim());

@@ -30,6 +30,12 @@ export interface Session {
   recentCommandIds: string[];
   checkoutUtteranceSeq: number | null;
   checkoutAt: number | null;
+  /**
+   * Who confirmed the order, from confirmCheckout until an edit reopens the review. The phone's yes on a card-only
+   * kiosk lets the kiosk open on its card step (owner 10-18, src/lib/kiosk/payment.ts). Absent before a confirm and on
+   * sessions stored before it existed.
+   */
+  confirmedBy?: Actor;
   upsellOffered: boolean;
   orderNumber: number | null;
   paidAt: number | null;

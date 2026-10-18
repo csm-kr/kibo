@@ -111,6 +111,19 @@ describe("kioskStep", () => {
     expect(kioskStep(malo, session("paid", { orderNumber: 860 }))).toBe("Kiosk: receipt question, then the order number.");
   });
 
+  it("after the phone's yes on a card-only kiosk, KIBO has picked 카드, so the step is only the card (owner 10-18)", () => {
+    expect(kioskStep(malo, session("paying", { confirmedBy: "phone" }))).toBe(
+      "Kiosk: payment. Insert your card, 카드 넣기 (Insert card). Demo only, no money is charged.",
+    );
+    expect(kioskStep(rail, session("paying", { confirmedBy: "phone" }))).toBe(
+      "Kiosk: payment. Insert your card, 카드 넣기 (Insert card). Demo only, no money is charged.",
+    );
+    // A touch confirm on the kiosk keeps the kiosk's own method screen.
+    expect(kioskStep(malo, session("paying", { confirmedBy: "kiosk" }))).toBe(
+      "Kiosk: payment. Tap 카드 (Card), then 카드 넣기 (Insert card). Demo only, no money is charged.",
+    );
+  });
+
   it("says nothing before the review, and a ticket machine says tickets (R-007)", () => {
     expect(kioskStep(malo, session("ordering"))).toBeNull();
     expect(kioskStep(rail, session("confirming"))).toBe("Kiosk: ticket review. Nothing is paid until you confirm.");
@@ -146,6 +159,9 @@ describe("demoKioskStep", () => {
     expect(demoKioskStep(malo, session("ordering", { cart: [LINE] }), false)).toBe("Menu: your order shows at the bottom.");
     expect(demoKioskStep(malo, session("confirming", { cart: [LINE] }), false)).toBe("Order review: nothing is paid until you confirm.");
     expect(demoKioskStep(malo, session("paying", { cart: [LINE] }), false)).toBe("Payment: tap 카드 (Card), then 카드 넣기 (Insert card).");
+    expect(demoKioskStep(malo, session("paying", { cart: [LINE], confirmedBy: "phone" }), false)).toBe(
+      "Payment: insert your card, 카드 넣기 (Insert card).",
+    );
     expect(demoKioskStep(malo, session("paid", { orderNumber: 7 }), false)).toBe("Receipt question: the order number is next.");
     // The last screen of the flow: past the receipt question, the number is on the kiosk (#1 item 13).
     expect(demoKioskStep(malo, session("paid", { orderNumber: 7 }), true)).toBe("Order number: done, no money was charged.");

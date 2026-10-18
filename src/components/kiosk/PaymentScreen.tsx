@@ -5,6 +5,7 @@ import type { CommandReply } from "@/lib/client/api";
 import type { CommandType } from "@/lib/commands/schemas";
 import { kt } from "@/lib/i18n/kiosk";
 import { formatWon } from "@/lib/kiosk/menu";
+import { kioskPickedCard } from "@/lib/kiosk/payment";
 import type { KioskData } from "@/types/menu";
 import type { Session } from "@/types/session";
 import { Header } from "./KioskScreen";
@@ -16,6 +17,8 @@ import { CARD_SHADOW, FOCUS } from "./styles";
 // which the server accepts in `paying` from the kiosk alone, reaches `paid`. Canvas px.
 
 const APPROVE_MS = 1500;
+/** How long the 카드 tile shows KIBO's pick before the card step opens (owner 10-18, kioskPickedCard). */
+const PICK_MS = 900;
 
 type Step = "method" | "insert" | "approving";
 
@@ -35,8 +38,17 @@ export function PaymentScreen(props: {
   const [step, setStep] = useState<Step>("method");
   const [busy, setBusy] = useState(false);
   const approveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  // The phone's yes on a card-only kiosk: KIBO picks 카드 for the user, as it adds items, so the voice flow ends at
+  // the card (owner 10-18). The tile shows the pick, then the card step opens; a touch confirm keeps the choice here.
+  const picked = kioskPickedCard(kiosk, session);
 
   useEffect(() => () => clearTimeout(approveTimer.current), []);
+
+  useEffect(() => {
+    if (!picked || step !== "method") return;
+    const timer = setTimeout(() => setStep("insert"), PICK_MS);
+    return () => clearTimeout(timer);
+  }, [picked, step]);
 
   function insertCard() {
     setStep("approving");
@@ -73,7 +85,7 @@ export function PaymentScreen(props: {
           <>
             <h1 className="k-text-72 pb-12 font-bold">{kt("payMethodTitle", locale)}</h1>
             <div className="grid grid-cols-3 gap-8">
-              <MethodButton label={kt("payCard", locale)} onClick={() => setStep("insert")} icon={<CardIcon />} />
+              <MethodButton label={kt("payCard", locale)} onClick={() => setStep("insert")} icon={<CardIcon />} picked={picked} />
               <MethodButton label={kt("payEasy", locale)} note={kt("notSupported", locale)} icon={<PhonePayIcon />} />
               <MethodButton label={kt("payCoupon", locale)} note={kt("notSupported", locale)} icon={<CouponIcon />} />
             </div>
@@ -128,16 +140,17 @@ export function PaymentScreen(props: {
  * note wraps to two lines ("지원하지 않아요"); the tiles are tall enough that the screen keeps no empty band over 30%
  * (qa 10-16 F2, F3).
  */
-function MethodButton(props: { label: string; note?: string; icon: ReactNode; onClick?(): void }) {
+function MethodButton(props: { label: string; note?: string; icon: ReactNode; onClick?(): void; picked?: boolean }) {
   const enabled = Boolean(props.onClick);
   return (
     <button
       type="button"
       disabled={!enabled}
       onClick={props.onClick}
+      data-picked={props.picked || undefined}
       className={`flex min-h-152 flex-col items-center justify-start gap-6 rounded-[32px] border-[6px] px-6 pt-24 pb-6 text-center ${
         enabled
-          ? `border-(--k-primary) bg-white text-(--k-primary-dark) active:bg-(--k-primary-tint) ${CARD_SHADOW}`
+          ? `border-(--k-primary) bg-white text-(--k-primary-dark) active:bg-(--k-primary-tint) ${props.picked ? "k-ring" : CARD_SHADOW}`
           : "border-[#E2DACB] bg-(--k-panel) text-[#4B463F]"
       } ${FOCUS}`}
     >
