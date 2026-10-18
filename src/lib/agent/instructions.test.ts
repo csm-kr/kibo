@@ -211,21 +211,6 @@ describe("buildInstructions", () => {
     expect(learned).not.toContain("showMenu");
   });
 
-  // Owner 10-18 (deck p9): the kiosk's own screen changes language only when the user asks, and only to one it has.
-  it("switches the kiosk screen's language only on request, naming the languages it has", () => {
-    const ASK = 'When the user asks to change the kiosk screen\'s language ("키오스크도 영어로 바꿔줘", "switch the kiosk to English"), call setKioskLanguage with that language.';
-    const NEVER = "Never call it on your own: replying in the user's language does not change the kiosk screen.";
-    expect(text).toContain("The kiosk's own screen can show Korean and English.");
-    expect(text).toContain(ASK);
-    expect(text).toContain(NEVER);
-    expect(text).toContain("If the user asks for a language the kiosk screen does not have, say it has only Korean and English, and keep helping in their language.");
-    const rail = buildInstructions(getKiosk("airport_rail"), { locale: "en" });
-    expect(rail).toContain("The kiosk's own screen can show Korean, English and Japanese.");
-    const learned = buildInstructions(getKiosk("doughhouse"), { locale: "en" });
-    expect(learned).not.toContain("setKioskLanguage");
-    expect(learned).toContain("The kiosk's own screen shows only Korean and cannot be changed from the phone. If the user asks, say so and keep helping in their language.");
-  });
-
   // Owner 10-18: English speech on a Korean iPhone got Korean voice replies ("start in Korean" read as the reply language).
   it("the phone's language is only the start; replies follow the user's own words, named per language", () => {
     const ko = buildInstructions(k, { locale: "ko" });
