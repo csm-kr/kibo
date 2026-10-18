@@ -18,7 +18,7 @@ Not injected into harness steps (lives under `docs/plan/`).
 2. Prototype link: the Cloud Run URL of **`/demo`**
 3. Deck PDF on the mandatory template, ≤ 5 MB
 4. Public GitHub repo (https)
-5. Demo video link: the public Terms (re-read 10-18) say "a video demonstration strictly three to four minutes in length"; the FAQ still says under 3 minutes and the form field "up to 3 minutes", so the final cut is **3:00.6** (v4.6), public YouTube, English captions
+5. Demo video link: the form field reads "Demo Video Link (3-4 minutes)" and penalizes a video outside that range (logged-in form, read 10-18), and the public Terms (re-read 10-18) say "a video demonstration strictly three to four minutes in length"; only the FAQ still says under 3 minutes. The final cut is **3:00.6** (v4.7), public YouTube, English captions; any re-cut must stay at or above 3:00.0
 6. Solution description ≤ 1,024 characters, naming how Firebase/Firestore, Cloud Run and Gemini are used
 
 ## Solution description (draft)
