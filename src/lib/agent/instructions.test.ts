@@ -55,6 +55,13 @@ describe("buildInstructions", () => {
     expect(text).toMatch(/halal/);
   });
 
+  // Eval r-en-out-of-domain, 10-18: "Two tickets to the airport" on MALO took the unknown-info rule and called staff.
+  it("a request for something the kiosk does not sell says what it sells and asks, never a staff call", () => {
+    expect(text).toMatch(/something this kiosk does not sell.*never call callStaff/);
+    expect(text).toMatch(/say the category names from the menu data, and ask what they would like/);
+    expect(buildInstructions(getKiosk("airport_rail"), { locale: "en" })).not.toMatch(/something this kiosk does not sell/);
+  });
+
   it("limits item descriptions to menu data words (I-072)", () => {
     expect(text).toMatch(/describe items only with words from the menu data/i);
     expect(text).toMatch(/never add taste, temperature, origin, freshness or popularity words/i);

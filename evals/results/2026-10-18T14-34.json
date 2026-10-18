@@ -1,0 +1,85 @@
+{
+  "date": "2026-10-18T05:34:44.296Z",
+  "model": "gemini-3.8-flash",
+  "backend": "auto",
+  "modelCallsByBackend": {
+    "api": 1,
+    "vertex": 0
+  },
+  "thinkingLevel": "low",
+  "evalClock": "14:00 KST",
+  "subset": [
+    "r-en-out-of-domain"
+  ],
+  "cases": 1,
+  "passed": 1,
+  "passRate": 1,
+  "byGroup": {
+    "recovery": {
+      "pass": 1,
+      "total": 1
+    }
+  },
+  "byKiosk": {
+    "malo": {
+      "pass": 1,
+      "total": 1
+    }
+  },
+  "byType": {
+    "12-recovery": {
+      "pass": 1,
+      "total": 1
+    }
+  },
+  "latency": {
+    "requests": 1,
+    "totalMedianMs": 4785,
+    "totalP90Ms": 4785,
+    "firstToolRequests": 0,
+    "firstToolMedianMs": null,
+    "firstToolP90Ms": null,
+    "modelCalls": 1,
+    "roundMedianMs": 4537,
+    "roundP90Ms": 4537,
+    "callsPerRequest": {
+      "1": 1
+    },
+    "oneCallWithTools": 0
+  },
+  "notCovered": [
+    {
+      "type": "7-count-limits",
+      "reason": "Count limits (max 3 toppings) need the learned Doughhouse kiosk, which has no LearnedAdapter yet."
+    }
+  ],
+  "results": [
+    {
+      "id": "r-en-out-of-domain",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": []
+      },
+      "requests": [
+        {
+          "ms": 4785,
+          "firstToolMs": null,
+          "rounds": [
+            4537
+          ],
+          "tools": []
+        }
+      ]
+    }
+  ]
+}

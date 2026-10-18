@@ -1,0 +1,145 @@
+{
+  "date": "2026-10-18T05:18:30.509Z",
+  "model": "gemini-3.8-flash",
+  "backend": "vertex",
+  "modelCallsByBackend": {
+    "api": 0,
+    "vertex": 5
+  },
+  "thinkingLevel": "low",
+  "evalClock": "14:00 KST",
+  "subset": [
+    "r-en-unsupported-modifier",
+    "r-en-out-of-domain"
+  ],
+  "cases": 2,
+  "passed": 2,
+  "passRate": 1,
+  "byGroup": {
+    "recovery": {
+      "pass": 2,
+      "total": 2
+    }
+  },
+  "byKiosk": {
+    "malo": {
+      "pass": 2,
+      "total": 2
+    }
+  },
+  "byType": {
+    "12-recovery": {
+      "pass": 2,
+      "total": 2
+    }
+  },
+  "latency": {
+    "requests": 2,
+    "totalMedianMs": 9872,
+    "totalP90Ms": 10124,
+    "firstToolRequests": 2,
+    "firstToolMedianMs": 6939,
+    "firstToolP90Ms": 7486,
+    "modelCalls": 5,
+    "roundMedianMs": 2358,
+    "roundP90Ms": 7480,
+    "callsPerRequest": {
+      "2": 1,
+      "3": 1
+    },
+    "oneCallWithTools": 0
+  },
+  "notCovered": [
+    {
+      "type": "7-count-limits",
+      "reason": "Count limits (max 3 toppings) need the learned Doughhouse kiosk, which has no LearnedAdapter yet."
+    }
+  ],
+  "results": [
+    {
+      "id": "r-en-unsupported-modifier",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "spicy_chicken_burger",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 10124,
+          "firstToolMs": 6939,
+          "rounds": [
+            6929,
+            1631,
+            1507
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-en-out-of-domain",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": []
+      },
+      "requests": [
+        {
+          "ms": 9872,
+          "firstToolMs": 7486,
+          "rounds": [
+            7480,
+            2358
+          ],
+          "tools": [
+            {
+              "name": "showMenu",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
