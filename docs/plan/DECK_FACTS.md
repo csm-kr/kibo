@@ -146,7 +146,7 @@ Blind KIBO Learn first (`docs/plan/SUBMISSION.md`).
 ## 14 Links
 | Fact | Source | Status |
 |---|---|---|
-| Product: https://kibo-407514467119.asia-northeast3.run.app/demo (the Cloud Run service `kibo`, `asia-northeast3`; production revision `kibo-00028-dl2` on 10-18, relay `kibo-voice-00008-xwn`) | `README.md`; `gcloud run services describe kibo --region asia-northeast3` | deployed (host confirmed 10-14, I-092); the revision changes with each deploy, so read it again before quoting it |
+| Product: https://kibo-407514467119.asia-northeast3.run.app/demo (the Cloud Run service `kibo`, `asia-northeast3`; production revision `kibo-00030-lzt` on 10-18, relay `kibo-voice-00009-xm9`) | `README.md`; `gcloud run services describe kibo --region asia-northeast3` | deployed (host confirmed 10-14, I-092); the revision changes with each deploy, so read it again before quoting it |
 | GitHub repo, demo video | — | not yet public (license open, I-089) |
 
 Slots 2, 15 and 16 of the template are not planned in `docs/plan/SUBMISSION.md`. In the final deck slot 2 (download instructions) is removed, slot 15 is the Impact page (20) and slot 16 the thank-you page (28).
