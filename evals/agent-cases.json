@@ -776,6 +776,38 @@
       "locale": "en",
       "turns": ["Show me the cards and passes."],
       "expect": { "screen": { "category": "pass" } }
+    },
+    {
+      "id": "r-en-big-qty",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "en",
+      "turns": ["10 cola, please."],
+      "expect": { "ask": {} }
+    },
+    {
+      "id": "r-en-big-qty-yes",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "en",
+      "turns": ["10 cola, please.", { "tapChoice": "yes" }],
+      "expect": { "cart": [{ "itemId": "cola", "variant": "single", "qty": 10, "selections": { "size": ["m"] } }] }
+    },
+    {
+      "id": "r-ko-big-qty",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "ko",
+      "turns": ["콜라 10개 주세요."],
+      "expect": { "ask": {} }
+    },
+    {
+      "id": "r-en-zero-cola-one",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "en",
+      "turns": ["One zero cola, please."],
+      "expect": { "cart": [{ "itemId": "zero_cola", "variant": "single", "qty": 1, "selections": { "size": ["m"] } }] }
     }
   ]
 }

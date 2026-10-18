@@ -1,0 +1,191 @@
+{
+  "date": "2026-10-18T06:57:51.324Z",
+  "model": "gemini-3.8-flash",
+  "backend": "vertex",
+  "modelCallsByBackend": {
+    "api": 0,
+    "vertex": 5
+  },
+  "thinkingLevel": "low",
+  "evalClock": "14:00 KST",
+  "subset": [
+    "r-en-big-qty",
+    "r-ko-big-qty",
+    "r-en-zero-cola-one"
+  ],
+  "cases": 3,
+  "passed": 1,
+  "passRate": 0.3333333333333333,
+  "byGroup": {
+    "recovery": {
+      "pass": 1,
+      "total": 3
+    }
+  },
+  "byKiosk": {
+    "malo": {
+      "pass": 1,
+      "total": 3
+    }
+  },
+  "byType": {
+    "12-recovery": {
+      "pass": 1,
+      "total": 3
+    }
+  },
+  "latency": {
+    "requests": 3,
+    "totalMedianMs": 6626,
+    "totalP90Ms": 8771,
+    "firstToolRequests": 3,
+    "firstToolMedianMs": 4722,
+    "firstToolP90Ms": 7049,
+    "modelCalls": 5,
+    "roundMedianMs": 2268,
+    "roundP90Ms": 7039,
+    "callsPerRequest": {
+      "1": 1,
+      "2": 2
+    },
+    "oneCallWithTools": 1
+  },
+  "notCovered": [
+    {
+      "type": "7-count-limits",
+      "reason": "Count limits (max 3 toppings) need the learned Doughhouse kiosk, which has no LearnedAdapter yet."
+    }
+  ],
+  "results": [
+    {
+      "id": "r-en-big-qty",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": false,
+      "reason": "names none of the expected items",
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "yes_no",
+        "choices": [
+          {
+            "kind": "yesno",
+            "id": "yes"
+          },
+          {
+            "kind": "yesno",
+            "id": "no"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": []
+      },
+      "requests": [
+        {
+          "ms": 8771,
+          "firstToolMs": 7049,
+          "rounds": [
+            7039,
+            1666
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-ko-big-qty",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "ko",
+      "pass": false,
+      "reason": "names none of the expected items",
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "yes_no",
+        "choices": [
+          {
+            "kind": "yesno",
+            "id": "yes"
+          },
+          {
+            "kind": "yesno",
+            "id": "no"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": []
+      },
+      "requests": [
+        {
+          "ms": 6626,
+          "firstToolMs": 4722,
+          "rounds": [
+            4720,
+            1801
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-en-zero-cola-one",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "zero_cola",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "size": [
+              "m"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 2306,
+          "firstToolMs": 2273,
+          "rounds": [
+            2268
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
