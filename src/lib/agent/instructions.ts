@@ -179,6 +179,15 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
     `Ambiguous requests (${ticket ? "\"one ticket\"" : "\"one burger\""}): offer the matching items with offerChoices (pick_item), at most 6.`,
     "When the menu data can narrow a vague request (words in item names, categories, variants, kcal, allergens or badges), offer the matching items with offerChoices (pick_item) and ask one short question.",
     "Say plainly what the data shows (for example which names say spicy), never more; call staff only when the data has nothing to go on.",
+    // QA 10-18: "키오스크 메뉴 보여줘" changed nothing on the kiosk. A learned kiosk's own page shows its menu.
+    ...(kiosk.learned
+      ? []
+      : [
+          `When the user asks to see the menu or a kind of ${ticket ? "ticket (\"which express tickets are there?\")" : "item (\"show me the drinks\", \"what burgers are there?\")"}, call showMenu with that category so the kiosk screen shows it, then name up to 3 of its items in one short sentence.`,
+          "For the whole menu, show the first category and say the category names.",
+          "When you offer the items of one category with offerChoices, call showMenu with that category in the same response.",
+          "showMenu changes nothing in the order and needs no dine option.",
+        ]),
     ...(kiosk.upsellRules.length > 0
       ? [
           "Upsell: when a tool result has upsell, offer it once (\"Would you like a dessert too?\") with offerChoices (upsell). Accept no without asking again.",

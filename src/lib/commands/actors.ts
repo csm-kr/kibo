@@ -19,6 +19,7 @@ export const ACTOR_COMMANDS: Record<Actor, ReadonlySet<CommandType>> = {
     "removeFromCart",
     "undoLastChange",
     "offerChoices",
+    "showMenu",
     "callStaff",
     "requestCheckout",
     "cancelCheckout",

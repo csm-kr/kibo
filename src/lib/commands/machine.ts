@@ -200,6 +200,14 @@ function transition(s: Session, cmd: Command, ctx: CommandContext): { next: Sess
       return { next: { ...s, pendingChoice: { templateId, choices: choices.map((c) => ({ ...c })) } }, result: {} };
     }
 
+    case "showMenu":
+      // Changes only what the kiosk shows; the dine option can come later (requestCheckout asks for it).
+      requireStatus(s, ["connected", "ordering"], "The order is being reviewed or paid.");
+      if (!k.categories.some((c) => c.categoryId === cmd.args.category)) {
+        throw new CommandError("BAD_REQUEST", "That category is not on this kiosk.");
+      }
+      return { next: { ...s, status: "ordering", screen: { category: cmd.args.category, at: ctx.now } }, result: {} };
+
     case "callStaff":
       return { next: { ...s, staffCalled: { reasonCode: cmd.args.reasonCode, at: ctx.now } }, result: {} };
 
@@ -347,6 +355,9 @@ function learnedTransition(s: Session, cmd: Command, ctx: CommandContext): { nex
     case "updateCart":
       throw new CommandError("CONFLICT", "On this kiosk, please remove the item and add it again.");
 
+    case "showMenu":
+      throw new CommandError("CONFLICT", "On this kiosk, the menu is on the kiosk screen.");
+
     case "confirmCheckout":
     case "editOrder":
     case "cardAction":
@@ -396,8 +407,10 @@ export function applyCommand(
   const { next, result } = ctx.kiosk.kind === "learned" ? learnedTransition(s, cmd, ctx) : transition(s, cmd, ctx);
   // The bridge's report is not a user answer, so an open question stays open. A dine option answers only the dine
   // question: the AI may have asked "which burger?" before it (10-17, a real iPhone lost those buttons to the dine tap).
+  // showMenu answers nothing: the AI shows the burgers on the kiosk while it asks which one.
   const keepsChoice =
     cmd.type === "offerChoices" ||
+    cmd.type === "showMenu" ||
     cmd.type === "bridgeReport" ||
     (cmd.type === "setDineOption" && next.pendingChoice?.templateId !== "pick_dine");
   return {

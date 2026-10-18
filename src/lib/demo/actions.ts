@@ -42,6 +42,7 @@ const TRIED: Record<string, (x: string, l: Locale) => string> = {
   removeFromCart: (x, l) => (l === "ko" ? `${x}을(를) 빼려고 했어요` : `Tried to remove ${x}`),
   undoLastChange: (_, l) => (l === "ko" ? "되돌리려고 했어요" : "Tried to undo"),
   offerChoices: (_, l) => (l === "ko" ? "선택지를 보여 주려고 했어요" : "Tried to show choices"),
+  showMenu: (_, l) => (l === "ko" ? "키오스크 화면을 바꾸려고 했어요" : "Tried to change the kiosk screen"),
   callStaff: (_, l) => (l === "ko" ? "직원을 부르려고 했어요" : "Tried to call staff"),
   requestCheckout: (_, l) => (l === "ko" ? "주문 내역을 띄우려고 했어요" : "Tried to open your order review"),
   confirmCheckout: (_, l) => (l === "ko" ? "결제하려고 했어요" : "Tried to pay"),
@@ -118,6 +119,10 @@ function okText(k: KioskData, a: AgentAction, locale: Locale): string {
       const labels = choices.map((c) => choiceLabel(k, c, locale)).filter(Boolean);
       const shown = labels.length > 4 ? [...labels.slice(0, 4), "…"] : labels;
       return ko ? `물어봤어요: ${shown.join(", ")}` : `Asked which one: ${shown.join(", ")}`;
+    }
+    case "showMenu": {
+      const name = k.categories.find((c) => c.categoryId === args.category)?.name[locale] ?? (ko ? "메뉴" : "the menu");
+      return ko ? `키오스크에 ${name}을(를) 띄웠어요` : `Showed ${name} on the kiosk`;
     }
     case "callStaff":
       return ko ? "직원을 호출했어요" : "Called staff";

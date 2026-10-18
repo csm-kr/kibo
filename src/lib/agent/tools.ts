@@ -1,7 +1,7 @@
 import type { FunctionDeclaration } from "@google/genai";
 import type { KioskData } from "@/types/menu";
 
-// The 9 agent tools (docs/ARCHITECTURE.md "Agent tools"), shared by Gemini Live and /api/chat.
+// The 10 agent tools (docs/ARCHITECTURE.md "Agent tools"), shared by Gemini Live and /api/chat.
 // Enums come from the catalog so the model can only name real ids; the server still validates everything.
 
 const VARIANTS = ["single", "set", "largeSet"];
@@ -81,6 +81,10 @@ export function toolDeclarations(k: KioskData): FunctionDeclaration[] {
       },
       ["templateId", "choices"],
     )],
+    ["showMenu", "Show a category on the kiosk screen when the user asks to see the menu or a kind of item.", object(
+      { category: { type: "string", enum: k.categories.map((c) => c.categoryId) } },
+      ["category"],
+    )],
     ["callStaff", "Call staff to the kiosk when the menu data cannot answer, the user asks for staff, or the user is stuck.", object(
       { reasonCode: { type: "string", enum: ["unknown_info", "user_request", "stuck"] } },
       ["reasonCode"],
@@ -89,8 +93,9 @@ export function toolDeclarations(k: KioskData): FunctionDeclaration[] {
     ["confirmCheckout", "Move to payment, only after the user clearly says yes in a new turn after the confirm card appeared.", object({})],
   ];
 
-  // A learned kiosk changes a line by remove + add, and the user pays on the kiosk itself (ARCHITECTURE "Agent tools").
-  const omit = [...(k.kind === "learned" ? ["updateCart", "confirmCheckout"] : []), ...(dine ? [] : ["setDineOption"])];
+  // A learned kiosk changes a line by remove + add, the user pays on the kiosk itself, and its own page shows its menu
+  // (ARCHITECTURE "Agent tools").
+  const omit = [...(k.kind === "learned" ? ["updateCart", "confirmCheckout", "showMenu"] : []), ...(dine ? [] : ["setDineOption"])];
   return tools
     .filter(([name]) => !omit.includes(name))
     .map(([name, description, parametersJsonSchema]) => ({ name, description, parametersJsonSchema }));

@@ -20,7 +20,7 @@ export interface DoneCall {
 
 const SIMPLE = new Set(["setDineOption", "addToCart", "updateCart", "removeFromCart", "undoLastChange", "requestCheckout", "confirmCheckout"]);
 
-type Kind = "add" | "update" | "remove" | "undo" | "dine" | "review" | "confirm" | "staff" | "entering";
+type Kind = "add" | "update" | "remove" | "undo" | "dine" | "review" | "confirm" | "staff" | "entering" | "show";
 
 /** Hangul syllable with a final consonant; `exceptRieul` treats a final ㄹ as none (for 로/으로). */
 function hasFinal(word: string, exceptRieul = false): boolean {
@@ -96,6 +96,11 @@ function sentencesFor(kiosk: KioskData, locale: Locale, calls: DoneCall[], stric
       push("staff");
       continue;
     }
+    if (c.name === "showMenu") {
+      const category = kiosk.categories.find((x) => x.categoryId === (c.args as { category?: unknown } | null)?.category);
+      if (category) push("show", category.name[locale]);
+      continue;
+    }
     // offerChoices: the caller ends the reply with its question.
     if (!SIMPLE.has(c.name)) continue;
     const lineId = (c.args as { lineId?: unknown } | null)?.lineId;
@@ -158,6 +163,8 @@ function sentencesFor(kiosk: KioskData, locale: Locale, calls: DoneCall[], stric
         return ko ? "직원을 불렀어요. 곧 도와드릴 거예요." : "I've called staff. Someone will come to help you.";
       case "entering":
         return ko ? "키오스크에 입력하고 있어요." : "The kiosk is entering it now.";
+      case "show":
+        return ko ? `키오스크 화면에 ${items[0]}${hasFinal(items[0]) ? "을" : "를"} 띄웠어요.` : `The kiosk shows ${items[0]} now.`;
     }
   });
   // The total after a cart change, unless the review or payment sentence already covers it.

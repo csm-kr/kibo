@@ -140,7 +140,7 @@ const ACCESS = [
   "Screen-reader labels, and cart changes announced when the AI voice is off",
   "Text and buttons when the microphone is unavailable",
   "Call staff always visible on the phone",
-  "Screens in Korean and English; the AI also answers in Japanese, Chinese, Spanish, Vietnamese, French, Thai and Indonesian (tested by typing, not yet by speaking)",
+  "Screens in Korean and English, and 日本語 on the ticket machine; the AI also answers in Japanese, Chinese, Spanish, Vietnamese, French, Thai and Indonesian (tested by typing; Japanese also by speaking)",
 ];
 
 export default function Home() {

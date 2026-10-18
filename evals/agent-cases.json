@@ -743,6 +743,39 @@
       "locale": "en",
       "turns": ["Two tickets to the airport, please."],
       "expect": { "choices": { "templateId": "pick_item", "ids": ["staff"] } }
+    },
+    {
+      "id": "r-ko-show-menu",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "ko",
+      "turns": ["키오스크에 음료 메뉴 좀 보여줘"],
+      "expect": { "screen": { "category": "drink" } }
+    },
+    {
+      "id": "r-ko-show-menu-all",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "ko",
+      "turns": ["키오스크 메뉴 보여줘"],
+      "expect": { "screen": { "category": "burger" } }
+    },
+    {
+      "id": "r-en-show-menu",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "en",
+      "turns": ["What desserts do you have? Show me on the kiosk."],
+      "expect": { "screen": { "category": "dessert" } }
+    },
+    {
+      "id": "r-en-rail-show-passes",
+      "kioskId": "airport_rail",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "en",
+      "turns": ["Show me the cards and passes."],
+      "expect": { "screen": { "category": "pass" } }
     }
   ]
 }

@@ -142,12 +142,16 @@ describe("actors", () => {
   it("matches the ARCHITECTURE command table", () => {
     expect([...ACTOR_COMMANDS.phone].sort()).toEqual([
       "addToCart", "callStaff", "cancelCheckout", "confirmCheckout", "offerChoices",
-      "removeFromCart", "requestCheckout", "setDineOption", "undoLastChange", "updateCart",
+      "removeFromCart", "requestCheckout", "setDineOption", "showMenu", "undoLastChange", "updateCart",
     ]);
     expect([...ACTOR_COMMANDS.kiosk].sort()).toEqual([
       "addToCart", "bridgeReport", "callStaff", "cancelCheckout", "cardAction", "clearCart", "confirmCheckout", "editOrder",
       "reissueClaim", "removeFromCart", "requestCheckout", "setDineOption", "startTouch", "undoLastChange", "updateCart",
     ]);
+  });
+
+  it("a kiosk cannot send showMenu (its own rail moves by touch)", () => {
+    expect(catchError(() => applyCommand(ordering(), cmd("showMenu", { category: "drink" }), ctx("kiosk"))).code).toBe("FORBIDDEN");
   });
 
   it.each(["cardAction", "editOrder", "startTouch", "clearCart", "reissueClaim"])("a phone cannot send %s", (type) => {
@@ -617,6 +621,61 @@ describe("offerChoices", () => {
   });
 });
 
+// QA 10-18: "키오스크 메뉴 보여줘" left the kiosk on 매장/포장: only a cart change moved its screen.
+describe("showMenu", () => {
+  const show = (category: string, extra: Record<string, unknown> = {}) =>
+    cmd("showMenu", { category }, { source: "voice", utteranceSeq: 1, ...extra });
+
+  it("moves a connected phone session to ordering on that category, with no dine option and no cart change", () => {
+    const s = applyCommand({ ...fresh(), status: "connected" }, show("drink"), ctx("phone", T0 + 5000)).session;
+    expect(s.status).toBe("ordering");
+    expect(s.screen).toEqual({ category: "drink", at: T0 + 5000 });
+    expect(s.dineOption).toBeNull();
+    expect(s.cartVersion).toBe(0);
+    expect(s.lastChange).toBeNull();
+    expect(s.undoStack).toEqual([]);
+  });
+
+  it("in ordering changes only the shown category; text works too", () => {
+    const before = ordering();
+    const s = applyCommand(before, show("dessert", { source: "text" }), ctx("phone", T0 + 6000)).session;
+    expect(s.screen).toEqual({ category: "dessert", at: T0 + 6000 });
+    expect({ ...s, screen: before.screen, recentCommandIds: [], lastSeenAt: 0, expiresAt: 0 }).toEqual({
+      ...before,
+      recentCommandIds: [],
+      lastSeenAt: 0,
+      expiresAt: 0,
+    });
+  });
+
+  it("keeps an open question: the AI shows the burgers and asks which one in the same turn", () => {
+    const choices = [
+      { kind: "item", id: "cheese_burger" },
+      { kind: "item", id: "bulgogi_burger" },
+    ];
+    const offered = applyCommand(
+      { ...fresh(), status: "connected" },
+      cmd("offerChoices", { templateId: "pick_item", choices }, { source: "voice" }),
+      ctx("phone"),
+    ).session;
+    expect(applyCommand(offered, show("burger"), ctx("phone")).session.pendingChoice).toEqual({ templateId: "pick_item", choices });
+  });
+
+  it("a category this kiosk does not have → BAD_REQUEST", () => {
+    expect(catchError(() => applyCommand(ordering(), show("pizza"), ctx("phone"))).code).toBe("BAD_REQUEST");
+  });
+
+  it.each(["confirming", "paying"] as const)("is refused in %s (CONFLICT)", (status) => {
+    expect(catchError(() => applyCommand({ ...fresh(), status }, show("drink"), ctx("phone"))).code).toBe("CONFLICT");
+  });
+
+  it("works on the ticket machine's categories", () => {
+    const rail = getKiosk("airport_rail");
+    const s = applyCommand({ ...fresh(), status: "connected" }, show("pass"), { ...ctx("phone", T0 + 7000), kiosk: rail }).session;
+    expect(s.screen).toEqual({ category: "pass", at: T0 + 7000 });
+  });
+});
+
 describe("expiry and bookkeeping", () => {
   it("an expired status or a passed expiresAt → GONE", () => {
     const expired: Session = { ...fresh(), status: "expired" };
@@ -859,6 +918,11 @@ describe("learned kiosk (doughhouse)", () => {
     const err = catchError(() => applyCommand(one, c, lctx("phone", T0 + 3000)));
     expect(err.code).toBe("CONFLICT");
     expect(err.message).toBe("On this kiosk, please remove the item and add it again.");
+  });
+
+  it("showMenu → CONFLICT: the bridge does not move the kiosk page's own menu", () => {
+    const err = catchError(() => applyCommand(learnedOrdering(), voice("showMenu", { category: dh.categories[0].categoryId }), lctx("phone")));
+    expect(err.code).toBe("CONFLICT");
   });
 
   it("undo after an add becomes a pending removeFromCart of that line; otherwise CONFLICT", () => {

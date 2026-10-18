@@ -26,9 +26,11 @@ export function kioskScreen(
       return local.touchStarted ? dine : "attract";
     case "connected":
       return dine;
-    case "ordering":
-      // A phone can add items before the dine option (requestCheckout asks for it later).
-      return local.touchStarted && session.dineOption === null && session.cart.length === 0 ? dine : "menu";
+    case "ordering": {
+      // A phone can add items or ask for the menu (showMenu) before the dine option (requestCheckout asks for it later).
+      const nothingYet = session.dineOption === null && session.cart.length === 0 && session.screen.at === undefined;
+      return local.touchStarted && nothingYet ? dine : "menu";
+    }
     case "confirming":
       return "review";
     case "paying":

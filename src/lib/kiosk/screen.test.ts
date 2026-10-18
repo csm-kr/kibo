@@ -53,6 +53,11 @@ describe("kioskScreen", () => {
     expect(kioskScreen(session("idle"), touch, malo)).toBe("dine");
   });
 
+  // A voice "show me the drinks" (showMenu) is a request for the menu, even on a kiosk someone touched first.
+  it("ordering after showMenu: the menu, even when touch was tapped and nothing is chosen yet", () => {
+    expect(kioskScreen(session("ordering", { screen: { category: "drink", at: 1 } }), touch, malo)).toBe("menu");
+  });
+
   it("connected (phone claimed the QR): dine", () => {
     expect(kioskScreen(session("connected"), none, malo)).toBe("dine");
     expect(kioskScreen(session("connected"), touch, malo)).toBe("dine");

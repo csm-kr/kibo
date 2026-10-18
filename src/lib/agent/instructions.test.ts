@@ -176,6 +176,26 @@ describe("buildInstructions", () => {
     expect(buildInstructions(getKiosk("airport_rail"), { locale: "en" })).not.toContain(LINE);
   });
 
+  // QA 10-18: "키오스크 메뉴 보여줘" changed nothing on the kiosk; a learned kiosk's own page shows its menu.
+  it("a menu request moves the kiosk with showMenu, also with the buttons; never on a learned kiosk", () => {
+    const LINES = [
+      "call showMenu with that category so the kiosk screen shows it",
+      "For the whole menu, show the first category and say the category names.",
+      "When you offer the items of one category with offerChoices, call showMenu with that category in the same response.",
+      "showMenu changes nothing in the order and needs no dine option.",
+    ];
+    const rail = buildInstructions(getKiosk("airport_rail"), { locale: "en" });
+    const learned = buildInstructions(getKiosk("doughhouse"), { locale: "en" });
+    for (const line of LINES) {
+      expect(text).toContain(line);
+      expect(rail).toContain(line);
+      expect(learned).not.toContain(line);
+    }
+    expect(text).toContain('"show me the drinks"');
+    expect(rail).not.toContain("drinks");
+    expect(learned).not.toContain("showMenu");
+  });
+
   it("explains replay, remove-and-add and paying on the kiosk only for a learned kiosk", () => {
     const LEARNED = [
       "This kiosk is operated by replaying its own screens.",

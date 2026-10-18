@@ -37,6 +37,7 @@ describe("toolCallToCommand", () => {
   });
 
   it("leaves out what the model did not send", () => {
+    expect(toolCallToCommand("showMenu", { category: "drink" })).toEqual({ type: "showMenu", args: { category: "drink" } });
     expect(toolCallToCommand("addToCart", { itemId: "cola" })).toEqual({ type: "addToCart", args: { itemId: "cola" } });
     expect(toolCallToCommand("addToCart", { itemId: "cola", options: [] }).args).toEqual({ itemId: "cola" });
   });

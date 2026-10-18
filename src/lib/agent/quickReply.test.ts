@@ -110,6 +110,15 @@ describe("summaryReply (15-judge-fixes:0)", () => {
     expect(reply).not.toMatch(/yes, pay now/i);
   });
 
+  // QA 10-18: the kiosk moves to the asked category; the model normally names its items, this is the fallback.
+  it("a shown category is named from menu data; quickReply leaves it to the model", () => {
+    const shown = call("showMenu", { category: "drink" }, ok([]));
+    expect(summaryReply(malo, "ko", [shown], null)).toBe("키오스크 화면에 음료를 띄웠어요.");
+    expect(summaryReply(malo, "en", [shown], null)).toBe("The kiosk shows Drinks now.");
+    expect(summaryReply(malo, "ko", [call("showMenu", { category: "burger" }, ok([]))], null)).toBe("키오스크 화면에 버거를 띄웠어요.");
+    expect(quickReply(malo, "en", [shown])).toBeNull();
+  });
+
   it("null when nothing was applied and nothing is asked", () => {
     expect(summaryReply(malo, "en", [failed], null)).toBeNull();
     expect(summaryReply(malo, "en", [], null)).toBeNull();

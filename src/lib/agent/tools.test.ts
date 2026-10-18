@@ -11,7 +11,7 @@ const byName = (name: string) => decls.find((d) => d.name === name)!;
 const params = (name: string) => byName(name).parametersJsonSchema as Schema;
 
 describe("toolDeclarations", () => {
-  it("declares the 9 tools, each with a one-line description", () => {
+  it("declares the 10 tools, each with a one-line description", () => {
     expect(decls.map((d) => d.name)).toEqual([
       "setDineOption",
       "addToCart",
@@ -19,6 +19,7 @@ describe("toolDeclarations", () => {
       "removeFromCart",
       "undoLastChange",
       "offerChoices",
+      "showMenu",
       "callStaff",
       "requestCheckout",
       "confirmCheckout",
@@ -85,13 +86,20 @@ describe("toolDeclarations", () => {
     expect(railIds).toContain("staff");
   });
 
+  // QA 10-18: a voice "show me the menu" had no tool, so the kiosk screen never moved.
+  it("gives showMenu a required category from this kiosk's categories", () => {
+    const p = params("showMenu");
+    expect(p.required).toEqual(["category"]);
+    expect(p.properties!.category.enum).toEqual(k.categories.map((c) => c.categoryId));
+  });
+
   it("gives the no-argument tools an empty object", () => {
     for (const name of ["undoLastChange", "requestCheckout", "confirmCheckout"]) {
       expect(params(name).properties).toEqual({});
     }
   });
 
-  it("leaves setDineOption and dine choices out on a kiosk without dine options (8 tools)", () => {
+  it("leaves setDineOption and dine choices out on a kiosk without dine options (9 tools)", () => {
     const rail = getKiosk("airport_rail");
     const ticket = toolDeclarations(rail);
     expect(ticket.map((d) => d.name)).toEqual([
@@ -100,6 +108,7 @@ describe("toolDeclarations", () => {
       "removeFromCart",
       "undoLastChange",
       "offerChoices",
+      "showMenu",
       "callStaff",
       "requestCheckout",
       "confirmCheckout",
@@ -112,7 +121,7 @@ describe("toolDeclarations", () => {
     expect(add.variant.enum).toEqual(["single"]);
   });
 
-  it("leaves updateCart and confirmCheckout out for a learned kiosk (7 tools)", () => {
+  it("leaves updateCart, confirmCheckout and showMenu out for a learned kiosk (7 tools)", () => {
     const dh = getKiosk("doughhouse");
     const learned = toolDeclarations(dh);
     expect(learned.map((d) => d.name)).toEqual([

@@ -78,7 +78,7 @@ describe("issueLiveToken", () => {
     expect(issued[0].expireTime).toBe(new Date(T0 + 600_000).toISOString());
   });
 
-  it("pins the model, the instructions with the menu and the current cart, and the 9 tools", async () => {
+  it("pins the model, the instructions with the menu and the current cart, and the 10 tools", async () => {
     const s = await demo();
     await kiosk(s, "addToCart", HERO_LINE);
     await issue(s, s.deviceToken);
@@ -97,6 +97,7 @@ describe("issueLiveToken", () => {
         "removeFromCart",
         "requestCheckout",
         "setDineOption",
+        "showMenu",
         "undoLastChange",
         "updateCart",
       ].sort(),

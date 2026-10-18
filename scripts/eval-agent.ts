@@ -49,6 +49,8 @@ type Expect =
   | { staff: true }
   | { refuse: true }
   | { status: SessionStatus }
+  // QA 10-18 ("키오스크 메뉴 보여줘"): the kiosk shows this category after a showMenu call, and the cart is unchanged.
+  | { screen: { category: string } }
   // The last reply passes the grounding check (I-072) and names at least one of these items. `payOnKiosk` (learned
   // kiosks, I-100): the order is at the review, nobody tried confirmCheckout and the reply never offers to pay.
   | { reply: { mentionsAny?: string[]; payOnKiosk?: true } };
@@ -188,6 +190,11 @@ function judge(
     return e.choices ? choiceMiss(final, e.choices) : null;
   }
   if ("status" in e) return final.status === e.status ? null : `status ${final.status}`;
+  if ("screen" in e) {
+    if (!unchanged) return "cart changed";
+    const shown = final.screen.at === undefined ? "none" : (final.screen.category ?? "none");
+    return shown === e.screen.category ? null : `kiosk shows ${shown}`;
+  }
   if (!unchanged) return "cart changed";
   if ("choices" in e) {
     if (e.noCheckout && calls.some((t) => t.name === "requestCheckout" || t.name === "confirmCheckout")) return "tried checkout";

@@ -118,6 +118,15 @@ export function MenuScreen(props: {
     }
   }
 
+  // showMenu: the AI asked the kiosk to show a category (QA 10-18), with the same rule as a change above.
+  const shownAt = session.screen.at ?? null;
+  const [seenShownAt, setSeenShownAt] = useState(shownAt);
+  if (shownAt !== seenShownAt) {
+    setSeenShownAt(shownAt);
+    const target = session.screen.category;
+    if (shownAt !== null && target && !sheetItem && !recentTouch) setCategory(target);
+  }
+
   useEffect(() => {
     if (!flash) return;
     const t = setTimeout(() => setFlash(null), RING_MS);

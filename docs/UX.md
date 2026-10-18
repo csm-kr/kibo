@@ -77,6 +77,7 @@ Pressing "Order by touch" runs the familiar kiosk flow (dine option → category
 |---|---|---|---|
 | **Misheard** | Shows what it heard. **[Undo]** once or "No, cancel that" reverts the last change | Last change reverted | 3, 9 |
 | **Ambiguous** ("one burger") | Asks with **choice buttons** (photos): cheeseburger / bulgogi / double… then "Make it a set?" No need to remember options | Shows the category | 6, 5 |
+| **"Show me the menu"** / "show me the drinks" (10-18, I-402) | Names up to 3 of its items; for the whole menu, the category names. No dine option needed yet (asked at checkout) | Leaves K2 for K3 and its rail moves to that category (the first one for the whole menu), unless someone is choosing on the kiosk (an open sheet or a touch in the last 5 s); a learned kiosk's page is not moved | 1, 6 |
 | **Sold out** | "The shrimp burger is sold out." + two similar items as buttons | Sold-out mark | 9 |
 | **Order before the dine option** (a learned kiosk, which asks it before its menu; or "I'll pay" on MALO with none chosen) | "Eat here or take out?" with the two buttons; nothing is added yet. A question the AI asks before it (which burger) shows on the talk screen, and an eat-in tap on either screen keeps it open (10-17). After the tap the phone sends the same message again, shown as "Continuing your order…", so the user never retypes it (15-judge-fixes:1). With voice open, the tap goes to the conversation as the answer | Moves to the menu once the dine option is in, then the lines appear | 3, 6 |
 | **Place the machine does not sell** (a real station, "to the airport") | Never swaps in another ticket: "This machine doesn't sell that. It sells express tickets to City Center, 39 min, 10,500 won, and …", then the matching tickets as buttons with **[Call staff]** last (the same staff call as the header) | Unchanged | 9, 6 |
@@ -99,7 +100,7 @@ Every screen and state that a QA pass must look at (`docs/UI_QA.md`). Ids are us
 | Id | Screen | Session status | Next |
 |---|---|---|---|
 | K1 | Kiosk attract (talk QR, touch, large text; the language row 한국어 · English, and 日本語 on the airport rail ticket machine, for this order). On a landscape screen the kiosk is as tall as the screen and KIBO's slim status column sits beside every kiosk screen (where to find the QR and code, phone status, order line; never a second QR or code; see Flow C1a) | `idle` | K2 or phone P1 |
-| K2 | Kiosk dine-in / take-out, small QR in the toolbar row; [처음으로] bottom left (standalone `/kiosk` only) | `connected` / `ordering` | K3, or K1 by [처음으로] |
+| K2 | Kiosk dine-in / take-out, small QR in the toolbar row; [처음으로] bottom left (standalone `/kiosk` only) | `connected` / `ordering` | K3 (a dine tap, the phone's first add, or "show me the menu"), or K1 by [처음으로] |
 | K3 | Kiosk menu: category rail, photo grid, cart bar ([처음으로] first in its button row on the standalone `/kiosk`; with items it asks "주문을 취소하고 처음으로 갈까요?" first), small QR | `ordering` | K4, K5, K6, or K1 by [처음으로] |
 | K4 | Kiosk product sheet: set → side → drink → ingredients | `ordering` | K3 |
 | K5 | Kiosk upsell pop-up (once per order) | `ordering` | K3 |

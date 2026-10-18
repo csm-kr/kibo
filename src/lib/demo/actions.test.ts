@@ -30,6 +30,7 @@ describe("actionRow", () => {
       act("removeFromCart", { lineId: "a1b2c3d4e5f60718", itemId: "cola" }),
       act("undoLastChange", {}),
       act("offerChoices", { templateId: "pick_option", choices: [{ kind: "option", id: "cola" }, { kind: "option", id: "cider" }] }),
+      act("showMenu", { category: "drink" }),
       act("callStaff", { reasonCode: "unknown_info" }),
       act("requestCheckout", {}),
       act("confirmCheckout", {}),
@@ -41,11 +42,19 @@ describe("actionRow", () => {
       "Removed Cola",
       "Undid the last change",
       "Asked which one: Cola, Cider",
+      "Showed Drinks on the kiosk",
       "Called staff",
       "Opened your order review",
       "You confirmed by saying yes",
       "Tried something this kiosk does not have → the server refused it",
     ]);
+  });
+
+  it("showMenu in Korean, and refused", () => {
+    expect(actionRow(malo, act("showMenu", { category: "dessert" }), "ko").text).toBe("키오스크에 디저트을(를) 띄웠어요");
+    expect(actionRow(malo, act("showMenu", { category: "drink" }, "CONFLICT"), "en").text).toBe(
+      "Tried to change the kiosk screen → not allowed at this point",
+    );
   });
 
   it("an offer to call staff reads as an offer, not a menu question (I-279)", () => {
