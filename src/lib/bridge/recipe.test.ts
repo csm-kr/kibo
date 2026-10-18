@@ -295,9 +295,76 @@ describe("isForbiddenTarget", () => {
     expect(isForbiddenTarget({ label: "💳 신용/체크카드", text: "💳 신용/체크카드" }, forbidden)).toBe(true);
   });
 
+  it("reads a target's other text lines whole, as the learner does: a notice that mentions paying is not a payment control (I-405)", () => {
+    const f = getKiosk("bunsik").learned!.forbiddenLabels;
+    // bk9's start screen is one tap-anywhere tile; its footer says cash is paid at the counter.
+    const attract = ["10.14 (수) 12:30", "★", "보리별 분식", "오늘도 든든하게, 한 그릇 뚝딱", "오늘의 할인 로제 떡볶이 6,500원 5,500원",
+      "화면을 터치하여 주문을 시작하세요", "현금 결제는 카운터에서 도와드려요"].join("\n");
+    expect(isForbiddenTarget({ label: "보리별 분식", text: attract }, f)).toBe(false);
+    // A line that is a payment or order control still refuses the target, whatever its label.
+    for (const line of ["카드 결제", "결제하실 금액 9,000원", "신용/체크카드", "주문하기", "주문 확인하기", "처음으로", "Pay now", "💳 카드로 결제"]) {
+      expect(isForbiddenTarget({ label: "다음", text: `다음\n${line}` }, f), line).toBe(true);
+    }
+    // The label itself keeps the strict rule: any payment word in it refuses.
+    expect(isForbiddenTarget({ label: "현금 결제는 카운터에서 도와드려요", text: "현금 결제는 카운터에서 도와드려요" }, f)).toBe(true);
+  });
+
   it("allows ordinary kiosk controls", () => {
     expect(isForbiddenTarget({ label: "화면을 터치하여 주문을 시작하세요", text: "화면을 터치하여 주문을 시작하세요" }, forbidden)).toBe(false);
     expect(isForbiddenTarget({ label: "페퍼로니", text: "페퍼로니\n17,900원" }, forbidden)).toBe(false);
     expect(isForbiddenTarget({ label: "삭제", text: "삭제" }, forbidden)).toBe(false);
+  });
+});
+
+describe("runPlan finds a role step's target the way the learner's driver does (getByRole, I-405)", () => {
+  /** A page whose document answers a CSS selector like a browser would for one native <button> and one role="button". */
+  function rolePage(log: string[]) {
+    const el = (text: string, tagName: string, role: string | null) => ({
+      tagName,
+      innerText: text,
+      textContent: text,
+      closest: () => null,
+      getAttribute: (a: string) => (a === "role" ? role : null),
+      getBoundingClientRect: () => ({ x: 0, y: 0, width: 80, height: 40 }),
+      click: vi.fn(() => log.push(`click ${text}`)),
+    });
+    const native = el("4,500원 담기", "BUTTON", null);
+    const div = el("세트 담기 9,900원", "DIV", "button");
+    const selectors: string[] = [];
+    const doc = {
+      defaultView: {
+        getComputedStyle: () => ({ visibility: "visible", cursor: "pointer" }),
+        requestAnimationFrame: (cb: () => void) => setTimeout(cb, 0),
+        MutationObserver: class {
+          observe() {}
+          disconnect() {}
+        },
+      },
+      documentElement: {},
+      body: { querySelectorAll: () => [] },
+      querySelectorAll: (selector: string) => {
+        selectors.push(selector);
+        const parts = selector.split(",").map((s) => s.trim());
+        return [...(parts.includes("button") ? [native] : []), ...(parts.includes('[role="button"]') ? [div] : [])];
+      },
+      createTreeWalker: () => ({ nextNode: () => null }),
+    } as unknown as Document;
+    return { doc, selectors };
+  }
+
+  it("a native <button> has the button role: bk9's add button (`role: button, name: 담기`) is found and clicked", async () => {
+    const log: string[] = [];
+    const { doc } = rolePage(log);
+    await runPlan(doc, [{ op: "click", role: "button", name: "원 담기" }], { forbiddenLabels: forbidden });
+    expect(log).toEqual(["click 4,500원 담기"]);
+  });
+
+  it("still finds an element with an explicit role, and radios and checkboxes stay native inputs", async () => {
+    const log: string[] = [];
+    const { doc, selectors } = rolePage(log);
+    await runPlan(doc, [{ op: "click", role: "button", name: "세트 담기" }], { forbiddenLabels: forbidden });
+    expect(log).toEqual(["click 세트 담기 9,900원"]);
+    await runPlan(doc, [{ op: "clickIfVisible", role: "radio", name: "라지" }], { forbiddenLabels: forbidden });
+    expect(selectors.at(-1)).toBe("input[type=radio]");
   });
 });

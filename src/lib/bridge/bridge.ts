@@ -219,7 +219,9 @@ export function createBridge(cfg: BridgeConfig) {
       await runPlan(doc, plan, opts);
     }
 
-    const seen = readKioskLines(doc, learned.cartLinePattern).map((l) => parseKioskLine(l, learned.cartLinePattern));
+    const seen = readKioskLines(doc, learned.cartLinePattern).map((l) =>
+      parseKioskLine(l, learned.cartLinePattern, learned.cartOptionSeparator),
+    );
     return seen.every((l) => l !== null) && sameLines(expected, seen as KioskLine[]);
   }
 

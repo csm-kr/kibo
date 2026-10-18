@@ -24,25 +24,31 @@ export function readKioskTotal(doc: Document, pattern: string): number | null {
   return Number.isInteger(n) && n >= 0 ? n : null;
 }
 
-/** Each on-screen text line that is a cart line, cut to the matched part (no delete-button text). */
+/**
+ * Each cart line on screen, cut to the matched part (no delete-button text). The pattern runs over the whole text
+ * with `^` and `$` at each text line, so a kiosk that shows one cart line as a block of text lines can be read (bk9).
+ */
 export function readKioskLines(doc: Document, linePattern: string): string[] {
-  const re = new RegExp(linePattern);
-  return pageText(doc)
-    .split("\n")
-    .flatMap((line) => {
-      const m = re.exec(line.trim());
-      return m ? [m[0].trim()] : [];
-    });
+  return [...pageText(doc).matchAll(new RegExp(linePattern, "gm"))].map((m) => m[0].trim()).filter(Boolean);
 }
 
-/** The skill's line pattern has groups 1 name, 2 options (", " separated, optional), 3 quantity, 4 line price. */
-export function parseKioskLine(line: string, linePattern: string): KioskLine | null {
+/**
+ * The skill's line pattern has groups 1 name, 2 options (optional), 3 quantity, 4 line price; the options are split by
+ * the skill's separator (a comma by default) and empty parts dropped.
+ */
+export function parseKioskLine(line: string, linePattern: string, optionSeparator = ","): KioskLine | null {
   const m = new RegExp(linePattern).exec(line);
   if (!m) return null;
   const qty = Number(m[3]);
   const price = won(m[4] ?? "");
   if (!m[1] || !Number.isInteger(qty) || !Number.isInteger(price)) return null;
-  return { name: m[1].trim(), options: m[2] ? m[2].split(",").map((o) => o.trim()) : [], qty, price };
+  const options = m[2]
+    ? m[2]
+        .split(new RegExp(optionSeparator))
+        .map((o) => o.trim())
+        .filter(Boolean)
+    : [];
+  return { name: m[1].trim(), options, qty, price };
 }
 
 function totals(lines: KioskLine[]): Map<string, { qty: number; price: number }> {

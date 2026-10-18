@@ -156,7 +156,7 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
     "A removeFromCart followed by addToCart in the same response already keeps the replaced line's choices for every group you leave out; to drop one, send that group with an empty optionIds list.",
     "When one request orders several lines, call addToCart for every line in the same response, before you say anything.",
     "Never say you will add something later: add it now, or ask what is missing.",
-    // I-411: "One zero cola, please." came back from speech recognition as "10 cola, please." and 10 were added.
+    // I-412: "One zero cola, please." came back from speech recognition as "10 cola, please." and 10 were added.
     "When the user's words give 5 or more of one item, add nothing yet: say the quantity back and ask with offerChoices (yes_no) whether that many is right.",
     ...(ticket
       ? []

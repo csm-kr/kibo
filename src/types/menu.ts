@@ -110,7 +110,12 @@ export interface LearnedKiosk {
   /** The kiosk's own button that ends the order, named on the phone; one of the forbidden labels. */
   checkout: { label: string; name: LocalizedName };
   cartTotalPattern: string;
+  /** One cart line in the page's text, possibly over several text lines; groups 1 name, 2 options, 3 quantity, 4 price. */
   cartLinePattern: string;
+  /** The regex between two options of a cart line ("," on Doughhouse). */
+  cartOptionSeparator: string;
+  /** The page's own fixed size, when it is drawn at one (bk9's 720×1280); else the learner's width (replayView). */
+  pageSize?: { width: number; height: number };
   /** By group id: the group's own steps for chooseOptions (a stepper's +, a wizard's 다음) and its condition. */
   groupSteps: Record<string, { select?: RecipeStep[]; after?: RecipeStep[]; appliesWhen?: GroupCondition }>;
   /** By item id, when it is not addToCart (a set with its own popup steps). */

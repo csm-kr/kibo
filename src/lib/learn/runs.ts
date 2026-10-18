@@ -33,9 +33,8 @@ export const LEARN_RUNS: LearnRun[] = [
     title: "Snack bar kiosk",
     phrase: "snack bar kiosk",
     provenance:
-      "Built by a separate AI agent from a short brief and never seen before this run: the learner was frozen first (round 4) and learned it once, in 9.6 min. Its orders were checked against the kiosk's total and cart afterwards.",
-    demoKioskId: null,
-    noDemoReason: "This kiosk was built for the test and is not in the live demo, so there is no order button here.",
+      "Built by a separate AI agent from a short brief and never seen before this run: the learner was frozen first (round 4) and learned it once, in 9.6 min. Its orders were checked against the kiosk's total and cart afterwards. Its skill, reviewed by a person, is a learned kiosk in the live demo too.",
+    demoKioskId: "bunsik",
     cover: {
       n: 3,
       alt: "Turn 3: the snack bar kiosk's tteokbokki sheet with a required spice level and toppings, in Korean",
@@ -76,7 +75,7 @@ export const LEARN_RUNS: LearnRun[] = [
     title: "Doughhouse pizza kiosk",
     phrase: "Doughhouse pizza kiosk",
     provenance:
-      "Built by the KIBO team, and the learner was developed on it, so this is not a blind test. It is the learned kiosk in the live demo. Recorded on 10-13, before the kiosk's look was restyled on 10-14, so the pictures show the plain page it learned; its labels did not change. This is the traced run of an earlier learner; the newest run on this kiosk (5.2 min) kept no trace.",
+      "Built by the KIBO team, and the learner was developed on it, so this is not a blind test. It is a learned kiosk in the live demo. Recorded on 10-13, before the kiosk's look was restyled on 10-14, so the pictures show the plain page it learned; its labels did not change. This is the traced run of an earlier learner; the newest run on this kiosk (5.2 min) kept no trace.",
     demoKioskId: "doughhouse",
     cover: {
       n: 13,

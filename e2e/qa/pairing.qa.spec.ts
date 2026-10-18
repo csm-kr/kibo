@@ -150,3 +150,37 @@ test("/demo [Start] on the learned pizza kiosk 1280x720: KIBO's panel with the Q
   await expect(page.locator("[data-learned-widget]").getByText("Phone connected")).toBeVisible();
   await check(page, info, "demo-D2-own-phone-learned-connected", LEARNED);
 });
+
+test.describe(() => {
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.155" } });
+
+  // The snack bar (I-405): its fixed 720×1280 page beside KIBO's panel, then the review with three other places in the
+  // row under it (it has no D1 card, so every card place is "another").
+  test("/demo [Start] on the learned snack bar 1280x720: QR and code beside the page, then the next order row", async ({ page, request }, info) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto("/demo?k=bunsik");
+    await page.getByRole("button", { name: "Start", exact: true }).click();
+    const { sessionId, claimToken } = await readClaim(page);
+    await expect(page.locator("[data-learned-widget] [data-pair-code]")).toBeInViewport({ ratio: 1 });
+    await check(page, info, "demo-D2-own-phone-bunsik-waiting", LEARNED);
+    const { deviceToken } = await (await claim(request, sessionId, claimToken)).json();
+    const widget = page.locator("[data-learned-widget]");
+    await expect(widget.getByText("Phone connected")).toBeVisible();
+    const phone = (type: string, args: object, utteranceSeq?: number) =>
+      command(request, deviceToken, { sessionId, type, args, source: utteranceSeq ? "voice" : "button", utteranceSeq });
+    await phone("setDineOption", { option: "eat_in" });
+    await expect(widget).toHaveAttribute("data-bridge-ok", "true");
+    await phone("addToCart", { itemId: "cheese_tteokbokki", qty: 1, selections: { spice: ["lv3"], tteok_topping: ["boiled_egg"] } }, 1);
+    await expect(widget).toContainText("kiosk total 6,000원 ✓ matches", { timeout: 15_000 });
+    await check(page, info, "demo-D2-own-phone-bunsik-connected", LEARNED);
+    await phone("requestCheckout", {}, 2);
+    const next = page.locator("[data-demo-next]");
+    await expect(next.getByRole("button", { name: "Try again" })).toBeInViewport({ ratio: 1 });
+    for (const link of await next.getByRole("navigation", { name: "Try another place" }).getByRole("link").all()) {
+      await expect(link).toBeInViewport({ ratio: 1 });
+    }
+    // The row's label keeps one line beside three places (it wrapped to three in a 644px card).
+    expect(await textLines(next.getByRole("heading", { name: "Try another place" }))).toBe(1);
+    await check(page, info, "demo-D3-own-phone-bunsik-done", DEMO);
+  });
+});

@@ -246,7 +246,40 @@ const DOUGHHOUSE: Scenario[] = [
   },
 ];
 
-const BY_KIOSK: Record<string, Scenario[]> = { malo: MALO, airport_rail: AIRPORT_RAIL, doughhouse: DOUGHHOUSE };
+const BUNSIK: Scenario[] = [
+  {
+    id: "learned-snack-bar",
+    kioskId: "bunsik",
+    persona: MINSU,
+    title: { en: "A snack bar KIBO learned blind", ko: "KIBO가 처음 보고 배운 분식 키오스크" },
+    goal: {
+      en: "Another AI agent built this kiosk; KIBO learned it the first time it saw it, then taps its screen and checks its total.",
+      ko: "다른 AI가 만든 키오스크를 KIBO가 처음 보고 배웠어요. 화면을 직접 누르고 합계를 확인해요.",
+    },
+    tags: ["learned", "ordering"],
+    steps: [
+      {
+        say: { en: "Cheese tteokbokki, medium spicy, with a boiled egg", ko: "치즈 떡볶이 3단계 보통맛으로, 삶은 계란 추가해 주세요." },
+        watch: {
+          en: "The kiosk's own screen is tapped step by step; the phone shows the line once the kiosk's total matches.",
+          ko: "키오스크 화면이 한 단계씩 눌리고, 키오스크 합계가 맞으면 휴대폰에 담겨요.",
+        },
+        done: { kind: "cartHas", itemId: "cheese_tteokbokki", selections: { spice: ["lv3"], tteok_topping: ["boiled_egg"] } },
+      },
+      {
+        say: { en: "I'm done", ko: "다 골랐어요." },
+        watch: {
+          en: "The phone shows the review. On this kiosk you pay on the kiosk itself.",
+          ko: "휴대폰에 주문 확인이 떠요. 이 키오스크에서는 키오스크에서 직접 결제해요.",
+        },
+        done: { kind: "status", status: "confirming" },
+      },
+    ],
+    stopBeforePay: true,
+  },
+];
+
+const BY_KIOSK: Record<string, Scenario[]> = { malo: MALO, airport_rail: AIRPORT_RAIL, doughhouse: DOUGHHOUSE, bunsik: BUNSIK };
 
 export function scenariosFor(kioskId: string): Scenario[] {
   return Object.hasOwn(BY_KIOSK, kioskId) ? BY_KIOSK[kioskId] : [];

@@ -45,8 +45,8 @@ async function check(page: Page, info: TestInfo, state: string, viewports = VIEW
 const screenOf = (page: Page) => page.locator("[data-phone-screen]");
 const notice = (page: Page) => page.locator("[data-bridge-notice]");
 
-async function openLearnedPhone(page: Page, request: APIRequestContext) {
-  const res = await request.post("/api/session", { data: { kioskId: "doughhouse" } });
+async function openLearnedPhone(page: Page, request: APIRequestContext, kioskId = "doughhouse") {
+  const res = await request.post("/api/session", { data: { kioskId } });
   const created = (await res.json()) as { sessionId: string; claimUrl: string; kioskToken: string };
   await page.goto(created.claimUrl);
   const key = `kibo.phone.${created.sessionId}`;
@@ -111,4 +111,40 @@ test("learned kiosk on the phone: entering, check the kiosk, mismatch, pay on th
   await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "confirmLearned");
   await expect(page.getByRole("button", { name: "Yes, pay now" })).toHaveCount(0);
   await check(page, info, "P4-learned-confirm");
+});
+
+test.describe(() => {
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.153" } });
+
+  // The snack bar KIBO learned blind (I-405): long English names, a set with five choices, a count option, and the
+  // kiosk's own review button named on P4 ("Tap 주문 확인하기 (Review order)"). R-007: no burger or counter words.
+  test("learned snack bar on the phone: three lines with their options, then pay on the kiosk", async ({ page, request }, info) => {
+    test.setTimeout(180_000);
+    const s = await openLearnedPhone(page, request, "bunsik");
+    await page.getByRole("button", { name: "Type instead" }).click();
+    await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "dine");
+    await s.bridge(await s.phone("setDineOption", { option: "take_out" }), true, 0);
+    await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
+    const lines: [object, number][] = [
+      [{ itemId: "cheese_tteokbokki", qty: 1, selections: { spice: ["lv3"], tteok_topping: ["boiled_egg"] } }, 6000],
+      [
+        { itemId: "boribyeol_set", qty: 1, selections: { set_tteok: ["tteok_rose"], set_spice: ["lv4"], set_gimbap: ["gimbap_tuna"], set_gimbap_cut: ["cut"], set_drink: ["drink_sikhye"] } },
+        18400,
+      ],
+      [{ itemId: "tuna_gimbap", qty: 2, selections: { gimbap_cut: ["whole"], gimbap_extra: ["extra_roll"] } }, 33400],
+    ];
+    for (const [args, total] of lines) await s.bridge(await s.phone("addToCart", args), true, total);
+    const cart = page.getByRole("region", { name: "Your order" });
+    await expect(cart.getByText("Boribyeol set", { exact: true })).toBeVisible();
+    await expect(cart.getByText("Tuna gimbap", { exact: true })).toBeVisible();
+    const words = (await page.locator("body").innerText()).toLowerCase();
+    for (const w of ["burger", "counter", "fries"]) expect(words, w).not.toContain(w);
+    await check(page, info, "P3-bunsik-lines");
+    await s.phone("requestCheckout");
+    await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "confirmLearned");
+    await expect(page.locator("[data-pay-on-kiosk]")).toHaveText(
+      "Your order is on the kiosk. Tap 주문 확인하기 (Review order) on the kiosk and pay there.",
+    );
+    await check(page, info, "P4-bunsik-confirm");
+  });
 });

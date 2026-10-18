@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Check, ChevronLeft, ChevronRight, Circle, Maximize2, Minimize2, OctagonX, Pause, Play, TriangleAlert } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Circle, Maximize2, Minimize2, OctagonX, Pause, Play, TriangleAlert } from "lucide-react";
 import { useEffect, useMemo, useState, useSyncExternalStore, type CSSProperties } from "react";
 import { CARD, FOCUS, ICON, PRESS, PRIMARY, QUIET, SECONDARY } from "@/components/phone/ui";
 import { formatWon } from "@/lib/kiosk/menu";
@@ -75,10 +75,19 @@ export function LearnPlayer({ run }: { run: LearnRun }) {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6">
       <header className="flex flex-col gap-2">
-        <Link href="/learn" className={`${QUIET} self-start`}>
-          <ArrowLeft {...ICON} />
-          All runs
-        </Link>
+        {/* A kiosk in the live demo can be tried from the first screen, not only after the last turn (I-405). */}
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <Link href="/learn" className={QUIET}>
+            <ArrowLeft {...ICON} />
+            All runs
+          </Link>
+          {run.demoKioskId && (
+            <Link href={`/demo?k=${run.demoKioskId}`} data-learn-try className={QUIET}>
+              Try ordering on this kiosk
+              <ArrowRight {...ICON} />
+            </Link>
+          )}
+        </div>
         <h1 className="font-display text-[32px] leading-tight font-bold">How KIBO learned the {run.phrase}</h1>
         <p className="text-base text-muted">
           {run.provenance} Recorded {data.startedAt.slice(0, 10)} with {data.model}.

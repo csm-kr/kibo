@@ -26,6 +26,7 @@ describe("scenariosFor", () => {
     ]);
     expect(scenariosFor("airport_rail").map((s) => s.id)).toEqual(["mei-tickets", "which-platform"]);
     expect(scenariosFor("doughhouse").map((s) => s.id)).toEqual(["learned-pizza"]);
+    expect(scenariosFor("bunsik").map((s) => s.id)).toEqual(["learned-snack-bar"]);
     expect(scenariosFor("nope")).toEqual([]);
   });
 

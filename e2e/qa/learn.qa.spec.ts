@@ -84,6 +84,20 @@ test("learn replay: Doughhouse refused payment tap and the order button", async 
   await check(page, info, "replay-order", "[data-learn-order]");
 });
 
+test("learn replay: the snack bar offers its /demo place from the first screen and at the end (I-405)", async ({ page }, info) => {
+  await page.goto("/learn/bunsik");
+  await stopAtStart(page);
+  await expect(page.locator("[data-learn-try]")).toHaveAttribute("href", "/demo?k=bunsik");
+  await check(page, info, "replay-bunsik-start");
+  // On a phone [Play] stays on the first screen with the extra link above it (I-199).
+  await page.setViewportSize(VIEWPORTS[2]);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect(page.locator("[data-learn-play]")).toBeInViewport({ ratio: 1 });
+  await page.locator('[data-learn-milestone="finish"]').click();
+  await expect(page.locator("[data-learn-order]")).toHaveAttribute("href", "/demo?k=bunsik");
+  await check(page, info, "replay-bunsik-order", "[data-learn-order]");
+});
+
 // The replay picture is the kiosk alone (the recorded frames had the recording page's dark frame baked in, a black box
 // beside the kiosk), drawn at its own aspect ratio, as tall as before and fully on screen at the judge sizes (#1 item 17).
 for (const vp of [VIEWPORTS[0], VIEWPORTS[1]]) {

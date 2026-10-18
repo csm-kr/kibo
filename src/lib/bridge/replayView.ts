@@ -1,5 +1,5 @@
 import { formatWon } from "@/lib/kiosk/menu";
-import type { KioskData } from "@/types/menu";
+import type { KioskData, LearnedKiosk } from "@/types/menu";
 import type { CartLine, PendingBridgeCommand, Session } from "@/types/session";
 
 // What KIBO shows around a learned kiosk page while the bridge replays (14-final:3): how big the page can be drawn,
@@ -40,8 +40,22 @@ export interface ReplayResult {
   kioskTotal: number | null;
 }
 
+/** The page's layout width and the heights it may be laid out at. */
+export interface PageSize {
+  w: number;
+  minH: number;
+  maxH: number;
+}
+
+/** A page drawn at a fixed size keeps it (bk9's 720×1280, I-405); others take the learner's width and 1120–1600. */
+export function pageSizeOf(learned: Pick<LearnedKiosk, "pageSize">): PageSize {
+  const p = learned.pageSize;
+  return p ? { w: p.width, minH: p.height, maxH: p.height } : { w: PAGE_W, minH: MIN_PAGE_H, maxH: MAX_PAGE_H };
+}
+
 export interface PageFrame {
   scale: number;
+  pageW: number;
   pageH: number;
   /** Where the scaled page starts inside the box. */
   left: number;
@@ -49,11 +63,11 @@ export interface PageFrame {
 }
 
 /** The page's layout height and scale for a box: as large as fits, never wider than the box, centred. */
-export function pageFrame(boxW: number, boxH: number): PageFrame {
-  if (boxW <= 0 || boxH <= 0) return { scale: 0, pageH: MAX_PAGE_H, left: 0, top: 0 };
-  const scale = Math.min(boxW / PAGE_W, boxH / MIN_PAGE_H);
-  const pageH = Math.min(MAX_PAGE_H, Math.max(MIN_PAGE_H, boxH / scale));
-  return { scale, pageH, left: (boxW - PAGE_W * scale) / 2, top: (boxH - pageH * scale) / 2 };
+export function pageFrame(boxW: number, boxH: number, page: PageSize = pageSizeOf({})): PageFrame {
+  if (boxW <= 0 || boxH <= 0) return { scale: 0, pageW: page.w, pageH: page.maxH, left: 0, top: 0 };
+  const scale = Math.min(boxW / page.w, boxH / page.minH);
+  const pageH = Math.min(page.maxH, Math.max(page.minH, boxH / scale));
+  return { scale, pageW: page.w, pageH, left: (boxW - page.w * scale) / 2, top: (boxH - pageH * scale) / 2 };
 }
 
 export interface TapMark {
@@ -65,12 +79,16 @@ export interface TapMark {
 }
 
 /** A mark per tap whose target was on the visible page; one scrolled out of view is left to the caption. */
-export function tapMarks(taps: ReplayTap[], frame: Pick<PageFrame, "scale" | "left" | "top" | "pageH">): TapMark[] {
+export function tapMarks(
+  taps: ReplayTap[],
+  frame: Pick<PageFrame, "scale" | "left" | "top" | "pageH"> & Partial<Pick<PageFrame, "pageW">>,
+): TapMark[] {
+  const pageW = frame.pageW ?? PAGE_W;
   return taps
     .filter((t) => {
       const cx = t.x + t.w / 2;
       const cy = t.y + t.h / 2;
-      return cx >= 0 && cx <= PAGE_W && cy >= 0 && cy <= frame.pageH;
+      return cx >= 0 && cx <= pageW && cy >= 0 && cy <= frame.pageH;
     })
     .map((t) => ({
       n: t.n,

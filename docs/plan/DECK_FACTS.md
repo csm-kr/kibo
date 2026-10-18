@@ -41,7 +41,7 @@ Pictures: real captures in `docs/assets/deck/` (`npm run shots:deck`, `scripts/d
 | Live mirror: every change shows on the kiosk with a 2 s highlight and "Added by AI" | `docs/UX.md` A6; `docs/UI_GUIDE.md` "Components" | design |
 | Confirm before pay: the AI can open the confirm card but cannot pay; payment needs the user's tap or a new "yes", then the card at the kiosk | ADR-005; `src/lib/commands/machine.ts` (unit-tested in `machine.test.ts`) | design |
 | Undo, choice buttons, sold-out alternatives, call staff when the data has no answer (e.g. halal) | `docs/UX.md` "Exception flows" | design |
-| Three places in `/demo`: MALO BURGER (35 items, 7 categories), SKYLINE AIRPORT RAIL ticket machine (11 tickets and passes), Doughhouse pizza (10 items, learned) | `data/kiosks/malo.json`, `data/kiosks/airport_rail.json`, `skills/doughhouse.json` | measured (counted in the data) |
+| Four places in `/demo`: MALO BURGER (35 items, 7 categories), SKYLINE AIRPORT RAIL ticket machine (11 tickets and passes), Doughhouse pizza (10 items, learned) on the three D1 cards, and since 10-18 the 보리별 분식 snack bar (32 items, 6 categories; built by a separate AI agent, learned blind in round 4) from its top bar tab and `/learn` (I-405) | `data/kiosks/malo.json`, `data/kiosks/airport_rail.json`, `skills/doughhouse.json`, `skills/bunsik.json` | measured (counted in the data) |
 
 ## 6 Flow
 | Fact | Source | Status |

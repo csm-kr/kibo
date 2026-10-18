@@ -62,3 +62,42 @@ test("learned kiosk widget: QR, then an order the bridge entered, with its taps 
   await expect(page.locator("[data-tap-mark]")).toHaveCount(0);
   await check(page, info, "widget-added");
 });
+
+test.describe(() => {
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.152" } });
+
+  // The snack bar KIBO learned blind (bk9-bunsik, I-405): a page of its own fixed 720×1280 size, drawn as large as fits.
+  test("learned snack bar widget: QR, then the set the bridge entered through its three-step popup", async ({ page, request }, info) => {
+    await page.goto("/learned/bunsik");
+    const { sessionId, claimToken } = await readClaim(page);
+    const frame = page.locator("iframe[data-learned-kiosk]");
+    await expect(frame).toHaveAttribute("data-page-scale", /\d/);
+    // The page keeps its own size, whole and as tall as the screen at the judge laptop size.
+    const box = (await frame.boundingBox())!;
+    expect(Math.round(box.height)).toBe(900);
+    expect(Math.round(box.width)).toBe(Math.round((900 * 720) / 1280));
+    await check(page, info, "bunsik-widget-qr");
+
+    const { deviceToken } = await (await claim(request, sessionId, claimToken)).json();
+    const widget = page.locator("[data-learned-widget]");
+    const phone = (type: string, args: object, utteranceSeq: number) =>
+      command(request, deviceToken, { sessionId, type, args, source: "voice", utteranceSeq });
+    await phone("setDineOption", { option: "eat_in" }, 1);
+    await expect(widget).toHaveAttribute("data-bridge-ok", "true");
+    const pause = (ms: number) => page.evaluate((v) => ((window as { __kiboTapPauseMs?: number }).__kiboTapPauseMs = v), ms);
+    await pause(2_500);
+    await phone(
+      "addToCart",
+      { itemId: "boribyeol_set", qty: 1, selections: { set_tteok: ["tteok_cheese"], set_spice: ["lv2"], set_gimbap: ["gimbap_kimchi"], set_gimbap_cut: ["whole"], set_drink: ["drink_cola"] } },
+      2,
+    );
+    // Mark 3 is the cheese tteokbokki in the set's first step, over the kiosk's own popup.
+    await expect(page.locator('[data-tap-mark="3"]')).toBeVisible({ timeout: 15_000 });
+    await qaShot(page, info, LEARNED, "bunsik-widget-tapping");
+    await pause(0);
+    await expect(widget.locator("[data-replay-caption]")).toHaveAttribute("data-replay-caption", "ok", { timeout: 30_000 });
+    await expect(widget).toContainText("Added: Boribyeol set. KIBO tapped 세트 → 보리별 세트 → 치즈 떡볶이");
+    await expect(widget).toContainText("kiosk total 10,900원 ✓ matches");
+    await check(page, info, "bunsik-widget-added");
+  });
+});

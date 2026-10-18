@@ -147,9 +147,14 @@ describe("skills/doughhouse.json", () => {
     expect(skill.catalog).toHaveLength(10);
   });
 
-  it("is byte-identical to the spike kiosk page", () => {
-    const spike = readFileSync(join(process.cwd(), "spikes/kibo-learn/kiosk/index.html"));
-    expect(readFileSync(join(publicDir, skill.page)).equals(spike)).toBe(true);
+  it("is the spike kiosk page, with only its food photos added as background images (10-18)", () => {
+    const spike = readFileSync(join(process.cwd(), "spikes/kibo-learn/kiosk/index.html"), "utf8");
+    const page = readFileSync(join(publicDir, skill.page), "utf8");
+    // One block of CSS before </style>: background-image rules and nothing else, so labels and text are unchanged.
+    const block = /\n {2}\/\* Food photos \(10-18, added after learning\)[^\n]*\n((?: {2}[^\n]*\n)*?) {2}\/\* End of food photos\. \*\/\n/.exec(page);
+    expect(block).not.toBeNull();
+    expect(page.replace(block![0], "\n")).toBe(spike);
+    for (const rule of block![1].trimEnd().split("\n")) expect(rule, rule).toMatch(/^ {2}[^{}]+ \{ background-image: url\("img\/[a-z0-9_]+\.jpg"\); \}$/);
   });
 });
 

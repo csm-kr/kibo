@@ -630,6 +630,51 @@ test("D1 to D3 with the learned pizza kiosk", async ({ page, request }, info) =>
   await learnedEndInView(page)();
 });
 
+test.describe(() => {
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.154" } });
+
+  // The snack bar KIBO learned blind (I-405): D1 keeps its three cards and names it under them; its page is a fixed
+  // 720×1280 screen in the kiosk column, with a set of five choices replayed through its own popup.
+  test("D1 to D3 with the learned snack bar kiosk", async ({ page, request }, info) => {
+    const judge = [VIEWPORTS[0], { width: 1280, height: 720 }];
+    await page.goto("/demo?k=bunsik");
+    await expect(page.locator("[data-place-extra]")).toBeVisible({ timeout: 60_000 });
+    await check(page, info, "D1-intro-bunsik", undefined, judge);
+
+    const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
+    await page.getByRole("button", { name: "Try it on this screen" }).click();
+    const s = (await (await created).json()) as { sessionId: string; deviceToken: string };
+    const widget = page.locator("[data-learned-widget]");
+    let seq = 0;
+    const ai = (type: string, args: object = {}) =>
+      command(request, s.deviceToken, { sessionId: s.sessionId, type, args, source: "voice", utteranceSeq: ++seq });
+    await expect(widget).toBeVisible();
+    // The kiosk page has drawn its start screen and the phone has its first question.
+    await expect(page.frameLocator("iframe[data-learned-kiosk]").locator(".attract")).toBeVisible();
+    await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "dine");
+    await check(page, info, "D2-bunsik-start", undefined, judge);
+    await ai("setDineOption", { option: "eat_in" });
+    await expect(widget).toHaveAttribute("data-bridge-ok", "true");
+    await ai("addToCart", { itemId: "cheese_tteokbokki", qty: 1, selections: { spice: ["lv3"], tteok_topping: ["boiled_egg"] } });
+    await expect(widget).toContainText("Added: Cheese tteokbokki", { timeout: 15_000 });
+    await check(page, info, "D2-bunsik-added", undefined, judge);
+    await ai("addToCart", {
+      itemId: "boribyeol_set",
+      qty: 1,
+      selections: { set_tteok: ["tteok_rose"], set_spice: ["lv4"], set_gimbap: ["gimbap_tuna"], set_gimbap_cut: ["cut"], set_drink: ["drink_sikhye"] },
+    });
+    await expect(widget).toContainText("kiosk total 18,400원 ✓ matches", { timeout: 30_000 });
+    await check(page, info, "D2-bunsik-set", undefined, judge);
+
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await ai("requestCheckout");
+    await expect(phoneScreen(page)).toHaveAttribute("data-phone-screen", "confirmLearned");
+    await expect(page.locator("[data-demo-end]")).toBeVisible();
+    const sizes = [{ width: 1280, height: 720 }, { width: 1366, height: 768 }, VIEWPORTS[0], VIEWPORTS[2]];
+    await check(page, info, "D3-bunsik-confirm", learnedEndInView(page), sizes);
+  });
+});
+
 /**
  * #1 25: the learned kiosk's end card. Its "never pays" line and [Try again] are whole, above the phone's bottom fade
  * and 8px clear of the app bar's buttons (UI_QA target gaps); what does not fit below them lies under the fade.

@@ -219,7 +219,7 @@ describe("buildInstructions", () => {
     expect(ko).not.toMatch(/start in Korean/);
   });
 
-  // I-411 (video take n1-t1 on kibo-00028-dl2): "One zero cola, please." was heard as "10 cola, please." and 10 were added.
+  // I-412 (video take n1-t1 on kibo-00028-dl2): "One zero cola, please." was heard as "10 cola, please." and 10 were added.
   it("reads back a quantity of 5 or more before adding, and takes zero next to a drink as its name", () => {
     expect(text).toContain("When the user's words give 5 or more of one item, add nothing yet: say the quantity back and ask with offerChoices (yes_no) whether that many is right.");
     expect(text).toContain("A word like \"zero\" right before a drink is part of its name when the menu data has that item (\"zero cola\" is one Zero cola), not a quantity.");
