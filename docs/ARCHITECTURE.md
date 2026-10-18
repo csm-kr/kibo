@@ -362,7 +362,7 @@ Pages: `/kiosk?k=<kioskId>` (`&demo=1` shows the tap counter and timer; on a lan
 8. Commit. Firestore retries the transaction on contention, so touch and AI changes at the same moment serialize instead of overwriting each other.
 
 ## Database (Firestore)
-Firestore Native mode in `asia-northeast3` (the location cannot be changed later). Menus are not in the database (ADR-009). All access is by document id, so no composite indexes are needed.
+Firestore Native mode in `asia-northeast3` (the location cannot be changed later); delete protection on since 10-18 (set by the owner before judging). Menus are not in the database (ADR-009). All access is by document id, so no composite indexes are needed.
 
 ### `data/kiosks/{kioskId}.json` (repo, read-only)
 ```
