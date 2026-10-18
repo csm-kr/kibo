@@ -61,7 +61,7 @@ describe("kibo-voice server", () => {
     const first = messages(ws, 2);
     ws.send(JSON.stringify({ sessionId: s.sessionId, deviceToken: s.deviceToken, locale: "en" }));
     const [hello, setup] = await first;
-    expect(hello).toMatchObject({ relay: { model: "gemini-3.8-live", voiceSeconds: 180 } });
+    expect(hello).toMatchObject({ relay: { model: "gemini-3.8-live", voiceSeconds: 600 } });
     expect(setup).toEqual({ setupComplete: {} });
     ws.send(JSON.stringify({ clientContent: { turns: [{ role: "user", parts: [{ text: "hi" }] }], turnComplete: true } }));
     await new Promise((r) => setTimeout(r, 50));

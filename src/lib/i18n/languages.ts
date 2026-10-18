@@ -66,6 +66,15 @@ const AI_TEXT = {
     th: "สวัสดี ต้องการอะไร พูดบอกได้เลย",
     id: "Halo! Mau pesan apa? Cukup ucapkan saja.",
   },
+  greetingDine: {
+    ja: "こんにちは！店内でお召し上がりですか、お持ち帰りですか？",
+    zh: "您好！在这里吃还是带走？",
+    es: "¡Hola! ¿Para comer aquí o para llevar?",
+    vi: "Xin chào! Bạn ăn tại đây hay mang đi?",
+    fr: "Bonjour ! Sur place ou à emporter ?",
+    th: "สวัสดี ทานที่นี่หรือรับกลับบ้าน",
+    id: "Halo! Makan di sini atau dibawa pulang?",
+  },
 } satisfies Partial<Record<PhoneTextKey, Record<AiOnlyLanguage, string>>>;
 
 export const AI_ONLY_KEYS = Object.keys(AI_TEXT) as (keyof typeof AI_TEXT)[];

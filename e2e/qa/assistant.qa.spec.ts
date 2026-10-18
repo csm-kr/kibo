@@ -91,8 +91,9 @@ test("phone path: claim link to order number", async ({ page, request }, info) =
   await page.getByRole("button", { name: "Type instead" }).click();
   await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "dine");
   await expect(page.getByRole("textbox", { name: "Type your order" })).toBeFocused();
-  // Typing instead of talking: the AI's greeting is the first bubble, as voice would say it.
-  await expect(page.getByText("Hi! What would you like? Just say it.")).toBeVisible();
+  // Typing instead of talking: the AI's greeting is the first bubble, as voice would say it, and on P2 it asks the
+  // dine question as the kiosk does (owner 10-18, I-420).
+  await expect(page.getByText("Hi! Eat here or take out?")).toBeVisible();
   await check(page, info, "P2-dine");
 
   await page.getByRole("button", { name: "Eat here" }).click();
@@ -411,6 +412,9 @@ test("P3 in Korean with larger text: the dock while typing, and the cart summary
   const phone = (type: string, args: object) =>
     command(request, deviceToken, { sessionId: created.sessionId, type, args, source: "voice", utteranceSeq: 1 });
   await page.getByRole("button", { name: "글자로 입력할게요" }).click();
+  // P2 in Korean: the greeting asks the kiosk's dine question too (owner 10-18, I-420).
+  await expect(page.getByText("안녕하세요! 드시고 가세요, 포장하세요?")).toBeVisible();
+  await check(page, info, "P2-dine-ko-large", [VIEWPORTS[1], VIEWPORTS[3]]);
   await page.getByRole("button", { name: "매장에서 먹기" }).click();
   await expect(page.locator("[data-phone-screen]")).toHaveAttribute("data-phone-screen", "talk");
   await phone("addToCart", { itemId: "bulgogi_burger", variant: "set", qty: 1, selections: { drink: ["zero_cola"] } });
