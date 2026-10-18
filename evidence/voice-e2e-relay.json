@@ -2,33 +2,33 @@
   "about": "Voice order E2E on /demo through the kibo-voice relay to Vertex AI Live (relay mode of e2e/voice.live.spec.ts, `npm run test:e2e:live`): GEMINI_LIVE_BACKEND=vertex; the relay and a dev server run in one local process (scripts/e2e-relay-stack.ts), so the browser → relay hop is local, not Cloud Run; Vertex AI in VOICE_VERTEX_LOCATION or us-central1. Synthetic TTS voice (Gemini TTS, e2e/fixtures) through Chromium's fake microphone on a laptop, not a real phone. End of speech = the last voiced 40 ms mic frame sent to Live before the model's first output; the page sends the looping fixture once. (a) end of speech → first AI audio chunk; (b) end of speech → first 2 s highlight ring on the kiosk half. Medians over passing runs.",
   "model": "gemini-3.8-live",
   "firstRun": "2026-10-13T09:23:34.155Z",
-  "lastRun": "2026-10-14T17:58:02.190Z",
+  "lastRun": "2026-10-18T13:11:20.320Z",
   "summary": {
     "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)",
-    "runs": 4,
-    "passed": 4,
-    "upstreamFailures": 0,
-    "aMedianMs": 2841,
-    "bMedianMs": 1715,
+    "runs": 8,
+    "passed": 6,
+    "upstreamFailures": 2,
+    "aMedianMs": 2749,
+    "bMedianMs": 1713,
     "byFixture": {
       "hero-en": {
-        "runs": 2,
-        "passed": 2,
-        "aMedianMs": 2841,
-        "bMedianMs": 1903
+        "runs": 4,
+        "passed": 3,
+        "aMedianMs": 2818,
+        "bMedianMs": 1780
       },
       "hero-ko": {
-        "runs": 2,
-        "passed": 2,
-        "aMedianMs": 2798,
-        "bMedianMs": 1575
+        "runs": 4,
+        "passed": 3,
+        "aMedianMs": 2658,
+        "bMedianMs": 1649
       }
     }
   },
   "allAttempts": {
-    "attempted": 8,
-    "passed": 8,
-    "upstreamFailures": 0
+    "attempted": 12,
+    "passed": 10,
+    "upstreamFailures": 2
   },
   "omitted": [
     {
@@ -128,6 +128,60 @@
         "addToCart:ok",
         "addToCart:ok"
       ],
+      "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)"
+    },
+    {
+      "at": "2026-10-18T13:07:18.215Z",
+      "fixture": "hero-en",
+      "connected": true,
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 2818,
+      "bMs": 1776,
+      "toolMs": 1483,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ],
+      "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)"
+    },
+    {
+      "at": "2026-10-18T13:07:58.165Z",
+      "fixture": "hero-ko",
+      "connected": true,
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 2658,
+      "bMs": 1650,
+      "toolMs": 1498,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ],
+      "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)"
+    },
+    {
+      "at": "2026-10-18T13:09:51.944Z",
+      "fixture": "hero-en",
+      "connected": false,
+      "pass": false,
+      "model": null,
+      "aMs": null,
+      "bMs": null,
+      "toolMs": null,
+      "commands": [],
+      "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)"
+    },
+    {
+      "at": "2026-10-18T13:11:20.320Z",
+      "fixture": "hero-ko",
+      "connected": false,
+      "pass": false,
+      "model": null,
+      "aMs": null,
+      "bMs": null,
+      "toolMs": null,
+      "commands": [],
       "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)"
     }
   ]

@@ -2,32 +2,32 @@
   "about": "Voice order E2E on /demo with real Gemini Live (e2e/voice.live.spec.ts, `npm run test:e2e:live`). Synthetic TTS voice (Gemini TTS, e2e/fixtures) through Chromium's fake microphone on a laptop, not a real phone. End of speech = the last voiced 40 ms mic frame sent to Live before the model's first output; the page sends the looping fixture once. (a) end of speech → first AI audio chunk; (b) end of speech → first 2 s highlight ring on the kiosk half. Medians over passing runs.",
   "model": "gemini-3.8-live",
   "firstRun": "2026-10-12T17:51:42.293Z",
-  "lastRun": "2026-10-14T17:57:09.011Z",
+  "lastRun": "2026-10-18T13:14:48.620Z",
   "summary": {
     "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)",
-    "runs": 4,
-    "passed": 4,
+    "runs": 12,
+    "passed": 11,
     "upstreamFailures": 0,
-    "aMedianMs": 2382,
-    "bMedianMs": 1669,
+    "aMedianMs": 3103,
+    "bMedianMs": 1864,
     "byFixture": {
       "hero-en": {
-        "runs": 2,
-        "passed": 2,
-        "aMedianMs": 2380,
-        "bMedianMs": 1700
+        "runs": 6,
+        "passed": 6,
+        "aMedianMs": 3142,
+        "bMedianMs": 2179
       },
       "hero-ko": {
-        "runs": 2,
-        "passed": 2,
-        "aMedianMs": 2511,
-        "bMedianMs": 1584
+        "runs": 6,
+        "passed": 5,
+        "aMedianMs": 2837,
+        "bMedianMs": 1678
       }
     }
   },
   "allAttempts": {
-    "attempted": 20,
-    "passed": 13,
+    "attempted": 28,
+    "passed": 20,
     "upstreamFailures": 6
   },
   "omitted": [
@@ -263,6 +263,129 @@
       "commands": [
         "addToCart:ok",
         "addToCart:ok"
+      ],
+      "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)"
+    },
+    {
+      "at": "2026-10-18T13:05:57.094Z",
+      "fixture": "hero-en",
+      "connected": true,
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 3112,
+      "bMs": 2296,
+      "toolMs": 1539,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ],
+      "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)"
+    },
+    {
+      "at": "2026-10-18T13:06:37.041Z",
+      "fixture": "hero-ko",
+      "connected": true,
+      "pass": false,
+      "model": "gemini-3.8-live",
+      "aMs": null,
+      "bMs": null,
+      "toolMs": null,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ],
+      "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)"
+    },
+    {
+      "at": "2026-10-18T13:08:37.194Z",
+      "fixture": "hero-en",
+      "connected": true,
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 4133,
+      "bMs": 2240,
+      "toolMs": 1920,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok",
+        "offerChoices:ok"
+      ],
+      "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)"
+    },
+    {
+      "at": "2026-10-18T13:09:16.947Z",
+      "fixture": "hero-ko",
+      "connected": true,
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 3103,
+      "bMs": 1935,
+      "toolMs": 1679,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ],
+      "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)"
+    },
+    {
+      "at": "2026-10-18T13:12:54.669Z",
+      "fixture": "hero-en",
+      "connected": true,
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 4221,
+      "bMs": 2118,
+      "toolMs": 1798,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok",
+        "offerChoices:ok"
+      ],
+      "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)"
+    },
+    {
+      "at": "2026-10-18T13:13:34.960Z",
+      "fixture": "hero-ko",
+      "connected": true,
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 2726,
+      "bMs": 1678,
+      "toolMs": 1521,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ],
+      "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)"
+    },
+    {
+      "at": "2026-10-18T13:14:13.298Z",
+      "fixture": "hero-en",
+      "connected": true,
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 3172,
+      "bMs": 2322,
+      "toolMs": 2058,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok"
+      ],
+      "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)"
+    },
+    {
+      "at": "2026-10-18T13:14:48.620Z",
+      "fixture": "hero-ko",
+      "connected": true,
+      "pass": true,
+      "model": "gemini-3.8-live",
+      "aMs": 3223,
+      "bMs": 1602,
+      "toolMs": 1444,
+      "commands": [
+        "addToCart:ok",
+        "addToCart:ok",
+        "offerChoices:ok"
       ],
       "fixtures": "v2: 24 kHz, header and trailing chunk stripped (I-237)"
     }
