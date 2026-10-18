@@ -129,7 +129,7 @@ const SAFETY = [
 const SERVICES = [
   ["Cloud Run", "Runs the Next.js app and its API in asia-northeast3. Every change to an order is a command the server checks."],
   ["Firestore", "One session document per order, changed only in transactions and streamed to the phone and the kiosk."],
-  ["Gemini Live", "The phone talks to it directly with a one-use token; the server pins the model, instructions and 10 tools."],
+  ["Gemini Live", "The phone talks to it directly with a one-use token; the server pins the model, instructions and 11 tools."],
   ["Gemini Flash", "The text agent with the same tools, for typing and for when voice is unavailable."],
   ["Secret Manager", "Holds the Gemini API key, which never reaches a browser."],
 ];

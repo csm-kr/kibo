@@ -129,7 +129,7 @@ describe("relayConnection: hello and auth", () => {
     expect(vertex.opened).toHaveLength(1);
     const { model, config } = vertex.opened[0];
     expect(model).toBe("gemini-3.8-live");
-    // The same config builders as the token path: instructions with the menu and the current cart, 10 tools, Korean.
+    // The same config builders as the token path: instructions with the menu and the current cart, 11 tools, Korean.
     expect(config.systemInstruction).toContain("<menu_data>");
     expect(config.systemInstruction).toContain("Cart lines, already applied; do not add these again:");
     expect(config.inputAudioTranscription).toEqual({ languageCodes: ["ko-KR", "en-US"] });
