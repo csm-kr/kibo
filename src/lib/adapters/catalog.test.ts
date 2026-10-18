@@ -499,7 +499,7 @@ describe("catalog helpers", () => {
   });
 
   it("allKioskIds lists every kiosk", () => {
-    expect(allKioskIds()).toEqual(["malo", "doughhouse", "airport_rail"]);
+    expect(allKioskIds()).toEqual(["malo", "doughhouse", "airport_rail", "bunsik"]);
     for (const id of allKioskIds()) expect(isKioskId(id)).toBe(true);
   });
 

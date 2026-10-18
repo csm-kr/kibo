@@ -1,6 +1,7 @@
 import { z } from "zod";
 import airportRail from "../../../data/kiosks/airport_rail.json";
 import malo from "../../../data/kiosks/malo.json";
+import bunsik from "../../../skills/bunsik.json";
 import doughhouse from "../../../skills/doughhouse.json";
 import type {
   KioskData,
@@ -14,7 +15,7 @@ import type {
 } from "@/types/menu";
 import { learnedToKiosk, skillSchema } from "./learned";
 
-export type KioskId = "malo" | "doughhouse" | "airport_rail";
+export type KioskId = "malo" | "doughhouse" | "airport_rail" | "bunsik";
 
 export class CatalogError extends Error {
   constructor(message: string) {
@@ -103,6 +104,7 @@ const sources: Record<KioskId, () => KioskData> = {
   malo: () => kioskSchema.parse(malo),
   doughhouse: () => learnedToKiosk(skillSchema.parse(doughhouse)),
   airport_rail: () => kioskSchema.parse(airportRail),
+  bunsik: () => learnedToKiosk(skillSchema.parse(bunsik)),
 };
 const cache = new Map<KioskId, KioskData>();
 

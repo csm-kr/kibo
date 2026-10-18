@@ -7,7 +7,7 @@ import { useKioskSession } from "@/hooks/useKioskSession";
 import { useNow } from "@/hooks/useNow";
 import { useQrSrc } from "@/hooks/useQrSrc";
 import { createBridge, type BridgeOutcome } from "@/lib/bridge/bridge";
-import { PAGE_W, pageFrame, replayCaption, tapMarks, type ReplayTap } from "@/lib/bridge/replayView";
+import { pageFrame, pageSizeOf, replayCaption, tapMarks, type ReplayTap } from "@/lib/bridge/replayView";
 import { sendCommand } from "@/lib/client/api";
 import { kiboWorking } from "@/lib/kiosk/timers";
 import type { KioskData } from "@/types/menu";
@@ -15,7 +15,8 @@ import type { Session } from "@/types/session";
 
 // A learned kiosk page (KIBO Learn), shown unchanged in a same-origin iframe, with the bridge in this parent page
 // driving iframe.contentDocument. The page is never modified or given scripts (docs/SECURITY.md "Learned kiosks").
-// The page keeps the learner's width but may be laid out shorter, so it can be drawn larger (pageFrame); each click
+// The page keeps the learner's width (or its own fixed size, bk9) but may be laid out shorter, so it can be drawn
+// larger (pageFrame); each click
 // the bridge makes is drawn as a numbered mark over it, a short pause per tap so a person can follow (14-final:3).
 
 /** How long each replayed tap stays on screen before its click; not counted in the bridge's replay time. */
@@ -32,6 +33,10 @@ const INTRO: Record<string, { en: string; ko: string }> = {
   doughhouse: {
     en: "A pizza kiosk KIBO learned by itself (our development kiosk).",
     ko: "KIBO가 스스로 익힌 피자 키오스크예요 (저희 개발용 키오스크).",
+  },
+  bunsik: {
+    en: "A snack bar kiosk KIBO learned by itself the first time it saw it (a blind test kiosk).",
+    ko: "KIBO가 처음 보고 스스로 익힌 분식 키오스크예요 (블라인드 시험용 키오스크).",
   },
 };
 const INTRO_DEFAULT = { en: "A kiosk KIBO learned by itself.", ko: "KIBO가 스스로 익힌 키오스크예요." };
@@ -85,7 +90,7 @@ export function LearnedKioskHost(props: {
   // Kept in a ref, not memoized: a bridge rebuilt by accident would forget what it handled and replay it twice.
   const bridge = useRef<{ doc: Document; sessionId: string; kioskToken: string; value: ReturnType<typeof createBridge> } | null>(null);
   const now = useNow();
-  const frame = pageFrame(box.w, box.h);
+  const frame = pageFrame(box.w, box.h, pageSizeOf(kiosk.learned ?? {}));
 
   useEffect(() => {
     const el = outer.current;
@@ -157,7 +162,7 @@ export function LearnedKioskHost(props: {
           data-page-scale={frame.scale.toFixed(3)}
           onLoad={(e) => setDoc(e.currentTarget.contentDocument)}
           style={{
-            width: PAGE_W,
+            width: frame.pageW,
             height: frame.pageH,
             transform: `translate(-50%, -50%) scale(${frame.scale})`,
             visibility: frame.scale ? "visible" : "hidden",

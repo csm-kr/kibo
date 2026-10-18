@@ -164,6 +164,9 @@ export function nearestWithin(found: Target[], within: string): Target[] {
   return min === Infinity ? [] : found.filter((_, i) => ds[i] === min);
 }
 
+/** Native elements that carry a role without the attribute (HTML-AAM), for the roles kiosk skills use. */
+const IMPLICIT_ROLE: Record<string, string[]> = { button: ["button"] };
+
 /** Every element the step could mean, in page order. */
 function candidates(doc: Document, step: PlainStep): Target[] {
   const all = allCandidates(doc, step);
@@ -175,8 +178,12 @@ function allCandidates(doc: Document, step: PlainStep): Target[] {
     return findByLabel(doc, step.label).map((el) => ({ el: el as HTMLElement, label: step.label!, text: textOf(el as HTMLElement) }));
   }
   if (step.role && step.name) {
-    // Radios and checkboxes are named by their <label> text ("라지 (+4,000원)" contains "라지").
-    const selector = step.role === "radio" || step.role === "checkbox" ? `input[type=${step.role}]` : `[role="${step.role}"]`;
+    // Radios and checkboxes are named by their <label> text ("라지 (+4,000원)" contains "라지"). Other roles also match
+    // the native elements that have them, as the learner's getByRole does: a <button> is a button (bk9's 담기, I-405).
+    const selector =
+      step.role === "radio" || step.role === "checkbox"
+        ? `input[type=${step.role}]`
+        : [`[role="${step.role}"]`, ...(IMPLICIT_ROLE[step.role] ?? [])].join(", ");
     const out: Target[] = [];
     for (const el of doc.querySelectorAll<HTMLElement>(selector)) {
       const box = (el.closest("label") as HTMLElement | null) ?? el;

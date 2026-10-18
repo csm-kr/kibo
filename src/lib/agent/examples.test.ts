@@ -36,6 +36,21 @@ describe("examplesFor", () => {
     ]);
   });
 
+  it("snack bar examples (the learned 보리별 분식, I-405): names and options from skills/bunsik.json", () => {
+    expect(examplesFor("bunsik", "en")).toEqual([
+      "Cheese tteokbokki, medium spicy, with a boiled egg",
+      "Add a tuna gimbap, sliced",
+      "Remove the gimbap",
+      "I'm done",
+    ]);
+    expect(examplesFor("bunsik", "ko")).toEqual([
+      "치즈 떡볶이 3단계 보통맛으로, 삶은 계란 추가해 주세요.",
+      "참치 김밥 하나 썰어서 추가해 주세요.",
+      "김밥은 빼 주세요.",
+      "다 골랐어요.",
+    ]);
+  });
+
   it("airport rail examples", () => {
     expect(examplesFor("airport_rail", "en")).toEqual([
       "Two adult tickets to City Center on the express, please.",

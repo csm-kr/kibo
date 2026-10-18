@@ -92,7 +92,13 @@ export const skillSchema = z
     checkout: z.strictObject({ label: text, name }),
     recipes: z.record(varName, z.array(recipeStep)),
     cartTotalPattern: z.string().max(200),
+    // One cart line in the page's text; it may span text lines (a kiosk that shows a line as a block, bk9).
     cartLinePattern: z.string().max(200),
+    // What stands between two options in a cart line, as a regex; a comma when absent.
+    cartOptionSeparator: z.string().min(1).max(60).optional(),
+    // A page drawn at a fixed size (a kiosk screen, bk9's 720×1280) is laid out at exactly that size; without it the
+    // page takes the learner's 1080 width at 1120–1600 tall (14-final:3).
+    pageSize: z.strictObject({ width: z.number().int().min(320).max(1600), height: z.number().int().min(480).max(2400) }).optional(),
     // Popups that can come up between any two steps (a timeout modal): the text that shows one and the step that
     // answers it (round 3, I-194).
     interrupts: z.array(z.strictObject({ text: text.min(4), dismiss: recipeStep })).max(5).optional(),
@@ -209,6 +215,8 @@ export function learnedToKiosk(skill: Skill): KioskData {
     checkout: skill.checkout,
     cartTotalPattern: skill.cartTotalPattern,
     cartLinePattern: skill.cartLinePattern,
+    cartOptionSeparator: skill.cartOptionSeparator ?? ",",
+    ...(skill.pageSize && { pageSize: skill.pageSize }),
     groupSteps,
     itemRecipes: Object.fromEntries(skill.catalog.flatMap((i) => (i.recipe && i.recipe !== "addToCart" ? [[i.itemId, i.recipe]] : []))),
     interrupts: skill.interrupts ?? [],

@@ -1,0 +1,2304 @@
+{
+  "kioskId": "bunsik",
+  "kind": "learned",
+  "brand": {
+    "ko": "보리별 분식",
+    "en": "Boribyeol Bunsik"
+  },
+  "locale": "ko",
+  "currency": "KRW",
+  "page": "/learned-kiosks/bunsik/index.html",
+  "provenance": {
+    "learnedBy": "gemini-3.8-flash",
+    "evidence": "spikes/blind-kiosks/results/bk9-bunsik/final/skill.json",
+    "reviewed": "2026-10-18"
+  },
+  "dineOptions": {
+    "eat_in": "매장에서 먹어요",
+    "take_out": "포장해 갈게요"
+  },
+  "categories": [
+    {
+      "categoryId": "tteok",
+      "name": {
+        "ko": "떡볶이",
+        "en": "Tteokbokki"
+      },
+      "label": "떡볶이"
+    },
+    {
+      "categoryId": "gimbap",
+      "name": {
+        "ko": "김밥",
+        "en": "Gimbap"
+      },
+      "label": "김밥"
+    },
+    {
+      "categoryId": "noodle",
+      "name": {
+        "ko": "라면/우동",
+        "en": "Ramen and udon"
+      },
+      "label": "라면/우동"
+    },
+    {
+      "categoryId": "fried",
+      "name": {
+        "ko": "튀김/순대",
+        "en": "Fried and sundae"
+      },
+      "label": "튀김/순대"
+    },
+    {
+      "categoryId": "set",
+      "name": {
+        "ko": "세트",
+        "en": "Sets"
+      },
+      "label": "세트"
+    },
+    {
+      "categoryId": "drink",
+      "name": {
+        "ko": "음료",
+        "en": "Drinks"
+      },
+      "label": "음료"
+    }
+  ],
+  "catalog": [
+    {
+      "itemId": "boribyeol_tteokbokki",
+      "name": {
+        "ko": "보리별 떡볶이",
+        "en": "Boribyeol tteokbokki"
+      },
+      "label": "보리별 떡볶이",
+      "category": "tteok",
+      "price": 4500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "spice",
+          "name": {
+            "ko": "맵기 선택",
+            "en": "Spice level"
+          },
+          "label": "맵기 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "lv1",
+              "name": {
+                "ko": "1단계 순한맛",
+                "en": "Level 1, mild"
+              },
+              "label": "1단계 순한맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv2",
+              "name": {
+                "ko": "2단계 덜매운맛",
+                "en": "Level 2, less spicy"
+              },
+              "label": "2단계 덜매운맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv3",
+              "name": {
+                "ko": "3단계 보통맛",
+                "en": "Level 3, medium"
+              },
+              "label": "3단계 보통맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv4",
+              "name": {
+                "ko": "4단계 매운맛",
+                "en": "Level 4, spicy"
+              },
+              "label": "4단계 매운맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv5",
+              "name": {
+                "ko": "5단계 아주매운맛",
+                "en": "Level 5, very spicy"
+              },
+              "label": "5단계 아주매운맛",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "groupId": "tteok_topping",
+          "name": {
+            "ko": "토핑 추가",
+            "en": "Extra toppings"
+          },
+          "label": "토핑 추가",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "boiled_egg",
+              "name": {
+                "ko": "삶은 계란",
+                "en": "Boiled egg"
+              },
+              "label": "삶은 계란",
+              "priceDelta": 500
+            },
+            {
+              "optionId": "extra_fishcake",
+              "name": {
+                "ko": "어묵 추가",
+                "en": "Extra fish cake"
+              },
+              "label": "어묵 추가",
+              "priceDelta": 1000
+            },
+            {
+              "optionId": "glass_noodles",
+              "name": {
+                "ko": "당면 사리",
+                "en": "Glass noodles"
+              },
+              "label": "당면 사리",
+              "priceDelta": 1000
+            },
+            {
+              "optionId": "dumplings",
+              "name": {
+                "ko": "만두 사리",
+                "en": "Dumplings"
+              },
+              "label": "만두 사리",
+              "priceDelta": 1000
+            },
+            {
+              "optionId": "ramen_noodles",
+              "name": {
+                "ko": "라면 사리",
+                "en": "Ramen noodles"
+              },
+              "label": "라면 사리",
+              "priceDelta": 1500
+            },
+            {
+              "optionId": "mozzarella",
+              "name": {
+                "ko": "모짜렐라 치즈",
+                "en": "Mozzarella"
+              },
+              "label": "모짜렐라 치즈",
+              "priceDelta": 1500
+            },
+            {
+              "optionId": "sausages",
+              "name": {
+                "ko": "비엔나 소시지",
+                "en": "Cocktail sausages"
+              },
+              "label": "비엔나 소시지",
+              "priceDelta": 1500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "cheese_tteokbokki",
+      "name": {
+        "ko": "치즈 떡볶이",
+        "en": "Cheese tteokbokki"
+      },
+      "label": "치즈 떡볶이",
+      "category": "tteok",
+      "price": 5500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "spice",
+          "name": {
+            "ko": "맵기 선택",
+            "en": "Spice level"
+          },
+          "label": "맵기 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "lv1",
+              "name": {
+                "ko": "1단계 순한맛",
+                "en": "Level 1, mild"
+              },
+              "label": "1단계 순한맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv2",
+              "name": {
+                "ko": "2단계 덜매운맛",
+                "en": "Level 2, less spicy"
+              },
+              "label": "2단계 덜매운맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv3",
+              "name": {
+                "ko": "3단계 보통맛",
+                "en": "Level 3, medium"
+              },
+              "label": "3단계 보통맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv4",
+              "name": {
+                "ko": "4단계 매운맛",
+                "en": "Level 4, spicy"
+              },
+              "label": "4단계 매운맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv5",
+              "name": {
+                "ko": "5단계 아주매운맛",
+                "en": "Level 5, very spicy"
+              },
+              "label": "5단계 아주매운맛",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "groupId": "tteok_topping",
+          "name": {
+            "ko": "토핑 추가",
+            "en": "Extra toppings"
+          },
+          "label": "토핑 추가",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "boiled_egg",
+              "name": {
+                "ko": "삶은 계란",
+                "en": "Boiled egg"
+              },
+              "label": "삶은 계란",
+              "priceDelta": 500
+            },
+            {
+              "optionId": "extra_fishcake",
+              "name": {
+                "ko": "어묵 추가",
+                "en": "Extra fish cake"
+              },
+              "label": "어묵 추가",
+              "priceDelta": 1000
+            },
+            {
+              "optionId": "glass_noodles",
+              "name": {
+                "ko": "당면 사리",
+                "en": "Glass noodles"
+              },
+              "label": "당면 사리",
+              "priceDelta": 1000
+            },
+            {
+              "optionId": "dumplings",
+              "name": {
+                "ko": "만두 사리",
+                "en": "Dumplings"
+              },
+              "label": "만두 사리",
+              "priceDelta": 1000
+            },
+            {
+              "optionId": "ramen_noodles",
+              "name": {
+                "ko": "라면 사리",
+                "en": "Ramen noodles"
+              },
+              "label": "라면 사리",
+              "priceDelta": 1500
+            },
+            {
+              "optionId": "mozzarella",
+              "name": {
+                "ko": "모짜렐라 치즈",
+                "en": "Mozzarella"
+              },
+              "label": "모짜렐라 치즈",
+              "priceDelta": 1500
+            },
+            {
+              "optionId": "sausages",
+              "name": {
+                "ko": "비엔나 소시지",
+                "en": "Cocktail sausages"
+              },
+              "label": "비엔나 소시지",
+              "priceDelta": 1500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "rose_tteokbokki",
+      "name": {
+        "ko": "로제 떡볶이",
+        "en": "Rosé tteokbokki"
+      },
+      "label": "로제 떡볶이",
+      "category": "tteok",
+      "price": 5500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "spice",
+          "name": {
+            "ko": "맵기 선택",
+            "en": "Spice level"
+          },
+          "label": "맵기 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "lv1",
+              "name": {
+                "ko": "1단계 순한맛",
+                "en": "Level 1, mild"
+              },
+              "label": "1단계 순한맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv2",
+              "name": {
+                "ko": "2단계 덜매운맛",
+                "en": "Level 2, less spicy"
+              },
+              "label": "2단계 덜매운맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv3",
+              "name": {
+                "ko": "3단계 보통맛",
+                "en": "Level 3, medium"
+              },
+              "label": "3단계 보통맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv4",
+              "name": {
+                "ko": "4단계 매운맛",
+                "en": "Level 4, spicy"
+              },
+              "label": "4단계 매운맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv5",
+              "name": {
+                "ko": "5단계 아주매운맛",
+                "en": "Level 5, very spicy"
+              },
+              "label": "5단계 아주매운맛",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "groupId": "tteok_topping",
+          "name": {
+            "ko": "토핑 추가",
+            "en": "Extra toppings"
+          },
+          "label": "토핑 추가",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "boiled_egg",
+              "name": {
+                "ko": "삶은 계란",
+                "en": "Boiled egg"
+              },
+              "label": "삶은 계란",
+              "priceDelta": 500
+            },
+            {
+              "optionId": "extra_fishcake",
+              "name": {
+                "ko": "어묵 추가",
+                "en": "Extra fish cake"
+              },
+              "label": "어묵 추가",
+              "priceDelta": 1000
+            },
+            {
+              "optionId": "glass_noodles",
+              "name": {
+                "ko": "당면 사리",
+                "en": "Glass noodles"
+              },
+              "label": "당면 사리",
+              "priceDelta": 1000
+            },
+            {
+              "optionId": "dumplings",
+              "name": {
+                "ko": "만두 사리",
+                "en": "Dumplings"
+              },
+              "label": "만두 사리",
+              "priceDelta": 1000
+            },
+            {
+              "optionId": "ramen_noodles",
+              "name": {
+                "ko": "라면 사리",
+                "en": "Ramen noodles"
+              },
+              "label": "라면 사리",
+              "priceDelta": 1500
+            },
+            {
+              "optionId": "mozzarella",
+              "name": {
+                "ko": "모짜렐라 치즈",
+                "en": "Mozzarella"
+              },
+              "label": "모짜렐라 치즈",
+              "priceDelta": 1500
+            },
+            {
+              "optionId": "sausages",
+              "name": {
+                "ko": "비엔나 소시지",
+                "en": "Cocktail sausages"
+              },
+              "label": "비엔나 소시지",
+              "priceDelta": 1500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "jjajang_tteokbokki",
+      "name": {
+        "ko": "짜장 떡볶이",
+        "en": "Black bean tteokbokki"
+      },
+      "label": "짜장 떡볶이",
+      "category": "tteok",
+      "price": 5500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "spice",
+          "name": {
+            "ko": "맵기 선택",
+            "en": "Spice level"
+          },
+          "label": "맵기 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "lv1",
+              "name": {
+                "ko": "1단계 순한맛",
+                "en": "Level 1, mild"
+              },
+              "label": "1단계 순한맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv2",
+              "name": {
+                "ko": "2단계 덜매운맛",
+                "en": "Level 2, less spicy"
+              },
+              "label": "2단계 덜매운맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv3",
+              "name": {
+                "ko": "3단계 보통맛",
+                "en": "Level 3, medium"
+              },
+              "label": "3단계 보통맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv4",
+              "name": {
+                "ko": "4단계 매운맛",
+                "en": "Level 4, spicy"
+              },
+              "label": "4단계 매운맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv5",
+              "name": {
+                "ko": "5단계 아주매운맛",
+                "en": "Level 5, very spicy"
+              },
+              "label": "5단계 아주매운맛",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "groupId": "tteok_topping",
+          "name": {
+            "ko": "토핑 추가",
+            "en": "Extra toppings"
+          },
+          "label": "토핑 추가",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "boiled_egg",
+              "name": {
+                "ko": "삶은 계란",
+                "en": "Boiled egg"
+              },
+              "label": "삶은 계란",
+              "priceDelta": 500
+            },
+            {
+              "optionId": "extra_fishcake",
+              "name": {
+                "ko": "어묵 추가",
+                "en": "Extra fish cake"
+              },
+              "label": "어묵 추가",
+              "priceDelta": 1000
+            },
+            {
+              "optionId": "glass_noodles",
+              "name": {
+                "ko": "당면 사리",
+                "en": "Glass noodles"
+              },
+              "label": "당면 사리",
+              "priceDelta": 1000
+            },
+            {
+              "optionId": "dumplings",
+              "name": {
+                "ko": "만두 사리",
+                "en": "Dumplings"
+              },
+              "label": "만두 사리",
+              "priceDelta": 1000
+            },
+            {
+              "optionId": "ramen_noodles",
+              "name": {
+                "ko": "라면 사리",
+                "en": "Ramen noodles"
+              },
+              "label": "라면 사리",
+              "priceDelta": 1500
+            },
+            {
+              "optionId": "mozzarella",
+              "name": {
+                "ko": "모짜렐라 치즈",
+                "en": "Mozzarella"
+              },
+              "label": "모짜렐라 치즈",
+              "priceDelta": 1500
+            },
+            {
+              "optionId": "sausages",
+              "name": {
+                "ko": "비엔나 소시지",
+                "en": "Cocktail sausages"
+              },
+              "label": "비엔나 소시지",
+              "priceDelta": 1500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "gungjung_tteokbokki",
+      "name": {
+        "ko": "궁중 떡볶이",
+        "en": "Soy sauce tteokbokki"
+      },
+      "label": "궁중 떡볶이",
+      "category": "tteok",
+      "price": 6000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "tteok_topping",
+          "name": {
+            "ko": "토핑 추가",
+            "en": "Extra toppings"
+          },
+          "label": "토핑 추가",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "boiled_egg",
+              "name": {
+                "ko": "삶은 계란",
+                "en": "Boiled egg"
+              },
+              "label": "삶은 계란",
+              "priceDelta": 500
+            },
+            {
+              "optionId": "extra_fishcake",
+              "name": {
+                "ko": "어묵 추가",
+                "en": "Extra fish cake"
+              },
+              "label": "어묵 추가",
+              "priceDelta": 1000
+            },
+            {
+              "optionId": "glass_noodles",
+              "name": {
+                "ko": "당면 사리",
+                "en": "Glass noodles"
+              },
+              "label": "당면 사리",
+              "priceDelta": 1000
+            },
+            {
+              "optionId": "dumplings",
+              "name": {
+                "ko": "만두 사리",
+                "en": "Dumplings"
+              },
+              "label": "만두 사리",
+              "priceDelta": 1000
+            },
+            {
+              "optionId": "ramen_noodles",
+              "name": {
+                "ko": "라면 사리",
+                "en": "Ramen noodles"
+              },
+              "label": "라면 사리",
+              "priceDelta": 1500
+            },
+            {
+              "optionId": "mozzarella",
+              "name": {
+                "ko": "모짜렐라 치즈",
+                "en": "Mozzarella"
+              },
+              "label": "모짜렐라 치즈",
+              "priceDelta": 1500
+            },
+            {
+              "optionId": "sausages",
+              "name": {
+                "ko": "비엔나 소시지",
+                "en": "Cocktail sausages"
+              },
+              "label": "비엔나 소시지",
+              "priceDelta": 1500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "lunch_jjolbokki",
+      "name": {
+        "ko": "점심 쫄볶이",
+        "en": "Lunch jjolbokki"
+      },
+      "label": "점심 쫄볶이",
+      "category": "tteok",
+      "price": 5000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "spice",
+          "name": {
+            "ko": "맵기 선택",
+            "en": "Spice level"
+          },
+          "label": "맵기 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "lv1",
+              "name": {
+                "ko": "1단계 순한맛",
+                "en": "Level 1, mild"
+              },
+              "label": "1단계 순한맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv2",
+              "name": {
+                "ko": "2단계 덜매운맛",
+                "en": "Level 2, less spicy"
+              },
+              "label": "2단계 덜매운맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv3",
+              "name": {
+                "ko": "3단계 보통맛",
+                "en": "Level 3, medium"
+              },
+              "label": "3단계 보통맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv4",
+              "name": {
+                "ko": "4단계 매운맛",
+                "en": "Level 4, spicy"
+              },
+              "label": "4단계 매운맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv5",
+              "name": {
+                "ko": "5단계 아주매운맛",
+                "en": "Level 5, very spicy"
+              },
+              "label": "5단계 아주매운맛",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "groupId": "tteok_topping",
+          "name": {
+            "ko": "토핑 추가",
+            "en": "Extra toppings"
+          },
+          "label": "토핑 추가",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "boiled_egg",
+              "name": {
+                "ko": "삶은 계란",
+                "en": "Boiled egg"
+              },
+              "label": "삶은 계란",
+              "priceDelta": 500
+            },
+            {
+              "optionId": "extra_fishcake",
+              "name": {
+                "ko": "어묵 추가",
+                "en": "Extra fish cake"
+              },
+              "label": "어묵 추가",
+              "priceDelta": 1000
+            },
+            {
+              "optionId": "glass_noodles",
+              "name": {
+                "ko": "당면 사리",
+                "en": "Glass noodles"
+              },
+              "label": "당면 사리",
+              "priceDelta": 1000
+            },
+            {
+              "optionId": "dumplings",
+              "name": {
+                "ko": "만두 사리",
+                "en": "Dumplings"
+              },
+              "label": "만두 사리",
+              "priceDelta": 1000
+            },
+            {
+              "optionId": "ramen_noodles",
+              "name": {
+                "ko": "라면 사리",
+                "en": "Ramen noodles"
+              },
+              "label": "라면 사리",
+              "priceDelta": 1500
+            },
+            {
+              "optionId": "mozzarella",
+              "name": {
+                "ko": "모짜렐라 치즈",
+                "en": "Mozzarella"
+              },
+              "label": "모짜렐라 치즈",
+              "priceDelta": 1500
+            },
+            {
+              "optionId": "sausages",
+              "name": {
+                "ko": "비엔나 소시지",
+                "en": "Cocktail sausages"
+              },
+              "label": "비엔나 소시지",
+              "priceDelta": 1500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "boribyeol_gimbap",
+      "name": {
+        "ko": "보리별 김밥",
+        "en": "Boribyeol gimbap"
+      },
+      "label": "보리별 김밥",
+      "category": "gimbap",
+      "price": 3500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "gimbap_cut",
+          "name": {
+            "ko": "김밥 커팅",
+            "en": "Cutting"
+          },
+          "label": "김밥 커팅",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "cut",
+              "name": {
+                "ko": "썰어서",
+                "en": "Sliced"
+              },
+              "label": "썰어서",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "whole",
+              "name": {
+                "ko": "통으로",
+                "en": "Whole roll"
+              },
+              "label": "통으로",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "groupId": "gimbap_extra",
+          "name": {
+            "ko": "김밥 추가",
+            "en": "Extra roll"
+          },
+          "label": "김밥 추가",
+          "required": false,
+          "min": 0,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "extra_roll",
+              "name": {
+                "ko": "김밥 추가 1줄",
+                "en": "One extra roll"
+              },
+              "label": "김밥 추가 1줄",
+              "priceDelta": 3000
+            }
+          ],
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "김밥 추가 1줄"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "kimchi_gimbap",
+      "name": {
+        "ko": "김치 김밥",
+        "en": "Kimchi gimbap"
+      },
+      "label": "김치 김밥",
+      "category": "gimbap",
+      "price": 4000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "gimbap_cut",
+          "name": {
+            "ko": "김밥 커팅",
+            "en": "Cutting"
+          },
+          "label": "김밥 커팅",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "cut",
+              "name": {
+                "ko": "썰어서",
+                "en": "Sliced"
+              },
+              "label": "썰어서",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "whole",
+              "name": {
+                "ko": "통으로",
+                "en": "Whole roll"
+              },
+              "label": "통으로",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "groupId": "gimbap_extra",
+          "name": {
+            "ko": "김밥 추가",
+            "en": "Extra roll"
+          },
+          "label": "김밥 추가",
+          "required": false,
+          "min": 0,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "extra_roll",
+              "name": {
+                "ko": "김밥 추가 1줄",
+                "en": "One extra roll"
+              },
+              "label": "김밥 추가 1줄",
+              "priceDelta": 3000
+            }
+          ],
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "김밥 추가 1줄"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "tuna_gimbap",
+      "name": {
+        "ko": "참치 김밥",
+        "en": "Tuna gimbap"
+      },
+      "label": "참치 김밥",
+      "category": "gimbap",
+      "price": 4500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "gimbap_cut",
+          "name": {
+            "ko": "김밥 커팅",
+            "en": "Cutting"
+          },
+          "label": "김밥 커팅",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "cut",
+              "name": {
+                "ko": "썰어서",
+                "en": "Sliced"
+              },
+              "label": "썰어서",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "whole",
+              "name": {
+                "ko": "통으로",
+                "en": "Whole roll"
+              },
+              "label": "통으로",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "groupId": "gimbap_extra",
+          "name": {
+            "ko": "김밥 추가",
+            "en": "Extra roll"
+          },
+          "label": "김밥 추가",
+          "required": false,
+          "min": 0,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "extra_roll",
+              "name": {
+                "ko": "김밥 추가 1줄",
+                "en": "One extra roll"
+              },
+              "label": "김밥 추가 1줄",
+              "priceDelta": 3000
+            }
+          ],
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "김밥 추가 1줄"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "cheese_gimbap",
+      "name": {
+        "ko": "치즈 김밥",
+        "en": "Cheese gimbap"
+      },
+      "label": "치즈 김밥",
+      "category": "gimbap",
+      "price": 4500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "gimbap_cut",
+          "name": {
+            "ko": "김밥 커팅",
+            "en": "Cutting"
+          },
+          "label": "김밥 커팅",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "cut",
+              "name": {
+                "ko": "썰어서",
+                "en": "Sliced"
+              },
+              "label": "썰어서",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "whole",
+              "name": {
+                "ko": "통으로",
+                "en": "Whole roll"
+              },
+              "label": "통으로",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "groupId": "gimbap_extra",
+          "name": {
+            "ko": "김밥 추가",
+            "en": "Extra roll"
+          },
+          "label": "김밥 추가",
+          "required": false,
+          "min": 0,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "extra_roll",
+              "name": {
+                "ko": "김밥 추가 1줄",
+                "en": "One extra roll"
+              },
+              "label": "김밥 추가 1줄",
+              "priceDelta": 3000
+            }
+          ],
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "김밥 추가 1줄"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "katsu_gimbap",
+      "name": {
+        "ko": "돈까스 김밥",
+        "en": "Pork cutlet gimbap"
+      },
+      "label": "돈까스 김밥",
+      "category": "gimbap",
+      "price": 5000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "gimbap_cut",
+          "name": {
+            "ko": "김밥 커팅",
+            "en": "Cutting"
+          },
+          "label": "김밥 커팅",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "cut",
+              "name": {
+                "ko": "썰어서",
+                "en": "Sliced"
+              },
+              "label": "썰어서",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "whole",
+              "name": {
+                "ko": "통으로",
+                "en": "Whole roll"
+              },
+              "label": "통으로",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "groupId": "gimbap_extra",
+          "name": {
+            "ko": "김밥 추가",
+            "en": "Extra roll"
+          },
+          "label": "김밥 추가",
+          "required": false,
+          "min": 0,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "extra_roll",
+              "name": {
+                "ko": "김밥 추가 1줄",
+                "en": "One extra roll"
+              },
+              "label": "김밥 추가 1줄",
+              "priceDelta": 3000
+            }
+          ],
+          "select": [
+            {
+              "op": "click",
+              "label": "+",
+              "within": "김밥 추가 1줄"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "anchovy_gimbap",
+      "name": {
+        "ko": "멸치 김밥",
+        "en": "Anchovy gimbap"
+      },
+      "label": "멸치 김밥",
+      "category": "gimbap",
+      "price": 4500,
+      "soldOut": true,
+      "optionGroups": []
+    },
+    {
+      "itemId": "boribyeol_ramen",
+      "name": {
+        "ko": "보리별 라면",
+        "en": "Boribyeol ramen"
+      },
+      "label": "보리별 라면",
+      "category": "noodle",
+      "price": 4000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "noodle_firm",
+          "name": {
+            "ko": "면 익힘 정도",
+            "en": "Noodle texture"
+          },
+          "label": "면 익힘 정도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "firm",
+              "name": {
+                "ko": "꼬들하게",
+                "en": "Firm"
+              },
+              "label": "꼬들하게",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "normal",
+              "name": {
+                "ko": "보통",
+                "en": "Regular"
+              },
+              "label": "보통",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "soft",
+              "name": {
+                "ko": "푹 익혀서",
+                "en": "Soft"
+              },
+              "label": "푹 익혀서",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "groupId": "ramen_addin",
+          "name": {
+            "ko": "추가 재료",
+            "en": "Add-ins"
+          },
+          "label": "추가 재료",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "egg",
+              "name": {
+                "ko": "계란",
+                "en": "Egg"
+              },
+              "label": "계란",
+              "priceDelta": 500
+            },
+            {
+              "optionId": "cheese",
+              "name": {
+                "ko": "치즈",
+                "en": "Cheese"
+              },
+              "label": "치즈",
+              "priceDelta": 700
+            },
+            {
+              "optionId": "rice_cakes",
+              "name": {
+                "ko": "떡 사리",
+                "en": "Rice cakes"
+              },
+              "label": "떡 사리",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "seafood_ramen",
+      "name": {
+        "ko": "해물 라면",
+        "en": "Seafood ramen"
+      },
+      "label": "해물 라면",
+      "category": "noodle",
+      "price": 5500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "ramen_addin",
+          "name": {
+            "ko": "추가 재료",
+            "en": "Add-ins"
+          },
+          "label": "추가 재료",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "egg",
+              "name": {
+                "ko": "계란",
+                "en": "Egg"
+              },
+              "label": "계란",
+              "priceDelta": 500
+            },
+            {
+              "optionId": "cheese",
+              "name": {
+                "ko": "치즈",
+                "en": "Cheese"
+              },
+              "label": "치즈",
+              "priceDelta": 700
+            },
+            {
+              "optionId": "rice_cakes",
+              "name": {
+                "ko": "떡 사리",
+                "en": "Rice cakes"
+              },
+              "label": "떡 사리",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "dumpling_ramen",
+      "name": {
+        "ko": "만두 라면",
+        "en": "Dumpling ramen"
+      },
+      "label": "만두 라면",
+      "category": "noodle",
+      "price": 5000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "noodle_firm",
+          "name": {
+            "ko": "면 익힘 정도",
+            "en": "Noodle texture"
+          },
+          "label": "면 익힘 정도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "firm",
+              "name": {
+                "ko": "꼬들하게",
+                "en": "Firm"
+              },
+              "label": "꼬들하게",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "normal",
+              "name": {
+                "ko": "보통",
+                "en": "Regular"
+              },
+              "label": "보통",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "soft",
+              "name": {
+                "ko": "푹 익혀서",
+                "en": "Soft"
+              },
+              "label": "푹 익혀서",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "groupId": "ramen_addin",
+          "name": {
+            "ko": "추가 재료",
+            "en": "Add-ins"
+          },
+          "label": "추가 재료",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "egg",
+              "name": {
+                "ko": "계란",
+                "en": "Egg"
+              },
+              "label": "계란",
+              "priceDelta": 500
+            },
+            {
+              "optionId": "cheese",
+              "name": {
+                "ko": "치즈",
+                "en": "Cheese"
+              },
+              "label": "치즈",
+              "priceDelta": 700
+            },
+            {
+              "optionId": "rice_cakes",
+              "name": {
+                "ko": "떡 사리",
+                "en": "Rice cakes"
+              },
+              "label": "떡 사리",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "jjamppong_ramen",
+      "name": {
+        "ko": "짬뽕 라면",
+        "en": "Jjamppong ramen"
+      },
+      "label": "짬뽕 라면",
+      "category": "noodle",
+      "price": 5500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "noodle_firm",
+          "name": {
+            "ko": "면 익힘 정도",
+            "en": "Noodle texture"
+          },
+          "label": "면 익힘 정도",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "firm",
+              "name": {
+                "ko": "꼬들하게",
+                "en": "Firm"
+              },
+              "label": "꼬들하게",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "normal",
+              "name": {
+                "ko": "보통",
+                "en": "Regular"
+              },
+              "label": "보통",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "soft",
+              "name": {
+                "ko": "푹 익혀서",
+                "en": "Soft"
+              },
+              "label": "푹 익혀서",
+              "priceDelta": 0
+            }
+          ]
+        },
+        {
+          "groupId": "ramen_addin",
+          "name": {
+            "ko": "추가 재료",
+            "en": "Add-ins"
+          },
+          "label": "추가 재료",
+          "required": false,
+          "min": 0,
+          "max": 3,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "egg",
+              "name": {
+                "ko": "계란",
+                "en": "Egg"
+              },
+              "label": "계란",
+              "priceDelta": 500
+            },
+            {
+              "optionId": "cheese",
+              "name": {
+                "ko": "치즈",
+                "en": "Cheese"
+              },
+              "label": "치즈",
+              "priceDelta": 700
+            },
+            {
+              "optionId": "rice_cakes",
+              "name": {
+                "ko": "떡 사리",
+                "en": "Rice cakes"
+              },
+              "label": "떡 사리",
+              "priceDelta": 1000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "fishcake_udon",
+      "name": {
+        "ko": "어묵 우동",
+        "en": "Fish cake udon"
+      },
+      "label": "어묵 우동",
+      "category": "noodle",
+      "price": 5500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "itemId": "kimchi_udon",
+      "name": {
+        "ko": "김치 우동",
+        "en": "Kimchi udon"
+      },
+      "label": "김치 우동",
+      "category": "noodle",
+      "price": 6000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "itemId": "mixed_fritters",
+      "name": {
+        "ko": "모둠 튀김",
+        "en": "Mixed fritters"
+      },
+      "label": "모둠 튀김",
+      "category": "fried",
+      "price": 5000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "itemId": "gimmari",
+      "name": {
+        "ko": "김말이 튀김",
+        "en": "Fried seaweed rolls"
+      },
+      "label": "김말이 튀김",
+      "category": "fried",
+      "price": 2500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "itemId": "pepper_fritters",
+      "name": {
+        "ko": "고추 튀김",
+        "en": "Stuffed pepper fritters"
+      },
+      "label": "고추 튀김",
+      "category": "fried",
+      "price": 3000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "itemId": "squid_fritters",
+      "name": {
+        "ko": "오징어 튀김",
+        "en": "Squid fritters"
+      },
+      "label": "오징어 튀김",
+      "category": "fried",
+      "price": 3500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "itemId": "sundae",
+      "name": {
+        "ko": "찹쌀 순대",
+        "en": "Sticky rice sundae"
+      },
+      "label": "찹쌀 순대",
+      "category": "fried",
+      "price": 4500,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "soondae_style",
+          "name": {
+            "ko": "순대 구성",
+            "en": "Sundae style"
+          },
+          "label": "순대 구성",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "sundae_only",
+              "name": {
+                "ko": "순대만",
+                "en": "Sundae only"
+              },
+              "label": "순대만",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "with_offal",
+              "name": {
+                "ko": "내장 섞어서",
+                "en": "With offal"
+              },
+              "label": "내장 섞어서",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "fried_dumplings",
+      "name": {
+        "ko": "군만두",
+        "en": "Pan-fried dumplings"
+      },
+      "label": "군만두",
+      "category": "fried",
+      "price": 3500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "itemId": "boribyeol_set",
+      "name": {
+        "ko": "보리별 세트",
+        "en": "Boribyeol set"
+      },
+      "label": "보리별 세트",
+      "category": "set",
+      "price": 9900,
+      "soldOut": false,
+      "recipe": "addSetToCart",
+      "optionGroups": [
+        {
+          "groupId": "set_tteok",
+          "name": {
+            "ko": "떡볶이 선택",
+            "en": "Tteokbokki"
+          },
+          "label": "떡볶이 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "tteok_basic",
+              "name": {
+                "ko": "보리별 떡볶이",
+                "en": "Boribyeol tteokbokki"
+              },
+              "label": "보리별 떡볶이",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "tteok_cheese",
+              "name": {
+                "ko": "치즈 떡볶이",
+                "en": "Cheese tteokbokki"
+              },
+              "label": "치즈 떡볶이",
+              "priceDelta": 1000
+            },
+            {
+              "optionId": "tteok_rose",
+              "name": {
+                "ko": "로제 떡볶이",
+                "en": "Rosé tteokbokki"
+              },
+              "label": "로제 떡볶이",
+              "priceDelta": 1500
+            }
+          ]
+        },
+        {
+          "groupId": "set_spice",
+          "name": {
+            "ko": "맵기 선택",
+            "en": "Spice level"
+          },
+          "label": "맵기 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "lv1",
+              "name": {
+                "ko": "1단계 순한맛",
+                "en": "Level 1, mild"
+              },
+              "label": "1단계 순한맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv2",
+              "name": {
+                "ko": "2단계 덜매운맛",
+                "en": "Level 2, less spicy"
+              },
+              "label": "2단계 덜매운맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv3",
+              "name": {
+                "ko": "3단계 보통맛",
+                "en": "Level 3, medium"
+              },
+              "label": "3단계 보통맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv4",
+              "name": {
+                "ko": "4단계 매운맛",
+                "en": "Level 4, spicy"
+              },
+              "label": "4단계 매운맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv5",
+              "name": {
+                "ko": "5단계 아주매운맛",
+                "en": "Level 5, very spicy"
+              },
+              "label": "5단계 아주매운맛",
+              "priceDelta": 0
+            }
+          ],
+          "after": [
+            {
+              "op": "click",
+              "label": "다음"
+            }
+          ]
+        },
+        {
+          "groupId": "set_gimbap",
+          "name": {
+            "ko": "김밥 선택",
+            "en": "Gimbap"
+          },
+          "label": "김밥 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "gimbap_basic",
+              "name": {
+                "ko": "보리별 김밥",
+                "en": "Boribyeol gimbap"
+              },
+              "label": "보리별 김밥",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "gimbap_kimchi",
+              "name": {
+                "ko": "김치 김밥",
+                "en": "Kimchi gimbap"
+              },
+              "label": "김치 김밥",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "gimbap_tuna",
+              "name": {
+                "ko": "참치 김밥",
+                "en": "Tuna gimbap"
+              },
+              "label": "참치 김밥",
+              "priceDelta": 500
+            },
+            {
+              "optionId": "gimbap_katsu",
+              "name": {
+                "ko": "돈까스 김밥",
+                "en": "Pork cutlet gimbap"
+              },
+              "label": "돈까스 김밥",
+              "priceDelta": 1000
+            }
+          ]
+        },
+        {
+          "groupId": "set_gimbap_cut",
+          "name": {
+            "ko": "김밥 커팅",
+            "en": "Cutting"
+          },
+          "label": "김밥 커팅",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "cut",
+              "name": {
+                "ko": "썰어서",
+                "en": "Sliced"
+              },
+              "label": "썰어서",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "whole",
+              "name": {
+                "ko": "통으로",
+                "en": "Whole roll"
+              },
+              "label": "통으로",
+              "priceDelta": 0
+            }
+          ],
+          "after": [
+            {
+              "op": "click",
+              "label": "다음"
+            }
+          ]
+        },
+        {
+          "groupId": "set_drink",
+          "name": {
+            "ko": "음료 선택",
+            "en": "Drink"
+          },
+          "label": "음료 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "drink_cola",
+              "name": {
+                "ko": "콜라",
+                "en": "Cola"
+              },
+              "label": "콜라",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "drink_cider",
+              "name": {
+                "ko": "사이다",
+                "en": "Cider"
+              },
+              "label": "사이다",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "drink_orange",
+              "name": {
+                "ko": "오렌지 주스",
+                "en": "Orange juice"
+              },
+              "label": "오렌지 주스",
+              "priceDelta": 500
+            },
+            {
+              "optionId": "drink_sikhye",
+              "name": {
+                "ko": "식혜",
+                "en": "Sikhye (sweet rice drink)"
+              },
+              "label": "식혜",
+              "priceDelta": 500
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "tteok_twi_sun_set",
+      "name": {
+        "ko": "떡튀순 세트",
+        "en": "Tteokbokki, fritters, sundae set"
+      },
+      "label": "떡튀순 세트",
+      "category": "set",
+      "price": 12000,
+      "soldOut": false,
+      "optionGroups": [
+        {
+          "groupId": "spice",
+          "name": {
+            "ko": "맵기 선택",
+            "en": "Spice level"
+          },
+          "label": "맵기 선택",
+          "required": true,
+          "min": 1,
+          "max": 1,
+          "defaultOptionIds": [],
+          "options": [
+            {
+              "optionId": "lv1",
+              "name": {
+                "ko": "1단계 순한맛",
+                "en": "Level 1, mild"
+              },
+              "label": "1단계 순한맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv2",
+              "name": {
+                "ko": "2단계 덜매운맛",
+                "en": "Level 2, less spicy"
+              },
+              "label": "2단계 덜매운맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv3",
+              "name": {
+                "ko": "3단계 보통맛",
+                "en": "Level 3, medium"
+              },
+              "label": "3단계 보통맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv4",
+              "name": {
+                "ko": "4단계 매운맛",
+                "en": "Level 4, spicy"
+              },
+              "label": "4단계 매운맛",
+              "priceDelta": 0
+            },
+            {
+              "optionId": "lv5",
+              "name": {
+                "ko": "5단계 아주매운맛",
+                "en": "Level 5, very spicy"
+              },
+              "label": "5단계 아주매운맛",
+              "priceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "twi_sun_set",
+      "name": {
+        "ko": "튀순 세트",
+        "en": "Fritters and sundae set"
+      },
+      "label": "튀순 세트",
+      "category": "set",
+      "price": 8500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "itemId": "cola",
+      "name": {
+        "ko": "콜라",
+        "en": "Cola"
+      },
+      "label": "콜라",
+      "category": "drink",
+      "price": 2000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "itemId": "cider",
+      "name": {
+        "ko": "사이다",
+        "en": "Cider"
+      },
+      "label": "사이다",
+      "category": "drink",
+      "price": 2000,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "itemId": "orange_juice",
+      "name": {
+        "ko": "오렌지 주스",
+        "en": "Orange juice"
+      },
+      "label": "오렌지 주스",
+      "category": "drink",
+      "price": 2500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "itemId": "sikhye",
+      "name": {
+        "ko": "식혜",
+        "en": "Sikhye (sweet rice drink)"
+      },
+      "label": "식혜",
+      "category": "drink",
+      "price": 2500,
+      "soldOut": false,
+      "optionGroups": []
+    },
+    {
+      "itemId": "water",
+      "name": {
+        "ko": "생수",
+        "en": "Water"
+      },
+      "label": "생수",
+      "category": "drink",
+      "price": 1000,
+      "soldOut": false,
+      "optionGroups": []
+    }
+  ],
+  "uiLabels": [
+    "오늘의 할인",
+    "전체 삭제",
+    "모두 삭제",
+    "취소",
+    "−",
+    "+",
+    "✕",
+    "삭제",
+    "주문 확인하기",
+    "담기",
+    "세트 담기",
+    "다음",
+    "이전으로",
+    "‹ 메뉴 더 담기",
+    "품절",
+    "적립할게요",
+    "적립 안 할게요"
+  ],
+  "forbiddenLabels": [
+    "처음으로",
+    "신용/체크카드",
+    "간편결제",
+    "모바일 상품권",
+    "카드 결제",
+    "현금 결제",
+    "카카오페이",
+    "네이버페이",
+    "토스페이",
+    "주문 확인하기",
+    "주문하기"
+  ],
+  "checkout": {
+    "label": "주문 확인하기",
+    "name": {
+      "ko": "주문 확인하기",
+      "en": "Review order"
+    }
+  },
+  "recipes": {
+    "startOrder": [
+      {
+        "op": "click",
+        "label": "보리별 분식"
+      },
+      {
+        "op": "click",
+        "label": "{dineOption}"
+      }
+    ],
+    "addToCart": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "label": "+",
+            "within": "수량"
+          }
+        ]
+      },
+      {
+        "op": "chooseOptions",
+        "steps": [
+          {
+            "op": "click",
+            "label": "{option}"
+          }
+        ]
+      },
+      {
+        "op": "click",
+        "role": "button",
+        "name": "담기"
+      }
+    ],
+    "addSetToCart": [
+      {
+        "op": "click",
+        "label": "{category}"
+      },
+      {
+        "op": "click",
+        "label": "{item}"
+      },
+      {
+        "op": "chooseOptions",
+        "steps": [
+          {
+            "op": "click",
+            "label": "{option}"
+          }
+        ]
+      },
+      {
+        "op": "click",
+        "role": "button",
+        "name": "담기"
+      },
+      {
+        "op": "repeat",
+        "times": "{qtyMinus1}",
+        "steps": [
+          {
+            "op": "click",
+            "label": "+",
+            "within": "{item}"
+          }
+        ]
+      }
+    ],
+    "removeLine": [
+      {
+        "op": "clickNth",
+        "label": "삭제",
+        "index": "{lineIndex}"
+      },
+      {
+        "op": "click",
+        "label": "삭제",
+        "within": "선택한 메뉴를 삭제할까요?"
+      }
+    ]
+  },
+  "cartTotalPattern": "총 \\d+개\\s+([\\d,]+)원",
+  "cartLinePattern": "^(?!✕$|전체 삭제$)([^\\n]+)\\n(?:([^\\n]+)\\n)?−\\n(\\d+)\\n\\+\\n([\\d,]+)원$",
+  "cartOptionSeparator": "\\s*(?:/|·|\\(|\\)|×1\\b)\\s*",
+  "pageSize": {
+    "width": 720,
+    "height": 1280
+  }
+}

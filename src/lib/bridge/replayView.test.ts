@@ -1,7 +1,18 @@
 import { describe, expect, it } from "vitest";
 import { getKiosk } from "@/lib/adapters/catalog";
 import type { CartLine, PendingBridgeCommand, Session } from "@/types/session";
-import { MAX_PAGE_H, MIN_PAGE_H, PAGE_W, pageFrame, replayCaption, tapLabel, tapMarks, type ReplayResult, type ReplayTap } from "./replayView";
+import {
+  MAX_PAGE_H,
+  MIN_PAGE_H,
+  PAGE_W,
+  pageFrame,
+  pageSizeOf,
+  replayCaption,
+  tapLabel,
+  tapMarks,
+  type ReplayResult,
+  type ReplayTap,
+} from "./replayView";
 
 const kiosk = getKiosk("doughhouse");
 
@@ -39,6 +50,26 @@ function session(over: Partial<Session> = {}): Session {
     ...over,
   } as Session;
 }
+
+describe("pageFrame for a page of a fixed size (the snack bar's 720×1280 screen, I-405)", () => {
+  it("keeps the learner's width and 1120–1600 height for Doughhouse, and the page's own size for the snack bar", () => {
+    expect(pageSizeOf(kiosk.learned!)).toEqual({ w: PAGE_W, minH: MIN_PAGE_H, maxH: MAX_PAGE_H });
+    expect(pageSizeOf(getKiosk("bunsik").learned!)).toEqual({ w: 720, minH: 1280, maxH: 1280 });
+  });
+
+  it("lays the page out at its size and scales it to fit the box, centred", () => {
+    const size = pageSizeOf(getKiosk("bunsik").learned!);
+    const f = pageFrame(500, 700, size);
+    expect(f.pageW).toBe(720);
+    expect(f.pageH).toBe(1280);
+    expect(f.scale).toBeCloseTo(700 / 1280);
+    expect(f.left).toBeCloseTo((500 - 720 * f.scale) / 2);
+    expect(f.top).toBeCloseTo(0);
+    // A target past the page's own right edge is not on the page.
+    expect(tapMarks([tap(1, "옆", 700, 100)], f)).toEqual([]);
+    expect(tapMarks([tap(1, "담기", 500, 1100)], f)).toHaveLength(1);
+  });
+});
 
 describe("pageFrame", () => {
   it("lays the page out shorter than the learning viewport so it scales up (≥ 0.8× at a 900 px tall box)", () => {

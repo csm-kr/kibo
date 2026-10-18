@@ -301,3 +301,56 @@ describe("isForbiddenTarget", () => {
     expect(isForbiddenTarget({ label: "삭제", text: "삭제" }, forbidden)).toBe(false);
   });
 });
+
+describe("runPlan finds a role step's target the way the learner's driver does (getByRole, I-405)", () => {
+  /** A page whose document answers a CSS selector like a browser would for one native <button> and one role="button". */
+  function rolePage(log: string[]) {
+    const el = (text: string, tagName: string, role: string | null) => ({
+      tagName,
+      innerText: text,
+      textContent: text,
+      closest: () => null,
+      getAttribute: (a: string) => (a === "role" ? role : null),
+      getBoundingClientRect: () => ({ x: 0, y: 0, width: 80, height: 40 }),
+      click: vi.fn(() => log.push(`click ${text}`)),
+    });
+    const native = el("4,500원 담기", "BUTTON", null);
+    const div = el("세트 담기 9,900원", "DIV", "button");
+    const selectors: string[] = [];
+    const doc = {
+      defaultView: {
+        getComputedStyle: () => ({ visibility: "visible", cursor: "pointer" }),
+        requestAnimationFrame: (cb: () => void) => setTimeout(cb, 0),
+        MutationObserver: class {
+          observe() {}
+          disconnect() {}
+        },
+      },
+      documentElement: {},
+      body: { querySelectorAll: () => [] },
+      querySelectorAll: (selector: string) => {
+        selectors.push(selector);
+        const parts = selector.split(",").map((s) => s.trim());
+        return [...(parts.includes("button") ? [native] : []), ...(parts.includes('[role="button"]') ? [div] : [])];
+      },
+      createTreeWalker: () => ({ nextNode: () => null }),
+    } as unknown as Document;
+    return { doc, selectors };
+  }
+
+  it("a native <button> has the button role: bk9's add button (`role: button, name: 담기`) is found and clicked", async () => {
+    const log: string[] = [];
+    const { doc } = rolePage(log);
+    await runPlan(doc, [{ op: "click", role: "button", name: "원 담기" }], { forbiddenLabels: forbidden });
+    expect(log).toEqual(["click 4,500원 담기"]);
+  });
+
+  it("still finds an element with an explicit role, and radios and checkboxes stay native inputs", async () => {
+    const log: string[] = [];
+    const { doc, selectors } = rolePage(log);
+    await runPlan(doc, [{ op: "click", role: "button", name: "세트 담기" }], { forbiddenLabels: forbidden });
+    expect(log).toEqual(["click 세트 담기 9,900원"]);
+    await runPlan(doc, [{ op: "clickIfVisible", role: "radio", name: "라지" }], { forbiddenLabels: forbidden });
+    expect(selectors.at(-1)).toBe("input[type=radio]");
+  });
+});

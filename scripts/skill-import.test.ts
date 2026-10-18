@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import graded from "../spikes/blind-kiosks/results/bk9-bunsik/final/grade-v2.json";
 import raw from "../spikes/blind-kiosks/results/bk9-bunsik/final/skill.json";
 import { orderPlan } from "../spikes/kibo-learn/plan.mjs";
-import { learnedToKiosk } from "../src/lib/adapters/learned";
+import bunsikReviewed from "../skills/bunsik.json";
+import { getKiosk } from "../src/lib/adapters/catalog";
+import { learnedToKiosk, type Skill, skillSchema } from "../src/lib/adapters/learned";
 import { changeVars } from "../src/lib/bridge/bridge";
 import { planSteps, type PlainStep } from "../src/lib/bridge/recipe";
 import type { KioskData } from "../src/types/menu";
@@ -75,6 +77,61 @@ describe("skill-import: a round-4 learner skill in the product format (15-judge-
     expect(labels.filter((l) => l === "다음")).toHaveLength(2);
     expect(labels).toContain("보리별 세트");
   });
+});
+
+/** A skill with every id and English name taken out and the review's own fields dropped: what the learner wrote. */
+function learnerPart(s: Skill) {
+  const ids = new Map<string, string>(s.categories.map((c) => [c.categoryId, c.label]));
+  return {
+    dineOptions: s.dineOptions,
+    categories: s.categories.map((c) => c.label),
+    catalog: s.catalog.map((i) => ({
+      label: i.label,
+      category: ids.get(i.category),
+      price: i.price,
+      soldOut: i.soldOut,
+      recipe: i.recipe,
+      optionGroups: i.optionGroups.map((g) => ({
+        label: g.label,
+        required: g.required,
+        min: g.min,
+        max: g.max,
+        options: g.options.map((o) => [o.label, o.priceDelta]),
+        select: g.select,
+        after: g.after,
+      })),
+    })),
+    uiLabels: s.uiLabels,
+    recipes: Object.fromEntries(Object.entries(s.recipes).filter(([k]) => k !== "removeLine")),
+    interrupts: s.interrupts,
+    declines: s.declines,
+  };
+}
+
+describe("skills/bunsik.json: the reviewed snack bar on /demo is the learner's skill and plans its clicks (I-405)", () => {
+  const kiosk = getKiosk("bunsik");
+  const reviewed = skillSchema.parse(bunsikReviewed);
+
+  it("is what skill:import makes of the round-4 skill: same labels, prices, options and recipes", () => {
+    expect(learnerPart(reviewed)).toEqual(learnerPart(importSkill(raw, "bunsik").skill));
+  });
+
+  it("review added only: ids, English names, removeLine, the cart reading, 주문하기 as forbidden, the page size", () => {
+    // The learner's own list and the order button skill:import adds, then the order button on the review.
+    expect(reviewed.forbiddenLabels).toEqual([...raw.forbiddenLabels, "주문 확인하기", "주문하기"]);
+    // The learner read the total from the accessibility tree (one line); the bridge reads innerText, with a line break.
+    expect(raw.cartTotalPattern).toBe("총 \\d+개 ([\\d,]+)원");
+    expect(reviewed.cartTotalPattern).toBe("총 \\d+개\\s+([\\d,]+)원");
+    expect(reviewed.provenance.evidence).toBe("spikes/blind-kiosks/results/bk9-bunsik/final/skill.json");
+  });
+
+  // Every holdout but h2, whose two extra rolls are a count the product cart cannot order yet (I-190).
+  for (const id of ["h1", "h3", "h4", "h5", "h6", "h7", "h8", "h9", "h10"]) {
+    it(`plans the same clicks as the offline runner for holdout ${id}`, () => {
+      const order = (graded.orders.results.find((r) => r.id === id) as { order: Order }).order;
+      expect(plain(bridgePlan(kiosk, order))).toEqual(plain(orderPlan(raw, order)));
+    });
+  }
 });
 
 describe("skill-import: round 3–4 fields", () => {
