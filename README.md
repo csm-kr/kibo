@@ -1,24 +1,91 @@
-# KIBO: Kiosk Intelligence Bridge & Operator
+<div align="center">
 
-**Don't learn the kiosk. Just talk.** Say your order to your own phone, and the self-order kiosk already on the counter fills its own cart. Gemini can fill the cart but cannot pay: payment needs your own yes or tap, then your card at the kiosk. Built for the Google Cloud AI Builder Cup 2026 (Sustainability & Social Impact).
+# KIBO
 
-KIBO is for older adults, people with low vision and travellers who cannot read the kiosk's language, and these groups are large worldwide: by 2030, 1 in 6 people in the world will be 60 or over ([WHO, Ageing and health, 2025](https://www.who.int/news-room/fact-sheets/detail/ageing-and-health)); at least 2.2 billion people have a near or distance vision impairment ([WHO, Blindness and vision impairment, 2026](https://www.who.int/news-room/fact-sheets/detail/blindness-and-visual-impairment)); an estimated 1.52 billion international tourist arrivals were recorded in 2025 ([UN Tourism](https://www.untourism.int/un-tourism-world-tourism-barometer-data)). None of these figures is about kiosks. Korea is one example of the kiosk problem: 17.9% of people aged 65+ say they can order or check in at a kiosk (self-reported; [KIHASA, 2024](https://www.kihasa.re.kr/api/kihasa/file/download?seq=28260), p. 32). Sources: [`docs/plan/SOURCES.md`](docs/plan/SOURCES.md) S44–S46, S16.
+**Kiosk Intelligence Bridge & Operator**
 
-- **Try it:** open https://kibo-407514467119.asia-northeast3.run.app/demo on a laptop, press **Start**, and scan the kiosk's QR with your phone
-- **On a phone:** open **kibo-2026.web.app** and type the 6-digit code a KIBO kiosk shows
-- Video and deck: linked from the submission
+### Talk to your phone. The kiosk already there takes the order.
 
-![The live demo: on the left the Korean kiosk with two cheeseburger sets the AI just added, highlighted; on the right the phone with the same order and total](public/landing/demo.webp)
+[**▶ Live demo**](https://kibo-2026.web.app/demo) · **Video:** VIDEO_LINK_PENDING · **Deck:** PDF in the submission · Google Cloud AI Builder Cup 2026, Sustainability & Social Impact
 
-The picture shows "Try it on this screen". With **Start**, the laptop shows the kiosk alone and you order on your own phone.
+![KIBO: on the left, "Don't learn the kiosk. Just talk."; on the right, the phone with a spoken order and the Korean self-order kiosk filling the same cart](docs/images/hero.webp)
+
+</div>
+
+Self-order kiosks leave many people out: older adults, people with low vision, travellers who cannot read the screen, and anyone who finds the touch maze a hassle. KIBO lets them order by talking to **their own phone**, in their own language. **Gemini** turns each sentence into tool calls, our **Cloud Run** server checks every call against the kiosk's own menu and rules, and the kiosk on the counter fills its own cart, step by step, as you talk. **The AI can never pay**: that takes your own yes or tap, then your card at the kiosk.
+
+| 96 of 98 | 2.1 s | 20 of 20 | 0 |
+|:---:|:---:|:---:|:---:|
+| text-agent test cases passed on the final code | median from the end of your sentence to the kiosk moving (voice) | test orders handled safely on two kiosks KIBO had never seen | payments the AI can complete |
+
+<sub>Team-written cases; synthetic voice on a laptop; synthetic test kiosks. Every number and its limits: [Results](#results), [`docs/plan/NUMBERS.md`](docs/plan/NUMBERS.md).</sub>
+
+## How it works
+
+| 1. Talk to your phone | 2. The kiosk fills its own cart | 3. Say yes, pay at the kiosk |
+|:---:|:---:|:---:|
+| ![The phone's order card: two cheeseburger sets with their sides and drinks, and the total](public/landing/phone-talk.webp) | ![The Korean kiosk highlighting the cheeseburger the AI just added, with KIBO's English subtitle "AI added: Cheeseburger set"](public/landing/kiosk-ai-highlight.webp) | ![The phone's review with "Yes, pay now" and "You can also say yes."](public/landing/phone-confirm.webp) |
+| Scan the kiosk's QR (or type its 6-digit code at **kibo-2026.web.app**) and speak or type, in Korean, English or 7 more languages. | Gemini calls one of **11 tools**; the server validates it and applies it in a Firestore transaction, and both screens update over a live stream. | The AI may open the review. Only your tap or your own new "yes" confirms it, and only the kiosk's card action pays. |
+
+![/demo after a spoken "yes": the Korean kiosk shows its insert-card step, the phone says "Insert your card into the kiosk", and "What the AI did" lists every Gemini tool call with the server's check](docs/images/voice-to-card.webp)
+
+<sub>The live `/demo` with "Try it on this screen": kiosk, phone and every Gemini tool call side by side. With **Start**, the laptop is the kiosk and you order on your own phone.</sub>
+
+## Why it matters
+
+- **1 in 6** people in the world will be 60 or over by 2030 ([WHO, 2025](https://www.who.int/news-room/fact-sheets/detail/ageing-and-health)).
+- **At least 2.2 billion** people have a near or distance vision impairment ([WHO, 2026](https://www.who.int/news-room/fact-sheets/detail/blindness-and-visual-impairment)).
+- **1.52 billion** international tourist arrivals were recorded in 2025 ([UN Tourism](https://www.untourism.int/un-tourism-world-tourism-barometer-data)).
+- In Korea, only **17.9%** of people aged 65+ say they can order or check in at a kiosk (self-reported; [KIHASA, 2024](https://www.kihasa.re.kr/api/kihasa/file/download?seq=28260), p. 32).
+
+None of the worldwide figures is about kiosks; Korea is one example of the kiosk problem. Sources: [`docs/plan/SOURCES.md`](docs/plan/SOURCES.md) S44–S46, S16. KIBO needs no new kiosk: the store keeps its kiosk, and people keep their phone.
+
+## What makes it safe
+
+![The order states: the AI may open the confirm card; only your tap or a new "yes" confirms; only the kiosk's card action pays. 37 of 37 forged commands refused](docs/images/safety.webp)
+
+- **One door for every change:** `POST /api/command`, zod-validated, applied in a Firestore transaction. Names and prices come only from the kiosk's menu data.
+- **The AI cannot pay:** `confirmCheckout` needs the review open, the same cart and your tap or a fresh utterance; `paid` comes only from the kiosk's card action.
+- **Tested by attack:** 37 of 37 forged commands refused ([`evidence/forged-commands.json`](evidence/forged-commands.json)). Details: [What the server enforces](#what-the-server-enforces).
+
+## Built on Google Cloud
+
+![Architecture: phone, kiosk and web kiosk outside the trust boundary; Cloud Run with POST /api/command, Firestore and the kibo-voice relay inside Google Cloud; Gemini Live, Gemini Flash and Vertex AI; KIBO Learn once, offline](docs/images/architecture.webp)
+
+| Service | Role |
+|---|---|
+| **Gemini Live** (`gemini-3.8-live`) | Voice ordering with function calling, straight from the phone with a one-use token |
+| **Gemini Flash** (`gemini-3.8-flash`) | The text agent with the same 11 tools and an explicit context cache |
+| **Vertex AI** | Voice relay and text fallback; KIBO Learn explores a kiosk it has never seen |
+| **Cloud Run** | The app and API (`kibo`) and the voice relay (`kibo-voice`), `asia-northeast3` |
+| **Firestore** | One session per order, every write in a transaction, streamed to both screens |
+| **Firebase Hosting** | The short address people type on a phone: **kibo-2026.web.app** |
+| **Secret Manager** | The Gemini API key, never in the repo or a browser |
+
+More: [What Gemini does, and where](#what-gemini-does-and-where), [Google Cloud services](#google-cloud-services), [Architecture](#architecture).
+
+## Results at a glance
+
+![96 of 98 team-written test cases passed; the kiosk moves 2.1 s after you stop talking (voice median), first audio 3.2 s; typed full order 7.1 s, follow-up 2.3 s](docs/images/results.webp)
+
+| Claim | Value |
+|---|---|
+| **Text agent** | 96 of 98 team-written cases on the final code; both misses were only the reply's language ([`evals/results/2026-10-18T21-59.md`](evals/results/2026-10-18T21-59.md)) |
+| **Voice** | End of speech → kiosk highlight, median 2,118 ms (7 of 8 runs, synthetic voice on a laptop) ([`evidence/voice-e2e.json`](evidence/voice-e2e.json)) |
+| **Kiosks it had never seen** | All 20 test orders handled safely: 16 finished hands-free, 4 stopped safely (2 handed to staff, 2 refused), none wrong (round 4, synthetic kiosks) ([`spikes/blind-kiosks/ROUND4.md`](spikes/blind-kiosks/ROUND4.md)) |
+| **The phone follows the talk** | Each item the AI adds comes into view on the phone, as it does on the kiosk ([`e2e/phone-follows-talk.spec.ts`](e2e/phone-follows-talk.spec.ts)) |
+
+Full table, methods and limits: [Results](#results), [Known limits](#known-limits).
+
+---
 
 ## Try it in 60 seconds
 
 **With your own phone (`/demo`, the default):**
-1. On a laptop, open [`/demo`](https://kibo-407514467119.asia-northeast3.run.app/demo), pick a place (burger shop, airport rail, pizza shop, or bunsik shop: a Korean snack bar KIBO learned blind) and press **Start**. The laptop becomes the kiosk: it shows the kiosk alone, with its QR and 6-digit code.
+1. On a laptop, open [`/demo`](https://kibo-407514467119.asia-northeast3.run.app/demo), pick a place (the burger shop or the airport rail ticket machine) and press **Start**. The laptop becomes the kiosk: it shows the kiosk alone, with its QR and 6-digit code.
 2. Scan the QR with your phone's camera (or open **kibo-2026.web.app** and type the code), and allow the microphone.
 3. Talk. On the burger shop, for example: "Two cheeseburger sets for here, with large fries: one zero cola, no pickles, the other a cider." Then "That's all, I'll pay." The AI opens the order review on both screens, and confirms it on your next "yes" ("Yes, pay now.") or your tap on **Yes, pay now**, never by itself.
-4. Pay on the kiosk: tap 카드 (Card), then 카드 넣기 (Insert card). The caption above the kiosk says each step in English. No real payment happens.
+4. Pay on the kiosk: after your yes on the phone, the kiosk picks 카드 (Card) by itself and shows its card step; tap 카드 넣기 (Insert card). The caption above the kiosk says each step in English. No real payment happens.
 5. In KakaoTalk, NAVER or another in-app browser the microphone often fails: open the link in Safari or Chrome.
 
 In one recorded take on production (10-16, `/kiosk` and the phone web app, a synthetic voice), those three sentences and the kiosk's two card taps placed order 259 (₩14,800), with no phone tap after setup ([`evidence/voice-only-hero.json`](evidence/voice-only-hero.json)).
@@ -139,7 +206,7 @@ stateDiagram-v2
 ## KIBO Learn
 
 For kiosks with no integration, Gemini explores the kiosk's web screen once (Playwright, accessibility tree and the tappable labels), writes a **skill** (catalog plus click recipes), and may finish only after the skill passes its own AI-free self-tests and a coverage audit. Every order after that is a deterministic replay with no AI; the in-page bridge checks the kiosk's own total, and on a mismatch nothing is added and staff is called.
-- **See it:** [`/learn`](https://kibo-407514467119.asia-northeast3.run.app/learn) replays recorded learning runs turn by turn; on [`/demo`](https://kibo-407514467119.asia-northeast3.run.app/demo), "Pizza shop" (Doughhouse, our development kiosk) and "Bunsik shop" (보리별 분식, a Korean snack bar built by a separate AI agent and learned blind in round 4) order on a learned kiosk and mark every tap KIBO replays.
+- **See it:** [`/learn`](https://kibo-407514467119.asia-northeast3.run.app/learn) replays recorded learning runs turn by turn; [`/demo?k=doughhouse`](https://kibo-407514467119.asia-northeast3.run.app/demo?k=doughhouse) (Doughhouse, our development kiosk) and [`/demo?k=bunsik`](https://kibo-407514467119.asia-northeast3.run.app/demo?k=bunsik) (보리별 분식, a Korean snack bar built by a separate AI agent and learned blind in round 4) order on a learned kiosk and mark every tap KIBO replays. The first screen of `/demo` lists only the two direct kiosks.
 - **Getting onto a real kiosk:** kiosks that share menu data use a direct adapter (`data/kiosks/*.json`). On a web kiosk the bridge is one script in the page, added by the vendor or store (script tag, kiosk-browser extension or WebView injection). Native kiosk apps are roadmap. There are no vendor or store partnerships yet.
 - Details: [`docs/KIBO_LEARN.md`](docs/KIBO_LEARN.md), [`spikes/blind-kiosks/`](spikes/blind-kiosks/).
 
