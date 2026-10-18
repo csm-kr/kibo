@@ -47,7 +47,7 @@ gcloud run deploy "$SERVICE" \
   --region "$REGION" \
   --service-account "kibo-runtime@$PROJECT.iam.gserviceaccount.com" \
   --allow-unauthenticated \
-  --min-instances 0 \
+  --min-instances 1 \
   --max-instances 2 \
   --concurrency 80 \
   --timeout 900 \

@@ -55,7 +55,7 @@ describe("scripts/deploy-voice.sh", { timeout: 30_000 }, () => {
     expect(deploy).toContain("--region asia-northeast3");
     expect(deploy).toContain("--service-account kibo-runtime@kibo-2026.iam.gserviceaccount.com");
     expect(deploy).toContain("--timeout 900");
-    expect(deploy).toContain("--min-instances 0");
+    expect(deploy).toContain("--min-instances 1");
     expect(deploy).toContain("--max-instances 2");
     expect(deploy).toContain("--session-affinity");
     // Vertex AI Live, post-paid; no API key secret on this service.
