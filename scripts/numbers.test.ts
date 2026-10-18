@@ -28,6 +28,7 @@ const ms = (n: number) => n.toLocaleString("en-US");
 const sec = (n: number) => (n / 1000).toFixed(1);
 
 interface VoiceRun {
+  at: string;
   pass: boolean;
   connected?: boolean;
   fixtures?: string;
@@ -41,13 +42,26 @@ interface VoiceFile {
   runs: VoiceRun[];
 }
 
+// I-422 (10-18) moved end of speech from 0.7 s to 1.0 s of silence. The files' summary spans every run on the current
+// fixtures, so the published medians count only the runs measured since then.
+const SINCE_SILENCE_1S = "2026-10-18T13:00:00Z";
+
 function voice(path: string) {
   const file = json(path) as VoiceFile;
   const passed = file.runs.filter((r) => r.pass && r.fixtures === file.summary.fixtures);
-  const pick = (k: "aMs" | "bMs") => passed.flatMap((r) => (r[k] === null ? [] : [r[k]]));
+  const pick = (runs: VoiceRun[], k: "aMs" | "bMs") => runs.flatMap((r) => (r[k] === null ? [] : [r[k]]));
+  const now = passed.filter((r) => r.at >= SINCE_SILENCE_1S);
   const attempted = file.runs.length + file.omitted.reduce((n, o) => n + o.runs, 0);
   const ok = file.runs.filter((r) => r.pass).length + file.omitted.reduce((n, o) => n + o.passed, 0);
-  return { file, a: median(pick("aMs")), b: median(pick("bMs")), attempted, ok };
+  return {
+    file,
+    a: median(pick(passed, "aMs")),
+    b: median(pick(passed, "bMs")),
+    aNow: median(pick(now, "aMs")),
+    bNow: median(pick(now, "bMs")),
+    attempted,
+    ok,
+  };
 }
 
 describe("docs/plan/NUMBERS.md matches the evidence files", () => {
@@ -65,14 +79,14 @@ describe("docs/plan/NUMBERS.md matches the evidence files", () => {
 
   it("voice: end of speech → kiosk highlight, direct and relay", () => {
     const r = row("Voice hero order, end of speech → kiosk highlight");
-    expect(r).toContain(`**${ms(direct.b)} ms** median direct`);
-    expect(r).toContain(`**${ms(relay.b)} ms** through the Vertex AI relay`);
+    expect(r).toContain(`**${ms(direct.bNow)} ms** median direct`);
+    expect(r).toContain(`**${ms(relay.bNow)} ms** through the Vertex AI relay`);
   });
 
   it("voice: end of speech → first AI audio, direct and relay", () => {
     const r = row("Voice hero order, end of speech → first AI audio");
-    expect(r).toContain(`**${ms(direct.a)} ms** median direct`);
-    expect(r).toContain(`**${ms(relay.a)} ms** relay`);
+    expect(r).toContain(`**${ms(direct.aNow)} ms** median direct`);
+    expect(r).toContain(`**${ms(relay.aNow)} ms** relay`);
   });
 
   it("voice: attempts and passes held in the two files", () => {
