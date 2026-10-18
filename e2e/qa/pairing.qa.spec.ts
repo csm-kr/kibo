@@ -52,7 +52,8 @@ for (const vp of [
     await command(request, deviceToken, { sessionId, type: "confirmCheckout", args: {}, source: "button", cartVersion: review.cartVersion });
     await expect(kioskRoot(page)).toHaveAttribute("data-screen", "payment");
     await expect(panel.locator("[data-panel-change]")).toHaveText("Confirmed by you");
-    await expect(panel.locator("[data-kiosk-step]")).toContainText("Tap 카드 (Card), then 카드 넣기 (Insert card)");
+    // KIBO picked 카드 after the phone's yes on this card-only kiosk, so only the card is left (I-427).
+    await expect(panel.locator("[data-kiosk-step]")).toContainText("Insert your card, 카드 넣기 (Insert card)");
     await check(page, info, "kiosk-pairing-paying");
   });
 }

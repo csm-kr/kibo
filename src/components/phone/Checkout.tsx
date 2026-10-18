@@ -144,7 +144,8 @@ export function PayCard(props: { total: number; locale: Locale; mirrored?: boole
       <h1 lang={ai.lang} className="text-2xl font-bold">
         {ai.t("payTitle", locale)}
       </h1>
-      <p className="text-xl">
+      {/* Balanced, so the Korean line never leaves "주세요." alone on its last line (I-427 QA). */}
+      <p className="text-xl text-balance">
         {hint.pre}
         <strong lang="ko" className="font-bold">
           {hint.label}
