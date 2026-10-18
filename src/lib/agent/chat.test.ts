@@ -358,6 +358,28 @@ describe("runChat", () => {
     expect(bySummary.replySource).toBe("summary");
   });
 
+  // Eval l-fr-order, 10-18: Gemini ended a turn with no parts after addToCart, and the summary answered a French user in
+  // English. The server has no French sentences, so the model is asked once more; its function calls are not run.
+  it("an empty reply in a language without server sentences gets one more model call, never a second change", async () => {
+    const fr = script([{ name: "addToCart", args: { itemId: "cola" } }], "", "Un cola ajouté.");
+    const out = await runChat(deps(fr.model), input(await demo(), { message: "Un cola, s'il vous plaît.", language: "fr" }));
+    expect(fr.requests).toHaveLength(3);
+    expect(out.reply).toBe("Un cola ajouté.");
+    expect(out.replySource).toBe("model");
+    expect(out.cart).toHaveLength(1);
+
+    const calls = script([{ name: "addToCart", args: { itemId: "cola" } }], "", [{ name: "addToCart", args: { itemId: "cola" } }]);
+    const again = await runChat(deps(calls.model), input(await demo(), { message: "Un cola, s'il vous plaît.", language: "fr" }));
+    expect(calls.requests).toHaveLength(3);
+    expect(again.cart).toHaveLength(1);
+    expect(again.cart[0].qty).toBe(1);
+    expect(again.replySource).toBe("summary");
+
+    const en = script([{ name: "addToCart", args: { itemId: "cola" } }], "");
+    expect((await runChat(deps(en.model), input(await demo(), { message: "A cola?" }))).replySource).toBe("summary");
+    expect(en.requests).toHaveLength(2);
+  });
+
   it("the model still writes the reply after a failure, a question, another language, its own text, or an upsell", async () => {
     const cases: { first: Call[] | string; extra?: Partial<ChatInput>; text?: string }[] = [
       { first: [{ name: "addToCart", args: { itemId: "cheese_burger", variant: "set" } }] },

@@ -290,6 +290,18 @@ export async function runChat(deps: ChatDeps, input: ChatInput): Promise<ChatRes
     }
   }
 
+  // Gemini can end a turn with no parts after tool results (model.ts), and the server's sentences are Korean or English
+  // only, so another language gets one more call for the reply (eval l-fr-order, 10-18). Its function calls are not
+  // run, and text beside them could claim a change, so only a plain reply counts; otherwise the summary answers as before.
+  if (!stoppedEarly && !reply && sentences === null) {
+    try {
+      const out = await model.generate({ system, contents, tools, deadlineMs: LATER_ROUND_DEADLINE_MS });
+      if (out.functionCalls.length === 0) reply = out.text;
+    } catch (e) {
+      if (!(e instanceof CommandError)) throw e;
+    }
+  }
+
   if (stoppedEarly || !reply) {
     reply = await serverReply();
     replySource = "summary";
