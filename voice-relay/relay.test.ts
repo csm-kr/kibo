@@ -134,7 +134,7 @@ describe("relayConnection: hello and auth", () => {
     expect(config.systemInstruction).toContain("Cart lines, already applied; do not add these again:");
     expect(config.inputAudioTranscription).toEqual({ languageCodes: ["ko-KR", "en-US"] });
     const [{ functionDeclarations }] = config.tools as { functionDeclarations: unknown[] }[];
-    expect(functionDeclarations).toHaveLength(10);
+    expect(functionDeclarations).toHaveLength(11);
     expect(client.sent).toEqual([
       { relay: { model: "gemini-3.8-live", expiresAt: T0 + 180_000, voiceSeconds: 180 } },
       { setupComplete: {} },

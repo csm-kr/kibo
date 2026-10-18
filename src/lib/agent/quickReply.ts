@@ -1,7 +1,7 @@
 import type { ChoiceRef } from "@/lib/commands/errors";
-import { lt, type SpeechLanguage } from "@/lib/i18n/languages";
+import { LANGUAGES, lt, type SpeechLanguage } from "@/lib/i18n/languages";
 import { formatWon, lineLabel } from "@/lib/kiosk/menu";
-import type { KioskData, Locale } from "@/types/menu";
+import type { KioskData, KioskLocale, Locale } from "@/types/menu";
 import type { CartLine } from "@/types/session";
 import type { toolResult } from "./mapping";
 
@@ -20,7 +20,9 @@ export interface DoneCall {
 
 const SIMPLE = new Set(["setDineOption", "addToCart", "updateCart", "removeFromCart", "undoLastChange", "requestCheckout", "confirmCheckout"]);
 
-type Kind = "add" | "update" | "remove" | "undo" | "dine" | "review" | "confirm" | "staff" | "entering" | "show";
+type Kind = "add" | "update" | "remove" | "undo" | "dine" | "review" | "confirm" | "staff" | "entering" | "show" | "language";
+
+const KOREAN_NAME: Record<KioskLocale, string> = { ko: "한국어", en: "영어", ja: "일본어" };
 
 /** Hangul syllable with a final consonant; `exceptRieul` treats a final ㄹ as none (for 로/으로). */
 function hasFinal(word: string, exceptRieul = false): boolean {
@@ -101,6 +103,11 @@ function sentencesFor(kiosk: KioskData, locale: Locale, calls: DoneCall[], stric
       if (category) push("show", category.name[locale]);
       continue;
     }
+    if (c.name === "setKioskLanguage") {
+      const code = kiosk.locales.find((l) => l === (c.args as { language?: unknown } | null)?.language);
+      if (code) push("language", ko ? KOREAN_NAME[code] : LANGUAGES[code].english);
+      continue;
+    }
     // offerChoices: the caller ends the reply with its question.
     if (!SIMPLE.has(c.name)) continue;
     const lineId = (c.args as { lineId?: unknown } | null)?.lineId;
@@ -165,6 +172,8 @@ function sentencesFor(kiosk: KioskData, locale: Locale, calls: DoneCall[], stric
         return ko ? "키오스크에 입력하고 있어요." : "The kiosk is entering it now.";
       case "show":
         return ko ? `키오스크 화면에 ${items[0]}${hasFinal(items[0]) ? "을" : "를"} 띄웠어요.` : `The kiosk shows ${items[0]} now.`;
+      case "language":
+        return ko ? `키오스크 화면을 ${items[0]}${ro(items[0])} 바꿨어요.` : `The kiosk screen is in ${items[0]} now.`;
     }
   });
   // The total after a cart change, unless the review or payment sentence already covers it.

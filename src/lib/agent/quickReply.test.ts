@@ -119,6 +119,14 @@ describe("summaryReply (15-judge-fixes:0)", () => {
     expect(quickReply(malo, "en", [shown])).toBeNull();
   });
 
+  it("a kiosk screen language is named in the reply's language; quickReply leaves it to the model", () => {
+    const en = call("setKioskLanguage", { language: "en" }, ok([]));
+    expect(summaryReply(malo, "ko", [en], null)).toBe("키오스크 화면을 영어로 바꿨어요.");
+    expect(summaryReply(malo, "en", [en], null)).toBe("The kiosk screen is in English now.");
+    expect(summaryReply(malo, "en", [call("setKioskLanguage", { language: "ko" }, ok([]))], null)).toBe("The kiosk screen is in Korean now.");
+    expect(quickReply(malo, "en", [en])).toBeNull();
+  });
+
   it("null when nothing was applied and nothing is asked", () => {
     expect(summaryReply(malo, "en", [failed], null)).toBeNull();
     expect(summaryReply(malo, "en", [], null)).toBeNull();

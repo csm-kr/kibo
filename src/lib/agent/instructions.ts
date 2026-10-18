@@ -90,6 +90,9 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
   const best = kiosk.items.find((i) => i.badge === "best");
   // The confirm button as the phone labels it in this language, so the AI names the words on screen (15-judge-fixes:2).
   const payNow = lt("payNow", language, kiosk.domain);
+  // "Korean and English", "Korean, English and Japanese".
+  const names = kiosk.locales.map((l) => LANGUAGES[l].english);
+  const screenLanguages = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)}` : names[0];
 
   const rules = [
     `You are KIBO, a friendly ordering helper. You operate the ${brand} ${ticket ? "ticket machine" : "kiosk"} for the user.`,
@@ -104,6 +107,17 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
     "Reply in the language of the user's latest own words, spoken or typed: English words get an English reply, Korean words a Korean reply, Japanese words a Japanese reply, and so on, even when the phone or the kiosk screens are another language.",
     "A choice button's label sent as the user's message is not their own words: keep the language of their earlier words.",
     "Item names: use name.ko for Korean speakers and name.en for everyone else; never translate or invent item names. Prices are in Korean won.",
+    // Owner 10-18 (deck p9, I-418): the kiosk's own screen changes language only when the user asks for it.
+    ...(kiosk.locales.length > 1
+      ? [
+          `The kiosk's own screen can show ${screenLanguages}.`,
+          'When the user asks to change the kiosk screen\'s language ("키오스크도 영어로 바꿔줘", "switch the kiosk to English"), call setKioskLanguage with that language.',
+          "Never call it on your own: replying in the user's language does not change the kiosk screen.",
+          `If the user asks for a language the kiosk screen does not have, say it has only ${screenLanguages}, and keep helping in their language.`,
+        ]
+      : [
+          `The kiosk's own screen shows only ${screenLanguages} and cannot be changed from the phone. If the user asks, say so and keep helping in their language.`,
+        ]),
     ...(vocabulary
       ? [
           `On this machine an item is a "${vocabulary.item.en}" (${vocabulary.item.ko}) and the chosen items are "${vocabulary.cart.en}" (${vocabulary.cart.ko}).`,

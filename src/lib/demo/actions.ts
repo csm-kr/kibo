@@ -3,8 +3,9 @@ import type { AgentAction } from "@/lib/agent/actions";
 import { choiceLabel } from "@/lib/agent/choices";
 import type { ChoiceRef } from "@/lib/commands/errors";
 import { variantWord } from "@/lib/i18n/kiosk";
+import { LANGUAGES } from "@/lib/i18n/languages";
 import { lineLabel } from "@/lib/kiosk/menu";
-import type { KioskData, Locale, Variant } from "@/types/menu";
+import type { KioskData, KioskLocale, Locale, Variant } from "@/types/menu";
 
 // Row text for /demo's "What the AI did" strip: plain words built from the action's ids and menu data, plus the
 // technical name and result code. Never model text.
@@ -33,6 +34,7 @@ const CONFIRM_CARD: Words = { ko: "직접 확인해야 해요", en: "you must co
 /** Why a confirm is the user's own: a tap on the card or a new "yes" after it appeared (server rule). */
 const NEEDS_YOU: Words = { ko: "직접 누르거나 새로 '네'라고 해야 해요", en: "Needs your tap or a new 'yes'" };
 const AN_ITEM: Words = { ko: "항목", en: "an item" };
+const KOREAN_NAME: Record<KioskLocale, string> = { ko: "한국어", en: "영어", ja: "일본어" };
 
 /** What was tried, for a refusal: "Tried to add X". */
 const TRIED: Record<string, (x: string, l: Locale) => string> = {
@@ -43,6 +45,7 @@ const TRIED: Record<string, (x: string, l: Locale) => string> = {
   undoLastChange: (_, l) => (l === "ko" ? "되돌리려고 했어요" : "Tried to undo"),
   offerChoices: (_, l) => (l === "ko" ? "선택지를 보여 주려고 했어요" : "Tried to show choices"),
   showMenu: (_, l) => (l === "ko" ? "키오스크 화면을 바꾸려고 했어요" : "Tried to change the kiosk screen"),
+  setKioskLanguage: (_, l) => (l === "ko" ? "키오스크 화면 언어를 바꾸려고 했어요" : "Tried to change the kiosk screen's language"),
   callStaff: (_, l) => (l === "ko" ? "직원을 부르려고 했어요" : "Tried to call staff"),
   requestCheckout: (_, l) => (l === "ko" ? "주문 내역을 띄우려고 했어요" : "Tried to open your order review"),
   confirmCheckout: (_, l) => (l === "ko" ? "결제하려고 했어요" : "Tried to pay"),
@@ -123,6 +126,11 @@ function okText(k: KioskData, a: AgentAction, locale: Locale): string {
     case "showMenu": {
       const name = k.categories.find((c) => c.categoryId === args.category)?.name[locale] ?? (ko ? "메뉴" : "the menu");
       return ko ? `키오스크에 ${name}을(를) 띄웠어요` : `Showed ${name} on the kiosk`;
+    }
+    case "setKioskLanguage": {
+      const code = k.locales.find((l) => l === args.language);
+      if (!code) return TRIED_UNKNOWN[locale];
+      return ko ? `키오스크 화면: ${KOREAN_NAME[code]}` : `Kiosk screen: ${LANGUAGES[code].english}`;
     }
     case "callStaff":
       return ko ? "직원을 호출했어요" : "Called staff";

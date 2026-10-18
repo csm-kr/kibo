@@ -57,6 +57,14 @@ describe("actionRow", () => {
     );
   });
 
+  it("setKioskLanguage, and refused", () => {
+    expect(actionRow(malo, act("setKioskLanguage", { language: "en" }), "en").text).toBe("Kiosk screen: English");
+    expect(actionRow(malo, act("setKioskLanguage", { language: "en" }), "ko").text).toBe("키오스크 화면: 영어");
+    expect(actionRow(malo, act("setKioskLanguage", { language: "en" }, "BAD_REQUEST"), "en").text).toBe(
+      "Tried to change the kiosk screen's language → the server refused it",
+    );
+  });
+
   it("an offer to call staff reads as an offer, not a menu question (I-279)", () => {
     const offer = act("offerChoices", { templateId: "ask_staff", choices: [{ kind: "staff", id: "staff" }] });
     expect(actionRow(malo, offer, "en").text).toBe("Offered to call staff");

@@ -85,6 +85,10 @@ export function toolDeclarations(k: KioskData): FunctionDeclaration[] {
       { category: { type: "string", enum: k.categories.map((c) => c.categoryId) } },
       ["category"],
     )],
+    ["setKioskLanguage", "Change the language of the kiosk's own screen, only when the user asks for that.", object(
+      { language: { type: "string", enum: k.locales } },
+      ["language"],
+    )],
     ["callStaff", "Call staff to the kiosk when the menu data cannot answer, the user asks for staff, or the user is stuck.", object(
       { reasonCode: { type: "string", enum: ["unknown_info", "user_request", "stuck"] } },
       ["reasonCode"],
@@ -94,8 +98,12 @@ export function toolDeclarations(k: KioskData): FunctionDeclaration[] {
   ];
 
   // A learned kiosk changes a line by remove + add, the user pays on the kiosk itself, and its own page shows its menu
-  // (ARCHITECTURE "Agent tools").
-  const omit = [...(k.kind === "learned" ? ["updateCart", "confirmCheckout", "showMenu"] : []), ...(dine ? [] : ["setDineOption"])];
+  // (ARCHITECTURE "Agent tools"). A screen with one language (every learned page) has nothing to switch to.
+  const omit = [
+    ...(k.kind === "learned" ? ["updateCart", "confirmCheckout", "showMenu"] : []),
+    ...(dine ? [] : ["setDineOption"]),
+    ...(k.locales.length > 1 ? [] : ["setKioskLanguage"]),
+  ];
   return tools
     .filter(([name]) => !omit.includes(name))
     .map(([name, description, parametersJsonSchema]) => ({ name, description, parametersJsonSchema }));

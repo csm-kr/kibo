@@ -11,7 +11,7 @@ const byName = (name: string) => decls.find((d) => d.name === name)!;
 const params = (name: string) => byName(name).parametersJsonSchema as Schema;
 
 describe("toolDeclarations", () => {
-  it("declares the 10 tools, each with a one-line description", () => {
+  it("declares the 11 tools, each with a one-line description", () => {
     expect(decls.map((d) => d.name)).toEqual([
       "setDineOption",
       "addToCart",
@@ -20,6 +20,7 @@ describe("toolDeclarations", () => {
       "undoLastChange",
       "offerChoices",
       "showMenu",
+      "setKioskLanguage",
       "callStaff",
       "requestCheckout",
       "confirmCheckout",
@@ -93,13 +94,22 @@ describe("toolDeclarations", () => {
     expect(p.properties!.category.enum).toEqual(k.categories.map((c) => c.categoryId));
   });
 
+  // Owner 10-18 (deck p9): "키오스크도 영어로 바꿔줘" changes the kiosk's own screen, into a language it offers.
+  it("gives setKioskLanguage a required language from this kiosk's screen languages", () => {
+    const p = params("setKioskLanguage");
+    expect(p.required).toEqual(["language"]);
+    expect(p.properties!.language.enum).toEqual(["ko", "en"]);
+    const rail = toolDeclarations(getKiosk("airport_rail")).find((d) => d.name === "setKioskLanguage")!;
+    expect((rail.parametersJsonSchema as Schema).properties!.language.enum).toEqual(["ko", "en", "ja"]);
+  });
+
   it("gives the no-argument tools an empty object", () => {
     for (const name of ["undoLastChange", "requestCheckout", "confirmCheckout"]) {
       expect(params(name).properties).toEqual({});
     }
   });
 
-  it("leaves setDineOption and dine choices out on a kiosk without dine options (9 tools)", () => {
+  it("leaves setDineOption and dine choices out on a kiosk without dine options (10 tools)", () => {
     const rail = getKiosk("airport_rail");
     const ticket = toolDeclarations(rail);
     expect(ticket.map((d) => d.name)).toEqual([
@@ -109,6 +119,7 @@ describe("toolDeclarations", () => {
       "undoLastChange",
       "offerChoices",
       "showMenu",
+      "setKioskLanguage",
       "callStaff",
       "requestCheckout",
       "confirmCheckout",
@@ -121,7 +132,7 @@ describe("toolDeclarations", () => {
     expect(add.variant.enum).toEqual(["single"]);
   });
 
-  it("leaves updateCart, confirmCheckout and showMenu out for a learned kiosk (7 tools)", () => {
+  it("leaves updateCart, confirmCheckout, showMenu and setKioskLanguage out for a learned kiosk (7 tools)", () => {
     const dh = getKiosk("doughhouse");
     const learned = toolDeclarations(dh);
     expect(learned.map((d) => d.name)).toEqual([

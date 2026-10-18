@@ -18,7 +18,7 @@ import { createSession, runCommand } from "@/lib/session/service";
 import { getKiosk } from "@/lib/adapters/catalog";
 import { MemoryStore } from "@/lib/store/memory";
 import type { SpeechLanguage } from "@/lib/i18n/languages";
-import type { Locale } from "@/types/menu";
+import type { KioskLocale, Locale } from "@/types/menu";
 import type { CartLine, DineOption, Session, SessionStatus } from "@/types/session";
 import { FALLBACK } from "@/lib/agent/chat";
 import { choiceLabel } from "@/lib/agent/choices";
@@ -51,6 +51,8 @@ type Expect =
   | { status: SessionStatus }
   // QA 10-18 ("키오스크 메뉴 보여줘"): the kiosk shows this category after a showMenu call, and the cart is unchanged.
   | { screen: { category: string } }
+  // Owner 10-18 (I-418): the kiosk screen's language after the turns (null: never changed), with the cart unchanged.
+  | { kioskLanguage: KioskLocale | null }
   // The last reply passes the grounding check (I-072) and names at least one of these items. `payOnKiosk` (learned
   // kiosks, I-100): the order is at the review, nobody tried confirmCheckout and the reply never offers to pay.
   | { reply: { mentionsAny?: string[]; payOnKiosk?: true } };
@@ -162,6 +164,15 @@ function judge(
 ): string | null {
   const unchanged = normalize(final.cart) === normalize(before);
   const e = c.expect;
+  // The kiosk screen's language changes only when the user asks for it (I-418), so any other case fails on a switch.
+  const switched = final.kioskLanguage?.code ?? null;
+  if ("kioskLanguage" in e) {
+    if (!unchanged) return "cart changed";
+    if (final.staffCalled) return "staff called";
+    if (lastReply === null) return "no reply";
+    return switched === e.kioskLanguage ? null : `kiosk language ${switched ?? "unchanged"}`;
+  }
+  if (switched) return `kiosk language changed to ${switched} unasked`;
   if ("ask" in e) {
     if (!unchanged) return "cart changed";
     if (final.staffCalled) return "staff called";

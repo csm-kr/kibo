@@ -808,6 +808,30 @@
       "locale": "en",
       "turns": ["One zero cola, please."],
       "expect": { "cart": [{ "itemId": "zero_cola", "variant": "single", "qty": 1, "selections": { "size": ["m"] } }] }
+    },
+    {
+      "id": "r-ko-kiosk-language",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "ko",
+      "turns": ["키오스크 화면도 영어로 바꿔줘."],
+      "expect": { "kioskLanguage": "en" }
+    },
+    {
+      "id": "r-en-kiosk-language",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "en",
+      "turns": ["Can you switch the kiosk screen to English?"],
+      "expect": { "kioskLanguage": "en" }
+    },
+    {
+      "id": "r-en-kiosk-language-missing",
+      "group": "recovery",
+      "type": "12-recovery",
+      "locale": "en",
+      "turns": ["Please change the kiosk screen to Japanese."],
+      "expect": { "kioskLanguage": null }
     }
   ]
 }
