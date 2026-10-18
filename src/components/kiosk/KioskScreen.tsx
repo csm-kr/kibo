@@ -10,7 +10,7 @@ import type { CommandType } from "@/lib/commands/schemas";
 import { errorCopy, type ScreenErrorCode } from "@/lib/i18n/errors";
 import { kt, languageName } from "@/lib/i18n/kiosk";
 import { formatWon, tilePrice } from "@/lib/kiosk/menu";
-import { kioskScreen, startOverStep } from "@/lib/kiosk/screen";
+import { kioskScreen, screenLocale, startOverStep } from "@/lib/kiosk/screen";
 import { kiboWorking } from "@/lib/kiosk/timers";
 import type { KioskData, KioskLocale } from "@/types/menu";
 import type { DineOption, Session } from "@/types/session";
@@ -68,10 +68,13 @@ export function KioskScreen(props: Props) {
   const { session, kioskToken, claimUrl, demo = false, clockOffset, onNewSession, onClaimUrl } = props;
   const sessionId = session?.sessionId ?? null;
   // The language row on K1 picks the screen language for this order; a new session starts in the kiosk's default.
-  const [lang, setLang] = useState<{ forId: string | null; locale: KioskLocale }>({ forId: null, locale: props.kiosk.locale });
+  // `at` is server time, to compare with a language asked for on the phone.
+  const [lang, setLang] = useState<{ forId: string | null; locale: KioskLocale; at: number } | null>(null);
   // A choice made before the first session arrived belongs to that session.
-  if (lang.forId === null && sessionId !== null) setLang({ forId: sessionId, locale: lang.locale });
-  const locale = lang.forId === sessionId || lang.forId === null ? lang.locale : props.kiosk.locale;
+  if (lang !== null && lang.forId === null && sessionId !== null) setLang({ ...lang, forId: sessionId });
+  const tapped = lang !== null && (lang.forId === sessionId || lang.forId === null) ? lang : null;
+  // The user can also ask on the phone ("키오스크도 영어로 바꿔줘", I-418); the later of the two wins.
+  const locale = screenLocale(props.kiosk, session?.kioskLanguage, tapped);
   // Every screen reads kiosk.locale, so the kiosk passed down carries the chosen language.
   const kiosk = useMemo(
     () => (locale === props.kiosk.locale ? props.kiosk : { ...props.kiosk, locale }),
@@ -171,7 +174,7 @@ export function KioskScreen(props: Props) {
           claimUrl={claimUrl} pairCode={props.pairCode} pairUrl={props.pairUrl}
           canStart={Boolean(session && kioskToken)}
           large={large}
-          onLocale={(l: KioskLocale) => setLang({ forId: sessionId, locale: l })}
+          onLocale={(l: KioskLocale) => setLang({ forId: sessionId, locale: l, at: Date.now() + clockOffset })}
           onTouch={startTouch}
           onLarge={() => setLarge((v) => !v)}
         />

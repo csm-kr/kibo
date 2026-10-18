@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { CartLine, Session, SessionStatus } from "@/types/session";
 import { getKiosk } from "@/lib/adapters/catalog";
-import { kioskScreen, startOverStep } from "./screen";
+import { kioskScreen, screenLocale, startOverStep } from "./screen";
 
 const line: CartLine = { lineId: "l1", itemId: "burger_cheese", variant: "single", qty: 1, selections: {}, unitPrice: 5000 };
 
@@ -115,5 +115,29 @@ describe("startOverStep ([처음으로], I-048)", () => {
   it("asks first when the cart has items", () => {
     expect(startOverStep("menu", session("ordering", { cart: [line] }))).toBe("ask");
     expect(startOverStep("menu", session("ordering", { cart: [] }))).toBe("now");
+  });
+});
+
+// Owner 10-18 (deck p9): the kiosk shows the language the user asked for on the phone, when it offers it; a later tap on
+// K1's language row still wins.
+describe("screenLocale", () => {
+  it("the kiosk's own language until something else happens", () => {
+    expect(screenLocale(malo, undefined, null)).toBe("ko");
+    expect(screenLocale(malo, null, null)).toBe("ko");
+  });
+
+  it("follows the asked language the kiosk offers", () => {
+    expect(screenLocale(malo, { code: "en", at: 10 }, null)).toBe("en");
+    expect(screenLocale(rail, { code: "ja", at: 10 }, null)).toBe("ja");
+  });
+
+  it("never shows a language the kiosk does not offer", () => {
+    expect(screenLocale(malo, { code: "ja", at: 10 }, null)).toBe("ko");
+    expect(screenLocale(malo, { code: "ja", at: 10 }, { locale: "en", at: 5 })).toBe("en");
+  });
+
+  it("the later of a tap and the asked language wins", () => {
+    expect(screenLocale(malo, { code: "en", at: 10 }, { locale: "ko", at: 5 })).toBe("en");
+    expect(screenLocale(malo, { code: "en", at: 10 }, { locale: "ko", at: 20 })).toBe("ko");
   });
 });

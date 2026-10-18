@@ -1,4 +1,4 @@
-import type { KioskData } from "@/types/menu";
+import type { KioskData, KioskLocale } from "@/types/menu";
 import type { Session } from "@/types/session";
 
 export type KioskScreenId = "attract" | "dine" | "menu" | "review" | "payment" | "done";
@@ -49,4 +49,17 @@ export function kioskScreen(
 export function startOverStep(screen: KioskScreenId, session: Session | null): "now" | "ask" | null {
   if (!session || (screen !== "dine" && screen !== "menu")) return null;
   return session.cart.length > 0 ? "ask" : "now";
+}
+
+/**
+ * The kiosk screen's language: the later of a tap on K1's language row and the language the user asked for on the phone
+ * (`session.kioskLanguage`, I-418), when this kiosk offers it; else the kiosk's own. Times are server time.
+ */
+export function screenLocale(
+  kiosk: Pick<KioskData, "locale" | "locales">,
+  asked: Session["kioskLanguage"],
+  tapped: { locale: KioskLocale; at: number } | null,
+): KioskLocale {
+  if (asked && kiosk.locales.includes(asked.code) && (!tapped || asked.at > tapped.at)) return asked.code;
+  return tapped?.locale ?? kiosk.locale;
 }

@@ -13,6 +13,7 @@ export function newSession(p: { sessionId: string; kioskId: string; demo: boolea
     total: 0,
     cartVersion: 0,
     screen: {},
+    kioskLanguage: null,
     lastChange: null,
     pendingChoice: null,
     staffCalled: null,

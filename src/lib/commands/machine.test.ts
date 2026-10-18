@@ -142,7 +142,7 @@ describe("actors", () => {
   it("matches the ARCHITECTURE command table", () => {
     expect([...ACTOR_COMMANDS.phone].sort()).toEqual([
       "addToCart", "callStaff", "cancelCheckout", "confirmCheckout", "offerChoices",
-      "removeFromCart", "requestCheckout", "setDineOption", "showMenu", "undoLastChange", "updateCart",
+      "removeFromCart", "requestCheckout", "setDineOption", "setKioskLanguage", "showMenu", "undoLastChange", "updateCart",
     ]);
     expect([...ACTOR_COMMANDS.kiosk].sort()).toEqual([
       "addToCart", "bridgeReport", "callStaff", "cancelCheckout", "cardAction", "clearCart", "confirmCheckout", "editOrder",
@@ -673,6 +673,68 @@ describe("showMenu", () => {
     const rail = getKiosk("airport_rail");
     const s = applyCommand({ ...fresh(), status: "connected" }, show("pass"), { ...ctx("phone", T0 + 7000), kiosk: rail }).session;
     expect(s.screen).toEqual({ category: "pass", at: T0 + 7000 });
+  });
+});
+
+// Owner 10-18 (deck p9): "키오스크도 영어로 바꿔줘" switches the kiosk's screen, when the kiosk has that language.
+describe("setKioskLanguage", () => {
+  const ask = (language: string, extra: Record<string, unknown> = {}) =>
+    cmd("setKioskLanguage", { language }, { source: "voice", ...extra });
+
+  it("records the asked language and when, and changes nothing else", () => {
+    const before = { ...fresh(), status: "connected" as const };
+    const s = applyCommand(before, ask("en"), ctx("phone", T0 + 5000)).session;
+    expect(s.kioskLanguage).toEqual({ code: "en", at: T0 + 5000 });
+    expect({ ...s, kioskLanguage: null, recentCommandIds: [], lastSeenAt: 0, expiresAt: 0 }).toEqual({
+      ...before,
+      kioskLanguage: null,
+      recentCommandIds: [],
+      lastSeenAt: 0,
+      expiresAt: 0,
+    });
+  });
+
+  it("keeps an open question: it answers nothing", () => {
+    const choices = [{ kind: "item", id: "cheese_burger" }];
+    const offered = applyCommand(
+      { ...fresh(), status: "connected" },
+      cmd("offerChoices", { templateId: "pick_item", choices }, { source: "voice" }),
+      ctx("phone"),
+    ).session;
+    expect(applyCommand(offered, ask("en", { source: "text" }), ctx("phone")).session.pendingChoice).toEqual({
+      templateId: "pick_item",
+      choices,
+    });
+  });
+
+  it("works while the order is reviewed or paid, so the review and the card screen follow too", () => {
+    const confirming = phoneConfirming();
+    expect(applyCommand(confirming, ask("en"), ctx("phone", T0 + 9000)).session).toMatchObject({
+      status: "confirming",
+      checkoutUtteranceSeq: confirming.checkoutUtteranceSeq,
+      kioskLanguage: { code: "en", at: T0 + 9000 },
+    });
+    expect(applyCommand({ ...fresh(), status: "paying" }, ask("en"), ctx("phone")).session.status).toBe("paying");
+  });
+
+  it("a language this kiosk's screen does not offer → BAD_REQUEST; the ticket machine offers Japanese", () => {
+    expect(catchError(() => applyCommand({ ...fresh(), status: "connected" }, ask("ja"), ctx("phone"))).code).toBe("BAD_REQUEST");
+    const rail = { ...ctx("phone", T0 + 7000), kiosk: getKiosk("airport_rail") };
+    expect(applyCommand({ ...fresh(), status: "connected" }, ask("ja"), rail).session.kioskLanguage).toEqual({ code: "ja", at: T0 + 7000 });
+  });
+
+  it("only kiosk screen languages parse", () => {
+    expect(() => ask("zh")).toThrow();
+  });
+
+  it("a kiosk cannot send it (its own language row stays on the kiosk)", () => {
+    expect(catchError(() => applyCommand(ordering(), cmd("setKioskLanguage", { language: "en" }), ctx("kiosk"))).code).toBe("FORBIDDEN");
+  });
+
+  it("a learned kiosk's page has one language → BAD_REQUEST", () => {
+    const dh = { ...ctx("phone"), kiosk: getKiosk("doughhouse") };
+    const s = { ...newSession({ sessionId: SID, kioskId: "doughhouse", demo: false, now: T0 }), status: "ordering" as const };
+    expect(catchError(() => applyCommand(s, ask("en"), dh)).code).toBe("BAD_REQUEST");
   });
 });
 

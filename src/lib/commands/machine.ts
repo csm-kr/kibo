@@ -208,6 +208,14 @@ function transition(s: Session, cmd: Command, ctx: CommandContext): { next: Sess
       }
       return { next: { ...s, status: "ordering", screen: { category: cmd.args.category, at: ctx.now } }, result: {} };
 
+    case "setKioskLanguage":
+      // Only the kiosk screen's language, and only one that screen offers (owner 10-18, I-418); any state before paid.
+      // A learned kiosk's page has one language (its locales default to Korean only).
+      if (!k.locales.includes(cmd.args.language)) {
+        throw new CommandError("BAD_REQUEST", "This kiosk's screen does not have that language.");
+      }
+      return { next: { ...s, kioskLanguage: { code: cmd.args.language, at: ctx.now } }, result: {} };
+
     case "callStaff":
       return { next: { ...s, staffCalled: { reasonCode: cmd.args.reasonCode, at: ctx.now } }, result: {} };
 
@@ -407,10 +415,11 @@ export function applyCommand(
   const { next, result } = ctx.kiosk.kind === "learned" ? learnedTransition(s, cmd, ctx) : transition(s, cmd, ctx);
   // The bridge's report is not a user answer, so an open question stays open. A dine option answers only the dine
   // question: the AI may have asked "which burger?" before it (10-17, a real iPhone lost those buttons to the dine tap).
-  // showMenu answers nothing: the AI shows the burgers on the kiosk while it asks which one.
+  // showMenu answers nothing: the AI shows the burgers on the kiosk while it asks which one. Nor does setKioskLanguage.
   const keepsChoice =
     cmd.type === "offerChoices" ||
     cmd.type === "showMenu" ||
+    cmd.type === "setKioskLanguage" ||
     cmd.type === "bridgeReport" ||
     (cmd.type === "setDineOption" && next.pendingChoice?.templateId !== "pick_dine");
   return {

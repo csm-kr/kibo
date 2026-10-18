@@ -15,6 +15,7 @@ export function toPublicSession(s: Session): Session {
     total: s.total,
     cartVersion: s.cartVersion,
     screen: s.screen,
+    kioskLanguage: s.kioskLanguage ?? null,
     lastChange: s.lastChange,
     pendingChoice: s.pendingChoice,
     staffCalled: s.staffCalled,
