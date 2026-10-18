@@ -122,18 +122,18 @@ stateDiagram-v2
 
 | Claim | Where it lives |
 |---|---|
-| Confirm rule and payment states | `isConfirmed` and the `confirmCheckout` / `cardAction` cases in [`src/lib/commands/machine.ts`](src/lib/commands/machine.ts#L119); tests in [`machine.test.ts`](src/lib/commands/machine.test.ts) |
+| Confirm rule and payment states | `isConfirmed` and the `confirmCheckout` / `cardAction` cases in [`src/lib/commands/machine.ts`](src/lib/commands/machine.ts#L123); tests in [`machine.test.ts`](src/lib/commands/machine.test.ts) |
 | Who may send what | `ACTOR_COMMANDS`, `ACTOR_SOURCES` in [`src/lib/commands/actors.ts`](src/lib/commands/actors.ts) |
 | The command endpoint and its order of checks | [`src/app/api/command/route.ts`](src/app/api/command/route.ts), `runCommand` in [`src/lib/session/service.ts`](src/lib/session/service.ts#L240), schemas in [`src/lib/commands/schemas.ts`](src/lib/commands/schemas.ts) |
 | Prices only from menu data | [`src/lib/commands/cart.ts`](src/lib/commands/cart.ts), menus in [`data/kiosks/`](data/kiosks/) |
 | Firestore transactions and the SSE stream | [`src/lib/store/firestore.ts`](src/lib/store/firestore.ts#L73), [`src/app/api/session/[id]/events/route.ts`](src/app/api/session/%5Bid%5D/events/route.ts) |
 | Gemini tool declarations | `toolDeclarations` in [`src/lib/agent/tools.ts`](src/lib/agent/tools.ts#L19) |
-| Pinned Live token | `geminiTokenIssuer` in [`src/lib/agent/live.ts`](src/lib/agent/live.ts#L92) |
-| Voice path choice and relay | `startLiveVoice` in [`src/lib/agent/liveBackend.ts`](src/lib/agent/liveBackend.ts#L126); only `realtimeInput`, `clientContent` and `toolResponse` pass the relay ([`voice-relay/relay.ts`](voice-relay/relay.ts#L54)) |
+| Pinned Live token | `geminiTokenIssuer` in [`src/lib/agent/live.ts`](src/lib/agent/live.ts#L97) |
+| Voice path choice and relay | `startLiveVoice` in [`src/lib/agent/liveBackend.ts`](src/lib/agent/liveBackend.ts#L127); only `realtimeInput`, `clientContent` and `toolResponse` pass the relay ([`voice-relay/relay.ts`](voice-relay/relay.ts#L54)) |
 | Text fallback to Vertex AI and the prompt cache | [`src/lib/agent/model.ts`](src/lib/agent/model.ts), [`src/lib/agent/cache.ts`](src/lib/agent/cache.ts) |
-| Rate limits and daily budgets | [`src/lib/limits/ip.ts`](src/lib/limits/ip.ts), [`src/lib/agent/live.ts`](src/lib/agent/live.ts#L136) |
+| Rate limits and daily budgets | [`src/lib/limits/ip.ts`](src/lib/limits/ip.ts), [`src/lib/agent/live.ts`](src/lib/agent/live.ts#L169) |
 | KIBO Learn finish gate (≥ 3 different passing self-test orders of the same skill, no failed one, every option group used, coverage audit, lint) | [`spikes/kibo-learn/learner.mjs`](spikes/kibo-learn/learner.mjs#L209), [`spikes/kibo-learn/audit.mjs`](spikes/kibo-learn/audit.mjs) |
-| Replay on a learned kiosk, checked against the kiosk's own total | `createBridge` in [`src/lib/bridge/bridge.ts`](src/lib/bridge/bridge.ts#L160), [`src/lib/bridge/verify.ts`](src/lib/bridge/verify.ts), `bridgeReport` in [`machine.ts`](src/lib/commands/machine.ts) |
+| Replay on a learned kiosk, checked against the kiosk's own total | `createBridge` in [`src/lib/bridge/bridge.ts`](src/lib/bridge/bridge.ts#L175), [`src/lib/bridge/verify.ts`](src/lib/bridge/verify.ts), `bridgeReport` in [`machine.ts`](src/lib/commands/machine.ts) |
 | Every number below | [`docs/plan/NUMBERS.md`](docs/plan/NUMBERS.md), then the evidence file named next to it |
 
 ## KIBO Learn
