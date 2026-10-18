@@ -48,16 +48,16 @@ Talk to your own phone, and the self-order kiosk already there fills its own car
 - gitleaks over the whole history before making the repo public.
 
 ## Video (3:00.6, English)
-Final v4.6 (10-18, 3:00.6; the Terms ask for three to four minutes). v4.5 (2:42.0) is not a fallback any more: it still shows 80/82. The v4.3 beat sheet is `videos/orchestrator/video-v4/PLAN-draft.md`; what changed since and every check on the final files are in `REPORT-v4.4.md` to `REPORT-v4.6.md` there (git-ignored). Real screens throughout; scenes in order:
+Final v4.7 (10-18, 3:00.6; the Terms ask for three to four minutes); v4.6 (3:00.6) is the fallback. v4.5 (2:42.0) is not a fallback any more: it still shows 80/82. The v4.3 beat sheet is `videos/orchestrator/video-v4/PLAN-draft.md`; what changed since and every check on the final files are in `REPORT-v4.4.md` to `REPORT-v4.7.md` there (git-ignored). Real screens throughout; scenes in order:
 
 | Scene | What it shows |
 |---|---|
 | Hook | TOUCH vs TALK on the burger kiosk, tagged "One example: a burger kiosk in Seoul": **24 taps vs 3 sentences · 2 taps**. Footnote: "Counted until the card is paid, on both sides. Not counted: waking the kiosk; scanning the QR and turning on the mic." Touch from `evidence/touch-hero-efficient.json`; talk from `evidence/voice-only-hero.json` (one recorded take on production, 10-16, order 259) (`docs/plan/DECK_FACTS.md` slot 12) |
 | Title | "Don't learn the kiosk. Just talk." |
-| Language montage | Real voice orders: English → English kiosk, English → the ticket machine's 日本語 screen, Japanese → Korean kiosk, an older Korean voice → Korean kiosk |
+| Language montage | Real voice orders: English → English kiosk, English → the ticket machine's 日本語 screen, Japanese → Korean kiosk, Korean → Korean kiosk |
 | Impact | 1 in 6 people 60 or over by 2030 (S44) · 2.2 billion with a vision impairment (S45) · 1.5 billion international tourist arrivals in 2025 (S46), then Korea: 17.9% of people 65+ say they can order or check in at a kiosk (S16) |
 | Pairing, hero order, review, payment | QR → connected; Gemini Live answers aloud, tool-call chips checked by the server before the kiosk moves; the AI stops at the review; your yes, your card |
-| Care | Larger text; an allergy question → [Call staff]; asking for the menu by voice: "Show me the drinks, please." moves the kiosk to its drinks, and a phone set to Korean turns English on its own (take n1-t1 on production, 10-18) |
+| Care | Larger text; a spoken allergy question: Gemini Live names the allergens from the menu data and offers [Call staff] (take a1-t1 on production, 10-18); asking for the menu by voice: "Show me the drinks, please." moves the kiosk to its drinks, and a phone set to Korean turns English on its own (take n1-t1 on production, 10-18) |
 | KIBO Learn | Gemini on Vertex AI explores a kiosk it has never seen, then a replay without AI; the round 4 short form "20 / 20 safe · 0 wrong" with its line under it (`docs/plan/NUMBERS.md`) |
 | Under the hood | The architecture node by node (Gemini Live direct or through the relay on Cloud Run, `/api/command`, Firestore transaction, SSE, Gemini Flash with Vertex AI as backup, Firebase Hosting, Secret Manager); 1.7 s end of speech → kiosk highlight (median, synthetic voice on a laptop) · 91 / 92 test cases passed (`docs/plan/NUMBERS.md`) |
 | Recap, end card | QR and kibo-2026.web.app |

@@ -5,7 +5,7 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { CARD, FOCUS, PRIMARY, SECONDARY } from "@/components/phone/ui";
 import { pt } from "@/lib/i18n/phone";
 import type { Locale } from "@/types/menu";
-import { DEMO_ENVIRONMENTS, demoHref } from "./environments";
+import { demoHref, offeredPlaces } from "./environments";
 
 // D3 (docs/UX.md Flow C5): next to the order number, a new demo order, the two other places, the real two-device
 // mode, the intro. A learned kiosk ends at its review (the user pays on the kiosk itself), so its card says so.
@@ -45,10 +45,10 @@ export function DemoEndCard(props: {
       <h2 id="demo-other-places" className="text-xl font-bold">
         {pt("tryAnotherPlace", locale)}
       </h2>
-      {/* Three places, two to a row (the third as wide as both), so they take the two rows two places took and the
-          order number above them stays in view at 1280×720 (I-414). */}
+      {/* The offered places but this one (I-426), two to a row (an odd last one as wide as both), so the order number
+          above them stays in view at 1280×720 (I-414). */}
       <div className="grid grid-cols-2 gap-2">
-        {DEMO_ENVIRONMENTS.filter((e) => e.kioskId !== props.kioskId).map((e) => (
+        {offeredPlaces().filter((e) => e.kioskId !== props.kioskId).map((e) => (
           <Link key={e.kioskId} href={demoHref(e.kioskId)} className={`${SECONDARY} last:odd:col-span-2`}>
             {e.place[locale]}
           </Link>

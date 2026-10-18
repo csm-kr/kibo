@@ -39,7 +39,8 @@ const commandSchema = z.discriminatedUnion("type", [
   command("cardAction", empty),
   command("reissueClaim", empty),
   command("setDineOption", z.strictObject({ option: z.enum(["eat_in", "take_out"]) })),
-  command("showMenu", z.strictObject({ category: id })),
+  // itemId: the item a question is about; scroll: the user asked to move the shown category (QA 10-18).
+  command("showMenu", z.strictObject({ category: id, itemId: id.optional(), scroll: z.enum(["down", "up"]).optional() })),
   command(
     "addToCart",
     z.strictObject({ itemId: id, variant: variant.optional(), qty: qty.optional(), selections: selections.optional() }),
@@ -92,7 +93,7 @@ export function isCommandType(v: unknown): v is CommandType {
 // field) came from the browser or the model, so it is shown as "*", never echoed.
 const FIELDS = new Set([
   ...Object.keys(envelope),
-  ...["type", "args", "itemId", "variant", "qty", "selections", "lineId", "changes", "option", "category", "templateId", "choices"],
+  ...["type", "args", "itemId", "variant", "qty", "selections", "lineId", "changes", "option", "category", "scroll", "templateId", "choices"],
   ...["kind", "id", "reasonCode", "commandId", "ok", "kioskTotal", "kioskLines", "options", "groupId", "optionIds"],
 ]);
 

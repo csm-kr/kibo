@@ -31,6 +31,7 @@ import { formatWon } from "@/lib/kiosk/menu";
 import { kioskPickedCard } from "@/lib/kiosk/payment";
 import { idleWarning, staffBannerVisible } from "@/lib/kiosk/timers";
 import { bridgeNotice, phoneScreen, type BridgeNotice, type PhoneLocal, type PhoneScreenId } from "@/lib/phone/screen";
+import { greetingKey } from "@/lib/voice/greeting";
 import { LARGE_TEXT_SCALE } from "@/lib/phone/settings";
 import type { KioskData, Locale, LocalizedName } from "@/types/menu";
 import type { DineOption, Session } from "@/types/session";
@@ -148,7 +149,7 @@ export function AssistantPanel(props: Props) {
   // been said yet and before the review. Phone only: /demo's laptop column keeps its own examples first.
   const greeting =
     mode === "phone" && chat.messages.length === 0 && (session?.status === "connected" || session?.status === "ordering")
-      ? lt("greeting", language, kiosk.domain)
+      ? lt(greetingKey(session.status, kiosk.dineOptions !== undefined), language, kiosk.domain)
       : null;
 
   // The text field sits behind [Type] in the dock and, once open, stays open for this order until the user closes it

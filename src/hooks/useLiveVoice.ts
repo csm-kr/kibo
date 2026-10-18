@@ -18,6 +18,7 @@ import type { KioskData, Locale } from "@/types/menu";
 import type { CartLine, DineOption, Session, SessionStatus } from "@/types/session";
 import { dineNote } from "@/lib/voice/dineNote";
 import { greeter, HELD_RESULT } from "@/lib/voice/greeting";
+import { scheduleOffers } from "@/lib/voice/offerScheduling";
 
 // The phone's Gemini Live connection (ADR-003, docs/ARCHITECTURE.md "Voice"): audio goes straight to Gemini with a
 // one-use token, or through the Vertex relay when /api/live-token says so (ADR-012; the same Live messages, so one
@@ -98,6 +99,12 @@ interface Run {
   /** For UX "Noise": the running response answered something the user said, and ran a tool. */
   respHeard: boolean;
   respTools: boolean;
+  /** The running response's tool call names; a new array per response, so a late answer still reads its own. */
+  respCalls: string[];
+  /** What the AI said aloud for one utteranceSeq, for offerScheduling.ts. */
+  said: { seq: number; text: string };
+  /** The connection uses an ephemeral token (offerChoices NON_BLOCKING there), not the relay. */
+  direct: boolean;
   misses: number;
   /** The dine option the open session knows: pinned with its token, or told since. */
   toldDine: DineOption | null;
@@ -262,6 +269,7 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     if (!sessionId || !deviceToken) return;
     // The seq of the response these calls belong to, taken before any await.
     const utteranceSeq = turns.seq;
+    const respCalls = r.respCalls;
     // The greeting's own response asked for something: nothing is run, and the model is told to wait for the user.
     if (r.greeter.holdsTools) {
       const held = calls.map((c) => ({ ...(c.id ? { id: c.id } : {}), name: c.name ?? "", response: HELD_RESULT }));
@@ -291,8 +299,10 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
       });
       // After a reconnect the new instructions already hold the cart, so a lost answer loses nothing.
       if (r.liveSessionId !== id || !r.live) return;
+      // Read now, after the round trip: by then the response that made these calls has said and called everything.
+      const heard = { said: r.said.seq === utteranceSeq ? r.said.text : "", calls: respCalls };
       try {
-        r.live.sendToolResponse({ functionResponses: responses as FunctionResponse[] });
+        r.live.sendToolResponse({ functionResponses: (r.direct ? scheduleOffers(responses, heard) : responses) as FunctionResponse[] });
       } catch {
         // The socket is closing; onclose reconnects.
       }
@@ -331,10 +341,15 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     if (sc?.turnComplete || sc?.interrupted) {
       r.respHeard = false;
       r.respTools = false;
+      r.respCalls = [];
     }
     if (sc?.inputTranscription?.text) r.userText += sc.inputTranscription.text;
     if (events.some((e) => e.type === "modelOutput")) flushUser(r);
-    if (sc?.outputTranscription?.text && !r.dropReply) r.aiText += sc.outputTranscription.text;
+    if (sc?.outputTranscription?.text && !r.dropReply) {
+      r.aiText += sc.outputTranscription.text;
+      if (r.said.seq !== turns.seq) r.said = { seq: turns.seq, text: "" };
+      r.said.text += sc.outputTranscription.text;
+    }
     if (sc?.interrupted) stopPlayback(r);
     if (o.voiceOutput && !r.dropReply) {
       for (const part of sc?.modelTurn?.parts ?? []) {
@@ -347,6 +362,7 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
       if (r.sources.size === 0) setState("listening");
     }
     const calls = m.toolCall?.functionCalls ?? [];
+    for (const c of calls) r.respCalls.push(c.name ?? "");
     if (calls.length > 0) runTools(r, id, calls);
     if (m.goAway) void reconnect(r);
   }
@@ -373,6 +389,7 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     const dineAtToken = o.getSession?.()?.dineOption ?? null;
     const t = await liveToken({ sessionId, token: deviceToken, locale, ...aiLang });
     if (r.stopped) return;
+    r.direct = t.mode === "direct";
     // The countdown runs from the first token of this start (the relay's arrives when it is ready); reconnects keep it.
     if (t.mode === "direct" && r.deadline === 0) startClock(r, t.voiceSeconds);
     const id = crypto.randomUUID();
@@ -495,6 +512,9 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
       stopped: false,
       respHeard: false,
       respTools: false,
+      respCalls: [],
+      said: { seq: -1, text: "" },
+      direct: false,
       misses: 0,
       toldDine: null,
       offers: offerTracker(),

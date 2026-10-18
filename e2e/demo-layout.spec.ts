@@ -212,7 +212,7 @@ test.describe(() => {
       await page.setViewportSize(vp);
       await expect(page.locator("[data-demo-check] [data-action-strip]"), `${vp.width}: strip under the phone`).toHaveCount(0);
       const places = page.getByRole("navigation", { name: "Try another place" });
-      await expect(places.getByRole("link", { name: "Pizza shop" }), `${vp.width}: [Pizza shop]`).toBeInViewport({ ratio: 1 });
+      await expect(places.getByRole("link", { name: "Airport rail" }), `${vp.width}: [Airport rail]`).toBeInViewport({ ratio: 1 });
     }
   });
 });

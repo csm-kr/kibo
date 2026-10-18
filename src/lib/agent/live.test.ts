@@ -1,4 +1,4 @@
-import { ApiError, EndSensitivity, Modality, type GoogleGenAI } from "@google/genai";
+import { ApiError, Behavior, EndSensitivity, Modality, type GoogleGenAI } from "@google/genai";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getKiosk } from "@/lib/adapters/catalog";
 import { CommandError } from "@/lib/commands/errors";
@@ -62,11 +62,12 @@ function kiosk(s: { sessionId: string; kioskToken: string }, type: string, args:
 }
 
 describe("issueLiveToken", () => {
-  it("demo: a one-use token for 3 min of voice; new sessions only in the next 60 s", async () => {
+  // Owner 10-18: 3 min ran out mid-order on /demo, so a demo start gets a real phone's 10 min.
+  it("demo: a one-use token for 10 min of voice; new sessions only in the next 60 s", async () => {
     const s = await demo();
     const out = await issue(s, s.deviceToken);
-    expect(out).toEqual({ token: "auth_tokens/t1", model: "gemini-3.8-live", expiresAt: T0 + 180_000, voiceSeconds: 180 });
-    expect(issued[0].expireTime).toBe(new Date(T0 + 180_000).toISOString());
+    expect(out).toEqual({ token: "auth_tokens/t1", model: "gemini-3.8-live", expiresAt: T0 + 600_000, voiceSeconds: 600 });
+    expect(issued[0].expireTime).toBe(new Date(T0 + 600_000).toISOString());
     expect(issued[0].newSessionExpireTime).toBe(new Date(T0 + 60_000).toISOString());
   });
 
@@ -158,11 +159,11 @@ describe("issueLiveToken", () => {
     expect(issued).toHaveLength(12);
   });
 
-  it("a judge's own phone on a pairable demo session keeps the demo limits: 3 min, 6 tokens", async () => {
+  it("a judge's own phone on a pairable demo session keeps the demo limits: 10 min, 6 tokens", async () => {
     const r = await createSession(store, { kioskId: "malo", demo: true, pairPhone: true }, T0);
     const { deviceToken } = await claimSession(store, { sessionId: r.sessionId, claimToken: r.claimToken }, T0);
     const s = { sessionId: r.sessionId };
-    expect((await issue(s, deviceToken)).voiceSeconds).toBe(180);
+    expect((await issue(s, deviceToken)).voiceSeconds).toBe(600);
     for (let i = 0; i < 5; i++) await issue(s, deviceToken);
     expect((await errorOf(issue(s, deviceToken))).code).toBe("RATE_LIMITED");
   });
@@ -298,11 +299,22 @@ describe("geminiTokenIssuer", () => {
         inputAudioTranscription: { languageCodes: ["ko-KR", "en-US"] },
         outputAudioTranscription: {},
         realtimeInputConfig: {
-          automaticActivityDetection: { endOfSpeechSensitivity: EndSensitivity.END_SENSITIVITY_HIGH, silenceDurationMs: 700 },
+          automaticActivityDetection: { endOfSpeechSensitivity: EndSensitivity.END_SENSITIVITY_HIGH, silenceDurationMs: 1000 },
         },
       },
     });
     expect(config.httpOptions).toEqual({ apiVersion: "v1alpha" });
+  });
+
+  it("offerChoices is NON_BLOCKING in the token, so the phone can answer it without a new response (I-417)", async () => {
+    const create = vi.fn().mockResolvedValue({ name: "auth_tokens/abc" });
+    const tools = [{ functionDeclarations: [{ name: "offerChoices" }, { name: "addToCart" }] }];
+    await geminiTokenIssuer(fakeAi(create)).create({ ...INPUT, tools });
+    expect(create.mock.calls[0][0].config.liveConnectConstraints.config.tools).toEqual([
+      { functionDeclarations: [{ name: "offerChoices", behavior: Behavior.NON_BLOCKING }, { name: "addToCart" }] },
+    ]);
+    // The relay (Vertex AI) gets liveConfig's tools as they are.
+    expect(tools[0].functionDeclarations[0]).toEqual({ name: "offerChoices" });
   });
 
   it("a Gemini 429 is RATE_LIMITED with the plain message", async () => {

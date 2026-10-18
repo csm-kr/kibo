@@ -34,9 +34,9 @@ test("phone claims the QR, mirrors the cart, confirms and gets the order number"
   const deviceToken = await phoneToken(phone, sessionId);
   await expect(kioskRoot(kiosk)).toHaveAttribute("data-screen", "dine");
   // P1, first time in this browser: the microphone hint; typing skips the microphone, and the AI's greeting is the
-  // first bubble, without a model call.
+  // first bubble, without a model call; it asks what K2 and P2 ask (owner 10-18, I-420).
   await phone.getByRole("button", { name: "Type instead" }).click();
-  await expect(phone.getByText("Hi! What would you like? Just say it.")).toBeVisible();
+  await expect(phone.getByText("Hi! Eat here or take out?")).toBeVisible();
   await expect(phone.getByRole("textbox", { name: "Type your order" })).toBeFocused();
   await phone.getByRole("button", { name: "Eat here" }).click();
   await expect(phone.locator("[data-phone-screen]")).toHaveAttribute("data-phone-screen", "talk");

@@ -19,8 +19,11 @@ export interface Session {
   cart: CartLine[];
   total: number;
   cartVersion: number;
-  /** `at`: when the AI last asked the kiosk to show `category` (showMenu), so the kiosk moves its rail once per ask. */
-  screen: { category?: string; itemId?: string; at?: number };
+  /**
+   * `at`: when the AI last asked the kiosk to show `category` (showMenu), so the kiosk moves its rail once per ask;
+   * with it, `itemId` is the item to bring into view and `scroll` a page down or up in that category.
+   */
+  screen: { category?: string; itemId?: string; scroll?: "down" | "up"; at?: number };
   lastChange: { lineId: string | null; kind: ChangeKind; source: Source; at: number } | null;
   pendingChoice: { templateId: TemplateId; choices: ChoiceRef[] } | null;
   staffCalled: { reasonCode: StaffReason; at: number } | null;

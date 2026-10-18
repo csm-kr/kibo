@@ -81,8 +81,12 @@ export function toolDeclarations(k: KioskData): FunctionDeclaration[] {
       },
       ["templateId", "choices"],
     )],
-    ["showMenu", "Show a category on the kiosk screen when the user asks to see the menu or a kind of item.", object(
-      { category: { type: "string", enum: k.categories.map((c) => c.categoryId) } },
+    ["showMenu", "Move the kiosk screen: show a category, bring one item of it into view (itemId), or scroll it (scroll) when the user asks to see or scroll the menu.", object(
+      {
+        category: { type: "string", enum: k.categories.map((c) => c.categoryId) },
+        itemId: { type: "string", enum: k.items.map((i) => i.itemId) },
+        scroll: { type: "string", enum: ["down", "up"] },
+      },
       ["category"],
     )],
     ["callStaff", "Call staff to the kiosk when the menu data cannot answer, the user asks for staff, or the user is stuck.", object(

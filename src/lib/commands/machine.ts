@@ -200,13 +200,19 @@ function transition(s: Session, cmd: Command, ctx: CommandContext): { next: Sess
       return { next: { ...s, pendingChoice: { templateId, choices: choices.map((c) => ({ ...c })) } }, result: {} };
     }
 
-    case "showMenu":
+    case "showMenu": {
       // Changes only what the kiosk shows; the dine option can come later (requestCheckout asks for it).
       requireStatus(s, ["connected", "ordering"], "The order is being reviewed or paid.");
-      if (!k.categories.some((c) => c.categoryId === cmd.args.category)) {
+      const { category, itemId, scroll } = cmd.args;
+      if (!k.categories.some((c) => c.categoryId === category)) {
         throw new CommandError("BAD_REQUEST", "That category is not on this kiosk.");
       }
-      return { next: { ...s, status: "ordering", screen: { category: cmd.args.category, at: ctx.now } }, result: {} };
+      if (itemId !== undefined && findItem(k, itemId)?.category !== category) {
+        throw new CommandError("BAD_REQUEST", "That item is not in this category.");
+      }
+      const screen = { category, ...(itemId !== undefined && { itemId }), ...(scroll !== undefined && { scroll }), at: ctx.now };
+      return { next: { ...s, status: "ordering", screen }, result: {} };
+    }
 
     case "callStaff":
       return { next: { ...s, staffCalled: { reasonCode: cmd.args.reasonCode, at: ctx.now } }, result: {} };
