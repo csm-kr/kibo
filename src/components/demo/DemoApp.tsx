@@ -25,7 +25,7 @@ import { CompareCard } from "./CompareCard";
 import { DemoEndCard } from "./DemoEndCard";
 import { DemoFrame } from "./DemoFrame";
 import { DemoIntro } from "./DemoIntro";
-import { DEMO_ENVIRONMENTS, demoHref, environmentOf } from "./environments";
+import { demoHref, environmentOf, offeredPlaces } from "./environments";
 import { ScenarioGuide, type SideTab } from "./ScenarioGuide";
 
 // /demo (docs/UX.md Flow C, screen map D1–D3): the real KioskScreen (or a learned kiosk page with the bridge) and
@@ -282,7 +282,7 @@ export function DemoApp({ kiosk }: { kiosk: KioskData }) {
                         <h2 id="demo-other-places" className="text-base font-semibold text-muted">
                           {pt("tryAnotherPlace", locale)}
                         </h2>
-                        {DEMO_ENVIRONMENTS.filter((e) => e.kioskId !== kiosk.kioskId).map((e) => (
+                        {offeredPlaces().filter((e) => e.kioskId !== kiosk.kioskId).map((e) => (
                           <Link key={e.kioskId} href={demoHref(e.kioskId)} className={SECONDARY_SMALL}>
                             {e.place[locale]}
                           </Link>

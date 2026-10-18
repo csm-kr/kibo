@@ -36,21 +36,23 @@ async function startOnScreen(page: Page): Promise<DemoSession> {
 const kioskPage = (page: Page) => page.frameLocator("iframe[data-learned-kiosk]");
 const phoneScreen = (page: Page) => page.locator("[data-phone-screen]");
 
-test("D1 has the bunsik shop as its fourth place card, selected, and the top bar selects it too (I-405, I-414)", async ({ page }) => {
+test("/demo?k=bunsik adds the bunsik shop's card after the two offered places, selected, and its tab (I-405, I-414, I-426)", async ({ page }) => {
   await openIntro(page);
   const cards = page.locator("[data-place-card]");
-  await expect(cards).toHaveCount(4);
-  const card = cards.nth(3);
+  await expect(cards).toHaveCount(3);
+  const card = cards.nth(2);
   await expect(card).toContainText("Bunsik shop");
   await expect(card).toContainText("Boribyeol Bunsik");
   await expect(card).toHaveAttribute("href", "/demo?k=bunsik");
   await expect(card).toHaveAttribute("aria-current", "true");
-  for (let i = 0; i < 3; i++) await expect(cards.nth(i)).not.toHaveAttribute("aria-current", /.+/);
+  for (let i = 0; i < 2; i++) await expect(cards.nth(i)).not.toHaveAttribute("aria-current", /.+/);
   // Its picture is its own kiosk's menu, not another place's.
   expect(await card.locator("img").getAttribute("src")).toContain("place-bunsik.webp");
-  const learned = page.locator("[data-place-learned]");
-  await expect(learned.getByRole("link", { name: "How KIBO learned the bunsik shop kiosk" })).toHaveAttribute("href", "/learn/bunsik");
-  const tab = page.locator("[data-demo-topbar]").getByRole("navigation", { name: "Places" }).getByRole("link", { name: "Bunsik shop" });
+  // The other learned kiosk stays unoffered.
+  await expect(page.getByText("Pizza shop")).toHaveCount(0);
+  const tabs = page.locator("[data-demo-topbar]").getByRole("navigation", { name: "Places" }).getByRole("link");
+  await expect(tabs).toHaveText(["Burger shop", "Airport rail", "Bunsik shop"]);
+  const tab = tabs.filter({ hasText: "Bunsik shop" });
   await expect(tab).toHaveAttribute("aria-current", "page");
   await expect(tab).toHaveAttribute("href", "/demo?k=bunsik");
   // The owner's word for the place is 분식집 / bunsik shop, never "snack bar" (I-414).
@@ -121,7 +123,7 @@ test("bunsik shop on /demo: the bridge enters a tteokbokki, a set and a gimbap, 
   await expect(kiosk.locator(".review, .pay")).toHaveCount(0);
   await expect(page.locator("[data-demo-end]")).toContainText("you would now pay on the kiosk itself");
   const others = page.getByRole("navigation", { name: "Try another place" });
-  await expect(others.getByRole("link")).toHaveText(["Burger shop", "Airport rail", "Pizza shop"]);
+  await expect(others.getByRole("link")).toHaveText(["Burger shop", "Airport rail"]);
 });
 
 test.describe(() => {
@@ -159,10 +161,10 @@ test.describe(() => {
     await expect(kioskPage(page).locator(".cart-list .ln")).toHaveCount(1);
     await expect(kioskPage(page).locator(".dine-chip")).toHaveText("포장 주문");
     await phone("requestCheckout", {}, { source: "voice", utteranceSeq: 2 });
-    // The learned order ends at the review: the row offers the next order, with every other place on one line.
+    // The learned order ends at the review: the row offers the next order and the two offered places on one line.
     await expect(next.getByRole("button", { name: "Try again" })).toBeVisible();
     const places = next.getByRole("navigation", { name: "Try another place" }).getByRole("link");
-    await expect(places).toHaveText(["Burger shop", "Airport rail", "Pizza shop"]);
+    await expect(places).toHaveText(["Burger shop", "Airport rail"]);
     for (const link of await places.all()) await expect(link).toBeInViewport({ ratio: 1 });
   });
 });

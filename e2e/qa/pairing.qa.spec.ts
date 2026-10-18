@@ -88,9 +88,9 @@ for (const vp of [
     // [Try again] and the other places in view under the kiosk, the kiosk at the size it had from the start.
     const next = page.locator("[data-demo-next]");
     await expect(next.getByRole("button", { name: "Try again" })).toBeInViewport({ ratio: 1 });
-    // Three other places since the bunsik shop got its card (I-414), and the row's label still on one line.
+    // The other offered place (the learned kiosks are not offered, I-426), and the row's label still on one line.
     const places = next.getByRole("navigation", { name: "Try another place" }).getByRole("link");
-    await expect(places).toHaveText(["Airport rail", "Pizza shop", "Bunsik shop"]);
+    await expect(places).toHaveText(["Airport rail"]);
     for (const link of await places.all()) await expect(link).toBeInViewport({ ratio: 1 });
     expect(await textLines(next.getByRole("heading", { name: "Try another place" }))).toBe(1);
     await check(page, info, "demo-D3-own-phone-done", DEMO);

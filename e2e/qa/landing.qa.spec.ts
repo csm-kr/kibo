@@ -23,10 +23,11 @@ test("root landing page", async ({ page }, info) => {
   await expect(page.getByRole("link", { name: "Try the live demo" })).toBeVisible({ timeout: 60_000 });
   await expect(page.getByRole("link", { name: "Try the live demo" })).toHaveAttribute("href", "/demo");
   await expect(page.getByRole("link", { name: "Two-device mode" })).toHaveAttribute("href", "/kiosk");
-  // "One phone, many kiosks": each place opens its working demo.
-  for (const [name, k] of [["burger shop", "malo"], ["airport rail", "airport_rail"], ["pizza shop", "doughhouse"]]) {
+  // "One phone, many kiosks": the two direct kiosks open their working demo; the learned ones are not linked (I-426).
+  for (const [name, k] of [["burger shop", "malo"], ["airport rail", "airport_rail"]]) {
     await expect(page.getByRole("link", { name: `Try the ${name}` })).toHaveAttribute("href", `/demo?k=${k}`);
   }
+  expect(await page.locator('a[href*="k=doughhouse"], a[href*="k=bunsik"], a[href^="/learn"]').count()).toBe(0);
   // Every external fact shows its source, and evidence paths link to the public repo (docs/RULE.md R-001).
   const problem = page.locator('[data-landing-section="problem"]');
   await expect(problem.getByText("Source:")).toHaveCount(6);
@@ -82,7 +83,7 @@ test("no dark 2px outlines; the cards and the secondary links follow the phone d
   expect(look.cards.length).toBeGreaterThan(0);
   expect(look.cards.filter((c) => c.border !== "0px" || !c.shadow)).toEqual([]);
   // Secondary links are kibo-tint with no border, like the phone's [Pick more].
-  for (const name of ["Two-device mode", "Try the burger shop", "Try the airport rail", "Try the pizza shop"]) {
+  for (const name of ["Two-device mode", "Try the burger shop", "Try the airport rail"]) {
     const link = page.getByRole("link", { name, exact: true });
     await expect(link, name).toHaveCSS("background-color", "rgb(238, 240, 253)");
     await expect(link, name).toHaveCSS("border-top-width", "0px");

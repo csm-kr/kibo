@@ -1,8 +1,10 @@
 import type { Locale } from "@/types/menu";
 
 // The places a judge can try on /demo (D1 cards, D3 "Try another place") and on the landing page. Each opens a
-// working kiosk: two direct-adapter kiosks and two learned kiosks. Pictures are captures of the running app
-// (`npm run shots:landing`, 800x600, the top of each kiosk's first menu screen).
+// working kiosk: two direct-adapter kiosks and two learned kiosks. Only the two direct ones are offered (owner 10-18:
+// they are the most finished, voice and kiosk stay in step from the first word); a learned kiosk is still reached by
+// its own link (/learn, the deck) and then shown as the selected place (I-426). Pictures are captures of the running
+// app (`npm run shots:landing`, 800x600, the top of each kiosk's first menu screen).
 
 /** A /demo place: what the top bar, the kiosk column's caption and the D1 note say about it. */
 export interface DemoPlace {
@@ -20,6 +22,8 @@ export interface DemoPlace {
    * shows from 1366px wide only, where the kiosk's step beside it still has room for two lines (#1 24).
    */
   caption: { name: string; note: string; noteWide?: boolean };
+  /** A kiosk KIBO Learn learned: not offered on D1, the top bar, D3 or the landing; open by its own link only. */
+  learned?: true;
 }
 
 /** A D1 place card: a place with the capture of its kiosk. */
@@ -55,6 +59,7 @@ export const DEMO_ENVIRONMENTS: DemoEnvironment[] = [
     persona: "Our development pizza kiosk: KIBO learned it once and replays orders without AI.",
     caption: { name: "Kiosk", note: "unchanged, learned by KIBO" },
     image: "/landing/place-doughhouse.webp",
+    learned: true,
   },
   {
     // The kiosk KIBO learned blind in round 4 (bk9-bunsik, built by a separate agent and never seen before its run).
@@ -66,10 +71,16 @@ export const DEMO_ENVIRONMENTS: DemoEnvironment[] = [
     persona: "Built by another AI agent; KIBO learned it the first time it saw it and replays orders without AI.",
     caption: { name: "Kiosk", note: "unchanged, learned by KIBO" },
     image: "/landing/place-bunsik.webp",
+    learned: true,
   },
 ];
 
 export const DEFAULT_ENVIRONMENT = DEMO_ENVIRONMENTS[0];
+
+/** The places offered: the two direct kiosks, and a learned kiosk only while it is the selected one (I-426). */
+export function offeredPlaces(kioskId?: string): DemoEnvironment[] {
+  return DEMO_ENVIRONMENTS.filter((e) => !e.learned || e.kioskId === kioskId);
+}
 
 export function demoHref(kioskId: string): string {
   return `/demo?k=${kioskId}`;
