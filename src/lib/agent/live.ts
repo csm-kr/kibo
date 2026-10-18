@@ -1,4 +1,4 @@
-import { ApiError, EndSensitivity, GoogleGenAI, Modality, type ToolListUnion } from "@google/genai";
+import { ApiError, Behavior, EndSensitivity, GoogleGenAI, Modality, type ToolListUnion } from "@google/genai";
 import { z } from "zod";
 import { getKiosk } from "@/lib/adapters/catalog";
 import { CommandError } from "@/lib/commands/errors";
@@ -95,6 +95,19 @@ export function liveConnectConfig(system: string, tools: object[], languageCode:
   };
 }
 
+/**
+ * The direct path only: offerChoices does not hold the response, so the phone can answer it SILENT once the AI has
+ * spoken, and its answer starts no second response that repeats the question (src/lib/voice/offerScheduling.ts,
+ * I-423). Whether Vertex AI Live accepts `behavior` is unverified, so the relay keeps liveConfig's blocking calls.
+ */
+function nonBlockingOffers(tools: object[]): object[] {
+  return (tools as { functionDeclarations?: { name?: string }[] }[]).map((t) =>
+    t.functionDeclarations
+      ? { ...t, functionDeclarations: t.functionDeclarations.map((d) => (d.name === "offerChoices" ? { ...d, behavior: Behavior.NON_BLOCKING } : d)) }
+      : t,
+  );
+}
+
 /** `ai` is injectable for tests; production builds the client on first use, so a missing key is an UPSTREAM error. */
 export function geminiTokenIssuer(ai?: Pick<GoogleGenAI, "authTokens">): LiveTokenIssuer {
   return {
@@ -114,7 +127,7 @@ export function geminiTokenIssuer(ai?: Pick<GoogleGenAI, "authTokens">): LiveTok
             expireTime,
             newSessionExpireTime,
             // With constraints and no lockAdditionalFields, the browser cannot change any LiveConnectConfig field.
-            liveConnectConstraints: { model, config: liveConnectConfig(system, tools, languageCode) },
+            liveConnectConstraints: { model, config: liveConnectConfig(system, nonBlockingOffers(tools), languageCode) },
             httpOptions: { apiVersion: "v1alpha" },
           },
         });

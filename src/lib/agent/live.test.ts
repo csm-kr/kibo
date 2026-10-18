@@ -1,4 +1,4 @@
-import { ApiError, EndSensitivity, Modality, type GoogleGenAI } from "@google/genai";
+import { ApiError, Behavior, EndSensitivity, Modality, type GoogleGenAI } from "@google/genai";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getKiosk } from "@/lib/adapters/catalog";
 import { CommandError } from "@/lib/commands/errors";
@@ -304,6 +304,17 @@ describe("geminiTokenIssuer", () => {
       },
     });
     expect(config.httpOptions).toEqual({ apiVersion: "v1alpha" });
+  });
+
+  it("offerChoices is NON_BLOCKING in the token, so the phone can answer it without a new response (I-417)", async () => {
+    const create = vi.fn().mockResolvedValue({ name: "auth_tokens/abc" });
+    const tools = [{ functionDeclarations: [{ name: "offerChoices" }, { name: "addToCart" }] }];
+    await geminiTokenIssuer(fakeAi(create)).create({ ...INPUT, tools });
+    expect(create.mock.calls[0][0].config.liveConnectConstraints.config.tools).toEqual([
+      { functionDeclarations: [{ name: "offerChoices", behavior: Behavior.NON_BLOCKING }, { name: "addToCart" }] },
+    ]);
+    // The relay (Vertex AI) gets liveConfig's tools as they are.
+    expect(tools[0].functionDeclarations[0]).toEqual({ name: "offerChoices" });
   });
 
   it("a Gemini 429 is RATE_LIMITED with the plain message", async () => {
