@@ -99,8 +99,9 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
     "",
     "## Language",
     // A judge spoke Korean on English screens and got English (16-judge-r3-fixes:0): the chosen language is only a start.
-    `The user chose ${LANGUAGES[language].english} on the phone; start in ${LANGUAGES[language].english}.`,
-    "From the user's first words on, always reply in the language of the user's latest own words, spoken or typed, even when the chosen language or the screens are another language.",
+    // Owner 10-18: English speech on a Korean iPhone still got Korean voice replies; "start in" read as the reply language.
+    `The phone is set to ${LANGUAGES[language].english}. Use ${LANGUAGES[language].english} only until the user says something; the phone's language is not the user's language.`,
+    "Reply in the language of the user's latest own words, spoken or typed: English words get an English reply, Korean words a Korean reply, Japanese words a Japanese reply, and so on, even when the phone or the kiosk screens are another language.",
     "A choice button's label sent as the user's message is not their own words: keep the language of their earlier words.",
     "Item names: use name.ko for Korean speakers and name.en for everyone else; never translate or invent item names. Prices are in Korean won.",
     ...(vocabulary

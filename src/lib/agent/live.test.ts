@@ -205,7 +205,7 @@ describe("liveConfig", () => {
   it("builds the instructions in the requested language", () => {
     const k = getKiosk("malo");
     const ko = liveConfig(k, { cart: [], status: "connected", dineOption: null, locale: "ko" });
-    expect(ko.system).toContain("The user chose Korean on the phone");
+    expect(ko.system).toContain("The phone is set to Korean.");
     expect(ko.system).toContain("Cart: empty");
   });
 
@@ -214,7 +214,7 @@ describe("liveConfig", () => {
     const opts = { cart: [], status: "connected" as const, dineOption: null, locale: "en" as const };
     const ja = liveConfig(k, { ...opts, language: "ja" });
     expect(ja.languageCode).toBe("ja-JP");
-    expect(ja.system).toContain("The user chose Japanese on the phone");
+    expect(ja.system).toContain("The phone is set to Japanese.");
     expect(liveConfig(k, { ...opts, language: "zh" }).languageCode).toBe("cmn-CN");
     expect(liveConfig(k, { ...opts, language: "th" }).languageCode).toBe("th-TH");
   });
@@ -229,7 +229,7 @@ describe("liveConfig", () => {
     const s = await demo();
     await issueLiveToken(deps(), { sessionId: s.sessionId, bearer: s.deviceToken, locale: "en", language: "fr", ip: "192.0.2.1" });
     expect(issued[0].languageCode).toBe("fr-FR");
-    expect(issued[0].system).toContain("The user chose French on the phone");
+    expect(issued[0].system).toContain("The phone is set to French.");
   });
 
   it("the speech recognizer's language follows the phone locale: ko-KR or en-US", () => {
@@ -249,8 +249,8 @@ describe("liveConfig", () => {
   it("Live instructions start in the chosen language and then follow the user's latest words", () => {
     const k = getKiosk("malo");
     const en = liveConfig(k, { cart: [], status: "connected", dineOption: null, locale: "en" });
-    expect(en.system).toContain("The user chose English on the phone; start in English.");
-    expect(en.system).toContain("From the user's first words on, always reply in the language of the user's latest own words");
+    expect(en.system).toContain("The phone is set to English. Use English only until the user says something");
+    expect(en.system).toContain("Reply in the language of the user's latest own words, spoken or typed");
   });
 
   it("issueLiveToken passes the locale's language code to the issuer", async () => {

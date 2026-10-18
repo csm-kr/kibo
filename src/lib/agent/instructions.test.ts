@@ -203,6 +203,14 @@ describe("buildInstructions", () => {
     expect(learned).not.toContain("showMenu");
   });
 
+  // Owner 10-18: English speech on a Korean iPhone got Korean voice replies ("start in Korean" read as the reply language).
+  it("the phone's language is only the start; replies follow the user's own words, named per language", () => {
+    const ko = buildInstructions(k, { locale: "ko" });
+    expect(ko).toContain("The phone is set to Korean. Use Korean only until the user says something; the phone's language is not the user's language.");
+    expect(ko).toContain("English words get an English reply, Korean words a Korean reply, Japanese words a Japanese reply");
+    expect(ko).not.toMatch(/start in Korean/);
+  });
+
   it("explains replay, remove-and-add and paying on the kiosk only for a learned kiosk", () => {
     const LEARNED = [
       "This kiosk is operated by replaying its own screens.",
@@ -350,12 +358,12 @@ describe("the pay button by the label the user sees (15-judge-fixes:2)", () => {
 describe("language and the dine option (14-final:4)", () => {
   it("starts in the language the user chose, then follows the user's latest own words (16-judge-r3-fixes:0)", () => {
     const ja = buildInstructions(k, { locale: "en", language: "ja" });
-    expect(ja).toMatch(/user chose Japanese on the phone; start in Japanese\./);
-    expect(ja).toMatch(/From the user's first words on, always reply in the language of the user's latest own words, spoken or typed/);
+    expect(ja).toMatch(/The phone is set to Japanese. Use Japanese only until the user says something/);
+    expect(ja).toMatch(/Reply in the language of the user's latest own words, spoken or typed/);
     expect(ja).toMatch(/choice button's label sent as the user's message is not their own words/);
     expect(ja).not.toMatch(/otherwise reply in English/);
     // Without a language, the phone's locale is the language, as before.
-    expect(buildInstructions(k, { locale: "ko" })).toMatch(/user chose Korean on the phone/);
+    expect(buildInstructions(k, { locale: "ko" })).toMatch(/The phone is set to Korean\./);
   });
 
   it("the chat order block carries the reply-language line; the system text only says to follow it", () => {
