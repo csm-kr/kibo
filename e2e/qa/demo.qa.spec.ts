@@ -286,9 +286,10 @@ test.describe(() => {
 test.describe(() => {
   test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.60" } });
 
-  // A Korean typed order on the English screens, through a choice tap (16-judge-r3-fixes:0, I-271). The tap sends the
-  // English label "Cider"; the reply stays Korean. No model: the route stands in for the agent and checks the message.
-  test("D2: a Korean typed order on English screens, through a choice tap", async ({ page, request }, info) => {
+  // A Korean typed order on the English screens, through a choice tap (16-judge-r3-fixes:0, I-271). Since I-404 the
+  // phone's screens follow the Korean line, so the choices and the tapped label are Korean too, and the tap keeps them;
+  // the reply stays Korean. No model: the route stands in for the agent and checks the message.
+  test("D2: a Korean typed order on English screens switches the phone to Korean, through a choice tap", async ({ page, request }, info) => {
     await page.goto("/demo");
     await expect(page.getByRole("button", { name: "Try it on this screen" })).toBeVisible({ timeout: 60_000 });
     const created = page.waitForResponse((r) => r.url().endsWith("/api/session") && r.request().method() === "POST");
@@ -317,13 +318,15 @@ test.describe(() => {
     });
     await page.getByRole("textbox", { name: "Type your order" }).fill("치즈버거 세트 하나, 감자튀김은 큰 걸로 주세요");
     await page.getByRole("button", { name: "Send", exact: true }).click();
-    await expect(page.getByRole("heading", { name: "Which one would you like?" })).toBeVisible();
-    await check(page, info, "D2-ko-on-en-choices", undefined, [VIEWPORTS[0]]);
+    await expect(phoneScreen(page)).toHaveAttribute("lang", "ko");
+    await expect(page.getByRole("heading", { name: "어떤 걸로 드릴까요?" })).toBeVisible();
+    await check(page, info, "D2-ko-typed-choices", undefined, [VIEWPORTS[0]]);
 
-    await page.locator("[data-choices]").getByRole("button", { name: /^Cider/ }).click();
+    await page.locator("[data-choices]").getByRole("button", { name: /^사이다/ }).click();
     await expect(page.locator('[data-bubble="model"]').last()).toContainText("사이다를 담았어요");
-    expect(sent[1]).toBe("Cider");
-    await check(page, info, "D2-ko-on-en-after-tap", undefined, [VIEWPORTS[0], VIEWPORTS[1]]);
+    expect(sent[1]).toBe("사이다");
+    await expect(phoneScreen(page)).toHaveAttribute("lang", "ko");
+    await check(page, info, "D2-ko-typed-after-tap", undefined, [VIEWPORTS[0], VIEWPORTS[1]]);
   });
 });
 

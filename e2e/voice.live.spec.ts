@@ -284,17 +284,20 @@ for (const { mode, fixture, ip } of RUNS) {
       expect(run.aMs).toBeGreaterThan(0);
       expect(run.bMs).toBeGreaterThan(0);
 
-      // Both halves show the same two lines, rendered from session state.
+      // Both halves show the same two lines, rendered from session state. The phone half's screens follow the spoken
+      // language (I-404): the Korean sentence turns /demo's English phone Korean.
       await expect(kioskRoot(page)).toHaveAttribute("data-screen", "menu");
-      const phoneCart = page.getByRole("region", { name: "Your order" });
+      const phoneLocale = fixture === "hero-ko" ? "ko" : "en";
+      await expect(page.locator("[data-phone-screen]")).toHaveAttribute("lang", phoneLocale);
+      const phoneCart = page.getByRole("region", { name: phoneLocale === "ko" ? "내 주문" : "Your order" });
       const canvas = page.locator("[data-kiosk-canvas]");
       for (const line of cart) {
-        const en = lineLabel(kiosk, line, "en");
-        await expect(phoneCart.getByText(en.detail, { exact: true })).toBeVisible();
+        const label = lineLabel(kiosk, line, phoneLocale);
+        await expect(phoneCart.getByText(label.detail, { exact: true })).toBeVisible();
       }
       // The kiosk's cart chips show name ×qty over the line price only (#1 1, 10-15); the options stay on the phone,
       // K6 and KIBO's subtitle, so the canvas is checked by its chips.
-      await expect(phoneCart.getByText("Cheeseburger set", { exact: true })).toHaveCount(2);
+      await expect(phoneCart.getByText(phoneLocale === "ko" ? "치즈버거 세트" : "Cheeseburger set", { exact: true })).toHaveCount(2);
       await expect(canvas.getByText("치즈버거 세트 ×1", { exact: true })).toHaveCount(2);
     });
   });

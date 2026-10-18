@@ -43,7 +43,7 @@ journey
 ```
 | Stage | Thinking | Drop-off risk | What must work |
 |---|---|---|---|
-| Connect | "Is this in my language?" | Phone shows Korean | Phone UI and voice follow the browser language |
+| Connect | "Is this in my language?" | Phone shows Korean | Phone UI and voice follow the browser language, then the language she speaks or types (I-404) |
 | Ask | "Can I trust what it says about food?" | AI guesses about halal or allergens | Answers only from menu data; otherwise calls staff (exception "Not in kiosk data") |
 | Ticket (airport rail) | "Two tickets to Seoul Station, please." | The machine sells only its own places; a quiet swap to City Center, or a staff call at once, leaves her unsure or waiting | The AI says plainly what this machine sells (names, minutes, prices from the data), shows those tickets as buttons and [Call staff] last; it never picks one for her (exception "Place the machine does not sell", 15-judge-fixes:1) |
 | Order | "Which drink did I get?" | Names only in Korean | `name.en` on the phone; the kiosk starts in Korean (it has an English button on K1, but Mei never needs it) and the 2 s highlight shows where |

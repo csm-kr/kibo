@@ -25,7 +25,8 @@ import type { CommandType } from "@/lib/commands/schemas";
 import type { SendResult } from "@/lib/demo/player";
 import { learnedUndoLine } from "@/lib/commands/undo";
 import { cartAnnouncement, itemCount, learnedPayHint, phoneSecondsLeft, pt, voiceSecondsLeft } from "@/lib/i18n/phone";
-import { lt, type SpeechLanguage } from "@/lib/i18n/languages";
+import { followSpeaker } from "@/lib/i18n/heard";
+import { lt, uiLocale, type SpeechLanguage } from "@/lib/i18n/languages";
 import { formatWon } from "@/lib/kiosk/menu";
 import { idleWarning, staffBannerVisible } from "@/lib/kiosk/timers";
 import { bridgeNotice, phoneScreen, type BridgeNotice, type PhoneLocal, type PhoneScreenId } from "@/lib/phone/screen";
@@ -189,6 +190,7 @@ export function AssistantPanel(props: Props) {
     getCartVersion: () => session?.cartVersion ?? 0,
     onUserText: (text) => {
       chat.voice("user", text);
+      followOwnWords(text);
       props.onUserTurn?.();
     },
     onAiText: (text) => chat.voice("model", text),
@@ -255,6 +257,21 @@ export function AssistantPanel(props: Props) {
   }
   function say(text: string) {
     void speak(text);
+  }
+  /**
+   * The screens and the AI follow the language of the user's own words, spoken or typed (owner 10-18, I-404), like a
+   * picker choice. Never a tapped label or example: those are the screens' words. Voice keeps its connection; the next
+   * one asks in the new language (useLiveVoice reads its options on every render).
+   */
+  function followOwnWords(text: string) {
+    const next = followSpeaker(language, text);
+    if (next === null) return;
+    if (props.onLanguageChange) props.onLanguageChange(next);
+    else props.onLocaleChange(uiLocale(next));
+  }
+  function sayOwn(text: string) {
+    followOwnWords(text);
+    say(text);
   }
   // /demo's scenario guide sends its sentences through this same path, so they show and count exactly as typed.
   const onSay = props.onSay;
@@ -409,7 +426,7 @@ export function AssistantPanel(props: Props) {
       voiceSwitch={!voiceInBar}
       typing={typing}
       onTyping={(open) => (open ? focusText() : setTyping(false))}
-      onSend={say}
+      onSend={sayOwn}
       placeholder={placeholder}
       note={voiceNote}
       limit={limitNotice || undefined}
@@ -616,7 +633,7 @@ export function AssistantPanel(props: Props) {
             note={voiceNote}
             limit={limitNotice || undefined}
             typingSheet={
-              <TypingSheet locale={locale} disabled={busy} placeholder={placeholder} quiet onSend={say} inputElement={inputElement} />
+              <TypingSheet locale={locale} disabled={busy} placeholder={placeholder} quiet onSend={sayOwn} inputElement={inputElement} />
             }
           />
         </>
