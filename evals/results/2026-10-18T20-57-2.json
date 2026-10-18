@@ -1,0 +1,5189 @@
+{
+  "date": "2026-10-18T11:57:30.444Z",
+  "model": "gemini-3.8-flash",
+  "backend": "auto",
+  "modelCallsByBackend": {
+    "api": 232,
+    "vertex": 0
+  },
+  "thinkingLevel": "low",
+  "evalClock": "14:00 KST",
+  "subset": null,
+  "cases": 95,
+  "passed": 92,
+  "passRate": 0.968421052631579,
+  "byGroup": {
+    "original": {
+      "pass": 44,
+      "total": 44
+    },
+    "colloquial": {
+      "pass": 10,
+      "total": 12
+    },
+    "language": {
+      "pass": 15,
+      "total": 16
+    },
+    "recovery": {
+      "pass": 23,
+      "total": 23
+    }
+  },
+  "byKiosk": {
+    "malo": {
+      "pass": 76,
+      "total": 79
+    },
+    "doughhouse": {
+      "pass": 3,
+      "total": 3
+    },
+    "airport_rail": {
+      "pass": 13,
+      "total": 13
+    }
+  },
+  "byType": {
+    "1-several-items": {
+      "pass": 2,
+      "total": 2
+    },
+    "2-same-item-different-options": {
+      "pass": 4,
+      "total": 4
+    },
+    "3-missing-required-choice": {
+      "pass": 5,
+      "total": 5
+    },
+    "4-remove-add-ingredients": {
+      "pass": 2,
+      "total": 2
+    },
+    "5-edit-existing-line": {
+      "pass": 5,
+      "total": 5
+    },
+    "6-sold-out-or-hours": {
+      "pass": 5,
+      "total": 5
+    },
+    "8-not-in-data": {
+      "pass": 7,
+      "total": 7
+    },
+    "grounded-reply": {
+      "pass": 6,
+      "total": 6
+    },
+    "9-ambiguous": {
+      "pass": 4,
+      "total": 4
+    },
+    "checkout": {
+      "pass": 4,
+      "total": 4
+    },
+    "10-colloquial": {
+      "pass": 10,
+      "total": 12
+    },
+    "11-any-language": {
+      "pass": 15,
+      "total": 16
+    },
+    "12-recovery": {
+      "pass": 23,
+      "total": 23
+    }
+  },
+  "latency": {
+    "requests": 118,
+    "totalMedianMs": 5925,
+    "totalP90Ms": 9860,
+    "firstToolRequests": 112,
+    "firstToolMedianMs": 3119,
+    "firstToolP90Ms": 6361,
+    "modelCalls": 232,
+    "roundMedianMs": 2483,
+    "roundP90Ms": 5189,
+    "callsPerRequest": {
+      "1": 35,
+      "2": 52,
+      "3": 31
+    },
+    "oneCallWithTools": 29
+  },
+  "notCovered": [
+    {
+      "type": "7-count-limits",
+      "reason": "Count limits (max 3 toppings) need the learned Doughhouse kiosk, which has no LearnedAdapter yet."
+    }
+  ],
+  "results": [
+    {
+      "id": "t1-en-several",
+      "kioskId": "malo",
+      "type": "1-several-items",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        },
+        {
+          "itemId": "chicken_nuggets",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "sauce": [
+              "honey_mustard"
+            ]
+          }
+        },
+        {
+          "itemId": "cola",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "size": [
+              "l"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 9408,
+          "firstToolMs": 4952,
+          "rounds": [
+            4916,
+            1912,
+            2424
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t1-ko-several",
+      "kioskId": "malo",
+      "type": "1-several-items",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_sticks",
+          "variant": "single",
+          "qty": 2,
+          "selections": {}
+        },
+        {
+          "itemId": "iced_tea",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        },
+        {
+          "itemId": "soft_cone",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 6289,
+          "firstToolMs": 5970,
+          "rounds": [
+            5964
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t2-en-hero",
+      "kioskId": "malo",
+      "type": "2-same-item-different-options",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 1,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "zero_cola"
+            ],
+            "ingredients": [
+              "no_pickles"
+            ]
+          }
+        },
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 1,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "cider"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 7036,
+          "firstToolMs": 2569,
+          "rounds": [
+            2565,
+            2556,
+            1892
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t2-ko-hero",
+      "kioskId": "malo",
+      "type": "2-same-item-different-options",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 1,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "zero_cola"
+            ],
+            "ingredients": [
+              "no_pickles"
+            ]
+          }
+        },
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 1,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "cider"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 7720,
+          "firstToolMs": 2677,
+          "rounds": [
+            2669,
+            2347,
+            2676
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t3-en-set-no-drink",
+      "kioskId": "malo",
+      "type": "3-missing-required-choice",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_option",
+        "choices": [
+          {
+            "kind": "option",
+            "id": "cola"
+          },
+          {
+            "kind": "option",
+            "id": "zero_cola"
+          },
+          {
+            "kind": "option",
+            "id": "cider"
+          },
+          {
+            "kind": "option",
+            "id": "iced_coffee"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 6164,
+          "firstToolMs": 4245,
+          "rounds": [
+            1805,
+            2398,
+            1907
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "NEEDS_CHOICE"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t3-ko-set-no-drink",
+      "kioskId": "malo",
+      "type": "3-missing-required-choice",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_option",
+        "choices": [
+          {
+            "kind": "option",
+            "id": "cola"
+          },
+          {
+            "kind": "option",
+            "id": "zero_cola"
+          },
+          {
+            "kind": "option",
+            "id": "cider"
+          },
+          {
+            "kind": "option",
+            "id": "iced_coffee"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 6374,
+          "firstToolMs": 4111,
+          "rounds": [
+            2029,
+            2005,
+            2251
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "NEEDS_CHOICE"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t3-en-variant",
+      "kioskId": "malo",
+      "type": "3-missing-required-choice",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_variant",
+        "choices": [
+          {
+            "kind": "variant",
+            "id": "single"
+          },
+          {
+            "kind": "variant",
+            "id": "set"
+          },
+          {
+            "kind": "variant",
+            "id": "largeSet"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 6912,
+          "firstToolMs": 4461,
+          "rounds": [
+            2434,
+            1992,
+            2445
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "NEEDS_CHOICE"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t3-ko-sauce",
+      "kioskId": "malo",
+      "type": "3-missing-required-choice",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_option",
+        "choices": [
+          {
+            "kind": "option",
+            "id": "sweet_chili"
+          },
+          {
+            "kind": "option",
+            "id": "honey_mustard"
+          },
+          {
+            "kind": "option",
+            "id": "bbq"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 6178,
+          "firstToolMs": 4273,
+          "rounds": [
+            1765,
+            2492,
+            1897
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "NEEDS_CHOICE"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t4-en-ingredients",
+      "kioskId": "malo",
+      "type": "4-remove-add-ingredients",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "double_cheese_burger",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "ingredients": [
+              "extra_cheese",
+              "no_onion"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 6638,
+          "firstToolMs": 2803,
+          "rounds": [
+            2786,
+            1748,
+            2065
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t4-ko-ingredients",
+      "kioskId": "malo",
+      "type": "4-remove-add-ingredients",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "bacon_cheese_burger",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "ingredients": [
+              "no_pickles",
+              "extra_patty"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 6786,
+          "firstToolMs": 2242,
+          "rounds": [
+            2224,
+            2334,
+            2181
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t5-en-both-fries-large",
+      "kioskId": "malo",
+      "type": "5-edit-existing-line",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 1,
+          "selections": {
+            "side": [
+              "fries_l"
+            ],
+            "drink": [
+              "zero_cola"
+            ],
+            "ingredients": [
+              "no_pickles"
+            ]
+          }
+        },
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 1,
+          "selections": {
+            "side": [
+              "fries_l"
+            ],
+            "drink": [
+              "cider"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 7421,
+          "firstToolMs": 2685,
+          "rounds": [
+            2667,
+            2483,
+            2249
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 2845,
+          "firstToolMs": 2810,
+          "rounds": [
+            2790
+          ],
+          "tools": [
+            {
+              "name": "updateCart",
+              "code": "ok"
+            },
+            {
+              "name": "updateCart",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t5-ko-fries-large",
+      "kioskId": "malo",
+      "type": "5-edit-existing-line",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 1,
+          "selections": {
+            "side": [
+              "fries_l"
+            ],
+            "drink": [
+              "cola"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 10285,
+          "firstToolMs": 3259,
+          "rounds": [
+            3255,
+            4069,
+            2940
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 2683,
+          "firstToolMs": 2678,
+          "rounds": [
+            2670
+          ],
+          "tools": [
+            {
+              "name": "updateCart",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t5-en-undo",
+      "kioskId": "malo",
+      "type": "5-edit-existing-line",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cola",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "size": [
+              "m"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 4139,
+          "firstToolMs": 4132,
+          "rounds": [
+            4120
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 2458,
+          "firstToolMs": 2455,
+          "rounds": [
+            2448
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 2613,
+          "firstToolMs": 2609,
+          "rounds": [
+            2602
+          ],
+          "tools": [
+            {
+              "name": "undoLastChange",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t5-ko-undo",
+      "kioskId": "malo",
+      "type": "5-edit-existing-line",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cider",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "size": [
+              "m"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 2703,
+          "firstToolMs": 2700,
+          "rounds": [
+            2695
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 3149,
+          "firstToolMs": 3124,
+          "rounds": [
+            3068
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 2147,
+          "firstToolMs": 2132,
+          "rounds": [
+            2117
+          ],
+          "tools": [
+            {
+              "name": "undoLastChange",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t5-ko-qty",
+      "kioskId": "malo",
+      "type": "5-edit-existing-line",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cola",
+          "variant": "single",
+          "qty": 2,
+          "selections": {
+            "size": [
+              "m"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 2240,
+          "firstToolMs": 2227,
+          "rounds": [
+            2219
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 3059,
+          "firstToolMs": 3056,
+          "rounds": [
+            2954
+          ],
+          "tools": [
+            {
+              "name": "updateCart",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t6-en-sold-out",
+      "kioskId": "malo",
+      "type": "6-sold-out-or-hours",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "alternatives",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bulgogi_burger"
+          },
+          {
+            "kind": "item",
+            "id": "spicy_chicken_burger"
+          },
+          {
+            "kind": "item",
+            "id": "crispy_chicken_burger"
+          },
+          {
+            "kind": "item",
+            "id": "classic_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bacon_cheese_burger"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 9860,
+          "firstToolMs": 6361,
+          "rounds": [
+            6352,
+            3494
+          ],
+          "tools": [
+            {
+              "name": "showMenu",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t6-ko-sold-out",
+      "kioskId": "malo",
+      "type": "6-sold-out-or-hours",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "alternatives",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bulgogi_burger"
+          },
+          {
+            "kind": "item",
+            "id": "crispy_chicken_burger"
+          },
+          {
+            "kind": "item",
+            "id": "classic_burger"
+          },
+          {
+            "kind": "item",
+            "id": "spicy_chicken_burger"
+          },
+          {
+            "kind": "item",
+            "id": "double_cheese_burger"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 9831,
+          "firstToolMs": 6557,
+          "rounds": [
+            6519,
+            3231
+          ],
+          "tools": [
+            {
+              "name": "showMenu",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t6-en-out-of-hours",
+      "kioskId": "malo",
+      "type": "6-sold-out-or-hours",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "alternatives",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "classic_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bulgogi_burger"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 14063,
+          "firstToolMs": 13884,
+          "rounds": [
+            4540,
+            9280
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "UNAVAILABLE"
+            },
+            {
+              "name": "showMenu",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t6-ko-out-of-hours",
+      "kioskId": "malo",
+      "type": "6-sold-out-or-hours",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 10453,
+          "firstToolMs": null,
+          "rounds": [
+            3522,
+            6858
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "UNAVAILABLE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t8-en-unknown-item",
+      "kioskId": "malo",
+      "type": "8-not-in-data",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 3429,
+          "firstToolMs": null,
+          "rounds": [
+            3426
+          ],
+          "tools": []
+        }
+      ]
+    },
+    {
+      "id": "t8-ko-unknown-item",
+      "kioskId": "malo",
+      "type": "8-not-in-data",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 3119,
+          "firstToolMs": null,
+          "rounds": [
+            3115
+          ],
+          "tools": []
+        }
+      ]
+    },
+    {
+      "id": "t8-en-halal",
+      "kioskId": "malo",
+      "type": "8-not-in-data",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": "unknown_info",
+      "requests": [
+        {
+          "ms": 5307,
+          "firstToolMs": 3034,
+          "rounds": [
+            3005,
+            2258
+          ],
+          "tools": [
+            {
+              "name": "callStaff",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t8-ko-origin",
+      "kioskId": "malo",
+      "type": "8-not-in-data",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": "unknown_info",
+      "requests": [
+        {
+          "ms": 7028,
+          "firstToolMs": 3360,
+          "rounds": [
+            3350,
+            3640
+          ],
+          "tools": [
+            {
+              "name": "callStaff",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "g-en-recommend-dessert",
+      "kioskId": "malo",
+      "type": "grounded-reply",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "soft_cone"
+          },
+          {
+            "kind": "item",
+            "id": "apple_pie"
+          },
+          {
+            "kind": "item",
+            "id": "choco_sundae"
+          },
+          {
+            "kind": "item",
+            "id": "choco_cookie"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": [
+          "soft_cone"
+        ]
+      },
+      "requests": [
+        {
+          "ms": 15013,
+          "firstToolMs": 9751,
+          "rounds": [
+            9631,
+            2852,
+            2371
+          ],
+          "tools": [
+            {
+              "name": "showMenu",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "g-ko-recommend-dessert",
+      "kioskId": "malo",
+      "type": "grounded-reply",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "soft_cone"
+          },
+          {
+            "kind": "item",
+            "id": "apple_pie"
+          },
+          {
+            "kind": "item",
+            "id": "choco_sundae"
+          },
+          {
+            "kind": "item",
+            "id": "choco_cookie"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": [
+          "soft_cone"
+        ]
+      },
+      "requests": [
+        {
+          "ms": 4933,
+          "firstToolMs": 2615,
+          "rounds": [
+            2606,
+            2295
+          ],
+          "tools": [
+            {
+              "name": "showMenu",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "g-en-popular",
+      "kioskId": "malo",
+      "type": "grounded-reply",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "soft_cone"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": [
+          "cheese_burger",
+          "soft_cone"
+        ]
+      },
+      "requests": [
+        {
+          "ms": 8075,
+          "firstToolMs": 4206,
+          "rounds": [
+            4149,
+            3066
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "g-ko-popular",
+      "kioskId": "malo",
+      "type": "grounded-reply",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "soft_cone"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": [
+          "cheese_burger",
+          "soft_cone"
+        ]
+      },
+      "requests": [
+        {
+          "ms": 8782,
+          "firstToolMs": 5900,
+          "rounds": [
+            5830,
+            2773
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lg-en-pay-on-kiosk",
+      "kioskId": "doughhouse",
+      "type": "grounded-reply",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "confirming",
+      "cart": [
+        {
+          "itemId": "cheese_oven_spaghetti",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": []
+      },
+      "requests": [
+        {
+          "ms": 9185,
+          "firstToolMs": 4395,
+          "rounds": [
+            4371,
+            2246
+          ],
+          "tools": [
+            {
+              "name": "setDineOption",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 5068,
+          "firstToolMs": 3014,
+          "rounds": [
+            2968,
+            2014
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 5325,
+          "firstToolMs": 2567,
+          "rounds": [
+            2455,
+            2556
+          ],
+          "tools": [
+            {
+              "name": "requestCheckout",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lg-ko-pay-on-kiosk",
+      "kioskId": "doughhouse",
+      "type": "grounded-reply",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "confirming",
+      "cart": [
+        {
+          "itemId": "cheese_oven_spaghetti",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": []
+      },
+      "requests": [
+        {
+          "ms": 6787,
+          "firstToolMs": 4744,
+          "rounds": [
+            4714,
+            2023
+          ],
+          "tools": [
+            {
+              "name": "setDineOption",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 4613,
+          "firstToolMs": 2251,
+          "rounds": [
+            2205,
+            2346
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 4169,
+          "firstToolMs": 1998,
+          "rounds": [
+            1974,
+            2166
+          ],
+          "tools": [
+            {
+              "name": "requestCheckout",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t9-en-one-burger",
+      "kioskId": "malo",
+      "type": "9-ambiguous",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bulgogi_burger"
+          },
+          {
+            "kind": "item",
+            "id": "double_cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "spicy_chicken_burger"
+          },
+          {
+            "kind": "item",
+            "id": "classic_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bacon_cheese_burger"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 6107,
+          "firstToolMs": 4409,
+          "rounds": [
+            4396,
+            1678
+          ],
+          "tools": [
+            {
+              "name": "showMenu",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t9-ko-one-drink",
+      "kioskId": "malo",
+      "type": "9-ambiguous",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cola"
+          },
+          {
+            "kind": "item",
+            "id": "zero_cola"
+          },
+          {
+            "kind": "item",
+            "id": "cider"
+          },
+          {
+            "kind": "item",
+            "id": "lemonade"
+          },
+          {
+            "kind": "item",
+            "id": "orange_juice"
+          },
+          {
+            "kind": "item",
+            "id": "iced_tea"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 5023,
+          "firstToolMs": 2635,
+          "rounds": [
+            2619,
+            2323
+          ],
+          "tools": [
+            {
+              "name": "showMenu",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "co-en-ill-pay",
+      "kioskId": "malo",
+      "type": "checkout",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "confirming",
+      "cart": [
+        {
+          "itemId": "cola",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "size": [
+              "m"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 3615,
+          "firstToolMs": 3553,
+          "rounds": [
+            3486
+          ],
+          "tools": [
+            {
+              "name": "setDineOption",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 2020,
+          "firstToolMs": 1951,
+          "rounds": [
+            1933
+          ],
+          "tools": [
+            {
+              "name": "requestCheckout",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "co-en-pay-in-one-message",
+      "kioskId": "malo",
+      "type": "checkout",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "confirming",
+      "cart": [
+        {
+          "itemId": "zero_cola",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "size": [
+              "m"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 5340,
+          "firstToolMs": 5293,
+          "rounds": [
+            5266
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "setDineOption",
+              "code": "ok"
+            },
+            {
+              "name": "requestCheckout",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "co-ko-yes-after-card",
+      "kioskId": "malo",
+      "type": "checkout",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "paying",
+      "cart": [
+        {
+          "itemId": "cola",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "size": [
+              "m"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 2380,
+          "firstToolMs": 2364,
+          "rounds": [
+            2336
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "setDineOption",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 2206,
+          "firstToolMs": 2188,
+          "rounds": [
+            2159
+          ],
+          "tools": [
+            {
+              "name": "requestCheckout",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 2867,
+          "firstToolMs": 2844,
+          "rounds": [
+            2794
+          ],
+          "tools": [
+            {
+              "name": "confirmCheckout",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r2-en-family",
+      "kioskId": "airport_rail",
+      "type": "2-same-item-different-options",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "express_city_center",
+          "variant": "single",
+          "qty": 2,
+          "selections": {
+            "passenger": [
+              "adult"
+            ]
+          }
+        },
+        {
+          "itemId": "express_city_center",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "passenger": [
+              "child"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 4670,
+          "firstToolMs": 4138,
+          "rounds": [
+            4065
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r2-ko-family",
+      "kioskId": "airport_rail",
+      "type": "2-same-item-different-options",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "all_stop_old_town",
+          "variant": "single",
+          "qty": 2,
+          "selections": {
+            "passenger": [
+              "adult"
+            ]
+          }
+        },
+        {
+          "itemId": "all_stop_old_town",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "passenger": [
+              "child"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 4899,
+          "firstToolMs": 4659,
+          "rounds": [
+            4592
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r9-en-destination",
+      "kioskId": "airport_rail",
+      "type": "9-ambiguous",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "express_city_center"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_city_center"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 6549,
+          "firstToolMs": 4916,
+          "rounds": [
+            4884,
+            1535
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r9-ko-destination",
+      "kioskId": "airport_rail",
+      "type": "9-ambiguous",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "express_city_center"
+          },
+          {
+            "kind": "item",
+            "id": "express_city_center_return"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_city_center"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 3866,
+          "firstToolMs": 2183,
+          "rounds": [
+            2168,
+            1677
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r3-ko-card-top-up",
+      "kioskId": "airport_rail",
+      "type": "3-missing-required-choice",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_option",
+        "choices": [
+          {
+            "kind": "option",
+            "id": "top_up_0"
+          },
+          {
+            "kind": "option",
+            "id": "top_up_10000"
+          },
+          {
+            "kind": "option",
+            "id": "top_up_20000"
+          },
+          {
+            "kind": "option",
+            "id": "top_up_30000"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 4973,
+          "firstToolMs": 3293,
+          "rounds": [
+            3281,
+            1667
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r6-en-sold-out",
+      "kioskId": "airport_rail",
+      "type": "6-sold-out-or-hours",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "alternatives",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "day_pass"
+          },
+          {
+            "kind": "item",
+            "id": "two_day_pass"
+          },
+          {
+            "kind": "item",
+            "id": "transit_card"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 5403,
+          "firstToolMs": 3649,
+          "rounds": [
+            3628,
+            1717
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            },
+            {
+              "name": "showMenu",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r8-en-platform",
+      "kioskId": "airport_rail",
+      "type": "8-not-in-data",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": "unknown_info",
+      "requests": [
+        {
+          "ms": 4913,
+          "firstToolMs": 2869,
+          "rounds": [
+            2858,
+            2038
+          ],
+          "tools": [
+            {
+              "name": "callStaff",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r8-ko-timetable",
+      "kioskId": "airport_rail",
+      "type": "8-not-in-data",
+      "group": "original",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": "unknown_info",
+      "requests": [
+        {
+          "ms": 5015,
+          "firstToolMs": 2633,
+          "rounds": [
+            2622,
+            2376
+          ],
+          "tools": [
+            {
+              "name": "callStaff",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r8-en-not-sold-here",
+      "kioskId": "airport_rail",
+      "type": "8-not-in-data",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "express_city_center"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_city_center"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_harbor_gate"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_expo_park"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_riverside"
+          },
+          {
+            "kind": "staff",
+            "id": "staff"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 9143,
+          "firstToolMs": 6873,
+          "rounds": [
+            6865,
+            2262
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rco-en-ill-pay",
+      "kioskId": "airport_rail",
+      "type": "checkout",
+      "group": "original",
+      "locale": "en",
+      "pass": true,
+      "status": "confirming",
+      "cart": [
+        {
+          "itemId": "all_stop_riverside",
+          "variant": "single",
+          "qty": 2,
+          "selections": {
+            "passenger": [
+              "adult"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 2424,
+          "firstToolMs": 2329,
+          "rounds": [
+            2291
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 1934,
+          "firstToolMs": 1927,
+          "rounds": [
+            1892
+          ],
+          "tools": [
+            {
+              "name": "requestCheckout",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c-en-grandson-not-spicy",
+      "kioskId": "malo",
+      "type": "10-colloquial",
+      "group": "colloquial",
+      "locale": "en",
+      "pass": false,
+      "reason": "no choice buttons",
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "hot_coffee",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 8465,
+          "firstToolMs": 8323,
+          "rounds": [
+            8216
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c-ko-not-spicy-burger",
+      "kioskId": "malo",
+      "type": "10-colloquial",
+      "group": "colloquial",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bulgogi_burger"
+          },
+          {
+            "kind": "item",
+            "id": "classic_burger"
+          },
+          {
+            "kind": "item",
+            "id": "double_cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bacon_cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "crispy_chicken_burger"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 5407,
+          "firstToolMs": 2686,
+          "rounds": [
+            2668,
+            2641
+          ],
+          "tools": [
+            {
+              "name": "showMenu",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c-en-usual-burger",
+      "kioskId": "malo",
+      "type": "10-colloquial",
+      "group": "colloquial",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bulgogi_burger"
+          },
+          {
+            "kind": "item",
+            "id": "classic_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bacon_cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "double_cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "spicy_chicken_burger"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": []
+      },
+      "requests": [
+        {
+          "ms": 7047,
+          "firstToolMs": 4592,
+          "rounds": [
+            4575,
+            2398
+          ],
+          "tools": [
+            {
+              "name": "showMenu",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c-ko-for-the-kids",
+      "kioskId": "malo",
+      "type": "10-colloquial",
+      "group": "colloquial",
+      "locale": "ko",
+      "pass": false,
+      "reason": "staff called",
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": "unknown_info",
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": []
+      },
+      "requests": [
+        {
+          "ms": 9955,
+          "firstToolMs": 7323,
+          "rounds": [
+            7299,
+            2612
+          ],
+          "tools": [
+            {
+              "name": "callStaff",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c-ko-best-seller",
+      "kioskId": "malo",
+      "type": "10-colloquial",
+      "group": "colloquial",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "soft_cone"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": [
+          "cheese_burger",
+          "soft_cone"
+        ]
+      },
+      "requests": [
+        {
+          "ms": 3975,
+          "firstToolMs": 2040,
+          "rounds": [
+            2026,
+            1926
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c-mixed-ko-en",
+      "kioskId": "malo",
+      "type": "10-colloquial",
+      "group": "colloquial",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 1,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "cola"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 7096,
+          "firstToolMs": 2163,
+          "rounds": [
+            2133,
+            2711,
+            2191
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c-ko-misheard",
+      "kioskId": "malo",
+      "type": "10-colloquial",
+      "group": "colloquial",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 1,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "cola"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 6527,
+          "firstToolMs": 2145,
+          "rounds": [
+            2099,
+            2310,
+            2043
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c-en-cheapest-burger",
+      "kioskId": "malo",
+      "type": "10-colloquial",
+      "group": "colloquial",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_variant",
+        "choices": [
+          {
+            "kind": "variant",
+            "id": "single"
+          },
+          {
+            "kind": "variant",
+            "id": "set"
+          },
+          {
+            "kind": "variant",
+            "id": "largeSet"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 6530,
+          "firstToolMs": 4102,
+          "rounds": [
+            2012,
+            2010,
+            2260
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "NEEDS_CHOICE"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c-ko-low-calorie-drink",
+      "kioskId": "malo",
+      "type": "10-colloquial",
+      "group": "colloquial",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "zero_cola"
+          },
+          {
+            "kind": "item",
+            "id": "iced_coffee"
+          },
+          {
+            "kind": "item",
+            "id": "hot_coffee"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": [
+          "hot_coffee"
+        ]
+      },
+      "requests": [
+        {
+          "ms": 4911,
+          "firstToolMs": 2615,
+          "rounds": [
+            2595,
+            2199
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            },
+            {
+              "name": "showMenu",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c-en-small-cold-drink",
+      "kioskId": "malo",
+      "type": "10-colloquial",
+      "group": "colloquial",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cola"
+          },
+          {
+            "kind": "item",
+            "id": "zero_cola"
+          },
+          {
+            "kind": "item",
+            "id": "cider"
+          },
+          {
+            "kind": "item",
+            "id": "lemonade"
+          },
+          {
+            "kind": "item",
+            "id": "orange_juice"
+          },
+          {
+            "kind": "item",
+            "id": "iced_tea"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": []
+      },
+      "requests": [
+        {
+          "ms": 12744,
+          "firstToolMs": 4890,
+          "rounds": [
+            4829
+          ],
+          "tools": [
+            {
+              "name": "showMenu",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c-ko-one-more-of-that",
+      "kioskId": "malo",
+      "type": "10-colloquial",
+      "group": "colloquial",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "bulgogi_burger",
+          "variant": "single",
+          "qty": 2,
+          "selections": {}
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 7971,
+          "firstToolMs": 3119,
+          "rounds": [
+            3062,
+            2406,
+            2134
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 2402,
+          "firstToolMs": 2213,
+          "rounds": [
+            2120
+          ],
+          "tools": [
+            {
+              "name": "updateCart",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c-en-same-again",
+      "kioskId": "malo",
+      "type": "10-colloquial",
+      "group": "colloquial",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "chicken_wrap",
+          "variant": "single",
+          "qty": 2,
+          "selections": {}
+        },
+        {
+          "itemId": "cola",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "size": [
+              "m"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 6920,
+          "firstToolMs": 2294,
+          "rounds": [
+            2266,
+            2679,
+            1875
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 2482,
+          "firstToolMs": 2425,
+          "rounds": [
+            2393
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l-ja-order",
+      "kioskId": "malo",
+      "type": "11-any-language",
+      "group": "language",
+      "locale": "en",
+      "language": "ja",
+      "replyLanguages": [
+        "ja"
+      ],
+      "replySources": [
+        "model"
+      ],
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 2,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "cola"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 8841,
+          "firstToolMs": 4368,
+          "rounds": [
+            4348,
+            2281,
+            2167
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l-ja-ambiguous-picker-en",
+      "kioskId": "malo",
+      "type": "11-any-language",
+      "group": "language",
+      "locale": "en",
+      "replyLanguages": [
+        "ja"
+      ],
+      "replySources": [
+        "model"
+      ],
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bulgogi_burger"
+          },
+          {
+            "kind": "item",
+            "id": "double_cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "spicy_chicken_burger"
+          },
+          {
+            "kind": "item",
+            "id": "classic_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bacon_cheese_burger"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 7776,
+          "firstToolMs": 4856,
+          "rounds": [
+            4820,
+            2315
+          ],
+          "tools": [
+            {
+              "name": "showMenu",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l-zh-order",
+      "kioskId": "malo",
+      "type": "11-any-language",
+      "group": "language",
+      "locale": "en",
+      "language": "zh",
+      "replyLanguages": [
+        "zh"
+      ],
+      "replySources": [
+        "model"
+      ],
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 2,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "cola"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 13791,
+          "firstToolMs": 6468,
+          "rounds": [
+            6452,
+            4573,
+            2742
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l-zh-ambiguous-picker-en",
+      "kioskId": "malo",
+      "type": "11-any-language",
+      "group": "language",
+      "locale": "en",
+      "replyLanguages": [
+        "zh"
+      ],
+      "replySources": [
+        "model"
+      ],
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bulgogi_burger"
+          },
+          {
+            "kind": "item",
+            "id": "double_cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "spicy_chicken_burger"
+          },
+          {
+            "kind": "item",
+            "id": "classic_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bacon_cheese_burger"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 6979,
+          "firstToolMs": 5099,
+          "rounds": [
+            5091,
+            1869
+          ],
+          "tools": [
+            {
+              "name": "showMenu",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l-es-order",
+      "kioskId": "malo",
+      "type": "11-any-language",
+      "group": "language",
+      "locale": "en",
+      "language": "es",
+      "replyLanguages": [
+        "es"
+      ],
+      "replySources": [
+        "model"
+      ],
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 2,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "cola"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 8976,
+          "firstToolMs": 4237,
+          "rounds": [
+            4223,
+            2080,
+            2649
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l-es-ambiguous-picker-en",
+      "kioskId": "malo",
+      "type": "11-any-language",
+      "group": "language",
+      "locale": "en",
+      "replyLanguages": [
+        null
+      ],
+      "replySources": [
+        "model"
+      ],
+      "pass": false,
+      "reason": "reply language ?",
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bulgogi_burger"
+          },
+          {
+            "kind": "item",
+            "id": "double_cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "spicy_chicken_burger"
+          },
+          {
+            "kind": "item",
+            "id": "classic_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bacon_cheese_burger"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 7608,
+          "firstToolMs": 5302,
+          "rounds": [
+            5295,
+            2297
+          ],
+          "tools": [
+            {
+              "name": "showMenu",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l-vi-order",
+      "kioskId": "malo",
+      "type": "11-any-language",
+      "group": "language",
+      "locale": "en",
+      "language": "vi",
+      "replyLanguages": [
+        "vi"
+      ],
+      "replySources": [
+        "model"
+      ],
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 2,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "cola"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 14636,
+          "firstToolMs": 5699,
+          "rounds": [
+            5669,
+            5669,
+            3088
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l-vi-ambiguous-picker-en",
+      "kioskId": "malo",
+      "type": "11-any-language",
+      "group": "language",
+      "locale": "en",
+      "replyLanguages": [
+        "vi"
+      ],
+      "replySources": [
+        "model"
+      ],
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bulgogi_burger"
+          },
+          {
+            "kind": "item",
+            "id": "double_cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "spicy_chicken_burger"
+          },
+          {
+            "kind": "item",
+            "id": "classic_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bacon_cheese_burger"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 8406,
+          "firstToolMs": 6340,
+          "rounds": [
+            6313,
+            2056
+          ],
+          "tools": [
+            {
+              "name": "showMenu",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l-fr-order",
+      "kioskId": "malo",
+      "type": "11-any-language",
+      "group": "language",
+      "locale": "en",
+      "language": "fr",
+      "replyLanguages": [
+        "fr"
+      ],
+      "replySources": [
+        "model"
+      ],
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 2,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "cola"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 14251,
+          "firstToolMs": 5217,
+          "rounds": [
+            5194,
+            5923,
+            3090
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l-fr-ambiguous-picker-en",
+      "kioskId": "malo",
+      "type": "11-any-language",
+      "group": "language",
+      "locale": "en",
+      "replyLanguages": [
+        "fr"
+      ],
+      "replySources": [
+        "model"
+      ],
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bulgogi_burger"
+          },
+          {
+            "kind": "item",
+            "id": "double_cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "spicy_chicken_burger"
+          },
+          {
+            "kind": "item",
+            "id": "classic_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bacon_cheese_burger"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 5979,
+          "firstToolMs": 3996,
+          "rounds": [
+            3980,
+            1975
+          ],
+          "tools": [
+            {
+              "name": "showMenu",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l-th-order",
+      "kioskId": "malo",
+      "type": "11-any-language",
+      "group": "language",
+      "locale": "en",
+      "language": "th",
+      "replyLanguages": [
+        "th"
+      ],
+      "replySources": [
+        "model"
+      ],
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 2,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "cola"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 9033,
+          "firstToolMs": 4421,
+          "rounds": [
+            4406,
+            2230,
+            2338
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l-th-ambiguous-picker-en",
+      "kioskId": "malo",
+      "type": "11-any-language",
+      "group": "language",
+      "locale": "en",
+      "replyLanguages": [
+        "th"
+      ],
+      "replySources": [
+        "model"
+      ],
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bulgogi_burger"
+          },
+          {
+            "kind": "item",
+            "id": "double_cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "spicy_chicken_burger"
+          },
+          {
+            "kind": "item",
+            "id": "classic_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bacon_cheese_burger"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 5405,
+          "firstToolMs": 3045,
+          "rounds": [
+            3024,
+            2349
+          ],
+          "tools": [
+            {
+              "name": "showMenu",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l-id-order",
+      "kioskId": "malo",
+      "type": "11-any-language",
+      "group": "language",
+      "locale": "en",
+      "language": "id",
+      "replyLanguages": [
+        "id"
+      ],
+      "replySources": [
+        "model"
+      ],
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 2,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "cola"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 14211,
+          "firstToolMs": 6361,
+          "rounds": [
+            6312,
+            4334,
+            3364
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l-id-ambiguous-picker-en",
+      "kioskId": "malo",
+      "type": "11-any-language",
+      "group": "language",
+      "locale": "en",
+      "replyLanguages": [
+        "id"
+      ],
+      "replySources": [
+        "model"
+      ],
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bulgogi_burger"
+          },
+          {
+            "kind": "item",
+            "id": "double_cheese_burger"
+          },
+          {
+            "kind": "item",
+            "id": "spicy_chicken_burger"
+          },
+          {
+            "kind": "item",
+            "id": "classic_burger"
+          },
+          {
+            "kind": "item",
+            "id": "bacon_cheese_burger"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 7516,
+          "firstToolMs": 5294,
+          "rounds": [
+            5189,
+            2199
+          ],
+          "tools": [
+            {
+              "name": "showMenu",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l-ko-on-en-tap",
+      "kioskId": "malo",
+      "type": "11-any-language",
+      "group": "language",
+      "locale": "en",
+      "replyLanguages": [
+        "ko",
+        "ko"
+      ],
+      "replySources": [
+        "model",
+        "model"
+      ],
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 1,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "cider"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 7069,
+          "firstToolMs": 4594,
+          "rounds": [
+            2102,
+            2399,
+            2279
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "NEEDS_CHOICE"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 7204,
+          "firstToolMs": 2457,
+          "rounds": [
+            2342,
+            2530,
+            2180
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l-ko-voice-like-en",
+      "kioskId": "malo",
+      "type": "11-any-language",
+      "group": "language",
+      "locale": "en",
+      "replyLanguages": [
+        "ko"
+      ],
+      "replySources": [
+        "model"
+      ],
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cheese_burger",
+          "variant": "set",
+          "qty": 2,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "cola"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 6987,
+          "firstToolMs": 2521,
+          "rounds": [
+            2429,
+            2117,
+            2323
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-ko-applied-never-generic",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "bulgogi_burger",
+          "variant": "set",
+          "qty": 2,
+          "selections": {
+            "side": [
+              "fries_m"
+            ],
+            "drink": [
+              "cider"
+            ]
+          }
+        },
+        {
+          "itemId": "apple_pie",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 6770,
+          "firstToolMs": 2514,
+          "rounds": [
+            2480,
+            2101,
+            2143
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-en-readback-pending",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_option",
+        "choices": [
+          {
+            "kind": "option",
+            "id": "cola"
+          },
+          {
+            "kind": "option",
+            "id": "zero_cola"
+          },
+          {
+            "kind": "option",
+            "id": "cider"
+          },
+          {
+            "kind": "option",
+            "id": "iced_coffee"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": [
+          "spicy_chicken_burger"
+        ]
+      },
+      "requests": [
+        {
+          "ms": 6409,
+          "firstToolMs": 4873,
+          "rounds": [
+            2329,
+            2517,
+            1532
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "NEEDS_CHOICE"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 2751,
+          "firstToolMs": null,
+          "rounds": [
+            2729
+          ],
+          "tools": []
+        }
+      ]
+    },
+    {
+      "id": "r-en-unsupported-modifier",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "spicy_chicken_burger",
+          "variant": "single",
+          "qty": 1,
+          "selections": {}
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_dine",
+        "choices": [
+          {
+            "kind": "dine",
+            "id": "eat_in"
+          },
+          {
+            "kind": "dine",
+            "id": "take_out"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 5553,
+          "firstToolMs": 1899,
+          "rounds": [
+            1882,
+            1769,
+            1848
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c-ko-swap-keeps-choices",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "bulgogi_burger",
+          "variant": "set",
+          "qty": 1,
+          "selections": {
+            "side": [
+              "fries_l"
+            ],
+            "drink": [
+              "cider"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 6560,
+          "firstToolMs": 2389,
+          "rounds": [
+            2319,
+            1909,
+            2162
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 2832,
+          "firstToolMs": 2820,
+          "rounds": [
+            2806
+          ],
+          "tools": [
+            {
+              "name": "removeFromCart",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-en-allergy-staff",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "ask_staff",
+        "choices": [
+          {
+            "kind": "staff",
+            "id": "staff"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 5640,
+          "firstToolMs": 3848,
+          "rounds": [
+            3842,
+            1790
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-ko-allergy-staff",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "ask_staff",
+        "choices": [
+          {
+            "kind": "staff",
+            "id": "staff"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 4580,
+          "firstToolMs": 2188,
+          "rounds": [
+            2165,
+            2376
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-ko-cash",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cola",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "size": [
+              "m"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "ask_staff",
+        "choices": [
+          {
+            "kind": "staff",
+            "id": "staff"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 2431,
+          "firstToolMs": 2422,
+          "rounds": [
+            2418
+          ],
+          "tools": [
+            {
+              "name": "setDineOption",
+              "code": "ok"
+            },
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 4230,
+          "firstToolMs": 2188,
+          "rounds": [
+            2178,
+            2012
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-en-cash",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "ask_staff",
+        "choices": [
+          {
+            "kind": "staff",
+            "id": "staff"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 5157,
+          "firstToolMs": 3001,
+          "rounds": [
+            2986,
+            2154
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-en-out-of-domain",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": []
+      },
+      "requests": [
+        {
+          "ms": 3012,
+          "firstToolMs": null,
+          "rounds": [
+            3006
+          ],
+          "tools": []
+        }
+      ]
+    },
+    {
+      "id": "r-en-pizza-order-before-dine",
+      "kioskId": "doughhouse",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "pepperoni",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "size": [
+              "large"
+            ],
+            "dough": [
+              "thin"
+            ],
+            "toppings": [
+              "double_cheese"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": {
+        "templateId": "pick_option",
+        "choices": [
+          {
+            "kind": "option",
+            "id": "ml_500"
+          },
+          {
+            "kind": "option",
+            "id": "l_1_25"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 4853,
+          "firstToolMs": 2564,
+          "rounds": [
+            2549,
+            2235
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 4872,
+          "firstToolMs": 2655,
+          "rounds": [
+            2651,
+            2001
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-en-rail-unknown-destination",
+      "kioskId": "airport_rail",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "express_city_center"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_harbor_gate"
+          },
+          {
+            "kind": "item",
+            "id": "day_pass"
+          },
+          {
+            "kind": "staff",
+            "id": "staff"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 8012,
+          "firstToolMs": 7940,
+          "rounds": [
+            7925
+          ],
+          "tools": []
+        }
+      ]
+    },
+    {
+      "id": "r-en-rail-to-the-airport",
+      "kioskId": "airport_rail",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "express_city_center"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_harbor_gate"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_expo_park"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_riverside"
+          },
+          {
+            "kind": "item",
+            "id": "all_stop_city_center"
+          },
+          {
+            "kind": "staff",
+            "id": "staff"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 9090,
+          "firstToolMs": 6551,
+          "rounds": [
+            6534,
+            2533
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-ko-show-menu",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 5457,
+          "firstToolMs": 2440,
+          "rounds": [
+            2418,
+            2956
+          ],
+          "tools": [
+            {
+              "name": "showMenu",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-ko-show-menu-all",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "ko",
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 5214,
+          "firstToolMs": 2026,
+          "rounds": [
+            2002,
+            3176
+          ],
+          "tools": [
+            {
+              "name": "showMenu",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-en-show-menu",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "pick_item",
+        "choices": [
+          {
+            "kind": "item",
+            "id": "soft_cone"
+          },
+          {
+            "kind": "item",
+            "id": "apple_pie"
+          },
+          {
+            "kind": "item",
+            "id": "choco_sundae"
+          },
+          {
+            "kind": "item",
+            "id": "choco_cookie"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 4798,
+          "firstToolMs": 2570,
+          "rounds": [
+            2564,
+            2196
+          ],
+          "tools": [
+            {
+              "name": "showMenu",
+              "code": "ok"
+            },
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-en-rail-show-passes",
+      "kioskId": "airport_rail",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 6588,
+          "firstToolMs": 4292,
+          "rounds": [
+            4282,
+            2273
+          ],
+          "tools": [
+            {
+              "name": "showMenu",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-en-big-qty",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "yes_no",
+        "choices": [
+          {
+            "kind": "yesno",
+            "id": "yes"
+          },
+          {
+            "kind": "yesno",
+            "id": "no"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": []
+      },
+      "requests": [
+        {
+          "ms": 7554,
+          "firstToolMs": 5524,
+          "rounds": [
+            5172,
+            1967
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-en-big-qty-yes",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "cola",
+          "variant": "single",
+          "qty": 10,
+          "selections": {
+            "size": [
+              "m"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 4542,
+          "firstToolMs": 2499,
+          "rounds": [
+            2483,
+            2035
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        },
+        {
+          "ms": 5925,
+          "firstToolMs": 5900,
+          "rounds": [
+            5871
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-ko-big-qty",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": {
+        "templateId": "yes_no",
+        "choices": [
+          {
+            "kind": "yesno",
+            "id": "yes"
+          },
+          {
+            "kind": "yesno",
+            "id": "no"
+          }
+        ]
+      },
+      "staffCalled": null,
+      "grounding": {
+        "pass": true,
+        "matched": [],
+        "mentioned": []
+      },
+      "requests": [
+        {
+          "ms": 5918,
+          "firstToolMs": 3903,
+          "rounds": [
+            3899,
+            2013
+          ],
+          "tools": [
+            {
+              "name": "offerChoices",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-en-zero-cola-one",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "ordering",
+      "cart": [
+        {
+          "itemId": "zero_cola",
+          "variant": "single",
+          "qty": 1,
+          "selections": {
+            "size": [
+              "m"
+            ]
+          }
+        }
+      ],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 3810,
+          "firstToolMs": 3582,
+          "rounds": [
+            3573
+          ],
+          "tools": [
+            {
+              "name": "addToCart",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-ko-kiosk-language",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "ko",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 11263,
+          "firstToolMs": 8589,
+          "rounds": [
+            8572,
+            2659
+          ],
+          "tools": [
+            {
+              "name": "setKioskLanguage",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-en-kiosk-language",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 6244,
+          "firstToolMs": 2983,
+          "rounds": [
+            2952,
+            2961
+          ],
+          "tools": [
+            {
+              "name": "setKioskLanguage",
+              "code": "ok"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "r-en-kiosk-language-missing",
+      "kioskId": "malo",
+      "type": "12-recovery",
+      "group": "recovery",
+      "locale": "en",
+      "pass": true,
+      "status": "connected",
+      "cart": [],
+      "pendingChoice": null,
+      "staffCalled": null,
+      "requests": [
+        {
+          "ms": 3106,
+          "firstToolMs": null,
+          "rounds": [
+            3103
+          ],
+          "tools": []
+        }
+      ]
+    }
+  ]
+}
