@@ -49,8 +49,9 @@ type Expect =
   | { staff: true }
   | { refuse: true }
   | { status: SessionStatus }
-  // QA 10-18 ("키오스크 메뉴 보여줘"): the kiosk shows this category after a showMenu call, and the cart is unchanged.
-  | { screen: { category: string } }
+  // QA 10-18 ("키오스크 메뉴 보여줘"): the kiosk shows this category after a showMenu call, and the cart is unchanged;
+  // `itemId` and `scroll` (QA 10-18, "키오스크 내려줘"): that item brought into view, or the page moved that way.
+  | { screen: { category: string; itemId?: string; scroll?: "down" | "up" } }
   // The last reply passes the grounding check (I-072) and names at least one of these items. `payOnKiosk` (learned
   // kiosks, I-100): the order is at the review, nobody tried confirmCheckout and the reply never offers to pay.
   | { reply: { mentionsAny?: string[]; payOnKiosk?: true } };
@@ -193,7 +194,10 @@ function judge(
   if ("screen" in e) {
     if (!unchanged) return "cart changed";
     const shown = final.screen.at === undefined ? "none" : (final.screen.category ?? "none");
-    return shown === e.screen.category ? null : `kiosk shows ${shown}`;
+    if (shown !== e.screen.category) return `kiosk shows ${shown}`;
+    if (e.screen.itemId && final.screen.itemId !== e.screen.itemId) return `kiosk item ${final.screen.itemId ?? "none"}`;
+    if (e.screen.scroll && final.screen.scroll !== e.screen.scroll) return `kiosk scroll ${final.screen.scroll ?? "none"}`;
+    return null;
   }
   if (!unchanged) return "cart changed";
   if ("choices" in e) {

@@ -211,6 +211,23 @@ describe("buildInstructions", () => {
     expect(learned).not.toContain("showMenu");
   });
 
+  // QA 10-18: a cheeseburger waiting for single-or-set never showed on the kiosk, and "키오스크 내려줘" called staff.
+  it("the item being asked about is shown, and a scroll request moves the kiosk instead of a refusal or staff", () => {
+    const DIRECT = [
+      "When you ask a question about one item (pick_variant or pick_option), call showMenu with its category and itemId in the same response as offerChoices, so the kiosk shows that item.",
+      'When the user asks to move or scroll the kiosk screen ("내려줘", "올려줘", "scroll down", "show me more"), call showMenu with the category the kiosk shows (the one you last showed or added from) and scroll down or up.',
+      "You can always move the kiosk screen with showMenu: never say you cannot, and never call staff for it.",
+    ];
+    const LEARNED = "If the user asks to see or scroll the menu, say the menu is on the kiosk screen and they can look and scroll there; never call staff for it.";
+    const learned = buildInstructions(getKiosk("doughhouse"), { locale: "en" });
+    for (const line of DIRECT) {
+      expect(text).toContain(line);
+      expect(learned).not.toContain(line);
+    }
+    expect(learned).toContain(LEARNED);
+    expect(text).not.toContain(LEARNED);
+  });
+
   // Owner 10-18: English speech on a Korean iPhone got Korean voice replies ("start in Korean" read as the reply language).
   it("the phone's language is only the start; replies follow the user's own words, named per language", () => {
     const ko = buildInstructions(k, { locale: "ko" });

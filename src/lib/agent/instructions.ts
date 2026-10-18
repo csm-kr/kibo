@@ -206,6 +206,11 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
           `When the user asks to see the menu or a kind of ${ticket ? "ticket (\"which express tickets are there?\")" : "item (\"show me the drinks\", \"what burgers are there?\")"}, call showMenu with that category so the kiosk screen shows it, then name up to 3 of its items in one short sentence.`,
           "For the whole menu, show the first category and say the category names.",
           "When you offer the items of one category with offerChoices, call showMenu with that category in the same response.",
+          // QA 10-18: a cheeseburger waiting for single-or-set left the kiosk on 매장/포장, and "키오스크 내려줘" called
+          // staff or got "that is restricted".
+          "When you ask a question about one item (pick_variant or pick_option), call showMenu with its category and itemId in the same response as offerChoices, so the kiosk shows that item.",
+          'When the user asks to move or scroll the kiosk screen ("내려줘", "올려줘", "scroll down", "show me more"), call showMenu with the category the kiosk shows (the one you last showed or added from) and scroll down or up.',
+          "You can always move the kiosk screen with showMenu: never say you cannot, and never call staff for it.",
           "showMenu changes nothing in the order and needs no dine option.",
         ]),
     ...(kiosk.upsellRules.length > 0
@@ -259,6 +264,7 @@ function parts(kiosk: KioskData, opts: OrderOptions): { rules: string[]; order: 
       ? [
           "## This kiosk",
           "This kiosk is operated by replaying its own screens. Changes take a few seconds.",
+          "If the user asks to see or scroll the menu, say the menu is on the kiosk screen and they can look and scroll there; never call staff for it.",
           "To change an item, remove it and add it again.",
           "The user pays on the kiosk itself.",
           "The dine option must be set before the first addToCart; this kiosk cannot change it later.",
