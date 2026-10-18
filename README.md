@@ -143,6 +143,17 @@ For kiosks with no integration, Gemini explores the kiosk's web screen once (Pla
 - **Getting onto a real kiosk:** kiosks that share menu data use a direct adapter (`data/kiosks/*.json`). On a web kiosk the bridge is one script in the page, added by the vendor or store (script tag, kiosk-browser extension or WebView injection). Native kiosk apps are roadmap. There are no vendor or store partnerships yet.
 - Details: [`docs/KIBO_LEARN.md`](docs/KIBO_LEARN.md), [`spikes/blind-kiosks/`](spikes/blind-kiosks/).
 
+### Setting up a real kiosk
+
+What it takes for a web kiosk that has no integration. Every step below has run only on synthetic kiosks; no vendor or store has installed KIBO.
+1. **Learn once, offline.** Run the learner ([`spikes/kibo-learn/learner.mjs`](spikes/kibo-learn/learner.mjs), `KIOSK_URL` = the kiosk's web page) on a computer with Playwright and Gemini on Vertex AI. It never taps payment controls and may finish only after the finish gate (≥ 3 passing self-test orders and the coverage audit). A Gemini run took 4.8 minutes on Doughhouse and 9.6 minutes on a snack bar kiosk it had never seen. Self-tests put items in the kiosk's cart, and the learner may tap the order button to read the total on the kiosk's order review, which on some kiosks sends the order (I-303), so learn on a test copy of the page or while the store is closed.
+2. **A person reviews the skill.** Items, prices and options are checked by a person before use; `npm run skill:import -- <skill.json> <kioskId>` converts the skill to the product format and adds the kiosk's order button to the forbidden labels.
+3. **Install the bridge.** One script in the kiosk's page, added by the vendor or store: a script tag, a kiosk-browser extension or WebView injection. In this demo the kiosk page runs inside KIBO's own page (`/learned/<kiosk>`).
+4. **Network.** The kiosk needs outbound HTTPS to the KIBO server: the bridge reads the session stream and reports every replay with the kiosk token ([`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) sequence 3). The server sends no cross-origin (CORS) headers today, because the demo's kiosk page is served from KIBO's own origin; a kiosk page on its own domain needs its origin allowed first (not built). The customer's phone needs internet too. Orders replay without AI.
+5. **When the menu changes.** A changed price makes the kiosk's own total differ, so the order stops and staff is called; a changed label needs a new learning run. There is no automatic re-learning.
+
+**Native kiosk apps: roadmap, not built.** The plan is to read and tap through the operating system's accessibility APIs (for example Windows UI Automation or Android AccessibilityService) instead of a web page ([`docs/KIBO_LEARN.md`](docs/KIBO_LEARN.md) "Known gaps").
+
 ## Results
 
 Every value comes from [`docs/plan/NUMBERS.md`](docs/plan/NUMBERS.md) and the evidence file next to it.
