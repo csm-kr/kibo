@@ -393,17 +393,17 @@ export function AssistantPanel(props: Props) {
     // drink) comes into view under the reply (owner 10-18, I-430). When both do not fit, the change itself puts the
     // line in view; a spoken reply, which lands only when the voice stops, keeps it there (it was heard), and a typed
     // reply is read, so it goes first.
+    // Room for the cart summary, which appears once the card below scrolls out of view and shortens the scroll area.
+    const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+    const reserve = itemsInCart > 0 && !choicesShown && !summaryShown ? SUMMARY_REM * rootPx : 0;
     const line = lineId ? turn.closest("[data-phone-scroll]")?.querySelector(`[data-line-id="${CSS.escape(lineId)}"]`) : null;
     if (line) {
       const changed = followedAt.current !== changeAt;
       followedAt.current = changeAt;
-      keepInView(last, line);
-      if (changed || session?.lastChange?.source !== "text") keepInView(line, line);
+      keepInView(last, line, reserve);
+      if (changed || session?.lastChange?.source !== "text") keepInView(line, line, reserve);
       return;
     }
-    // Room for the cart summary, which appears once the card below scrolls out of view.
-    const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-    const reserve = itemsInCart > 0 && !choicesShown && !summaryShown ? SUMMARY_REM * rootPx : 0;
     keepInView(last, turn, reserve, turn.querySelector("[data-choices]"));
   });
   useEffect(() => showTurn(), [lastId, working, choicesShown, pendingKey, changeAt]);
