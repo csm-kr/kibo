@@ -9,7 +9,7 @@ import { AppBar } from "@/components/phone/AppBar";
 import { ConfirmBar, ConfirmCard, DoneCard, PayCard } from "@/components/phone/Checkout";
 import { Choices } from "@/components/phone/Choices";
 import { keepInView, LastMessage, Messages, StatusChip } from "@/components/phone/Conversation";
-import { Dock, TypingSheet, voiceActive } from "@/components/phone/Dock";
+import { Dock, TypingSheet, voiceActive, voiceConnected } from "@/components/phone/Dock";
 import { AiLanguageProvider } from "@/components/phone/language";
 import { OrderCard } from "@/components/phone/OrderCard";
 import { Suggestions } from "@/components/phone/Suggestions";
@@ -202,14 +202,16 @@ export function AssistantPanel(props: Props) {
       focusText();
     },
     onNoise: () => setVoiceNote(pt("voiceNoise", locale)),
+    onShortHold: () => setVoiceNote(pt("micHoldHint", locale)),
     voiceOutput,
     utterances,
     getCart: () => session?.cart ?? [],
     getSession: () => session,
     onAction: props.onActions ? (action) => props.onActions?.([action]) : undefined,
-    greeting,
+    // By voice the greeting also says how to answer: the mic is held to talk (I-431).
+    greeting: greeting && `${greeting} ${lt("greetingHold", language)}`,
   });
-  const voiceOpen = voice.state === "listening" || voice.state === "thinking" || voice.state === "speaking";
+  const voiceOpen = voiceConnected(voice.state);
 
   /** Starts voice; call only from a tap (the microphone and iOS audio need a user gesture). */
   function startVoice() {
@@ -220,6 +222,12 @@ export function AssistantPanel(props: Props) {
   function toggleVoice() {
     if (voiceActive(voice.state)) voice.stop();
     else startVoice();
+  }
+
+  /** The connected mic went down: the microphone goes to the AI until it comes up (hold to talk). */
+  function pressMic() {
+    setVoiceNote(null);
+    voice.press();
   }
 
   async function command(type: CommandType, args: object, cartVersion?: number): Promise<boolean> {
@@ -453,6 +461,8 @@ export function AssistantPanel(props: Props) {
       disabled={!session || !deviceToken}
       sendDisabled={busy}
       onMic={toggleVoice}
+      onMicPress={pressMic}
+      onMicRelease={voice.release}
       voiceOutput={voiceOutput}
       onVoiceOutput={setVoiceOutput}
       voiceSwitch={!voiceInBar}
@@ -660,6 +670,8 @@ export function AssistantPanel(props: Props) {
             voice={voice.state}
             micDisabled={!deviceToken}
             onMic={toggleVoice}
+            onMicPress={pressMic}
+            onMicRelease={voice.release}
             typing={typing}
             onTyping={(open) => (open ? focusText() : setTyping(false))}
             note={voiceNote}

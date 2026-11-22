@@ -8,7 +8,7 @@ import { aiLanguageField, ApiError, liveToken, sendCommand } from "@/lib/client/
 import type { SpeechLanguage } from "@/lib/i18n/languages";
 import { errorCopy } from "@/lib/i18n/errors";
 import { pt } from "@/lib/i18n/phone";
-import { bargeIn } from "@/lib/voice/bargeIn";
+import { holdToTalk } from "@/lib/voice/hold";
 import { e2eFrame, e2eMarks, e2eOutput, frameRms } from "@/lib/voice/e2eMarks";
 import { base64ToFloat32, downsampleTo16k, int16ToBase64 } from "@/lib/voice/pcm";
 import { connectRelay, relayCloseOutcome, type LiveLink } from "@/lib/voice/relayLink";
@@ -22,10 +22,11 @@ import { scheduleOffers } from "@/lib/voice/offerScheduling";
 
 // The phone's Gemini Live connection (ADR-003, docs/ARCHITECTURE.md "Voice"): audio goes straight to Gemini with a
 // one-use token, or through the Vertex relay when /api/live-token says so (ADR-012; the same Live messages, so one
-// handler serves both); tool calls go to /api/command. Half-duplex, reconnect, then text. Audio, transcripts and
-// tokens are never logged.
+// handler serves both); tool calls go to /api/command. Hold to talk (src/lib/voice/hold.ts), half-duplex, reconnect,
+// then text. Audio, transcripts and tokens are never logged.
 
-export type VoiceState = "off" | "connecting" | "listening" | "thinking" | "speaking" | "reconnecting" | "error";
+/** `ready`: connected and waiting for the user to hold the mic; `listening`: the mic is held and goes to Live. */
+export type VoiceState = "off" | "connecting" | "ready" | "listening" | "thinking" | "speaking" | "reconnecting" | "error";
 
 export interface LiveVoiceOptions {
   sessionId: string | null;
@@ -46,6 +47,8 @@ export interface LiveVoiceOptions {
   onFallback(reason: string): void;
   /** Two spoken turns in a row did nothing (UX "Noise"): suggest typing or the buttons. */
   onNoise(): void;
+  /** The mic was tapped, not held: say to keep holding while talking. */
+  onShortHold?(): void;
   voiceOutput: boolean;
   /** The last utteranceSeq used by typed or spoken turns, shared with the chat so the server sees one counter. */
   utterances: { current: number };
@@ -68,9 +71,12 @@ const RETRY_DELAY_MS = 1000;
 const SETUP_TIMEOUT_MS = 10_000;
 /** The relay checks the session and opens Vertex first, with its own 10 s limits; give it room to say why it failed. */
 const RELAY_SETUP_TIMEOUT_MS = 15_000;
-/** Where the person may talk over the AI (bargeIn.ts). Not on the order review: only a yes said after the AI finished
- *  (or a tap) confirms there, so the AI's own "say yes" can never come back through the mic as the person's answer. */
-const BARGE_STATES = new Set<SessionStatus | null>(["connected", "ordering"]);
+/** Where pressing the mic stops the AI's voice at once. Not on the order review: only a yes said after the AI finished
+ *  (or a tap) confirms there, so the AI's own "say yes" can never come back through the mic as the person's answer;
+ *  a hold started while it speaks there begins to send when it has finished. */
+const CUT_IN_STATES = new Set<SessionStatus | null>(["connected", "ordering"]);
+/** With nothing coming back (a hold without words, a greeting never answered), "thinking" gives way to "ready". */
+const ANSWER_WAIT_MS = 5000;
 
 interface Run {
   ctx: AudioContext;
@@ -83,8 +89,8 @@ interface Run {
   sources: Set<AudioBufferSourceNode>;
   playEnd: number;
   mutedUntil: number;
-  /** Frames heard while the mic is shut, for a cut-in (bargeIn.ts). */
-  barge: ReturnType<typeof bargeIn>;
+  /** Runs after a release until the AI answers. */
+  answerTimer: ReturnType<typeof setTimeout> | null;
   /** The person cut in: the rest of the running reply is not played. */
   dropReply: boolean;
   /** Reconnects since the last successful setup. */
@@ -136,6 +142,26 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
   let turns = initialTurns();
   // Latency marks for the voice E2E (`?e2e=1` only); null otherwise.
   const marks = e2eMarks();
+  const hold = holdToTalk();
+
+  /** Connected with nothing going on: the mic is held, or waits for a hold. */
+  function rest(r: Run) {
+    if (r.answerTimer) clearTimeout(r.answerTimer);
+    r.answerTimer = null;
+    setState(hold.held ? "listening" : "ready");
+  }
+
+  /** The AI is about to answer (a release, or the greeting): "thinking", and back to "ready" if nothing comes. */
+  function awaitAnswer(r: Run) {
+    if (r.answerTimer) clearTimeout(r.answerTimer);
+    setState("thinking");
+    r.answerTimer = setTimeout(() => {
+      r.answerTimer = null;
+      if (run === r && !r.stopped && !hold.held && !turns.responding && r.sources.size === 0) setState("ready");
+    }, ANSWER_WAIT_MS);
+  }
+
+  const aiSpeaking = (r: Run) => r.sources.size > 0 || performance.now() < r.mutedUntil;
 
   function flushUser(r: Run) {
     const text = r.userText.trim();
@@ -188,6 +214,9 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     r.release = null;
     if (r.timer) clearInterval(r.timer);
     r.timer = null;
+    if (r.answerTimer) clearTimeout(r.answerTimer);
+    r.answerTimer = null;
+    hold.answered();
   }
 
   function end(r: Run, next: "off" | "error", reason?: string) {
@@ -223,22 +252,64 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
   }
 
   function sendFrame(r: Run, frame: Float32Array) {
-    if (!r.live) return;
-    // Half-duplex: nothing goes up while the AI voice plays or just after, unless the person talks over it (owner
-    // 10-18): then the AI stops at once and Live hears them from the start of their words.
-    if (r.sources.size > 0 || performance.now() < r.mutedUntil) {
-      // The voice E2E's fake mic loops its sentence; it sends one utterance only (e2eMarks.ts), so no cut-in there.
-      if (marks || !BARGE_STATES.has(o.status) || !r.barge.push(frame, frameRms(frame))) return;
+    // Hold to talk: the microphone goes to Live only while the button is held (hold.ts).
+    if (!r.live || !hold.held) return;
+    // Half-duplex: nothing goes up while the AI voice plays or just after.
+    const canSend = !aiSpeaking(r);
+    // The voice E2E's fake mic loops its sentence; it sends one whole utterance per page (e2eMarks.ts).
+    const whole = !marks || !canSend || e2eFrame(marks, frameRms(frame), performance.now());
+    if (hold.frame(canSend && whole)) sendPcm(r, frame);
+  }
+
+  /** Tells Live the audio of this hold ended: the turn closes without its second of silence. */
+  function endAudio(r: Run) {
+    try {
+      r.live?.sendRealtimeInput({ audioStreamEnd: true });
+    } catch {
+      // The socket is closing; onclose reconnects.
+    }
+  }
+
+  /** The mic button went down. Call from the pointer or key event. */
+  function press() {
+    const r = run;
+    if (!r || r.stopped || hold.held) return;
+    if (!r.live) {
+      // Reconnecting: the hold waits, and sends from the moment the connection is back ("Reconnecting…" shows).
+      hold.press(performance.now());
+      return;
+    }
+    if (aiSpeaking(r) && CUT_IN_STATES.has(o.status)) {
+      // The person comes first (owner 10-18): the AI stops at once and the rest of its reply is not played.
       r.dropReply = turns.responding;
       stopPlayback(r);
       r.mutedUntil = 0;
-      setState("listening");
-      for (const kept of r.barge.take()) sendPcm(r, kept);
-      return;
     }
-    r.barge.reset();
-    if (marks && !e2eFrame(marks, frameRms(frame), performance.now())) return;
-    sendPcm(r, frame);
+    // The fake mic may be mid-sentence: wait for its next silence, then send one whole utterance.
+    if (marks) Object.assign(marks, { open: false, quietSince: null });
+    hold.press(performance.now());
+    if (r.answerTimer) clearTimeout(r.answerTimer);
+    r.answerTimer = null;
+    // On the review a hold started while the AI speaks shows "speaking" until it has finished.
+    if (r.sources.size === 0) setState("listening");
+  }
+
+  /** The mic button came up (or the hold was cancelled: the pointer left, the tab went away). */
+  function release() {
+    const r = run;
+    // A second release (pointer up, then the capture ending) must not undo "thinking".
+    if (!hold.held) return;
+    const { end, short } = hold.release(performance.now());
+    if (!r?.live || r.stopped) return;
+    // The turn closes now, without Live waiting for a second of silence it may never hear in a loud place.
+    if (end) endAudio(r);
+    if (short) o.onShortHold?.();
+    // The AI's voice is playing: "speaking" stays.
+    if (r.sources.size > 0) return;
+    // A reply is under way with nothing playing (cut off by this press, or between two chunks): its end moves on.
+    if (turns.responding) return setState("thinking");
+    if (!end || short) return rest(r);
+    awaitAnswer(r);
   }
 
   function play(r: Run, b64: string) {
@@ -259,8 +330,8 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
       r.sources.delete(src);
       if (r.sources.size > 0) return;
       r.mutedUntil = performance.now() + MUTE_TAIL_MS;
-      // A gap between audio chunks of one reply keeps "speaking"; turnComplete then moves to listening.
-      if (!r.stopped && !turns.responding) setState("listening");
+      // A gap between audio chunks of one reply keeps "speaking"; turnComplete then moves on.
+      if (!r.stopped && !turns.responding) rest(r);
     };
   }
 
@@ -317,7 +388,15 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
 
   function onMessage(r: Run, id: string, m: LiveServerMessage) {
     const events = turnEvents(m);
+    const wasResponding = turns.responding;
     countTurns(events);
+    if (!wasResponding && turns.responding) {
+      // The AI began to answer. A hold still down is over: more audio would cut the answer off (hold.ts).
+      if (hold.held) setState("thinking");
+      if (hold.answered()) endAudio(r);
+      if (r.answerTimer) clearTimeout(r.answerTimer);
+      r.answerTimer = null;
+    }
     r.greeter.onMessage(events);
     const sc = m.serverContent;
     if (marks) {
@@ -329,7 +408,9 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
 
     if (m.setupComplete) {
       r.retries = 0;
-      setState("listening");
+      // An answer is on its way (the greeting sent as the connection opened): "thinking" goes on.
+      if (r.answerTimer && !hold.held) setState("thinking");
+      else rest(r);
     }
     if (events.some((e) => e.type === "userSpeech")) r.respHeard = true;
     if (m.toolCall?.functionCalls?.length) r.respTools = true;
@@ -359,7 +440,7 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     if (sc?.turnComplete || sc?.interrupted) {
       flushText(r);
       r.dropReply = false;
-      if (r.sources.size === 0) setState("listening");
+      if (r.sources.size === 0) rest(r);
     }
     const calls = m.toolCall?.functionCalls ?? [];
     for (const c of calls) r.respCalls.push(c.name ?? "");
@@ -501,7 +582,7 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
       sources: new Set(),
       playEnd: 0,
       mutedUntil: 0,
-      barge: bargeIn(),
+      answerTimer: null,
       dropReply: false,
       retries: 0,
       deadline: 0,
@@ -576,6 +657,8 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     if (!turn || !r.live) return;
     try {
       r.live.sendClientContent(turn);
+      // "Thinking" until the greeting is heard: a hold started before it would be ended by it.
+      awaitAnswer(r);
     } catch {
       // A closing socket: nothing to greet.
     }
@@ -599,6 +682,8 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
   return {
     start,
     sendText,
+    press,
+    release,
     stop() {
       if (run) end(run, "off");
     },
@@ -617,6 +702,9 @@ export function useLiveVoice(opts: LiveVoiceOptions): {
   stop(): void;
   /** A tapped answer as one user turn on the open connection; false when there is none (send it as text). */
   sendText(text: string): boolean;
+  /** The mic button went down: the microphone goes to Live until `release`. */
+  press(): void;
+  release(): void;
   secondsLeft: number | null;
 } {
   const [state, setState] = useState<VoiceState>("off");
@@ -634,5 +722,17 @@ export function useLiveVoice(opts: LiveVoiceOptions): {
     if (opts.status === "paid" || opts.status === "expired") voice.stop();
   }, [opts.status, voice]);
 
-  return { state, start: voice.start, stop: voice.stop, sendText: voice.sendText, secondsLeft };
+  // A hold cannot outlive the screen: the tab hidden or the window out of focus releases it.
+  useEffect(() => {
+    const release = () => voice.release();
+    const hidden = () => document.hidden && voice.release();
+    window.addEventListener("blur", release);
+    document.addEventListener("visibilitychange", hidden);
+    return () => {
+      window.removeEventListener("blur", release);
+      document.removeEventListener("visibilitychange", hidden);
+    };
+  }, [voice]);
+
+  return { state, start: voice.start, stop: voice.stop, sendText: voice.sendText, press: voice.press, release: voice.release, secondsLeft };
 }

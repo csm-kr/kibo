@@ -61,7 +61,8 @@ export function turnsReducer(s: TurnState, e: TurnEvent): TurnState {
       if (!s.responding) return s;
       // Half-duplex mutes the mic while the AI speaks, so speech heard during a completed response is a late chunk
       // of the sentence it answered, not a new utterance (I-151). Dropping it only means the phone taps the card. A
-      // cut-in (bargeIn.ts) is new speech, but never on the review, and Live answers it with an interrupted response.
+      // press on the mic that stops the AI (useLiveVoice's press) is new speech, but never on the review, and Live
+      // answers it with an interrupted response.
       return e.complete ? { ...s, heard: false, responding: false } : { ...s, responding: false };
   }
 }

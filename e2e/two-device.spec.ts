@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { chromium, expect, test, type Browser, type Page } from "@playwright/test";
 import type { CartLine } from "@/types/session";
-import { buttonWithText, command, kioskRoot, readClaim, warmPhone } from "./helpers";
+import { buttonWithText, command, kioskRoot, readClaim, sayHeld, warmPhone } from "./helpers";
 import { writeQrVideo } from "./qrVideo";
 
 // The two-device demo end to end (docs/TESTING.md "End to end", USER_JOURNEY J1): a laptop on /kiosk (browser A,
@@ -155,15 +155,14 @@ test("@live laptop kiosk and phone: the hero order spoken in Korean to the phone
     await phone.getByRole("button", { name: "Turn on the microphone" }).click({ timeout: 60_000 });
     await phone.getByRole("button", { name: "Eat here" }).click();
     const mic = phone.locator("button[data-voice-state]");
-    await expect(mic).toHaveAttribute("data-voice-state", /listening|thinking|speaking/, { timeout: 20_000 });
+    await expect(mic).toHaveAttribute("data-voice-state", /ready|thinking|speaking/, { timeout: 20_000 });
+    await sayHeld(phone);
 
     await expect.poll(() => isHero(cart), { timeout: 60_000, intervals: [200], message: `commands: ${commands.join(", ")}` }).toBe(true);
     // The kiosk on the laptop shows both lines, and the panel says the AI changed it.
     await expect(kioskRoot(kiosk)).toHaveAttribute("data-screen", "menu");
     await expect(kiosk.locator("[data-kiosk-canvas]").getByText("치즈버거 세트 ×1", { exact: true })).toHaveCount(2);
     await expect(kiosk.locator("[data-panel-order]")).toHaveText(/^Ordering · 2 items · ₩[\d,]+$/);
-    await mic.click();
-    await expect(mic).toHaveAttribute("data-voice-state", "off");
   } finally {
     await browser.close();
   }

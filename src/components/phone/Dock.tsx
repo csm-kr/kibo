@@ -1,7 +1,7 @@
 "use client";
 
 import { Keyboard, KeyboardOff, Mic, Volume2, VolumeX } from "lucide-react";
-import { useId, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent, type MouseEvent, type PointerEvent, type ReactNode } from "react";
 import type { VoiceState } from "@/hooks/useLiveVoice";
 import { pt, type PhoneTextKey } from "@/lib/i18n/phone";
 import type { Locale } from "@/types/menu";
@@ -11,7 +11,9 @@ import { COMPACT, FOCUS, ICON, PRESS, PRIMARY_SMALL, SECONDARY_SMALL } from "./u
 
 // The bottom dock (docs/UI_GUIDE.md "Phone design"): one 88px round mic in the middle, [Type] on the left, the AI
 // voice switch on the right; at most 150px tall at 390x844. The text field appears only after [Type].
-// Under the mic: what a tap does. Above the dock: what is happening, as a status pill. Color is never the only signal.
+// Under the mic: what the button does now. Above the dock: what is happening, as a status pill. Color is never the
+// only signal. Hold to talk (owner 11-22, I-431): a tap starts voice; after that the microphone is sent only while
+// the mic is held.
 
 const STATUS: Partial<Record<VoiceState, PhoneTextKey>> = {
   connecting: "micConnecting",
@@ -21,18 +23,87 @@ const STATUS: Partial<Record<VoiceState, PhoneTextKey>> = {
   reconnecting: "reconnecting",
 };
 
-/** Voice is running (or getting there): a tap stops it. */
+/** Voice is running (or getting there). */
 export function voiceActive(state: VoiceState): boolean {
   return state !== "off" && state !== "error";
 }
 
-/** The words under a mic: what a tap does now. */
-export function micAction(state: VoiceState): PhoneTextKey {
-  if (!voiceActive(state)) return "micTap";
-  return state === "connecting" || state === "reconnecting" ? "micCancel" : "micEnd";
+/** Voice is connected: holding the mic talks. */
+export function voiceConnected(state: VoiceState): boolean {
+  return state === "ready" || state === "listening" || state === "thinking" || state === "speaking";
 }
 
-/** The mic's state in words for screen readers, before what a tap does; its visible pill sits above the dock. */
+/** The mic is held to talk: connected, or getting the connection back (a hold then waits for it). */
+function micHolds(state: VoiceState): boolean {
+  return voiceConnected(state) || state === "reconnecting";
+}
+
+/** The words under a mic: what the button does now. */
+export function micAction(state: VoiceState): PhoneTextKey {
+  if (!voiceActive(state)) return "micTap";
+  if (!micHolds(state)) return "micCancel";
+  return state === "listening" ? "micRelease" : "micHold";
+}
+
+/** No scrolling, text selection or long-press menu starts on a held mic. */
+export const HOLD = "touch-none select-none [-webkit-touch-callout:none]";
+
+/**
+ * A mic button's events. Voice off: a tap starts it (`tap`; while it first connects, the same tap cancels). Starting
+ * stays on the click, which browsers count as the gesture audio and the microphone prompt need. Connected: the
+ * microphone is sent from pointer or key down until it comes up, leaves or is taken away. Whether a press is a tap or
+ * a hold is decided when it goes down, so a hold that outlives the connection (the socket dropped meanwhile) never
+ * ends as a tap that turns voice off.
+ */
+export function useMicEvents(state: VoiceState, on: { tap(): void; press(): void; release(): void }) {
+  // The press now down (or the last one) began as a hold: its click is not a tap.
+  const holding = useRef(false);
+  const handlers = useRef(on);
+  useEffect(() => {
+    handlers.current = on;
+  });
+  // The button goes away under the finger (the review opens): the hold ends with it.
+  useEffect(() => () => handlers.current.release(), []);
+
+  const down = () => {
+    holding.current = micHolds(state);
+    if (holding.current) on.press();
+    return holding.current;
+  };
+  const talkKey = (e: KeyboardEvent) => e.key === " " || e.key === "Enter";
+  return {
+    onClick: () => {
+      if (holding.current) holding.current = false;
+      else if (!micHolds(state)) on.tap();
+    },
+    onPointerDown: (e: PointerEvent<HTMLButtonElement>) => {
+      if (e.button !== 0) return;
+      // The hold goes on when the finger slides off the button.
+      if (down()) e.currentTarget.setPointerCapture(e.pointerId);
+    },
+    onPointerUp: () => on.release(),
+    onPointerCancel: () => {
+      // No click follows a cancelled press.
+      holding.current = false;
+      on.release();
+    },
+    onLostPointerCapture: () => on.release(),
+    onKeyDown: (e: KeyboardEvent<HTMLButtonElement>) => {
+      if (!talkKey(e)) return;
+      // No click from a key that holds (nor from its repeats): it would be read as a tap.
+      if (e.repeat ? holding.current : down()) e.preventDefault();
+    },
+    onKeyUp: (e: KeyboardEvent<HTMLButtonElement>) => {
+      if (!talkKey(e) || !holding.current) return;
+      e.preventDefault();
+      holding.current = false;
+      on.release();
+    },
+    onBlur: () => on.release(),
+    onContextMenu: (e: MouseEvent) => e.preventDefault(),
+  };
+}
+
 export function MicState({ state, locale }: { state: VoiceState; locale: Locale }) {
   const key = STATUS[state];
   return key ? <span className="sr-only">{pt(key, locale)} </span> : null;
@@ -48,7 +119,11 @@ export function Dock(props: {
   disabled: boolean;
   /** [Send]: a message or a command is on its way. */
   sendDisabled?: boolean;
+  /** A tap on the mic while voice is off (start) or connecting (cancel). */
   onMic(): void;
+  /** The connected mic went down, and came up: the microphone is sent in between. */
+  onMicPress(): void;
+  onMicRelease(): void;
   voiceOutput: boolean;
   onVoiceOutput(on: boolean): void;
   /** False on a small phone with larger text: the AI voice switch moves to the app bar's sheet (15-judge-fixes:2). */
@@ -79,12 +154,15 @@ export function Dock(props: {
   const compact = Boolean(props.compactWhileTyping) && typing && inputFocused && !active;
   const statusKey = STATUS[state];
   const noteId = useId();
+  const mic = useMicEvents(state, { tap: props.onMic, press: props.onMicPress, release: props.onMicRelease });
   // One filled primary per screen (I-142): while the text field is open, [Send] is the primary and the mic steps back.
-  const micLook = active
-    ? `border-[3px] border-kibo bg-white text-kibo ${state === "listening" ? "kibo-listen" : ""}`
-    : typing
-      ? "bg-kibo-tint text-kibo"
-      : "bg-kibo text-white";
+  // Waiting for a hold it is filled like at rest; ringed white while held or while the AI thinks or speaks.
+  const micLook =
+    active && state !== "ready"
+      ? `border-[3px] border-kibo bg-white text-kibo ${state === "listening" ? "kibo-listen" : ""}`
+      : typing
+        ? "bg-kibo-tint text-kibo"
+        : "bg-kibo text-white";
   return (
     <div className="flex flex-none flex-col gap-2">
       {(statusKey || props.status) && (
@@ -132,9 +210,9 @@ export function Dock(props: {
             data-voice-state={state}
             data-compact={compact || undefined}
             disabled={props.disabled}
-            onClick={props.onMic}
+            {...mic}
             // gap-3: the listening pulse grows 12px past the circle and must not touch the label.
-            className={`flex flex-col items-center rounded-tile disabled:opacity-60 ${compact ? "" : "gap-3"} ${PRESS} ${FOCUS}`}
+            className={`flex flex-col items-center rounded-tile disabled:opacity-60 ${compact ? "" : "gap-3"} ${HOLD} ${PRESS} ${FOCUS}`}
           >
             {/* While the keyboard is up, a 56px circle; its words stay for screen readers. */}
             <span className={`flex items-center justify-center rounded-full ${compact ? "size-14" : "size-22"} ${micLook}`}>

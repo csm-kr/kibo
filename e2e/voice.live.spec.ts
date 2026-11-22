@@ -5,7 +5,7 @@ import { getKiosk } from "@/lib/adapters/catalog";
 import { lineLabel } from "@/lib/kiosk/menu";
 import type { CartLine } from "@/types/session";
 import { evidencePath } from "../scripts/evidencePath";
-import { kioskRoot } from "./helpers";
+import { kioskRoot, sayHeld } from "./helpers";
 
 // Voice order end to end on /demo with real Gemini Live (docs/TESTING.md "End to end", "Latency"). Chromium's fake
 // mic plays a synthetic TTS sentence (e2e/fixtures, `npm run fixtures:voice`); no real person's voice. The page runs
@@ -239,10 +239,11 @@ for (const { mode, fixture, ip } of RUNS) {
       await startDemo(page);
       const mic = page.locator("button[data-voice-state]");
       await mic.click();
-      await expect(mic).toHaveAttribute("data-voice-state", /listening|thinking|speaking/, { timeout: 20_000 });
+      await expect(mic).toHaveAttribute("data-voice-state", /ready|thinking|speaking/, { timeout: 20_000 });
       run.connected = true;
 
-      // The page sends the sentence once (e2eMarks); stop the mic once the answer's first audio is in.
+      // Hold to talk: the page sends the sentence once while the mic is held (e2eMarks).
+      await sayHeld(page);
       await expect
         .poll(
           async () => (await page.evaluate(() => window.__kiboVoiceTimings?.firstAudio != null)) && isHero(cart),
@@ -265,8 +266,6 @@ for (const { mode, fixture, ip } of RUNS) {
           )
           .toMatch(/hangul=true/);
       }
-      await mic.click();
-      await expect(mic).toHaveAttribute("data-voice-state", "off");
       expect(leaked, "instructions reached the browser").toBe(false);
       expect(modes.length).toBeGreaterThan(0);
       // GEMINI_LIVE_BACKEND=vertex always sends the phone to the relay; direct mode (auto) may also go there while

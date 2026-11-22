@@ -116,7 +116,7 @@ test("/assistant at 360×800 in Korean with larger text: a cart summary when the
   const mic = page.locator("[data-voice-state]");
   await expect(mic).toHaveAttribute("data-compact", "true");
   expect((await mic.boundingBox())?.height).toBeLessThan(70);
-  await expect(mic).toHaveAccessibleName(/눌러서 말하기/);
+  await expect(mic).toHaveAccessibleName(/눌러서 시작/);
   // The hint fits beside [Send] (I-133).
   const fits = await input.evaluate((el: HTMLInputElement) => {
     const cs = getComputedStyle(el);

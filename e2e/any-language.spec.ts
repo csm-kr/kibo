@@ -29,7 +29,7 @@ test("choosing 日本語 sends language ja with voice and text, keeps English sc
   await expect(page.getByRole("button", { name: "Language and text size: 日本語" })).toBeVisible();
   // English screens, Japanese mic label.
   await expect(page.getByText("Nothing in your order yet.")).toBeVisible();
-  await expect(page.locator("[data-voice-state]")).toContainText("押して話す");
+  await expect(page.locator("[data-voice-state]")).toContainText("タップして開始");
 
   const bodies: Record<string, { locale?: string; language?: string }> = {};
   await page.route("**/api/live-token", async (route) => {

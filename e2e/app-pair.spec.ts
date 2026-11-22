@@ -142,11 +142,11 @@ test("/app/scan without a camera offers the camera app and a pasted link, checke
   await expect(page.getByRole("heading", { name: "The camera isn't available." })).toBeVisible();
   const link = page.getByLabel("Kiosk link");
   await link.fill("https://evil.example/assistant");
-  await page.getByRole("button", { name: "Open" }).click();
+  await page.getByRole("button", { name: "Open", exact: true }).click();
   await expect(page.getByText("This QR is not a KIBO kiosk.")).toBeVisible();
   await expect(page).toHaveURL(/\/app\/scan$/);
   await link.fill(s.claimUrl);
-  await page.getByRole("button", { name: "Open" }).click();
+  await page.getByRole("button", { name: "Open", exact: true }).click();
   await expect(page).toHaveURL(`/assistant?s=${s.sessionId}`);
   await expect.poll(() => page.evaluate((k) => localStorage.getItem(k), `kibo.phone.${s.sessionId}`)).not.toBeNull();
 });

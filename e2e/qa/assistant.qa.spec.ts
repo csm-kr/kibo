@@ -237,7 +237,14 @@ async function checkMicButton(page: Page, label: RegExp) {
 const pulseRunning = (page: Page) =>
   page.evaluate(() => document.getAnimations().some((a) => a instanceof CSSAnimation && a.animationName === "kibo-listen" && a.playState === "running"));
 
-test("P1 to P3 by voice: connecting, listening, stop", async ({ page, request }, info) => {
+/** Puts the pointer on the mic and holds it down. */
+async function holdMic(page: Page) {
+  const box = (await micButton(page).boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+}
+
+test("P1 to P3 by voice: connecting, ready, listening only while the mic is held", async ({ page, request }, info) => {
   const release = await fakeLive(page);
   await openPhone(page, request);
   await page.getByRole("button", { name: "Turn on the microphone" }).click();
@@ -247,23 +254,138 @@ test("P1 to P3 by voice: connecting, listening, stop", async ({ page, request },
   await check(page, info, "P2-mic-connecting");
 
   release();
-  await expect(micButton(page)).toHaveAttribute("data-voice-state", "listening");
+  // "Thinking" while the AI's greeting is on its way; this fake Live never sends one, so the mic goes on to waiting.
+  await expect(micButton(page)).toHaveAttribute("data-voice-state", "thinking");
   await page.getByRole("button", { name: "Eat here" }).click();
   await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
-  await checkMicButton(page, /Listening…/);
+  await expect(micButton(page)).toHaveAttribute("data-voice-state", "ready", { timeout: 8000 });
+  // Connected, the mic waits for a hold: its words say so, and nothing pulses.
+  await checkMicButton(page, /Hold to talk/);
+  expect(await pulseRunning(page)).toBe(false);
+  await check(page, info, "P3-mic-ready");
+
+  // Hold to talk (I-431): listening only while the mic is held.
+  await holdMic(page);
+  await expect(micButton(page)).toHaveAttribute("data-voice-state", "listening");
+  await expect(micButton(page)).toHaveAccessibleName(/Listening….*Release to send/);
   // The pulse runs only while listening, and not at all with reduced motion (checks.ts makes that an H rule too).
   expect(await pulseRunning(page)).toBe(true);
   await page.emulateMedia({ reducedMotion: "reduce" });
   expect(await pulseRunning(page)).toBe(false);
   await page.emulateMedia({ reducedMotion: null });
   await check(page, info, "P3-listening");
+  // The check's tab walk took the focus away, which lets go of the mic like lifting the finger.
+  await page.mouse.up();
+  await expect(micButton(page)).not.toHaveAttribute("data-voice-state", "listening");
+  await expect(micButton(page)).toHaveAttribute("data-voice-state", "ready", { timeout: 8000 });
 
-  await page.getByRole("switch", { name: "AI voice" }).click();
-  await expect(page.getByRole("switch", { name: "AI voice" })).toHaveAttribute("aria-checked", "false");
-  await micButton(page).click();
-  await expect(micButton(page)).toHaveAttribute("data-voice-state", "off");
-  await checkMicButton(page, /Tap to talk/);
+  // Letting go sends what was said: "Thinking…" until the AI answers.
+  await holdMic(page);
+  await expect(micButton(page)).toHaveAttribute("data-voice-state", "listening");
+  await page.waitForTimeout(600);
+  await page.mouse.up();
+  await expect(micButton(page)).toHaveAttribute("data-voice-state", "thinking");
   expect(await pulseRunning(page)).toBe(false);
+  // This fake Live never answers: the mic goes back to waiting instead of staying on "Thinking…".
+  await expect(micButton(page)).toHaveAttribute("data-voice-state", "ready", { timeout: 8000 });
+
+  // A tap is not a hold: one line says what to do.
+  await micButton(page).click();
+  await expect(page.getByText("Keep holding the button while you talk.")).toBeVisible();
+  await expect(micButton(page)).toHaveAttribute("data-voice-state", "ready");
+  await check(page, info, "P3-mic-tap-hint");
+
+  // By keyboard: Space held down talks.
+  await micButton(page).focus();
+  await page.keyboard.down("Space");
+  await expect(micButton(page)).toHaveAttribute("data-voice-state", "listening");
+  await expect(page.getByText("Keep holding the button while you talk.")).toHaveCount(0);
+  await page.waitForTimeout(500);
+  await page.keyboard.up("Space");
+  await expect(micButton(page)).not.toHaveAttribute("data-voice-state", "listening");
+});
+
+test.describe("with a finger", () => {
+  test.use({ hasTouch: true });
+
+  test("P3: a long press holds the mic until the finger lifts", async ({ page, request }) => {
+    const release = await fakeLive(page);
+    await openPhone(page, request);
+    await page.getByRole("button", { name: "Turn on the microphone" }).tap();
+    release();
+    await page.getByRole("button", { name: "Eat here" }).tap();
+    await expect(micButton(page)).toHaveAttribute("data-voice-state", "ready", { timeout: 8000 });
+
+    const box = (await micButton(page).boundingBox())!;
+    const point = { x: Math.round(box.x + box.width / 2), y: Math.round(box.y + box.height / 2) };
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [point] });
+    await expect(micButton(page)).toHaveAttribute("data-voice-state", "listening");
+    // Longer than the browser's long-press: no menu, no text selection, and the hold goes on.
+    await page.waitForTimeout(1200);
+    await expect(micButton(page)).toHaveAttribute("data-voice-state", "listening");
+    expect(await page.evaluate(() => String(getSelection()))).toBe("");
+    await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    // The lift sends what was said and is not a tap: "Thinking…", no hint.
+    await expect(micButton(page)).toHaveAttribute("data-voice-state", "thinking");
+    await expect(page.getByText("Keep holding the button while you talk.")).toHaveCount(0);
+  });
+});
+
+// R-019: the mic's words in each state (tap to start, hold to talk, release to send), in English and every AI-only
+// language, at the narrowest phone with larger text.
+test("P3: the mic's words fit at 320 wide with larger text in every language", async ({ browser, request }, info) => {
+  // One session for all the languages: each new session counts against the address's limit.
+  const ctx = await browser.newContext({
+    viewport: { width: 320, height: 700 },
+    locale: "en-US",
+    isMobile: true,
+    hasTouch: true,
+    extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.61" },
+  });
+  const page = await ctx.newPage();
+  await page.addInitScript(() => localStorage.setItem("kibo.phone.largeText", "on"));
+  (await fakeLive(page))();
+  await openPhone(page, request);
+  await page.getByRole("button", { name: "Type instead" }).click();
+  await page.getByRole("button", { name: "Eat here" }).click();
+  const mic = micButton(page);
+  const bad: string[] = [];
+  for (const lang of ["en", "ja", "zh", "es", "vi", "fr", "th", "id"]) {
+    await page.evaluate((l) => (l === "en" ? localStorage.removeItem("kibo.phone.aiLang") : localStorage.setItem("kibo.phone.aiLang", l)), lang);
+    await page.reload();
+    await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
+    await expect(mic).toHaveAttribute("data-voice-state", "off");
+    const hide = page.getByRole("button", { name: "Hide keyboard", exact: true });
+    if (await hide.isVisible()) await hide.click();
+    const measure = async (state: string) => {
+      const m = await mic.evaluate((el) => {
+        const label = el.lastElementChild!.lastElementChild!;
+        const range = document.createRange();
+        range.selectNodeContents(label);
+        const lines = new Set([...range.getClientRects()].filter((r) => r.width > 0).map((r) => Math.round(r.top))).size;
+        return {
+          text: label.textContent,
+          lang: label.getAttribute("lang"),
+          lines,
+          pageFits: document.documentElement.scrollWidth <= window.innerWidth,
+          sidesFit: [...el.parentElement!.children].every((c) => c.scrollWidth <= c.clientWidth + 1),
+        };
+      });
+      if ((m.lang ?? "en") !== lang || m.lines > 2 || !m.pageFits || !m.sidesFit) bad.push(`${lang} ${state}: ${JSON.stringify(m)}`);
+      await page.screenshot({ path: info.outputPath(`mic-${lang}-${state}.png`) });
+    };
+    await measure("off");
+    await mic.click();
+    await expect(mic).toHaveAttribute("data-voice-state", "ready", { timeout: 8000 });
+    await measure("ready");
+    await holdMic(page);
+    await expect(mic).toHaveAttribute("data-voice-state", "listening");
+    await measure("listening");
+    await page.mouse.up();
+  }
+  expect(bad).toEqual([]);
+  await ctx.close();
 });
 
 test("P3: voice gives way to text when it is busy", async ({ page, request }, info) => {
@@ -285,6 +407,128 @@ test("P3: voice gives way to text when it is busy", async ({ page, request }, in
   await expect(input).toBeFocused();
   await expect(input).toBeEnabled();
   await check(page, info, "P3-voice-fallback");
+});
+
+/** A fake Live the test can speak through: `say()` plays 3 s of (silent) AI voice, `done()` ends the AI's turn. */
+async function talkingLive(page: Page) {
+  let socket: { send(m: string): void; close(): void } | null = null;
+  let ends = 0;
+  await page.route("**/api/live-token", (route) =>
+    route.fulfill({ json: { ok: true, token: "fake", model: "gemini-3.8-live", expiresAt: Date.now() + 180_000, voiceSeconds: 600 } }),
+  );
+  await page.routeWebSocket(/generativelanguage\.googleapis\.com/, (ws) => {
+    let setup = false;
+    ws.onMessage((m) => {
+      if (String(m).includes("audioStreamEnd")) ends++;
+      if (setup) return;
+      setup = true;
+      socket = ws;
+      ws.send(JSON.stringify({ setupComplete: {} }));
+    });
+  });
+  const voice = Buffer.alloc(3 * 24000 * 2).toString("base64");
+  return {
+    /** How often the phone told Live that a hold's audio ended. */
+    ends: () => ends,
+    drop: () => socket!.close(),
+    say: () => socket!.send(JSON.stringify({ serverContent: { modelTurn: { parts: [{ inlineData: { mimeType: "audio/pcm;rate=24000", data: voice } }] } } })),
+    done: () => socket!.send(JSON.stringify({ serverContent: { turnComplete: true } })),
+  };
+}
+
+// R-035: every state here must end without the model's help or on the next thing it sends.
+test("P3 and P4: the mic pressed while the AI speaks, and the AI answering while the mic is held", async ({ page, request }) => {
+  const live = await talkingLive(page);
+  const s = await openPhone(page, request);
+  await page.getByRole("button", { name: "Type instead" }).click();
+  await page.getByRole("button", { name: "Eat here" }).click();
+  await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
+  const mic = micButton(page);
+  await mic.click();
+  await expect(mic).toHaveAttribute("data-voice-state", "ready");
+
+  // While ordering, a press stops the AI at once (the person comes first) ...
+  live.say();
+  await expect(mic).toHaveAttribute("data-voice-state", "speaking");
+  await holdMic(page);
+  await expect(mic).toHaveAttribute("data-voice-state", "listening");
+  await page.waitForTimeout(600);
+  await page.mouse.up();
+  // ... and after the release the cut-off reply is still under way: "Thinking…", never a stuck "Listening…".
+  await expect(mic).toHaveAttribute("data-voice-state", "thinking");
+  live.done();
+  await expect(mic).toHaveAttribute("data-voice-state", "ready");
+
+  // The AI answers while the mic is still held (it heard a pause): the hold is over and the answer plays.
+  await holdMic(page);
+  await expect(mic).toHaveAttribute("data-voice-state", "listening");
+  live.say();
+  await expect(mic).toHaveAttribute("data-voice-state", "speaking");
+  await page.mouse.up();
+  await expect(mic).toHaveAttribute("data-voice-state", "speaking");
+  await expect(page.getByText("Keep holding the button while you talk.")).toHaveCount(0);
+  live.done();
+  await expect(mic).toHaveAttribute("data-voice-state", "ready", { timeout: 8000 });
+
+  // A second hold begun before the first one's answer: when the answer starts, the hold ends and Live is told so,
+  // or the half sentence would stay open.
+  await holdMic(page);
+  await page.waitForTimeout(600);
+  await page.mouse.up();
+  await expect(mic).toHaveAttribute("data-voice-state", "thinking");
+  const before = live.ends();
+  await holdMic(page);
+  await expect(mic).toHaveAttribute("data-voice-state", "listening");
+  await page.waitForTimeout(300);
+  live.say();
+  await expect(mic).toHaveAttribute("data-voice-state", "speaking");
+  await expect.poll(() => live.ends()).toBe(before + 1);
+  await page.mouse.up();
+  live.done();
+  await expect(mic).toHaveAttribute("data-voice-state", "ready", { timeout: 8000 });
+
+  // On the order review a press does not stop the AI: the hold starts to send when it has finished.
+  await s.phone("addToCart", cheeseSet("cola"), { utteranceSeq: 1 });
+  expect((await s.phone("requestCheckout", {}, { utteranceSeq: 2 })).status).toBe("confirming");
+  await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "confirm");
+  await expect(mic).toHaveAccessibleName(/Hold to talk/);
+  live.say();
+  await expect(mic).toHaveAttribute("data-voice-state", "speaking");
+  await holdMic(page);
+  await page.waitForTimeout(600);
+  await expect(mic).toHaveAttribute("data-voice-state", "speaking");
+  live.done();
+  await expect(mic).toHaveAttribute("data-voice-state", "listening", { timeout: 8000 });
+  await page.mouse.up();
+  await expect(mic).not.toHaveAttribute("data-voice-state", "listening");
+});
+
+test("P3: the connection drops while the mic is held: letting go does not turn voice off, and the hold waits for it", async ({ page, request }) => {
+  const live = await talkingLive(page);
+  await openPhone(page, request);
+  await page.getByRole("button", { name: "Type instead" }).click();
+  await page.getByRole("button", { name: "Eat here" }).click();
+  const mic = micButton(page);
+  await mic.click();
+  await expect(mic).toHaveAttribute("data-voice-state", "ready");
+
+  await holdMic(page);
+  await expect(mic).toHaveAttribute("data-voice-state", "listening");
+  live.drop();
+  await expect(mic).toHaveAttribute("data-voice-state", "reconnecting");
+  await expect(mic).toHaveAccessibleName(/Reconnecting….*Hold to talk/);
+  // The lift is the end of a hold, not a tap that cancels.
+  await page.mouse.up();
+  await expect(mic).not.toHaveAttribute("data-voice-state", "off");
+  await expect(mic).toHaveAttribute("data-voice-state", "ready", { timeout: 15_000 });
+
+  // A press while it reconnects waits, and listens once the connection is back.
+  live.drop();
+  await expect(mic).toHaveAttribute("data-voice-state", "reconnecting");
+  await holdMic(page);
+  await expect(mic).toHaveAttribute("data-voice-state", "listening", { timeout: 15_000 });
+  await page.mouse.up();
+  await expect(mic).not.toHaveAttribute("data-voice-state", "off");
 });
 
 test("P3: noise hint, voice reconnecting, then text after the retries fail", async ({ page, request }, info) => {
@@ -318,7 +562,7 @@ test("P3: noise hint, voice reconnecting, then text after the retries fail", asy
   await page.getByRole("button", { name: "Eat here" }).click();
   await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
   await micButton(page).click();
-  await expect(micButton(page)).toHaveAttribute("data-voice-state", "listening");
+  await expect(micButton(page)).toHaveAttribute("data-voice-state", "ready");
 
   // UX "Noise": two heard turns in a row that run no tool.
   for (let i = 0; i < 2; i++) {

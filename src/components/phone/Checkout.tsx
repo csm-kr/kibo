@@ -7,7 +7,7 @@ import { payMethodHint, pt } from "@/lib/i18n/phone";
 import { formatWon } from "@/lib/kiosk/menu";
 import type { KioskData, Locale } from "@/types/menu";
 import type { CartLine } from "@/types/session";
-import { micAction, MicState, voiceActive } from "./Dock";
+import { HOLD, micAction, MicState, useMicEvents, voiceActive } from "./Dock";
 import { useAiText } from "./language";
 import { OrderLines, OrderTotal } from "./OrderCard";
 import { CARD, COMPACT, FOCUS, ICON, PRESS, PRIMARY, SECONDARY } from "./ui";
@@ -71,6 +71,8 @@ export function ConfirmBar(props: {
   voice: VoiceState;
   micDisabled?: boolean;
   onMic(): void;
+  onMicPress(): void;
+  onMicRelease(): void;
   typing?: boolean;
   onTyping(open: boolean): void;
   typingSheet?: ReactNode;
@@ -80,7 +82,8 @@ export function ConfirmBar(props: {
 }) {
   const { locale } = props;
   const ai = useAiText();
-  const active = voiceActive(props.voice);
+  const active = voiceActive(props.voice) && props.voice !== "ready";
+  const mic = useMicEvents(props.voice, { tap: props.onMic, press: props.onMicPress, release: props.onMicRelease });
   const typing = props.typing && !props.limit;
   return (
     <div className="flex flex-none flex-col gap-3 rounded-t-sheet bg-white px-4 pt-3 pb-3 shadow-dock">
@@ -108,8 +111,8 @@ export function ConfirmBar(props: {
           type="button"
           data-voice-state={props.voice}
           disabled={props.micDisabled}
-          onClick={props.onMic}
-          className={`flex min-h-22 flex-1 items-center gap-3 rounded-full bg-kibo-tint px-3 text-left text-kibo-deep active:bg-kibo-tint-pressed disabled:opacity-60 ${PRESS} ${FOCUS}`}
+          {...mic}
+          className={`flex min-h-22 flex-1 items-center gap-3 rounded-full bg-kibo-tint px-3 text-left text-kibo-deep active:bg-kibo-tint-pressed disabled:opacity-60 ${HOLD} ${PRESS} ${FOCUS}`}
         >
           <span
             className={`flex size-14 flex-none items-center justify-center rounded-full bg-white text-kibo ${

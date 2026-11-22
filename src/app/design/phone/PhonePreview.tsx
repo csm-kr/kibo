@@ -49,7 +49,7 @@ const CHOICE: NonNullable<Session["pendingChoice"]> = {
   ],
 };
 
-const DOCK_STATES: VoiceState[] = ["off", "listening", "thinking", "reconnecting"];
+const DOCK_STATES: VoiceState[] = ["off", "ready", "listening", "thinking", "reconnecting"];
 
 function noop() {}
 
@@ -115,7 +115,7 @@ export function PhonePreview({ kiosk }: { kiosk: KioskData }) {
               state={state}
               locale={locale}
               disabled={false}
-              onMic={noop}
+              onMic={noop} onMicPress={noop} onMicRelease={noop}
               voiceOutput={voiceOutput}
               onVoiceOutput={setVoiceOutput}
               typing={false}
@@ -131,7 +131,7 @@ export function PhonePreview({ kiosk }: { kiosk: KioskData }) {
           state="off"
           locale={locale}
           disabled={false}
-          onMic={noop}
+          onMic={noop} onMicPress={noop} onMicRelease={noop}
           voiceOutput={voiceOutput}
           onVoiceOutput={setVoiceOutput}
           typing={typing}
@@ -144,7 +144,7 @@ export function PhonePreview({ kiosk }: { kiosk: KioskData }) {
         <div className="px-4">
           <ConfirmCard kiosk={kiosk} cart={CART} locale={locale} dine={kiosk.dineOptions?.eat_in.name[locale]} onPickMore={noop} />
         </div>
-        <ConfirmBar total={TOTAL} locale={locale} onPay={noop} voice="off" onMic={noop} onTyping={noop} />
+        <ConfirmBar total={TOTAL} locale={locale} onPay={noop} voice="off" onMic={noop} onMicPress={noop} onMicRelease={noop} onTyping={noop} />
       </Frame>
 
       <Frame id="pay" title="Pay (P5)">

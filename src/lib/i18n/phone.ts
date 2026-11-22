@@ -35,6 +35,8 @@ const PHONE_TEXT = {
   greeting: { ko: "안녕하세요! 무엇을 드릴까요? 말씀만 하세요.", en: "Hi! What would you like? Just say it." },
   // While K2 and P2 ask eat here or take out, the greeting asks it too, in dineQuestion's words (owner 10-18, I-420).
   greetingDine: { ko: "안녕하세요! 드시고 가세요, 포장하세요?", en: "Hi! Eat here or take out?" },
+  // Spoken after either greeting, never shown when typing: how to answer by voice (hold to talk, I-431).
+  greetingHold: { ko: "마이크 버튼을 누른 채로 말씀해 주세요.", en: "Hold the mic button while you talk." },
   // Dine
   dineQuestion: { ko: "드시고 가세요, 포장하세요?", en: "Eat here or take out?" },
   dineOrTalk: { ko: "아니면 바로 주문을 말해 주세요.", en: "Or just tell me your order." },
@@ -181,14 +183,18 @@ const PHONE_TEXT = {
   stayHere: { ko: "여기서 글자로 주문하기", en: "Order here by typing" },
   inAppTyping: { ko: "글자로는 여기서도 주문할 수 있어요.", en: "Typing works here." },
   // Mic button: the label names the state, not only the color (docs/UI_QA.md "Color")
-  micTap: { ko: "눌러서 말하기", en: "Tap to talk" },
+  micTap: { ko: "눌러서 시작", en: "Tap to start" },
   micConnecting: { ko: "연결하고 있어요…", en: "Connecting…" },
   micListening: { ko: "듣고 있어요…", en: "Listening…" },
   micThinking: { ko: "생각하고 있어요…", en: "Thinking…" },
   micSpeaking: { ko: "말하고 있어요…", en: "Speaking…" },
-  // Under the mic: what a tap does in that state (a tap while voice runs ends it; while it connects, cancels it).
-  micEnd: { ko: "누르면 음성을 끝내요", en: "Tap to end voice" },
+  // Under the mic: what the button does in that state. A tap starts voice, or cancels it while it connects; once
+  // connected the microphone is sent only while the button is held (hold to talk, I-431).
+  micHold: { ko: "꾹 누르고 말하기", en: "Hold to talk" },
+  micRelease: { ko: "손 떼면 보내요", en: "Release to send" },
   micCancel: { ko: "누르면 취소해요", en: "Tap to cancel" },
+  // In the dock after a tap on the connected mic.
+  micHoldHint: { ko: "버튼을 누르고 있는 동안 말해 주세요.", en: "Keep holding the button while you talk." },
   aiVoice: { ko: "AI 목소리", en: "AI voice" },
   voiceOn: { ko: "음성 켜짐", en: "Voice on" },
   voiceOff: { ko: "음성 꺼짐", en: "Voice off" },

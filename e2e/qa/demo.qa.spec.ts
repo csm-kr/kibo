@@ -79,7 +79,7 @@ test("D1 to D3", async ({ page, request }, info) => {
     }),
   );
   const mic = page.locator("[data-voice-state]");
-  await expect(mic).toHaveAccessibleName(/Tap to talk/);
+  await expect(mic).toHaveAccessibleName(/Tap to start/);
   expect((await mic.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(88);
   await mic.click();
   await expect(page.getByText("Voice is busy right now. Please type instead.")).toBeVisible();

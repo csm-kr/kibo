@@ -162,3 +162,8 @@ When an issue class in `docs/ISSUE.md` is seen for the **3rd time**, it becomes 
 - From: `repeated-question` — I-378 (seen 10-16/session), I-397 (10-17/session), I-423 (10-18/session)
 - Why: three rounds of instruction lines ("ask their question only once") lowered but never ended the repeated question, because every blocking tool answer starts a new response and the model had already asked before the call.
 - Check: a change to Live tools, tool results or their instructions runs the offline token-path probe (the phone's pinned config, `offerChoices` answered as the app does) over the allergy, cash and vague-item questions in Korean and English, 20+ runs, and reports runs with a sentence said twice (target 0) and runs with nothing said (target 0).
+
+### R-035 (proposed): Every voice state that waits for the model has a way out without the model; prove it against a Live that never answers
+- From: `stuck-voice-state` — I-386 (seen 10-16/session), I-394 (10-16/session), I-435 (11-22/session)
+- Why: three times a screen kept "Speaking…", "Working…" or "Thinking…" because the state only ended on a message the model did not send (a turn with no audio, a turn that outlived its command, a greeting never answered).
+- Check: for each voice or working state a step adds or changes, name what ends it when the model stays silent (a timer, the command landing, the socket closing), and `e2e/qa/assistant.qa.spec.ts` reaches that state with its fake Live (`fakeLive`, which answers nothing) and asserts the screen leaves it.

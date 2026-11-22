@@ -4,6 +4,32 @@ import { expect, type APIRequestContext, type Browser, type Locator, type Page }
 // Shared steps for the kiosk E2E specs. The "phone" here is plain HTTP calls with the device token,
 // the same calls /assistant will make.
 
+/**
+ * Hold to talk under `?e2e=1`: holds the phone's mic while the fake microphone says its sentence once
+ * (src/lib/voice/e2eMarks.ts), and lets go 0.7 s after its last word, as a person would. 0.7 s is longer than any
+ * pause inside a fixture sentence.
+ */
+export async function sayHeld(page: Page): Promise<void> {
+  const mic = page.locator("button[data-voice-state]");
+  // After the AI's greeting.
+  await expect(mic).toHaveAttribute("data-voice-state", "ready", { timeout: 30_000 });
+  const box = (await mic.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await expect(mic).toHaveAttribute("data-voice-state", "listening");
+  await expect
+    .poll(
+      () =>
+        page.evaluate(() => {
+          const m = (window as unknown as { __kiboVoiceTimings?: { lastVoiced: number | null } }).__kiboVoiceTimings;
+          return m?.lastVoiced != null && performance.now() - m.lastVoiced > 700;
+        }),
+      { timeout: 30_000, intervals: [50] },
+    )
+    .toBe(true);
+  await page.mouse.up();
+}
+
 /** Shows the /demo scenario guide: the third column's "Scenarios" tab, unless it is selected already (#1 E). */
 export async function openScenarios(page: Page): Promise<void> {
   const tab = page.locator("[data-scenario-guide]").getByRole("tab", { name: "Scenarios" });

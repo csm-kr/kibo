@@ -1,6 +1,6 @@
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
 import { command, kioskRoot } from "../helpers";
-import { qaState, type Findings, type Profile } from "./checks";
+import { hideDevOverlay, qaState, type Findings, type Profile } from "./checks";
 
 // UI QA of the /demo frame (issue #1 batch E, docs/UI_GUIDE.md "/demo frame"): the top bar over D1, D2 and D3, the
 // question a place tab asks before it clears an open order, and the kiosk column's caption row with the kiosk's step
@@ -124,6 +124,7 @@ test.describe(() => {
 
     // From the top of the page through the top bar, the kiosk (its category rail, tiles and cart bar), the phone and
     // the scenarios, as a keyboard user goes.
+    await hideDevOverlay(page);
     await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
     const seen = new Map<string, string>();
     for (let i = 0; i < 90; i++) {

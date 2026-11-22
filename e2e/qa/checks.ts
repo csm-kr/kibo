@@ -424,6 +424,14 @@ async function screenshot(page: Page, info: TestInfo, p: Profile, state: string)
 }
 
 /** Saves a screenshot of one state, runs every check and appends a line to ui-qa.jsonl. */
+/**
+ * The Next.js dev overlay is not part of the app. Its "Insight" badge (16.4.0 asks for an upgrade, I-432) sits over
+ * the phone's dock and takes focus in a tab walk, so it is taken out of the page before a shot or a focus check.
+ */
+export async function hideDevOverlay(page: Page): Promise<void> {
+  await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
+}
+
 export async function qaState(
   page: Page,
   info: TestInfo,
@@ -431,6 +439,7 @@ export async function qaState(
   state: string,
   opts: { reflow?: boolean; afterShot?: () => Promise<void> } = {},
 ): Promise<Findings> {
+  await hideDevOverlay(page);
   const { out, viewport, shot } = await screenshot(page, info, p, state);
   await opts.afterShot?.();
 

@@ -22,7 +22,7 @@ journey
 |---|---|---|---|---|
 | Arrive | Looks at the attract screen | "Can I do this before people get annoyed?" | Does not notice the talk option | Two equal, large choices; "talk (QR)" readable from 1 m (A1) |
 | Connect | Scans the QR, opens the link | "Do I need to install something?" | Camera link not tapped; mic prompt denied | No install; picture hint before the browser prompt; deny → text and buttons (A2, A3) |
-| Order | Speaks one long sentence | "Did it understand me?" | Silence or a wrong item with no feedback | "Listening…", transcript shown, kiosk highlight within 3 s, cart card with photos (A5, A6) |
+| Order | Holds the mic and speaks one long sentence, then lets go | "Did it understand me?" | Silence or a wrong item with no feedback; taps the mic instead of holding it; people talking nearby | "Hold to talk" under the mic and "Listening…" only while it is held, "Keep holding the button while you talk." after a tap, the microphone closed between holds (I-431), transcript shown, kiosk highlight within 3 s, cart card with photos (A5, A6) |
 | Fix | Changes the fries, says no to dessert | "Will it mess up what I already have?" | Duplicate lines, upsell loop | `updateCart` edits lines; upsell once per order; [Undo] visible (A7) |
 | Pay | Reads the confirm card, inserts the card | "Am I paying the right amount?" | Total hidden or tiny; AI pays by itself | Total ≥ 32px; only her "yes" or tap moves to payment; arrow to the kiosk (A8, A9) |
 | After | Waits for her number | "What number was it?" | Number lost when the kiosk resets | Large number kept on the phone (A10, A11) |

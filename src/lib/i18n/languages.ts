@@ -33,7 +33,9 @@ export const aiOnly = (language: SpeechLanguage): language is AiOnlyLanguage => 
 /** The mic label, the review's two buttons, "insert your card into the kiosk", the order number (P3–P6) and the greeting. */
 const AI_TEXT = {
   // Short: Japanese and Chinese wrap between any two characters, and the mic's label column is ~120px at 320 wide.
-  micTap: { ja: "押して話す", zh: "点击说话", es: "Toca para hablar", vi: "Chạm để nói", fr: "Touchez pour parler", th: "แตะเพื่อพูด", id: "Ketuk untuk bicara" },
+  micTap: { ja: "タップして開始", zh: "点击开始", es: "Toca para empezar", vi: "Chạm để bắt đầu", fr: "Touchez pour démarrer", th: "แตะเพื่อเริ่ม", id: "Ketuk untuk mulai" },
+  micHold: { ja: "押しながら話す", zh: "按住说话", es: "Mantén para hablar", vi: "Giữ để nói", fr: "Maintenez pour parler", th: "กดค้างเพื่อพูด", id: "Tahan untuk bicara" },
+  micRelease: { ja: "離すと送信", zh: "松开发送", es: "Suelta para enviar", vi: "Thả để gửi", fr: "Relâchez pour envoyer", th: "ปล่อยเพื่อส่ง", id: "Lepas untuk kirim" },
   sayYes: {
     ja: "「はい」と言ってもOKです。",
     zh: "也可以说“是”。",
@@ -74,6 +76,15 @@ const AI_TEXT = {
     fr: "Bonjour ! Sur place ou à emporter ?",
     th: "สวัสดี ทานที่นี่หรือรับกลับบ้าน",
     id: "Halo! Makan di sini atau dibawa pulang?",
+  },
+  greetingHold: {
+    ja: "マイクのボタンを押しながら話してください。",
+    zh: "请按住麦克风按钮说话。",
+    es: "Mantenga pulsado el botón del micrófono mientras habla.",
+    vi: "Hãy giữ nút micro trong khi nói.",
+    fr: "Maintenez le bouton du micro pendant que vous parlez.",
+    th: "กดปุ่มไมค์ค้างไว้ขณะพูด",
+    id: "Tahan tombol mikrofon saat berbicara.",
   },
 } satisfies Partial<Record<PhoneTextKey, Record<AiOnlyLanguage, string>>>;
 
