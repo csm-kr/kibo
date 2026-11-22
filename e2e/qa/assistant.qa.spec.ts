@@ -700,6 +700,28 @@ test.describe("the first press", () => {
     await page.mouse.up();
     await expect.poll(() => live.sent()).toEqual(["greeting", "audio", "end"]);
   });
+
+  // The other screen change under a finger: the review opens. Its mic is another button (the confirm bar), so the
+  // hold ends there with its end signal, and a spoken "yes" needs a new hold after the card appeared (I-441 review).
+  test("P3 to P4: the review opens under a held mic: the hold ends and its audio is closed", async ({ page, request }) => {
+    const live = await recordingLive(page);
+    live.open();
+    const { phone } = await openPhone(page, request);
+    await page.getByRole("button", { name: "Turn on the microphone" }).click();
+    await phone("setDineOption", { option: "eat_in" }, { source: "button" });
+    await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
+    const mic = micButton(page);
+    await expect(mic).toHaveAttribute("data-voice-state", "ready", { timeout: 8000 });
+    await phone("addToCart", cheeseSet("zero_cola"), { utteranceSeq: 1 });
+    await holdMic(page);
+    await expect(mic).toHaveAttribute("data-voice-state", "listening");
+
+    await phone("requestCheckout", {}, { utteranceSeq: 1 });
+    await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "confirm");
+    await expect.poll(() => live.sent().at(-1)).toBe("end");
+    await expect(micButton(page)).not.toHaveAttribute("data-voice-state", "listening");
+    await page.mouse.up();
+  });
 });
 
 test("P3: noise hint, voice reconnecting, then text after the retries fail", async ({ page, request }, info) => {
