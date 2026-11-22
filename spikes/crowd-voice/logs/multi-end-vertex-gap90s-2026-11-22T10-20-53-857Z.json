@@ -1,0 +1,51 @@
+[
+ {
+  "level": "off",
+  "run": 1,
+  "model": "gemini-3.8-live",
+  "gapMs": 90000,
+  "reactions": [
+   1212,
+   1348,
+   889,
+   730,
+   1444
+  ],
+  "status": "paying",
+  "heroCart": true,
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "updateCart:ok",
+   "updateCart:ok",
+   "requestCheckout:ok",
+   "confirmCheckout:ok"
+  ],
+  "heard": "Two cheeseburger sets, one without pickles. Drinks, zero cola and cider.Make both fries large.No, thanks.That's all. Okay.Yes."
+ },
+ {
+  "level": "off",
+  "run": 0,
+  "model": "gemini-3.8-live",
+  "gapMs": 90000,
+  "reactions": [
+   1492,
+   1026,
+   812,
+   707,
+   1274
+  ],
+  "status": "paying",
+  "heroCart": false,
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "offerChoices:ok",
+   "updateCart:ok",
+   "updateCart:ok",
+   "requestCheckout:ok",
+   "confirmCheckout:ok"
+  ],
+  "heard": "Two cheeseburger sets, one without pickles. Drinks, zero cola and cider.Make both fries large.No, thanks.That's all. Okay.Yes."
+ }
+]

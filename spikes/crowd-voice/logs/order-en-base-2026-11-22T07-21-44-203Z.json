@@ -1,0 +1,1110 @@
+[
+ {
+  "level": "off",
+  "run": 2,
+  "ok": true,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 1240,
+  "cheeseburgers": 2,
+  "foreign": [],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok"
+  ],
+  "heard": "two cheeseburger sets, one without pickles. Drinks, zero cola and cider.",
+  "model": "gemini-3.8-live",
+  "sent": 369,
+  "dropped": 196,
+  "events": [
+   {
+    "t": 11720,
+    "kind": "heard",
+    "text": "two cheeseburger sets, one without pickles. Drinks, zero cola and cider."
+   },
+   {
+    "t": 11842,
+    "kind": "tool",
+    "text": "addToCart {\"options\":[{\"optionIds\":[\"fries_m\"],\"groupId\":\"side\"},{\"groupId\":\"drink\",\"optionIds\":[\"zero_cola\"]}],\"qty\":1,\"variant\":\"set\",\"itemId\":\"cheese_burger\"}"
+   },
+   {
+    "t": 11842,
+    "kind": "tool",
+    "text": "addToCart {\"itemId\":\"cheese_burger\",\"variant\":\"set\",\"qty\":1,\"options\":[{\"groupId\":\"side\",\"optionIds\":[\"fries_m\"]},{\"optionIds\":[\"cider\"],\"groupId\":\"drink\"},{\"optionIds\":[\"no_pickles\"],\"groupId\":\"ingredients\"}]}"
+   },
+   {
+    "t": 11844,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 11844,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 11887,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 12575,
+    "kind": "said",
+    "text": "Added two Cheeseburger sets, "
+   },
+   {
+    "t": 12575,
+    "kind": "audio"
+   },
+   {
+    "t": 12701,
+    "kind": "said",
+    "text": "one with Zero"
+   },
+   {
+    "t": 12834,
+    "kind": "said",
+    "text": " cola and one with"
+   },
+   {
+    "t": 12993,
+    "kind": "said",
+    "text": " Cider without pickles."
+   },
+   {
+    "t": 13113,
+    "kind": "said",
+    "text": " Would you like"
+   },
+   {
+    "t": 13242,
+    "kind": "said",
+    "text": " to add a Soft cone"
+   },
+   {
+    "t": 13392,
+    "kind": "said",
+    "text": " or Apple pie?"
+   },
+   {
+    "t": 20095,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-25",
+  "run": 1,
+  "ok": false,
+  "repliesBeforeUser": 2,
+  "repliesDuringUser": 0,
+  "reactionMs": 1138,
+  "cheeseburgers": 2,
+  "foreign": [
+   "cola"
+  ],
+  "cmds": [
+   "addToCart:NEEDS_CHOICE",
+   "addToCart:ok",
+   "addToCart:ok",
+   "addToCart:ok"
+  ],
+  "heard": "Can I get a spicy chicken burger and a large cola, please?Two cheeseburger sets, one without pickles. Drinks, zero cola and cider.하나랑 레모네이드 주세요.",
+  "model": "gemini-3.8-live",
+  "sent": 517,
+  "dropped": 48,
+  "events": [
+   {
+    "t": 4486,
+    "kind": "heard",
+    "text": "Can I get a spicy chicken burger and a large cola, please?"
+   },
+   {
+    "t": 4535,
+    "kind": "tool",
+    "text": "addToCart {\"itemId\":\"spicy_chicken_burger\",\"qty\":1}"
+   },
+   {
+    "t": 4535,
+    "kind": "tool",
+    "text": "addToCart {\"itemId\":\"cola\",\"qty\":1,\"options\":[{\"groupId\":\"size\",\"optionIds\":[\"l\"]}],\"variant\":\"single\"}"
+   },
+   {
+    "t": 4540,
+    "kind": "cmd",
+    "text": "addToCart:NEEDS_CHOICE"
+   },
+   {
+    "t": 4543,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 4587,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 11723,
+    "kind": "heard",
+    "text": "Two cheeseburger sets, one without pickles. Drinks, zero cola and cider."
+   },
+   {
+    "t": 11740,
+    "kind": "tool",
+    "text": "addToCart {\"qty\":1,\"itemId\":\"cheese_burger\",\"options\":[{\"groupId\":\"side\",\"optionIds\":[\"fries_m\"]},{\"optionIds\":[\"zero_cola\"],\"groupId\":\"drink\"},{\"optionIds\":[],\"groupId\":\"ingredients\"}],\"variant\":\"set\"}"
+   },
+   {
+    "t": 11740,
+    "kind": "tool",
+    "text": "addToCart {\"qty\":1,\"itemId\":\"cheese_burger\",\"variant\":\"set\",\"options\":[{\"groupId\":\"side\",\"optionIds\":[\"fries_m\"]},{\"optionIds\":[\"cider\"],\"groupId\":\"drink\"},{\"optionIds\":[\"no_pickles\"],\"groupId\":\"ingredients\"}]}"
+   },
+   {
+    "t": 11742,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 11744,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 11797,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 20616,
+    "kind": "heard",
+    "text": "하나랑 레모네이드 주세요."
+   },
+   {
+    "t": 20675,
+    "kind": "said",
+    "text": "매콤 치킨버거는 "
+   },
+   {
+    "t": 20675,
+    "kind": "audio"
+   },
+   {
+    "t": 20734,
+    "kind": "said",
+    "text": "단품,"
+   },
+   {
+    "t": 20774,
+    "kind": "said",
+    "text": " 세트,"
+   },
+   {
+    "t": 20883,
+    "kind": "said",
+    "text": " 라지 세트 중 어떤"
+   },
+   {
+    "t": 20885,
+    "kind": "said",
+    "text": " 걸로 드릴까요?"
+   }
+  ]
+ },
+ {
+  "level": "off",
+  "run": 1,
+  "ok": true,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 1124,
+  "cheeseburgers": 2,
+  "foreign": [],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "offerChoices:ok"
+  ],
+  "heard": "two cheeseburger sets, one without pickles. Drinks, zero cola and cider.",
+  "model": "gemini-3.8-live",
+  "sent": 313,
+  "dropped": 252,
+  "events": [
+   {
+    "t": 11721,
+    "kind": "heard",
+    "text": "two cheeseburger sets, one without pickles. Drinks, zero cola and cider."
+   },
+   {
+    "t": 11726,
+    "kind": "tool",
+    "text": "addToCart {\"itemId\":\"cheese_burger\",\"variant\":\"set\",\"options\":[{\"groupId\":\"side\",\"optionIds\":[\"fries_m\"]},{\"optionIds\":[\"zero_cola\"],\"groupId\":\"drink\"},{\"groupId\":\"ingredients\",\"optionIds\":[\"no_pickles\"]}],\"qty\":1}"
+   },
+   {
+    "t": 11726,
+    "kind": "tool",
+    "text": "addToCart {\"variant\":\"set\",\"options\":[{\"optionIds\":[\"fries_m\"],\"groupId\":\"side\"},{\"optionIds\":[\"cider\"],\"groupId\":\"drink\"}],\"qty\":1,\"itemId\":\"cheese_burger\"}"
+   },
+   {
+    "t": 11727,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 11728,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 11749,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 12319,
+    "kind": "said",
+    "text": "Added two "
+   },
+   {
+    "t": 12319,
+    "kind": "audio"
+   },
+   {
+    "t": 12512,
+    "kind": "said",
+    "text": "Cheeseburger sets,"
+   },
+   {
+    "t": 12623,
+    "kind": "said",
+    "text": " one without pickles."
+   },
+   {
+    "t": 12775,
+    "kind": "said",
+    "text": " Would you like a dessert"
+   },
+   {
+    "t": 12893,
+    "kind": "said",
+    "text": " too?"
+   },
+   {
+    "t": 12977,
+    "kind": "tool",
+    "text": "offerChoices {\"templateId\":\"upsell\",\"choices\":[{\"id\":\"soft_cone\",\"kind\":\"item\"},{\"kind\":\"item\",\"id\":\"apple_pie\"}]}"
+   },
+   {
+    "t": 12982,
+    "kind": "cmd",
+    "text": "offerChoices:ok"
+   },
+   {
+    "t": 17086,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 17600,
+    "kind": "said",
+    "text": "I've added two "
+   },
+   {
+    "t": 17600,
+    "kind": "audio"
+   },
+   {
+    "t": 17774,
+    "kind": "said",
+    "text": "Cheeseburger sets, one"
+   },
+   {
+    "t": 17888,
+    "kind": "said",
+    "text": " without pickles."
+   },
+   {
+    "t": 18018,
+    "kind": "said",
+    "text": " Would you like a dessert"
+   },
+   {
+    "t": 18210,
+    "kind": "said",
+    "text": " too?"
+   },
+   {
+    "t": 22345,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-25",
+  "run": 0,
+  "ok": true,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 3819,
+  "cheeseburgers": 2,
+  "foreign": [],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok"
+  ],
+  "heard": "So I told him we should take the later train. It is cheaper anyway and we still get there before two cheeseburger sets, one without pickles. Drinks, zero cola and cider.",
+  "model": "gemini-3.8-live",
+  "sent": 565,
+  "dropped": 0,
+  "events": [
+   {
+    "t": 14419,
+    "kind": "heard",
+    "text": "So I told him we should take the later train. It is cheaper anyway and we still get there before two cheeseburger sets, one without pickles. Drinks, zero cola and cider."
+   },
+   {
+    "t": 14421,
+    "kind": "tool",
+    "text": "addToCart {\"qty\":1,\"itemId\":\"cheese_burger\",\"variant\":\"set\",\"options\":[{\"groupId\":\"drink\",\"optionIds\":[\"zero_cola\"]}]}"
+   },
+   {
+    "t": 14421,
+    "kind": "tool",
+    "text": "addToCart {\"variant\":\"set\",\"itemId\":\"cheese_burger\",\"options\":[{\"optionIds\":[\"zero_cola\"],\"groupId\":\"drink\"}],\"qty\":1}"
+   },
+   {
+    "t": 14422,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 14423,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 14433,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-25",
+  "run": 2,
+  "ok": false,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 6087,
+  "cheeseburgers": 2,
+  "foreign": [],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "offerChoices:ok",
+   "showMenu:ok"
+  ],
+  "heard": "哇。 그 회의 진짜 길었지. 점심은 뭐 먹을까? 나는spicy chicken burger and a large cola please",
+  "model": "gemini-3.8-live",
+  "sent": 565,
+  "dropped": 0,
+  "events": [
+   {
+    "t": 11962,
+    "kind": "heard",
+    "text": "哇。 그 회의 진짜 길었지. 점심은 뭐 먹을까? 나는"
+   },
+   {
+    "t": 16689,
+    "kind": "tool",
+    "text": "addToCart {\"itemId\":\"cheese_burger\",\"options\":[{\"optionIds\":[\"zero_cola\"],\"groupId\":\"drink\"}],\"variant\":\"set\",\"qty\":1}"
+   },
+   {
+    "t": 16689,
+    "kind": "tool",
+    "text": "addToCart {\"variant\":\"set\",\"itemId\":\"cheese_burger\",\"options\":[{\"optionIds\":[\"cider\"],\"groupId\":\"drink\"},{\"optionIds\":[\"no_pickles\"],\"groupId\":\"ingredients\"}],\"qty\":1}"
+   },
+   {
+    "t": 16690,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 16691,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 16692,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 20483,
+    "kind": "heard",
+    "text": "spicy chicken burger and a large cola please"
+   },
+   {
+    "t": 20518,
+    "kind": "tool",
+    "text": "offerChoices {\"templateId\":\"pick_variant\",\"choices\":[{\"kind\":\"variant\",\"id\":\"single\"},{\"id\":\"set\",\"kind\":\"variant\"},{\"id\":\"largeSet\",\"kind\":\"variant\"}]}"
+   },
+   {
+    "t": 20518,
+    "kind": "tool",
+    "text": "showMenu {\"itemId\":\"spicy_chicken_burger\",\"category\":\"burger\"}"
+   },
+   {
+    "t": 20520,
+    "kind": "cmd",
+    "text": "offerChoices:ok"
+   },
+   {
+    "t": 20522,
+    "kind": "cmd",
+    "text": "showMenu:ok"
+   },
+   {
+    "t": 20566,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "off",
+  "run": 0,
+  "ok": true,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 1158,
+  "cheeseburgers": 2,
+  "foreign": [],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "offerChoices:ok"
+  ],
+  "heard": "two cheeseburger sets, one without pickles. Drinks, zero cola and cider.",
+  "model": "gemini-3.8-live",
+  "sent": 412,
+  "dropped": 153,
+  "events": [
+   {
+    "t": 11726,
+    "kind": "heard",
+    "text": "two cheeseburger sets, one without pickles. Drinks, zero cola and cider."
+   },
+   {
+    "t": 11760,
+    "kind": "tool",
+    "text": "addToCart {\"qty\":1,\"variant\":\"set\",\"options\":[{\"optionIds\":[\"fries_m\"],\"groupId\":\"side\"},{\"groupId\":\"drink\",\"optionIds\":[\"zero_cola\"]}],\"itemId\":\"cheese_burger\"}"
+   },
+   {
+    "t": 11760,
+    "kind": "tool",
+    "text": "addToCart {\"variant\":\"set\",\"itemId\":\"cheese_burger\",\"options\":[{\"optionIds\":[\"fries_m\"],\"groupId\":\"side\"},{\"groupId\":\"drink\",\"optionIds\":[\"cider\"]},{\"groupId\":\"ingredients\",\"optionIds\":[\"no_pickles\"]}],\"qty\":1}"
+   },
+   {
+    "t": 11761,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 11761,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 11806,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 12478,
+    "kind": "said",
+    "text": "Added two Cheeseburger "
+   },
+   {
+    "t": 12478,
+    "kind": "audio"
+   },
+   {
+    "t": 12667,
+    "kind": "said",
+    "text": "sets, one"
+   },
+   {
+    "t": 12779,
+    "kind": "said",
+    "text": " with no pickles."
+   },
+   {
+    "t": 12918,
+    "kind": "said",
+    "text": " Would you like to add"
+   },
+   {
+    "t": 13027,
+    "kind": "said",
+    "text": " a dessert?"
+   },
+   {
+    "t": 13095,
+    "kind": "tool",
+    "text": "offerChoices {\"choices\":[{\"id\":\"soft_cone\",\"kind\":\"item\"},{\"kind\":\"item\",\"id\":\"apple_pie\"}],\"templateId\":\"upsell\"}"
+   },
+   {
+    "t": 13096,
+    "kind": "cmd",
+    "text": "offerChoices:ok"
+   },
+   {
+    "t": 17141,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 17672,
+    "kind": "said",
+    "text": "<no "
+   },
+   {
+    "t": 17672,
+    "kind": "audio"
+   },
+   {
+    "t": 17787,
+    "kind": "said",
+    "text": "speech>{pause}"
+   },
+   {
+    "t": 18583,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-20",
+  "run": 2,
+  "ok": false,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 6154,
+  "cheeseburgers": 2,
+  "foreign": [],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "offerChoices:ok",
+   "showMenu:ok"
+  ],
+  "heard": "哇, 거의 진짜 길었지. 점심은 뭐 먹을까? 나는spicy chicken burger and a large cola, please.",
+  "model": "gemini-3.8-live",
+  "sent": 565,
+  "dropped": 0,
+  "events": [
+   {
+    "t": 11957,
+    "kind": "heard",
+    "text": "哇, 거의 진짜 길었지. 점심은 뭐 먹을까? 나는"
+   },
+   {
+    "t": 16756,
+    "kind": "tool",
+    "text": "addToCart {\"itemId\":\"cheese_burger\",\"qty\":1,\"options\":[{\"groupId\":\"side\",\"optionIds\":[\"fries_m\"]},{\"optionIds\":[\"zero_cola\"],\"groupId\":\"drink\"},{\"groupId\":\"ingredients\",\"optionIds\":[\"no_pickles\"]}],\"variant\":\"set\"}"
+   },
+   {
+    "t": 16756,
+    "kind": "tool",
+    "text": "addToCart {\"variant\":\"set\",\"options\":[{\"groupId\":\"side\",\"optionIds\":[\"fries_m\"]},{\"optionIds\":[\"cider\"],\"groupId\":\"drink\"}],\"qty\":1,\"itemId\":\"cheese_burger\"}"
+   },
+   {
+    "t": 16757,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 16757,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 16758,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 20540,
+    "kind": "heard",
+    "text": "spicy chicken burger and a large cola, please."
+   },
+   {
+    "t": 20730,
+    "kind": "tool",
+    "text": "offerChoices {\"templateId\":\"pick_variant\",\"choices\":[{\"kind\":\"variant\",\"id\":\"single\"},{\"id\":\"set\",\"kind\":\"variant\"},{\"kind\":\"variant\",\"id\":\"largeSet\"}]}"
+   },
+   {
+    "t": 20730,
+    "kind": "tool",
+    "text": "showMenu {\"itemId\":\"spicy_chicken_burger\",\"category\":\"burger\"}"
+   },
+   {
+    "t": 20733,
+    "kind": "cmd",
+    "text": "offerChoices:ok"
+   },
+   {
+    "t": 20734,
+    "kind": "cmd",
+    "text": "showMenu:ok"
+   },
+   {
+    "t": 20771,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-15",
+  "run": 0,
+  "ok": false,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": null,
+  "cheeseburgers": 0,
+  "foreign": [],
+  "cmds": [],
+  "heard": "So I told him we should take the later train. It is cheaper anyway and we still get there before dinner.",
+  "model": "gemini-3.8-live",
+  "sent": 565,
+  "dropped": 0,
+  "events": [
+   {
+    "t": 21837,
+    "kind": "heard",
+    "text": "So I told him we should take the later train. It is cheaper anyway and we still get there before dinner."
+   }
+  ]
+ },
+ {
+  "level": "-15",
+  "run": 2,
+  "ok": false,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 10067,
+  "cheeseburgers": 2,
+  "foreign": [],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok"
+  ],
+  "heard": "Wow. 그 회의 진짜 길었지? 점심은 뭐 먹을까? 나는",
+  "model": "gemini-3.8-live",
+  "sent": 565,
+  "dropped": 0,
+  "events": [
+   {
+    "t": 11937,
+    "kind": "heard",
+    "text": "Wow. 그 회의 진짜 길었지? 점심은 뭐 먹을까? 나는"
+   },
+   {
+    "t": 20669,
+    "kind": "tool",
+    "text": "addToCart {\"qty\":1,\"variant\":\"set\",\"itemId\":\"cheese_burger\",\"options\":[{\"optionIds\":[\"zero_cola\"],\"groupId\":\"drink\"},{\"optionIds\":[\"no_pickles\"],\"groupId\":\"ingredients\"}]}"
+   },
+   {
+    "t": 20669,
+    "kind": "tool",
+    "text": "addToCart {\"variant\":\"set\",\"itemId\":\"cheese_burger\",\"qty\":1,\"options\":[{\"groupId\":\"drink\",\"optionIds\":[\"cider\"]}]}"
+   },
+   {
+    "t": 20670,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 20670,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 20671,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-20",
+  "run": 1,
+  "ok": false,
+  "repliesBeforeUser": 2,
+  "repliesDuringUser": 0,
+  "reactionMs": null,
+  "cheeseburgers": 0,
+  "foreign": [
+   "spicy_chicken_burger",
+   "cola"
+  ],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok"
+  ],
+  "heard": "Can I get a spicy chicken burger and a large cola, please?two cheeseburger sets, one without pickles, drinks zero cola and cider.",
+  "model": "gemini-3.8-live",
+  "sent": 565,
+  "dropped": 0,
+  "events": [
+   {
+    "t": 4505,
+    "kind": "heard",
+    "text": "Can I get a spicy chicken burger and a large cola, please?"
+   },
+   {
+    "t": 4506,
+    "kind": "tool",
+    "text": "addToCart {\"qty\":1,\"variant\":\"single\",\"itemId\":\"spicy_chicken_burger\"}"
+   },
+   {
+    "t": 4506,
+    "kind": "tool",
+    "text": "addToCart {\"options\":[{\"groupId\":\"size\",\"optionIds\":[\"l\"]}],\"qty\":1,\"variant\":\"single\",\"itemId\":\"cola\"}"
+   },
+   {
+    "t": 4508,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 4508,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 4509,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 11885,
+    "kind": "heard",
+    "text": "two cheeseburger sets, one without pickles, drinks zero cola and cider."
+   }
+  ]
+ },
+ {
+  "level": "-20",
+  "run": 0,
+  "ok": false,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 10874,
+  "cheeseburgers": 2,
+  "foreign": [],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok"
+  ],
+  "heard": "So I told him we should take the later train. It is cheaper anyway and we still get there before they close. Two cheeseburger sets, one without pickles. Drinks, zero cola and cider.",
+  "model": "gemini-3.8-live",
+  "sent": 565,
+  "dropped": 0,
+  "events": [
+   {
+    "t": 21474,
+    "kind": "heard",
+    "text": "So I told him we should take the later train. It is cheaper anyway and we still get there before they close. Two cheeseburger sets, one without pickles. Drinks, zero cola and cider."
+   },
+   {
+    "t": 21476,
+    "kind": "tool",
+    "text": "addToCart {\"qty\":1,\"options\":[{\"groupId\":\"side\",\"optionIds\":[\"fries_m\"]},{\"optionIds\":[\"zero_cola\"],\"groupId\":\"drink\"}],\"itemId\":\"cheese_burger\",\"variant\":\"set\"}"
+   },
+   {
+    "t": 21476,
+    "kind": "tool",
+    "text": "addToCart {\"options\":[{\"groupId\":\"side\",\"optionIds\":[\"fries_m\"]},{\"groupId\":\"drink\",\"optionIds\":[\"cider\"]},{\"optionIds\":[\"no_pickles\"],\"groupId\":\"ingredients\"}],\"variant\":\"set\",\"qty\":1,\"itemId\":\"cheese_burger\"}"
+   },
+   {
+    "t": 21477,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 21478,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 21478,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-15",
+  "run": 1,
+  "ok": false,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 5001,
+  "cheeseburgers": 0,
+  "foreign": [
+   "cola"
+  ],
+  "cmds": [
+   "addToCart:ok",
+   "offerChoices:ok",
+   "showMenu:ok"
+  ],
+  "heard": "Can I get a spicy chicken burger and a large cola, please?",
+  "model": "gemini-3.8-live",
+  "sent": 565,
+  "dropped": 0,
+  "events": [
+   {
+    "t": 15603,
+    "kind": "heard",
+    "text": "Can I get a spicy chicken burger and a large cola, please?"
+   },
+   {
+    "t": 15603,
+    "kind": "tool",
+    "text": "addToCart {\"options\":[{\"optionIds\":[\"l\"],\"groupId\":\"size\"}],\"itemId\":\"cola\",\"qty\":1,\"variant\":\"single\"}"
+   },
+   {
+    "t": 15603,
+    "kind": "tool",
+    "text": "offerChoices {\"templateId\":\"pick_variant\",\"choices\":[{\"id\":\"single\",\"kind\":\"variant\"},{\"id\":\"set\",\"kind\":\"variant\"},{\"id\":\"largeSet\",\"kind\":\"variant\"}]}"
+   },
+   {
+    "t": 15603,
+    "kind": "tool",
+    "text": "showMenu {\"itemId\":\"spicy_chicken_burger\",\"category\":\"burger\"}"
+   },
+   {
+    "t": 15604,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 15604,
+    "kind": "cmd",
+    "text": "offerChoices:ok"
+   },
+   {
+    "t": 15605,
+    "kind": "cmd",
+    "text": "showMenu:ok"
+   },
+   {
+    "t": 15605,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-10",
+  "run": 0,
+  "ok": false,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": null,
+  "cheeseburgers": 0,
+  "foreign": [],
+  "cmds": [],
+  "heard": "",
+  "model": "gemini-3.8-live",
+  "sent": 565,
+  "dropped": 0,
+  "events": []
+ },
+ {
+  "level": "-10",
+  "run": 1,
+  "ok": false,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": null,
+  "cheeseburgers": 0,
+  "foreign": [],
+  "cmds": [],
+  "heard": "Can I get a spicy chicken burger and a large cola, please? Two cheeseburger sets, one without pickles. Drinks, zero cola and cider.",
+  "model": "gemini-3.8-live",
+  "sent": 565,
+  "dropped": 0,
+  "events": [
+   {
+    "t": 15955,
+    "kind": "heard",
+    "text": "Can I get a spicy chicken burger and a large cola, please? Two cheeseburger sets, one without pickles. Drinks, zero cola and cider."
+   }
+  ]
+ },
+ {
+  "level": "-10",
+  "run": 2,
+  "ok": false,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 6234,
+  "cheeseburgers": 0,
+  "foreign": [
+   "spicy_chicken_burger",
+   "cola"
+  ],
+  "cmds": [
+   "showMenu:ok",
+   "offerChoices:ok",
+   "addToCart:ok",
+   "addToCart:ok"
+  ],
+  "heard": "Wow. 회의 진짜 길었지. 점심은 뭐 먹을까? 나는 불고기 버거 먹을래.spicy chicken burger and a large cola, please.",
+  "model": "gemini-3.8-live",
+  "sent": 565,
+  "dropped": 0,
+  "events": [
+   {
+    "t": 16834,
+    "kind": "heard",
+    "text": "Wow. 회의 진짜 길었지. 점심은 뭐 먹을까? 나는 불고기 버거 먹을래."
+   },
+   {
+    "t": 16836,
+    "kind": "tool",
+    "text": "showMenu {\"category\":\"burger\",\"itemId\":\"bulgogi_burger\"}"
+   },
+   {
+    "t": 16836,
+    "kind": "tool",
+    "text": "offerChoices {\"choices\":[{\"id\":\"single\",\"kind\":\"variant\"},{\"id\":\"set\",\"kind\":\"variant\"}],\"templateId\":\"pick_variant\"}"
+   },
+   {
+    "t": 16839,
+    "kind": "cmd",
+    "text": "showMenu:ok"
+   },
+   {
+    "t": 16840,
+    "kind": "cmd",
+    "text": "offerChoices:ok"
+   },
+   {
+    "t": 16841,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 20526,
+    "kind": "heard",
+    "text": "spicy chicken burger and a large cola, please."
+   },
+   {
+    "t": 20614,
+    "kind": "tool",
+    "text": "addToCart {\"variant\":\"single\",\"itemId\":\"spicy_chicken_burger\"}"
+   },
+   {
+    "t": 20614,
+    "kind": "tool",
+    "text": "addToCart {\"variant\":\"single\",\"itemId\":\"cola\",\"options\":[{\"optionIds\":[\"l\"],\"groupId\":\"size\"}]}"
+   },
+   {
+    "t": 20615,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 20615,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 20666,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-5",
+  "run": 1,
+  "ok": false,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": null,
+  "cheeseburgers": 0,
+  "foreign": [],
+  "cmds": [],
+  "heard": "",
+  "model": "gemini-3.8-live",
+  "sent": 565,
+  "dropped": 0,
+  "events": []
+ },
+ {
+  "level": "-5",
+  "run": 2,
+  "ok": false,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 10104,
+  "cheeseburgers": 0,
+  "foreign": [
+   "bulgogi_burger"
+  ],
+  "cmds": [
+   "addToCart:NEEDS_CHOICE",
+   "addToCart:NEEDS_CHOICE",
+   "addToCart:ok"
+  ],
+  "heard": "와, 그 회의 진짜 길었지. 점심은 뭐 먹을까? 나는 불고기 버거 먹고 싶어.",
+  "model": "gemini-3.8-live",
+  "sent": 565,
+  "dropped": 0,
+  "events": [
+   {
+    "t": 20706,
+    "kind": "heard",
+    "text": "와, 그 회의 진짜 길었지. 점심은 뭐 먹을까? 나는 불고기 버거 먹고 싶어."
+   },
+   {
+    "t": 20706,
+    "kind": "tool",
+    "text": "addToCart {\"itemId\":\"cheese_burger\",\"variant\":\"set\",\"qty\":1}"
+   },
+   {
+    "t": 20706,
+    "kind": "tool",
+    "text": "addToCart {\"itemId\":\"cheese_burger\",\"variant\":\"set\",\"qty\":1}"
+   },
+   {
+    "t": 20706,
+    "kind": "tool",
+    "text": "addToCart {\"qty\":1,\"options\":[{\"groupId\":\"ingredients\",\"optionIds\":[\"no_pickles\"]}],\"variant\":\"single\",\"itemId\":\"bulgogi_burger\"}"
+   },
+   {
+    "t": 20708,
+    "kind": "cmd",
+    "text": "addToCart:NEEDS_CHOICE"
+   },
+   {
+    "t": 20710,
+    "kind": "cmd",
+    "text": "addToCart:NEEDS_CHOICE"
+   },
+   {
+    "t": 20710,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 20711,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-5",
+  "run": 0,
+  "ok": false,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": null,
+  "cheeseburgers": 0,
+  "foreign": [],
+  "cmds": [],
+  "heard": "",
+  "model": "gemini-3.8-live",
+  "sent": 565,
+  "dropped": 0,
+  "events": []
+ }
+]

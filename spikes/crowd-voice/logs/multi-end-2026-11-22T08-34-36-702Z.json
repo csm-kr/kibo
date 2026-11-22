@@ -1,0 +1,97 @@
+[
+ {
+  "level": "off",
+  "run": 1,
+  "model": "gemini-3.8-live",
+  "reactions": [
+   1071,
+   918,
+   489,
+   564,
+   1067
+  ],
+  "status": "paying",
+  "heroCart": true,
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "updateCart:ok",
+   "updateCart:ok",
+   "requestCheckout:ok",
+   "confirmCheckout:ok"
+  ],
+  "heard": "two cheeseburger sets, one without pickles. Drinks, zero cola and cider.Make both fries large.No, thanks.That's all. Okay.Yes."
+ },
+ {
+  "level": "off",
+  "run": 0,
+  "model": "gemini-3.8-live",
+  "reactions": [
+   1082,
+   861,
+   594,
+   546,
+   1036
+  ],
+  "status": "paying",
+  "heroCart": false,
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "updateCart:ok",
+   "updateCart:ok",
+   "requestCheckout:ok",
+   "confirmCheckout:ok"
+  ],
+  "heard": "two cheeseburger sets, one without pickles. Drinks, zero cola and cider.Make both fries large.No, thanks.That's all. Okay.Yes."
+ },
+ {
+  "level": "-10",
+  "run": 1,
+  "model": "gemini-3.8-live",
+  "reactions": [
+   1142,
+   919,
+   387,
+   667,
+   1684
+  ],
+  "status": "paying",
+  "heroCart": true,
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "updateCart:ok",
+   "updateCart:ok",
+   "requestCheckout:ok",
+   "confirmCheckout:ok"
+  ],
+  "heard": "two cheeseburger sets, one without pickles drinks, zero cola and ciderMake those fries large.No, thanks.That's all. Okay.Yes."
+ },
+ {
+  "level": "-10",
+  "run": 0,
+  "model": "gemini-3.8-live",
+  "reactions": [
+   1281,
+   975,
+   556,
+   726,
+   630
+  ],
+  "status": "confirming",
+  "heroCart": false,
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "offerChoices:ok",
+   "updateCart:ok",
+   "updateCart:ok",
+   "requestCheckout:ok",
+   "addToCart:ok",
+   "confirmCheckout:CONFLICT",
+   "requestCheckout:ok"
+  ],
+  "heard": "two cheeseburger sets, one without pickles, drinks, zero cola and cider.Make both fries large.No, thanks.레모네이드Yes."
+ }
+]

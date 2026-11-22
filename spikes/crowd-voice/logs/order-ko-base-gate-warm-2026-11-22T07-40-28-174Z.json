@@ -1,0 +1,1189 @@
+[
+ {
+  "level": "-20",
+  "run": 1,
+  "ok": true,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 1181,
+  "cheeseburgers": 2,
+  "foreign": [],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok"
+  ],
+  "heard": "치즈버거 세트 두 개 주세요. 하나는 피클 빼고 음료는 제로 콜라랑 사이다로요.",
+  "model": "gemini-3.8-live",
+  "sent": 323,
+  "dropped": 250,
+  "events": [
+   {
+    "t": 12122,
+    "kind": "heard",
+    "text": "치즈버거 세트 두 개 주세요. 하나는 피클 빼고 음료는 제로 콜라랑 사이다로요."
+   },
+   {
+    "t": 12128,
+    "kind": "tool",
+    "text": "addToCart {\"itemId\":\"cheese_burger\",\"options\":[{\"groupId\":\"ingredients\",\"optionIds\":[\"no_pickles\"]},{\"optionIds\":[\"zero_cola\"],\"groupId\":\"drink\"}],\"variant\":\"set\",\"qty\":1}"
+   },
+   {
+    "t": 12128,
+    "kind": "tool",
+    "text": "addToCart {\"itemId\":\"cheese_burger\",\"qty\":1,\"variant\":\"set\",\"options\":[{\"optionIds\":[\"cider\"],\"groupId\":\"drink\"}]}"
+   },
+   {
+    "t": 12137,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 12138,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 12178,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 12882,
+    "kind": "said",
+    "text": "치즈버거 세트 두 "
+   },
+   {
+    "t": 12882,
+    "kind": "audio"
+   },
+   {
+    "t": 12993,
+    "kind": "said",
+    "text": "개를 추가했습니다."
+   },
+   {
+    "t": 13141,
+    "kind": "said",
+    "text": " 하나는 피클을"
+   },
+   {
+    "t": 13243,
+    "kind": "said",
+    "text": " 빼고 제로콜라를,"
+   },
+   {
+    "t": 13410,
+    "kind": "said",
+    "text": " 다른 하나는"
+   },
+   {
+    "t": 13514,
+    "kind": "said",
+    "text": " 사이다를 선택하셨어요."
+   },
+   {
+    "t": 13658,
+    "kind": "said",
+    "text": " 혹시 디저트로"
+   },
+   {
+    "t": 13794,
+    "kind": "said",
+    "text": " 소프트콘이나"
+   },
+   {
+    "t": 13937,
+    "kind": "said",
+    "text": " 애플파이도 필요하신가요?"
+   },
+   {
+    "t": 23064,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-20",
+  "run": 2,
+  "ok": true,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 1436,
+  "cheeseburgers": 2,
+  "foreign": [],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "offerChoices:ok"
+  ],
+  "heard": "치즈버거 세트 두 개 주세요. 하나는 피클 빼고 음료는 제로 콜라랑 사이다로요.",
+  "model": "gemini-3.8-live",
+  "sent": 343,
+  "dropped": 230,
+  "events": [
+   {
+    "t": 12162,
+    "kind": "heard",
+    "text": "치즈버거 세트 두 개 주세요. 하나는 피클 빼고 음료는 제로 콜라랑 사이다로요."
+   },
+   {
+    "t": 12383,
+    "kind": "tool",
+    "text": "addToCart {\"itemId\":\"cheese_burger\",\"qty\":1,\"options\":[{\"groupId\":\"ingredients\",\"optionIds\":[\"no_pickles\"]},{\"groupId\":\"drink\",\"optionIds\":[\"zero_cola\"]}],\"variant\":\"set\"}"
+   },
+   {
+    "t": 12383,
+    "kind": "tool",
+    "text": "addToCart {\"qty\":1,\"options\":[{\"optionIds\":[\"cider\"],\"groupId\":\"drink\"}],\"variant\":\"set\",\"itemId\":\"cheese_burger\"}"
+   },
+   {
+    "t": 12384,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 12385,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 12431,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 13070,
+    "kind": "tool",
+    "text": "offerChoices {\"templateId\":\"upsell\",\"choices\":[{\"kind\":\"item\",\"id\":\"soft_cone\"},{\"id\":\"apple_pie\",\"kind\":\"item\"}]}"
+   },
+   {
+    "t": 13074,
+    "kind": "cmd",
+    "text": "offerChoices:ok"
+   },
+   {
+    "t": 13122,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 13717,
+    "kind": "said",
+    "text": "치즈버거 세트 두 "
+   },
+   {
+    "t": 13717,
+    "kind": "audio"
+   },
+   {
+    "t": 13883,
+    "kind": "said",
+    "text": "개 추가되었습니다."
+   },
+   {
+    "t": 14060,
+    "kind": "said",
+    "text": " 하나는 피클을"
+   },
+   {
+    "t": 14191,
+    "kind": "said",
+    "text": " 제외하고"
+   },
+   {
+    "t": 14325,
+    "kind": "said",
+    "text": " 제로 콜라를,"
+   },
+   {
+    "t": 14437,
+    "kind": "said",
+    "text": " 다른 하나는"
+   },
+   {
+    "t": 14612,
+    "kind": "said",
+    "text": " 사이다로 구성했습니다."
+   },
+   {
+    "t": 14720,
+    "kind": "said",
+    "text": " 디저트로"
+   },
+   {
+    "t": 14876,
+    "kind": "said",
+    "text": " 소프트콘이나"
+   },
+   {
+    "t": 15019,
+    "kind": "said",
+    "text": " 애플파이는 어떠세요?"
+   },
+   {
+    "t": 24296,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-20",
+  "run": 0,
+  "ok": true,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 1233,
+  "cheeseburgers": 2,
+  "foreign": [],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "offerChoices:ok"
+  ],
+  "heard": "치즈버거 세트 두 개 주세요. 하나는 피클 빼고 음료는 제로 콜라랑 사이다로요.",
+  "model": "gemini-3.8-live",
+  "sent": 323,
+  "dropped": 250,
+  "events": [
+   {
+    "t": 12180,
+    "kind": "heard",
+    "text": "치즈버거 세트 두 개 주세요. 하나는 피클 빼고 음료는 제로 콜라랑 사이다로요."
+   },
+   {
+    "t": 12180,
+    "kind": "tool",
+    "text": "addToCart {\"options\":[{\"optionIds\":[\"no_pickles\"],\"groupId\":\"ingredients\"},{\"optionIds\":[\"zero_cola\"],\"groupId\":\"drink\"}],\"qty\":1,\"itemId\":\"cheese_burger\",\"variant\":\"set\"}"
+   },
+   {
+    "t": 12180,
+    "kind": "tool",
+    "text": "addToCart {\"options\":[{\"groupId\":\"drink\",\"optionIds\":[\"cider\"]}],\"variant\":\"set\",\"qty\":1,\"itemId\":\"cheese_burger\"}"
+   },
+   {
+    "t": 12182,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 12183,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 12216,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 12817,
+    "kind": "said",
+    "text": "치즈버거 세트 "
+   },
+   {
+    "t": 12817,
+    "kind": "audio"
+   },
+   {
+    "t": 12992,
+    "kind": "said",
+    "text": "2개가 추가되었습니다."
+   },
+   {
+    "t": 13097,
+    "kind": "said",
+    "text": " 혹시 디저트"
+   },
+   {
+    "t": 13249,
+    "kind": "said",
+    "text": " 메뉴도 함께"
+   },
+   {
+    "t": 13335,
+    "kind": "said",
+    "text": " 보시겠어요?"
+   },
+   {
+    "t": 13449,
+    "kind": "tool",
+    "text": "offerChoices {\"templateId\":\"upsell\",\"choices\":[{\"id\":\"soft_cone\",\"kind\":\"item\"},{\"id\":\"apple_pie\",\"kind\":\"item\"},{\"kind\":\"yesno\",\"id\":\"no\"}]}"
+   },
+   {
+    "t": 13450,
+    "kind": "cmd",
+    "text": "offerChoices:ok"
+   },
+   {
+    "t": 17658,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 18069,
+    "kind": "said",
+    "text": "---"
+   },
+   {
+    "t": 18069,
+    "kind": "audio"
+   },
+   {
+    "t": 22904,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "off",
+  "run": 1,
+  "ok": true,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 1225,
+  "cheeseburgers": 2,
+  "foreign": [],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok"
+  ],
+  "heard": "치즈버거 세트 두 개 주세요. 하나는 피클 빼고 음료는 제로 콜라랑 사이다로요.",
+  "model": "gemini-3.8-live",
+  "sent": 322,
+  "dropped": 251,
+  "events": [
+   {
+    "t": 12166,
+    "kind": "heard",
+    "text": "치즈버거 세트 두 개 주세요. 하나는 피클 빼고 음료는 제로 콜라랑 사이다로요."
+   },
+   {
+    "t": 12172,
+    "kind": "tool",
+    "text": "addToCart {\"qty\":1,\"itemId\":\"cheese_burger\",\"options\":[{\"optionIds\":[\"no_pickles\"],\"groupId\":\"ingredients\"},{\"groupId\":\"drink\",\"optionIds\":[\"zero_cola\"]}],\"variant\":\"set\"}"
+   },
+   {
+    "t": 12172,
+    "kind": "tool",
+    "text": "addToCart {\"variant\":\"set\",\"itemId\":\"cheese_burger\",\"qty\":1,\"options\":[{\"optionIds\":[\"cider\"],\"groupId\":\"drink\"}]}"
+   },
+   {
+    "t": 12173,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 12174,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 12209,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 12858,
+    "kind": "said",
+    "text": "치즈버거 세트 두 "
+   },
+   {
+    "t": 12858,
+    "kind": "audio"
+   },
+   {
+    "t": 12939,
+    "kind": "said",
+    "text": "개 추가되었습니다."
+   },
+   {
+    "t": 13128,
+    "kind": "said",
+    "text": " 하나는 피클을"
+   },
+   {
+    "t": 13236,
+    "kind": "said",
+    "text": " 빼고 제로콜라를,"
+   },
+   {
+    "t": 13392,
+    "kind": "said",
+    "text": " 다른 하나는"
+   },
+   {
+    "t": 13558,
+    "kind": "said",
+    "text": " 사이다로 준비했습니다."
+   },
+   {
+    "t": 13692,
+    "kind": "said",
+    "text": " 혹시 디저트로"
+   },
+   {
+    "t": 13796,
+    "kind": "said",
+    "text": " 소프트콘이나"
+   },
+   {
+    "t": 13920,
+    "kind": "said",
+    "text": " 애플파이도"
+   },
+   {
+    "t": 14124,
+    "kind": "said",
+    "text": " 추가하시겠어요?"
+   },
+   {
+    "t": 23314,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "off",
+  "run": 2,
+  "ok": true,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 1221,
+  "cheeseburgers": 2,
+  "foreign": [],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok"
+  ],
+  "heard": "치즈버거 세트 두 개 주세요. 하나는 피클 빼고 음료는 제로 콜라랑 사이다로요.",
+  "model": "gemini-3.8-live",
+  "sent": 421,
+  "dropped": 152,
+  "events": [
+   {
+    "t": 12159,
+    "kind": "heard",
+    "text": "치즈버거 세트 두 개 주세요. 하나는 피클 빼고 음료는 제로 콜라랑 사이다로요."
+   },
+   {
+    "t": 12168,
+    "kind": "tool",
+    "text": "addToCart {\"itemId\":\"cheese_burger\",\"options\":[{\"optionIds\":[\"fries_m\"],\"groupId\":\"side\"},{\"groupId\":\"drink\",\"optionIds\":[\"zero_cola\"]}],\"qty\":1,\"variant\":\"set\"}"
+   },
+   {
+    "t": 12168,
+    "kind": "tool",
+    "text": "addToCart {\"qty\":1,\"itemId\":\"cheese_burger\",\"options\":[{\"optionIds\":[\"fries_m\"],\"groupId\":\"side\"},{\"groupId\":\"drink\",\"optionIds\":[\"cider\"]},{\"groupId\":\"ingredients\",\"optionIds\":[\"no_pickles\"]}],\"variant\":\"set\"}"
+   },
+   {
+    "t": 12169,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 12170,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 12218,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 12810,
+    "kind": "said",
+    "text": "치즈버거 세트 두 "
+   },
+   {
+    "t": 12810,
+    "kind": "audio"
+   },
+   {
+    "t": 13019,
+    "kind": "said",
+    "text": "개가 추가되었습니다."
+   },
+   {
+    "t": 13148,
+    "kind": "said",
+    "text": " 디저트로"
+   },
+   {
+    "t": 13275,
+    "kind": "said",
+    "text": " 소프트콘이나"
+   },
+   {
+    "t": 13370,
+    "kind": "said",
+    "text": " 애플파이 추가하시겠어요?"
+   },
+   {
+    "t": 18593,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "off",
+  "run": 0,
+  "ok": true,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 1221,
+  "cheeseburgers": 2,
+  "foreign": [],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "offerChoices:ok"
+  ],
+  "heard": "치즈버거 세트 두 개 주세요. 하나는 피클 빼고 음료는 제로 콜라랑 사이다로요.",
+  "model": "gemini-3.8-live",
+  "sent": 373,
+  "dropped": 200,
+  "events": [
+   {
+    "t": 12168,
+    "kind": "heard",
+    "text": "치즈버거 세트 두 개 주세요. 하나는 피클 빼고 음료는 제로 콜라랑 사이다로요."
+   },
+   {
+    "t": 12168,
+    "kind": "tool",
+    "text": "addToCart {\"options\":[{\"groupId\":\"ingredients\",\"optionIds\":[\"no_pickles\"]},{\"optionIds\":[\"zero_cola\"],\"groupId\":\"drink\"}],\"variant\":\"set\",\"qty\":1,\"itemId\":\"cheese_burger\"}"
+   },
+   {
+    "t": 12168,
+    "kind": "tool",
+    "text": "addToCart {\"variant\":\"set\",\"options\":[{\"optionIds\":[\"cider\"],\"groupId\":\"drink\"}],\"qty\":1,\"itemId\":\"cheese_burger\"}"
+   },
+   {
+    "t": 12169,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 12169,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 12172,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 12912,
+    "kind": "said",
+    "text": "치즈버거 세트 두 "
+   },
+   {
+    "t": 12912,
+    "kind": "audio"
+   },
+   {
+    "t": 13115,
+    "kind": "said",
+    "text": "개가 준비되었습니다."
+   },
+   {
+    "t": 13231,
+    "kind": "said",
+    "text": " 디저트로"
+   },
+   {
+    "t": 13363,
+    "kind": "said",
+    "text": " 소프트콘이나 애플파이는"
+   },
+   {
+    "t": 13497,
+    "kind": "said",
+    "text": " 어떠세요?"
+   },
+   {
+    "t": 13632,
+    "kind": "tool",
+    "text": "offerChoices {\"choices\":[{\"kind\":\"item\",\"id\":\"soft_cone\"},{\"id\":\"apple_pie\",\"kind\":\"item\"}],\"templateId\":\"upsell\"}"
+   },
+   {
+    "t": 13634,
+    "kind": "cmd",
+    "text": "offerChoices:ok"
+   },
+   {
+    "t": 18272,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 18703,
+    "kind": "said",
+    "text": "​"
+   },
+   {
+    "t": 18703,
+    "kind": "audio"
+   },
+   {
+    "t": 20711,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-15",
+  "run": 0,
+  "ok": true,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 1268,
+  "cheeseburgers": 2,
+  "foreign": [],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok"
+  ],
+  "heard": "치즈버거 세트 두 개 주세요. 하나는 피클 빼고 음료는 제로 콜라랑 사이다로요.",
+  "model": "gemini-3.8-live",
+  "sent": 349,
+  "dropped": 224,
+  "events": [
+   {
+    "t": 12115,
+    "kind": "heard",
+    "text": "치즈버거 세트 두 개 주세요. 하나는 피클 빼고 음료는 제로 콜라랑 사이다로요."
+   },
+   {
+    "t": 12215,
+    "kind": "tool",
+    "text": "addToCart {\"itemId\":\"cheese_burger\",\"variant\":\"set\",\"options\":[{\"optionIds\":[\"no_pickles\"],\"groupId\":\"ingredients\"},{\"groupId\":\"drink\",\"optionIds\":[\"zero_cola\"]}],\"qty\":1}"
+   },
+   {
+    "t": 12215,
+    "kind": "tool",
+    "text": "addToCart {\"options\":[{\"optionIds\":[\"cider\"],\"groupId\":\"drink\"}],\"variant\":\"set\",\"itemId\":\"cheese_burger\",\"qty\":1}"
+   },
+   {
+    "t": 12216,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 12217,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 12265,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 12898,
+    "kind": "said",
+    "text": "치즈버거 세트 "
+   },
+   {
+    "t": 12898,
+    "kind": "audio"
+   },
+   {
+    "t": 13097,
+    "kind": "said",
+    "text": "2개가 준비되었습니다."
+   },
+   {
+    "t": 13168,
+    "kind": "said",
+    "text": " 하나는 피클을"
+   },
+   {
+    "t": 13226,
+    "kind": "said",
+    "text": " 뺐고, 음료는"
+   },
+   {
+    "t": 13410,
+    "kind": "said",
+    "text": " 제로 콜라와 사이다로"
+   },
+   {
+    "t": 13539,
+    "kind": "said",
+    "text": " 선택하셨어요."
+   },
+   {
+    "t": 13650,
+    "kind": "said",
+    "text": " 디저트도"
+   },
+   {
+    "t": 13828,
+    "kind": "said",
+    "text": " 함께 보시겠어요?"
+   },
+   {
+    "t": 21536,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-15",
+  "run": 1,
+  "ok": true,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 1416,
+  "cheeseburgers": 2,
+  "foreign": [],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok"
+  ],
+  "heard": "치즈버거 세트 두 개 주세요. 하나는 피클 빼고 음료는 제로 콜라랑 사이다로요.",
+  "model": "gemini-3.8-live",
+  "sent": 388,
+  "dropped": 185,
+  "events": [
+   {
+    "t": 12118,
+    "kind": "heard",
+    "text": "치즈버거 세트 두 개 주세요. 하나는 피클 빼고 음료는 제로 콜라랑 사이다로요."
+   },
+   {
+    "t": 12363,
+    "kind": "tool",
+    "text": "addToCart {\"options\":[{\"groupId\":\"drink\",\"optionIds\":[\"zero_cola\"]},{\"optionIds\":[\"no_pickles\"],\"groupId\":\"ingredients\"}],\"qty\":1,\"variant\":\"set\",\"itemId\":\"cheese_burger\"}"
+   },
+   {
+    "t": 12363,
+    "kind": "tool",
+    "text": "addToCart {\"options\":[{\"optionIds\":[\"cider\"],\"groupId\":\"drink\"}],\"itemId\":\"cheese_burger\",\"variant\":\"set\",\"qty\":1}"
+   },
+   {
+    "t": 12364,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 12365,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 12414,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 13280,
+    "kind": "said",
+    "text": "치즈버거 세트 두 "
+   },
+   {
+    "t": 13280,
+    "kind": "audio"
+   },
+   {
+    "t": 13357,
+    "kind": "said",
+    "text": "개가 준비되었습니다."
+   },
+   {
+    "t": 13449,
+    "kind": "said",
+    "text": " 하나는"
+   },
+   {
+    "t": 13580,
+    "kind": "said",
+    "text": " 제로콜라에 피클을"
+   },
+   {
+    "t": 13734,
+    "kind": "said",
+    "text": " 뺐고, 다른"
+   },
+   {
+    "t": 13918,
+    "kind": "said",
+    "text": " 하나는 사이다로 선택하셨습니다."
+   },
+   {
+    "t": 20331,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-15",
+  "run": 2,
+  "ok": true,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 1277,
+  "cheeseburgers": 2,
+  "foreign": [],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok"
+  ],
+  "heard": "치즈버거 세트 두 개 주세요. 하나는 피클 빼고 음료는 제로 콜라랑 사이다로요.",
+  "model": "gemini-3.8-live",
+  "sent": 329,
+  "dropped": 244,
+  "events": [
+   {
+    "t": 12167,
+    "kind": "heard",
+    "text": "치즈버거 세트 두 개 주세요. 하나는 피클 빼고 음료는 제로 콜라랑 사이다로요."
+   },
+   {
+    "t": 12224,
+    "kind": "tool",
+    "text": "addToCart {\"options\":[{\"groupId\":\"ingredients\",\"optionIds\":[\"no_pickles\"]},{\"groupId\":\"drink\",\"optionIds\":[\"zero_cola\"]}],\"itemId\":\"cheese_burger\",\"variant\":\"set\",\"qty\":1}"
+   },
+   {
+    "t": 12224,
+    "kind": "tool",
+    "text": "addToCart {\"variant\":\"set\",\"itemId\":\"cheese_burger\",\"options\":[{\"optionIds\":[\"cider\"],\"groupId\":\"drink\"}],\"qty\":1}"
+   },
+   {
+    "t": 12224,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 12225,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 12274,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 13131,
+    "kind": "said",
+    "text": "치즈버거 세트 두 "
+   },
+   {
+    "t": 13131,
+    "kind": "audio"
+   },
+   {
+    "t": 13336,
+    "kind": "said",
+    "text": "개 추가되었습니다."
+   },
+   {
+    "t": 13378,
+    "kind": "said",
+    "text": " 하나는 피클"
+   },
+   {
+    "t": 13460,
+    "kind": "said",
+    "text": " 빼고 제로"
+   },
+   {
+    "t": 13629,
+    "kind": "said",
+    "text": " 콜라, 다른"
+   },
+   {
+    "t": 13757,
+    "kind": "said",
+    "text": " 하나는 사이다로 준비했어요."
+   },
+   {
+    "t": 13910,
+    "kind": "said",
+    "text": " 혹시"
+   },
+   {
+    "t": 14058,
+    "kind": "said",
+    "text": " 소프트콘이나"
+   },
+   {
+    "t": 14190,
+    "kind": "said",
+    "text": " 애플파이도 필요하세요?"
+   },
+   {
+    "t": 23072,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-10",
+  "run": 1,
+  "ok": false,
+  "repliesBeforeUser": 3,
+  "repliesDuringUser": 0,
+  "reactionMs": 3542,
+  "cheeseburgers": 0,
+  "foreign": [
+   "spicy_chicken_burger"
+  ],
+  "cmds": [
+   "showMenu:ok",
+   "offerChoices:ok",
+   "addToCart:ok",
+   "addToCart:ok"
+  ],
+  "heard": "Can I get a하나는 피클 빼고 음료는 제로 콜라랑 사이다로.I told them we should later train. is cheaper anyway, and we still get there before dinner.",
+  "model": "gemini-3.8-live",
+  "sent": 461,
+  "dropped": 112,
+  "events": [
+   {
+    "t": 2045,
+    "kind": "heard",
+    "text": "Can I get a"
+   },
+   {
+    "t": 2045,
+    "kind": "tool",
+    "text": "showMenu {\"itemId\":\"spicy_chicken_burger\",\"category\":\"burger\"}"
+   },
+   {
+    "t": 2045,
+    "kind": "tool",
+    "text": "offerChoices {\"templateId\":\"pick_variant\",\"choices\":[{\"id\":\"single\",\"kind\":\"variant\"},{\"id\":\"set\",\"kind\":\"variant\"},{\"id\":\"largeSet\",\"kind\":\"variant\"}]}"
+   },
+   {
+    "t": 2045,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 2048,
+    "kind": "cmd",
+    "text": "showMenu:ok"
+   },
+   {
+    "t": 2049,
+    "kind": "cmd",
+    "text": "offerChoices:ok"
+   },
+   {
+    "t": 2539,
+    "kind": "said",
+    "text": "Would you like the "
+   },
+   {
+    "t": 2539,
+    "kind": "audio"
+   },
+   {
+    "t": 2703,
+    "kind": "said",
+    "text": "Spicy chicken burger"
+   },
+   {
+    "t": 2891,
+    "kind": "said",
+    "text": " as a single, set,"
+   },
+   {
+    "t": 2978,
+    "kind": "said",
+    "text": " or large set?"
+   },
+   {
+    "t": 6734,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 14485,
+    "kind": "heard",
+    "text": "하나는 피클 빼고 음료는 제로 콜라랑 사이다로."
+   },
+   {
+    "t": 14489,
+    "kind": "tool",
+    "text": "addToCart {\"itemId\":\"spicy_chicken_burger\",\"qty\":1,\"variant\":\"set\",\"options\":[{\"optionIds\":[\"no_pickles\"],\"groupId\":\"ingredients\"},{\"groupId\":\"drink\",\"optionIds\":[\"zero_cola\"]}]}"
+   },
+   {
+    "t": 14489,
+    "kind": "tool",
+    "text": "addToCart {\"qty\":1,\"variant\":\"set\",\"options\":[{\"groupId\":\"ingredients\",\"optionIds\":[\"no_pickles\"]},{\"groupId\":\"drink\",\"optionIds\":[\"cider\"]}],\"itemId\":\"spicy_chicken_burger\"}"
+   },
+   {
+    "t": 14491,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 14491,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 14492,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 20528,
+    "kind": "heard",
+    "text": "I told them we should later train. is cheaper anyway, and we still get there before dinner."
+   },
+   {
+    "t": 20855,
+    "kind": "interrupted"
+   },
+   {
+    "t": 20904,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-10",
+  "run": 0,
+  "ok": false,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 5055,
+  "cheeseburgers": 2,
+  "foreign": [],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok"
+  ],
+  "heard": "So I later train for anyway. Still get there before the cheese burger set two. One is pickle and 음료는 제로 콜라랑 사이다로. 진짜 길어. 먹을까?",
+  "model": "gemini-3.8-live",
+  "sent": 573,
+  "dropped": 0,
+  "events": [
+   {
+    "t": 12912,
+    "kind": "heard",
+    "text": "So I later train for anyway. Still get there before the cheese burger set two. One is pickle and 음료는 제로 콜라랑 사이다로."
+   },
+   {
+    "t": 16002,
+    "kind": "heard",
+    "text": " 진짜 길어. 먹을까?"
+   },
+   {
+    "t": 16002,
+    "kind": "tool",
+    "text": "addToCart {\"options\":[{\"groupId\":\"ingredients\",\"optionIds\":[\"no_pickles\"]},{\"groupId\":\"drink\",\"optionIds\":[\"zero_cola\"]}],\"itemId\":\"cheese_burger\",\"variant\":\"set\",\"qty\":1}"
+   },
+   {
+    "t": 16002,
+    "kind": "tool",
+    "text": "addToCart {\"variant\":\"set\",\"itemId\":\"cheese_burger\",\"options\":[{\"optionIds\":[\"cider\"],\"groupId\":\"drink\"}],\"qty\":1}"
+   },
+   {
+    "t": 16003,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 16004,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 16005,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 16780,
+    "kind": "interrupted"
+   },
+   {
+    "t": 16860,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-10",
+  "run": 2,
+  "ok": false,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 3481,
+  "cheeseburgers": 2,
+  "foreign": [
+   "spicy_chicken_burger",
+   "cola"
+  ],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "addToCart:ok",
+   "addToCart:ok"
+  ],
+  "heard": "진짜 길었지. 점심은 뭐 먹을까? 나는 치즈버거 세트 두 개 주세요. 하나는 피클 빼고 음료는 제로 콜라랑 사이다로.there before dinner. Can I get a spicy burger and a large cola, please?",
+  "model": "gemini-3.8-live",
+  "sent": 573,
+  "dropped": 0,
+  "events": [
+   {
+    "t": 13677,
+    "kind": "heard",
+    "text": "진짜 길었지. 점심은 뭐 먹을까? 나는 치즈버거 세트 두 개 주세요. 하나는 피클 빼고 음료는 제로 콜라랑 사이다로."
+   },
+   {
+    "t": 14428,
+    "kind": "tool",
+    "text": "addToCart {\"qty\":1,\"options\":[{\"optionIds\":[\"no_pickles\"],\"groupId\":\"ingredients\"},{\"groupId\":\"drink\",\"optionIds\":[\"zero_cola\"]}],\"variant\":\"set\",\"itemId\":\"cheese_burger\"}"
+   },
+   {
+    "t": 14428,
+    "kind": "tool",
+    "text": "addToCart {\"options\":[{\"groupId\":\"drink\",\"optionIds\":[\"cider\"]}],\"itemId\":\"cheese_burger\",\"variant\":\"set\",\"qty\":1}"
+   },
+   {
+    "t": 14429,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 14430,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 14474,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 15049,
+    "kind": "interrupted"
+   },
+   {
+    "t": 15161,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 20525,
+    "kind": "heard",
+    "text": "there before dinner. Can I get a spicy burger and a large cola, please?"
+   },
+   {
+    "t": 20528,
+    "kind": "tool",
+    "text": "addToCart {\"itemId\":\"spicy_chicken_burger\",\"qty\":1,\"variant\":\"single\"}"
+   },
+   {
+    "t": 20528,
+    "kind": "tool",
+    "text": "addToCart {\"qty\":1,\"itemId\":\"cola\",\"variant\":\"single\",\"options\":[{\"optionIds\":[\"l\"],\"groupId\":\"size\"}]}"
+   },
+   {
+    "t": 20529,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 20530,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 20531,
+    "kind": "turnComplete"
+   }
+  ]
+ }
+]

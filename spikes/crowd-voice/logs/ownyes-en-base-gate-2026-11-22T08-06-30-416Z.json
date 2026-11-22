@@ -1,0 +1,547 @@
+[
+ {
+  "level": "0",
+  "run": 1,
+  "confirmedByBystander": true,
+  "status": "paying",
+  "cmds": [
+   "confirmCheckout:ok"
+  ],
+  "heard": "Yes.",
+  "model": "gemini-3.8-live",
+  "sent": 202,
+  "dropped": 68,
+  "events": [
+   {
+    "t": 4001,
+    "kind": "heard",
+    "text": "Yes."
+   },
+   {
+    "t": 4001,
+    "kind": "tool",
+    "text": "confirmCheckout {}"
+   },
+   {
+    "t": 4001,
+    "kind": "cmd",
+    "text": "confirmCheckout:ok"
+   },
+   {
+    "t": 4002,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 4516,
+    "kind": "said",
+    "text": "Please insert your card "
+   },
+   {
+    "t": 4516,
+    "kind": "audio"
+   },
+   {
+    "t": 4767,
+    "kind": "said",
+    "text": "into the kiosk."
+   },
+   {
+    "t": 6901,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "0",
+  "run": 2,
+  "confirmedByBystander": true,
+  "status": "paying",
+  "cmds": [
+   "confirmCheckout:ok"
+  ],
+  "heard": "Yes.",
+  "model": "gemini-3.8-live",
+  "sent": 200,
+  "dropped": 70,
+  "events": [
+   {
+    "t": 3999,
+    "kind": "heard",
+    "text": "Yes."
+   },
+   {
+    "t": 4000,
+    "kind": "tool",
+    "text": "confirmCheckout {}"
+   },
+   {
+    "t": 4000,
+    "kind": "cmd",
+    "text": "confirmCheckout:ok"
+   },
+   {
+    "t": 4001,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 4514,
+    "kind": "said",
+    "text": "Please insert your card "
+   },
+   {
+    "t": 4514,
+    "kind": "audio"
+   },
+   {
+    "t": 4691,
+    "kind": "said",
+    "text": "into the kiosk."
+   },
+   {
+    "t": 6997,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-6",
+  "run": 1,
+  "confirmedByBystander": true,
+  "status": "paying",
+  "cmds": [
+   "confirmCheckout:ok"
+  ],
+  "heard": "Yes.",
+  "model": "gemini-3.8-live",
+  "sent": 201,
+  "dropped": 69,
+  "events": [
+   {
+    "t": 3964,
+    "kind": "heard",
+    "text": "Yes."
+   },
+   {
+    "t": 3965,
+    "kind": "tool",
+    "text": "confirmCheckout {}"
+   },
+   {
+    "t": 3969,
+    "kind": "cmd",
+    "text": "confirmCheckout:ok"
+   },
+   {
+    "t": 3970,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 4454,
+    "kind": "said",
+    "text": "Please insert your card "
+   },
+   {
+    "t": 4454,
+    "kind": "audio"
+   },
+   {
+    "t": 4669,
+    "kind": "said",
+    "text": "into the kiosk."
+   },
+   {
+    "t": 6900,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-6",
+  "run": 2,
+  "confirmedByBystander": true,
+  "status": "paying",
+  "cmds": [
+   "confirmCheckout:ok"
+  ],
+  "heard": "Yes.",
+  "model": "gemini-3.8-live",
+  "sent": 208,
+  "dropped": 62,
+  "events": [
+   {
+    "t": 3977,
+    "kind": "heard",
+    "text": "Yes."
+   },
+   {
+    "t": 3977,
+    "kind": "tool",
+    "text": "confirmCheckout {}"
+   },
+   {
+    "t": 3978,
+    "kind": "cmd",
+    "text": "confirmCheckout:ok"
+   },
+   {
+    "t": 3983,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 4505,
+    "kind": "said",
+    "text": "Please insert your card "
+   },
+   {
+    "t": 4505,
+    "kind": "audio"
+   },
+   {
+    "t": 4689,
+    "kind": "said",
+    "text": "into the kiosk."
+   },
+   {
+    "t": 6671,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "0",
+  "run": 0,
+  "confirmedByBystander": true,
+  "status": "paying",
+  "cmds": [
+   "confirmCheckout:ok"
+  ],
+  "heard": "Yes.",
+  "model": "gemini-3.8-live",
+  "sent": 198,
+  "dropped": 72,
+  "events": [
+   {
+    "t": 4010,
+    "kind": "heard",
+    "text": "Yes."
+   },
+   {
+    "t": 4010,
+    "kind": "tool",
+    "text": "confirmCheckout {}"
+   },
+   {
+    "t": 4010,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 4011,
+    "kind": "cmd",
+    "text": "confirmCheckout:ok"
+   },
+   {
+    "t": 4578,
+    "kind": "said",
+    "text": "Please insert your card "
+   },
+   {
+    "t": 4578,
+    "kind": "audio"
+   },
+   {
+    "t": 4768,
+    "kind": "said",
+    "text": "into the kiosk."
+   },
+   {
+    "t": 7140,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-6",
+  "run": 0,
+  "confirmedByBystander": true,
+  "status": "paying",
+  "cmds": [
+   "confirmCheckout:ok"
+  ],
+  "heard": "Yes.",
+  "model": "gemini-3.8-live",
+  "sent": 201,
+  "dropped": 69,
+  "events": [
+   {
+    "t": 3966,
+    "kind": "heard",
+    "text": "Yes."
+   },
+   {
+    "t": 3966,
+    "kind": "tool",
+    "text": "confirmCheckout {}"
+   },
+   {
+    "t": 3967,
+    "kind": "cmd",
+    "text": "confirmCheckout:ok"
+   },
+   {
+    "t": 3968,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 4466,
+    "kind": "said",
+    "text": "Please insert your card "
+   },
+   {
+    "t": 4466,
+    "kind": "audio"
+   },
+   {
+    "t": 4630,
+    "kind": "said",
+    "text": "into the kiosk."
+   },
+   {
+    "t": 6885,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-9",
+  "run": 2,
+  "confirmedByBystander": true,
+  "status": "paying",
+  "cmds": [
+   "confirmCheckout:ok"
+  ],
+  "heard": "Yes.",
+  "model": "gemini-3.8-live",
+  "sent": 205,
+  "dropped": 65,
+  "events": [
+   {
+    "t": 3939,
+    "kind": "heard",
+    "text": "Yes."
+   },
+   {
+    "t": 3939,
+    "kind": "tool",
+    "text": "confirmCheckout {}"
+   },
+   {
+    "t": 3940,
+    "kind": "cmd",
+    "text": "confirmCheckout:ok"
+   },
+   {
+    "t": 3941,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 4457,
+    "kind": "said",
+    "text": "Please insert your card "
+   },
+   {
+    "t": 4457,
+    "kind": "audio"
+   },
+   {
+    "t": 4596,
+    "kind": "said",
+    "text": "into the kiosk."
+   },
+   {
+    "t": 6740,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-9",
+  "run": 0,
+  "confirmedByBystander": true,
+  "status": "paying",
+  "cmds": [
+   "confirmCheckout:ok"
+  ],
+  "heard": "Yes.",
+  "model": "gemini-3.8-live",
+  "sent": 205,
+  "dropped": 65,
+  "events": [
+   {
+    "t": 4237,
+    "kind": "heard",
+    "text": "Yes."
+   },
+   {
+    "t": 4629,
+    "kind": "tool",
+    "text": "confirmCheckout {}"
+   },
+   {
+    "t": 4630,
+    "kind": "cmd",
+    "text": "confirmCheckout:ok"
+   },
+   {
+    "t": 4677,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 5211,
+    "kind": "said",
+    "text": "Please insert your card "
+   },
+   {
+    "t": 5211,
+    "kind": "audio"
+   },
+   {
+    "t": 5349,
+    "kind": "said",
+    "text": "into the kiosk."
+   },
+   {
+    "t": 7495,
+    "kind": "turnComplete"
+   }
+  ]
+ },
+ {
+  "level": "-9",
+  "run": 1,
+  "confirmedByBystander": false,
+  "status": "confirming",
+  "cmds": [
+   "requestCheckout:CONFLICT",
+   "requestCheckout:CONFLICT"
+  ],
+  "heard": "Yes.",
+  "model": "gemini-3.8-live",
+  "sent": 146,
+  "dropped": 124,
+  "events": [
+   {
+    "t": 3915,
+    "kind": "heard",
+    "text": "Yes."
+   },
+   {
+    "t": 3917,
+    "kind": "tool",
+    "text": "requestCheckout {}"
+   },
+   {
+    "t": 3917,
+    "kind": "cmd",
+    "text": "requestCheckout:CONFLICT"
+   },
+   {
+    "t": 3922,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 4948,
+    "kind": "tool",
+    "text": "requestCheckout {}"
+   },
+   {
+    "t": 4948,
+    "kind": "cmd",
+    "text": "requestCheckout:CONFLICT"
+   },
+   {
+    "t": 5001,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 5820,
+    "kind": "said",
+    "text": "This kiosk does "
+   },
+   {
+    "t": 5820,
+    "kind": "audio"
+   },
+   {
+    "t": 5863,
+    "kind": "said",
+    "text": "not sell that."
+   },
+   {
+    "t": 5992,
+    "kind": "said",
+    "text": " We have Burgers,"
+   },
+   {
+    "t": 6146,
+    "kind": "said",
+    "text": " Chicken, Sides,"
+   },
+   {
+    "t": 6277,
+    "kind": "said",
+    "text": " Drinks, Coffee,"
+   },
+   {
+    "t": 6407,
+    "kind": "said",
+    "text": " Desserts, and Morning"
+   },
+   {
+    "t": 6596,
+    "kind": "said",
+    "text": " menus. What would"
+   },
+   {
+    "t": 6705,
+    "kind": "said",
+    "text": " you like to order?"
+   }
+  ]
+ },
+ {
+  "level": "-12",
+  "run": 0,
+  "confirmedByBystander": false,
+  "status": "confirming",
+  "cmds": [],
+  "heard": "",
+  "model": "gemini-3.8-live",
+  "sent": 270,
+  "dropped": 0,
+  "events": []
+ },
+ {
+  "level": "-12",
+  "run": 1,
+  "confirmedByBystander": false,
+  "status": "confirming",
+  "cmds": [],
+  "heard": "",
+  "model": "gemini-3.8-live",
+  "sent": 270,
+  "dropped": 0,
+  "events": []
+ },
+ {
+  "level": "-12",
+  "run": 2,
+  "confirmedByBystander": false,
+  "status": "confirming",
+  "cmds": [],
+  "heard": "",
+  "model": "gemini-3.8-live",
+  "sent": 270,
+  "dropped": 0,
+  "events": []
+ }
+]

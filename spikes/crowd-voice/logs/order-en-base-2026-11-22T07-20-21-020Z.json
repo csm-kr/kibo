@@ -1,0 +1,115 @@
+[
+ {
+  "level": "-10",
+  "run": 0,
+  "ok": false,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": null,
+  "cheeseburgers": 0,
+  "foreign": [],
+  "cmds": [],
+  "heard": "",
+  "model": "gemini-3.8-live",
+  "sent": 565,
+  "dropped": 0,
+  "events": []
+ },
+ {
+  "level": "off",
+  "run": 0,
+  "ok": true,
+  "repliesBeforeUser": 0,
+  "repliesDuringUser": 0,
+  "reactionMs": 1127,
+  "cheeseburgers": 2,
+  "foreign": [],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok"
+  ],
+  "heard": "two cheeseburger sets, one without pickles. Drinks, zero cola and cider.",
+  "model": "gemini-3.8-live",
+  "sent": 386,
+  "dropped": 179,
+  "events": [
+   {
+    "t": 11728,
+    "kind": "heard",
+    "text": "two cheeseburger sets, one without pickles. Drinks, zero cola and cider."
+   },
+   {
+    "t": 11729,
+    "kind": "tool",
+    "text": "addToCart {\"options\":[{\"groupId\":\"drink\",\"optionIds\":[\"zero_cola\"]}],\"itemId\":\"cheese_burger\",\"variant\":\"set\",\"qty\":1}"
+   },
+   {
+    "t": 11729,
+    "kind": "tool",
+    "text": "addToCart {\"qty\":1,\"itemId\":\"cheese_burger\",\"variant\":\"set\",\"options\":[{\"groupId\":\"ingredients\",\"optionIds\":[\"no_pickles\"]},{\"optionIds\":[\"cider\"],\"groupId\":\"drink\"}]}"
+   },
+   {
+    "t": 11738,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 11739,
+    "kind": "cmd",
+    "text": "addToCart:ok"
+   },
+   {
+    "t": 11773,
+    "kind": "turnComplete"
+   },
+   {
+    "t": 12476,
+    "kind": "said",
+    "text": "Added two "
+   },
+   {
+    "t": 12476,
+    "kind": "audio"
+   },
+   {
+    "t": 12577,
+    "kind": "said",
+    "text": "Cheeseburger sets,"
+   },
+   {
+    "t": 12802,
+    "kind": "said",
+    "text": " one with Zero"
+   },
+   {
+    "t": 12877,
+    "kind": "said",
+    "text": " cola and one with Cider"
+   },
+   {
+    "t": 13034,
+    "kind": "said",
+    "text": " without pickles."
+   },
+   {
+    "t": 13144,
+    "kind": "said",
+    "text": " Would you like"
+   },
+   {
+    "t": 13284,
+    "kind": "said",
+    "text": " a dessert too?"
+   },
+   {
+    "t": 13398,
+    "kind": "said",
+    "text": " mercantile\n- Retail chains\n- Boutique shops\n- Franchise owners\n- Service providers seeking B2C engagement\n\n### 4. Target Audience\n- Who buys from you?\n- Demographic/Firmographic profile\n\n### 5. Your Unique Value Proposition (UVP)\n- Why should someone choose you over a competitor?\n\n### 6. Tone of Brand Voice\n- How do you want to sound? (e.g., Professional, Authoritative, Approachable, Witty, Serious, Warm)\n\n### 7. Competitor Overview (Top 3)\n- Who are they?\n- What do they do well or poorly?\n\n### 8. Key Differentiators/Advantages\n- What makes you different? (e.g., Price, Speed, Quality, Customization, Customer Service)\n\n### 9. Current Marketing Channels & Presence\n- Where are you currently active? (e.g., Social media, Website, Email marketing, Paid ads)\n\n### 10. Core Message/Main Objective for Marketing Materials\n- What is the primary goal of the content I will be writing or designing? (e.g., Lead generation, Brand awareness, Sales conversions)\n\n***\n**Note:** You can answer these questions as briefly or as detailed as you like. Feel free to skip any questions that do not apply to your specific brand."
+   },
+   {
+    "t": 19293,
+    "kind": "turnComplete"
+   }
+  ]
+ }
+]
