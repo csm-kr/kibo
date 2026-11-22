@@ -2,7 +2,7 @@
 
 Talk to your phone, and an existing self-order kiosk places the order. Built for the Google Cloud AI Builder Cup 2026 (submission 2026-10-17, judging until 2026-11-06).
 
-Read first: `docs/RULE.md` (rules from repeated mistakes) and `docs/ISSUE.md` (known issues), then `docs/PRD.md` (problem, scope, demo), `docs/UX.md` (flows, screen map, heuristics), `docs/USER_JOURNEY.md` (journeys per persona), `docs/ARCHITECTURE.md` (API, database, tools, voice, limits), `docs/ADR.md` (decisions), `docs/SECURITY.md` (controls the code must have), `docs/UI_GUIDE.md` (look, components), `docs/UI_QA.md` (UI checklist and QA pass), `docs/KIBO_LEARN.md`, `docs/TESTING.md`. Strategy, schedule, submission and operations notes are in `docs/plan/`. The prototype in `design/prototype/` shows the intended screens and flows.
+Read first: `docs/GOAL.md` (the goal every task is judged against), `docs/RULE.md` (rules from repeated mistakes) and `docs/ISSUE.md` (known issues), then `docs/PRD.md` (problem, scope, demo), `docs/UX.md` (flows, screen map, heuristics), `docs/USER_JOURNEY.md` (journeys per persona), `docs/ARCHITECTURE.md` (API, database, tools, voice, limits), `docs/ADR.md` (decisions), `docs/SECURITY.md` (controls the code must have), `docs/UI_GUIDE.md` (look, components), `docs/UI_QA.md` (UI checklist and QA pass), `docs/KIBO_LEARN.md`, `docs/TESTING.md`. Strategy, schedule, submission and operations notes are in `docs/plan/`. The prototype in `design/prototype/` shows the intended screens and flows.
 
 ## Stack
 - Next.js (App Router), TypeScript strict, Tailwind CSS

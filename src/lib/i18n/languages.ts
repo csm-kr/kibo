@@ -34,6 +34,7 @@ export const aiOnly = (language: SpeechLanguage): language is AiOnlyLanguage => 
 const AI_TEXT = {
   // Short: Japanese and Chinese wrap between any two characters, and the mic's label column is ~120px at 320 wide.
   micTap: { ja: "タップして開始", zh: "点击开始", es: "Toca para empezar", vi: "Chạm để bắt đầu", fr: "Touchez pour démarrer", th: "แตะเพื่อเริ่ม", id: "Ketuk untuk mulai" },
+  micWait: { ja: "少々お待ちください", zh: "请稍候", es: "Un momento", vi: "Chờ một chút", fr: "Un instant", th: "รอสักครู่", id: "Tunggu sebentar" },
   micHold: { ja: "押しながら話す", zh: "按住说话", es: "Mantén para hablar", vi: "Giữ để nói", fr: "Maintenez pour parler", th: "กดค้างเพื่อพูด", id: "Tahan untuk bicara" },
   micRelease: { ja: "離すと送信", zh: "松开发送", es: "Suelta para enviar", vi: "Thả để gửi", fr: "Relâchez pour envoyer", th: "ปล่อยเพื่อส่ง", id: "Lepas untuk kirim" },
   sayYes: {

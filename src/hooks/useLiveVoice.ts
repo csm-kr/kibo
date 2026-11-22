@@ -9,6 +9,7 @@ import type { SpeechLanguage } from "@/lib/i18n/languages";
 import { errorCopy } from "@/lib/i18n/errors";
 import { pt } from "@/lib/i18n/phone";
 import { holdToTalk } from "@/lib/voice/hold";
+import { CATCH_UP_GAP_MS, END, heldBack } from "@/lib/voice/heldBack";
 import { e2eFrame, e2eMarks, e2eOutput, frameRms } from "@/lib/voice/e2eMarks";
 import { base64ToFloat32, downsampleTo16k, int16ToBase64 } from "@/lib/voice/pcm";
 import { connectRelay, relayCloseOutcome, type LiveLink } from "@/lib/voice/relayLink";
@@ -26,7 +27,9 @@ import { scheduleOffers } from "@/lib/voice/offerScheduling";
 // then text. Audio, transcripts and tokens are never logged.
 
 /** `ready`: connected and waiting for the user to hold the mic; `listening`: the mic is held and goes to Live. */
-export type VoiceState = "off" | "connecting" | "ready" | "listening" | "thinking" | "speaking" | "reconnecting" | "error";
+// "starting": the tap was taken and the microphone is being opened; a hold cannot count yet. "connecting": the
+// microphone is open and the connection is being made; what is said in a hold waits for it (I-439).
+export type VoiceState = "off" | "starting" | "connecting" | "ready" | "listening" | "thinking" | "speaking" | "reconnecting" | "error";
 
 export interface LiveVoiceOptions {
   sessionId: string | null;
@@ -49,6 +52,8 @@ export interface LiveVoiceOptions {
   onNoise(): void;
   /** The mic was tapped, not held: say to keep holding while talking. */
   onShortHold?(): void;
+  /** A hold could not reach the AI whole (the connection was lost, or took too long): say it again. */
+  onMissed?(): void;
   voiceOutput: boolean;
   /** The last utteranceSeq used by typed or spoken turns, shared with the chat so the server sees one counter. */
   utterances: { current: number };
@@ -91,6 +96,8 @@ interface Run {
   mutedUntil: number;
   /** Runs after a release until the AI answers. */
   answerTimer: ReturnType<typeof setTimeout> | null;
+  /** What waited for the connection is going up (heldBack.ts). */
+  catching: boolean;
   /** The person cut in: the rest of the running reply is not played. */
   dropReply: boolean;
   /** Reconnects since the last successful setup. */
@@ -143,6 +150,11 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
   // Latency marks for the voice E2E (`?e2e=1` only); null otherwise.
   const marks = e2eMarks();
   const hold = holdToTalk();
+  // What is said while there is no connection waits here (heldBack.ts).
+  const back = heldBack();
+
+  /** No connection: the first one is being made, or a lost one is being made again. */
+  const linkState = (r: Run): VoiceState => (r.retries > 0 ? "reconnecting" : "connecting");
 
   /** Connected with nothing going on: the mic is held, or waits for a hold. */
   function rest(r: Run) {
@@ -217,6 +229,7 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     if (r.answerTimer) clearTimeout(r.answerTimer);
     r.answerTimer = null;
     hold.answered();
+    back.clear();
   }
 
   function end(r: Run, next: "off" | "error", reason?: string) {
@@ -242,23 +255,53 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     return pt("voiceFailed", o.locale);
   }
 
-  function sendPcm(r: Run, frame: Float32Array) {
-    const pcm = downsampleTo16k(frame, r.ctx.sampleRate);
+  function sendAudio(r: Run, data: string) {
     try {
-      r.live?.sendRealtimeInput({ audio: { data: int16ToBase64(pcm), mimeType: "audio/pcm;rate=16000" } });
+      r.live?.sendRealtimeInput({ audio: { data, mimeType: "audio/pcm;rate=16000" } });
     } catch {
       // The socket is closing; onclose reconnects.
     }
   }
 
   function sendFrame(r: Run, frame: Float32Array) {
-    // Hold to talk: the microphone goes to Live only while the button is held (hold.ts).
-    if (!r.live || !hold.held) return;
-    // Half-duplex: nothing goes up while the AI voice plays or just after.
-    const canSend = !aiSpeaking(r);
+    // Hold to talk: the microphone is used only while the button is held (hold.ts).
+    if (!hold.held) return;
+    // Half-duplex: nothing goes up while the AI voice plays or just after. Without a connection nothing plays.
+    const canSend = !r.live || !aiSpeaking(r);
     // The voice E2E's fake mic loops its sentence; it sends one whole utterance per page (e2eMarks.ts).
     const whole = !marks || !canSend || e2eFrame(marks, frameRms(frame), performance.now());
-    if (hold.frame(canSend && whole)) sendPcm(r, frame);
+    if (!hold.frame(canSend && whole)) return;
+    const data = int16ToBase64(downsampleTo16k(frame, r.ctx.sampleRate));
+    // Straight up with a connection and nothing waiting; else behind what waits (heldBack.ts).
+    if (r.live && !back.waiting) return sendAudio(r, data);
+    // More waits than a connection should ever take: this hold has failed.
+    if (!back.add(data)) miss(r);
+  }
+
+  /** The hold now down cannot reach Live whole: it ends here, and the screen asks to say it again. */
+  function miss(r: Run) {
+    back.dropOpen();
+    hold.answered();
+    o.onMissed?.();
+    if (r.live) rest(r);
+    else setState(linkState(r));
+  }
+
+  /** Sends what waited for the connection, four times faster than it was said, each hold with its end signal. */
+  function catchUp(r: Run) {
+    if (r.catching) return;
+    r.catching = true;
+    const live = r.live;
+    const step = () => {
+      const next = r.live === live && !r.stopped ? back.next() : null;
+      if (next === null) return void (r.catching = false);
+      if (next === END) {
+        endAudio(r);
+        if (!hold.held && !turns.responding && r.sources.size === 0) awaitAnswer(r);
+      } else sendAudio(r, next);
+      setTimeout(step, CATCH_UP_GAP_MS);
+    };
+    step();
   }
 
   /** Tells Live the audio of this hold ended: the turn closes without its second of silence. */
@@ -275,8 +318,12 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     const r = run;
     if (!r || r.stopped || hold.held) return;
     if (!r.live) {
-      // Reconnecting: the hold waits, and sends from the moment the connection is back ("Reconnecting…" shows).
+      // Connecting, or reconnecting: what is said now waits and goes up when the connection opens (heldBack.ts).
+      // Before the microphone is open ("starting") nothing could be kept, so that press does not count.
+      if (!r.worklet) return;
+      if (marks) Object.assign(marks, { open: false, quietSince: null });
       hold.press(performance.now());
+      setState("listening");
       return;
     }
     if (aiSpeaking(r) && CUT_IN_STATES.has(o.status)) {
@@ -300,9 +347,21 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     // A second release (pointer up, then the capture ending) must not undo "thinking".
     if (!hold.held) return;
     const { end, short } = hold.release(performance.now());
-    if (!r?.live || r.stopped) return;
-    // The turn closes now, without Live waiting for a second of silence it may never hear in a loud place.
-    if (end) endAudio(r);
+    if (!r || r.stopped) return;
+    // Told to the greeting too: a tool call that follows these words is the person's, not the greeting's.
+    if (end) r.greeter.onMessage([{ type: "userSpeech" }]);
+    if (!r.live) {
+      // Nothing went up yet: a tap leaves nothing behind, a sentence waits with its end signal.
+      if (short) {
+        back.dropOpen();
+        o.onShortHold?.();
+      } else back.end();
+      return setState(linkState(r));
+    }
+    // The turn closes now, without Live waiting for a second of silence it may never hear in a loud place; behind
+    // frames that still wait, the end signal waits too.
+    if (back.waiting) back.end();
+    else if (end) endAudio(r);
     if (short) o.onShortHold?.();
     // The AI's voice is playing: "speaking" stays.
     if (r.sources.size > 0) return;
@@ -391,9 +450,15 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     const wasResponding = turns.responding;
     countTurns(events);
     if (!wasResponding && turns.responding) {
-      // The AI began to answer. A hold still down is over: more audio would cut the answer off (hold.ts).
-      if (hold.held) setState("thinking");
-      if (hold.answered()) endAudio(r);
+      if (hold.held && r.greeter.holdsTools) {
+        // The greeting begins after the person began to talk (I-439): it gives way. It is not played, and Live cuts
+        // it off when it hears the person (spikes/crowd-voice/first-press.ts).
+        r.dropReply = true;
+      } else {
+        // The AI began to answer. A hold still down is over: more audio would cut the answer off (hold.ts).
+        if (hold.held) setState("thinking");
+        if (hold.answered()) endAudio(r);
+      }
       if (r.answerTimer) clearTimeout(r.answerTimer);
       r.answerTimer = null;
     }
@@ -409,7 +474,7 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     if (m.setupComplete) {
       r.retries = 0;
       // An answer is on its way (the greeting sent as the connection opened): "thinking" goes on.
-      if (r.answerTimer && !hold.held) setState("thinking");
+      if ((r.answerTimer || back.waiting) && !hold.held) setState("thinking");
       else rest(r);
     }
     if (events.some((e) => e.type === "userSpeech")) r.respHeard = true;
@@ -490,7 +555,12 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
       r.live = live;
       r.toldDine = dineAtToken;
       tellDine(r);
-      greet(r);
+      if (hold.held || back.waiting) {
+        // The person already talks, or has: their words go up instead of the greeting.
+        r.greeter.skip();
+        if (!hold.held) setState("thinking");
+        catchUp(r);
+      } else greet(r);
     };
 
     if (t.mode === "relay") {
@@ -539,6 +609,14 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
 
   async function reconnect(r: Run) {
     if (r.stopped) return;
+    // Part of what the person said may have gone up on the lost connection, and the rest alone would be a sentence
+    // with its head cut off. On a connection that never opened nothing went up, so what waits stays.
+    if (r.live && (hold.held || back.waiting)) {
+      back.clear();
+      hold.answered();
+      o.onMissed?.();
+    }
+    r.catching = false;
     flushText(r);
     stopPlayback(r);
     r.dropReply = false;
@@ -553,7 +631,7 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     }
     if (r.retries >= MAX_RETRIES) return end(r, "error", pt("voiceFailed", o.locale));
     r.retries++;
-    setState("reconnecting");
+    setState(hold.held ? "listening" : "reconnecting");
     await wait(RETRY_DELAY_MS);
     if (r.stopped) return;
     try {
@@ -583,6 +661,7 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
       playEnd: 0,
       mutedUntil: 0,
       answerTimer: null,
+      catching: false,
       dropReply: false,
       retries: 0,
       deadline: 0,
@@ -602,7 +681,7 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
       greeter: greeter(),
     };
     run = r;
-    setState("connecting");
+    setState("starting");
 
     r.release = await holdLock(`kibo-live-${sessionId}`);
     if (r.stopped) return free(r);
@@ -625,6 +704,8 @@ function createVoice(initial: LiveVoiceOptions, setState: (s: VoiceState) => voi
     } catch {
       return end(r, "error", pt("voiceNoMic", o.locale));
     }
+    // From here on a hold is kept, connection or not.
+    setState("connecting");
 
     try {
       await connect(r);

@@ -6,7 +6,7 @@ import { MemoryUsageStore, type UsageStore } from "@/lib/limits/usage";
 import { claimSession, createSession } from "@/lib/session/service";
 import { MemoryStore } from "@/lib/store/memory";
 import { geminiTokenIssuer, KeyUnavailableError, type LiveTokenIssuer } from "./live";
-import { createKeyHealth, liveBackendSetting, relayHealthUrl, startLiveVoice, voiceRelayUrl, type KeyHealth } from "./liveBackend";
+import { createKeyHealth, liveBackendSetting, relayHealthUrl, startLiveVoice, voiceRelayUrl, warmVoiceStart, type KeyHealth } from "./liveBackend";
 
 const T0 = Date.UTC(2026, 9, 13, 9, 0);
 const RELAY = "wss://kibo-voice.example.run.app/ws";
@@ -225,6 +225,37 @@ describe("createKeyHealth", () => {
     expect(await hang.usable()).toBe(true);
   });
 
+  // 11-22 (I-439): the probe (one generateContent, about 2 s) ran inside the mic tap on nearly every first connection.
+  it("an ok older than 60 s is answered at once while one probe refreshes it", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    let t = 0;
+    let settle: (e: unknown) => void = () => {};
+    const probe = vi.fn().mockResolvedValueOnce(undefined);
+    const health = createKeyHealth({ probe, now: () => t });
+    await health.usable();
+    t = 61_000;
+    probe.mockReturnValueOnce(new Promise((_, reject) => (settle = reject)));
+    // The refresh has not answered yet.
+    expect(await health.usable()).toBe(true);
+    expect(await health.usable()).toBe(true);
+    expect(probe).toHaveBeenCalledTimes(2);
+    // The refresh finds the credits used up: the next start takes the relay.
+    settle(Object.assign(new Error("credits"), { status: 402 }));
+    await vi.waitFor(async () => expect(await health.usable()).toBe(false));
+    expect(probe).toHaveBeenCalledTimes(2);
+  });
+
+  it("an ok older than 10 min is not trusted: the probe is awaited", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    let t = 0;
+    const probe = vi.fn().mockResolvedValueOnce(undefined);
+    const health = createKeyHealth({ probe, now: () => t });
+    await health.usable();
+    t = 10 * 60_000 + 60_000;
+    probe.mockRejectedValueOnce(Object.assign(new Error("credits"), { status: 402 }));
+    expect(await health.usable()).toBe(false);
+  });
+
   it("failed() marks the key down for 10 min without a probe", async () => {
     let t = 0;
     const probe = vi.fn().mockResolvedValue(undefined);
@@ -234,5 +265,18 @@ describe("createKeyHealth", () => {
     expect(probe).not.toHaveBeenCalled();
     t = 10 * 60_000;
     expect(await health.usable()).toBe(true);
+  });
+});
+
+describe("warmVoiceStart", () => {
+  it("starts the key probe before the mic is tapped, only where a start would probe", () => {
+    const usable = vi.fn<KeyHealth["usable"]>().mockResolvedValue(true);
+    const health = { usable, failed: vi.fn<KeyHealth["failed"]>() };
+    warmVoiceStart({ key: health, backend: "auto", relayUrl: RELAY });
+    expect(usable).toHaveBeenCalledTimes(1);
+    warmVoiceStart({ key: health, backend: "auto", relayUrl: null });
+    warmVoiceStart({ key: health, backend: "api", relayUrl: RELAY });
+    warmVoiceStart({ key: health, backend: "vertex", relayUrl: RELAY });
+    expect(usable).toHaveBeenCalledTimes(1);
   });
 });

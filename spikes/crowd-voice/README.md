@@ -138,6 +138,36 @@ Every run is in `logs/` (synthetic transcripts and tool calls only).
 The browser path with the gate wired into `useLiveVoice` (since removed): `e2e/voice.live.spec.ts` direct, hero-en and hero-ko, 1 run each, both passed
 (2026-11-22; end of speech to kiosk highlight 1,725 ms and 1,477 ms; not added to `evidence/`).
 
+## The first press (2026-11-22, I-439)
+
+The owner's phone test of hold to talk: "the first press sometimes does not take my voice, and the first connection is
+slow." On the candidate a hold begun while voice connected, or before the greeting was heard, sent nothing
+(`logs/first-press-candidate-before.log`). `first-press.ts` asks what Live does with a sentence that was held back
+while the phone connected, and with a hold that starts around the greeting. One hero sentence per session
+(`e2e/fixtures/hero-ko.wav`, `hero-en.wav`), ended with `audioStreamEnd`; "heard to its end" is Live's own input
+transcription ending with the sentence's last word.
+
+| How the sentence went up | Sessions | Heard to its end | Nothing heard | First reaction after the end (median) |
+|---|---|---|---|---|
+| All at once (Korean, Gemini API) | 12 | 10 | 2 | 2.5 s |
+| Four times real time (Korean, Gemini API) | 20 | 20 | 0 | 1.1 to 1.4 s |
+| Four times real time (English, Gemini API) | 8 | 8 | 0 | 1.1 s |
+| First 2 s at four times, the rest in real time (Korean, Gemini API) | 8 | 8 | 0 | 1.3 s |
+| Four times real time (Korean, Vertex AI) | 8 | 8 | 0 | 1.7 s |
+| First 2 s at four times, the rest in real time (Korean, Vertex AI) | 6 | 6 | 0 | 1.2 s |
+
+All at once, Live answered nothing at all in 2 of 12 sessions (no transcription, no reply within 10 s). At four times
+real time every sentence was heard, and the cart held the two sets in 36 of 36 sessions on the Gemini API and 12 of
+14 on Vertex AI (once it asked which drink, once it added a third line). So the phone sends what waited one 40 ms
+frame every 10 ms (`src/lib/voice/heldBack.ts`).
+
+A hold that starts 0, 300 or 700 ms after the phone's greeting was sent (5 sessions each, Korean, in real time): the
+sentence was heard to its end and ordered in 15 of 15. Live cut its greeting off in 12 and never answered it in 3 (all
+at 0 ms), so the phone must not wait for a greeting that may not come: it lets the hold go on and does not play a
+greeting that starts under it.
+
+Logs: `logs/first-press-*.log`; the server's voice-start times: `logs/live-token-latency.log`.
+
 ## Limits
 
 - A digital mix: no room, no phone microphone, no browser echo cancellation, noise suppression or automatic gain.
@@ -168,6 +198,10 @@ npx tsx --env-file=.env spikes/crowd-voice/run.ts --scenario order --lang en --l
 npx tsx --env-file=.env spikes/crowd-voice/run.ts --scenario order --lang en --levels off,-10,0,5,10 --runs 3 --ptt-end
 npx tsx --env-file=.env spikes/crowd-voice/multi.ts --release end --levels off,-10,0 --runs 3
 npx tsx --env-file=.env spikes/crowd-voice/multi.ts --release end --levels off,-10 --runs 2 --vertex
+npx tsx --env-file=.env spikes/crowd-voice/first-press.ts --mode burst --runs 8 --lang ko
+npx tsx --env-file=.env spikes/crowd-voice/first-press.ts --mode burst --speed 4 --runs 12 --lang ko
+npx tsx --env-file=.env spikes/crowd-voice/first-press.ts --mode partial --head-ms 2000 --speed 4 --runs 8 --lang ko --vertex
+npx tsx --env-file=.env spikes/crowd-voice/first-press.ts --mode greet --offset-ms 300 --runs 5 --lang ko
 npx tsx --env-file=.env spikes/crowd-voice/multi.ts --release end --levels off --runs 3 --gap-ms 90000
 npx tsx --env-file=.env spikes/crowd-voice/multi.ts --release open --levels off --runs 6
 npx tsx spikes/crowd-voice/levels.ts

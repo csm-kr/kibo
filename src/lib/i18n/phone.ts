@@ -184,17 +184,18 @@ const PHONE_TEXT = {
   inAppTyping: { ko: "글자로는 여기서도 주문할 수 있어요.", en: "Typing works here." },
   // Mic button: the label names the state, not only the color (docs/UI_QA.md "Color")
   micTap: { ko: "눌러서 시작", en: "Tap to start" },
+  micWait: { ko: "잠시만요", en: "One moment" },
   micConnecting: { ko: "연결하고 있어요…", en: "Connecting…" },
   micListening: { ko: "듣고 있어요…", en: "Listening…" },
   micThinking: { ko: "생각하고 있어요…", en: "Thinking…" },
   micSpeaking: { ko: "말하고 있어요…", en: "Speaking…" },
-  // Under the mic: what the button does in that state. A tap starts voice, or cancels it while it connects; once
-  // connected the microphone is sent only while the button is held (hold to talk, I-431).
+  // Under the mic: what the button does in that state. A tap starts voice; from then on the microphone is used only
+  // while the button is held (hold to talk, I-431), also while voice still connects (I-439).
   micHold: { ko: "꾹 누르고 말하기", en: "Hold to talk" },
   micRelease: { ko: "손 떼면 보내요", en: "Release to send" },
-  micCancel: { ko: "누르면 취소해요", en: "Tap to cancel" },
   // In the dock after a tap on the connected mic.
   micHoldHint: { ko: "버튼을 누르고 있는 동안 말해 주세요.", en: "Keep holding the button while you talk." },
+  micAgain: { ko: "방금 말을 못 들었어요. 다시 누르고 말해 주세요.", en: "I missed that. Hold the button and say it again." },
   aiVoice: { ko: "AI 목소리", en: "AI voice" },
   voiceOn: { ko: "음성 켜짐", en: "Voice on" },
   voiceOff: { ko: "음성 꺼짐", en: "Voice off" },

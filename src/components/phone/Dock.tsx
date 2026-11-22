@@ -16,6 +16,7 @@ import { COMPACT, FOCUS, ICON, PRESS, PRIMARY_SMALL, SECONDARY_SMALL } from "./u
 // the mic is held.
 
 const STATUS: Partial<Record<VoiceState, PhoneTextKey>> = {
+  starting: "micConnecting",
   connecting: "micConnecting",
   listening: "micListening",
   thinking: "micThinking",
@@ -33,15 +34,11 @@ export function voiceConnected(state: VoiceState): boolean {
   return state === "ready" || state === "listening" || state === "thinking" || state === "speaking";
 }
 
-/** The mic is held to talk: connected, or getting the connection back (a hold then waits for it). */
-function micHolds(state: VoiceState): boolean {
-  return voiceConnected(state) || state === "reconnecting";
-}
-
 /** The words under a mic: what the button does now. */
 export function micAction(state: VoiceState): PhoneTextKey {
   if (!voiceActive(state)) return "micTap";
-  if (!micHolds(state)) return "micCancel";
+  // The microphone is not open yet: a hold could not be kept.
+  if (state === "starting") return "micWait";
   return state === "listening" ? "micRelease" : "micHold";
 }
 
@@ -49,11 +46,11 @@ export function micAction(state: VoiceState): PhoneTextKey {
 export const HOLD = "touch-none select-none [-webkit-touch-callout:none]";
 
 /**
- * A mic button's events. Voice off: a tap starts it (`tap`; while it first connects, the same tap cancels). Starting
- * stays on the click, which browsers count as the gesture audio and the microphone prompt need. Connected: the
- * microphone is sent from pointer or key down until it comes up, leaves or is taken away. Whether a press is a tap or
- * a hold is decided when it goes down, so a hold that outlives the connection (the socket dropped meanwhile) never
- * ends as a tap that turns voice off.
+ * A mic button's events. Voice off: a tap starts it (`tap`). Starting stays on the click, which browsers count as
+ * the gesture audio and the microphone prompt need. Voice on, also while it still connects (what is said then waits
+ * for the connection, I-439): the microphone is used from pointer or key down until it comes up, leaves or is taken
+ * away. Whether a press is a tap or a hold is decided when it goes down, so a hold that outlives the connection (the
+ * socket dropped meanwhile) never ends as a tap, and no press on a mic that is on turns voice off.
  */
 export function useMicEvents(state: VoiceState, on: { tap(): void; press(): void; release(): void }) {
   // The press now down (or the last one) began as a hold: its click is not a tap.
@@ -66,7 +63,7 @@ export function useMicEvents(state: VoiceState, on: { tap(): void; press(): void
   useEffect(() => () => handlers.current.release(), []);
 
   const down = () => {
-    holding.current = micHolds(state);
+    holding.current = voiceActive(state);
     if (holding.current) on.press();
     return holding.current;
   };
@@ -74,7 +71,7 @@ export function useMicEvents(state: VoiceState, on: { tap(): void; press(): void
   return {
     onClick: () => {
       if (holding.current) holding.current = false;
-      else if (!micHolds(state)) on.tap();
+      else if (!voiceActive(state)) on.tap();
     },
     onPointerDown: (e: PointerEvent<HTMLButtonElement>) => {
       if (e.button !== 0) return;

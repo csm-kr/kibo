@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { warmVoiceStart } from "@/lib/agent/liveBackend";
 import { claimUrl, clientIp, fail, ok, pairUrl, parseBody, readJson } from "@/lib/http";
 import { checkIpLimit } from "@/lib/limits/ip";
 import { createSession } from "@/lib/session/service";
@@ -19,6 +20,7 @@ export async function POST(req: Request) {
     checkIpLimit(ip, "session");
     const input = parseBody(bodySchema, await readJson(req));
     const r = await createSession(getStore(), input, Date.now());
+    warmVoiceStart();
     return ok({
       sessionId: r.sessionId,
       claimUrl: claimUrl(req, r.sessionId, r.claimToken),

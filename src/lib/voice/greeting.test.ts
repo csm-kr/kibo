@@ -20,6 +20,14 @@ describe("greeter", () => {
     expect(g.onConnected(HELLO, "connected")).toBeNull();
   });
 
+  // I-439: the person held the mic while voice connected; their words go up instead of the greeting.
+  it("skipped when the person already talks: no greeting in this voice start, and no tool call is held", () => {
+    const g = greeter();
+    g.skip();
+    expect(g.onConnected(HELLO, "connected")).toBeNull();
+    expect(g.holdsTools).toBe(false);
+  });
+
   it("only before the review, and only while the conversation is empty (the phone passes no greeting then)", () => {
     for (const status of ["confirming", "paying", "paid", "expired"] as const) expect(greeter().onConnected(HELLO, status), status).toBeNull();
     expect(greeter().onConnected(HELLO, "ordering")).not.toBeNull();

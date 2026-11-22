@@ -1,0 +1,22 @@
+# 2026-11-22, candidate kibo-00040-yig (hold to talk before the I-439 fix), laptop Chromium: /kiosk?k=malo on one
+# browser, a phone-sized touch browser that opened the QR's claim link, a touch hold on the mic at four moments.
+# Fixture e2e/fixtures/hero-ko.wav through `?e2e=1`; times in ms since the tap on [Turn on the microphone].
+CASE connecting: pressed in state=connecting label="Connecting… Tap to cancel" | sentence sent=false | kiosk lines=0 | tokens=1 | end state=ready
+   commands: setDineOption:ok
+   timeline: connecting@292  FINGER-DOWN@367  token@3192  thinking@4565  speaking@5098  ready@9749  FINGER-UP@20414
+CASE thinking: pressed in state=thinking label="Thinking… Hold to talk" | sentence sent=false | kiosk lines=0 | tokens=1 | end state=ready
+   commands: setDineOption:ok
+   timeline: connecting@274  token@1640  thinking@3247  FINGER-DOWN@3255  listening@3278  speaking@3961  ready@8562  FINGER-UP@23275
+CASE greeting: pressed in state=speaking label="Speaking… Hold to talk" | sentence sent=true | kiosk lines=2 | tokens=1 | end state=ready
+   commands: setDineOption:ok, addToCart:ok, addToCart:ok
+   timeline: connecting@273  token@2808  thinking@4799  speaking@5464  FINGER-DOWN@6683  listening@6716  FINGER-UP@17052  thinking@17082  ready@17831
+CASE ready: pressed in state=ready label="Hold to talk" | sentence sent=true | kiosk lines=2 | tokens=1 | end state=ready
+   commands: setDineOption:ok, addToCart:ok, addToCart:ok
+   timeline: connecting@265  token@961  thinking@2840  speaking@3625  ready@8107  FINGER-DOWN@8131  listening@8158  FINGER-UP@17033  thinking@17057  ready@17705
+
+# /demo on the same candidate, tap on the mic to "ready" (no greeting on /demo), ms since the tap:
+run 1: state:connecting=250  token-req=922  token-res=3589  ws-open=3817  ws-first-msg=5537  state:ready=5539
+run 2: state:connecting=209  token-req=314  token-res=831  ws-open=993  ws-first-msg=2717  state:ready=2721
+# after a 70 s pause (the key probe's 60 s ok has run out):
+run 1: state:connecting=208  token-req=362  token-res=1175  ws-open=1334  ws-first-msg=3546  state:ready=3548
+run 2: state:connecting=234  token-req=430  token-res=3173  ws-open=3333  ws-first-msg=5011  state:ready=5013

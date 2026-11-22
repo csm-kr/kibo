@@ -48,6 +48,10 @@ export function greeter() {
       open = true;
       return { turns: [{ role: "user", parts: [{ text: `${GREETING_NOTE} ${greeting}` }] }], turnComplete: true };
     },
+    /** The person talked first (a hold begun while voice connected): this voice start has no greeting. */
+    skip(): void {
+      sent = true;
+    },
     /** The greeting's response ends with its turn or an interruption, or once the user speaks. */
     onMessage(events: TurnEvent[]): void {
       if (events.some((e) => e.type === "userSpeech" || e.type === "responseEnd")) open = false;

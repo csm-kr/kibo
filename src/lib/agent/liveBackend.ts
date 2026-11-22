@@ -53,11 +53,15 @@ const OK_MS = 60_000;
 /** As long as the text agent skips the key after repeated 402s (src/lib/agent/model.ts). */
 const DOWN_MS = 10 * 60_000;
 const PROBE_TIMEOUT_MS = 5_000;
+/** An ok this old is still answered at once while a probe refreshes it; an older one waits for the probe. */
+const STALE_OK_MS = 10 * 60_000;
 
 /** Ephemeral tokens are free and kept working with the credits used up (I-104), so the probe is one output token
  *  through generateContent on the key, like the deep health's keyGenerate. At most one probe a minute per instance;
  *  billing (402), a 429 (a spend cap or a used-up daily quota also answers 429 and holds for hours; one token a minute
- *  is never a burst) and a missing key mean down, other errors say nothing about billing. */
+ *  is never a burst) and a missing key mean down, other errors say nothing about billing.
+ *  The probe takes about 2 s, so a mic tap does not wait for it when a recent ok exists (I-439): that ok is answered
+ *  and the probe refreshes it. A key that died meanwhile fails that one connection, and the phone's retry asks again. */
 export function createKeyHealth(deps: { probe: () => Promise<unknown>; now: () => number; timeoutMs?: number }): KeyHealth {
   let state: { usable: boolean; until: number } | null = null;
   let running: Promise<boolean> | null = null;
@@ -86,12 +90,13 @@ export function createKeyHealth(deps: { probe: () => Promise<unknown>; now: () =
   return {
     usable() {
       if (state && deps.now() < state.until) return Promise.resolve(state.usable);
+      const recentOk = state?.usable === true && deps.now() < state.until + STALE_OK_MS;
       running ??= probe().then((usable) => {
         state = { usable, until: deps.now() + (usable ? OK_MS : DOWN_MS) };
         running = null;
         return usable;
       });
-      return running;
+      return recentOk ? Promise.resolve(true) : running;
     },
     failed() {
       state = { usable: false, until: deps.now() + DOWN_MS };
@@ -116,6 +121,16 @@ export function sharedKeyHealth(): KeyHealth {
     },
     now: Date.now,
   }));
+}
+
+/**
+ * Starts the key probe without waiting for it, where a voice start would wait for one: called when a session is
+ * made or claimed, seconds before the mic is tapped (I-439).
+ */
+export function warmVoiceStart(
+  deps: Pick<LiveStartDeps, "key" | "backend" | "relayUrl"> = { key: sharedKeyHealth(), backend: liveBackendSetting(), relayUrl: voiceRelayUrl() },
+): void {
+  if (deps.backend === "auto" && deps.relayUrl !== null) void deps.key.usable();
 }
 
 export interface LiveStartDeps extends LiveTokenDeps {

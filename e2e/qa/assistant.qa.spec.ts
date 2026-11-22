@@ -503,7 +503,7 @@ test("P3 and P4: the mic pressed while the AI speaks, and the AI answering while
   await expect(mic).not.toHaveAttribute("data-voice-state", "listening");
 });
 
-test("P3: the connection drops while the mic is held: letting go does not turn voice off, and the hold waits for it", async ({ page, request }) => {
+test("P3: the connection drops while the mic is held: the hold ends with a hint, letting go does not turn voice off", async ({ page, request }) => {
   const live = await talkingLive(page);
   await openPhone(page, request);
   await page.getByRole("button", { name: "Type instead" }).click();
@@ -517,18 +517,165 @@ test("P3: the connection drops while the mic is held: letting go does not turn v
   live.drop();
   await expect(mic).toHaveAttribute("data-voice-state", "reconnecting");
   await expect(mic).toHaveAccessibleName(/Reconnecting….*Hold to talk/);
+  // Part of the sentence went up on the lost connection, so the rest is not sent: the screen asks for it again.
+  await expect(page.getByText("I missed that. Hold the button and say it again.")).toBeVisible();
   // The lift is the end of a hold, not a tap that cancels.
   await page.mouse.up();
   await expect(mic).not.toHaveAttribute("data-voice-state", "off");
   await expect(mic).toHaveAttribute("data-voice-state", "ready", { timeout: 15_000 });
 
-  // A press while it reconnects waits, and listens once the connection is back.
+  // A press while it reconnects listens at once: what is said waits for the connection (I-439).
   live.drop();
   await expect(mic).toHaveAttribute("data-voice-state", "reconnecting");
   await holdMic(page);
-  await expect(mic).toHaveAttribute("data-voice-state", "listening", { timeout: 15_000 });
+  await expect(mic).toHaveAttribute("data-voice-state", "listening");
+  await expect(page.getByText("I missed that. Hold the button and say it again.")).toHaveCount(0);
+  await page.waitForTimeout(600);
   await page.mouse.up();
   await expect(mic).not.toHaveAttribute("data-voice-state", "off");
+  // The sentence goes up with its end signal once the connection is back.
+  await expect.poll(() => live.ends(), { timeout: 15_000 }).toBe(1);
+});
+
+/**
+ * A fake Live that keeps what the phone sent, in order: "greeting", "audio" (a run of microphone frames) and "end"
+ * (the end of a hold's audio). The token waits for `open()`, so the phone stays on "Connecting…" until then.
+ */
+async function recordingLive(page: Page) {
+  let socket: { send(m: string): void; close(): void } | null = null;
+  let open = () => {};
+  const held = new Promise<void>((r) => (open = r));
+  const sent: string[] = [];
+  let frames = 0;
+  const note = (what: string) => {
+    if (sent.at(-1) !== what) sent.push(what);
+  };
+  await page.route("**/api/live-token", async (route) => {
+    await held;
+    await route.fulfill({ json: { ok: true, token: "fake", model: "gemini-3.8-live", expiresAt: Date.now() + 180_000, voiceSeconds: 600 } });
+  });
+  await page.routeWebSocket(/generativelanguage\.googleapis\.com/, (ws) => {
+    let setup = false;
+    ws.onMessage((m) => {
+      const text = String(m);
+      if (!setup) {
+        setup = true;
+        socket = ws;
+        return ws.send(JSON.stringify({ setupComplete: {} }));
+      }
+      if (text.includes("audioStreamEnd")) note("end");
+      else if (text.includes("realtimeInput")) {
+        frames++;
+        note("audio");
+      } else if (text.includes("Greeting from the phone")) note("greeting");
+    });
+  });
+  const voice = Buffer.alloc(3 * 24000 * 2).toString("base64");
+  return {
+    open: () => open(),
+    sent: () => sent,
+    frames: () => frames,
+    say: () => socket!.send(JSON.stringify({ serverContent: { modelTurn: { parts: [{ inlineData: { mimeType: "audio/pcm;rate=24000", data: voice } }] } } })),
+    interrupted: () => socket!.send(JSON.stringify({ serverContent: { interrupted: true } })),
+  };
+}
+
+// I-439 (owner 11-22: "the first press does not take my voice"): a hold begun while voice still connected was lost.
+test.describe("the first press", () => {
+  // Its own address for the per-IP session limit (R-005).
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": "192.0.2.142" } });
+
+  test("P2: the mic held while voice connects: what is said waits, goes up when the connection opens, and no greeting follows", async ({ page, request }) => {
+    const live = await recordingLive(page);
+    // The microphone takes a while to open, as on a phone.
+    await page.addInitScript(() => {
+      const open = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+      navigator.mediaDevices.getUserMedia = async (c) => {
+        await new Promise((r) => setTimeout(r, 1500));
+        return open(c);
+      };
+    });
+    await openPhone(page, request);
+    await page.getByRole("button", { name: "Turn on the microphone" }).click();
+    const mic = micButton(page);
+    // Until the microphone is open a hold could not be kept: the mic says to wait, and a press neither counts nor
+    // turns voice off.
+    await expect(mic).toHaveAttribute("data-voice-state", "starting");
+    await expect(mic).toHaveAccessibleName(/Connecting….*One moment/);
+    await mic.click();
+    await expect(mic).toHaveAttribute("data-voice-state", "starting");
+    // The microphone is open: the mic says to hold, connection or not.
+    await expect(mic).toHaveAttribute("data-voice-state", "connecting");
+    await expect(mic).toHaveAccessibleName(/Connecting….*Hold to talk/);
+    await holdMic(page);
+    await expect(mic).toHaveAttribute("data-voice-state", "listening");
+    await expect(mic).toHaveAccessibleName(/Listening….*Release to send/);
+    await page.waitForTimeout(1000);
+    expect(live.sent()).toEqual([]);
+
+    live.open();
+    // Still held: the waiting frames go up, then the live ones, and the greeting is never sent.
+    await expect.poll(() => live.frames()).toBeGreaterThan(25);
+    await expect(mic).toHaveAttribute("data-voice-state", "listening");
+    await page.mouse.up();
+    await expect.poll(() => live.sent().at(-1)).toBe("end");
+    expect(live.sent()).toEqual(["audio", "end"]);
+    await expect(mic).toHaveAttribute("data-voice-state", "thinking");
+    // This fake Live never answers.
+    await expect(mic).toHaveAttribute("data-voice-state", "ready", { timeout: 8000 });
+  });
+
+  test("P2: said and let go before the connection opens: the sentence goes up whole with its end; a tap sends nothing", async ({ page, request }) => {
+    const live = await recordingLive(page);
+    await openPhone(page, request);
+    await page.getByRole("button", { name: "Turn on the microphone" }).click();
+    const mic = micButton(page);
+    await expect(mic).toHaveAttribute("data-voice-state", "connecting");
+
+    // A tap while it connects neither cancels voice nor leaves anything to send.
+    await mic.click();
+    await expect(page.getByText("Keep holding the button while you talk.")).toBeVisible();
+    await expect(mic).toHaveAttribute("data-voice-state", "connecting");
+
+    await holdMic(page);
+    await expect(mic).toHaveAttribute("data-voice-state", "listening");
+    await page.waitForTimeout(1000);
+    await page.mouse.up();
+    await expect(mic).toHaveAttribute("data-voice-state", "connecting");
+    expect(live.sent()).toEqual([]);
+
+    live.open();
+    await expect.poll(() => live.sent()).toEqual(["audio", "end"]);
+    // About a second of 40 ms frames, and none of the tap's.
+    expect(live.frames()).toBeGreaterThan(15);
+    expect(live.frames()).toBeLessThan(40);
+    await expect(mic).toHaveAttribute("data-voice-state", "thinking");
+    await expect(mic).toHaveAttribute("data-voice-state", "ready", { timeout: 8000 });
+  });
+
+  test("P2: a hold begun before the greeting is heard: the greeting gives way, the hold goes on", async ({ page, request }) => {
+    const live = await recordingLive(page);
+    live.open();
+    await openPhone(page, request);
+    await page.getByRole("button", { name: "Turn on the microphone" }).click();
+    const mic = micButton(page);
+    // Connected, the greeting sent and not yet answered.
+    await expect(mic).toHaveAttribute("data-voice-state", "thinking");
+    await expect.poll(() => live.sent()).toEqual(["greeting"]);
+    await holdMic(page);
+    await expect(mic).toHaveAttribute("data-voice-state", "listening");
+
+    // The greeting's voice arrives while the person talks: it is not played and the hold is not ended.
+    live.say();
+    await page.waitForTimeout(500);
+    await expect(mic).toHaveAttribute("data-voice-state", "listening");
+    // Live hears the person and cuts its greeting off.
+    live.interrupted();
+    await expect(mic).toHaveAttribute("data-voice-state", "listening");
+    await page.mouse.up();
+    await expect.poll(() => live.sent()).toEqual(["greeting", "audio", "end"]);
+    await expect(mic).toHaveAttribute("data-voice-state", "thinking");
+  });
 });
 
 test("P3: noise hint, voice reconnecting, then text after the retries fail", async ({ page, request }, info) => {

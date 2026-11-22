@@ -9,7 +9,7 @@ import { AppBar } from "@/components/phone/AppBar";
 import { ConfirmBar, ConfirmCard, DoneCard, PayCard } from "@/components/phone/Checkout";
 import { Choices } from "@/components/phone/Choices";
 import { keepInView, LastMessage, Messages, StatusChip } from "@/components/phone/Conversation";
-import { Dock, TypingSheet, voiceActive, voiceConnected } from "@/components/phone/Dock";
+import { Dock, TypingSheet, voiceConnected } from "@/components/phone/Dock";
 import { AiLanguageProvider } from "@/components/phone/language";
 import { OrderCard } from "@/components/phone/OrderCard";
 import { Suggestions } from "@/components/phone/Suggestions";
@@ -203,6 +203,7 @@ export function AssistantPanel(props: Props) {
     },
     onNoise: () => setVoiceNote(pt("voiceNoise", locale)),
     onShortHold: () => setVoiceNote(pt("micHoldHint", locale)),
+    onMissed: () => setVoiceNote(pt("micAgain", locale)),
     voiceOutput,
     utterances,
     getCart: () => session?.cart ?? [],
@@ -217,11 +218,6 @@ export function AssistantPanel(props: Props) {
   function startVoice() {
     setVoiceNote(null);
     void voice.start();
-  }
-
-  function toggleVoice() {
-    if (voiceActive(voice.state)) voice.stop();
-    else startVoice();
   }
 
   /** The connected mic went down: the microphone goes to the AI until it comes up (hold to talk). */
@@ -460,7 +456,7 @@ export function AssistantPanel(props: Props) {
       locale={locale}
       disabled={!session || !deviceToken}
       sendDisabled={busy}
-      onMic={toggleVoice}
+      onMic={startVoice}
       onMicPress={pressMic}
       onMicRelease={voice.release}
       voiceOutput={voiceOutput}
@@ -669,7 +665,7 @@ export function AssistantPanel(props: Props) {
             payDisabled={sending || !deviceToken}
             voice={voice.state}
             micDisabled={!deviceToken}
-            onMic={toggleVoice}
+            onMic={startVoice}
             onMicPress={pressMic}
             onMicRelease={voice.release}
             typing={typing}
