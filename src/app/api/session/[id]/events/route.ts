@@ -22,16 +22,11 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
   }
   const { id } = await ctx.params;
   if (!SESSION_ID.test(id)) return fail(new CommandError("BAD_REQUEST", "That request could not be understood."));
-  // Each open stream holds a Cloud Run request until it closes, so one address may hold only a few (I-149).
-  let release: () => void;
-  try {
-    release = openStream(ip);
-  } catch (e) {
-    return fail(e);
-  }
-
   const encoder = new TextEncoder();
   let close = () => {};
+  // Each open stream holds a Cloud Run request until it closes, so one address may hold only a few (I-149); over
+  // that, its oldest stream is closed for this one (I-206).
+  const release = openStream(ip, () => close());
   const stream = new ReadableStream<Uint8Array>({
     start(controller) {
       let closed = false;

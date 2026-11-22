@@ -1,0 +1,270 @@
+{
+ "url": "https://hold---kibo-407514467119.asia-northeast3.run.app",
+ "date": "2026-11-22T14:22:38.385Z",
+ "results": [
+  {
+   "case": "connecting",
+   "lang": "ko",
+   "run": 0,
+   "ok": true,
+   "pressedIn": "connecting",
+   "tapToTalkMs": null,
+   "releaseToKioskMs": 2014,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "FINGER-DOWN@496",
+    "FINGER-UP@8092"
+   ]
+  },
+  {
+   "case": "thinking",
+   "lang": "ko",
+   "run": 0,
+   "ok": true,
+   "pressedIn": "thinking",
+   "tapToTalkMs": null,
+   "releaseToKioskMs": 3376,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "FINGER-DOWN@3500",
+    "FINGER-UP@17023"
+   ]
+  },
+  {
+   "case": "greeting",
+   "lang": "ko",
+   "run": 0,
+   "ok": true,
+   "pressedIn": "speaking",
+   "tapToTalkMs": null,
+   "releaseToKioskMs": 632,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "FINGER-DOWN@5876",
+    "FINGER-UP@16987"
+   ]
+  },
+  {
+   "case": "ready",
+   "lang": "ko",
+   "run": 0,
+   "ok": true,
+   "pressedIn": "ready",
+   "tapToTalkMs": null,
+   "releaseToKioskMs": 3367,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "FINGER-DOWN@7899",
+    "FINGER-UP@16988"
+   ]
+  },
+  {
+   "case": "connecting",
+   "lang": "en",
+   "run": 0,
+   "ok": false,
+   "pressedIn": "connecting",
+   "tapToTalkMs": null,
+   "releaseToKioskMs": null,
+   "commands": [
+    "setDineOption:ok"
+   ],
+   "timeline": [
+    "FINGER-DOWN@339",
+    "FINGER-UP@20347"
+   ]
+  },
+  {
+   "case": "thinking",
+   "lang": "en",
+   "run": 0,
+   "ok": true,
+   "pressedIn": "thinking",
+   "tapToTalkMs": null,
+   "releaseToKioskMs": 2111,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "FINGER-DOWN@2529",
+    "FINGER-UP@16307"
+   ]
+  },
+  {
+   "case": "greeting",
+   "lang": "en",
+   "run": 0,
+   "ok": true,
+   "pressedIn": "speaking",
+   "tapToTalkMs": null,
+   "releaseToKioskMs": 2437,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "FINGER-DOWN@6141",
+    "FINGER-UP@16335"
+   ]
+  },
+  {
+   "case": "ready",
+   "lang": "en",
+   "run": 0,
+   "ok": true,
+   "pressedIn": "ready",
+   "tapToTalkMs": null,
+   "releaseToKioskMs": 2017,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "FINGER-DOWN@8093",
+    "FINGER-UP@16275"
+   ]
+  },
+  {
+   "case": "connecting",
+   "lang": "ko",
+   "run": 1,
+   "ok": false,
+   "pressedIn": "connecting",
+   "tapToTalkMs": null,
+   "releaseToKioskMs": null,
+   "commands": [
+    "setDineOption:ok"
+   ],
+   "timeline": [
+    "FINGER-DOWN@363"
+   ],
+   "error": "TypeError: Cannot read properties of null (reading 'x')"
+  },
+  {
+   "case": "thinking",
+   "lang": "ko",
+   "run": 1,
+   "ok": true,
+   "pressedIn": "thinking",
+   "tapToTalkMs": null,
+   "releaseToKioskMs": 2427,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "FINGER-DOWN@2619",
+    "FINGER-UP@17016"
+   ]
+  },
+  {
+   "case": "greeting",
+   "lang": "ko",
+   "run": 1,
+   "ok": true,
+   "pressedIn": "speaking",
+   "tapToTalkMs": null,
+   "releaseToKioskMs": 852,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "FINGER-DOWN@4635",
+    "FINGER-UP@17014"
+   ]
+  },
+  {
+   "case": "ready",
+   "lang": "ko",
+   "run": 1,
+   "ok": true,
+   "pressedIn": "ready",
+   "tapToTalkMs": null,
+   "releaseToKioskMs": 747,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "FINGER-DOWN@7865",
+    "FINGER-UP@17035"
+   ]
+  },
+  {
+   "case": "connecting",
+   "lang": "en",
+   "run": 1,
+   "ok": false,
+   "pressedIn": "connecting",
+   "tapToTalkMs": null,
+   "releaseToKioskMs": null,
+   "commands": [
+    "setDineOption:ok"
+   ],
+   "timeline": [
+    "FINGER-DOWN@336",
+    "FINGER-UP@20372"
+   ]
+  },
+  {
+   "case": "thinking",
+   "lang": "en",
+   "run": 1,
+   "ok": false,
+   "pressedIn": "",
+   "tapToTalkMs": null,
+   "releaseToKioskMs": null,
+   "commands": [],
+   "timeline": [],
+   "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Turn on the microphone' }) to be visible\u001b[22m\n"
+  },
+  {
+   "case": "greeting",
+   "lang": "en",
+   "run": 1,
+   "ok": false,
+   "pressedIn": "",
+   "tapToTalkMs": null,
+   "releaseToKioskMs": null,
+   "commands": [],
+   "timeline": [],
+   "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Turn on the microphone' }) to be visible\u001b[22m\n"
+  },
+  {
+   "case": "ready",
+   "lang": "en",
+   "run": 1,
+   "ok": false,
+   "pressedIn": "",
+   "tapToTalkMs": null,
+   "releaseToKioskMs": null,
+   "commands": [],
+   "timeline": [],
+   "error": "TimeoutError: locator.waitFor: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Turn on the microphone' }) to be visible\u001b[22m\n"
+  }
+ ]
+}

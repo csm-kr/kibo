@@ -450,8 +450,11 @@ export function AssistantPanel(props: Props) {
     </div>
   );
 
+  // One key on every screen: the dock sits after a different number of siblings on the dine, cart and confirm
+  // screens, and without it a screen change remounts the mic and ends the hold on it (I-441).
   const dock = (
     <Dock
+      key="dock"
       state={voice.state}
       locale={locale}
       disabled={!session || !deviceToken}

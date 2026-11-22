@@ -11,7 +11,8 @@
 //
 //   npm run rehearse -- --url https://hold---kibo-407514467119.asia-northeast3.run.app --runs 3
 //   ... --cases connecting,ready --langs ko,en --out spikes/crowd-voice/logs/rehearse.json
-// One session per run; the server allows 10 new sessions a minute per address.
+// One session and one voice start per run. The server allows 10 new sessions a minute and 24 voice starts a day per
+// address and instance, and a phone on the same Wi-Fi shares them: keep a rehearsal small on the day of a demo.
 
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -78,18 +79,19 @@ async function one(c: string, lang: string, run: number): Promise<Result> {
       mark(s);
       if (out.tapToTalkMs === null && s !== "starting") out.tapToTalkMs = Date.now() - t0;
     });
-    await phone.addInitScript(() => {
+    // A string, not a function: tsx adds a name helper to functions that the page does not have.
+    await phone.addInitScript(`(() => {
       let last = "";
       const tick = () => {
         const s = document.querySelector("button[data-voice-state]")?.getAttribute("data-voice-state") ?? "";
         if (s && s !== last) {
           last = s;
-          (window as unknown as { __mark?: (s: string) => void }).__mark?.(s);
+          window.__mark?.(s);
         }
         requestAnimationFrame(tick);
       };
       requestAnimationFrame(tick);
-    });
+    })()`);
     // The phone's camera opens the claim link; the reload only adds `?e2e=1` (the device token is stored).
     await phone.goto(claim);
     await phone.getByRole("button", { name: "Turn on the microphone" }).waitFor({ timeout: 60_000 });
@@ -98,6 +100,8 @@ async function one(c: string, lang: string, run: number): Promise<Result> {
     await on.waitFor({ timeout: 60_000 });
     t0 = Date.now();
     await on.click();
+    // The press may land while the dine option is still on its way to the server: the cart screen then opens under
+    // the finger, as it does for a person who taps [Eat here] and talks at once (I-441).
     await phone.getByRole("button", { name: "Eat here" }).click({ timeout: 30_000 });
     const mic = phone.locator("button[data-voice-state]");
     await mic.waitFor({ timeout: 20_000 });

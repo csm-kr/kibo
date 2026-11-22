@@ -25,6 +25,8 @@ export const CLIPS: { file: string; voice: string; text: string }[] = [
   // The rest of the hero order's turns in the user's voice, for the several-holds run (multi.ts).
   { file: "user-no-thanks-en.wav", voice: "Kore", text: "No, thanks." },
   { file: "user-pay-en.wav", voice: "Kore", text: "That's all. I'll pay." },
+  // The customer's voice sample for multi.ts --enroll sample (the fixtures' voice, scripts/make-voice-fixtures.ts).
+  { file: "user-sample-en.wav", voice: "Kore", text: "This is my voice. I am the one ordering on this phone." },
 ];
 
 async function main() {

@@ -45,6 +45,16 @@ const RUNS = Number(arg("runs", "3"));
 const CONC = Number(arg("conc", "3"));
 const VERTEX = process.argv.includes("--vertex");
 const GAP_MS = Number(arg("gap-ms", "0"));
+// The owner's idea (11-22): "recognise only my voice". `instruction`: the Live instructions say that other people
+// talk near the phone and only the customer's voice counts. `sample`: also, before the first hold, the phone sends a
+// clean sentence in the customer's voice and names it as the customer's.
+const ENROLL = arg("enroll", "off") as "off" | "instruction" | "sample";
+const VOICES_RULE = [
+  "",
+  "## Voices",
+  "Other people talk near the phone, and the microphone hears them too. Only the customer orders: the customer is the closest and clearest voice in each recording, and the same voice all through this order. Never add, change or confirm anything that another voice says. If you cannot tell which words were the customer's, ask the customer to say it again.",
+].join("\n");
+const SAMPLE_NOTE = "Voice sample from the phone: the audio that follows is the customer's own voice. Remember this voice; it is the only one that orders. Answer only: OK.";
 
 const HOLDS = [
   join(ROOT, "e2e/fixtures/hero-en.wav"),
@@ -158,13 +168,28 @@ async function one(level: string, run: number) {
 
   live = await ai.live.connect({
     model: config.model,
-    config: liveConnectConfig(config.system, config.tools, config.languageCode),
+    config: liveConnectConfig(config.system + (ENROLL === "off" ? "" : VOICES_RULE), config.tools, config.languageCode),
     callbacks: { onmessage, onerror: () => {}, onclose: () => (closed = true) },
   });
   const t0 = performance.now();
   const crowdAt = () => Math.floor(((performance.now() - t0) / 1000) * RATE) % (crowd.length - FRAME);
   const silence = b64(new Float32Array(FRAME));
   const reactions: (number | null)[] = [];
+
+  if (ENROLL === "sample") {
+    // The sample: a text turn that names it, then the clean voice, then the end of the audio; wait for the "OK".
+    const sample = atLevel(trim(load(join(DIR, "audio/user-sample-en.wav"))), USER_DBFS);
+    live.sendClientContent({ turns: [{ role: "user", parts: [{ text: SAMPLE_NOTE }] }], turnComplete: false });
+    for (let i = 0; i + FRAME <= sample.length; i += FRAME) {
+      live.sendRealtimeInput({ audio: { data: b64(sample.subarray(i, i + FRAME)), mimeType: "audio/pcm;rate=16000" } });
+      await sleep(10);
+    }
+    live.sendRealtimeInput({ audioStreamEnd: true });
+    const sent = performance.now();
+    while (performance.now() - sent < 10_000 && turnCompleteAt < sent) await sleep(40);
+    await sleep(Math.max(0, playEnd - performance.now()) + MUTE_TAIL_MS);
+    heard = "";
+  }
 
   for (const [n, file] of HOLDS.entries()) {
     if (closed) break;
@@ -213,7 +238,7 @@ async function one(level: string, run: number) {
   closed = true;
   live.close();
   const end = (await store.get(sessionId))!;
-  return { level, run, model: config.model, gapMs: GAP_MS, reactions, status: end.status, heroCart: sameOrder(end.cart), cart: end.cart, cmds, heard };
+  return { level, run, model: config.model, gapMs: GAP_MS, enroll: ENROLL, reactions, status: end.status, heroCart: sameOrder(end.cart), cart: end.cart, cmds, heard };
 }
 
 async function main() {
@@ -235,9 +260,9 @@ async function main() {
     }),
   );
   mkdirSync(join(DIR, "logs"), { recursive: true });
-  const name = `multi-${RELEASE}${VERTEX ? "-vertex" : ""}${GAP_MS ? `-gap${GAP_MS / 1000}s` : ""}-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
+  const name = `multi-${RELEASE}${VERTEX ? "-vertex" : ""}${GAP_MS ? `-gap${GAP_MS / 1000}s` : ""}${ENROLL === "off" ? "" : `-enroll-${ENROLL}`}-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
   writeFileSync(join(DIR, "logs", name), JSON.stringify(results, null, 1));
-  console.log(`\nfive holds, release = ${RELEASE}${VERTEX ? ", Vertex AI" : ""}`);
+  console.log(`\nfive holds, release = ${RELEASE}${VERTEX ? ", Vertex AI" : ""}, enroll = ${ENROLL}`);
   for (const level of LEVELS) {
     const rows = results.filter((r) => r.level === level);
     const answered = rows.reduce((n, r) => n + r.reactions.filter((x) => x !== null).length, 0);

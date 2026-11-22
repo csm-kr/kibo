@@ -207,3 +207,31 @@ npx tsx --env-file=.env spikes/crowd-voice/multi.ts --release open --levels off 
 npx tsx spikes/crowd-voice/levels.ts
 npx vitest run --root spikes/crowd-voice
 ```
+
+## "Only my voice" told to Gemini Live (2026-11-22, the owner's idea)
+
+Question: does telling Gemini Live whose voice is the customer's raise the five-hold order when a bystander talks
+during every hold? `multi.ts --enroll instruction` adds a "Voices" rule to the Live instructions (only the closest,
+clearest voice orders; ask again when unsure); `--enroll sample` also sends one clean sentence in the customer's voice
+before the first hold and names it. Hold to talk with `audioStreamEnd`, six sessions per cell, synthetic voices, digital
+mix, English.
+
+| Bystander level | No rule | Rule in the instructions | Rule + voice sample |
+|---|---|---|---|
+| -10 dB: reached `paying` / hero cart right | 6 of 6 / 3 of 6 | 6 of 6 / 3 of 6 | 6 of 6 / 5 of 6 |
+| 0 dB: reached `paying` / hero cart right | 2 of 6 / 3 of 6 | 1 of 6 / 3 of 6 | 1 of 6 / 1 of 6 |
+
+- No gain that six sessions can show, and none at 0 dB, where the model adds the bystander's items (extra `addToCart`
+  after the hero lines) or opens choices nobody asked for. Not shipped. 5 of 6 against 3 of 6 at -10 dB is within what
+  six runs vary by; it would need 20 or more per cell to say anything.
+- This is an instruction to a model, not speaker verification: nothing here checks a voice. A voiceprint model on the
+  phone would be a non-Gemini model in `src/` (CLAUDE.md) and biometric data; not built.
+- What works today is distance: hold to talk with the phone near the mouth puts other voices 10 dB or more below the
+  customer's, where the order reached `paying` in 18 of 18 sessions here (12 above, 6 of 7 earlier).
+
+```
+npx tsx --env-file=.env spikes/crowd-voice/multi.ts --release end --levels -10,0 --runs 6 --conc 3 [--enroll instruction|sample]
+```
+
+Logs: `logs/multi-end-2026-11-22T14-03-30-202Z.json`, `logs/multi-end-enroll-instruction-2026-11-22T14-07-08-839Z.json`,
+`logs/multi-end-enroll-sample-2026-11-22T14-11-08-000Z.json`.

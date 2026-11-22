@@ -1,0 +1,675 @@
+[
+ {
+  "level": "-10",
+  "run": 1,
+  "model": "gemini-3.8-live",
+  "gapMs": 0,
+  "enroll": "instruction",
+  "reactions": [
+   1440,
+   1097,
+   244,
+   602,
+   542
+  ],
+  "status": "paying",
+  "heroCart": false,
+  "cart": [
+   {
+    "lineId": "089420a36ad37e57",
+    "itemId": "cheese_burger",
+    "variant": "set",
+    "qty": 1,
+    "selections": {
+     "side": [
+      "fries_l"
+     ],
+     "drink": [
+      "zero_cola"
+     ]
+    },
+    "unitPrice": 7400
+   },
+   {
+    "lineId": "49b9c0bd3cf43ca0",
+    "itemId": "cheese_burger",
+    "variant": "set",
+    "qty": 1,
+    "selections": {
+     "side": [
+      "fries_l"
+     ],
+     "drink": [
+      "cider"
+     ],
+     "ingredients": [
+      "no_pickles"
+     ]
+    },
+    "unitPrice": 7400
+   }
+  ],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "updateCart:ok",
+   "updateCart:ok",
+   "requestCheckout:ok",
+   "confirmCheckout:ok"
+  ],
+  "heard": "Two cheeseburger sets, one without pickles. Drinks, zero cola and cider.Make both fries large.지.That's all. Okay.Yes."
+ },
+ {
+  "level": "-10",
+  "run": 2,
+  "model": "gemini-3.8-live",
+  "gapMs": 0,
+  "enroll": "instruction",
+  "reactions": [
+   1079,
+   894,
+   617,
+   618,
+   1055
+  ],
+  "status": "paying",
+  "heroCart": true,
+  "cart": [
+   {
+    "lineId": "c52240c31df63fab",
+    "itemId": "cheese_burger",
+    "variant": "set",
+    "qty": 1,
+    "selections": {
+     "side": [
+      "fries_l"
+     ],
+     "drink": [
+      "zero_cola"
+     ],
+     "ingredients": [
+      "no_pickles"
+     ]
+    },
+    "unitPrice": 7400
+   },
+   {
+    "lineId": "806eb750d69a7da3",
+    "itemId": "cheese_burger",
+    "variant": "set",
+    "qty": 1,
+    "selections": {
+     "side": [
+      "fries_l"
+     ],
+     "drink": [
+      "cider"
+     ]
+    },
+    "unitPrice": 7400
+   }
+  ],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "updateCart:ok",
+   "updateCart:ok",
+   "requestCheckout:ok",
+   "confirmCheckout:ok"
+  ],
+  "heard": "two cheeseburger sets one without pickles drinks Zero Cola and ciderMake both fries large.No, thanks.That's all. OpenYes."
+ },
+ {
+  "level": "-10",
+  "run": 0,
+  "model": "gemini-3.8-live",
+  "gapMs": 0,
+  "enroll": "instruction",
+  "reactions": [
+   2801,
+   2738,
+   2479,
+   2864,
+   2207
+  ],
+  "status": "paying",
+  "heroCart": true,
+  "cart": [
+   {
+    "lineId": "ca443df1200e51c7",
+    "itemId": "cheese_burger",
+    "variant": "set",
+    "qty": 1,
+    "selections": {
+     "side": [
+      "fries_l"
+     ],
+     "drink": [
+      "zero_cola"
+     ],
+     "ingredients": [
+      "no_pickles"
+     ]
+    },
+    "unitPrice": 7400
+   },
+   {
+    "lineId": "0a439feca43b585a",
+    "itemId": "cheese_burger",
+    "variant": "set",
+    "qty": 1,
+    "selections": {
+     "side": [
+      "fries_l"
+     ],
+     "drink": [
+      "cider"
+     ]
+    },
+    "unitPrice": 7400
+   }
+  ],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "offerChoices:ok",
+   "updateCart:ok",
+   "updateCart:ok",
+   "requestCheckout:ok",
+   "confirmCheckout:ok"
+  ],
+  "heard": "two cheeseburger sets, one without pickles, drinks zero cola and cider.Make both fries large.No thanks.I told him we should take the later train.Yes."
+ },
+ {
+  "level": "-10",
+  "run": 4,
+  "model": "gemini-3.8-live",
+  "gapMs": 0,
+  "enroll": "instruction",
+  "reactions": [
+   1091,
+   905,
+   508,
+   646,
+   1341
+  ],
+  "status": "paying",
+  "heroCart": true,
+  "cart": [
+   {
+    "lineId": "cec2460f85d62e31",
+    "itemId": "cheese_burger",
+    "variant": "set",
+    "qty": 1,
+    "selections": {
+     "side": [
+      "fries_l"
+     ],
+     "drink": [
+      "zero_cola"
+     ],
+     "ingredients": [
+      "no_pickles"
+     ]
+    },
+    "unitPrice": 7400
+   },
+   {
+    "lineId": "5ec7362a282196f6",
+    "itemId": "cheese_burger",
+    "variant": "set",
+    "qty": 1,
+    "selections": {
+     "side": [
+      "fries_l"
+     ],
+     "drink": [
+      "cider"
+     ]
+    },
+    "unitPrice": 7400
+   }
+  ],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "updateCart:ok",
+   "updateCart:ok",
+   "requestCheckout:ok",
+   "confirmCheckout:ok"
+  ],
+  "heard": "two cheeseburger sets, one without pickles, drinks zero cola and cider.Make both fries large.No, thanks.That's all.Yes."
+ },
+ {
+  "level": "-10",
+  "run": 3,
+  "model": "gemini-3.8-live",
+  "gapMs": 0,
+  "enroll": "instruction",
+  "reactions": [
+   2796,
+   2952,
+   2295,
+   2419,
+   3080
+  ],
+  "status": "paying",
+  "heroCart": false,
+  "cart": [
+   {
+    "lineId": "ddf8bc065d8ae4a4",
+    "itemId": "cheese_burger",
+    "variant": "set",
+    "qty": 1,
+    "selections": {
+     "side": [
+      "fries_l"
+     ],
+     "drink": [
+      "zero_cola"
+     ]
+    },
+    "unitPrice": 7400
+   },
+   {
+    "lineId": "151cf9e0972834ce",
+    "itemId": "cheese_burger",
+    "variant": "set",
+    "qty": 1,
+    "selections": {
+     "side": [
+      "fries_l"
+     ],
+     "drink": [
+      "cider"
+     ],
+     "ingredients": [
+      "no_pickles"
+     ]
+    },
+    "unitPrice": 7400
+   }
+  ],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "updateCart:ok",
+   "updateCart:ok",
+   "requestCheckout:ok",
+   "confirmCheckout:ok"
+  ],
+  "heard": "Two cheeseburger sets, one without pickles. Drinks, zero cola and cider.Make both fries large.No, thank you.That's all. Okay.Yes."
+ },
+ {
+  "level": "-10",
+  "run": 5,
+  "model": "gemini-3.8-live",
+  "gapMs": 0,
+  "enroll": "instruction",
+  "reactions": [
+   958,
+   859,
+   674,
+   437,
+   684
+  ],
+  "status": "paying",
+  "heroCart": false,
+  "cart": [
+   {
+    "lineId": "fddc9f18e87b1abc",
+    "itemId": "cheese_burger",
+    "variant": "set",
+    "qty": 1,
+    "selections": {
+     "side": [
+      "fries_l"
+     ],
+     "drink": [
+      "zero_cola"
+     ]
+    },
+    "unitPrice": 7400
+   },
+   {
+    "lineId": "1f15b738ea05d149",
+    "itemId": "cheese_burger",
+    "variant": "set",
+    "qty": 1,
+    "selections": {
+     "side": [
+      "fries_l"
+     ],
+     "drink": [
+      "cider"
+     ],
+     "ingredients": [
+      "no_pickles"
+     ]
+    },
+    "unitPrice": 7400
+   }
+  ],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "updateCart:ok",
+   "updateCart:ok",
+   "requestCheckout:ok",
+   "confirmCheckout:ok"
+  ],
+  "heard": "two cheeseburger set, one without pickles. Drinks, zero cola and cider.Make both fries large.No, thanks.레몬을 넣어 주세요.Yes."
+ },
+ {
+  "level": "0",
+  "run": 0,
+  "model": "gemini-3.8-live",
+  "gapMs": 0,
+  "enroll": "instruction",
+  "reactions": [
+   801,
+   972,
+   591,
+   235,
+   1521
+  ],
+  "status": "paying",
+  "heroCart": true,
+  "cart": [
+   {
+    "lineId": "d0ed72019f1ce23c",
+    "itemId": "cheese_burger",
+    "variant": "set",
+    "qty": 1,
+    "selections": {
+     "side": [
+      "fries_l"
+     ],
+     "drink": [
+      "zero_cola"
+     ],
+     "ingredients": [
+      "no_pickles"
+     ]
+    },
+    "unitPrice": 7400
+   },
+   {
+    "lineId": "965ced2e363dbe59",
+    "itemId": "cheese_burger",
+    "variant": "set",
+    "qty": 1,
+    "selections": {
+     "side": [
+      "fries_l"
+     ],
+     "drink": [
+      "cider"
+     ]
+    },
+    "unitPrice": 7400
+   }
+  ],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "updateCart:ok",
+   "updateCart:ok",
+   "requestCheckout:ok",
+   "confirmCheckout:ok"
+  ],
+  "heard": "two cheeseburger sets, one without pickle, drinks zero cola and cider.Make both fries large.No thanks.That's all.Yes."
+ },
+ {
+  "level": "0",
+  "run": 2,
+  "model": "gemini-3.8-live",
+  "gapMs": 0,
+  "enroll": "instruction",
+  "reactions": [
+   284,
+   1050,
+   926,
+   1037,
+   789
+  ],
+  "status": "ordering",
+  "heroCart": false,
+  "cart": [],
+  "cmds": [
+   "showMenu:ok",
+   "offerChoices:ok"
+  ],
+  "heard": "Wow.Maybe both fries large.진짜 길었지.So I told him we should takechicken burger"
+ },
+ {
+  "level": "0",
+  "run": 1,
+  "model": "gemini-3.8-live",
+  "gapMs": 0,
+  "enroll": "instruction",
+  "reactions": [
+   2802,
+   807,
+   2826,
+   2931,
+   702
+  ],
+  "status": "ordering",
+  "heroCart": true,
+  "cart": [
+   {
+    "lineId": "627beaca85e557ea",
+    "itemId": "cheese_burger",
+    "variant": "set",
+    "qty": 1,
+    "selections": {
+     "side": [
+      "fries_l"
+     ],
+     "drink": [
+      "zero_cola"
+     ],
+     "ingredients": [
+      "no_pickles"
+     ]
+    },
+    "unitPrice": 7400
+   },
+   {
+    "lineId": "04e5eb090e9bffb6",
+    "itemId": "cheese_burger",
+    "variant": "set",
+    "qty": 1,
+    "selections": {
+     "side": [
+      "fries_l"
+     ],
+     "drink": [
+      "cider"
+     ]
+    },
+    "unitPrice": 7400
+   }
+  ],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "updateCart:ok",
+   "updateCart:ok",
+   "showMenu:ok",
+   "showMenu:ok",
+   "offerChoices:ok",
+   "addToCart:NEEDS_CHOICE",
+   "offerChoices:ok"
+  ],
+  "heard": "two cheeseburger sets, one without pickles, drinks, zero cola and cider.Make both fries large.뭐 먹을까?Can I get a spicy chicken burger?Yes."
+ },
+ {
+  "level": "0",
+  "run": 3,
+  "model": "gemini-3.8-live",
+  "gapMs": 0,
+  "enroll": "instruction",
+  "reactions": [
+   1386,
+   939,
+   1155,
+   1272,
+   975
+  ],
+  "status": "ordering",
+  "heroCart": true,
+  "cart": [
+   {
+    "lineId": "e6132e6697ff68d5",
+    "itemId": "cheese_burger",
+    "variant": "set",
+    "qty": 1,
+    "selections": {
+     "side": [
+      "fries_l"
+     ],
+     "drink": [
+      "zero_cola"
+     ],
+     "ingredients": [
+      "no_pickles"
+     ]
+    },
+    "unitPrice": 7400
+   },
+   {
+    "lineId": "66fb5adb36a975d4",
+    "itemId": "cheese_burger",
+    "variant": "set",
+    "qty": 1,
+    "selections": {
+     "side": [
+      "fries_l"
+     ],
+     "drink": [
+      "cider"
+     ]
+    },
+    "unitPrice": 7400
+   }
+  ],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "offerChoices:ok",
+   "updateCart:ok",
+   "updateCart:ok",
+   "addToCart:NEEDS_CHOICE",
+   "showMenu:ok",
+   "offerChoices:ok",
+   "offerChoices:ok"
+  ],
+  "heard": "two cheeseburger sets, one without pickles. Drink, zero cola and cider.Make both fries large.I told them we should take the laterspicy chicken burger andYes."
+ },
+ {
+  "level": "0",
+  "run": 4,
+  "model": "gemini-3.8-live",
+  "gapMs": 0,
+  "enroll": "instruction",
+  "reactions": [
+   4747,
+   2988,
+   2256,
+   2809,
+   2517
+  ],
+  "status": "ordering",
+  "heroCart": false,
+  "cart": [
+   {
+    "lineId": "ceeb7036e3942a5e",
+    "itemId": "cheese_burger",
+    "variant": "set",
+    "qty": 1,
+    "selections": {
+     "side": [
+      "fries_l"
+     ],
+     "drink": [
+      "zero_cola"
+     ],
+     "ingredients": [
+      "no_pickles"
+     ]
+    },
+    "unitPrice": 7400
+   },
+   {
+    "lineId": "d4ca052b36891963",
+    "itemId": "cheese_burger",
+    "variant": "set",
+    "qty": 1,
+    "selections": {
+     "side": [
+      "fries_l"
+     ],
+     "drink": [
+      "cider"
+     ]
+    },
+    "unitPrice": 7400
+   },
+   {
+    "lineId": "c922841869ba0186",
+    "itemId": "lemonade",
+    "variant": "single",
+    "qty": 1,
+    "selections": {},
+    "unitPrice": 2500
+   }
+  ],
+  "cmds": [
+   "addToCart:ok",
+   "addToCart:ok",
+   "updateCart:ok",
+   "updateCart:ok",
+   "addToCart:ok",
+   "showMenu:ok",
+   "offerChoices:ok"
+  ],
+  "heard": "two cheeseburger sets one without pickles drinks zero cola and ciderMake both fries large.진짜 길었지.레모네이드 주세요.cheeseburger"
+ },
+ {
+  "level": "0",
+  "run": 5,
+  "model": "gemini-3.8-live",
+  "gapMs": 0,
+  "enroll": "instruction",
+  "reactions": [
+   1247,
+   1043,
+   1285,
+   801,
+   1303
+  ],
+  "status": "ordering",
+  "heroCart": false,
+  "cart": [
+   {
+    "lineId": "bc4f12614fa23cfa",
+    "itemId": "lemonade",
+    "variant": "single",
+    "qty": 1,
+    "selections": {},
+    "unitPrice": 2500
+   }
+  ],
+  "cmds": [
+   "addToCart:NEEDS_CHOICE",
+   "offerChoices:ok",
+   "showMenu:ok",
+   "undoLastChange:CONFLICT",
+   "addToCart:SOLD_OUT",
+   "addToCart:ok"
+  ],
+  "heard": "Can I get a spicy Zax, one without pickles? Drinks, zero cola and cider.Make both fries large.No, thanks.새우 버거 하나랑and a large"
+ }
+]

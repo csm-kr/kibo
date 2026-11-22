@@ -167,3 +167,9 @@ When an issue class in `docs/ISSUE.md` is seen for the **3rd time**, it becomes 
 - From: `stuck-voice-state` — I-386 (seen 10-16/session), I-394 (10-16/session), I-435 (11-22/session)
 - Why: three times a screen kept "Speaking…", "Working…" or "Thinking…" because the state only ended on a message the model did not send (a turn with no audio, a turn that outlived its command, a greeting never answered).
 - Check: for each voice or working state a step adds or changes, name what ends it when the model stays silent (a timer, the command landing, the socket closing), and `e2e/qa/assistant.qa.spec.ts` reaches that state with its fake Live (`fakeLive`, which answers nothing) and asserts the screen leaves it.
+
+### R-036 (proposed): A limit counted per address is sized for a room of people behind one address, and says what they see when it is reached
+- From: `shared-nat-limit` — I-154 (seen 10-13/11-hardening:0, 10-13/session), I-442 (11-22/session); see also I-206 (places held by closed pages)
+- Why: judges behind one office network hit 10 streams and 60 requests a minute, and the finale's venue Wi-Fi puts the owner's phone, the kiosk and every judge's phone behind one address with 24 voice starts a day.
+- Check: a step that adds or changes a per-address limit writes in `docs/ARCHITECTURE.md` what 30 people at one address get in the limit's window, and what the screen shows at the limit; a limit that can be reached by honest use ends the oldest holder or waits and retries instead of leaving a screen dead.
+

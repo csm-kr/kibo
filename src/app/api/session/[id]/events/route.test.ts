@@ -40,6 +40,24 @@ function dataOf(event: string | null) {
   return JSON.parse(event!.slice("data: ".length));
 }
 
+/** How many store listeners the streams hold now: one per stream that has not ended. */
+function countSubscribers() {
+  const store = getStore();
+  let n = 0;
+  const original = store.subscribe.bind(store);
+  vi.spyOn(store, "subscribe").mockImplementation((id, onChange, onError) => {
+    n++;
+    const off = original(id, onChange, onError);
+    let done = false;
+    return () => {
+      if (!done) n--;
+      done = true;
+      off();
+    };
+  });
+  return () => n;
+}
+
 async function newSession() {
   const { body } = await read(await createSession(jsonRequest("/api/session", { kioskId: "malo" })));
   return { sessionId: body.sessionId as string, kioskToken: body.kioskToken as string };
@@ -142,53 +160,38 @@ describe("GET /api/session/[id]/events", () => {
   });
 
   // I-149: each stream holds one Cloud Run request (concurrency 80 x max 3 instances = 240) for up to the request
-  // timeout, and the only cap was the per-IP requests a minute, so one address could hold every slot. The cap is 40
-  // per address (shared office networks during judging, I-154), well below the 240 slots.
-  it("I-149: one address cannot hold more than 40 streams open at once", async () => {
-    const t0 = Date.now();
-    let now = t0;
-    vi.spyOn(Date, "now").mockImplementation(() => now);
+  // timeout, so one address may hold 40 (shared office networks during judging, I-154), well below the 240 slots.
+  // I-206 (11-22): Cloud Run does not tell the server that a browser left (116 of 119 production streams lasted the
+  // whole 15 min), so closed screens kept their places and the 41st page opened within 15 min got "Too many open
+  // screens": the finale rehearsal locked its own address out. Now the address's oldest stream ends instead. A screen
+  // that is gone loses nothing; one that is still open reconnects (EventSource).
+  it("I-149, I-206: one address holds at most 40 streams; one more ends its oldest stream instead of being refused", async () => {
     const s = await newSession();
-    const open: Response[] = [];
-    for (let minute = 0; minute < 4; minute++) {
-      now = t0 + minute * 61_000;
-      for (let k = 0; k < 240; k++) {
-        const res = await GET(new Request(`${BASE}/api/session/${s.sessionId}/events`, { headers: { "x-forwarded-for": "203.0.113.9" } }), {
-          params: Promise.resolve({ id: s.sessionId }),
-        });
-        if (res.status === 200) open.push(res);
-      }
-    }
-    const held = open.length;
-    await Promise.all(open.map((r) => r.body!.cancel()));
-    expect(held, `streams one address held open at the same time`).toBeLessThanOrEqual(40);
-    // A closed stream frees its place (a minute later, past the per-IP request window).
-    now += 61_000;
-    const again = await GET(new Request(`${BASE}/api/session/${s.sessionId}/events`, { headers: { "x-forwarded-for": "203.0.113.9" } }), {
-      params: Promise.resolve({ id: s.sessionId }),
-    });
-    expect(again.status).toBe(200);
-    await again.body!.cancel();
-  });
-
-  it("I-149: a stream refused for too many open screens is 429 with a plain message", async () => {
-    const s = await newSession();
-    const req = () =>
-      GET(new Request(`${BASE}/api/session/${s.sessionId}/events`, { headers: { "x-forwarded-for": "203.0.113.10" } }), {
+    const held = countSubscribers();
+    const streams = [];
+    for (let k = 0; k < 45; k++) {
+      const res = await GET(new Request(`${BASE}/api/session/${s.sessionId}/events`, { headers: { "x-forwarded-for": "203.0.113.9" } }), {
         params: Promise.resolve({ id: s.sessionId }),
       });
-    const open = [];
-    for (let i = 0; i < 40; i++) open.push(await req());
-    const { status, body } = await read(await req());
-    expect(status).toBe(429);
-    expect(body.error).toEqual({ code: "RATE_LIMITED", message: "Too many open screens. Please close one and try again." });
-    await Promise.all(open.map((r) => r.body!.cancel()));
+      expect(res.status).toBe(200);
+      streams.push(events(res));
+      expect(held()).toBe(Math.min(k + 1, 40));
+    }
+    // The five oldest were closed, after what was already written to them; the sixth is still open.
+    for (const old of streams.slice(0, 5)) {
+      let last: string | null = "";
+      while (last !== null) last = await old.next();
+    }
+    expect(dataOf(await streams[5].next())).toMatchObject({ sessionId: s.sessionId });
+    await Promise.all(streams.slice(5).map((x) => x.cancel()));
+    expect(held()).toBe(0);
   });
 
-  // Live 10-13: places came back minutes after pages were closed. Every way a stream ends must free its place at
-  // once, and only once.
-  it("I-149: cancelling a stream frees its place at once, and an abort after it frees nothing more", async () => {
+  // Live 10-13: places came back minutes after pages were closed. Every way a stream ends must end it at once, and
+  // only once.
+  it("I-149: cancelling a stream ends it at once, and an abort after it does nothing more", async () => {
     const s = await newSession();
+    const held = countSubscribers();
     const req = (signal?: AbortSignal) =>
       GET(new Request(`${BASE}/api/session/${s.sessionId}/events`, { headers: { "x-forwarded-for": "203.0.113.13" }, signal }), {
         params: Promise.resolve({ id: s.sessionId }),
@@ -197,13 +200,15 @@ describe("GET /api/session/[id]/events", () => {
     const first = await req(ac.signal);
     const rest = [];
     for (let i = 0; i < 39; i++) rest.push(await req());
-    expect((await req()).status).toBe(429);
+    expect(held()).toBe(40);
 
     await first.body!.cancel();
+    expect(held()).toBe(39);
     ac.abort();
+    expect(held()).toBe(39);
     const again = await req();
     expect(again.status).toBe(200);
-    expect((await req()).status).toBe(429);
+    expect(held()).toBe(40);
     await Promise.all([again, ...rest].map((r) => r.body!.cancel()));
   });
 
@@ -215,9 +220,10 @@ describe("GET /api/session/[id]/events", () => {
         GET(new Request(`${BASE}/api/session/${s.sessionId}/events`, { headers: { "x-forwarded-for": "203.0.113.14" } }), {
           params: Promise.resolve({ id: s.sessionId }),
         });
+      const held = countSubscribers();
       const open = [];
       for (let i = 0; i < 40; i++) open.push(await req());
-      expect((await req()).status).toBe(429);
+      expect(held()).toBe(40);
 
       // The next keepalive cannot be written.
       const enqueue = vi.spyOn(ReadableStreamDefaultController.prototype, "enqueue").mockImplementation(() => {
@@ -225,6 +231,7 @@ describe("GET /api/session/[id]/events", () => {
       });
       vi.advanceTimersByTime(25_000);
       enqueue.mockRestore();
+      expect(held()).toBe(0);
 
       const again = await req();
       expect(again.status).toBe(200);
@@ -265,7 +272,6 @@ describe("GET /api/session/[id]/events", () => {
       // Fill this address's 40 places; the 15-minute end of the first must free one.
       const first = events(await req());
       for (let i = 0; i < 39; i++) expect((await req()).status).toBe(200);
-      expect((await req()).status).toBe(429);
 
       await first.next();
       vi.advanceTimersByTime(15 * 60_000 - 1);

@@ -676,6 +676,30 @@ test.describe("the first press", () => {
     await expect.poll(() => live.sent()).toEqual(["greeting", "audio", "end"]);
     await expect(mic).toHaveAttribute("data-voice-state", "thinking");
   });
+
+  // On Cloud Run the dine option takes a few hundred ms to come back, so a hold begun right after the tap on
+  // [Eat here] starts on the dine screen and the cart screen opens under the finger (rehearsal on kibo-00043-kub).
+  test("P2 to P3: the screen changes from the dine question to the cart under a held mic: the hold goes on", async ({ page, request }) => {
+    const live = await recordingLive(page);
+    live.open();
+    const { phone } = await openPhone(page, request);
+    await page.getByRole("button", { name: "Turn on the microphone" }).click();
+    const mic = micButton(page);
+    await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "dine");
+    await expect(mic).toHaveAttribute("data-voice-state", "ready", { timeout: 8000 });
+    await holdMic(page);
+    await expect(mic).toHaveAttribute("data-voice-state", "listening");
+
+    await phone("setDineOption", { option: "eat_in" }, { source: "button" });
+    await expect(screenOf(page)).toHaveAttribute("data-phone-screen", "talk");
+    const before = live.frames();
+    await page.waitForTimeout(600);
+    await expect(mic).toHaveAttribute("data-voice-state", "listening");
+    expect(live.frames()).toBeGreaterThan(before + 5);
+    expect(live.sent()).toEqual(["greeting", "audio"]);
+    await page.mouse.up();
+    await expect.poll(() => live.sent()).toEqual(["greeting", "audio", "end"]);
+  });
 });
 
 test("P3: noise hint, voice reconnecting, then text after the retries fail", async ({ page, request }, info) => {

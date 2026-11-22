@@ -81,14 +81,29 @@ describe("takeDailyBudget (I-148)", () => {
   });
 });
 
-describe("openStream (I-149)", () => {
-  it("allows 40 open streams per address and frees one on release, once", () => {
-    const releases = Array.from({ length: 40 }, () => openStream("1.1.1.1"));
-    expect(rateLimited(() => openStream("1.1.1.1"))).toBe(true);
-    expect(rateLimited(() => openStream("2.2.2.2"))).toBe(false);
+describe("openStream (I-149, I-206)", () => {
+  it("holds 40 streams per address; one more ends the oldest instead of being refused", () => {
+    const ended: number[] = [];
+    const releases = Array.from({ length: 40 }, (_, i) => openStream("1.1.1.1", () => ended.push(i)));
+    openStream("2.2.2.2", () => ended.push(-1));
+    expect(ended).toEqual([]);
+    openStream("1.1.1.1", () => ended.push(40));
+    expect(ended).toEqual([0]);
+    // A released stream frees its place, once: the next one ends nobody, the one after it the oldest left.
+    releases[1]();
+    releases[1]();
+    openStream("1.1.1.1", () => ended.push(41));
+    expect(ended).toEqual([0]);
+    openStream("1.1.1.1", () => ended.push(42));
+    expect(ended).toEqual([0, 2]);
+  });
+
+  it("a stream that was ended for a newer one is not ended again, and its release frees nothing more", () => {
+    const ended: number[] = [];
+    const releases = Array.from({ length: 41 }, (_, i) => openStream("1.1.1.1", () => ended.push(i)));
+    expect(ended).toEqual([0]);
     releases[0]();
-    releases[0]();
-    expect(rateLimited(() => openStream("1.1.1.1"))).toBe(false);
-    expect(rateLimited(() => openStream("1.1.1.1"))).toBe(true);
+    openStream("1.1.1.1", () => ended.push(41));
+    expect(ended).toEqual([0, 1]);
   });
 });

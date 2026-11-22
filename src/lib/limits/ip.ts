@@ -83,21 +83,29 @@ export function giveBackDailyBudget(ip: string, kind: keyof typeof DAILY, now = 
  * not 10: judges behind one office network hit 10 on 10-13 (I-154); 40 stays far below the 240 slots.
  */
 const MAX_STREAMS = 40;
-const streams = new Map<string, number>();
+/** Per address, oldest first (a Set keeps the order things were added in). */
+const streams = new Map<string, Set<{ end(): void }>>();
 
-/** Counts one open stream for the address and returns the function that releases it; RATE_LIMITED over the cap. */
-export function openStream(ip: string): () => void {
+/**
+ * Counts one open stream for the address and returns the function that releases it. At the cap the address's oldest
+ * stream is ended (`end`, given when it opened) and the new one takes its place (I-206): Cloud Run does not tell the
+ * server that a browser left, so most places are held by screens that are gone, and a refusal left a real screen dead
+ * (I-033). A screen that is still open reconnects by itself.
+ */
+export function openStream(ip: string, end: () => void): () => void {
   const key = clientKey(ip);
-  const n = streams.get(key) ?? 0;
-  if (n >= MAX_STREAMS) throw new CommandError("RATE_LIMITED", "Too many open screens. Please close one and try again.");
-  streams.set(key, n + 1);
-  let released = false;
+  let open = streams.get(key);
+  if (!open) streams.set(key, (open = new Set()));
+  if (open.size >= MAX_STREAMS) {
+    const oldest = open.values().next().value!;
+    open.delete(oldest);
+    oldest.end();
+  }
+  const mine = { end };
+  open.add(mine);
   return () => {
-    if (released) return;
-    released = true;
-    const left = (streams.get(key) ?? 1) - 1;
-    if (left > 0) streams.set(key, left);
-    else streams.delete(key);
+    open.delete(mine);
+    if (open.size === 0 && streams.get(key) === open) streams.delete(key);
   };
 }
 
