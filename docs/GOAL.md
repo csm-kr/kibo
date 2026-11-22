@@ -1,6 +1,6 @@
 # KIBO goal
 
-Updated: 2026-11-22 · Next check: 2026-11-25 (after the owner's next phone test), then 2026-12-01 (freeze)
+Updated: 2026-11-23 · Next check: 2026-11-25 (after the owner's next phone test), then 2026-12-01 (freeze)
 
 - **Readers:** every session and agent working on KIBO (before choosing work, and after finishing it), and the owner.
 - **Purpose:** every task is chosen and judged against the same goal and number. The method is the `goal-lens` skill.
@@ -61,11 +61,15 @@ time per team and scoring sheet (ask the organizer or a mentor).
 - Baseline: B3 (first press lost; reproduced in a browser at two of four press moments).
 - Adopt if: the owner's phone test loses no first press in 10 tries. Stop if: a hold shows "Listening…" and the words
   still do not arrive.
-- Next experiment (the owner's idea, 11-22: "recognise only my voice"): does telling Gemini Live whose voice is the
-  customer's, with or without a spoken sample, raise the five-hold order at 0 dB above 1 of 3? Adopt only on numbers.
+- Tried 11-22 (the owner's idea, "recognise only my voice"): telling Gemini Live whose voice is the customer's, with or
+  without a spoken sample. At 0 dB the order reached `paying` in 2, 1 and 1 of 6: no gain, not shipped
+  (`spikes/crowd-voice/README.md`). What keeps other voices out today is distance: the phone near the mouth.
+- Rehearsal before every candidate is handed over: `npm run rehearse -- --url <address>` (four press moments, Korean
+  and English). It is the first judge; the owner's phone is the second and decides.
 
 ## 6. Log
 
 | Date | Main number | With it | What changed |
 |---|---|---|---|
 | 11-22 | not measured (no loud-room phone test yet) | voice start request median 2.05 s (52 calls) | Goal written; key variable (a) chosen |
+| 11-23 | not measured on a phone; rehearsal on the deployed candidate 22 of 22 first-try orders (synthetic voice, Chromium, quiet) | tap to a hold that counts: median 332 to 350 ms; voice start request median 562 ms (was 2,382 ms); release to both lines on the kiosk median 731 ms (moments) and 1,167 ms (hold while connecting) | Candidate `kibo-00044-hid`: I-439, I-440, I-441, I-206. "Only my voice" instruction or sample: no gain at 0 dB, not shipped |

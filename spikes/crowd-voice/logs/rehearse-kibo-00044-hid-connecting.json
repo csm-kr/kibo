@@ -1,0 +1,236 @@
+{
+ "url": "https://hold---kibo-407514467119.asia-northeast3.run.app",
+ "date": "2026-11-22T14:55:32.771Z",
+ "results": [
+  {
+   "case": "connecting",
+   "lang": "ko",
+   "run": 0,
+   "ok": true,
+   "pressedIn": "connecting",
+   "tapToTalkMs": 383,
+   "releaseToKioskMs": 2223,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "starting@290",
+    "connecting@383",
+    "FINGER-DOWN@428",
+    "listening@483",
+    "FINGER-UP@17083",
+    "thinking@17115",
+    "ready@19165"
+   ]
+  },
+  {
+   "case": "connecting",
+   "lang": "en",
+   "run": 0,
+   "ok": true,
+   "pressedIn": "connecting",
+   "tapToTalkMs": 327,
+   "releaseToKioskMs": 633,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "starting@249",
+    "connecting@327",
+    "FINGER-DOWN@381",
+    "listening@410",
+    "FINGER-UP@7572",
+    "thinking@7594",
+    "ready@8127"
+   ]
+  },
+  {
+   "case": "connecting",
+   "lang": "ko",
+   "run": 1,
+   "ok": true,
+   "pressedIn": "connecting",
+   "tapToTalkMs": 338,
+   "releaseToKioskMs": 1167,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "starting@270",
+    "connecting@338",
+    "FINGER-DOWN@367",
+    "listening@405",
+    "FINGER-UP@7947",
+    "thinking@7970",
+    "ready@8837"
+   ]
+  },
+  {
+   "case": "connecting",
+   "lang": "en",
+   "run": 1,
+   "ok": true,
+   "pressedIn": "connecting",
+   "tapToTalkMs": 379,
+   "releaseToKioskMs": 849,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "starting@305",
+    "connecting@379",
+    "FINGER-DOWN@407",
+    "listening@447",
+    "FINGER-UP@7650",
+    "thinking@7697",
+    "ready@8380"
+   ]
+  },
+  {
+   "case": "connecting",
+   "lang": "ko",
+   "run": 2,
+   "ok": true,
+   "pressedIn": "connecting",
+   "tapToTalkMs": 322,
+   "releaseToKioskMs": 740,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "starting@254",
+    "connecting@322",
+    "FINGER-DOWN@352",
+    "listening@374",
+    "FINGER-UP@7959",
+    "thinking@7990",
+    "ready@8556"
+   ]
+  },
+  {
+   "case": "connecting",
+   "lang": "en",
+   "run": 2,
+   "ok": true,
+   "pressedIn": "connecting",
+   "tapToTalkMs": 332,
+   "releaseToKioskMs": 2114,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "starting@261",
+    "connecting@332",
+    "FINGER-DOWN@358",
+    "listening@398",
+    "FINGER-UP@7581",
+    "thinking@7615",
+    "ready@8348"
+   ]
+  },
+  {
+   "case": "connecting",
+   "lang": "ko",
+   "run": 3,
+   "ok": true,
+   "pressedIn": "connecting",
+   "tapToTalkMs": 336,
+   "releaseToKioskMs": 855,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "starting@268",
+    "connecting@336",
+    "FINGER-DOWN@357",
+    "listening@386",
+    "FINGER-UP@7954",
+    "thinking@7984",
+    "ready@8651"
+   ]
+  },
+  {
+   "case": "connecting",
+   "lang": "en",
+   "run": 3,
+   "ok": true,
+   "pressedIn": "connecting",
+   "tapToTalkMs": 325,
+   "releaseToKioskMs": 1594,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "starting@256",
+    "connecting@325",
+    "FINGER-DOWN@354",
+    "listening@382",
+    "FINGER-UP@7573",
+    "thinking@7593",
+    "ready@9092"
+   ]
+  },
+  {
+   "case": "connecting",
+   "lang": "ko",
+   "run": 4,
+   "ok": true,
+   "pressedIn": "connecting",
+   "tapToTalkMs": 327,
+   "releaseToKioskMs": 2225,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "starting@258",
+    "connecting@327",
+    "FINGER-DOWN@355",
+    "listening@394",
+    "FINGER-UP@7933",
+    "thinking@7961",
+    "ready@10043"
+   ]
+  },
+  {
+   "case": "connecting",
+   "lang": "en",
+   "run": 4,
+   "ok": true,
+   "pressedIn": "connecting",
+   "tapToTalkMs": 326,
+   "releaseToKioskMs": 857,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "starting@261",
+    "connecting@326",
+    "FINGER-DOWN@350",
+    "listening@381",
+    "FINGER-UP@7573",
+    "thinking@7593",
+    "ready@8311"
+   ]
+  }
+ ]
+}

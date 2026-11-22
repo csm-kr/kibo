@@ -1,0 +1,309 @@
+{
+ "url": "https://hold---kibo-407514467119.asia-northeast3.run.app",
+ "date": "2026-11-22T20:46:04.195Z",
+ "results": [
+  {
+   "case": "thinking",
+   "lang": "ko",
+   "run": 0,
+   "ok": true,
+   "pressedIn": "thinking",
+   "tapToTalkMs": 458,
+   "releaseToKioskMs": 731,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "starting@330",
+    "connecting@458",
+    "thinking@3509",
+    "FINGER-DOWN@3518",
+    "listening@3558",
+    "FINGER-UP@17118",
+    "thinking@17140",
+    "ready@17606"
+   ]
+  },
+  {
+   "case": "greeting",
+   "lang": "ko",
+   "run": 0,
+   "ok": true,
+   "pressedIn": "speaking",
+   "tapToTalkMs": 372,
+   "releaseToKioskMs": 631,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "starting@306",
+    "connecting@372",
+    "thinking@2788",
+    "speaking@3238",
+    "FINGER-DOWN@4486",
+    "listening@4521",
+    "FINGER-UP@17070",
+    "thinking@17104",
+    "ready@17537"
+   ]
+  },
+  {
+   "case": "ready",
+   "lang": "ko",
+   "run": 0,
+   "ok": true,
+   "pressedIn": "ready",
+   "tapToTalkMs": 335,
+   "releaseToKioskMs": 625,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "starting@267",
+    "connecting@335",
+    "thinking@3401",
+    "speaking@4268",
+    "ready@8419",
+    "FINGER-DOWN@8454",
+    "listening@8484",
+    "FINGER-UP@17054",
+    "thinking@17083",
+    "ready@17533"
+   ]
+  },
+  {
+   "case": "thinking",
+   "lang": "en",
+   "run": 0,
+   "ok": true,
+   "pressedIn": "thinking",
+   "tapToTalkMs": 352,
+   "releaseToKioskMs": 732,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "starting@273",
+    "connecting@352",
+    "thinking@3850",
+    "FINGER-DOWN@3889",
+    "listening@3917",
+    "FINGER-UP@16303",
+    "thinking@16333",
+    "ready@16949"
+   ]
+  },
+  {
+   "case": "greeting",
+   "lang": "en",
+   "run": 0,
+   "ok": true,
+   "pressedIn": "speaking",
+   "tapToTalkMs": 335,
+   "releaseToKioskMs": 628,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "starting@269",
+    "connecting@335",
+    "thinking@2751",
+    "speaking@3218",
+    "FINGER-DOWN@4446",
+    "listening@4467",
+    "FINGER-UP@16292",
+    "thinking@16316",
+    "ready@16783"
+   ]
+  },
+  {
+   "case": "ready",
+   "lang": "en",
+   "run": 0,
+   "ok": true,
+   "pressedIn": "ready",
+   "tapToTalkMs": 362,
+   "releaseToKioskMs": 1878,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:NEEDS_CHOICE",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "starting@293",
+    "connecting@362",
+    "thinking@3380",
+    "speaking@3994",
+    "ready@8396",
+    "FINGER-DOWN@8430",
+    "listening@8461",
+    "FINGER-UP@16313",
+    "thinking@16344",
+    "ready@17343",
+    "thinking@18110",
+    "ready@18160"
+   ]
+  },
+  {
+   "case": "thinking",
+   "lang": "ko",
+   "run": 1,
+   "ok": true,
+   "pressedIn": "thinking",
+   "tapToTalkMs": 335,
+   "releaseToKioskMs": 629,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "starting@261",
+    "connecting@335",
+    "thinking@2436",
+    "FINGER-DOWN@2453",
+    "listening@2485",
+    "FINGER-UP@17023",
+    "thinking@17051",
+    "ready@17551"
+   ]
+  },
+  {
+   "case": "greeting",
+   "lang": "ko",
+   "run": 1,
+   "ok": true,
+   "pressedIn": "speaking",
+   "tapToTalkMs": 330,
+   "releaseToKioskMs": 731,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "starting@268",
+    "connecting@330",
+    "thinking@3029",
+    "speaking@3663",
+    "FINGER-DOWN@4902",
+    "listening@4928",
+    "FINGER-UP@17008",
+    "thinking@17028",
+    "ready@17578"
+   ]
+  },
+  {
+   "case": "ready",
+   "lang": "ko",
+   "run": 1,
+   "ok": true,
+   "pressedIn": "ready",
+   "tapToTalkMs": 385,
+   "releaseToKioskMs": 831,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "starting@306",
+    "connecting@385",
+    "thinking@3501",
+    "speaking@4018",
+    "ready@8634",
+    "FINGER-DOWN@8653",
+    "listening@8683",
+    "FINGER-UP@17054",
+    "thinking@17083",
+    "ready@17600"
+   ]
+  },
+  {
+   "case": "thinking",
+   "lang": "en",
+   "run": 1,
+   "ok": true,
+   "pressedIn": "thinking",
+   "tapToTalkMs": 324,
+   "releaseToKioskMs": 945,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "starting@246",
+    "connecting@324",
+    "thinking@2440",
+    "FINGER-DOWN@2477",
+    "listening@2507",
+    "FINGER-UP@16280",
+    "thinking@16306",
+    "ready@17123"
+   ]
+  },
+  {
+   "case": "greeting",
+   "lang": "en",
+   "run": 1,
+   "ok": true,
+   "pressedIn": "speaking",
+   "tapToTalkMs": 335,
+   "releaseToKioskMs": 525,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "starting@274",
+    "connecting@335",
+    "thinking@3970",
+    "speaking@4519",
+    "FINGER-DOWN@5752",
+    "listening@5785",
+    "FINGER-UP@16338",
+    "thinking@16369",
+    "ready@16784"
+   ]
+  },
+  {
+   "case": "ready",
+   "lang": "en",
+   "run": 1,
+   "ok": true,
+   "pressedIn": "ready",
+   "tapToTalkMs": 350,
+   "releaseToKioskMs": 624,
+   "commands": [
+    "setDineOption:ok",
+    "addToCart:ok",
+    "addToCart:ok"
+   ],
+   "timeline": [
+    "starting@280",
+    "connecting@350",
+    "thinking@3167",
+    "speaking@3818",
+    "ready@8184",
+    "FINGER-DOWN@8205",
+    "listening@8234",
+    "FINGER-UP@16338",
+    "thinking@16366",
+    "ready@16883"
+   ]
+  }
+ ]
+}
