@@ -73,6 +73,13 @@ The landing says: "No account. KIBO keeps no audio, no conversation and no perso
 - **Session ends after 10 minutes:** `SESSION_TTL_MS` (`src/lib/commands/session.ts`) is 10 minutes, extended only by activity; Firestore's TTL policy then deletes `sessions`, `sessionSecrets` and `pairCodes` on `expiresAt` (TTL deletion is not instant; Google does not promise a time).
 - **Google's side:** KIBO does not enable Gemini Live session resumption (no `sessionResumption` in `src/` or `voice-relay/` source). How long Google keeps request data follows the Gemini API terms (direct path, text agent on the key) and Google Cloud's terms (Vertex relay, Vertex fallback); KIBO makes no claim about it (`docs/plan/SOURCES.md` section 9).
 
+## Speaker-aware listening (planned, ADR-014; controls the code must have before it ships)
+- A voice embedding (voiceprint) is biometric data. It is made for one voice start, kept only in memory (the phone's, or the server's for one request when the model runs there), never written to Firestore, disk, logs, analytics or evidence files, and dropped when voice stops, the order is paid or expires, or the tab closes.
+- No voiceprint is ever compared across sessions or people: there is no enrolment store and no "remember me".
+- The landing's privacy line ("KIBO keeps no audio, no conversation and no personal data") must say it before the feature ships, e.g. "the phone tells your voice from others for this order only and forgets it".
+- The gate never decides a payment: the review needs a tap or a hold (`confirmCheckout` rules unchanged).
+- Test fixtures and benchmarks use synthetic voices or public speech with a license that allows it; a real person's recorded voice only with their consent, never committed.
+
 ## Reliability
 - Kiosk stores `{sessionId, kioskToken}` per kiosk in localStorage and resumes after a reload unless expired or paid.
 - The phone app's service worker (`public/sw.js`, scope `/app`) caches only a static offline page; it never caches or answers `/api`, session streams, `/assistant` or anything holding a token. `/app` keeps only the last order's session id, status and expiry for [Continue my order]; the device token stays under its own key, as before.

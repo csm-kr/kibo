@@ -1,6 +1,6 @@
 # KIBO goal
 
-Updated: 2026-11-23 · Next check: 2026-11-25 (after the owner's next phone test), then 2026-12-01 (freeze)
+Updated: 2026-11-25 · Next check: 2026-11-26 (after the owner's next phone test), then 2026-12-01 (freeze)
 
 - **Readers:** every session and agent working on KIBO (before choosing work, and after finishing it), and the owner.
 - **Purpose:** every task is chosen and judged against the same goal and number. The method is the `goal-lens` skill.
@@ -51,10 +51,37 @@ time per team and scoring sheet (ask the organizer or a mentor).
 
 - Before a task: one line, "does this move the main number, and how?" If not, it waits.
 - After a task: what the judge showed (the owner's phone, a measured run), not "done".
-- Not now: an on-device speaker model that is not Gemini (license, size, iOS Safari, and the Google AI score);
-  new screens or kiosks; refactors. Look again if hold to talk fails the loud-room test.
+- Not now: new screens or kiosks; refactors.
+- Reopened 11-25 by the owner: "solve the cocktail party without pressing: tell apart the voice of the person I was
+  talking with, recognise it (embeddings are fine); if that fails, hold to talk." A speaker model that is not Gemini
+  may be tried in `spikes/`, but shipping one in `src/` needs the owner's explicit word (CLAUDE.md: Gemini for every
+  AI feature; license, size, iOS Safari and the Google AI score).
 
 ## 5. Experiment now
+
+### Speaker gate: no pressing, as good as hold (planned; not started)
+
+The owner, 11-25: "this will be our technical moat; we must have it. Don't build it yet, update the docs; we need to
+talk more about winning first." Decision record: ADR-014. Nothing below runs until the owner says so; the dates are
+proposals.
+
+- Idea: the phone learns the customer's voice from their first words and sends Live only the stretches where that
+  voice speaks; everything else goes up as silence, so Live's turn ends and a bystander's words never arrive. A gate
+  passes or blocks whole stretches: it cannot take a bystander out of a stretch where both talk. So the target is
+  "no pressing, results equal to hold to talk", not "the cocktail party solved".
+- Kept: hold to talk on candidate `kibo-00044-hid` (the owner's second phone test), production `kibo-00041-gow`.
+  The order review stays on a tap or a hold in every mode: a probabilistic gate never sits behind `confirmCheckout`.
+- Stage 1, proposed by 11-27 (`spikes/speaker-gate/`): does an embedding tell voices apart? Kill test first: Gemini Embedding 2
+  on audio, same voice with different sentences against different voices with the same sentence. Then 1 s windows
+  of real voices (not only TTS), Korean and English, user alone, bystander alone, both at -10 and 0 dB.
+  Adopt a model if, with 3 s of enrolment: user windows passed 95% or more, bystander-only windows passed 5% or less,
+  user-with-bystander windows at -10 dB passed 90% or more, and a decision within 1 s of speech starting.
+- Stage 2, proposed by 11-29 (`spikes/crowd-voice/run.ts`, the gate in its `--gate` slot): open mic plus the gate on real
+  Gemini Live. Adopt if the order is right in 18 or more of 20 at -10 dB (hold to talk: 6 of 6 reached `paying`) with
+  no reaction to bystander-only talk, and the reaction to the last word no more than 0.5 s slower than hold.
+- Stop: no model passes stage 1 by 11-27, or stage 2 fails by 11-29: hold to talk is the finale's mode.
+- The switch: `VOICE_INPUT=hold|open` chooses who drives the existing hold machinery, the finger or the gate, so the
+  I-439 fixes and the hold tests stay valid. Built only after stage 1 passes.
 
 - Change: the first press (I-439) and the voice start's 2 s key probe, on the candidate only.
 - Kept: production (`kibo-00041-gow`), the submitted flow.
