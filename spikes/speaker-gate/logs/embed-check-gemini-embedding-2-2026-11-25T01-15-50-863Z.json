@@ -1,0 +1,18 @@
+{
+ "model": "gemini-embedding-2",
+ "clips": 48,
+ "dims": 3072,
+ "meanCos": {
+  "sameVoiceDiffWords": 0.6231639039056458,
+  "diffVoiceSameWords": 0.9246185512909237,
+  "diffVoiceDiffWords": 0.6215442893316689
+ },
+ "aucSameVoiceVsSameWords": 0.007886904761904762,
+ "aucSameVoiceVsDiffBoth": 0.5053174603174603,
+ "nearestIsSameVoice": "0 of 48",
+ "nearestIsSameWords": "48 of 48",
+ "callMs": {
+  "median": 942,
+  "max": 1636
+ }
+}

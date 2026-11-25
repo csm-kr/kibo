@@ -59,29 +59,40 @@ time per team and scoring sheet (ask the organizer or a mentor).
 
 ## 5. Experiment now
 
-### Speaker gate: no pressing, as good as hold (planned; not started)
+### Speaker-aware listening: no pressing, and the customer's words only (planned; ADR-014)
 
-The owner, 11-25: "this will be our technical moat; we must have it. Don't build it yet, update the docs; we need to
-talk more about winning first." Decision record: ADR-014. Nothing below runs until the owner says so; the dates are
-proposals.
+The owner, 11-25: "this will be our technical moat; we must have it", then "plan how to remove the part where two
+people talk at once". Building waits for the owner's word; the dates are proposals. Kept meanwhile: hold to talk on
+candidate `kibo-00044-hid`, production `kibo-00041-gow`. The order review needs a tap or a hold in every mode.
 
-- Idea: the phone learns the customer's voice from their first words and sends Live only the stretches where that
-  voice speaks; everything else goes up as silence, so Live's turn ends and a bystander's words never arrive. A gate
-  passes or blocks whole stretches: it cannot take a bystander out of a stretch where both talk. So the target is
-  "no pressing, results equal to hold to talk", not "the cocktail party solved".
-- Kept: hold to talk on candidate `kibo-00044-hid` (the owner's second phone test), production `kibo-00041-gow`.
-  The order review stays on a tap or a hold in every mode: a probabilistic gate never sits behind `confirmCheckout`.
-- Stage 1, proposed by 11-27 (`spikes/speaker-gate/`): does an embedding tell voices apart? Kill test first: Gemini Embedding 2
-  on audio, same voice with different sentences against different voices with the same sentence. Then 1 s windows
-  of real voices (not only TTS), Korean and English, user alone, bystander alone, both at -10 and 0 dB.
-  Adopt a model if, with 3 s of enrolment: user windows passed 95% or more, bystander-only windows passed 5% or less,
-  user-with-bystander windows at -10 dB passed 90% or more, and a decision within 1 s of speech starting.
-- Stage 2, proposed by 11-29 (`spikes/crowd-voice/run.ts`, the gate in its `--gate` slot): open mic plus the gate on real
-  Gemini Live. Adopt if the order is right in 18 or more of 20 at -10 dB (hold to talk: 6 of 6 reached `paying`) with
-  no reaction to bystander-only talk, and the reaction to the last word no more than 0.5 s slower than hold.
-- Stop: no model passes stage 1 by 11-27, or stage 2 fails by 11-29: hold to talk is the finale's mode.
-- The switch: `VOICE_INPUT=hold|open` chooses who drives the existing hold machinery, the finger or the gate, so the
-  I-439 fixes and the hold tests stay valid. Built only after stage 1 passes.
+- **Two problems, two tools.** (1) Turns: bystanders talking between the customer's sentences keep Live's turn open
+  and put their words in (open mic: 0 of 12 right at -20 dB). A *gate* that sends only the customer's stretches
+  fixes this; its ceiling is hold to talk. (2) Overlap: a bystander talking at the same moment as the customer. Only
+  *extraction* fixes this: something that takes the customer's words out of the mixture (hold to talk at 0 dB:
+  `paying` 2 of 6).
+- **Stage 0, done 11-25: Gemini Embedding 2 cannot tell voices apart** (nearest clip the same words 48 of 48, the same
+  voice 0 of 48; `spikes/speaker-gate/README.md`). So the gate needs a speaker-verification model, or Gemini must do
+  the attribution itself.
+- **Stage 1, 11-26: the judge first.** Crowd benchmark v2 in `spikes/speaker-gate/`: real recorded voices with a
+  license that allows it (public read speech, English and Korean) as well as TTS; customer alone, bystander alone,
+  and overlap at +5, 0 and -5 dB; enrolment from the customer's first 3 s. Measures: customer words kept, bystander
+  words leaked (one fixed transcriber), added delay, and the order on real Gemini Live (`run.ts`, 20 runs per cell).
+- **Stage 2, 11-26 to 11-27: three candidates on that judge.**
+  - A, Gemini only: Gemini Flash hears the customer's sample and the mixture and writes only the customer's words;
+    Live gets them as text and answers by voice. Keeps "Gemini for every AI feature"; costs a call per turn.
+  - B, gate: a small speaker-verification model (e.g. CAM++ or ECAPA, open licence) drives the hold machinery.
+  - C, extraction: a target-speaker extraction model conditioned on the customer's voice cleans the audio before Live
+    (published family: VoiceFilter, SpeakerBeam, SpEx; open toolkits exist). Heaviest; the only one that can beat
+    hold at 0 dB on the audio itself.
+- **Adopt** (for the finale): at 0 dB overlap the order right in 18 or more of 20 and bystander items added in 1 or
+  fewer; the customer alone no worse than today; added delay 0.5 s or less for B and C, 1.5 s or less for A.
+  "As good as hold without the press" (B alone) is the fallback goal if no candidate removes overlap.
+- **Stage 3, 11-28 to 12-01, only on the owner's word:** the winner into the app behind `VOICE_INPUT=open` (on the
+  phone, or in the `kibo-voice` relay, which already sits in the audio path), rehearsal with a recorded bystander
+  playing next to the phone, and the owner's phone test in a loud place with a teammate talking over them. A model
+  that is not Gemini needs the owner's explicit word first.
+- **Stop:** no candidate meets the adopt line by 11-28, or the phone test fails by 12-01: hold to talk on stage, and
+  the benchmark numbers go in the deck as the next step (never as a finished feature).
 
 - Change: the first press (I-439) and the voice start's 2 s key probe, on the candidate only.
 - Kept: production (`kibo-00041-gow`), the submitted flow.
