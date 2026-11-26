@@ -1,5 +1,5 @@
 {
- "at": "2026-11-26T21:14:36.962Z",
+ "at": "2026-11-26T22:29:00.199Z",
  "prices": {
   "liveText": 0.75,
   "liveAudioIn": 3,
@@ -61,9 +61,9 @@
    "note": "field-open 11-27, as kibo-1b reported it: scripts/confirm-check.ts, 40 + 40 calls on Vertex and 20 on the API key, 2 probes, 5 on fixture 21; gemini-3.5-flash-lite priced at Flash rates as an upper bound; +105 calls for the saved evidence run of all 21 fixtures x 5 (evidence/confirm-check.json on feat/field-open, 71f3c51), not metered, about $0.07 as an upper bound"
   },
   "field-open-live": {
-   "sessions": 52,
-   "usd": 5.6606,
-   "note": "field-open 11-27, as kibo-1b reported it at 04:56 KST: scripts/rehearse-open.ts on the local server (VOICE_INPUT=open), Live usage from its usage messages at the ledger's prices; later reruns not yet added"
+   "sessions": 64,
+   "usd": 6.6565,
+   "note": "field-open 11-27, as kibo-1b reported it at 04:56 KST: scripts/rehearse-open.ts on the local server (VOICE_INPUT=open), Live usage from its usage messages at the ledger's prices; later reruns not yet added; +12 sessions, $0.9959, the ambient-lead run 06:38 to 06:52 KST (from its usage messages)"
   },
   "field-open-tts": {
    "requests": 1,
@@ -71,6 +71,6 @@
    "note": "field-open 11-27: one TTS request for e2e/fixtures/open/yes-en.wav"
   }
  },
- "totalUsd": 64.51415044118922,
- "totalWon": 90320
+ "totalUsd": 65.51005044118922,
+ "totalWon": 91714
 }
