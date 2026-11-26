@@ -1,6 +1,6 @@
 # KIBO goal
 
-Updated: 2026-11-25 · Next check: 2026-11-26 (after the owner's next phone test), then 2026-12-01 (freeze)
+Updated: 2026-11-26 · Next check: 2026-11-27 (bench results into the blog), 2026-11-29 (phone test), 2026-12-01 (freeze)
 
 - **Readers:** every session and agent working on KIBO (before choosing work, and after finishing it), and the owner.
 - **Purpose:** every task is chosen and judged against the same goal and number. The method is the `goal-lens` skill.
@@ -33,6 +33,7 @@ Updated: 2026-11-25 · Next check: 2026-11-26 (after the owner's next phone test
 | B2 | Open microphone with bystander speech (11-22) | 0 of 12 orders right at -20 dB or louder; a bystander's "yes" taken in 10 of 15 | Synthetic voices, digital mix | `spikes/crowd-voice/README.md` |
 | A2 | Hold to talk (11-22) | One sentence right in 17 of 18 up to 0 dB; five holds reached `paying` 18 of 18 in quiet, 6 of 7 at -10 dB, 1 of 3 at 0 dB | Same | same |
 | B3 | Owner's iPhone test of hold to talk (11-22) | "The first press sometimes does not take my voice; the first connection is slow" | Real phone, candidate `kibo-00040-yig` | ISSUE I-439 |
+| B4 | Mentor session questions (11-20): tap on the mic to KIBO's first hello on production | 3.5 to 6.0 s, median 3.8 s (5 runs); token 0.9 s, Live setup 2.1 s, hello 0.6 s after | Headless Chrome, fake mic, not a phone. The mentor's answers were not written down | `mentoring/tap-to-hello-20261120.json` (folder not in git) |
 | — | Finale format | "A live demo in front of Google Cloud leaders and industry experts"; minutes per team, and whether all 50 present, not stated | Read 11-22 | aibuildercup.com (home, rewards, FAQ) |
 
 Missing: a real phone in a real loud room (none yet); real users other than the owner (none recorded); the finale's
@@ -98,6 +99,36 @@ candidate `kibo-00044-hid`, production `kibo-00041-gow`. The order review needs 
   that is not Gemini needs the owner's explicit word first.
 - **Stop:** no candidate meets the adopt line by 11-28, or the phone test fails by 12-01: hold to talk on stage, and
   the benchmark numbers go in the deck as the next step (never as a finished feature).
+
+### Plan of 11-26 (the owner: "aim for first place; solve everything I said"; made with goal-lens and be-ambitious)
+
+The owner's list, 11-26: the cocktail party (several voices, music, singing) with experiments; meaning before
+embeddings ("an embedding is hard: test whether filtering by meaning is good enough; throw away what is too low in
+decibels; design the experiment so it hears well"); music and singing through an existing library; both mentoring
+problems (listening in a loud place; the first connection, B4); a Japanese-subway-style ticket machine; the Top 50
+blog by Sat 11-28 15:30 KST, written from the current technology plus this experiment.
+
+- **Rung chosen (2 of 3): remove the cause, and show it.** Not three rival models but one stack of cheap layers, each
+  scored alone and combined on the frozen judge (`spikes/speaker-gate/bench/`): L0 library noise and music removal;
+  L1 loudness (drop what is too quiet next to the customer); L2 voice gate (optional); L3 meaning (Gemini keeps only
+  words addressed to the ordering assistant that fit the conversation); the order review always needs a tap or a
+  hold. Bystanders are split by what they say (small talk, a rival order from the same menu, a "yes" on the review,
+  song lyrics), because meaning can only filter some of it (expected, not measured). Rung 3, a stretch: the judge
+  becomes a command every voice change must pass, and the blog publishes it.
+- **Hard targets (proposed):** the adopt line above at 0 dB; at -10 dB (a phone near the mouth) 20 of 20 without a
+  press; the customer's quiet "yes" still heard; tap on the mic to hello 2 s or less measured, and something heard
+  within 0.5 s of the tap.
+- **Judges:** the frozen bench, then the owner's phone with a loudspeaker playing babble and music at a measured
+  level, then a second person talking over them. A digital mix alone never decides.
+- **Order (by the main number and the dates):** (1) blog draft with slots, filled Fri 11-27; (2) layers on the judge,
+  the best stack to a phone test by 11-29; (3) the first hello (branch from `feat/hold-to-talk`: measure on the
+  candidate first, then connect before the tap, a smaller setup, a greeting that plays at once); (4) the subway
+  machine on its own branch, merged only after QA by a session that did not build it.
+- **Against (kept in view):** every layer adds delay and a way to shut the customer out; a phone near the mouth may
+  already put bystanders 10 dB down, where loudness and a hold are enough. The subway machine and yen touch price
+  paths and do not move the main number: off the hero path, and dropped if not clean by 12-01.
+- **Not known:** what the mentor answered on 11-20 (ask the owner); the finale's time per team; a real phone in a
+  real loud room (none yet).
 
 - Change: the first press (I-439) and the voice start's 2 s key probe, on the candidate only.
 - Kept: production (`kibo-00041-gow`), the submitted flow.
