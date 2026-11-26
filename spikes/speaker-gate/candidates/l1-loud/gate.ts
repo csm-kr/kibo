@@ -62,11 +62,12 @@ export interface GateParams {
    *  at its close, so the app must hold its audio until then and send it in a burst. A lone quiet talker is not
    *  trimmed: the anchor is their own level. */
   trimFirstTurn: boolean;
-  /** Anchored modes: a run of speech more than learnWithinDb over the anchor, accepted in a turn, lifts the anchor to
-   *  its level when that turn closes, unless the cap ended the turn or it began straight out of a capped one
-   *  (kibo-59 11-27, I-471: whoever talked first in a turn of their own set the anchor, and a louder customer never
-   *  moved it). Down it still learns only within learnWithinDb. The cost: a louder passer-by lifts it too, and the
-   *  customer is then kept out until they press (the app's hint to hold the button). */
+  /** Anchored modes: accepted speech more than learnWithinDb over the anchor (a 0.6 s chunk, after the one before)
+   *  lifts the anchor to its level at once, mid-turn and inside a capped turn too (kibo-59 11-27, I-471: whoever
+   *  talked first in a turn of their own set the anchor, and a louder customer never moved it; kibo-fd's f0012: a
+   *  rise that waited for an uncapped close never came while a neighbour talked non-stop). Down it still learns only
+   *  within learnWithinDb. The cost: a louder passer-by lifts it too, and the customer is then kept out until they
+   *  press (the app's hint to hold the button). */
   anchorRise: boolean;
 }
 
@@ -137,20 +138,11 @@ export function loudGate(params: Partial<GateParams> = {}) {
   let firstTurnMax: number | null = null;
   /** trimFirstTurn: every frame's level until the anchor is set (at most the first turn plus the quiet before it). */
   let early: number[] = [];
-  /** anchorRise: the loudest run over the anchor's learning window in the open turn, and how many lifts so far. */
-  let riseTo: number | null = null;
+  /** anchorRise: how many lifts so far. */
   let rises = 0;
-  let capped = false;
-  let fromCap = false;
 
-  function closeTurn(seg: [number, number], byCap = false) {
+  function closeTurn(seg: [number, number]) {
     open = false;
-    if (p.anchorRise && anchored !== null && riseTo !== null && !byCap && !fromCap) {
-      anchored = riseTo;
-      rises++;
-    }
-    riseTo = null;
-    capped = byCap;
     if (p.anchor !== "recent" && anchored === null && firstTurnMax !== null) {
       anchored = firstTurnMax;
       if (p.trimFirstTurn) {
@@ -183,7 +175,10 @@ export function loudGate(params: Partial<GateParams> = {}) {
       if (p.anchor !== "recent" && open) {
         if (anchored !== null) {
           if (Math.abs(v - anchored) <= p.learnWithinDb) anchored += Math.max(-p.learnDbPerChunk, Math.min(p.learnDbPerChunk, v - anchored));
-          else if (v > anchored) riseTo = Math.max(riseTo ?? -Infinity, v);
+          else if (p.anchorRise && v > anchored) {
+            anchored = v;
+            rises++;
+          }
         }
         else firstTurnMax = Math.max(firstTurnMax ?? -Infinity, v);
       }
@@ -227,14 +222,13 @@ export function loudGate(params: Partial<GateParams> = {}) {
       const reach = run.length >= commit && !(p.reachBack === "near" && anchored !== null);
       const from = reach ? Math.min(firstNear, runStart) : firstNear;
       start = Math.max(prevEnd, from - p.preRollMs, 0);
-      fromCap = capped && start - prevEnd < p.hangMs;
       hang = hangFrames;
     } else if (open) {
       if (isNear) hang = hangFrames;
       else hang--;
       if (hang <= 0) closeTurn([start, lastNearEnd + p.hangMs]);
       // The cap: this frame closes the turn; the next near frame opens a new one from here.
-      else if (t + F - start >= p.maxTurnMs) closeTurn([start, t + F], true);
+      else if (t + F - start >= p.maxTurnMs) closeTurn([start, t + F]);
     }
     k++;
     return open;

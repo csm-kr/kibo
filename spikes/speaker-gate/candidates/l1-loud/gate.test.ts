@@ -315,10 +315,19 @@ describe("loudGate anchorRise", () => {
     expect(openIn(g.segments(), 10400, 13400)).toBe(false);
   });
 
-  it("on: a turn the cap ended does not lift it, nor the turn straight after it", () => {
-    const g = go([...q(400), ...t(-26, 3000), ...q(2000), ...t(-18, 14000), ...q(1600)], { anchorRise: true });
+  // kibo-59 11-27 (kibo-fd's f0012 at d5): the rise waited for an uncapped close, and a non-stop neighbour kept every
+  // turn capped. It now fires mid-turn, capped or not.
+  it("on: a neighbour sets the level, then talks non-stop; the customer's louder sentence lifts it mid-turn", () => {
+    const g = go([...q(400), ...t(-36, 2000), ...q(1200), ...t(-36, 2400), ...t(-26, 3000), ...t(-36, 11000), ...q(1600)], { anchorRise: true });
     expect(g.level()).toBe(-26);
-    expect(g.rises()).toBe(0);
+    expect(g.rises()).toBe(1);
+    expect(g.segments().some(([, e]) => e >= 9000 && e <= 10200)).toBe(true);
+    expect(openIn(g.segments(), 10500, 20000)).toBe(false);
+  });
+
+  it("on: a capped turn lifts it too", () => {
+    const g = go([...q(400), ...t(-26, 3000), ...q(2000), ...t(-18, 14000), ...q(1600)], { anchorRise: true });
+    expect(g.level()).toBe(-18);
   });
 
   it("on: within learnWithinDb it still learns slowly, without a rise", () => {

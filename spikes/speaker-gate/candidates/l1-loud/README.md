@@ -92,11 +92,14 @@ measure what Live would get (the segments), not the frames the gate called open.
   anchor, dropping a quieter lead-in (f0020, f0024, f0062). The phone must hold that turn until it closes (at most the
   10 s cap plus pre-roll: about 326 KB at 16 kHz, 16-bit) and send it in a burst, so Live starts on it about 1 s after
   the last word instead of while the person speaks; `bench/flow.ts` does the same when the setting is on.
-- `anchorRise: true` (I-471): a run more than `learnWithinDb` over the anchor, accepted in a turn, lifts the anchor to
-  its level when the turn closes, unless the cap ended the turn or it began straight out of a capped one. Without it,
+- `anchorRise: true` (I-471): accepted speech more than `learnWithinDb` over the anchor (a 0.6 s chunk, after the
+  one before) lifts the anchor to its level at once, mid-turn and inside a capped turn too (a first version waited for
+  an uncapped close; with a neighbour's low anchor a non-stop neighbour kept every turn capped and it never fired:
+  kibo-fd, f0012 at depth 5). Without it,
   whoever talked first in a turn of their own kept the anchor (Live on the field build: a neighbour 10 dB under the
   customer, talking from the start, passed every later turn). Tested: neighbour -36, customer -26, neighbour again ->
-  anchor -26 and the neighbour's later sentence stays out. **The cost**, also tested: customer -26, one loud passer-by
+  anchor -26 and the neighbour's later sentence stays out; a neighbour who sets the anchor and then talks non-stop ->
+  the customer's sentence lifts it and the turn ends 1 s after it. **The cost**, also tested: customer -26, one loud passer-by
   sentence at -18, customer -26 again -> the anchor is -18 and the customer is kept out; after about 3 s of their
   speech under the bar the app shows the hint to hold the button, and a press re-anchors to them.
 
