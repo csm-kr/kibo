@@ -64,6 +64,23 @@ A laptop stands in for the kiosk and a real phone orders (USER_JOURNEY J1, J2). 
 - 10/1–10/11: about KRW 10k net on Gemini, almost all from KIBO Learn experiments that resent the whole conversation every turn.
 - Fixes: memory tool, last 4 screens only, per-run token cap, finish gate. Experiments now run on OpenAI development credits; published numbers are re-measured with Gemini.
 
+## Production state (11-27 01:25 KST)
+
+- **Serving 100%: `kibo-00045-xuw` (tag `taponly`)** = the image and settings of `kibo-00041-gow` plus
+  `CONFIRM_TAP_ONLY=1` (owner's decision 11-27 after I-455: with an open microphone a bystander's words confirmed
+  the checkout on the bench). Made with `gcloud run services update --image <00041's image> --min-instances 1
+  --update-env-vars PUBLIC_ORIGIN=...,SHORT_APP_URL=...,CONFIRM_TAP_ONLY=1 --no-traffic --tag taponly`, because
+  the service's latest template was the hold candidate's (other image, other `PUBLIC_ORIGIN`, no minimum); the
+  full configuration was diffed against 00041 (one line differs) before traffic moved. Checked on the public
+  address with one typed order, no AI call: a voice confirm on a new utterance after 2 s answers 409, a tap on the
+  card reaches `paying`; deep health all ok.
+- **What changes for the demo:** "yes, pay" by voice no longer confirms; the customer taps [Yes, pay now] on the
+  phone. Play it for me is unaffected (it stops at the confirm card).
+- **Back:** `gcloud run services update-traffic kibo --to-revisions kibo-00041-gow=100 --region asia-northeast3
+  --project kibo-2026`. `kibo-00041-gow` (tag `patch`) keeps its minimum instance while it has a tag, so it still
+  costs idle money at 0%; removing the tag stops that and keeps the roll-back. Not done; the owner decides.
+- `kibo-00044-hid` (tag `hold`): the hold-to-talk candidate, 0%, no minimum.
+
 ## Spend watch (owner 11-26: "there is no budget; it could get blocked; watch it")
 
 - **What was read 11-26 22:50 (consoles, no saved file):** billing account "My Billing Account", Nov 1 to 26: ₩82.7K
