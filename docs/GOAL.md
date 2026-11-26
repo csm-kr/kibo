@@ -133,6 +133,20 @@ blog by Sat 11-28 15:30 KST, written from the current technology plus this exper
   within 0.5 s of the tap.
 - **Judges:** the frozen bench, then the owner's phone with a loudspeaker playing babble and music at a measured
   level, then a second person talking over them. A digital mix alone never decides.
+- **The field test is built for the owner and a teammate to run themselves** (owner 11-26: "let us test it in a loud
+  place too"): one candidate image on top of `feat/fast-hello`, so both mentoring problems ride together, deployed
+  as two tagged revisions at 0% of traffic (`VOICE_INPUT=open` with `CONFIRM_TAP_ONLY=1`, and `hold`), production
+  as the third arm; protocol in `docs/TESTING.md` "Field test in a loud place". The open arm ships only what was
+  scored and only Gemini plus our own code: the loudness gate with a plain level detector ends the turn, the flow
+  instruction filters by meaning. A model that is not Gemini still needs the owner's explicit word.
+- **Money (owner 11-26: "there is no budget; watch it"):** no experiment Live session without a number from the
+  owner; text-only scoring first; one ledger and hard stops (`docs/plan/OPERATIONS.md` "Spend watch"). The phone
+  test is the cheaper judge and the one that decides, so Live money goes to the multi-turn flow cells and to 20 runs
+  for one winner, not to a grid.
+- **Blog (the deliverable, Sat 11-28 15:30 KST):** `docs/plan/BLOG.md` is publishable from numbers already in hand
+  (baselines, the library layer) and gains the flow results as they land; results cut-off Fri 11-27 22:00 KST. Before
+  it goes to the owner: an agent that built nothing re-derives every number from the logs, and
+  `grep -n "\[\[RESULT\|\[\[OPTIONAL" docs/plan/BLOG.md` returns nothing.
 - **Order (by the main number and the dates):** (1) blog draft with slots, filled Fri 11-27; (2) layers on the judge,
   the best stack to a phone test by 11-29; (3) the first hello (branch from `feat/hold-to-talk`: measure on the
   candidate first, then connect before the tap, a smaller setup, a greeting that plays at once); (4) the subway

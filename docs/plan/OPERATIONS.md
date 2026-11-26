@@ -64,6 +64,25 @@ A laptop stands in for the kiosk and a real phone orders (USER_JOURNEY J1, J2). 
 - 10/1–10/11: about KRW 10k net on Gemini, almost all from KIBO Learn experiments that resent the whole conversation every turn.
 - Fixes: memory tool, last 4 screens only, per-run token cap, finish gate. Experiments now run on OpenAI development credits; published numbers are re-measured with Gemini.
 
+## Spend watch (owner 11-26: "there is no budget; it could get blocked; watch it")
+
+- **What was read 11-26 22:50 (consoles, no saved file):** billing account "My Billing Account", Nov 1 to 26: ₩82.7K
+  after savings (Cloud Run ₩46,181, Gemini API ₩31,289, Artifact Registry ₩3,486, Vertex AI ₩1,614); forecast ₩146K
+  for November; the budget "KIBO monthly 50k KRW" (₩100,000) only sends mail. AI Studio: Tier 2, no monthly spend cap
+  set, "GCP credit ₩0". Whether Gemini still draws on a prepaid balance (₩238k noted 10-18) or is billed to the card
+  was not visible on any page read: unverified, the owner knows.
+- **Why it matters:** experiments use production's API key. Used-up credit answers 402 and a reached cap 429; then
+  production voice falls back to the relay (above). An experiment must never be what empties the finale's budget.
+- **Rules:** (1) no Gemini Live session for an experiment without a number from the owner; text-only scoring first.
+  (2) One ledger for every stream: `spikes/speaker-gate/bench/logs/spend.json` (Live sessions with usage tokens,
+  transcriber and text calls, and the sessions other branches report), totals in tokens and an estimate in won with
+  the assumed rate marked unverified. (3) The bench stops at the first 402 or 429 and refuses to start past its cap.
+  (4) At every checkpoint read production `/api/health?deep=1` (11-27 00:10 KST: all seven checks ok) and, because
+  the spend page lags by hours, read aistudio.google.com/spend only to confirm the ledger.
+- **Idle cost, read 11-27 00:10:** production `kibo-00041-gow` keeps one instance (min 1); the candidate
+  `kibo-00044-hid` (tag `hold`) has no minimum, so it costs nothing while nobody opens it. Cloud Run is the largest
+  line of the bill; the minimum instance is what keeps the first request fast and was not changed.
+
 ## Finale (top 50 announced 11/07; Singapore 12/04)
 - Mentorship weeks (11/10–12/01): apply first-round feedback.
 - Live demo: the touch vs voice comparison on stage, with an offline backup video and a hotspot; do not rely on venue Wi-Fi.

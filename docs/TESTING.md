@@ -42,6 +42,29 @@ Report pass rate per type and per kiosk. Each case names its `kioskId` (default 
 - **Real kiosks:** screens, taps and time for the hero order at two real fast-food kiosks (notes only, no photos). The simulator's tap count should be within ±20%.
 - **Cost per session:** Gemini tokens for one hero order by text (`/api/chat` path) and by voice (one Live session), `npm run measure:cost` (`scripts/measure-cost.ts`): 4 user turns (the order, both fries large, no dessert, "I'll pay"), 3 runs each, token counts only. The official Gemini API prices (with their URL and read date) are stored in the evidence file's `prices`, and `scripts/cost.ts` turns the tokens into USD per order (`costUsdPerOrder`, checked by `scripts/cost.test.ts`); re-read the pricing page before quoting it.
 
+## Field test in a loud place (owner 11-26; the judge that decides)
+
+The digital mix in `spikes/speaker-gate/bench/` screens ideas; a person with a real phone in a real loud place decides
+(`docs/GOAL.md`, main number). This is the protocol, so two tests on two days can be compared.
+
+- **Arms, same phone, same place, same sitting:** (1) production (open microphone as submitted); (2) the candidate with
+  `VOICE_INPUT=hold` (hold to talk); (3) the candidate with `VOICE_INPUT=open` (no press: the loudness gate ends the
+  turn, the flow instruction filters by meaning, `CONFIRM_TAP_ONLY=1`). Arms 2 and 3 are one image deployed as two
+  tagged revisions at 0% of traffic; each has its own address and its own QR.
+- **Place and level:** a cafe, food court or station concourse with people talking and music. Write down the place,
+  the time, and the sound level read from a phone sound-meter app held where the KIBO phone is held (dBA, a 30 s
+  average; the app and phone model named). A second person stands beside the tester and talks: first small talk,
+  then about what they would order from the same menu.
+- **Orders:** 10 hero orders per arm (pair by QR, speak the order, confirm, pay on the kiosk), the phone held as a
+  customer would hold it (about 20 to 30 cm, no headset). Alternate the arms so the room changes equally for each.
+- **Write down for every order, on the spot:** right cart with no retry (yes or no); any item nobody ordered; whether
+  KIBO answered at all; whether the tester had to repeat, press or type; anything it did to a bystander's words.
+- **Limits that cut the test short:** one address gets 24 voice starts a day per instance (I-442), so a sitting is at
+  most about 20 orders on one network; use mobile data for one arm and the venue Wi-Fi for another, or spread over
+  two days. Each order costs API money: count them in the spend ledger (`docs/plan/OPERATIONS.md` "Spend watch").
+- **Result:** a row in `docs/GOAL.md` (answer sheet and log) the same day: k of 10 per arm, place, level, date. Not
+  "it felt better".
+
 ## UX check
 The full UI QA pass (numbers, visual heuristics, flows, journeys, states) is in `docs/UI_QA.md`; findings go to `docs/ISSUE.md`. In short: walk flows A, B, C and every exception in `docs/UX.md` and the journeys in `docs/USER_JOURNEY.md` as a checklist; go through the heuristics table line by line and fix violations. If possible, have one person over 60 try Flow A and note where they stall.
 
