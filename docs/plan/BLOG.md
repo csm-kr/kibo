@@ -21,7 +21,7 @@ The body is publishable as it stands. One fenced block waits for the phone test 
 1. **Your language, the kiosk's language** (pick)
    Subtitle: A phone as the voice remote for the kiosk already on the counter, and what we measured while teaching
    it to tell you from the people around you.
-2. **45 of 80 without a press, 64 with one: teaching a kiosk's voice remote who is talking**
+2. **45 of 80 without a press, 64 with a perfect one: teaching a kiosk's voice remote who is talking**
    Subtitle: Voice ordering on Gemini Live, Cloud Run and Firestore, and a crowd benchmark that scored every idea
    before we kept it.
 3. **The phone is the remote**
@@ -156,7 +156,7 @@ Without a press, the anchored gate got 45 of 80 right against 64 and let stray i
 
 **What the instructions add.** On the same recordings, the anchored gate with our ordinary instructions let stray items in 6 of 24 sessions, against 7 of 64 with the flow instructions over every repeat: too few to call. At equal loudness under a perfect hold, orders right were 11 of 24 with the flow instructions and 6 without (one run each): small talk 8 and 4 of 12, menu talk only 3 and 2. The anchored gate was not run on Live at equal loudness.
 
-**What did not work.** With the first gate a deeper bar scored worse on the word layer; a shallower one cuts more of the bystanders' speech offline but has not run on Live. Holding back the first turn to trim the speech before it delayed KIBO's first reply to a median 3.4 seconds from 1.4 for no gain in orders right or stray items, so we dropped it. One change stays: once the gate knows the customer's level, a turn no longer reaches back into the speech before it, and Live heard the customer's "No, thanks" in 21 of 24 sessions against 8 (with nothing else mixed in, 19 against 7). It has not lowered stray items on Live (2, 3 and 7 of 24 in three batches, against 7 of 64 for the anchored gate). A neighbour who talks first can also set the customer's level; we changed the rule so louder speech raises it.
+**What did not work.** With the first gate a deeper bar scored worse on the word layer; a shallower one cuts more of the bystanders' speech offline but has not run on Live. Holding back the first turn to trim the speech before it delayed KIBO's first reply to a median 3.4 seconds from 1.4 for no gain in orders right or stray items, so we dropped it. One change stays: once the gate knows the customer's level, a turn no longer reaches back into the speech before it, and Live heard the customer's "No, thanks" in 21 of 24 sessions against 8 (the whole answer and nothing else, 19 against 7). It has not lowered stray items on Live (2, 3 and 7 of 24 in three batches, against 7 of 64 for the anchored gate). A neighbour who talks first can also set the customer's level; we changed the rule so louder speech raises it.
 
 **What we tried and are not shipping.** Three open-source approaches fell short on the word layer and are not in the product, which uses Gemini for every AI feature. Noise removal (GTCRN) did not help: music alone cost few words, and where words were lost it lost more. A voice gate (Silero VAD with CAM++) kept 22% of the words in English short answers ("Yes.", "That's all."): 2 of 12 answers, and "Yes." in none of 6. Voice extraction (VoxLock) passed a lone bystander at full level.
 
