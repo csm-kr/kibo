@@ -57,12 +57,19 @@ The digital mix in `spikes/speaker-gate/bench/` screens ideas; a person with a r
   the time, and the sound level read from a phone sound-meter app held where the KIBO phone is held (dBA, a 30 s
   average; the app and phone model named). A second person stands beside the tester and talks: first small talk,
   then about what they would order from the same menu.
-- **Measure the level gap once, before the orders:** record 60 s on the same phone, held the same way (any voice
-  recorder, uncompressed if possible), while the place goes on around you: stay silent for the first 10 s, say the
-  hero order at about 10 s and again at about 35 s, and note the seconds. Then
+- **Measure the level gap once, before the orders:** record 60 s on the same phone, held the same way, while the
+  place goes on around you: stay silent for the first 10 s, say the hero order at about 10 s and again at about 35 s,
+  and note the seconds. Best: the recorder on `/mic-test` of the candidate revision (branch `feat/field-open`,
+  `de79504`), which records through the app's own microphone path, plays the greeting clip at the start, shows the
+  cues, and saves a WAV and a JSON of marks on the phone (nothing is sent); send both files to the computer. Any
+  voice recorder also works, without the greeting part. Then
   `npx tsx spikes/speaker-gate/field/levelgap.mts <recording> --customer 10-16,35-41` (your own times) prints the
   customer's level, the loud other talk, the gap in dB, what the no-press gate would send at depth 6, 5 and 4, and
   an answer in words: hold to talk (gap under 6 dB; the bench measured only 10 and 0 dB), or which depth to use.
+  With a `/mic-test` file (its name ends in `-clip-<start>-<end>`; or pass `--clip 0.5-3.4`) it also compares the
+  room's level while the greeting played with the level after it: the no-press gate's first-sentence rule sets its
+  bar from the greeting's seconds, so a shift over 2 dB either way means the phone's echo cancellation or gain
+  control breaks that rule on this phone. Have someone talk nearby through the greeting, or the comparison is empty.
   Without `--customer` the script guesses the times and marks its answer provisional. Limits it prints itself: one
   recording, and a voice recorder's own processing differs from the app's microphone settings. At equal level even
   a perfect press got 1 or 2 of 6 on the bench's multi-turn sessions.

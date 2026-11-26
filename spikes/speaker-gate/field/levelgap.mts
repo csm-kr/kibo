@@ -3,7 +3,7 @@
 // (spikes/speaker-gate/candidates/l1-loud/gate.ts: PICK + reachBack "near" + anchorRise) at depth 6, 5 and 4. No API.
 // Scratch tool (kibo-fd, 11-27).
 //
-//   cd <repo root>; npx tsx <this file> <recording> [--customer 3-9.2,21.2-23.4] [--turns 2]
+//   cd <repo root>; npx tsx <this file> <recording> [--customer 3-9.2,21.2-23.4] [--turns 2] [--clip 0.5-3.4]
 //   (from the repo root: the bench imports use the repo's "@/" path alias and its tsx)
 //
 // <recording>: any file ffmpeg reads (m4a, wav, ...); it is converted to 16 kHz mono 16-bit, as the app hears it.
@@ -23,6 +23,13 @@
 //   gate's own 0.2 s lead and 1.0 s tail, that are 10 dB or more over the room floor, inside segments); the level the
 //   gate learned first and last.
 //
+// - the greeting (only with --clip, or a /mic-test file name ending in -clip-<start>-<end>): the 90th percentile of
+//   the frames while the greeting clip played against the same measure from the clip's end to the customer's first
+//   word. The "ambient lead" gate sets its bar 4 dB over the level during the clip, so it holds only if the phone's
+//   echo cancellation and gain control leave the room's talk at the same level while KIBO speaks. Shift over 2 dB
+//   either way is flagged: higher during the clip = the bar is too high (customer may not be heard, the app offers
+//   hold); lower = the bar is too low (the neighbour opens the gate, as today).
+//
 // The rule, written before any test run:
 // 1. Gap under 6 dB: no depth helps (on the bench, at equal loudness nothing worked, a perfect press included):
 //    recommend hold to talk at this spot.
@@ -37,8 +44,8 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { decodeWav } from "../bench/audio.ts";
-import { frameDb, loudGate, PICK } from "../candidates/l1-loud/gate.ts";
+import { decodeWav } from "../bench/audio";
+import { frameDb, loudGate, PICK } from "../candidates/l1-loud/gate";
 
 type Span = [number, number];
 const RATE = 16000;
@@ -48,10 +55,11 @@ const CHUNK = 15; // frames: 0.6 s, the gate's own chunk
 const DEPTHS = [6, 5, 4];
 
 const args = process.argv.slice(2);
-const input = args.find((a) => !a.startsWith("--") && args[args.indexOf(a) - 1] !== "--customer" && args[args.indexOf(a) - 1] !== "--turns");
+const VALUED = ["--customer", "--turns", "--clip"];
+const input = args.find((a) => !a.startsWith("--") && !VALUED.includes(args[args.indexOf(a) - 1]));
 const opt = (name: string) => (args.includes(name) ? args[args.indexOf(name) + 1] : undefined);
 if (!input || !existsSync(input)) {
-  console.error("usage: npx tsx levelgap.mts <recording> [--customer 3-9.2,21.2-23.4] [--turns 2]");
+  console.error("usage: npx tsx levelgap.mts <recording> [--customer 3-9.2,21.2-23.4] [--turns 2] [--clip 0.5-3.4]");
   process.exit(2);
 }
 
@@ -131,6 +139,16 @@ const room = median(otherChunks);
 const floor = pct(db, 0.1);
 const gap = custLevel - loudOther;
 
+// The greeting clip's window against the stretch after it (see the header).
+const AMBIENT_MARGIN_DB = 4;
+const clipText = opt("--clip") ?? /-clip-(\d+(?:\.\d+)?-\d+(?:\.\d+)?)/.exec(basename(input))?.[1];
+const clip = clipText ? (clipText.split("-").map(Number) as Span) : null;
+if (clip && !(clip[1] > clip[0])) throw new Error(`bad --clip: ${clipText}`);
+const loudIn = ([a, b]: Span) => pct(db.filter((_, i) => at(i) >= a && at(i) + F / 1000 <= b), 0.9);
+const firstWord = Math.min(...customer.map(([a]) => a));
+const duringClip = clip ? loudIn(clip) : NaN;
+const afterClip = clip ? loudIn([clip[1] + 0.3, firstWord - 0.3]) : NaN;
+
 // The gate at each depth.
 const turnsMask: Span[] = customer.map(([a, b]) => [a - 0.2, b + 1.0]);
 const custFrames = db.map((_, i) => i).filter((i) => inside(at(i) + F / 2000, customer) && db[i] >= custLevel - 15);
@@ -182,6 +200,27 @@ console.log(`  Customer speaking                ${f1(custLevel)}`);
 console.log(`  Loud other talk (top 10%)        ${f1(loudOther)}   ${f1(gap)} dB under the customer`);
 console.log(`  Loudest other moment             ${f1(loudest)}   ${f1(custLevel - loudest)} dB under the customer`);
 console.log(`  The place in between (median)    ${f1(room)}`);
+if (clip) {
+  const shift = duringClip - afterClip;
+  const bar = duringClip + AMBIENT_MARGIN_DB;
+  console.log("");
+  console.log(`WHILE THE GREETING PLAYED (${clip[0].toFixed(2)}-${clip[1].toFixed(2)} s)`);
+  console.log(`  Loud level during the greeting   ${f1(duringClip)}`);
+  console.log(`  Loud level after it, before you  ${f1(afterClip)}   (${clip[1].toFixed(1)}-${firstWord.toFixed(1)} s)`);
+  if (!Number.isFinite(shift)) console.log("  Too little time between the greeting and the first order to compare.");
+  else {
+    console.log(
+      `  Shift ${shift >= 0 ? "+" : ""}${shift.toFixed(1)} dB: ` +
+        (Math.abs(shift) <= 2
+          ? "the phone leaves the room at about the same level while KIBO speaks."
+          : shift > 0
+            ? "LOUDER during the greeting (KIBO's own voice left over, or gain raised). The bar would sit too high."
+            : "QUIETER during the greeting (the phone pushed the room down). The bar would sit too low: the neighbour opens the gate."),
+    );
+    console.log(`  Bar from the greeting (+${AMBIENT_MARGIN_DB} dB)       ${f1(bar)}   customer ${f1(custLevel - bar)} dB over it, loud talk after the greeting ${f1(afterClip - bar)} dB over it`);
+    console.log(`  ${custLevel - bar >= 3 && afterClip - bar <= 0 ? "The greeting bar would hear the customer and keep this talk out." : custLevel - bar < 3 ? "The greeting bar would not hear the customer reliably here." : "The greeting bar would let this talk through after the greeting."}`);
+  }
+}
 console.log("");
 console.log("WHAT THE GATE WOULD SEND TO KIBO WITHOUT A PRESS");
 console.log("  depth | customer's speech sent | other talk sent | level it learned first (when) | level at the end");
@@ -199,5 +238,5 @@ console.log("  automatic gain (src/hooks/useLiveVoice.ts on feat/field-open); a 
 console.log("  app hears can differ. A real customer's level moves more than in one recording.");
 console.log(
   "summary " +
-    JSON.stringify({ file: basename(input), customer, found, custLevel: +custLevel.toFixed(1), loudOther: +loudOther.toFixed(1), gap: +gap.toFixed(1), rows, pick }),
+    JSON.stringify({ file: basename(input), customer, found, clip, duringClip: +duringClip.toFixed(1), afterClip: +afterClip.toFixed(1), custLevel: +custLevel.toFixed(1), loudOther: +loudOther.toFixed(1), gap: +gap.toFixed(1), rows, pick }),
 );
