@@ -1,0 +1,7 @@
+flow cells, both languages (n 16 each): ends/session | bystander-only time open % | ... inside segments % | customer time open % | ... inside segments % | closes inside a sentence
+words (alone, short, quiet-6, quiet-12; n 24 each, cold): customer time open % / inside segments % (trials needing the fallback); fallback starts x dB under the anchor (no question / after one)
+pick d6                      |  7.4  23  40  98 100  0 |  5.5  17  25  99 100  0 |  9.8  98 100 100 100  2 |  9.0  98 100 100 100  4 | 100/100(0)  93/100(0)  98/ 99(0)  98/100(0) | 7/7
+pick+rise d6                 |  7.3  22  39  98 100  0 |  5.4  16  24  99 100  0 | 10.3  98 100 100 100  2 |  9.2  98 100  99 100  5 | 100/100(0)  93/100(0)  98/ 99(0)  98/100(0) | 7/7
+near+trim d6                 |  7.4  23  23  98 100  0 |  5.5  17  16  99 100  0 |  9.8  98 100 100 100  2 |  9.0  98 100 100 100  4 | 100/100(0)  93/100(0)  98/ 98(0)  98/ 98(0) | 7/7
+near+trim+rise d6            |  7.3  22  22  98 100  0 |  5.4  16  15  99 100  0 | 10.3  98 100 100 100  2 |  9.2  98 100  99 100  5 | 100/100(0)  93/100(0)  98/ 98(0)  98/ 98(0) | 7/7
+bystander talks first: flow/chat@-10 16/16, flow/menu@-10 16/16, flow/chat@0 16/16, flow/menu@0 16/16
