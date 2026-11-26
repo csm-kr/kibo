@@ -1,0 +1,61 @@
+{
+ "at": "2026-11-26T16:11:25.194Z",
+ "prices": {
+  "liveText": 0.75,
+  "liveAudioIn": 3,
+  "liveAudioOut": 12,
+  "liveTextOut": 4.5,
+  "flashIn": 0.75,
+  "flashAudioIn": 3,
+  "flashOut": 3.75,
+  "wonPerUsd": 1400,
+  "source": "evidence/cost-per-order.json (read 2026-10-13); unverified today; Flash audio in assumed = Live audio in"
+ },
+ "live": {
+  "sessions": 436,
+  "withUsage": 351,
+  "promptTokens": 18860951,
+  "outTokens": 221096,
+  "usdMeasured": 17.69672399999999,
+  "usdIncludingSessionsWithoutUsage": 20.218974941189213
+ },
+ "textCalls": {
+  "transcribe": {
+   "calls": 2916,
+   "usd": 2.0215897500000035,
+   "promptTokens": 749861,
+   "outTokens": 65173
+  },
+  "flow": {
+   "calls": 1122,
+   "usd": 0.9216607499999994,
+   "promptTokens": 567151,
+   "outTokens": 132346
+  }
+ },
+ "earlierTranscriberCalls": {
+  "calls": 3326,
+  "usdEstimate": 2.8736639999999998,
+  "note": "no usage logged; estimated per call"
+ },
+ "tts": {
+  "clips": 148,
+  "usdEstimate": 0.222,
+  "note": "estimated; regenerated clips not counted"
+ },
+ "otherStreams": {
+  "ticket-kiosk": {
+   "sessions": 5,
+   "usd": 0.1417,
+   "note": "reported by kibo-59 11-27; no usage logged; estimated at the single-sentence mean of $0.0283 per session (logs/spend.json live total / sessions)"
+  },
+  "first-hello": {
+   "sessions": 79,
+   "ttsRequests": 30,
+   "usd": 2.2807,
+   "note": "reported by kibo-59 11-27; no usage logged; 79 Live sessions at the single-sentence mean of $0.0283 (24 were full rehearsal orders, so likely an underestimate) plus 30 TTS requests at about 5 s of audio each"
+  }
+ },
+ "totalUsd": 28.680289441189213,
+ "totalWon": 40152
+}

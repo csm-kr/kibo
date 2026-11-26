@@ -1,0 +1,13 @@
+{
+ "candidate": "c-voxlock-vad",
+ "trials": 960,
+ "audio_s": 6762.2,
+ "compute_s": 121.31,
+ "ms_per_audio_s": 17.9,
+ "threads": 1,
+ "machine": "this MacBook (Apple silicon), one thread",
+ "model": "silero_vad.onnx",
+ "on": "c-voxlock out.wav",
+ "preroll_s": 0.2,
+ "hang_s": 0.7
+}

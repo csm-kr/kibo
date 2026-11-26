@@ -1,0 +1,19 @@
+{
+ "candidate": "c-voxlock",
+ "trials": 20,
+ "audio_s": 142.1,
+ "compute_s": 201.54,
+ "ms_per_audio_s": 1418.3,
+ "threads": 1,
+ "machine": "this MacBook (Apple silicon), one thread",
+ "models": [
+  "voxlock-v2/voxlock_enroll.onnx",
+  "voxlock-v2/voxlock_chunk_int8.onnx"
+ ],
+ "mode": "OnlineSpeechDenoiser, 40 ms chunks",
+ "rtf": 1.418,
+ "chunk_ms_median": 47.8,
+ "chunk_ms_p95": 92.98,
+ "latency_ms_declared": 121,
+ "load_avg_at_end": 7.03466796875
+}

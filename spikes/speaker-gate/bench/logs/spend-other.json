@@ -1,0 +1,13 @@
+{
+ "ticket-kiosk": {
+  "sessions": 5,
+  "usd": 0.1417,
+  "note": "reported by kibo-59 11-27; no usage logged; estimated at the single-sentence mean of $0.0283 per session (logs/spend.json live total / sessions)"
+ },
+ "first-hello": {
+  "sessions": 79,
+  "ttsRequests": 30,
+  "usd": 2.2807,
+  "note": "reported by kibo-59 11-27; no usage logged; 79 Live sessions at the single-sentence mean of $0.0283 (24 were full rehearsal orders, so likely an underestimate) plus 30 TTS requests at about 5 s of audio each"
+ }
+}

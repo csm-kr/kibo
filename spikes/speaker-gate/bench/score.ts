@@ -29,6 +29,7 @@ import { int16ToBase64 } from "@/lib/voice/pcm";
 import { runToolCalls } from "@/lib/voice/toolRunner";
 import { initialTurns, turnEvents, turnsReducer } from "@/lib/voice/turns";
 import { RATE, decodeWav, encodeWav, sha256 } from "./audio";
+import { isQuotaError, ledger } from "./spend";
 import { adoptVerdict, bystanderItemsAdded, frameActions, isRight, resolveChain, type Lang, wilson, wordScore, yesAccepted } from "./scoring";
 
 const BENCH = join(process.cwd(), "spikes/speaker-gate/bench");
@@ -52,6 +53,38 @@ const ADOPT_CELL = "order@0";
 const BESIDE_CELL = "chat@0";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Spend stops (kibo-59, 11-26): --cap-won <won> is required for any run; it refuses to start, and stops before the
+ *  next Live session, once the ledger (spend.ts) has reached the cap. The first 402 or 429 ends the run at once. */
+function capCheck(where: string) {
+  const i = process.argv.indexOf("--cap-won");
+  const cap = i > 0 ? Number(process.argv[i + 1]) : NaN;
+  if (!Number.isFinite(cap)) {
+    console.error("--cap-won <won> is required (no default): the ledger in logs/spend.json must stay under it");
+    process.exit(4);
+  }
+  const l = ledger();
+  if (l.totalWon >= cap) {
+    console.error(`spend cap reached ${where}: ledger about ₩${l.totalWon} >= cap ₩${cap}; stopped`);
+    process.exit(4);
+  }
+}
+function quotaStop(e: unknown, where: string) {
+  if (!isQuotaError(e)) return;
+  console.error(`API refused for quota or credit (${where}): ${e instanceof Error ? e.message.slice(0, 200) : JSON.stringify(e).slice(0, 200)}; stopped`);
+  process.exit(3);
+}
+const CALLS = join(BENCH, "logs", "calls.jsonl");
+
+/** --instructions <file>: text appended to the pinned Live instructions (a meaning layer such as l3-instr). It changes
+ *  no trial and no scoring; every run logs the file and its sha256, and runs go to the stack's own log (--as). */
+const INSTRUCTIONS = (() => {
+  const i = process.argv.indexOf("--instructions");
+  if (i < 0) return null;
+  const file = process.argv[i + 1];
+  const text = readFileSync(file, "utf8");
+  return { file, sha256: sha256(Buffer.from(text)), text };
+})();
 function arg(name: string, fallback: string): string {
   const i = process.argv.indexOf(`--${name}`);
   return i > 0 ? process.argv[i + 1] : fallback;
@@ -175,15 +208,18 @@ async function transcribe(ai: GoogleGenAI, wav: Buffer, cache: Record<string, st
   if (key in cache) return cache[key];
   for (let attempt = 0; ; attempt++) {
     try {
+      const t0 = performance.now();
       const res = await ai.models.generateContent({
         model: TRANSCRIBER.model,
         contents: [{ role: "user", parts: [{ inlineData: { mimeType: "audio/wav", data: wav.toString("base64") } }, { text: TRANSCRIBER.prompt }] }],
         config: { temperature: 0, thinkingConfig: { thinkingLevel: "low" as never } },
       });
       const text = (res.candidates?.[0]?.content?.parts ?? []).map((p) => p.text ?? "").join("").trim();
+      appendFileSync(CALLS, JSON.stringify({ at: new Date().toISOString(), kind: "transcribe", model: TRANSCRIBER.model, ms: Math.round(performance.now() - t0), usage: res.usageMetadata ?? null }) + "\n");
       cache[key] = text;
       return text;
     } catch (e) {
+      quotaStop(e, "transcriber");
       if (attempt >= 3) throw e;
       await sleep(2000 * (attempt + 1));
     }
@@ -199,7 +235,10 @@ async function wordLayer(cand: string, set: BenchSet, conc: number) {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   mkdirSync(join(BENCH, "work"), { recursive: true });
   const cache: Record<string, string> = existsSync(CACHE) ? JSON.parse(readFileSync(CACHE, "utf8")) : {};
-  const trials = Object.values(set.refs).filter((r) => r.set === "words");
+  // --trials a,b,c or a file with one id per line: a named slice (a development sweep); the log records it.
+  const only = arg("trials", "");
+  const slice = only ? new Set((existsSync(only) ? readFileSync(only, "utf8") : only).split(/[\s,]+/).filter(Boolean)) : null;
+  const trials = Object.values(set.refs).filter((r) => r.set === "words" && (!slice || slice.has(r.id)));
   type Row = ReturnType<typeof wordScore> & { trial: string; lang: string; cell: string; voices: string; transcript: string; latencyMs: number };
   const rows: Row[] = [];
   let next = 0;
@@ -249,8 +288,8 @@ async function wordLayer(cand: string, set: BenchSet, conc: number) {
   });
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
   mkdirSync(join(BENCH, "logs"), { recursive: true });
-  const logName = `words-${cand}-${stamp}.json`;
-  writeFileSync(join(BENCH, "logs", logName), JSON.stringify({ candidate: cand, manifestSha: set.manifestSha, ...gitStamp(), transcriber: TRANSCRIBER, keepAt: KEEP_AT, leakAt: LEAK_AT, cells, rows }, null, 1));
+  const logName = `words-${cand}${slice ? "-slice" : ""}-${stamp}.json`;
+  writeFileSync(join(BENCH, "logs", logName), JSON.stringify({ candidate: cand, slice: slice ? [...slice].sort() : null, manifestSha: set.manifestSha, ...gitStamp(), transcriber: TRANSCRIBER, keepAt: KEEP_AT, leakAt: LEAK_AT, cells, rows }, null, 1));
   console.log(`\nword layer, ${cand} (${rows.length} trials, ${calls} new transcriber calls; manifest ${set.manifestSha.slice(0, 12)})`);
   console.log(`cell                     n  kept%  trials kept>=90%      leaked%  trials leaking>=20%   neither/trial`);
   for (const c of cells) {
@@ -287,7 +326,8 @@ async function liveRun(ref: Ref, meta: Meta, audio: Float32Array, latencyMs: num
     await send("requestCheckout", {}, { source: "voice", utteranceSeq: seq });
   }
   const session = (await store.get(sessionId))!;
-  const config = liveConfig(kiosk, { cart: session.cart, status: session.status, dineOption: session.dineOption, locale: ref.lang });
+  const base0 = liveConfig(kiosk, { cart: session.cart, status: session.status, dineOption: session.dineOption, locale: ref.lang });
+  const config = INSTRUCTIONS ? { ...base0, system: `${base0.system}\n\n${INSTRUCTIONS.text.trim()}` } : base0;
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY, httpOptions: { apiVersion: "v1alpha" } });
   const liveSessionId = randomUUID();
   const events: Event[] = [];
@@ -350,7 +390,15 @@ async function liveRun(ref: Ref, meta: Meta, audio: Float32Array, latencyMs: num
   live = await ai.live.connect({
     model: config.model,
     config: liveConnectConfig(config.system, config.tools, config.languageCode),
-    callbacks: { onmessage, onerror: () => {}, onclose: () => (closed = true) },
+    callbacks: {
+      onmessage,
+      onerror: () => {},
+      onclose: (ev) => {
+        closed = true;
+        // A session refused for quota or credit closes with the reason; stop the whole run.
+        quotaStop({ reason: ev?.reason, code: ev?.code }, "Live close");
+      },
+    },
   });
   // On the review the 1.5 s wait after requestCheckout (CONFIRM_WAIT_MS) has passed before anyone speaks (run.ts).
   await sleep(ref.review ? 1600 : 200);
@@ -446,9 +494,9 @@ function cellSummary(rows: LiveRow[]) {
   };
 }
 
-async function liveLayer(cand: string, set: BenchSet, runs: number, cells: string[], conc: number, fresh: boolean, method: "A" | "B" | "C") {
+async function liveLayer(cand: string, stack: string, set: BenchSet, runs: number, cells: string[], conc: number, fresh: boolean, method: "A" | "B" | "C") {
   mkdirSync(join(BENCH, "logs"), { recursive: true });
-  const log = join(BENCH, "logs", `live-${cand}.jsonl`);
+  const log = join(BENCH, "logs", `live-${stack}.jsonl`);
   if (fresh && existsSync(log)) writeFileSync(log, "");
   const done = new Set(readLog(log, set.manifestSha).map((r) => r.trial));
   const jobs = cells.flatMap((cell) => {
@@ -456,19 +504,20 @@ async function liveLayer(cand: string, set: BenchSet, runs: number, cells: strin
     if (!ids) throw new Error(`no live cell ${cell}`);
     return ids.slice(0, runs).map((id, run) => ({ cell, id, run })).filter((j) => !done.has(j.id));
   });
-  console.log(`live layer, ${cand}: ${jobs.length} sessions to run (${done.size} already in logs/live-${cand}.jsonl for this manifest)`);
+  console.log(`live layer, ${stack}: ${jobs.length} sessions to run (${done.size} already in logs/live-${stack}.jsonl for this manifest)`);
   let next = 0;
   await Promise.all(
     Array.from({ length: conc }, async () => {
       while (next < jobs.length) {
         const j = jobs[next++];
+        capCheck("before a Live session");
         const ref = set.refs[j.id];
         const stamp = gitStamp();
         if (stamp.dirty) {
           console.error(`src/, data/ or skills/ changed while running (${stamp.dirty.split("\n")[0]}): stopped; tell kibo-59`);
           process.exit(2);
         }
-        const base = { candidate: cand, manifestSha: set.manifestSha, ...stamp, cell: j.cell, trial: j.id, run: j.run, at: new Date().toISOString() };
+        const base = { stack, candidate: cand, instructions: INSTRUCTIONS && { file: INSTRUCTIONS.file, sha256: INSTRUCTIONS.sha256 }, manifestSha: set.manifestSha, ...stamp, cell: j.cell, trial: j.id, run: j.run, at: new Date().toISOString() };
         try {
           const { meta, audio, latencyMs, chain } = candidateTrial(cand, ref, set);
           const r = await liveRun(ref, meta, audio, latencyMs);
@@ -476,6 +525,7 @@ async function liveLayer(cand: string, set: BenchSet, runs: number, cells: strin
           const what = ref.review ? `yes ${r.yesAccepted ? "accepted" : "not accepted"}` : `${r.ok ? "right" : "wrong"} reaction ${r.reactionMs} ms items [${r.bystanderItems.join(",")}]`;
           console.log(`${j.cell} run ${j.run} ${j.id}: ${what} ${r.sessionS} s`);
         } catch (e) {
+          quotaStop(e, "Live session");
           appendFileSync(log, JSON.stringify({ ...base, error: e instanceof Error ? e.message.slice(0, 300) : "error" }) + "\n");
           console.log(`${j.cell} run ${j.run}: error ${e instanceof Error ? e.message.slice(0, 120) : ""}`);
         }
@@ -485,17 +535,23 @@ async function liveLayer(cand: string, set: BenchSet, runs: number, cells: strin
   // Summary over everything logged for this manifest in the asked cells, the first `runs` trials of each.
   const all = readLog(log, set.manifestSha);
   const openRows = readLog(join(BENCH, "logs", "live-open.jsonl"), set.manifestSha);
+  const holdRows = readLog(join(BENCH, "logs", "live-hold-oracle.jsonl"), set.manifestSha);
   const pick = (rows: LiveRow[], cell: string) => {
     const ids = new Set((set.cells[`live/${cell}`] ?? []).slice(0, runs));
     return rows.filter((r) => ids.has(r.trial));
   };
-  const summary = cells.map((cell) => ({ cell, ...cellSummary(pick(all, cell)) }));
-  console.log(`\nlive layer, ${cand}, first ${runs} trials per cell (manifest ${set.manifestSha.slice(0, 12)}; log spikes/speaker-gate/bench/logs/live-${cand}.jsonl)`);
-  console.log("cell                   right                  items outside hero     review: AI tried to confirm / yes accepted   median reaction (right runs)");
+  // Extra column, not part of the verdict: median reaction minus hold-oracle's in the same cell and trials.
+  const summary = cells.map((cell) => {
+    const s = cellSummary(pick(all, cell));
+    const h = cellSummary(pick(holdRows, cell));
+    return { cell, ...s, vsHoldOracleMs: s.medianReactionMs !== null && h.medianReactionMs !== null ? s.medianReactionMs - h.medianReactionMs : null };
+  });
+  console.log(`\nlive layer, ${stack}, first ${runs} trials per cell (manifest ${set.manifestSha.slice(0, 12)}; log spikes/speaker-gate/bench/logs/live-${stack}.jsonl)`);
+  console.log("cell                   right                  items outside hero     review: AI tried to confirm / yes accepted   median reaction (right runs), vs hold-oracle");
   for (const s of summary) {
     const review = s.cell.includes("review");
     console.log(
-      `${s.cell.padEnd(22)} ${(review ? "-" : kOfN(s.right, s.n)).padEnd(22)} ${(review ? "-" : kOfN(s.withBystanderItems, s.n)).padEnd(22)} ${(review ? `${kOfN(s.confirmTried, s.n)} / ${s.yesAccepted}` : "-").padEnd(43)} ${s.medianReactionMs ?? "-"} ms`,
+      `${s.cell.padEnd(22)} ${(review ? "-" : kOfN(s.right, s.n)).padEnd(22)} ${(review ? "-" : kOfN(s.withBystanderItems, s.n)).padEnd(22)} ${(review ? `${kOfN(s.confirmTried, s.n)} / ${s.yesAccepted}` : "-").padEnd(43)} ${s.medianReactionMs ?? "-"} ms, ${s.vsHoldOracleMs === null ? "-" : `${s.vsHoldOracleMs > 0 ? "+" : ""}${s.vsHoldOracleMs}`} ms`,
     );
   }
   const verdicts: object[] = [];
@@ -516,8 +572,8 @@ async function liveLayer(cand: string, set: BenchSet, runs: number, cells: strin
     verdicts.push({ lang, method, ...v, addedDelayMs: added });
     console.log(`adopt line (${lang}, ${ADOPT_CELL}, method ${method}): ${v.verdict.toUpperCase()}${v.reasons.length ? ` (${v.reasons.join("; ")})` : ""}; ${BESIDE_CELL} beside it: right ${kOfN(beside.right, beside.n)}`);
   }
-  const sumName = `live-${cand}-summary.json`;
-  writeFileSync(join(BENCH, "logs", sumName), JSON.stringify({ candidate: cand, manifestSha: set.manifestSha, ...gitStamp(), runsPerCell: runs, cells: summary.map((s) => ({ ...s, rightCi: wilson(s.right, s.n), itemsCi: wilson(s.withBystanderItems, s.n), yesCi: wilson(s.yesAccepted, s.n), triedCi: wilson(s.confirmTried, s.n) })), verdicts }, null, 1));
+  const sumName = `live-${stack}-summary.json`;
+  writeFileSync(join(BENCH, "logs", sumName), JSON.stringify({ stack, candidate: cand, instructions: INSTRUCTIONS && { file: INSTRUCTIONS.file, sha256: INSTRUCTIONS.sha256 }, manifestSha: set.manifestSha, ...gitStamp(), runsPerCell: runs, cells: summary.map((s) => ({ ...s, rightCi: wilson(s.right, s.n), itemsCi: wilson(s.withBystanderItems, s.n), yesCi: wilson(s.yesAccepted, s.n), triedCi: wilson(s.confirmTried, s.n) })), verdicts }, null, 1));
   console.log(`summary: spikes/speaker-gate/bench/logs/${sumName}`);
 }
 
@@ -525,13 +581,17 @@ async function main() {
   const cand = arg("candidate", "");
   if (!cand) throw new Error("--candidate <name> is required");
   const layer = arg("layer", "all");
+  capCheck("at start");
   const set = loadSet();
   console.log(`benchmark manifest sha256 ${set.manifestSha}`);
   if (layer === "words" || layer === "all") await wordLayer(cand, set, Number(arg("conc", "4")));
   if (layer === "live" || layer === "all") {
     const all = Object.keys(set.cells).filter((c) => c.startsWith("live/")).map((c) => c.slice(5));
     const cells = arg("cells", all.join(",")).split(",");
-    await liveLayer(cand, set, Number(arg("runs", "6")), cells, Number(arg("conc", "4")), process.argv.includes("--fresh"), arg("method", "B") as "A" | "B" | "C");
+    // The stack's name: the candidate, plus the instruction file's name when one is added.
+    const stack = arg("as", INSTRUCTIONS ? `${cand}+${INSTRUCTIONS.file.split("/").pop()!.replace(/\.[a-z]+$/, "")}` : cand);
+    if (INSTRUCTIONS && stack === cand) throw new Error("--as must differ from the candidate when --instructions is given");
+    await liveLayer(cand, stack, set, Number(arg("runs", "6")), cells, Number(arg("conc", "4")), process.argv.includes("--fresh"), arg("method", "B") as "A" | "B" | "C");
   }
 }
 

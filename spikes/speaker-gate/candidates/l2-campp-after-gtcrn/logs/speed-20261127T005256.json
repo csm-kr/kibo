@@ -1,0 +1,15 @@
+{
+ "candidate": "l2-campp-after-gtcrn",
+ "trials": 960,
+ "audio_s": 6762.2,
+ "compute_s": 4321.43,
+ "ms_per_audio_s": 639.1,
+ "threads": 1,
+ "machine": "this MacBook (Apple silicon), one thread",
+ "model": "campplus-zh-en-advanced/3dspeaker_speech_campplus_sv_zh_en_16k-common_advanced.onnx",
+ "vad": "silero_vad.onnx",
+ "window_s": 1.0,
+ "hop_s": 0.25,
+ "ms_per_window_median": 102.8,
+ "windows": 20829
+}

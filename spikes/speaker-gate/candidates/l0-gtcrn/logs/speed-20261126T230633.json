@@ -1,0 +1,11 @@
+{
+ "candidate": "l0-gtcrn",
+ "trials": 960,
+ "audio_s": 6762.2,
+ "compute_s": 910.03,
+ "ms_per_audio_s": 134.6,
+ "threads": 1,
+ "machine": "this MacBook (Apple silicon), one thread",
+ "model": "gtcrn/gtcrn_simple.onnx",
+ "latency_ms_declared": 50
+}

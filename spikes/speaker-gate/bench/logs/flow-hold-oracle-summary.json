@@ -1,0 +1,147 @@
+{
+ "stack": "hold-oracle",
+ "gate": "hold-oracle",
+ "instructions": null,
+ "manifestSha": "026b37a758ecc06ca00f569c4dcc17f9a9a1655327741e8128987598039b848f",
+ "commit": "1abf4047e0edae6fb3a202f926ada5b21469a1ba",
+ "dirty": "",
+ "runsPerCell": 6,
+ "cells": [
+  {
+   "cell": "en/chat@-10",
+   "n": 6,
+   "right": 5,
+   "rightCi": [
+    0.43649056343635395,
+    0.9699474141282697
+   ],
+   "withBystanderItems": 0,
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "heroCart": 5,
+   "answeredMean": 4,
+   "spuriousMean": 0
+  },
+  {
+   "cell": "en/chat@0",
+   "n": 6,
+   "right": 2,
+   "rightCi": [
+    0.09676933255921683,
+    0.7000116786584712
+   ],
+   "withBystanderItems": 2,
+   "itemsCi": [
+    0.09676933255921683,
+    0.7000116786584712
+   ],
+   "heroCart": 2,
+   "answeredMean": 4,
+   "spuriousMean": 0
+  },
+  {
+   "cell": "en/menu@-10",
+   "n": 6,
+   "right": 5,
+   "rightCi": [
+    0.43649056343635395,
+    0.9699474141282697
+   ],
+   "withBystanderItems": 1,
+   "itemsCi": [
+    0.03005258587173032,
+    0.563509436563646
+   ],
+   "heroCart": 5,
+   "answeredMean": 4,
+   "spuriousMean": 0.3333333333333333
+  },
+  {
+   "cell": "en/menu@0",
+   "n": 6,
+   "right": 1,
+   "rightCi": [
+    0.03005258587173032,
+    0.563509436563646
+   ],
+   "withBystanderItems": 5,
+   "itemsCi": [
+    0.43649056343635395,
+    0.9699474141282697
+   ],
+   "heroCart": 1,
+   "answeredMean": 4,
+   "spuriousMean": 0.16666666666666666
+  },
+  {
+   "cell": "ko/chat@-10",
+   "n": 6,
+   "right": 3,
+   "rightCi": [
+    0.18761280689940868,
+    0.8123871931005913
+   ],
+   "withBystanderItems": 0,
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "heroCart": 3,
+   "answeredMean": 4,
+   "spuriousMean": 0
+  },
+  {
+   "cell": "ko/chat@0",
+   "n": 6,
+   "right": 2,
+   "rightCi": [
+    0.09676933255921683,
+    0.7000116786584712
+   ],
+   "withBystanderItems": 0,
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "heroCart": 3,
+   "answeredMean": 3.6666666666666665,
+   "spuriousMean": 0
+  },
+  {
+   "cell": "ko/menu@-10",
+   "n": 6,
+   "right": 6,
+   "rightCi": [
+    0.6096569663469354,
+    0.9999999999999999
+   ],
+   "withBystanderItems": 0,
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "heroCart": 6,
+   "answeredMean": 4,
+   "spuriousMean": 0
+  },
+  {
+   "cell": "ko/menu@0",
+   "n": 6,
+   "right": 1,
+   "rightCi": [
+    0.03005258587173032,
+    0.563509436563646
+   ],
+   "withBystanderItems": 1,
+   "itemsCi": [
+    0.03005258587173032,
+    0.563509436563646
+   ],
+   "heroCart": 1,
+   "answeredMean": 3.8333333333333335,
+   "spuriousMean": 0.16666666666666666
+  }
+ ]
+}

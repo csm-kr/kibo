@@ -1,0 +1,158 @@
+{
+ "stack": "l1-loud+l3-flow-live",
+ "gate": "l1-loud",
+ "instructions": {
+  "file": "spikes/speaker-gate/candidates/l3-flow-live/instructions.txt",
+  "sha256": "d728043fa3dad4345a28b8618940051460ff0b7ccc403389023f676ca4243cee"
+ },
+ "manifestSha": "026b37a758ecc06ca00f569c4dcc17f9a9a1655327741e8128987598039b848f",
+ "commit": "1abf4047e0edae6fb3a202f926ada5b21469a1ba",
+ "dirty": "",
+ "runsPerCell": 6,
+ "cells": [
+  {
+   "cell": "en/chat@-10",
+   "n": 6,
+   "right": 4,
+   "rightCi": [
+    0.29998832134152864,
+    0.9032306674407831
+   ],
+   "payingWithoutTap": 1,
+   "withBystanderItems": 0,
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "heroCart": 4,
+   "answeredMean": 2.8333333333333335,
+   "spuriousMean": 1.6666666666666667
+  },
+  {
+   "cell": "en/chat@0",
+   "n": 6,
+   "right": 2,
+   "rightCi": [
+    0.09676933255921683,
+    0.7000116786584712
+   ],
+   "payingWithoutTap": 0,
+   "withBystanderItems": 0,
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "heroCart": 3,
+   "answeredMean": 1.8333333333333333,
+   "spuriousMean": 2.5
+  },
+  {
+   "cell": "en/menu@-10",
+   "n": 6,
+   "right": 1,
+   "rightCi": [
+    0.03005258587173032,
+    0.563509436563646
+   ],
+   "payingWithoutTap": 0,
+   "withBystanderItems": 5,
+   "itemsCi": [
+    0.43649056343635395,
+    0.9699474141282697
+   ],
+   "heroCart": 1,
+   "answeredMean": 3.1666666666666665,
+   "spuriousMean": 2.6666666666666665
+  },
+  {
+   "cell": "en/menu@0",
+   "n": 6,
+   "right": 0,
+   "rightCi": [
+    0,
+    0.3903430336530645
+   ],
+   "payingWithoutTap": 0,
+   "withBystanderItems": 6,
+   "itemsCi": [
+    0.6096569663469354,
+    0.9999999999999999
+   ],
+   "heroCart": 0,
+   "answeredMean": 2.5,
+   "spuriousMean": 2.3333333333333335
+  },
+  {
+   "cell": "ko/chat@-10",
+   "n": 6,
+   "right": 4,
+   "rightCi": [
+    0.29998832134152864,
+    0.9032306674407831
+   ],
+   "payingWithoutTap": 3,
+   "withBystanderItems": 0,
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "heroCart": 4,
+   "answeredMean": 3.3333333333333335,
+   "spuriousMean": 1.3333333333333333
+  },
+  {
+   "cell": "ko/chat@0",
+   "n": 6,
+   "right": 1,
+   "rightCi": [
+    0.03005258587173032,
+    0.563509436563646
+   ],
+   "payingWithoutTap": 1,
+   "withBystanderItems": 1,
+   "itemsCi": [
+    0.03005258587173032,
+    0.563509436563646
+   ],
+   "heroCart": 2,
+   "answeredMean": 2.3333333333333335,
+   "spuriousMean": 2.3333333333333335
+  },
+  {
+   "cell": "ko/menu@-10",
+   "n": 6,
+   "right": 0,
+   "rightCi": [
+    0,
+    0.3903430336530645
+   ],
+   "payingWithoutTap": 1,
+   "withBystanderItems": 6,
+   "itemsCi": [
+    0.6096569663469354,
+    0.9999999999999999
+   ],
+   "heroCart": 0,
+   "answeredMean": 4,
+   "spuriousMean": 1.8333333333333333
+  },
+  {
+   "cell": "ko/menu@0",
+   "n": 6,
+   "right": 0,
+   "rightCi": [
+    0,
+    0.3903430336530645
+   ],
+   "payingWithoutTap": 0,
+   "withBystanderItems": 6,
+   "itemsCi": [
+    0.6096569663469354,
+    0.9999999999999999
+   ],
+   "heroCart": 0,
+   "answeredMean": 1.8333333333333333,
+   "spuriousMean": 2.3333333333333335
+  }
+ ]
+}

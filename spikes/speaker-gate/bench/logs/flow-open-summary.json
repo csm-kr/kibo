@@ -1,0 +1,155 @@
+{
+ "stack": "open",
+ "gate": "open",
+ "instructions": null,
+ "manifestSha": "026b37a758ecc06ca00f569c4dcc17f9a9a1655327741e8128987598039b848f",
+ "commit": "1abf4047e0edae6fb3a202f926ada5b21469a1ba",
+ "dirty": "",
+ "runsPerCell": 2,
+ "cells": [
+  {
+   "cell": "en/chat@-10",
+   "n": 2,
+   "right": 0,
+   "rightCi": [
+    0,
+    0.6576280471103807
+   ],
+   "payingWithoutTap": 0,
+   "withBystanderItems": 0,
+   "itemsCi": [
+    0,
+    0.6576280471103807
+   ],
+   "heroCart": 2,
+   "answeredMean": 0.5,
+   "spuriousMean": 1
+  },
+  {
+   "cell": "en/chat@0",
+   "n": 2,
+   "right": 0,
+   "rightCi": [
+    0,
+    0.6576280471103807
+   ],
+   "payingWithoutTap": 0,
+   "withBystanderItems": 0,
+   "itemsCi": [
+    0,
+    0.6576280471103807
+   ],
+   "heroCart": 0,
+   "answeredMean": 0,
+   "spuriousMean": 0
+  },
+  {
+   "cell": "en/menu@-10",
+   "n": 2,
+   "right": 0,
+   "rightCi": [
+    0,
+    0.6576280471103807
+   ],
+   "payingWithoutTap": 0,
+   "withBystanderItems": 1,
+   "itemsCi": [
+    0.09452865480086614,
+    0.9054713451991339
+   ],
+   "heroCart": 1,
+   "answeredMean": 0,
+   "spuriousMean": 0.5
+  },
+  {
+   "cell": "en/menu@0",
+   "n": 2,
+   "right": 0,
+   "rightCi": [
+    0,
+    0.6576280471103807
+   ],
+   "payingWithoutTap": 0,
+   "withBystanderItems": 2,
+   "itemsCi": [
+    0.34237195288961925,
+    1
+   ],
+   "heroCart": 0,
+   "answeredMean": 0.5,
+   "spuriousMean": 2
+  },
+  {
+   "cell": "ko/chat@-10",
+   "n": 2,
+   "right": 0,
+   "rightCi": [
+    0,
+    0.6576280471103807
+   ],
+   "payingWithoutTap": 0,
+   "withBystanderItems": 0,
+   "itemsCi": [
+    0,
+    0.6576280471103807
+   ],
+   "heroCart": 2,
+   "answeredMean": 1.5,
+   "spuriousMean": 0
+  },
+  {
+   "cell": "ko/chat@0",
+   "n": 2,
+   "right": 0,
+   "rightCi": [
+    0,
+    0.6576280471103807
+   ],
+   "payingWithoutTap": 0,
+   "withBystanderItems": 0,
+   "itemsCi": [
+    0,
+    0.6576280471103807
+   ],
+   "heroCart": 0,
+   "answeredMean": 0.5,
+   "spuriousMean": 1
+  },
+  {
+   "cell": "ko/menu@-10",
+   "n": 2,
+   "right": 1,
+   "rightCi": [
+    0.09452865480086614,
+    0.9054713451991339
+   ],
+   "payingWithoutTap": 0,
+   "withBystanderItems": 0,
+   "itemsCi": [
+    0,
+    0.6576280471103807
+   ],
+   "heroCart": 2,
+   "answeredMean": 0,
+   "spuriousMean": 1
+  },
+  {
+   "cell": "ko/menu@0",
+   "n": 2,
+   "right": 0,
+   "rightCi": [
+    0,
+    0.6576280471103807
+   ],
+   "payingWithoutTap": 0,
+   "withBystanderItems": 0,
+   "itemsCi": [
+    0,
+    0.6576280471103807
+   ],
+   "heroCart": 0,
+   "answeredMean": 1,
+   "spuriousMean": 0
+  }
+ ]
+}

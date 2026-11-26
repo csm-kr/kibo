@@ -1,0 +1,85 @@
+{
+ "settings": {
+  "threshold": 0.35,
+  "smooth": 3,
+  "lookback_s": 1.0
+ },
+ "model": {
+  "file_mb": 28.3,
+  "ort_ms_per_1s_window_median": 57.9,
+  "ort_ms_p90": 70.5,
+  "load_avg": 5.7
+ },
+ "decision_delay": {
+  "en/alone": {
+   "n": 12,
+   "never_opened": 0,
+   "delay_ms_median": 496,
+   "delay_ms_p90": 1905
+  },
+  "en/quiet-6": {
+   "n": 12,
+   "never_opened": 0,
+   "delay_ms_median": 432,
+   "delay_ms_p90": 1905
+  },
+  "en/quiet-12": {
+   "n": 12,
+   "never_opened": 0,
+   "delay_ms_median": 557,
+   "delay_ms_p90": 1876
+  },
+  "en/short": {
+   "n": 12,
+   "never_opened": 10,
+   "delay_ms_median": 480,
+   "delay_ms_p90": 480
+  },
+  "ko/alone": {
+   "n": 12,
+   "never_opened": 0,
+   "delay_ms_median": 448,
+   "delay_ms_p90": 676
+  },
+  "ko/quiet-6": {
+   "n": 12,
+   "never_opened": 0,
+   "delay_ms_median": 448,
+   "delay_ms_p90": 529
+  },
+  "ko/quiet-12": {
+   "n": 12,
+   "never_opened": 0,
+   "delay_ms_median": 448,
+   "delay_ms_p90": 541
+  },
+  "ko/short": {
+   "n": 12,
+   "never_opened": 4,
+   "delay_ms_median": 448,
+   "delay_ms_p90": 698
+  }
+ },
+ "enrol_length_dev_slice": {
+  "1.0s": {
+   "kept": 0.643,
+   "leaked": 0.204
+  },
+  "1.5s": {
+   "kept": 0.768,
+   "leaked": 0.262
+  },
+  "2.0s": {
+   "kept": 0.835,
+   "leaked": 0.358
+  },
+  "3.0s": {
+   "kept": 0.852,
+   "leaked": 0.363
+  },
+  "whole": {
+   "kept": 0.862,
+   "leaked": 0.376
+  }
+ }
+}

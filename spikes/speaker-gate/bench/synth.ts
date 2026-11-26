@@ -8,6 +8,7 @@ import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { GoogleGenAI } from "@google/genai";
 import { readWav, trimToSpeech, ttsPcm, writeWav } from "../../../scripts/wav";
+import { FLOW_TEXTS } from "./flow-sources";
 import { BYSTANDER_TEXTS, CUSTOMER_TEXTS, SONG_TEXTS, ttsFile } from "./sources";
 
 const MODEL = "gemini-3.8-flash-tts";
@@ -17,7 +18,7 @@ async function main() {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   const dir = join(process.cwd(), "spikes/speaker-gate/bench/audio/src/tts");
   mkdirSync(dir, { recursive: true });
-  const jobs = [...CUSTOMER_TEXTS, ...BYSTANDER_TEXTS, ...SONG_TEXTS];
+  const jobs = [...CUSTOMER_TEXTS, ...BYSTANDER_TEXTS, ...SONG_TEXTS, ...FLOW_TEXTS];
   let next = 0;
   let failed = 0;
   async function worker() {

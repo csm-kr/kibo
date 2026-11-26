@@ -7,8 +7,9 @@ export interface TtsText {
   role: "customer" | "bystander";
   /** hero: the hero order; enrol: the enrolment sentence; extra: another order sentence; short1/short2: a short
    *  answer; order: a rival order from the same menu; chat: small talk; yes: a yes on the order review; song: a
-   *  voice-over of lyrics-like lines (stand-in for singing). */
-  kind: "hero" | "enrol" | "extra" | "short1" | "short2" | "order" | "chat" | "yes" | "song";
+   *  voice-over of lyrics-like lines (stand-in for singing). The flow session (flow-sources.ts) adds fries, no and
+   *  pay (the customer's later turns) and menu (a neighbour talking about their own food, not to the assistant). */
+  kind: "hero" | "enrol" | "extra" | "short1" | "short2" | "order" | "chat" | "yes" | "song" | "fries" | "no" | "pay" | "menu";
   voice: string;
   lang: Lang;
   text: string;

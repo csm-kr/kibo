@@ -653,3 +653,83 @@ the combinations L0+L1+L3, +L2, and C1 in place of L2. Routing all voice through
 server-side layer (section 0). Any voice sample stays in memory (`docs/SECURITY.md`): use the `voxlock` package's
 in-memory sample, not sherpa-onnx's `voice_sample` file path, and never VoxLock's online self-enrolment in a queue
 (it enrols whoever speaks first, C1).
+
+## J. Measured on the judge (task 2, 2026-11-26)
+
+Bench v2 (manifest sha256 `51967c1a81e8…`), word layer only (`score.ts --layer words`, transcriber `gemini-3.8-flash`),
+no Live sessions. Code, run commands and the L2 dev slice are in `candidates/README.md`. Each cell below is "customer
+words kept % / bystander words leaked %", 12 trials per cell; music@0 has no bystander words. Baselines are kibo-1b's
+v2 runs: open `words-open-2026-11-26T13-51-41-631Z.json`, hold-oracle `words-hold-oracle-2026-11-26T13-56-32-346Z.json`,
+customer-oracle `words-customer-oracle-2026-11-26T13-43-55-272Z.json` (all in `bench/logs/`).
+
+Models added for this task, each in its own folder under `~/kibo-data/speaker-gate/models/`:
+
+| Folder / file | Source | Licence | Bytes | sha256 |
+|---|---|---|---|---|
+| `gtcrn/gtcrn_simple.onnx` | sherpa-onnx release `speech-enhancement-models` | MIT (GTCRN) | 535,638 | `e77603ac0c23dac3227dd2d7135b3a585cbee2679048aecfa886657d3ae1b534` (no published digest to compare) |
+| `dpdfnet-baseline/dpdfnet_baseline.onnx` | same release | Apache-2.0 | 8,791,035 | `debaf0e8893479fca91b8b4c1eae8db195aa8980ccc9012f5809fde2b738151a` (matches GitHub) |
+| `silero-vad/silero_vad.onnx` | sherpa-onnx release `asr-models` | MIT | 643,854 | `9e2449e1087496d8d4caba907f23e0bd3f78d91fa552479bb9c23ac09cbb1fd6` (matches GitHub) |
+| `voxlock-v2/voxlock_enroll.onnx` | github.com/arbazsiddiqui/voxlock release `sherpa-onnx-models-v2` | see C1 | 21,024,406 | `850ed19ec52ff80421e4746b0028647f36ffba4997ab776b5180c49bd948f41e` (matches GitHub) |
+| `voxlock-v2/voxlock_chunk_int8.onnx` | same release | see C1 | 56,561,266 | `2d1716a0df324188ec43e134ec72ba22d8ae13a7f2ce3a976a81113db844a65a` (matches GitHub) |
+| `voxlock-hf/` (deleted after use for disk) | `voxlock` 1.3.1 from PyPI, its own download of HF `arbazsiddiqui/voxlock` rev `2413b292…`, `onnx/v2/` | see C1 | 74 MB | enroll `81f305c9b7a32f13d1401f53bb4c6301826a607c9e807e60912f36ef1b9fae29`, chunk_int8 `c50ffdc8d723fd4f91cb08889f3d0143491f95967b705f35c444a0b4afe88172` |
+
+The venv also gained the `voxlock` 1.3.1 package and its dependencies (onnxruntime 1.32.0, soxr, huggingface_hub; no
+PyTorch), used only for the cross-check in J3.
+
+### J1. l0-gtcrn: GTCRN over the whole mix (L0)
+
+GTCRN (`gtcrn_simple.onnx`) through sherpa-onnx's denoiser over each mix; out.wav only, time-aligned with the mix (lag
+0 samples, checked). latency_ms 50 (32 ms window + 16 ms hop + compute). Log
+`bench/logs/words-l0-gtcrn-2026-11-26T14-19-03-314Z.json`.
+
+| en | alone | chat@-10 | chat@0 | order@-10 | order@0 | babble@0 | music@0 | song@0 |
+|---|---|---|---|---|---|---|---|---|
+| open | 96 / - | 100 / 52 | 95 / 71 | 99 / 49 | 95 / 74 | 36 / 13 | 97 / - | 73 / 30 |
+| l0-gtcrn | 96 / - | 96 / 43 | 78 / 63 | 90 / 43 | 92 / 64 | 32 / 12 | 98 / - | 72 / 27 |
+
+| ko | alone | chat@-10 | chat@0 | order@-10 | order@0 | babble@0 | music@0 | song@0 |
+|---|---|---|---|---|---|---|---|---|
+| open | 100 / - | 100 / 38 | 99 / 82 | 100 / 53 | 98 / 91 | 52 / 12 | 99 / - | 83 / 30 |
+| l0-gtcrn | 100 / - | 100 / 29 | 92 / 76 | 100 / 59 | 80 / 73 | 41 / 9 | 96 / - | 69 / 37 |
+
+What it shows: GTCRN does not separate voices (bystander leak stays within a few points of open) and costs customer
+words in the hardest cells (en chat@0 95 to 78, ko order@0 98 to 80, babble and song lower than open). Music at 0 dB
+does not hurt the transcriber even without it (open keeps 97 and 99), so on this bench L0 has nothing to fix. The
+song cells are a spoken voice-over of lyric-like lines (README), so this says nothing about real singing.
+
+### J2. l2-campp: CAM++ voice gate (L2)
+
+Silero VAD finds speech; CAM++ zh/en scores each 1.0 s window (0.25 s hop, windows with under 0.3 s of speech are not
+scored) against an embedding of enrol.wav. A hop matches when the mean of the last 3 scored hops reaches the threshold;
+the gate then opens back to the onset of the speech run in progress (at most 1.0 s before the decision, minus 0.2 s)
+and closes 0.7 s after the last matching window. Segments only; the judge sends the mix inside them.
+
+Tuning: threshold 0.10 to 0.70 x smoothing 1/3/5 hops x look-back 1/2/3 s, on the dev slice only (chat@-5 and
+read@-5, English and Korean, 48 trials), maximising customer speech time kept minus bystander-only time leaked
+(objective written before the sweep). Chosen: **threshold 0.35, smoothing 3, look-back 1.0 s** (dev slice: 86% of
+customer speech time kept, 37% of bystander time leaked). Log `candidates/l2-campp/logs/tune-20261126T233859.json`.
+Judge on the dev slice as a check (words, not time): kept 65 to 85%, leaked 9 to 31% per cell
+(`bench/logs/words-l2-campp-slice-2026-11-26T14-42-35-140Z.json`, not reported below).
+
+Full run: `bench/logs/words-l2-campp-2026-11-26T14-49-34-842Z.json`. latency_ms 83 = median compute of one window,
+one thread, on a machine at load average 13 to 100 from other projects (not a clean speed; see J5).
+
+| en | alone | chat@-10 | chat@0 | order@-10 | order@0 | babble@0 | music@0 | song@0 |
+|---|---|---|---|---|---|---|---|---|
+| open | 96 / - | 100 / 52 | 95 / 71 | 99 / 49 | 95 / 74 | 36 / 13 | 97 / - | 73 / 30 |
+| hold-oracle | 96 / - | 100 / 14 | 87 / 55 | 92 / 21 | 85 / 58 | 34 / 5 | 98 / - | 88 / 11 |
+| l2-campp | 86 / - | 71 / 8 | 39 / 16 | 67 / 11 | 51 / 31 | 15 / 1 | 86 / - | 50 / 9 |
+
+| ko | alone | chat@-10 | chat@0 | order@-10 | order@0 | babble@0 | music@0 | song@0 |
+|---|---|---|---|---|---|---|---|---|
+| open | 100 / - | 100 / 38 | 99 / 82 | 100 / 53 | 98 / 91 | 52 / 12 | 99 / - | 83 / 30 |
+| hold-oracle | 100 / - | 100 / 9 | 99 / 63 | 100 / 27 | 93 / 64 | 50 / 4 | 99 / - | 84 / 8 |
+| l2-campp | 99 / - | 82 / 19 | 72 / 43 | 96 / 33 | 73 / 46 | 36 / 4 | 89 / - | 46 / 5 |
+
+What it shows: the gate trades customer words for fewer leaks; it does not separate. When both voices are in a window
+the score falls between the two speakers', so the gate shuts during overlap and takes the customer with it (en chat@0:
+39% kept, 16% leaked; hold-oracle 87% / 55%). Its look-back of 1.0 s, chosen because longer look-backs leaked more on
+the dev slice, clips the first phrase even when the customer is alone (en alone 86%). Scores of the same voice over
+1 s windows were only 0.2 to 0.56 in the smoke test (`w0074`, `w0473`), close to the cross-speaker range; 1 s is too
+short for CAM++ to be sure (its published EER at 1 s is 5.86%, measured on real speech, not on 0 dB overlap). Korean
+keeps more and leaks more than English at the same setting (one threshold for both).

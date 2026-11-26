@@ -1,0 +1,10 @@
+VoxLock compute check, 2026-11-27 ~01:00, this MacBook (4 performance + 4 efficiency cores), NOT a quiet machine:
+three other projects' processes were using ~95% CPU each (load average 6.6 to 11.1 during the run), so some of this
+ran on efficiency cores. Same first 5 word trials of the manifest for every row; wall time per second of audio;
+sherpa-onnx 2.0.3, voxlock_enroll.onnx + voxlock_chunk_int8.onnx, enrol.wav as voice_sample. One-off check
+(script not kept); the reproducible number is the `speed` step's log speed-20261127T005646.json (20 trials).
+
+online=False threads=1 wall ms/audio s 1181  load 6.6
+online=True threads=1 wall ms/audio s 1482  load 8.0
+online=False threads=2 wall ms/audio s 679  load 6.9
+online=True threads=2 wall ms/audio s 1810  load 11.1

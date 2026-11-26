@@ -218,3 +218,108 @@ trial, about 2 to 5 minutes per candidate at 6 to 8 at a time; the call price is
 - `latency_ms` is self-reported. The word layer depends on one transcriber; Korean leak per character has a floor.
 - The review cell measures the AI and the server's confirm rule together; the phone's own tap/hold rule for the
   review (`docs/GOAL.md`) is not in this path.
+
+## Stage 2, loudness and meaning on the judge (2026-11-26 to 11-27)
+
+Asked by kibo-59: L1 (loudness) and L3 (meaning) as candidates on the frozen judge, then Live. The owner made meaning
+the main line on 11-26 ("follow the flow of meaning ... speak without pressing"). No trial byte and no scoring rule
+of stage 1 changed; every addition below is logged in the rows it affects.
+
+### Judge additions (stage 1 untouched)
+
+- `--cap-won <won>` is required for every scoring run; it refuses to start, and stops before each Live session, once
+  the ledger has reached it. The first 402 or 429 (or a Live close whose reason says quota or credit) ends the run
+  (exit 3). `bench/spend.ts` rebuilds the ledger from the logs: Live usage per session (`live-*.jsonl`,
+  `flow-*.jsonl`, `logs/v1`), text calls with usage (`logs/calls.jsonl`, written by the transcriber and the flow
+  filter from 11-27), earlier transcriber calls and TTS clips (estimated), other streams (`logs/spend-other.json`).
+  Prices from `evidence/cost-per-order.json` (read 10-13), unverified today; ₩1,400 per dollar unverified.
+- `--instructions <file>` appends text to the pinned Live instructions; the file and its sha256 go in every row, and
+  the runs go to the stack's own log (`--as`). `--trials <ids or file>` scores a named word-layer slice
+  (`words-<cand>-slice-*.json`). The Live summary prints the reaction against hold-oracle in the same cell as an extra
+  column; the adopt rule still compares with `open` on `alone` (kibo-59: lead with the frozen rule).
+- The flow session, `bench/build-flow.ts` (texts in `flow-sources.ts`, 48 new TTS clips, pinned in
+  `sources-flow.json`): 64 trials in their own `manifest-flow.json` (version flow-1, sha256
+  `026b37a758ecc06ca00f569c4dcc17f9a9a1655327741e8128987598039b848f`) and `refs-flow.json`, so the stage-1 manifest's
+  sha256 that keys every earlier log is unchanged; `--check` rebuilt all 128 files byte for byte. One trial is one
+  61.5 s Live session: 3 s of bystanders, then the customer's four turns (the hero order; "Make both fries large";
+  "No, thanks"; "That's all. I'll pay."), each 12 s after the one before, then 12 s. Bystanders talk throughout:
+  chat (the stage-1 chat clips) or menu talk (a neighbour discussing their own food from the same menu, not said to
+  the assistant). Cells chat and menu at -10 and 0 dB, English and Korean, 8 trials each. Runner `bench/flow.ts`:
+  stacks open, hold-oracle (customer turns ±0.2 s) and l1-loud (the gate run frame by frame, `asked()` after each
+  KIBO reply, held frames sent at once on opening, activity end on each close). Right = hero cart, status confirming
+  or paying, no bystander item ever added; also logged: paying without the review's tap, turns answered, spurious
+  replies, reaction from the customer's last word, gate closes inside a customer sentence.
+
+### L1, the loudness gate (`candidates/l1-loud/`, README there has the app contract)
+
+Depth swept on a 96-trial dev slice with the rule written first (`SWEEP.md`): 6 dB won (0.522 against 0.499 to
+0.502). The first warm version (level from the enrolment, only rising) cut chat@-10 leaks to the hold-oracle ceiling
+(en 15%, ko 7%) but kept 3% and 0% of a customer 12 dB quieter (`words-l1-loud-warm-2026-11-26T14-54-34-160Z.json`).
+The fixed rule (level = loudest run of speech in the last 5 s; a lone talker is never gated out; 10 s turn cap) keeps
+the quiet customer (quiet-12 en 97%, ko 98%) and the customer alone (95%, 100%), and gives the -10 dB gain back
+(chat@-10 leaked en 51%, ko 18%; open 52%, 38%) (`words-l1-loud-warm-2026-11-26T15-15-21-100Z.json`, cold
+`words-l1-loud-2026-11-26T15-13-12-408Z.json`). At -5 and 0 dB no variant changes anything. The level-only detector
+(main, no model) against Silero VAD (comparison): a few customer words lost under music (music@0 kept 92% against 97%
+en, 91% against 100% ko); warm Silero kept more of the English -10 dB gain (31% leaked)
+(`words-l1-loud-silero*-2026-11-26T15-17-46-378Z.json`, `...15-20-00-025Z.json`).
+
+### L3, meaning
+
+**Can Live's own transcript feed a text filter?** No, not while bystanders talk: in `logs/live-open.jsonl`, chat@0
+had no input transcript in 0 of 6 runs in either language, order@0 in 1 of 6 (en) and 0 of 6 (ko), and no turn ended
+in 6 of 6. So `l3-flow-text` was scored on the word layer only, from the judge's batch transcripts of the mix; that
+score flatters a design that would need L1 or a second streaming transcriber to run.
+
+**`l3-flow-text` on the word layer** (`words-l3-flow-text-2026-11-26T15-07-06-590Z.json`; gemini-3.8-flash, thinking
+low, temperature 0, JSON; fixed state: empty cart, KIBO's opening question). Trials where the customer says order
+speech (TTS halves), kept% / leaked%, open then filtered, n = 12 per cell unless noted:
+
+| Cell | English | Korean |
+|---|---|---|
+| chat@-10 | 100/52 → 100/0 | 100/38 → 100/0 |
+| chat@0 | 95/71 → 95/1 | 99/82 → 99/0 |
+| yes@0 (leaked) | 100 → 4 | 92 → 10 |
+| song@0 (n 6) | 95/22 → 95/0 | 99/16 → 99/0 |
+| order@-10 | 99/49 → 58/38 | 100/53 → 92/21 |
+| order@0 | 95/74 → 69/40 | 98/91 → 79/31 |
+| silent+order@0 (leaked) | 95 → 63 | 90 → 90 |
+| alone, quiet-6, quiet-12 (n 6) kept | 100 → 100, 84, 100 | 100 → 100 |
+
+Meaning removes chat, a bystander's yes and lyrics, and cannot remove a rival order from the same menu, where it also
+loses customer words (kibo-fd's hypothesis holds). Real-voice customers (book sentences) are kept 0% by design.
+Latency: 990 calls, median 3,063 ms, p90 6,546 ms (`logs/calls.jsonl`, kind flow). gemini-3.5-flash-lite (the newest
+lite on the key), 30 English calls: thinking minimal median 793 ms (p90 1,997), low 854 ms (p90 1,397); chat@0 leaked
+4% and kept 87% (Flash 1% and 95%, n 12), order@0 leaked 49% (Flash 30%, n 6)
+(`words-l3-flow-lite-minimal-slice-2026-11-26T15-26-36-863Z.json`, `...-low-slice-...15-26-43-343Z.json`). Short
+answers with the right state (hero in the cart, the customer's earlier words, KIBO asking "Is that everything?"):
+ko short kept 44% → 100%, en short+chat@0 6% → 61%, ko 28% → 56%, leaks 0 (n 12;
+`words-l3-flow-text-asked-slice-2026-11-26T15-26-51-718Z.json`).
+
+**`l3-flow-live` in Live** (`candidates/l3-flow-live/instructions.txt`, appended to the pinned instructions), stacked
+on l1-loud with the 10 s cap, flow session, 6 sessions per cell. Right k of 6, English then Korean:
+
+| Cell | open (2 per cell) | hold-oracle | l1-loud + l3-flow-live |
+|---|---|---|---|
+| chat@-10 | 0/2, 0/2 | 5/6, 3/6 | 4/6, 4/6 |
+| chat@0 | 0/2, 0/2 | 2/6, 2/6 | 2/6, 1/6 |
+| menu@-10 | 0/2, 1/2 | 5/6, 6/6 | 1/6, 0/6 |
+| menu@0 | 0/2, 0/2 | 1/6, 1/6 | 0/6, 0/6 |
+
+Logs: `logs/flow-open.jsonl`, `logs/flow-hold-oracle.jsonl`, `logs/flow-l1-loud+l3-flow-live.jsonl` and their
+summaries. Bystander items in the no-press stack: 5 or 6 of 6 in every menu cell (chicken wrap 18 times, spicy wings
+17, iced tea 14 in 48 sessions); spurious replies 1.3 to 2.7 per session (hold-oracle 0 to 0.3); 12.8 activity ends
+per session (hold-oracle 4); 299 frames dropped per session by half-duplex muting while KIBO answered someone
+(hold-oracle 7); 15 gate closes inside a customer sentence in 48 sessions. Reaction from the last customer word,
+answered turns: hold-oracle median 1,017 ms (p90 1,312), l1 + flow-live 1,480 ms (p90 3,973), open 2,193 ms.
+Between the customer's turns the neighbour is the lone talker, the gate opens for them, and the flow instruction did
+not keep Live from acting on their menu talk.
+
+**Safety.** With an open microphone "a fresh user utterance" is anyone's: in the no-press stack confirmCheckout came
+11 to 13 s after the customer's "I'll pay" turn, right after bystander speech, in 3 sessions (f0045 en chat@-10, f0040
+ko chat@0, f0006 ko menu@-10). Under hold-oracle 29 of 48 sessions reached paying by voice, nearly all on the
+customer's own "I'll pay". Any no-press build needs the review confirmed by tap only (`CONFIRM_TAP_ONLY=1`).
+
+Spend: ledger about ₩39,700 for the whole run after these sessions (`logs/spend.json`); flow sessions cost about ₩186
+each when Live answers the turns (about ₩17 for open, whose turns never end). Not run: hold-oracle + l3-flow-live (the
+ablation that would show whether the instruction helps when the turns are perfect), l1-loud alone on the flow set,
+and the 20-run adopt phase.
