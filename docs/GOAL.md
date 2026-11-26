@@ -16,6 +16,9 @@ Updated: 2026-11-26 · Next check: 2026-11-27 (bench results into the blog), 202
   is the higher goal. We want first place." And the method: "the AI follows the flow of meaning, removes what does
   not belong, and selectively keeps what fits my flow of meaning." So no press is part of the goal, not an option;
   hold to talk is a safety net only; a headset or a closer microphone is not the answer being asked for.
+  And on 11-27: "'Yes, please pay' by voice must work. The person only puts the card in. That is the point." So
+  the whole order, the confirmation included, is spoken; the one physical act is the card. A tap on the confirm
+  card stays possible but is never required.
 - **Main number:** first-try orders on a real phone in a loud place, **without pressing to talk**: of 10 hero orders
   (pair by QR, speak, confirm, pay on the kiosk) by a person, how many finish with the right cart and no retry.
   Target 9 of 10 (proposed, not the owner's number). Judge: the owner's own phone test, not this session's browser.
