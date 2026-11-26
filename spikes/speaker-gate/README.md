@@ -73,7 +73,10 @@ LibriSpeech dev-clean-2 (English, 26 speakers in the set, https://www.openslr.or
 test (Korean, 10 speakers, https://www.openslr.org/40/, CC BY 4.0; read from the Hugging Face parquet
 `kresnik/zeroth_korean`, whose page states no licence, so the licence is the original's). Real speakers cannot say the
 hero order: they are customers and bystanders in the word layer and bystanders in Live babble. Music: only the
-project's own scores (`videos/kibo-ad-40s/out/score.wav`, `videos/malo-ad-30s/out/score.wav`).
+project's own scores (`videos/kibo-ad-40s/out/score.wav`, `videos/malo-ad-30s/out/score.wav`). The 40 s score is played
+by our code from third-party samples: VSCO-2-CE orchestral samples (CC0) and six one-shots under the Pixabay Content
+License (`videos/kibo-ad-40s/samples/sfx/CREDITS.md`); the 30 s score is synthesized in code. No audio is in the
+repository: the logs hold numbers and transcripts only.
 
 **Song is a stand-in.** No CC0 or CC BY song with vocals was used. Asked to sing, Gemini TTS read the instruction
 aloud ("Sing these lyrics as a slow pop song…", checked by transcribing the four clips on 11-26), so the song cells are
