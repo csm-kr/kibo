@@ -90,5 +90,10 @@ Not gating: right 12/24 (pick 15/24, 37/64); items 7/24 (pick 2/24, 7/64).
    - near is cleared for hearing the customer's short answers ("No, thanks" heard 8/24 → 19-21/24) and, without the trim, for the first reply (1.34 s).
 3. "No bystander's words confirmed a payment" or "voice confirm is safe with an open microphone".
    - Section 8 lists the confirms the tap-only server refused after neighbour speech only.
-   - near opens the review earlier (15-18/24 right after "No, thanks").
+   - near opens the review earlier (15-18/24 right after "No, thanks"): 13 s more clock time
+     with the review open (median 37.3 s against 50.3 s). Amended after the item-state read:
+     neighbour-only audio Live received after the review opened is the same, 2.5 s against
+     2.4 s a session, so this is clock time, not more neighbour audio. Bystander items added
+     after the review opened: near 3 of 12 item sessions, pick 0 of 7; every near add came
+     within 3.3 s after a customer turn that a neighbour sentence overlapped.
 Always with: n=20 per cell is 8 recordings replayed 2-3 times; the intervals are narrower than the truth.
