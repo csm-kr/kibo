@@ -1,5 +1,5 @@
 {
- "at": "2026-11-26T19:50:05.280Z",
+ "at": "2026-11-26T20:56:24.748Z",
  "prices": {
   "liveText": 0.75,
   "liveAudioIn": 3,
@@ -12,12 +12,12 @@
   "source": "evidence/cost-per-order.json (read 2026-10-13); unverified today; Flash audio in assumed = Live audio in"
  },
  "live": {
-  "sessions": 460,
-  "withUsage": 375,
-  "promptTokens": 21658891,
-  "outTokens": 250441,
-  "usdMeasured": 20.37097424999999,
-  "usdIncludingSessionsWithoutUsage": 22.893225191189213
+  "sessions": 692,
+  "withUsage": 607,
+  "promptTokens": 48258667,
+  "outTokens": 521246,
+  "usdMeasured": 45.50266349999999,
+  "usdIncludingSessionsWithoutUsage": 48.02491444118921
  },
  "textCalls": {
   "transcribe": {
@@ -45,9 +45,9 @@
  },
  "otherStreams": {
   "ticket-kiosk": {
-   "sessions": 5,
-   "usd": 0.1417,
-   "note": "reported by kibo-59 11-27; no usage logged; estimated at the single-sentence mean of $0.0283 per session (logs/spend.json live total / sessions)"
+   "sessions": 31,
+   "usd": 1.2273,
+   "note": "reported by kibo-59 11-27; rounds 1 to 4 and the independent check: 5 + 12 + 4 + 4 + 2 Gemini Live sessions (single short orders and compound orders), no usage logged, estimated at the single-sentence mean of $0.0283 per session; plus about 42 text-model turns and an unknown number of TTS takes for fixtures (25 for the English hero alone), estimated at $0.15 together; round 4 and the check added about 80 text-model turns, estimated at $0.10; round 5 added 4 Live sessions and about 120 text-model calls (the airport_rail evals twice, typed turns in three languages), estimated at $0.10"
   },
   "first-hello": {
    "sessions": 79,
@@ -58,19 +58,19 @@
   "confirm-check": {
    "calls": 107,
    "usd": 0.0722,
-   "note": "field-open 11-27: scripts/confirm-check.ts, 40 + 40 calls on Vertex and 20 on the API key, plus 2 probes; gemini-3.5-flash-lite, about 330 prompt tokens and under 100 out (thinking included) per call; priced at Flash rates as an upper bound; +5 on fixture 21 (\"강\", kibo-59)"
+   "note": "field-open 11-27, as kibo-1b reported it: scripts/confirm-check.ts, 40 + 40 calls on Vertex and 20 on the API key, 2 probes, 5 on fixture 21; gemini-3.5-flash-lite priced at Flash rates as an upper bound"
   },
   "field-open-live": {
-   "sessions": 48,
-   "usd": 5.22719325,
-   "note": "field-open 11-27: scripts/rehearse-open.ts on the local server (VOICE_INPUT=open), Live usage from its usage messages at the ledger's prices; the confirm checks are under confirm-check"
+   "sessions": 52,
+   "usd": 5.6606,
+   "note": "field-open 11-27, as kibo-1b reported it at 04:56 KST: scripts/rehearse-open.ts on the local server (VOICE_INPUT=open), Live usage from its usage messages at the ledger's prices; later reruns not yet added"
   },
   "field-open-tts": {
    "requests": 1,
    "usd": 0.0006,
-   "note": "field-open 11-27: one gemini-3.8-flash-tts request for e2e/fixtures/open/yes-en.wav (1.5 s, Achird), at about 25 audio tokens a second at Live audio-out prices"
+   "note": "field-open 11-27: one TTS request for e2e/fixtures/open/yes-en.wav"
   }
  },
- "totalUsd": 37.79345444118922,
- "totalWon": 52911
+ "totalUsd": 64.44415044118922,
+ "totalWon": 90222
 }
