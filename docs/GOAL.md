@@ -12,9 +12,13 @@ Updated: 2026-11-26 · Next check: 2026-11-27 (bench results into the blog), 202
 - **Why (asked twice):** The owner (11-22): "improve it so that this app is worth 10 million won or more and wins the
   AI Builder Cup." Why win: the contest is the launch point for a business (memory `kibo-business-goal`, 10-15). What
   that needs: an app that does its job for a stranger in a real, noisy place, not only in a recorded video.
-- **Main number:** first-try orders on a real phone in a loud place: of 10 hero orders (pair by QR, speak, confirm,
-  pay on the kiosk) by a person, how many finish with the right cart and no retry. Target 9 of 10 (proposed, not the
-  owner's number). Judge: the owner's own phone test, not this session's browser.
+- **How, stated by the owner (11-26 23:40):** "We want to speak without pressing and still be told apart well; that
+  is the higher goal. We want first place." And the method: "the AI follows the flow of meaning, removes what does
+  not belong, and selectively keeps what fits my flow of meaning." So no press is part of the goal, not an option;
+  hold to talk is a safety net only; a headset or a closer microphone is not the answer being asked for.
+- **Main number:** first-try orders on a real phone in a loud place, **without pressing to talk**: of 10 hero orders
+  (pair by QR, speak, confirm, pay on the kiosk) by a person, how many finish with the right cart and no retry.
+  Target 9 of 10 (proposed, not the owner's number). Judge: the owner's own phone test, not this session's browser.
 - **Numbers read with it:** (a) tap on the mic to the moment the first word can be spoken, on the phone;
   (b) the last word to the kiosk highlight (`docs/plan/NUMBERS.md`).
 - **Constraints:** the AI still cannot pay (CLAUDE.md); no claim without its evidence file; Gemini for every AI feature
@@ -115,6 +119,15 @@ blog by Sat 11-28 15:30 KST, written from the current technology plus this exper
   hold. Bystanders are split by what they say (small talk, a rival order from the same menu, a "yes" on the review,
   song lyrics), because meaning can only filter some of it (expected, not measured). Rung 3, a stretch: the judge
   becomes a command every voice change must pass, and the blog publishes it.
+- **Main line since 11-26 23:40 (the owner): the meaning layer.** L3 is built as a flow filter, not a one-line rule:
+  inside Live (`l3-flow-live`: act only on what continues this customer's order or answers the question just asked)
+  and as transcribe-then-filter (`l3-flow-text`: a fast Gemini text call returns only the words that continue the
+  customer's flow, with "complete" and "unsure" flags). Something must also end the turn without a press (the open
+  microphone's first failure is that Live never hears silence): L1's gate closing, or the "complete" flag. A
+  multi-turn "flow session" is added to the judge, with bystanders who chat and bystanders who talk about the same
+  menu. First read from the judge, before these exist (`spikes/speaker-gate/bench/logs/words-*.json`, 12 trials a
+  cell, English): the library layer L0 (GTCRN) bought nothing on music (customer words kept 97% to 98%) or on the
+  song stand-in (73% to 72%) and cost customer words under a talker (95% to 78%).
 - **Hard targets (proposed):** the adopt line above at 0 dB; at -10 dB (a phone near the mouth) 20 of 20 without a
   press; the customer's quiet "yes" still heard; tap on the mic to hello 2 s or less measured, and something heard
   within 0.5 s of the tap.
