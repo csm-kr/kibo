@@ -186,6 +186,7 @@ Today, production runs the open microphone as submitted; hold to talk is a candi
 
 - Demo: https://kibo-407514467119.asia-northeast3.run.app/demo (short address: kibo-2026.web.app)
 - Code: https://github.com/csm-kr/kibo
+- The experiments in this post (bench, logs, the gate): https://github.com/csm-kr/kibo/tree/feat/hold-to-talk/spikes/speaker-gate
 - Video (3 minutes): https://youtu.be/2jPeDGbLsQM
 
 <!-- BODY END -->
