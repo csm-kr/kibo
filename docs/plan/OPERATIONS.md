@@ -74,10 +74,12 @@ A laptop stands in for the kiosk and a real phone orders (USER_JOURNEY J1, J2). 
   ₩177,188 left ("Prepaid - AI Studio"; last top-up ₩150,000 on 10-18), **automatic top-up off**. Gemini API use is
   paid from this credit, so at ₩0 the key answers 402 until someone tops up by hand. The same page shows ₩41,685
   owed on the post-paid side (Cloud Run and the rest), billed to the card. The page lags, like the spend page.
-- **Cap for the 11-26 listening experiment (orchestrator's number after the owner's "monitor well and go on"; the
-  owner named no figure):** the ledger total may reach ₩36,000 (it stood at ₩18,249 at 23:37: 324 Live sessions,
-  4,283 transcriber calls, 100 speech clips; rates from 10-13, unverified), of which new Live sessions at most
-  ₩10,000. Scoring on text is cheap but not free: about ₩1,200 for one candidate over the 960 word trials.
+- **Cap for the 11-26 listening experiment (owner 11-27 00:55: "there is enough; spend up to ₩50,000, then notify
+  me"):** read as the ledger total for the whole run, ₩50,000 (it stood at ₩18,249 at 23:37: 324 Live sessions,
+  4,283 transcriber calls, 100 speech clips; rates from 10-13, unverified). Shares of the rest: Live and text for
+  the flow experiment ₩20,000, the other candidates' word layer ₩8,000, the first-hello and ticket-kiosk branches
+  ₩3,750. The owner is told when the ledger reaches the cap; nothing is spent past it without a new number.
+  Scoring on text is cheap but not free: about ₩1,200 for one candidate over the 960 word trials.
 - **Why it matters:** experiments use production's API key. Used-up credit answers 402 and a reached cap 429; then
   production voice falls back to the relay (above). An experiment must never be what empties the finale's budget.
 - **Rules:** (1) no Gemini Live session for an experiment without a number from the owner; text-only scoring first.
