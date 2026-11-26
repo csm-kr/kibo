@@ -1,8 +1,8 @@
 {
  "ticket-kiosk": {
-  "sessions": 5,
-  "usd": 0.1417,
-  "note": "reported by kibo-59 11-27; no usage logged; estimated at the single-sentence mean of $0.0283 per session (logs/spend.json live total / sessions)"
+  "sessions": 21,
+  "usd": 0.7443000000000001,
+  "note": "reported by kibo-59 11-27; rounds 1 to 3: 5 + 12 + 4 Gemini Live sessions (single short orders and compound orders), no usage logged, estimated at the single-sentence mean of $0.0283 per session; plus about 42 text-model turns and an unknown number of TTS takes for fixtures (25 for the English hero alone), estimated at $0.15 together"
  },
  "first-hello": {
   "sessions": 79,
