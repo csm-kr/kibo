@@ -69,14 +69,21 @@ A laptop stands in for the kiosk and a real phone orders (USER_JOURNEY J1, J2). 
 - **What was read 11-26 22:50 (consoles, no saved file):** billing account "My Billing Account", Nov 1 to 26: ₩82.7K
   after savings (Cloud Run ₩46,181, Gemini API ₩31,289, Artifact Registry ₩3,486, Vertex AI ₩1,614); forecast ₩146K
   for November; the budget "KIBO monthly 50k KRW" (₩100,000) only sends mail. AI Studio: Tier 2, no monthly spend cap
-  set, "GCP credit ₩0". Whether Gemini still draws on a prepaid balance (₩238k noted 10-18) or is billed to the card
-  was not visible on any page read: unverified, the owner knows.
+  set, "GCP credit ₩0".
+- **Prepaid Gemini credit, read 11-27 00:40 KST (Cloud console, Billing, Payment overview; no saved file):**
+  ₩177,188 left ("Prepaid - AI Studio"; last top-up ₩150,000 on 10-18), **automatic top-up off**. Gemini API use is
+  paid from this credit, so at ₩0 the key answers 402 until someone tops up by hand. The same page shows ₩41,685
+  owed on the post-paid side (Cloud Run and the rest), billed to the card. The page lags, like the spend page.
+- **Cap for the 11-26 listening experiment (orchestrator's number after the owner's "monitor well and go on"; the
+  owner named no figure):** the ledger total may reach ₩36,000 (it stood at ₩18,249 at 23:37: 324 Live sessions,
+  4,283 transcriber calls, 100 speech clips; rates from 10-13, unverified), of which new Live sessions at most
+  ₩10,000. Scoring on text is cheap but not free: about ₩1,200 for one candidate over the 960 word trials.
 - **Why it matters:** experiments use production's API key. Used-up credit answers 402 and a reached cap 429; then
   production voice falls back to the relay (above). An experiment must never be what empties the finale's budget.
 - **Rules:** (1) no Gemini Live session for an experiment without a number from the owner; text-only scoring first.
   (2) One ledger for every stream: `spikes/speaker-gate/bench/logs/spend.json` (Live sessions with usage tokens,
   transcriber and text calls, and the sessions other branches report), totals in tokens and an estimate in won with
-  the assumed rate marked unverified. (3) The bench stops at the first 402 or 429 and refuses to start past its cap.
+  the assumed rate marked unverified. (3) The bench stops at the first 402 or 429 and refuses to run without `--cap-won` or past it.
   (4) At every checkpoint read production `/api/health?deep=1` (11-27 00:10 KST: all seven checks ok) and, because
   the spend page lags by hours, read aistudio.google.com/spend only to confirm the ledger.
 - **Idle cost, read 11-27 00:10:** production `kibo-00041-gow` keeps one instance (min 1); the candidate
