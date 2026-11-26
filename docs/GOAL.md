@@ -77,6 +77,9 @@ candidate `kibo-00044-hid`, production `kibo-00041-gow`. The order review needs 
   license that allows it (public read speech, English and Korean) as well as TTS; customer alone, bystander alone,
   and overlap at +5, 0 and -5 dB; enrolment from the customer's first 3 s. Measures: customer words kept, bystander
   words leaked (one fixed transcriber), added delay, and the order on real Gemini Live (`run.ts`, 20 runs per cell).
+  Added 11-26 by the owner ("many other voices, or music playing"): several bystanders at once (babble) and music
+  under the customer are conditions of the judge too. The owner's order of work (memo, 11-26): enrol the voice from a
+  short sample, filter by voice before transcribing, then drop words that do not belong to the order.
 - **Stage 2, 11-26 to 11-27: three candidates on that judge.**
   - A, Gemini only: Gemini Flash hears the customer's sample and the mixture and writes only the customer's words;
     Live gets them as text and answers by voice. Keeps "Gemini for every AI feature"; costs a call per turn.
