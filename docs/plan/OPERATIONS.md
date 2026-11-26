@@ -89,12 +89,13 @@ A laptop stands in for the kiosk and a real phone orders (USER_JOURNEY J1, J2). 
   ₩177,188 left ("Prepaid - AI Studio"; last top-up ₩150,000 on 10-18), **automatic top-up off**. Gemini API use is
   paid from this credit, so at ₩0 the key answers 402 until someone tops up by hand. The same page shows ₩41,685
   owed on the post-paid side (Cloud Run and the rest), billed to the card. The page lags, like the spend page.
-- **Cap for the 11-26 listening experiment (owner 11-27 00:55: "there is enough; spend up to ₩50,000, then notify
-  me"):** read as the ledger total for the whole run, ₩50,000 (it stood at ₩18,249 at 23:37: 324 Live sessions,
-  4,283 transcriber calls, 100 speech clips; rates from 10-13, unverified). Shares of the rest: Live and text for
-  the flow experiment ₩20,000, the other candidates' word layer ₩8,000, the first-hello and ticket-kiosk branches
-  ₩3,750. The owner is told when the ledger reaches the cap; nothing is spent past it without a new number.
-  Scoring on text is cheap but not free: about ₩1,200 for one candidate over the 960 word trials.
+- **Cap for the 11-26 listening experiment: ₩100,000 on the ledger** (owner 11-27 about 03:30: "set the limit to
+  ₩100,000 and keep going"; before that ₩50,000, set 00:55). The ledger stood at about ₩45,600 when it was raised
+  (first cut 18,249; Live flow sessions and word-layer scoring since). Shares of the rest: the bench's 20-run
+  confirmation and ablations ₩30,000, the phone candidate's own Live checks ₩6,000, the ticket machine ₩2,000,
+  the remainder unassigned. The owner is told when the ledger reaches the cap (panes report at ₩90,000); nothing
+  is spent past it without a new number. Scoring on text is cheap but not free: about ₩900 to ₩1,200 for one
+  candidate over the 960 word trials; a multi-turn Live session costs about ₩145 to ₩162.
 - **Why it matters:** experiments use production's API key. Used-up credit answers 402 and a reached cap 429; then
   production voice falls back to the relay (above). An experiment must never be what empties the finale's budget.
 - **Rules:** (1) no Gemini Live session for an experiment without a number from the owner; text-only scoring first.
