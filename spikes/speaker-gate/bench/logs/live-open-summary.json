@@ -1,0 +1,479 @@
+{
+ "candidate": "open",
+ "manifestSha": "51967c1a81e89fbfb5f76fa921e0f4d980f57845b704f1a29d66a430a2726292",
+ "commit": "397cb09e56668bac920adeae01b056e75e9b6289",
+ "dirty": "",
+ "runsPerCell": 6,
+ "cells": [
+  {
+   "cell": "en/alone",
+   "n": 6,
+   "right": 5,
+   "withBystanderItems": 1,
+   "yesAccepted": 0,
+   "confirmTried": 0,
+   "medianReactionMs": 1284,
+   "rightCi": [
+    0.43649056343635395,
+    0.9699474141282697
+   ],
+   "itemsCi": [
+    0.03005258587173032,
+    0.563509436563646
+   ],
+   "yesCi": [
+    0,
+    0.3903430336530645
+   ],
+   "triedCi": [
+    0,
+    0.3903430336530645
+   ]
+  },
+  {
+   "cell": "en/chat@-10",
+   "n": 6,
+   "right": 0,
+   "withBystanderItems": 0,
+   "yesAccepted": 0,
+   "confirmTried": 0,
+   "medianReactionMs": null,
+   "rightCi": [
+    0,
+    0.3903430336530645
+   ],
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "yesCi": [
+    0,
+    0.3903430336530645
+   ],
+   "triedCi": [
+    0,
+    0.3903430336530645
+   ]
+  },
+  {
+   "cell": "en/chat@0",
+   "n": 6,
+   "right": 0,
+   "withBystanderItems": 0,
+   "yesAccepted": 0,
+   "confirmTried": 0,
+   "medianReactionMs": null,
+   "rightCi": [
+    0,
+    0.3903430336530645
+   ],
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "yesCi": [
+    0,
+    0.3903430336530645
+   ],
+   "triedCi": [
+    0,
+    0.3903430336530645
+   ]
+  },
+  {
+   "cell": "en/order@-10",
+   "n": 6,
+   "right": 0,
+   "withBystanderItems": 2,
+   "yesAccepted": 0,
+   "confirmTried": 0,
+   "medianReactionMs": null,
+   "rightCi": [
+    0,
+    0.3903430336530645
+   ],
+   "itemsCi": [
+    0.09676933255921683,
+    0.7000116786584712
+   ],
+   "yesCi": [
+    0,
+    0.3903430336530645
+   ],
+   "triedCi": [
+    0,
+    0.3903430336530645
+   ]
+  },
+  {
+   "cell": "en/order@0",
+   "n": 6,
+   "right": 0,
+   "withBystanderItems": 0,
+   "yesAccepted": 0,
+   "confirmTried": 0,
+   "medianReactionMs": null,
+   "rightCi": [
+    0,
+    0.3903430336530645
+   ],
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "yesCi": [
+    0,
+    0.3903430336530645
+   ],
+   "triedCi": [
+    0,
+    0.3903430336530645
+   ]
+  },
+  {
+   "cell": "en/babble@0",
+   "n": 6,
+   "right": 0,
+   "withBystanderItems": 2,
+   "yesAccepted": 0,
+   "confirmTried": 0,
+   "medianReactionMs": null,
+   "rightCi": [
+    0,
+    0.3903430336530645
+   ],
+   "itemsCi": [
+    0.09676933255921683,
+    0.7000116786584712
+   ],
+   "yesCi": [
+    0,
+    0.3903430336530645
+   ],
+   "triedCi": [
+    0,
+    0.3903430336530645
+   ]
+  },
+  {
+   "cell": "en/music@0",
+   "n": 6,
+   "right": 4,
+   "withBystanderItems": 0,
+   "yesAccepted": 0,
+   "confirmTried": 0,
+   "medianReactionMs": 2111,
+   "rightCi": [
+    0.29998832134152864,
+    0.9032306674407831
+   ],
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "yesCi": [
+    0,
+    0.3903430336530645
+   ],
+   "triedCi": [
+    0,
+    0.3903430336530645
+   ]
+  },
+  {
+   "cell": "en/song@0",
+   "n": 6,
+   "right": 1,
+   "withBystanderItems": 0,
+   "yesAccepted": 0,
+   "confirmTried": 0,
+   "medianReactionMs": 1787,
+   "rightCi": [
+    0.03005258587173032,
+    0.563509436563646
+   ],
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "yesCi": [
+    0,
+    0.3903430336530645
+   ],
+   "triedCi": [
+    0,
+    0.3903430336530645
+   ]
+  },
+  {
+   "cell": "en/review-yes@0",
+   "n": 6,
+   "right": 1,
+   "withBystanderItems": 0,
+   "yesAccepted": 5,
+   "confirmTried": 5,
+   "medianReactionMs": null,
+   "rightCi": [
+    0.03005258587173032,
+    0.563509436563646
+   ],
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "yesCi": [
+    0.43649056343635395,
+    0.9699474141282697
+   ],
+   "triedCi": [
+    0.43649056343635395,
+    0.9699474141282697
+   ]
+  },
+  {
+   "cell": "ko/alone",
+   "n": 6,
+   "right": 6,
+   "withBystanderItems": 0,
+   "yesAccepted": 0,
+   "confirmTried": 0,
+   "medianReactionMs": 1151,
+   "rightCi": [
+    0.6096569663469354,
+    0.9999999999999999
+   ],
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "yesCi": [
+    0,
+    0.3903430336530645
+   ],
+   "triedCi": [
+    0,
+    0.3903430336530645
+   ]
+  },
+  {
+   "cell": "ko/chat@-10",
+   "n": 6,
+   "right": 0,
+   "withBystanderItems": 0,
+   "yesAccepted": 0,
+   "confirmTried": 0,
+   "medianReactionMs": null,
+   "rightCi": [
+    0,
+    0.3903430336530645
+   ],
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "yesCi": [
+    0,
+    0.3903430336530645
+   ],
+   "triedCi": [
+    0,
+    0.3903430336530645
+   ]
+  },
+  {
+   "cell": "ko/chat@0",
+   "n": 6,
+   "right": 0,
+   "withBystanderItems": 0,
+   "yesAccepted": 0,
+   "confirmTried": 0,
+   "medianReactionMs": null,
+   "rightCi": [
+    0,
+    0.3903430336530645
+   ],
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "yesCi": [
+    0,
+    0.3903430336530645
+   ],
+   "triedCi": [
+    0,
+    0.3903430336530645
+   ]
+  },
+  {
+   "cell": "ko/order@-10",
+   "n": 6,
+   "right": 0,
+   "withBystanderItems": 0,
+   "yesAccepted": 0,
+   "confirmTried": 0,
+   "medianReactionMs": null,
+   "rightCi": [
+    0,
+    0.3903430336530645
+   ],
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "yesCi": [
+    0,
+    0.3903430336530645
+   ],
+   "triedCi": [
+    0,
+    0.3903430336530645
+   ]
+  },
+  {
+   "cell": "ko/order@0",
+   "n": 6,
+   "right": 0,
+   "withBystanderItems": 0,
+   "yesAccepted": 0,
+   "confirmTried": 0,
+   "medianReactionMs": null,
+   "rightCi": [
+    0,
+    0.3903430336530645
+   ],
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "yesCi": [
+    0,
+    0.3903430336530645
+   ],
+   "triedCi": [
+    0,
+    0.3903430336530645
+   ]
+  },
+  {
+   "cell": "ko/babble@0",
+   "n": 6,
+   "right": 0,
+   "withBystanderItems": 1,
+   "yesAccepted": 0,
+   "confirmTried": 0,
+   "medianReactionMs": null,
+   "rightCi": [
+    0,
+    0.3903430336530645
+   ],
+   "itemsCi": [
+    0.03005258587173032,
+    0.563509436563646
+   ],
+   "yesCi": [
+    0,
+    0.3903430336530645
+   ],
+   "triedCi": [
+    0,
+    0.3903430336530645
+   ]
+  },
+  {
+   "cell": "ko/music@0",
+   "n": 6,
+   "right": 5,
+   "withBystanderItems": 0,
+   "yesAccepted": 0,
+   "confirmTried": 0,
+   "medianReactionMs": 1274,
+   "rightCi": [
+    0.43649056343635395,
+    0.9699474141282697
+   ],
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "yesCi": [
+    0,
+    0.3903430336530645
+   ],
+   "triedCi": [
+    0,
+    0.3903430336530645
+   ]
+  },
+  {
+   "cell": "ko/song@0",
+   "n": 6,
+   "right": 0,
+   "withBystanderItems": 0,
+   "yesAccepted": 0,
+   "confirmTried": 0,
+   "medianReactionMs": null,
+   "rightCi": [
+    0,
+    0.3903430336530645
+   ],
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "yesCi": [
+    0,
+    0.3903430336530645
+   ],
+   "triedCi": [
+    0,
+    0.3903430336530645
+   ]
+  },
+  {
+   "cell": "ko/review-yes@0",
+   "n": 6,
+   "right": 5,
+   "withBystanderItems": 0,
+   "yesAccepted": 1,
+   "confirmTried": 1,
+   "medianReactionMs": null,
+   "rightCi": [
+    0.43649056343635395,
+    0.9699474141282697
+   ],
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "yesCi": [
+    0.03005258587173032,
+    0.563509436563646
+   ],
+   "triedCi": [
+    0.03005258587173032,
+    0.563509436563646
+   ]
+  }
+ ],
+ "verdicts": [
+  {
+   "lang": "en",
+   "method": "B",
+   "verdict": "not evaluable",
+   "reasons": [
+    "6 runs at 0 dB overlap; the line needs 20"
+   ],
+   "addedDelayMs": 0
+  },
+  {
+   "lang": "ko",
+   "method": "B",
+   "verdict": "not evaluable",
+   "reasons": [
+    "6 runs at 0 dB overlap; the line needs 20"
+   ],
+   "addedDelayMs": 0
+  }
+ ]
+}

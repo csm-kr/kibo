@@ -1,0 +1,6 @@
+# Generated locally, not committed: TTS sources, benchmark audio, candidate outputs, transcript cache
+audio/
+inputs/
+refs/
+out/
+work/

@@ -1,0 +1,60 @@
+{
+ "candidate": "text-oracle",
+ "manifestSha": "51967c1a81e89fbfb5f76fa921e0f4d980f57845b704f1a29d66a430a2726292",
+ "commit": "397cb09e56668bac920adeae01b056e75e9b6289",
+ "dirty": "",
+ "runsPerCell": 6,
+ "cells": [
+  {
+   "cell": "en/alone",
+   "n": 6,
+   "right": 6,
+   "withBystanderItems": 0,
+   "yesAccepted": 0,
+   "confirmTried": 0,
+   "medianReactionMs": 992,
+   "rightCi": [
+    0.6096569663469354,
+    0.9999999999999999
+   ],
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "yesCi": [
+    0,
+    0.3903430336530645
+   ],
+   "triedCi": [
+    0,
+    0.3903430336530645
+   ]
+  },
+  {
+   "cell": "ko/alone",
+   "n": 6,
+   "right": 6,
+   "withBystanderItems": 0,
+   "yesAccepted": 0,
+   "confirmTried": 0,
+   "medianReactionMs": 995,
+   "rightCi": [
+    0.6096569663469354,
+    0.9999999999999999
+   ],
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "yesCi": [
+    0,
+    0.3903430336530645
+   ],
+   "triedCi": [
+    0,
+    0.3903430336530645
+   ]
+  }
+ ],
+ "verdicts": []
+}

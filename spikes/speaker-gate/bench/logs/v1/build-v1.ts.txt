@@ -1,0 +1,452 @@
+// Builds the frozen crowd benchmark (docs/GOAL.md "Speaker-aware listening", stage 1). Same sources and seed give the
+// same bytes. Inputs a candidate may read go to inputs/<trial>/ (mix.wav, enrol.wav); references it may not read go to
+// refs/<trial>/ (customer.wav, noise.wav, ref.json). manifest.json (inputs and their sha256) and refs.json (cells,
+// references and their sha256) are committed; the audio is not. sources.json pins every source file by sha256, because
+// Gemini TTS and the corpora cannot be fetched again byte for byte: a build refuses sources that do not match.
+//
+//   npx tsx spikes/speaker-gate/bench/build.ts --real ~/kibo-data/speaker-gate/data/real [--pin]
+// --pin writes sources.json from the files on disk (first build only).
+
+import { spawnSync } from "node:child_process";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { RATE, atLevel, decodeWav, dbfs, encodeWav, rng, sha256, speechRms, speechSpans, to16k, toInt16, trim } from "./audio";
+import { BYSTANDER_VOICES, CUSTOMER_VOICES, HERO, MUSIC, SONG_TEXTS, type Lang, ttsFile } from "./sources";
+
+export const SEED = 20261126;
+const ROOT = process.cwd();
+export const BENCH = join(ROOT, "spikes/speaker-gate/bench");
+const CUSTOMER_DBFS = -20;
+const GAP_S = 0.4;
+const ENROL_S = 3;
+const LANGS: Lang[] = ["en", "ko"];
+
+export type Condition = "alone" | "bystander-alone" | "sir+5" | "sir0" | "sir-5" | "babble" | "music" | "music+bystander" | "song0" | "song-5";
+/** Noise level relative to the customer's speech, in dB (run.ts's "level"); SIR is its negative. */
+const LEVEL: Record<Condition, number | null> = {
+  alone: null,
+  "bystander-alone": 0,
+  "sir+5": -5,
+  sir0: 0,
+  "sir-5": 5,
+  babble: 0,
+  music: 0,
+  "music+bystander": 0,
+  // A song: the project's score plus a TTS voice singing (stand-in), together at 0 dB and 5 dB over the customer.
+  song0: 0,
+  "song-5": 5,
+};
+const WORD_CONDITIONS: Condition[] = ["alone", "bystander-alone", "sir+5", "sir0", "sir-5", "babble", "music", "music+bystander", "song0", "song-5"];
+const LIVE_CONDITIONS: Condition[] = ["alone", "sir+5", "sir0", "sir-5", "babble", "music", "music+bystander", "song0", "song-5"];
+const WORD_TRIALS = 12;
+const LIVE_TRIALS = 20;
+const SETS = {
+  words: { leadS: 1, tailS: 1, conditions: WORD_CONDITIONS, trials: WORD_TRIALS },
+  live: { leadS: 5, tailS: 12, conditions: LIVE_CONDITIONS, trials: LIVE_TRIALS },
+};
+
+// ---- Sources ----
+
+interface Clip {
+  key: string;
+  who: string;
+  text: string;
+  kind: string;
+  x: Float32Array;
+}
+
+const used = new Map<string, string>();
+let pinned: Record<string, string> | null = null;
+
+function pin(key: string, file: string) {
+  if (used.has(key)) return;
+  const h = sha256(readFileSync(file));
+  if (pinned && pinned[key] !== h) throw new Error(`source ${key} does not match sources.json (refusing to build a different benchmark)`);
+  used.set(key, h);
+}
+
+const cache = new Map<string, Clip>();
+
+function tts(voice: string, kind: string, lang: Lang, text: string): Clip {
+  const name = ttsFile({ voice, kind: kind as never, lang });
+  const key = `tts/${name}`;
+  if (cache.has(key)) return cache.get(key)!;
+  const file = join(BENCH, "audio/src/tts", name);
+  pin(key, file);
+  const { rate, x } = decodeWav(readFileSync(file));
+  const clip = { key, who: `tts:${voice}`, text, kind, x: trim(to16k(x, rate)) };
+  cache.set(key, clip);
+  return clip;
+}
+
+interface RealRow {
+  speaker: string;
+  id: string;
+  file: string;
+  text: string;
+}
+
+function decodeReal(corpus: string, row: RealRow): Clip {
+  const key = `${corpus}/${row.id}`;
+  if (cache.has(key)) return cache.get(key)!;
+  pin(key, row.file);
+  // Lossless decoding only: the corpora are 16 kHz already; anything else is refused, not resampled.
+  const p = spawnSync("ffmpeg", ["-v", "error", "-i", row.file, "-ac", "1", "-f", "wav", "-"], { maxBuffer: 1 << 28 });
+  if (p.status !== 0) throw new Error(`ffmpeg could not decode ${key}`);
+  const { rate, x } = decodeWav(p.stdout);
+  if (rate !== RATE) throw new Error(`${key} is ${rate} Hz`);
+  const clip = { key, who: `${corpus}:${row.speaker}`, text: row.text, kind: "read", x: trim(x) };
+  cache.set(key, clip);
+  return clip;
+}
+
+function music(i: number): Float32Array {
+  const file = join(ROOT, MUSIC[i]);
+  pin(MUSIC[i], file);
+  const { rate, x } = decodeWav(readFileSync(file));
+  return to16k(x, rate);
+}
+
+/** Speakers with their utterances of a usable length (by transcript length, so only picked ones are decoded). */
+function realPool(realDir: string, lang: Lang): { corpus: string; speakers: Map<string, RealRow[]> } {
+  const corpus = lang === "en" ? "libri-en" : "zeroth-ko";
+  const rows: RealRow[] = JSON.parse(readFileSync(join(realDir, `${corpus}.json`), "utf8"));
+  const speakers = new Map<string, RealRow[]>();
+  for (const r of rows) {
+    const n = lang === "en" ? r.text.split(/\s+/).length : r.text.replace(/\s/g, "").length;
+    if (lang === "en" ? n < 8 || n > 24 : n < 14 || n > 40) continue;
+    speakers.set(r.speaker, [...(speakers.get(r.speaker) ?? []), r]);
+  }
+  for (const [s, us] of speakers) if (us.length < 3) speakers.delete(s);
+  return { corpus, speakers: new Map([...speakers].sort(([a], [b]) => a.localeCompare(b))) };
+}
+
+// ---- One trial ----
+
+type Rand = ReturnType<typeof rng>;
+
+interface Placed {
+  who: string;
+  source: string;
+  kind: string;
+  text: string;
+  startMs: number;
+  endMs: number;
+  complete: boolean;
+}
+
+/** One person's clips back to back with 0.4 s gaps from a random start. The live set runs them through the whole take
+ *  (cut at its edges, as run.ts); the word set places whole clips only, so every reference word was played. */
+function track(clips: Clip[], length: number, r: Rand, whole: boolean, levelDb: number): { x: Float32Array; placed: Placed[] } {
+  const x = new Float32Array(length);
+  const placed: Placed[] = [];
+  let at = whole ? Math.round(r.next() * 0.8 * RATE) : -Math.round(r.next() * 2 * RATE);
+  for (let i = r.int(clips.length); at < length; i++) {
+    const c = clips[i % clips.length];
+    const y = atLevel(c.x, levelDb);
+    if (whole && at + y.length > length) break;
+    for (let j = Math.max(0, -at); j < y.length && at + j < length; j++) x[at + j] += y[j];
+    placed.push({
+      who: c.who,
+      source: c.key,
+      kind: c.kind,
+      text: c.text,
+      startMs: Math.round((Math.max(0, at) / RATE) * 1000),
+      endMs: Math.round((Math.min(length, at + y.length) / RATE) * 1000),
+      complete: at >= 0 && at + y.length <= length,
+    });
+    at += y.length + Math.round(GAP_S * RATE);
+  }
+  return { x, placed };
+}
+
+interface Trial {
+  set: "words" | "live";
+  lang: Lang;
+  condition: Condition;
+  index: number;
+  mix: Int16Array;
+  enrol: Int16Array;
+  customer: Int16Array | null;
+  noise: Int16Array | null;
+  ref: Record<string, unknown>;
+}
+
+interface Who {
+  customer: Clip;
+  enrol: Clip;
+  /** Bystanders as people, each with their clips. */
+  bystanders: Clip[][];
+  /** The singing stand-in's lines (song cells). */
+  song: Clip[];
+  voices: "tts" | "real" | "mixed";
+}
+
+function makeTrial(set: "words" | "live", lang: Lang, condition: Condition, index: number, who: Who, r: Rand): Trial {
+  const { leadS, tailS } = SETS[set];
+  const speaks = condition !== "bystander-alone";
+  const c = atLevel(who.customer.x, CUSTOMER_DBFS);
+  const lead = leadS * RATE;
+  // The word set places whole bystander clips, so the take is at least as long as the longest one after its start.
+  const longest = set === "words" && LEVEL[condition] !== null ? Math.max(0, ...who.bystanders.flat().map((b) => b.x.length)) + RATE : 0;
+  const length = Math.max(lead + c.length + tailS * RATE, longest);
+  const customer = new Float32Array(length);
+  if (speaks) customer.set(c, lead);
+  const level = LEVEL[condition];
+  const whole = set === "words";
+  let noise: Float32Array | null = null;
+  let placed: Placed[] = [];
+  let musicRef: object | null = null;
+  if (level !== null) {
+    const target = CUSTOMER_DBFS + level;
+    const parts: Float32Array[] = [];
+    if (condition === "babble") {
+      // Four people at once, their sum at the target level.
+      const ts = who.bystanders.slice(0, 4).map((p) => track(p, length, r, whole, -20));
+      const sum = new Float32Array(length);
+      for (const t of ts) for (let i = 0; i < length; i++) sum[i] += t.x[i];
+      parts.push(atLevel(sum, target));
+      placed = ts.flatMap((t) => t.placed);
+    } else {
+      // Music plus a bystander or a singer: each 3 dB under the target, so the two together are at the target.
+      const song = condition === "song0" || condition === "song-5";
+      const each = condition === "music+bystander" || song ? target - 3 : target;
+      if (condition !== "music") {
+        // A song runs through the whole take, cut at its edges (its lines are longer than a word-set trial).
+        const t = track(song ? who.song : who.bystanders[0], length, r, whole && !song, each);
+        parts.push(t.x);
+        placed = t.placed;
+      }
+      if (condition === "music" || condition === "music+bystander" || song) {
+        const m = r.int(MUSIC.length);
+        const song = music(m);
+        const offset = r.int(song.length - length);
+        parts.push(atLevel(song.slice(offset, offset + length), each));
+        musicRef = { file: MUSIC[m], offsetMs: Math.round((offset / RATE) * 1000), levelDb: Math.round((each - CUSTOMER_DBFS) * 10) / 10 };
+      }
+    }
+    noise = new Float32Array(length);
+    for (const p of parts) for (let i = 0; i < length; i++) noise[i] += p[i];
+  }
+  const mix = Float32Array.from(customer, (s, i) => s + (noise ? noise[i] : 0));
+  const custSpans = speaks ? speechSpans(c, leadS * 1000) : [];
+  // Overlap: share of the customer's speech frames where the noise is within 15 dB of its own level.
+  let overlap: number | null = null;
+  if (speaks && noise) {
+    const thr = 10 ** ((CUSTOMER_DBFS + level! - 15) / 20);
+    const n = RATE / 50;
+    let inSpeech = 0;
+    let hit = 0;
+    for (const [s, e] of custSpans)
+      for (let t = s; t + 20 <= e; t += 20) {
+        const i0 = (t * RATE) / 1000;
+        let p = 0;
+        for (let j = i0; j < i0 + n; j++) p += noise[j] * noise[j];
+        inSpeech++;
+        if (Math.sqrt(p / n) > thr) hit++;
+      }
+    overlap = Math.round((hit / Math.max(1, inSpeech)) * 1000) / 1000;
+  }
+  const mixQ = toInt16(mix);
+  const ref = {
+    set,
+    lang,
+    condition,
+    voices: who.voices,
+    sirDb: level === null ? null : -level,
+    customer: speaks
+      ? { who: who.customer.who, source: who.customer.key, text: who.customer.text, startMs: leadS * 1000, endMs: Math.round(((lead + c.length) / RATE) * 1000), speechSpans: custSpans }
+      : null,
+    enrol: { who: who.enrol.who, source: who.enrol.key },
+    bystanders: placed,
+    music: musicRef,
+    noiseLevelDbfs: noise ? Math.round(dbfs(speechRms(noise)) * 10) / 10 : null,
+    overlap,
+    clippedSamples: mixQ.clipped,
+    lengthMs: Math.round((length / RATE) * 1000),
+  };
+  const e = atLevel(who.enrol.x, CUSTOMER_DBFS);
+  return {
+    set,
+    lang,
+    condition,
+    index,
+    mix: mixQ.pcm,
+    enrol: toInt16(e).pcm,
+    customer: speaks ? toInt16(customer).pcm : null,
+    noise: noise ? toInt16(noise).pcm : null,
+    ref,
+  };
+}
+
+// ---- Who speaks in each trial ----
+
+function ttsCustomer(voice: string, lang: Lang, kind: "hero" | "extra"): { customer: Clip; enrol: Clip } {
+  const text = kind === "hero" ? HERO[lang] : "";
+  const customer = tts(voice, kind, lang, kind === "hero" ? text : EXTRA_TEXT[lang]);
+  return { customer, enrol: tts(voice, "enrol", lang, ENROL_TEXT[lang]) };
+}
+
+import { CUSTOMER_TEXTS, BYSTANDER_TEXTS } from "./sources";
+const textOf = (voice: string, kind: string, lang: Lang) => [...CUSTOMER_TEXTS, ...BYSTANDER_TEXTS].find((t) => t.voice === voice && t.kind === kind && t.lang === lang)!.text;
+const ENROL_TEXT = { en: textOf(CUSTOMER_VOICES[0], "enrol", "en"), ko: textOf(CUSTOMER_VOICES[0], "enrol", "ko") };
+const EXTRA_TEXT = { en: textOf(CUSTOMER_VOICES[0], "extra", "en"), ko: textOf(CUSTOMER_VOICES[0], "extra", "ko") };
+
+const ttsBystander = (voice: string, lang: Lang): Clip[] => [tts(voice, "order", lang, textOf(voice, "order", lang)), tts(voice, "chat", lang, textOf(voice, "chat", lang))];
+
+/** One singer: one of the two stand-in voices, its line repeated. */
+function songClips(lang: Lang, r: Rand): Clip[] {
+  const s = r.pick(SONG_TEXTS.filter((t) => t.lang === lang));
+  return [tts(s.voice, "song", lang, s.text)];
+}
+
+function realUtterance(pool: ReturnType<typeof realPool>, speaker: string, r: Rand, not: Set<string>, minS: number, maxS: number): Clip {
+  const us = pool.speakers.get(speaker)!;
+  for (const row of r.shuffle(us)) {
+    if (not.has(row.id)) continue;
+    const clip = decodeReal(pool.corpus, row);
+    const s = clip.x.length / RATE;
+    if (s >= minS && s <= maxS) return clip;
+  }
+  throw new Error(`no usable utterance for ${pool.corpus} ${speaker}`);
+}
+
+/** A real speaker as a bystander: three of their utterances, read one after another. */
+function realBystander(pool: ReturnType<typeof realPool>, speaker: string, r: Rand): Clip[] {
+  const out: Clip[] = [];
+  const seen = new Set<string>();
+  while (out.length < 3) {
+    const c = realUtterance(pool, speaker, r, seen, 2, 9);
+    seen.add(c.key.split("/")[1]);
+    out.push(c);
+  }
+  return out;
+}
+
+function build(realDir: string) {
+  const r = rng(SEED);
+  const trials: Trial[] = [];
+  for (const lang of LANGS) {
+    const pool = realPool(realDir, lang);
+    const speakers = [...pool.speakers.keys()];
+    for (const set of ["words", "live"] as const) {
+      for (const condition of SETS[set].conditions) {
+        for (let k = 0; k < SETS[set].trials; k++) {
+          const real = set === "words" && k >= WORD_TRIALS / 2;
+          const nBys = condition === "babble" ? 4 : 1;
+          let who: Who;
+          if (!real) {
+            const voice = CUSTOMER_VOICES[k % CUSTOMER_VOICES.length];
+            const { customer, enrol } = ttsCustomer(voice, lang, set === "live" || k % 2 === 0 ? "hero" : "extra");
+            const bv = r.shuffle(BYSTANDER_VOICES);
+            const bystanders = bv.slice(0, nBys).map((v) => ttsBystander(v, lang));
+            // The live set's babble mixes two synthetic and two real bystanders (real speakers cannot say an order).
+            if (set === "live" && condition === "babble") {
+              const rs = r.shuffle(speakers).slice(0, 2);
+              bystanders.splice(2, 2, ...rs.map((s) => realBystander(pool, s, r)));
+            }
+            who = { customer, enrol, bystanders, song: songClips(lang, r), voices: set === "live" && condition === "babble" ? "mixed" : "tts" };
+          } else {
+            const [cs, ...others] = r.shuffle(speakers);
+            const customer = realUtterance(pool, cs, r, new Set(), 2.5, 9);
+            const enrolFull = realUtterance(pool, cs, r, new Set([customer.key.split("/")[1]]), ENROL_S, 20);
+            const enrol = { ...enrolFull, x: enrolFull.x.slice(0, ENROL_S * RATE) };
+            who = { customer, enrol, bystanders: others.slice(0, nBys).map((s) => realBystander(pool, s, r)), song: songClips(lang, r), voices: "real" };
+          }
+          // In the live set's overlap cells a rival order must sound over the customer; draw the noise again if not.
+          let t: Trial | null = null;
+          for (let attempt = 0; attempt < 30; attempt++) {
+            t = makeTrial(set, lang, condition, k, who, r);
+            const ref = t.ref as { customer: { startMs: number; endMs: number } | null; bystanders: Placed[]; overlap: number | null };
+            const needsOrder = set === "live" && !["alone", "music", "song0", "song-5"].includes(condition);
+            const orderOver = ref.bystanders.some((b) => b.kind === "order" && ref.customer && b.startMs < ref.customer.endMs && b.endMs > ref.customer.startMs);
+            const overlapOk = ref.overlap === null || condition === "music" || condition.startsWith("song") || ref.overlap >= (set === "live" ? 0.6 : 0.3);
+            if ((!needsOrder || orderOver) && overlapOk) break;
+            if (attempt === 29) throw new Error(`no draw met the overlap floor: ${set} ${lang} ${condition} ${k}`);
+          }
+          trials.push(t!);
+        }
+      }
+    }
+  }
+  return trials;
+}
+
+function main() {
+  const i = process.argv.indexOf("--real");
+  if (i < 0) throw new Error("--real <dir with libri-en.json and zeroth-ko.json> is required");
+  const realDir = process.argv[i + 1].replace(/^~/, process.env.HOME ?? "~");
+  const pinFile = join(BENCH, "sources.json");
+  const doPin = process.argv.includes("--pin");
+  if (!doPin) {
+    if (!existsSync(pinFile)) throw new Error("sources.json is missing: run once with --pin");
+    pinned = JSON.parse(readFileSync(pinFile, "utf8")).sources;
+  }
+  const trials = build(realDir);
+  // Opaque ids: the order of trials is shuffled per set, so an id says nothing about its condition.
+  const r = rng(SEED + 1);
+  const ids = new Map<Trial, string>();
+  for (const set of ["words", "live"] as const) {
+    const ts = trials.filter((t) => t.set === set);
+    r.shuffle(ts.map((_, k) => k)).forEach((n, k) => ids.set(ts[k], `${set === "words" ? "w" : "l"}${String(n).padStart(3, "0")}`));
+  }
+  // --check: build in memory and compare with the committed manifest.json and refs.json; write nothing.
+  const check = process.argv.includes("--check");
+  const write = (file: string, data: Buffer | string) => {
+    if (!check) writeFileSync(file, data);
+  };
+  if (!check) for (const d of ["inputs", "refs"]) rmSync(join(BENCH, d), { recursive: true, force: true });
+  const manifest: { id: string; set: string; lengthMs: number; mix: string; enrol: string }[] = [];
+  const refs: Record<string, object> = {};
+  const cells: Record<string, string[]> = {};
+  let bytes = 0;
+  for (const t of trials) {
+    const id = ids.get(t)!;
+    const inDir = join(BENCH, "inputs", id);
+    const refDir = join(BENCH, "refs", id);
+    if (!check) {
+      mkdirSync(inDir, { recursive: true });
+      mkdirSync(refDir, { recursive: true });
+    }
+    const mix = encodeWav(t.mix);
+    const enrol = encodeWav(t.enrol);
+    write(join(inDir, "mix.wav"), mix);
+    write(join(inDir, "enrol.wav"), enrol);
+    bytes += mix.length + enrol.length;
+    const files: Record<string, string> = {};
+    for (const [name, pcm] of [["customer", t.customer], ["noise", t.noise]] as const) {
+      if (!pcm) continue;
+      const b = encodeWav(pcm);
+      write(join(refDir, `${name}.wav`), b);
+      files[name] = sha256(b);
+      bytes += b.length;
+    }
+    const ref = { id, ...t.ref, files };
+    write(join(refDir, "ref.json"), JSON.stringify(ref, null, 1));
+    refs[id] = ref;
+    manifest.push({ id, set: t.set, lengthMs: (t.ref as { lengthMs: number }).lengthMs, mix: sha256(mix), enrol: sha256(enrol) });
+    const cell = `${t.set}/${t.lang}/${t.condition}`;
+    (cells[cell] ??= []).push(id);
+  }
+  manifest.sort((a, b) => a.id.localeCompare(b.id));
+  const sources = Object.fromEntries([...used].sort(([a], [b]) => a.localeCompare(b)));
+  if (doPin) writeFileSync(pinFile, JSON.stringify({ note: "sha256 of every source file the benchmark was built from", sources }, null, 1) + "\n");
+  const inputs = { seed: SEED, rate: RATE, note: "Inputs a candidate may read. score.ts refuses to run if a file differs.", trials: manifest };
+  const manifestText = JSON.stringify(inputs, null, 1) + "\n";
+  // Cells list trials in run order: run k of a cell is always the same trial, for every candidate.
+  const refsText = JSON.stringify({ seed: SEED, cells, trials: refs }, null, 1) + "\n";
+  if (check) {
+    const same = (f: string, text: string) => readFileSync(join(BENCH, f), "utf8") === text;
+    const ok = same("manifest.json", manifestText) && same("refs.json", refsText);
+    console.log(`check: ${ok ? "same bytes as" : "DIFFERENT from"} manifest.json and refs.json (${trials.length} trials)`);
+    if (!ok) process.exit(1);
+    return;
+  }
+  if (doPin) writeFileSync(pinFile, JSON.stringify({ note: "sha256 of every source file the benchmark was built from", sources }, null, 1) + "\n");
+  writeFileSync(join(BENCH, "manifest.json"), manifestText);
+  writeFileSync(join(BENCH, "refs.json"), refsText);
+  console.log(`${trials.length} trials, ${Object.keys(cells).length} cells, ${(bytes / 1e6).toFixed(0)} MB audio, ${used.size} sources`);
+  console.log(`manifest sha256 ${sha256(readFileSync(join(BENCH, "manifest.json")))}`);
+}
+
+main();
