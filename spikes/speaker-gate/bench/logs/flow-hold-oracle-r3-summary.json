@@ -1,0 +1,83 @@
+{
+ "stack": "hold-oracle-r3",
+ "gate": "hold-oracle",
+ "instructions": null,
+ "manifestSha": "026b37a758ecc06ca00f569c4dcc17f9a9a1655327741e8128987598039b848f",
+ "commit": "8ffcba50ebf6081a5415e404eea87e7b78f060c5",
+ "dirty": "",
+ "runsPerCell": 4,
+ "cells": [
+  {
+   "cell": "en/chat@-10",
+   "n": 4,
+   "right": 3,
+   "rightCi": [
+    0.3006360524426366,
+    0.9544139373553637
+   ],
+   "payingWithoutTap": 4,
+   "withBystanderItems": 0,
+   "itemsCi": [
+    0,
+    0.48990002040399916
+   ],
+   "heroCart": 3,
+   "answeredMean": 4,
+   "spuriousMean": 0
+  },
+  {
+   "cell": "ko/chat@-10",
+   "n": 4,
+   "right": 4,
+   "rightCi": [
+    0.5100999795960008,
+    1
+   ],
+   "payingWithoutTap": 4,
+   "withBystanderItems": 0,
+   "itemsCi": [
+    0,
+    0.48990002040399916
+   ],
+   "heroCart": 4,
+   "answeredMean": 4,
+   "spuriousMean": 0
+  },
+  {
+   "cell": "en/menu@-10",
+   "n": 4,
+   "right": 4,
+   "rightCi": [
+    0.5100999795960008,
+    1
+   ],
+   "payingWithoutTap": 3,
+   "withBystanderItems": 0,
+   "itemsCi": [
+    0,
+    0.48990002040399916
+   ],
+   "heroCart": 4,
+   "answeredMean": 4,
+   "spuriousMean": 0
+  },
+  {
+   "cell": "ko/menu@-10",
+   "n": 4,
+   "right": 2,
+   "rightCi": [
+    0.15003570882017148,
+    0.8499642911798285
+   ],
+   "payingWithoutTap": 3,
+   "withBystanderItems": 0,
+   "itemsCi": [
+    0,
+    0.48990002040399916
+   ],
+   "heroCart": 2,
+   "answeredMean": 4,
+   "spuriousMean": 0
+  }
+ ]
+}

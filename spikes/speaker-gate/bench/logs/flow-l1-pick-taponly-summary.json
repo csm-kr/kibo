@@ -1,0 +1,83 @@
+{
+ "stack": "l1-pick-taponly",
+ "gate": "l1-loud",
+ "instructions": null,
+ "manifestSha": "026b37a758ecc06ca00f569c4dcc17f9a9a1655327741e8128987598039b848f",
+ "commit": "2c87a9d0b84769f38578d9fa7e5a871651c5cc15",
+ "dirty": "",
+ "runsPerCell": 6,
+ "cells": [
+  {
+   "cell": "en/chat@-10",
+   "n": 6,
+   "right": 4,
+   "rightCi": [
+    0.29998832134152864,
+    0.9032306674407831
+   ],
+   "payingWithoutTap": 0,
+   "withBystanderItems": 1,
+   "itemsCi": [
+    0.03005258587173032,
+    0.563509436563646
+   ],
+   "heroCart": 4,
+   "answeredMean": 3.6666666666666665,
+   "spuriousMean": 0.3333333333333333
+  },
+  {
+   "cell": "ko/chat@-10",
+   "n": 6,
+   "right": 5,
+   "rightCi": [
+    0.43649056343635395,
+    0.9699474141282697
+   ],
+   "payingWithoutTap": 0,
+   "withBystanderItems": 0,
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "heroCart": 5,
+   "answeredMean": 3.5,
+   "spuriousMean": 1.3333333333333333
+  },
+  {
+   "cell": "en/menu@-10",
+   "n": 6,
+   "right": 2,
+   "rightCi": [
+    0.09676933255921683,
+    0.7000116786584712
+   ],
+   "payingWithoutTap": 0,
+   "withBystanderItems": 3,
+   "itemsCi": [
+    0.18761280689940868,
+    0.8123871931005913
+   ],
+   "heroCart": 3,
+   "answeredMean": 4,
+   "spuriousMean": 0.6666666666666666
+  },
+  {
+   "cell": "ko/menu@-10",
+   "n": 6,
+   "right": 1,
+   "rightCi": [
+    0.03005258587173032,
+    0.563509436563646
+   ],
+   "payingWithoutTap": 0,
+   "withBystanderItems": 2,
+   "itemsCi": [
+    0.09676933255921683,
+    0.7000116786584712
+   ],
+   "heroCart": 1,
+   "answeredMean": 3.6666666666666665,
+   "spuriousMean": 0.5
+  }
+ ]
+}

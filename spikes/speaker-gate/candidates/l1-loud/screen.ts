@@ -6,9 +6,14 @@
 // about 1.0 s; the 5 s playback is an assumption.
 //
 //   npx tsx spikes/speaker-gate/candidates/l1-loud/screen.ts      writes work/screen.json, prints the table
+//   ... --variants '[{"name":"pick d4","p":{"anchor":"first-turn","depthDb":4,"askDb":0,"hangMs":1000}}]'   replaces the list
+//   ... --out <path>                                                  writes there instead of work/screen.json
+// bysOnlyOpen counts bystander-only frames where push() said open; bysOnlySeg counts those inside g.segments(), which
+// is what Live gets: it includes the 0.2 s pre-roll and the reach-back to the start of the run that set a new level.
+// custSeg is the same for the customer's speech: a trimmed or later start shows there, not in custKept.
 
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { decodeWav } from "../../bench/audio";
 import { frameDb, loudGate, type GateParams } from "./gate";
 
@@ -60,7 +65,7 @@ function load(): Trial[] {
     });
   }
   const words = JSON.parse(readFileSync(join(BENCH, "refs.json"), "utf8"));
-  for (const cell of ["alone", "quiet-6", "quiet-12"])
+  for (const cell of ["alone", "short", "quiet-6", "quiet-12"])
     for (const lang of ["en", "ko"])
       for (const id of words.cells[`words/${lang}/${cell}`] as string[]) {
         const r = words.trials[id];
@@ -115,12 +120,22 @@ function replay(tr: Trial, p: Partial<GateParams>) {
     }
   }
   const segs = g.segments();
+  let bysOnlySeg = 0;
+  let custSeg = 0;
+  for (let k = 0; k < tr.db.length; k++) {
+    const t = k * F;
+    if (!inside(segs, t)) continue;
+    if (inside(tr.customer, t)) custSeg++;
+    else if (inside(tr.bystanders, t)) bysOnlySeg++;
+  }
   const closesInside = segs.filter(([, e]) => tr.sentences.some(([s, x]) => e > s && e < x)).length;
   const firstBys = tr.bystanders.length ? Math.min(...tr.bystanders.map(([s]) => s)) : Infinity;
   return {
     ends: segs.length,
     custKept: cust ? custOpen / cust : null,
+    custSeg: cust ? custSeg / cust : null,
     bysOnlyOpen: bysOnly ? bysOnlyOpen / bysOnly : null,
+    bysOnlySeg: bysOnly ? bysOnlySeg / bysOnly : null,
     bysOnlyAskOpen: bysOnlyAsk ? bysOnlyAskOpen / bysOnlyAsk : null,
     closesInside,
     bystanderFirst: firstBys < Math.min(...tr.customer.map(([s]) => s)),
@@ -145,9 +160,16 @@ function fallbackAt(p: Partial<GateParams>, ask: boolean): number | null {
   return null;
 }
 
+function arg(name: string): string | undefined {
+  const i = process.argv.indexOf(`--${name}`);
+  return i > 0 ? process.argv[i + 1] : undefined;
+}
+
 function main() {
   const trials = load();
-  const variants: { name: string; p: Partial<GateParams> }[] = [
+  const given = arg("variants");
+  const out = arg("out") ?? join(HERE, "work", "screen.json");
+  let variants: { name: string; p: Partial<GateParams> }[] = [
     { name: "ref recent d6 ask cap", p: {} },
     { name: "ref recent d6 ask nocap", p: { maxTurnMs: Infinity } },
   ];
@@ -158,7 +180,8 @@ function main() {
       for (const ask of [true, false])
         for (const cap of [true, false])
           variants.push({ name: `${anchor} d${d} ${ask ? "ask" : "noask"} ${cap ? "cap" : "nocap"}`, p: { anchor, depthDb: d, askDb: ask ? 6 : 0, maxTurnMs: cap ? 10000 : Infinity } });
-  const groups = ["flow/chat@-10", "flow/menu@-10", "flow/chat@0", "flow/menu@0", "words/alone", "words/quiet-6", "words/quiet-12"];
+  if (given) variants = JSON.parse(given) as typeof variants;
+  const groups = ["flow/chat@-10", "flow/menu@-10", "flow/chat@0", "flow/menu@0", "words/alone", "words/short", "words/quiet-6", "words/quiet-12"];
   const results: Record<string, unknown>[] = [];
   const mean = (xs: (number | null)[]) => {
     const v = xs.filter((x): x is number => x !== null);
@@ -174,8 +197,10 @@ function main() {
           n: rs.length,
           endsPerSession: mean(rs.map(({ r }) => r.ends)),
           bysOnlyOpen: mean(rs.map(({ r }) => r.bysOnlyOpen)),
+          bysOnlySeg: mean(rs.map(({ r }) => r.bysOnlySeg)),
           bysOnlyAskOpen: mean(rs.map(({ r }) => r.bysOnlyAskOpen)),
           custKept: mean(rs.map(({ r }) => r.custKept)),
+          custSeg: mean(rs.map(({ r }) => r.custSeg)),
           closesInside: rs.reduce((a, { r }) => a + r.closesInside, 0),
           needsFallback: rs.filter(({ r }) => r.custKept !== null && r.custKept < 0.5).length,
           bystanderFirst: rs.filter(({ r }) => r.bystanderFirst).length,
@@ -183,17 +208,17 @@ function main() {
       }
     results.push({ variant: v.name, params: v.p, fallbackAtDb: { noAsk: fallbackAt(v.p, false), afterAsk: fallbackAt(v.p, true) }, groups: byGroup });
   }
-  mkdirSync(join(HERE, "work"), { recursive: true });
-  writeFileSync(join(HERE, "work", "screen.json"), JSON.stringify(results, null, 1));
+  mkdirSync(dirname(out), { recursive: true });
+  writeFileSync(out, JSON.stringify(results, null, 1));
   const pct = (x: unknown) => (x === null ? "  -" : `${Math.round(100 * (x as number))}`.padStart(3));
-  console.log("flow cells, both languages (n 16 each): ends/session | bystander-only time open % | customer time open % | closes inside a sentence");
-  console.log("words (n 24 each, cold): customer time open % (trials needing the fallback); fallback starts x dB under the anchor (no question / after one)");
+  console.log("flow cells, both languages (n 16 each): ends/session | bystander-only time open % | ... inside segments % | customer time open % | ... inside segments % | closes inside a sentence");
+  console.log("words (alone, short, quiet-6, quiet-12; n 24 each, cold): customer time open % / inside segments % (trials needing the fallback); fallback starts x dB under the anchor (no question / after one)");
   for (const r of results as { variant: string; fallbackAtDb: { noAsk: number | null; afterAsk: number | null }; groups: Record<string, Record<string, number | null>> }[]) {
     const f = groups.slice(0, 4).map((g) => {
       const x = r.groups[`${g}/all`];
-      return `${(x.endsPerSession as number).toFixed(1).padStart(4)} ${pct(x.bysOnlyOpen)} ${pct(x.custKept)} ${String(x.closesInside).padStart(2)}`;
+      return `${(x.endsPerSession as number).toFixed(1).padStart(4)} ${pct(x.bysOnlyOpen)} ${pct(x.bysOnlySeg)} ${pct(x.custKept)} ${pct(x.custSeg)} ${String(x.closesInside).padStart(2)}`;
     });
-    const w = groups.slice(4).map((g) => `${pct(r.groups[`${g}/all`].custKept)}(${r.groups[`${g}/all`].needsFallback})`);
+    const w = groups.slice(4).map((g) => `${pct(r.groups[`${g}/all`].custKept)}/${pct(r.groups[`${g}/all`].custSeg)}(${r.groups[`${g}/all`].needsFallback})`);
     console.log(`${r.variant.padEnd(28)} | ${f.join(" | ")} | ${w.join(" ")} | ${r.fallbackAtDb.noAsk}/${r.fallbackAtDb.afterAsk}`);
   }
   const bf = (results[0] as { groups: Record<string, { bystanderFirst: number; n: number }> }).groups;

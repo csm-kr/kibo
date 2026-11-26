@@ -34,11 +34,19 @@ npx tsx --env-file=.env spikes/speaker-gate/bench/score.ts --candidate <name> --
 python3 -I spikes/speaker-gate/candidates/table.py open hold-oracle customer-oracle <names...>
 ```
 
+`l2/phone.py` measures what the L2 gate would need on a phone (model time, decision delay, enrolment length) from local
+data only. `table.py --cells a,b,... <names>` prints any other cells. After each word run the audio candidates' out.wav
+files were deleted for disk (meta.json kept); re-run the candidate to re-create them. `l2-campp-after-gtcrn` has gate
+metas in bench/out but was not judged (dropped for money, 11-27).
+
 ## Dev slice (L2 tuning)
 
 The L2 gate's threshold, smoothing and look-back are chosen on the **dev slice: cells `chat@-5` and `read@-5`, English
-and Korean (4 cells x 12 = 48 trials)**, and then fixed. `l2/tune.py` is the only file that reads `bench/refs.json`,
-and only for those 48 trials (customer speech spans and bystander times, to count speech time kept and leaked). These
+and Korean (4 cells x 12 = 48 trials)**, and then fixed. `l2/tune.py` and `l2/phone.py` (its enrolment-length
+part) are the only candidate-folder files that read `bench/refs.json` for these cells, and only for those 48 trials
+(customer speech spans and bystander times, to count speech time kept and leaked). The experimenter check
+`c-voxlock/check_lone_bystander.py` reads refs for 4 reported trials to split each mix into its two voices; it
+changes no setting. These
 four cells are never reported for any candidate. Every other candidate here has no tuned setting: GTCRN and VoxLock run
 as shipped, and the Silero VAD settings in `common.py` are fixed defaults (threshold 0.5, 0.25 s minimum silence).
 

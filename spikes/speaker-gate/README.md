@@ -247,8 +247,14 @@ of stage 1 changed; every addition below is logged in the rows it affects.
   the assistant). Cells chat and menu at -10 and 0 dB, English and Korean, 8 trials each. Runner `bench/flow.ts`:
   stacks open, hold-oracle (customer turns ±0.2 s) and l1-loud (the gate run frame by frame, `asked()` after each
   KIBO reply, held frames sent at once on opening, activity end on each close). Right = hero cart, status confirming
-  or paying, no bystander item ever added; also logged: paying without the review's tap, turns answered, spurious
-  replies, reaction from the customer's last word, gate closes inside a customer sentence.
+  or paying, no bystander item ever added; also logged: paying without the review's tap, spurious replies, gate closes
+  inside a customer sentence, refused voice confirms (from 11-27), and the sha256 of gate.ts and flow.ts and the
+  gate settings (from 11-27; the earlier rows ran before the anchor option, with the default path unchanged). Each
+  customer turn counts as acted on only by its own action within 5 s of its end (`bench/flowScoring.ts`: the hero
+  order an addToCart of cheese_burger, "both fries large" an updateCart), recomputed from the logs by
+  `bench/flow-report.ts`. Limit: the customer speaks on a fixed clock, 12 s apart, sometimes into KIBO's playback,
+  which half-duplex muting then drops, so "right" in the chat cells is partly a bench effect; items added and payments
+  confirmed do not depend on it.
 
 ### L1, the loudness gate (`candidates/l1-loud/`, README there has the app contract)
 
@@ -309,17 +315,42 @@ Logs: `logs/flow-open.jsonl`, `logs/flow-hold-oracle.jsonl`, `logs/flow-l1-loud+
 summaries. Bystander items in the no-press stack: 5 or 6 of 6 in every menu cell (chicken wrap 18 times, spicy wings
 17, iced tea 14 in 48 sessions); spurious replies 1.3 to 2.7 per session (hold-oracle 0 to 0.3); 12.8 activity ends
 per session (hold-oracle 4); 299 frames dropped per session by half-duplex muting while KIBO answered someone
-(hold-oracle 7); 15 gate closes inside a customer sentence in 48 sessions. Reaction from the last customer word,
-answered turns: hold-oracle median 1,017 ms (p90 1,312), l1 + flow-live 1,480 ms (p90 3,973), open 2,193 ms.
-Between the customer's turns the neighbour is the lone talker, the gate opens for them, and the flow instruction did
-not keep Live from acting on their menu talk.
+(hold-oracle 7); 15 gate closes inside a customer sentence in 48 sessions. Turns acted on by their own action:
+hero 43 and fries 35 of 48 under hold-oracle, 31 and 16 of 48 in the no-press stack, 5 and 1 of 16 open. Delay from
+the last customer word to that turn's own action: hold-oracle median 1,144 ms (p90 1,327, n 85), l1 + flow-live
+1,329 ms (p90 3,092, n 63) (`bench/flow-report.ts`). Between the customer's turns the neighbour is the lone talker,
+the gate opens for them, and in this stack the flow instruction did not prevent Live from acting on their menu talk;
+whether it helps on its own is not known (the gate is a confounder; the ablation was not run).
 
-**Safety.** With an open microphone "a fresh user utterance" is anyone's: in the no-press stack confirmCheckout came
-11 to 13 s after the customer's "I'll pay" turn, right after bystander speech, in 3 sessions (f0045 en chat@-10, f0040
-ko chat@0, f0006 ko menu@-10). Under hold-oracle 29 of 48 sessions reached paying by voice, nearly all on the
-customer's own "I'll pay". Any no-press build needs the review confirmed by tap only (`CONFIRM_TAP_ONLY=1`).
+**The picked gate, tap-only review** (11-27; `logs/flow-l1-pick+l3-flow-live-taponly.jsonl`): `loudGate(PICK)`
+(first-turn anchor, depth 6, no question lowering, hang-over 1.0 s, cap 10 s; chosen offline by
+`candidates/l1-loud/screen.ts`) + l3-flow-live, `CONFIRM_TAP_ONLY=1`, -10 dB cells only, 6 sessions per cell; rows
+carry gate.ts sha 29263222…, flow.ts 1e36f410…, instruction d728043f…. Right k of 6, en chat, en menu, ko chat, ko
+menu: hold-oracle 5, 5, 3, 6 (19/24); first no-press 4, 1, 4, 0 (9/24); the pick 5, 3, 3, 4 (15/24). Sessions with a
+bystander item: 1, 11 and 2 of 24. Hero and fries turns acted on by their own action: 24 and 23, 22 and 12, 22 and
+22. Spurious replies per session 0 to 0.3, 1.3 to 2.7, 0.3 to 1.5 (ko chat). Activity ends per session 4, 12.7 to
+15.0, 5.5 to 7.0. Gate closes inside a customer sentence 0, 10, 0. Frames dropped per session 2, 370, 74. Delay to the
+turn's own action, median (p90): 1,140 (1,288), 1,318 (1,973), 1,285 (2,009) ms. Three of the pick's 7 wrong carts are
+the hero order with "both fries large" read as a large set (hold-oracle 1 of 5), a reading problem, not a gate one.
+Voice confirms refused by the tap-only rule: 4, three right after the customer's own "That's all. I'll pay." and one
+(f0032 ko menu@-10, 60.0 s, on "는") with no customer turn in the 6 s before, at the session's end. Paying without the
+tap: 0 of 24.
 
-Spend: ledger about ₩39,700 for the whole run after these sessions (`logs/spend.json`); flow sessions cost about ₩186
-each when Live answers the turns (about ₩17 for open, whose turns never end). Not run: hold-oracle + l3-flow-live (the
+**Safety.** The runner sends tool calls through the app's own code (`src/lib/voice/toolRunner` → `runCommand` →
+`machine.ts` `isConfirmed`), with `utteranceSeq` from the app's `turnsReducer`, so the bench's confirm rule is the
+app's. With an open microphone the "fresh user utterance" that rule needs is anyone's: in the no-press stack
+confirmCheckout succeeded right after bystander speech in 4 sessions: f0045 en chat@-10 ("told him we should take the
+later train"), f0040 ko chat@0 ("아까 회의 진짜 길었지"), f0006 ko menu@-10 ("네. 나는 새우버거랑 레모네이드 할래"),
+and f0004 ko chat@-10 (the fragment "매일", 39.5 s, after Live had called requestCheckout on the customer's "No,
+thanks"). Three of the four came at 61 to 64 s, when the session ended and the runner closed the last gate segment,
+so partly an end-of-run effect; f0004 came mid-session. Under hold-oracle 29 of 48 sessions reached paying by voice,
+nearly all on the customer's own "I'll pay". Any no-press build needs the review confirmed by tap only
+(`CONFIRM_TAP_ONLY=1`).
+
+Spend: ledger about ₩40,152 for the whole run after these sessions, with the ticket-kiosk and first-hello streams
+(`logs/spend.json`, `logs/spend-other.json`); flow sessions cost about ₩145 (hold-oracle) and ₩162 (l1 + flow-live)
+each, about ₩36 for open, whose turns never end. (An earlier ₩39,700 priced sessions without usage at one global
+mean; each log file now gets its own.) The picked-gate batch cost ₩3,744 (₩156 a session); the ledger is about
+₩45,491 after it, over the ₩45,000 line, with about ₩1,655 of kibo-fd's c-voxlock transcriptions in the same window. Not run: hold-oracle + l3-flow-live (the
 ablation that would show whether the instruction helps when the turns are perfect), l1-loud alone on the flow set,
 and the 20-run adopt phase.

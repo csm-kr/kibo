@@ -732,4 +732,164 @@ the score falls between the two speakers', so the gate shuts during overlap and 
 the dev slice, clips the first phrase even when the customer is alone (en alone 86%). Scores of the same voice over
 1 s windows were only 0.2 to 0.56 in the smoke test (`w0074`, `w0473`), close to the cross-speaker range; 1 s is too
 short for CAM++ to be sure (its published EER at 1 s is 5.86%, measured on real speech, not on 0 dB overlap). Korean
-keeps more and leaks more than English at the same setting (one threshold for both).
+keeps more and leaks more than English at the same setting (one threshold for both). A Korean-only threshold does not
+close the gap: on the dev slice, Korean kept minus leaked is flat from 0.35 to 0.40 (0.44 to 0.45), and at the leak
+English has at 0.35 (30%) Korean keeps 68% against English's 81% (threshold 0.45; same tune log). The zh/en model
+separates these Korean voices less well.
+
+L2 on the cells kibo-59 asked about (same log; "k/12" = trials where at least 20% of the bystander's words leaked):
+
+| l2-campp | silent+chat@0 | silent+order@0 | silent+read@0 | quiet-6 | quiet-12 | alone | short | short+chat@0 | order@-10 | order@0 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| en | - / 15 (2/12) | - / 9 (2/12) | - / 1 (0/12) | 95 / - | 93 / - | 86 / - | 22 / - | 22 / 22 (3/12) | 67 / 11 (5/12) | 51 / 31 (6/12) |
+| ko | - / 26 (3/12) | - / 36 (7/12) | - / 18 (4/12) | 99 / - | 98 / - | 99 / - | 89 / - | 31 / 35 (6/12) | 96 / 33 (5/12) | 73 / 46 (9/12) |
+
+(open leaks 90 to 100% of a lone bystander's words in all six silent+ cells, 12/12 trials each.) The voice gate closes
+most of the stretch where the customer is silent, which a loudness gate cannot do when the bystander is as loud as the
+customer, but Korean leaks 2 to 4 times more than English at the same threshold, and one-word customer answers
+("short") rarely open it in English (22% kept; 10 of 12 trials never opened, `phone-20261127T010832.json`).
+
+### J3. c-voxlock: VoxLock target-speaker extraction (route C)
+
+VoxLock (`voxlock_enroll.onnx` + `voxlock_chunk_int8.onnx`) through sherpa-onnx's denoiser, with the trial's enrol.wav
+as the explicit voice sample (sherpa uses its loudest 3 s). out.wav only; time-aligned with the mix (lag 0). No setting
+was tuned. Log `bench/logs/words-c-voxlock-2026-11-26T16-12-39-113Z.json` (960 trials, 957 transcriber calls).
+latency_ms 121 = 24 ms algorithmic + one 40 ms chunk + the compute for that chunk at the measured 1.42x real time; see
+J5, which also says why that number is not a real bound.
+
+| en | alone | chat@-10 | chat@0 | order@-10 | order@0 | babble@0 | music@0 | song@0 |
+|---|---|---|---|---|---|---|---|---|
+| open | 96 / - | 100 / 52 | 95 / 71 | 99 / 49 | 95 / 74 | 36 / 13 | 97 / - | 73 / 30 |
+| hold-oracle | 96 / - | 100 / 14 | 87 / 55 | 92 / 21 | 85 / 58 | 34 / 5 | 98 / - | 88 / 11 |
+| c-voxlock | 98 / - | 97 / 15 | 90 / 46 | 98 / 34 | 67 / 66 | 68 / 7 | 98 / - | 86 / 7 |
+
+| ko | alone | chat@-10 | chat@0 | order@-10 | order@0 | babble@0 | music@0 | song@0 |
+|---|---|---|---|---|---|---|---|---|
+| open | 100 / - | 100 / 38 | 99 / 82 | 100 / 53 | 98 / 91 | 52 / 12 | 99 / - | 83 / 30 |
+| hold-oracle | 100 / - | 100 / 9 | 99 / 63 | 100 / 27 | 93 / 64 | 50 / 4 | 99 / - | 84 / 8 |
+| c-voxlock | 100 / - | 100 / 3 | 97 / 33 | 100 / 20 | 92 / 28 | 61 / 9 | 99 / - | 89 / 14 |
+
+By bystander content (pooled over levels -15 to +5 dB, chat@-5 and read@-5 left out for every row; n trials), then the
+cells where the customer says nothing and a bystander talks alone at 0 dB (leaked %, 12 trials each):
+
+| | chat | order | read | yes | song | silent+chat | silent+order | silent+read |
+|---|---|---|---|---|---|---|---|---|
+| en open | 89 / 57 (48) | 93 / 64 (60) | 84 / 55 (48) | - / 100 (60) | 80 / 34 (36) | 100 | 95 | 98 |
+| en c-voxlock | 86 / 39 (48) | 85 / 49 (60) | 85 / 17 (48) | - / 98 (60) | 86 / 12 (36) | 100 | 99 | 88 |
+| ko open | 97 / 54 (48) | 96 / 65 (60) | 70 / 35 (48) | - / 92 (60) | 80 / 30 (36) | 100 | 90 | 99 |
+| ko c-voxlock | 92 / 24 (48) | 94 / 22 (60) | 84 / 10 (48) | - / 85 (60) | 81 / 12 (36) | 95 | 89 | 98 |
+
+Other cells: quiet-6 / quiet-12 / short keep 99 / 96 / 100 (en) and 99 / 100 / 100 (ko); short+chat@0 72 / 81 (en,
+11/12 trials leaking) and 92 / 49 (ko, 8/12).
+
+What it shows:
+
+- **A lone bystander passes at full level.** When the customer is silent and someone else talks, VoxLock passes that
+  voice through: 88 to 100% of the bystander's words reach the transcriber (all 12 trials leak in five of the six
+  silent+ cells), and the bystander's "yes" lines pass 98% (en) and 85% (ko). The signal check in
+  `candidates/c-voxlock/logs/check-lone-bystander-20261126.txt` shows why: a lone non-target voice comes out at
+  1.06 to 1.08 times its input level for 4 to 6 s, the same gain as the customer alone, and the author's own `voxlock`
+  1.3.1 package gives the same numbers, so this is the model, not the sherpa-onnx integration. VoxLock suppresses the
+  other voice only while the enrolled voice is also present. The author's published 0.11 background words per minute
+  comes from a different test (Krisp's benchmark, its own conditions); this bench's case, a nearby talker while the
+  customer is silent, is not what that number measures.
+- **During overlap it helps, unevenly.** It removes more bystander words than a perfect press in Korean (chat@0 33%
+  vs hold-oracle 63%, order@0 28% vs 64%) and in English chat@0 (46% vs 55%), and keeps most of the customer (en chat@0 90%, ko
+  order@0 92%, the other overlap cells 97 to 100%). English order@0 fails: 67% kept, 66% leaked, 11 of 12 trials leaking. The trials checked by signal show a
+  similar-voice pair (w0737, two male voices: overlap fit customer 0.32, bystander 0.85) where the model follows the
+  wrong voice.
+- **Korean.** VoxLock does not hurt Korean on this bench: Korean keeps as much as English, and loses fewer words to
+  the bystander in overlap (pooled order leak 22% vs 49%). Why is not known (the voice pairs per language were not
+  compared).
+- **Against the headline of section C** ("only extraction can reach the 0 dB overlap line"): partly confirmed.
+  Extraction is the only candidate here that cuts 0 dB overlap leakage below the perfect press while keeping the
+  customer (ko both cells, en chat@0). It is far from the customer-oracle line (0% leaked), it fails en order@0, and by
+  itself it does nothing for the stretches where the customer is silent.
+- Babble@0 keeps 68% (en) and 61% (ko) of the customer's words vs open 36% and 52%: extraction also helps
+  understanding in a crowd.
+
+### J4. c-voxlock-vad, and the chains not run
+
+c-voxlock-vad: Silero VAD (threshold 0.5, fixed) on c-voxlock's out.wav, segments widened by 0.2 s before and 0.7 s
+after; the judge sends c-voxlock's out.wav inside them. latency_ms 33 on top of c-voxlock. Log
+`bench/logs/words-c-voxlock-vad-2026-11-26T16-17-41-752Z.json` (461 new transcriber calls; the rest were unchanged
+audio).
+
+| | alone | chat@-10 | chat@0 | order@-10 | order@0 | babble@0 | music@0 | song@0 |
+|---|---|---|---|---|---|---|---|---|
+| en c-voxlock-vad | 97 / - | 97 / 17 | 87 / 48 | 99 / 31 | 70 / 66 | 50 / 6 | 99 / - | 92 / 6 |
+| ko c-voxlock-vad | 100 / - | 100 / 3 | 97 / 33 | 100 / 20 | 92 / 25 | 63 / 9 | 93 / - | 94 / 12 |
+
+| | chat | order | read | yes | song | silent+chat | silent+order | silent+read |
+|---|---|---|---|---|---|---|---|---|
+| en c-voxlock-vad | 85 / 39 (48) | 86 / 48 (60) | 86 / 17 (48) | - / 96 (60) | 87 / 12 (36) | 95 | 99 | 86 |
+| ko c-voxlock-vad | 92 / 24 (48) | 94 / 20 (60) | 86 / 7 (48) | - / 69 (60) | 86 / 11 (36) | 86 | 83 | 91 |
+
+What it shows: a VAD after extraction changes almost nothing. The lone bystander comes out of VoxLock at full level,
+so the VAD hears speech and keeps it (silent+ cells still 83 to 99%). Differences from c-voxlock are a few points
+either way at n = 12, except en babble@0 (68 to 50% kept: the VAD cuts quiet customer words in babble) and the
+Korean bystander "yes" lines (85 to 69% leaked) and ko silent+ cells (89 to 98% down to 83 to 91%).
+
+Not run (kibo-59, 11-27, money for the Live flow sessions): `l2-campp-after-gtcrn` (its gate metas were written,
+threshold 0.35 / smoothing 1 / look-back 1.0 s from the dev slice, `candidates/l2-campp-after-gtcrn/logs/tune-20261127T005311.json`,
+but it was not judged) and `l0-dpdfnet`. The combination the results point to, the L2 gate with VoxLock inside it, was
+not built or measured either.
+
+The out.wav files of l0-gtcrn and c-voxlock were deleted after their word logs were written (disk rule); meta.json
+files remain, and `l0/run.py` and `c-voxlock/run.py extract` re-create the audio.
+
+### J5. Compute and added delay
+
+All on this MacBook (Apple silicon, 4 performance + 4 efficiency cores), one thread, while other projects' builds and
+headless browsers ran (load average 5 to 100). No number below is a clean measurement; a run on a quiet machine was not
+done.
+
+| Model (candidate) | ms of compute per second of audio | Other | Log (`candidates/<name>/logs/`) |
+|---|---|---|---|
+| GTCRN (l0-gtcrn) | 134.6 (offline, 960 trials) | | `l0-gtcrn/logs/speed-20261126T230633.json` |
+| Silero VAD + CAM++ (l2-campp) | 413.4 (960 trials; windows scored only over speech) | 82.8 ms per 1 s window, median | `l2-campp/logs/speed-20261126T233749.json` |
+| same, on GTCRN output | 639.1 (heavier load) | 102.8 ms per window | `l2-campp-after-gtcrn/logs/speed-20261127T005256.json` |
+| CAM++ network only (onnxruntime) | about 230 at 4 windows per second | 57.9 ms per window (p90 70.5), load 5.7 | `l2-campp/logs/phone-20261127T010832.json` |
+| Silero VAD (c-voxlock-vad) | 17.9 | | `c-voxlock-vad/logs/speed-20261127T010258.json` |
+| VoxLock (c-voxlock), streaming 40 ms chunks | **1,418** (20 trials) | chunk median 47.8 ms, p95 93.0 ms | `c-voxlock/logs/speed-20261127T005646.json` |
+| VoxLock, 5-trial check | offline 1 thread 1,181; 2 threads 679 | streaming 2 threads 1,810 at higher load | `c-voxlock/logs/check-speed-compare-20261127T0100.txt` |
+| DPDFNet | not measured (dropped) | | |
+
+Added delay (`latency_ms` declared to the judge): l0-gtcrn 50; l2-campp 83 (compute only; it needs the app to hold
+back audio, because the gate decides 430 to 560 ms after the customer starts, median, p90 up to 1.9 s in English,
+`phone-20261127T010832.json`; without the look-back it would declare about 1,000 ms); c-voxlock 121 (24 ms algorithmic
++ 40 ms chunk + compute at 1.42x real time); c-voxlock-vad 154 (121 + 33). VoxLock's 121 ms is not a real bound: at
+1.42x real time on one thread it falls further behind with every second of audio, so it needs at least two threads or a
+faster core to stream at all (not verified for streaming). The slowness is compute, not waiting for a core: the
+20-trial run used 190 s of CPU time for 142 s of audio at 92% CPU (`time`, 11-27). Whether macOS put it on an
+efficiency core part of the time is not known.
+
+L2 on a phone (sent to kibo-59 11-27): CAM++ zh/en is 28.3 MB fp32; about 2 s of the customer's clean speech as
+enrolment gives the same dev-slice operating point as the bench's 3 to 4.7 s (1.0 s: 64% kept / 20% leaked; 2.0 s:
+84% / 36%; whole: 86% / 38%; threshold fixed at 0.35, `phone-20261127T010832.json`). Phone-class CPU and
+onnxruntime-web speeds are assumed, not measured (2 to 4x and a further 1.5 to 3x slower than this Mac), so in the
+browser it likely needs a 0.5 s hop or an int8 model.
+
+### J6. What this means, what failed, what is unverified
+
+**For a no-press design.** Extraction does not close the microphone. When the customer is silent and a bystander
+talks, VoxLock passes the bystander at full level (88 to 100% of words, J3), and a VAD after it does not help (J4).
+Something else must close the window between the customer's turns. Of what was measured here, only the voice gate
+does that for a bystander as loud as the customer (l2-campp: 1 to 15% leaked in English, 18 to 36% in Korean, J2).
+A loudness gate cannot when the levels are equal, and meaning cannot for a rival order (reported by kibo-59 from the
+Live flow sessions, not measured here: the neighbour's order was added in 5 to 6 of 6). The stack these numbers point to is the L2 gate deciding *who*, with
+VoxLock inside the open gate for overlap. That combination is not measured.
+
+**Failed or weak:**
+- VoxLock: lone bystander pass-through; en order@0 (66% leaked, 67% kept); slower than real time on one thread here.
+- l2-campp: one-word answers (en short 22% kept); Korean leaks 2 to 4 times more than English at one threshold; it
+  drops the customer in overlap (en chat@0 39% kept).
+- l0-gtcrn: nothing to fix on this bench (music at 0 dB does not hurt the transcriber), and it costs customer words in
+  the hardest cells.
+
+**Unverified:**
+- All speeds (machine under load; no quiet re-run); phone and browser speeds are assumptions.
+- All voices are TTS or public read speech mixed in software; no real room, phone microphone or real singing.
+- Enrolment from the customer's first words in a noisy place (the bench enrols from clean speech).
+- Why VoxLock does better on Korean than English (voice pairs per language not compared).
+- Nothing here ran on the Live layer.

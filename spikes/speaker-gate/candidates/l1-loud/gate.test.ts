@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { frameDb, loudGate, type GateParams } from "./gate";
+import { frameDb, loudGate, PICK, type GateParams } from "./gate";
 
 // The first block uses the bench's 32 ms Silero windows with a speech flag per frame; the second the app's 40 ms
 // frames and the gate's own level test (no flag).
@@ -227,5 +227,104 @@ describe("loudGate, anchored to the customer (anchor: first-turn or enrol)", () 
   it("enrol: the enrolment sets the level before anyone talks, so a quieter talker who starts first stays out", () => {
     const g = go([...q(500), ...t(-30, 3000), ...q(500)], { anchor: "enrol", askDb: 0 }, [...q(300), ...t(-20, 2500)]);
     expect(g.segments()).toEqual([]);
+  });
+});
+
+// kibo-59, 11-27 (the 20-run read): the leaks were in the segments sent, not the open frames. Two settings, each
+// off by default; 40 ms frames and the gate's own level test, from the pick.
+describe("loudGate segments: reach-back and the first turn", () => {
+  const F = 40;
+  const q = (ms: number): number[] => Array.from({ length: Math.round(ms / F) }, () => -70);
+  const t = (db: number, ms: number): number[] => Array.from({ length: Math.round(ms / F) }, () => db);
+  const go = (levels: number[], p: Partial<GateParams> = {}) => {
+    const g = loudGate({ frameMs: F, ...PICK, ...p });
+    for (const e of levels) g.push(e);
+    return g;
+  };
+  // Times on the 40 ms grid. The customer at -20 sets the level (0.4 to 3.4 s); then a neighbour at -30 talks for 2 s
+  // straight into the customer's next words (5.0 to 7.0 s, customer 7.0 to 8.6 s).
+  const anchoredThenLeadIn = [...q(400), ...t(-20, 3000), ...q(1600), ...t(-30, 2000), ...t(-20, 1600), ...q(1600)];
+  const NEIGHBOUR = 5000;
+  const CUSTOMER = 7000;
+
+  it("reachBack 'run' (today): an anchored turn reaches back to the start of the run, the neighbour's lead-in included", () => {
+    const segs = go(anchoredThenLeadIn).segments();
+    expect(firstOpen(segs, NEIGHBOUR, CUSTOMER + 1500)).toBeLessThan(CUSTOMER - 1000);
+  });
+
+  it("reachBack 'near': once anchored, a turn starts at its first frame over the bar, minus the pre-roll", () => {
+    const segs = go(anchoredThenLeadIn, { reachBack: "near" }).segments();
+    expect(firstOpen(segs, NEIGHBOUR, CUSTOMER + 1500)).toBe(CUSTOMER - 200);
+  });
+
+  // A neighbour at -30 talks first (0.4 to 1.4 s) and runs straight into the customer's -20 order (1.4 to 4.4 s):
+  // one turn before any anchor.
+  const neighbourFirst = [...q(400), ...t(-30, 1000), ...t(-20, 3000), ...q(1600)];
+
+  it("trimFirstTurn off (today): the first turn starts with the neighbour", () => {
+    expect(go(neighbourFirst).segments()[0][0]).toBe(200);
+  });
+
+  it("trimFirstTurn: when the first turn sets the anchor, it starts at the first frame within the depth of it", () => {
+    const g = go(neighbourFirst, { trimFirstTurn: true });
+    expect(g.segments()[0][0]).toBe(1400 - 200);
+    // Only the first turn: later ones are untouched by it.
+    expect(g.segments().length).toBe(1);
+  });
+
+  it("trimFirstTurn: a lone quiet first talker is not trimmed", () => {
+    expect(go([...q(400), ...t(-32, 3000), ...q(1600)], { trimFirstTurn: true }).segments()[0][0]).toBe(200);
+  });
+
+  it("trimFirstTurn: while the first turn is open its start is not yet known, so segments() reports it untrimmed", () => {
+    const g = go([...q(400), ...t(-30, 1000), ...t(-20, 1000)], { trimFirstTurn: true });
+    expect(g.segments()[0][0]).toBe(200);
+  });
+});
+
+// kibo-59, 11-27 (Live, I-471): whoever talks first in a turn of their own set the first-turn anchor, and a customer
+// more than learnWithinDb louder never moved it. anchorRise: a louder accepted run lifts it when its turn closes.
+describe("loudGate anchorRise", () => {
+  const F = 40;
+  const q = (ms: number): number[] => Array.from({ length: Math.round(ms / F) }, () => -70);
+  const t = (db: number, ms: number): number[] => Array.from({ length: Math.round(ms / F) }, () => db);
+  const go = (levels: number[], p: Partial<GateParams> = {}) => {
+    const g = loudGate({ frameMs: F, ...PICK, ...p });
+    for (const e of levels) g.push(e);
+    return g;
+  };
+  // Neighbour at -36 (0.4 to 2.4 s), customer at -26 (4.4 to 7.4 s), the neighbour again (9.4 to 11.4 s).
+  const neighbourFirst = [...q(400), ...t(-36, 2000), ...q(2000), ...t(-26, 3000), ...q(2000), ...t(-36, 2000), ...q(1600)];
+
+  it("off (today): the neighbour who spoke first keeps the anchor, and their later sentence passes", () => {
+    const g = go(neighbourFirst);
+    expect(g.level()).toBe(-36);
+    expect(openIn(g.segments(), 9400, 11400)).toBe(true);
+  });
+
+  it("on: the customer's louder turn lifts the anchor to their level, and the neighbour's later sentence stays out", () => {
+    const g = go(neighbourFirst, { anchorRise: true });
+    expect(g.level()).toBe(-26);
+    expect(g.rises()).toBe(1);
+    expect(openIn(g.segments(), 9400, 11400)).toBe(false);
+  });
+
+  it("on: the cost, a loud passer-by (-18) lifts it too and the customer (-26) is then kept out", () => {
+    const g = go([...q(400), ...t(-26, 3000), ...q(2000), ...t(-18, 3000), ...q(2000), ...t(-26, 3000), ...q(1600)], { anchorRise: true });
+    expect(g.level()).toBe(-18);
+    expect(openIn(g.segments(), 10400, 13400)).toBe(false);
+  });
+
+  it("on: a turn the cap ended does not lift it, nor the turn straight after it", () => {
+    const g = go([...q(400), ...t(-26, 3000), ...q(2000), ...t(-18, 14000), ...q(1600)], { anchorRise: true });
+    expect(g.level()).toBe(-26);
+    expect(g.rises()).toBe(0);
+  });
+
+  it("on: within learnWithinDb it still learns slowly, without a rise", () => {
+    const g = go([...q(400), ...t(-26, 3000), ...q(2000), ...t(-24, 1200), ...q(1600)], { anchorRise: true });
+    expect(g.rises()).toBe(0);
+    expect(g.level()).toBeGreaterThan(-26);
+    expect(g.level()).toBeLessThan(-24);
   });
 });

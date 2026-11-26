@@ -220,6 +220,21 @@ async function one(ref: FlowRef, mix: Float32Array) {
   let sent = 0;
   let dropped = 0;
   let ends = 0;
+  // trimFirstTurn: a turn that opens before the anchor is set is held, and sent at its close as the gate trimmed it,
+  // in one burst (what the phone would have to do).
+  const holdFirst = STACK === "l1-loud" && GATE_PARAMS.trimFirstTurn === true;
+  let holding = false;
+  const burst = (seg: [number, number], until: number) => {
+    const muted = performance.now() < playEnd + MUTE_TAIL_MS;
+    for (let j = Math.max(nextUnsent, Math.floor(seg[0] / FRAME_MS)); j < until && j * FRAME_MS < seg[1]; j++) {
+      if (muted) dropped++;
+      else {
+        send(j);
+        sent++;
+      }
+    }
+    nextUnsent = until;
+  };
   for (let k = 0; k < n && !closed; k++) {
     const atMs = k * FRAME_MS;
     const wait = t0 + atMs - performance.now();
@@ -229,7 +244,19 @@ async function one(ref: FlowRef, mix: Float32Array) {
     if (STACK === "open") want = true;
     else if (STACK === "hold-oracle") want = holdSegs.some(([s, e]) => atMs >= s && atMs < e);
     else {
+      const anchoredBefore = gate!.anchored();
       want = gate!.push(10 * Math.log10(Math.max(1e-10, mix.subarray(k * FRAME, (k + 1) * FRAME).reduce((a, v) => a + v * v, 0) / FRAME)));
+      if (holdFirst && want && !open && !anchoredBefore) holding = true;
+      if (holding) {
+        if (!want) {
+          burst(gate!.closedSegments().at(-1)!, k);
+          live.sendRealtimeInput({ audioStreamEnd: true });
+          ends++;
+          holding = false;
+        }
+        open = want;
+        continue;
+      }
       if (want && !open) {
         const segs = gate!.segments();
         from = Math.max(nextUnsent, Math.floor(segs[segs.length - 1][0] / FRAME_MS));
@@ -255,6 +282,7 @@ async function one(ref: FlowRef, mix: Float32Array) {
       open = false;
     }
   }
+  if (holding && !closed) burst(gate!.segments().at(-1)!, n);
   if (open && STACK !== "open" && !closed) live.sendRealtimeInput({ audioStreamEnd: true });
   await sleep(1500);
   await pendingTools;
@@ -266,9 +294,19 @@ async function one(ref: FlowRef, mix: Float32Array) {
   const items = bystanderItemsAdded(tools, cart);
   const hero = sameOrder(end.cart, HERO_CART);
   const s = flowScore(ref.customer.turns, outputs);
+  // Voice confirms the server refused (CONFIRM_TAP_ONLY=1 refuses them all): when, what Live had just heard, and
+  // whether a customer turn ended in the 6 s before (otherwise only bystanders were talking).
+  const refusedConfirms = events
+    .filter((e) => e.kind === "cmd" && e.text?.startsWith("confirmCheckout:") && e.text !== "confirmCheckout:ok")
+    .map((e) => ({
+      t: e.t,
+      code: e.text,
+      heard: events.filter((h) => h.kind === "heard" && h.t > e.t - 6000 && h.t <= e.t).map((h) => h.text).join("").slice(-120),
+      customerTurnJustEnded: ref.customer.turns.some((u) => u.endMs <= e.t && e.t - u.endMs <= 6000),
+    }));
   // Gate closes that fall inside a customer sentence (the cap or the hang-over cutting the customer off).
   const closesInsideTurns = (gate?.segments() ?? []).filter(([, e]) => ref.customer.turns.some((u) => e > u.startMs && e < u.endMs)).length;
-  return { ok: isRightFlow({ heroCart: hero, status: end.status, bystanderItems: items }), heroCart: hero, status: end.status, bystanderItems: items, ...s, closesInsideTurns, cart, sent, dropped, ends, events, usage, gateSegments: gate?.segments() ?? null };
+  return { ok: isRightFlow({ heroCart: hero, status: end.status, bystanderItems: items }), heroCart: hero, status: end.status, bystanderItems: items, ...s, closesInsideTurns, refusedConfirms, confirmTapOnly: process.env.CONFIRM_TAP_ONLY === "1", cart, sent, dropped, ends, events, usage, gateSegments: gate?.segments() ?? null };
 }
 
 async function main() {

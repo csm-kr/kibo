@@ -1,0 +1,48 @@
+VoxLock lone-bystander check, 2026-11-26/27 (session kibo-fd). Experimenter check, not part of the candidate: it reads
+bench/refs/<trial>/customer.wav and refs.json to split each mix into its customer track (customer.wav placed at its
+startMs on the mix time base) and its bystander track (mix minus customer). Each track, and the mix, went through VoxLock
+with the trial's enrol.wav (the customer's voice) as the voice sample. Script: ../check_lone_bystander.py (sherpa | pip).
+
+Columns: output rms / input rms per 0.5 s block (None = the input block is silent). "byst only" and "overlap" are
+least-squares fits out ~ a*customer + b*bystander over the mix regions where only the bystander talks and where both
+talk (a = customer coefficient, b = bystander coefficient; 1.0 = passed at full level, 0 = removed).
+
+A. sherpa-onnx 2.0.3 OfflineSpeechDenoiser, voxlock_enroll.onnx + voxlock_chunk_int8.onnx (release sherpa-onnx-models-v2),
+`check_lone_bystander.py sherpa`, run 2026-11-27:
+
+w0068 tts:Zephyr enrol vs tts:Charon | bystander alone out/in rms per 0.5 s: [1.06, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, None, None, None, None, None]
+w0068 tts:Zephyr enrol vs tts:Charon | customer alone  out/in rms per 0.5 s: [None, None, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.06, 1.05, None]
+w0068 tts:Zephyr enrol vs tts:Charon | mix             out/in rms per 0.5 s: [1.06, 1.08, 0.83, 0.77, 0.54, 0.89, 0.7, 1.02, 1.08, 1.08, 1.01, 1.04, None] | byst only: cust +0.00 byst +1.07 | overlap: cust +1.04 byst +0.10
+w0737 tts:Orus enrol vs tts:Charon | bystander alone out/in rms per 0.5 s: [1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, None, None, None]
+w0737 tts:Orus enrol vs tts:Charon | customer alone  out/in rms per 0.5 s: [None, None, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.07, None]
+w0737 tts:Orus enrol vs tts:Charon | mix             out/in rms per 0.5 s: [1.08, 1.08, 0.78, 0.5, 0.6, 0.86, 0.71, 0.53, 0.28, 0.11, None] | byst only: cust +0.00 byst +1.08 | overlap: cust +0.32 byst +0.85
+w0281 tts:Kore enrol vs tts:Aoede | bystander alone out/in rms per 0.5 s: [None, 1.08, 1.08, 1.08, 1.08, 1.08, 1.07, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, None, None]
+w0281 tts:Kore enrol vs tts:Aoede | customer alone  out/in rms per 0.5 s: [None, None, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, None]
+w0281 tts:Kore enrol vs tts:Aoede | mix             out/in rms per 0.5 s: [None, 1.08, 1.02, 0.97, 1.03, 0.25, 0.41, 0.97, 0.97, 1.05, 1.04, 1.03, 0.98, 1.07, None] | byst only: cust +0.00 byst +1.08 | overlap: cust +0.98 byst +0.18
+w0734 tts:Kore enrol vs tts:Despina | bystander alone out/in rms per 0.5 s: [None, 1.08, 1.08, 1.06, 1.08, 1.08, 1.01, 1.08, 1.08, None, None, None, None, None, None, None]
+w0734 tts:Kore enrol vs tts:Despina | customer alone  out/in rms per 0.5 s: [None, None, 1.07, 1.08, 1.08, 1.07, 1.08, 1.08, 1.08, 1.07, 1.08, 1.08, 1.08, 1.08, 1.08, None]
+w0734 tts:Kore enrol vs tts:Despina | mix             out/in rms per 0.5 s: [None, 1.08, 1.02, 0.96, 0.72, 0.83, 0.91, 1.06, 1.02, 1.07, 1.05, 1.07, 1.08, 1.07, 1.08, None] | byst only: cust +0.00 byst +1.08 | overlap: cust +0.98 byst +0.41
+
+B. The author's own package, voxlock 1.3.1 from PyPI (onnxruntime 1.32.0), with its own download of HF
+arbazsiddiqui/voxlock rev 2413b292..., onnx/v2 (enroll sha256 81f305c9...ae29, chunk_int8 sha256 c50ffdc8...f88172),
+`isolate(x, sample=enrol)` with the enrolment passed in memory, run 2026-11-26 (`check_lone_bystander.py pip`;
+its output copied from the session transcript):
+
+w0068 tts:Zephyr enrol vs tts:Charon | bystander alone out/in rms per 0.5 s: [1.06, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, None, None, None, None, None]
+w0068 tts:Zephyr enrol vs tts:Charon | customer alone  out/in rms per 0.5 s: [None, None, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.06, 1.05, None]
+w0068 tts:Zephyr enrol vs tts:Charon | mix             out/in rms per 0.5 s: [1.06, 1.08, 0.83, 0.77, 0.54, 0.89, 0.7, 1.02, 1.08, 1.08, 1.01, 1.04, None] | byst only: cust +0.00 byst +1.07 | overlap: cust +1.04 byst +0.10
+w0737 tts:Orus enrol vs tts:Charon | bystander alone out/in rms per 0.5 s: [1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, None, None, None]
+w0737 tts:Orus enrol vs tts:Charon | customer alone  out/in rms per 0.5 s: [None, None, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.07, None]
+w0737 tts:Orus enrol vs tts:Charon | mix             out/in rms per 0.5 s: [1.08, 1.08, 0.78, 0.5, 0.6, 0.86, 0.71, 0.53, 0.28, 0.11, None] | byst only: cust +0.00 byst +1.08 | overlap: cust +0.32 byst +0.85
+w0281 tts:Kore enrol vs tts:Aoede | bystander alone out/in rms per 0.5 s: [None, 1.08, 1.08, 1.08, 1.08, 1.08, 1.07, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, None, None]
+w0281 tts:Kore enrol vs tts:Aoede | customer alone  out/in rms per 0.5 s: [None, None, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, 1.08, None]
+w0281 tts:Kore enrol vs tts:Aoede | mix             out/in rms per 0.5 s: [None, 1.08, 1.02, 0.97, 1.03, 0.25, 0.41, 0.97, 0.97, 1.05, 1.04, 1.03, 0.98, 1.07, None] | byst only: cust +0.00 byst +1.08 | overlap: cust +0.98 byst +0.18
+w0734 tts:Kore enrol vs tts:Despina | bystander alone out/in rms per 0.5 s: [None, 1.08, 1.08, 1.06, 1.08, 1.08, 1.01, 1.08, 1.08, None, None, None, None, None, None, None]
+w0734 tts:Kore enrol vs tts:Despina | customer alone  out/in rms per 0.5 s: [None, None, 1.07, 1.08, 1.08, 1.07, 1.08, 1.08, 1.08, 1.07, 1.08, 1.08, 1.08, 1.08, 1.08, None]
+w0734 tts:Kore enrol vs tts:Despina | mix             out/in rms per 0.5 s: [None, 1.08, 1.02, 0.96, 0.72, 0.83, 0.91, 1.06, 1.02, 1.07, 1.05, 1.07, 1.08, 1.07, 1.08, None] | byst only: cust +0.00 byst +1.08 | overlap: cust +0.98 byst +0.41
+
+A and B agree on every printed number. The HF copies used by B were deleted afterwards for disk.
+
+Cells (from bench/logs/words-c-voxlock-2026-11-26T16-12-39-113Z.json; kept/customer words, leaked/bystander words):
+w0068 en order@0 kept 9/11 leaked 3/11; w0737 en order@0 kept 6/10 leaked 11/11; w0281 ko chat@-10 kept 31/31
+leaked 0/28; w0734 en chat@-10 kept 11/11 leaked 4/14.
