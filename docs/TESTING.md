@@ -56,9 +56,14 @@ The digital mix in `spikes/speaker-gate/bench/` screens ideas; a person with a r
   average; the app and phone model named). A second person stands beside the tester and talks: first small talk,
   then about what they would order from the same menu.
 - **Measure the level gap once, before the orders:** record 60 s on the same phone, held the same way (any voice
-  recorder, uncompressed if possible): 20 s of the tester ordering, 20 s of the second person talking beside them,
-  20 s of the room alone. The gap in dB between the first two says which bench cells describe the place (bystander
-  10 dB quieter, or equal); at equal level even a perfect press got 1 or 2 of 6 on the bench's multi-turn sessions.
+  recorder, uncompressed if possible), while the place goes on around you: stay silent for the first 10 s, say the
+  hero order at about 10 s and again at about 35 s, and note the seconds. Then
+  `npx tsx spikes/speaker-gate/field/levelgap.mts <recording> --customer 10-16,35-41` (your own times) prints the
+  customer's level, the loud other talk, the gap in dB, what the no-press gate would send at depth 6, 5 and 4, and
+  an answer in words: hold to talk (gap under 6 dB; the bench measured only 10 and 0 dB), or which depth to use.
+  Without `--customer` the script guesses the times and marks its answer provisional. Limits it prints itself: one
+  recording, and a voice recorder's own processing differs from the app's microphone settings. At equal level even
+  a perfect press got 1 or 2 of 6 on the bench's multi-turn sessions.
 - **Orders:** 10 hero orders per arm (pair by QR, speak the order, confirm, pay on the kiosk), the phone held as a
   customer would hold it (about 20 to 30 cm, no headset). Alternate the arms so the room changes equally for each.
 - **Write down for every order, on the spot:** right cart with no retry (yes or no); any item nobody ordered; whether
