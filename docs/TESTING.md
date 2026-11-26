@@ -49,7 +49,9 @@ The digital mix in `spikes/speaker-gate/bench/` screens ideas; a person with a r
 
 - **Arms, same phone, same place, same sitting:** (1) production (open microphone as submitted); (2) the candidate with
   `VOICE_INPUT=hold` (hold to talk); (3) the candidate with `VOICE_INPUT=open` (no press: the loudness gate ends the
-  turn, the flow instruction filters by meaning, `CONFIRM_TAP_ONLY=1`). Arms 2 and 3 are one image deployed as two
+  turn, the flow instruction filters by meaning, and "yes, please pay" by voice passes only through the guard: the
+  words came through the gate as the customer's, and a server check finds a confirmation and nothing else). In every
+  arm the person confirms by voice and only puts the card in. Arms 2 and 3 are one image deployed as two
   tagged revisions at 0% of traffic; each has its own address and its own QR.
 - **Place and level:** a cafe, food court or station concourse with people talking and music. Write down the place,
   the time, and the sound level read from a phone sound-meter app held where the KIBO phone is held (dBA, a 30 s
