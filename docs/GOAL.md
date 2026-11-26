@@ -51,7 +51,9 @@ time per team and scoring sheet (ask the organizer or a mentor).
 
 - Before a task: one line, "does this move the main number, and how?" If not, it waits.
 - After a task: what the judge showed (the owner's phone, a measured run), not "done".
-- Not now: new screens or kiosks; refactors.
+- Not now: new screens or kiosks; refactors. One exception, reopened by the owner 11-26: a Japanese-subway-style
+  ticket machine as a demo example (branch `feat/jp-metro-kiosk`, not deployed). It does not move the main number; it
+  serves the story (a visitor, a foreign screen, fares by destination, one sentence).
 - Reopened 11-25 by the owner: "solve the cocktail party without pressing: tell apart the voice of the person I was
   talking with, recognise it (embeddings are fine); if that fails, hold to talk." A speaker model that is not Gemini
   may be tried in `spikes/`, but shipping one in `src/` needs the owner's explicit word (CLAUDE.md: Gemini for every
