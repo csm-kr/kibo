@@ -1,5 +1,5 @@
 {
- "at": "2026-11-26T18:13:38.860Z",
+ "at": "2026-11-26T18:31:58.245Z",
  "prices": {
   "liveText": 0.75,
   "liveAudioIn": 3,
@@ -61,8 +61,8 @@
    "note": "field-open 11-27: scripts/confirm-check.ts, 40 + 40 calls on Vertex and 20 on the API key, plus 2 probes; gemini-3.5-flash-lite, about 330 prompt tokens and under 100 out (thinking included) per call; priced at Flash rates as an upper bound"
   },
   "field-open-live": {
-   "sessions": 27,
-   "usd": 2.9977559999999994,
+   "sessions": 40,
+   "usd": 4.3379025,
    "note": "field-open 11-27: scripts/rehearse-open.ts on the local server (VOICE_INPUT=open), Live usage from its usage messages at the ledger's prices; the confirm checks are under confirm-check"
   },
   "field-open-tts": {
@@ -71,6 +71,6 @@
    "note": "field-open 11-27: one gemini-3.8-flash-tts request for e2e/fixtures/open/yes-en.wav (1.5 s, Achird), at about 25 audio tokens a second at Live audio-out prices"
   }
  },
- "totalUsd": 35.56061719118922,
- "totalWon": 49785
+ "totalUsd": 36.90076369118921,
+ "totalWon": 51661
 }

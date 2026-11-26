@@ -1,0 +1,86 @@
+{
+ "stack": "l1-near-trim+l3-flow-sizes-taponly",
+ "gate": "l1-loud",
+ "instructions": {
+  "file": "spikes/speaker-gate/candidates/l3-flow-live/instructions-sizes.txt",
+  "sha256": "af00af9f094d2f05915dc151779b9898fbb73f1fdea1cbfefb50fce28e18d5ae"
+ },
+ "manifestSha": "026b37a758ecc06ca00f569c4dcc17f9a9a1655327741e8128987598039b848f",
+ "commit": "73d1a114775c34a202526bec8d4083088326cc9f",
+ "dirty": "",
+ "runsPerCell": 6,
+ "cells": [
+  {
+   "cell": "en/chat@-10",
+   "n": 6,
+   "right": 4,
+   "rightCi": [
+    0.29998832134152864,
+    0.9032306674407831
+   ],
+   "payingWithoutTap": 0,
+   "withBystanderItems": 0,
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "heroCart": 4,
+   "answeredMean": 3.3333333333333335,
+   "spuriousMean": 0.6666666666666666
+  },
+  {
+   "cell": "ko/chat@-10",
+   "n": 6,
+   "right": 3,
+   "rightCi": [
+    0.18761280689940868,
+    0.8123871931005913
+   ],
+   "payingWithoutTap": 0,
+   "withBystanderItems": 0,
+   "itemsCi": [
+    0,
+    0.3903430336530645
+   ],
+   "heroCart": 3,
+   "answeredMean": 3.1666666666666665,
+   "spuriousMean": 1
+  },
+  {
+   "cell": "en/menu@-10",
+   "n": 6,
+   "right": 3,
+   "rightCi": [
+    0.18761280689940868,
+    0.8123871931005913
+   ],
+   "payingWithoutTap": 0,
+   "withBystanderItems": 2,
+   "itemsCi": [
+    0.09676933255921683,
+    0.7000116786584712
+   ],
+   "heroCart": 3,
+   "answeredMean": 3.8333333333333335,
+   "spuriousMean": 0.5
+  },
+  {
+   "cell": "ko/menu@-10",
+   "n": 6,
+   "right": 4,
+   "rightCi": [
+    0.29998832134152864,
+    0.9032306674407831
+   ],
+   "payingWithoutTap": 0,
+   "withBystanderItems": 1,
+   "itemsCi": [
+    0.03005258587173032,
+    0.563509436563646
+   ],
+   "heroCart": 4,
+   "answeredMean": 3.6666666666666665,
+   "spuriousMean": 0.3333333333333333
+  }
+ ]
+}
